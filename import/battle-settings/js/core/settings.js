@@ -29,7 +29,7 @@ function sanitize(s) {
 
 export function createSettings() {
   const subs = new Set();
-  const st = { data: sanitize(read(KEYS.settings) || { lang: (navigator.language || '').startsWith('pl') ? 'pl' : 'en' }) };
+  const st = { data: sanitize(read(KEYS.settings)) };     // English by default; Polish is chosen in Options > Language
   st.update = (fn) => {
     const draft = JSON.parse(JSON.stringify(st.data));
     fn(draft);
