@@ -1,0 +1,31 @@
+/* Start / pause / results / options overlay. The 3D showcase renders behind it. */
+#menu{position:fixed;inset:0;z-index:5;display:flex;align-items:center;background:linear-gradient(90deg,rgba(4,10,16,.9) 0,rgba(4,10,16,.6) 40%,rgba(4,10,16,0) 68%)}
+#menu:not([data-screen=main]):not([data-screen=multi]){background:rgba(4,10,16,.62);justify-content:center}
+.screen{width:min(470px,calc(100vw - 32px));box-sizing:border-box;padding:22px 26px;margin-left:clamp(16px,5vw,80px);max-height:100vh;overflow:auto}
+#menu:not([data-screen=main]):not([data-screen=multi]) .screen{margin-left:0;background:#0a1824;border:1px solid #2c4c60;text-align:center}
+#menu[data-screen=options] .screen{width:min(540px,calc(100vw - 24px))}
+.logo{margin:0 0 6px;font-size:40px;line-height:1;letter-spacing:.14em;color:#f0c070;text-shadow:3px 3px 0 #6a3a10}
+.screen h2{margin:14px 0 10px;font-size:18px;color:#f0c070;letter-spacing:.06em}
+.screen p{margin:6px 0;color:#b8ccd6;white-space:pre-line}
+.stack{display:flex;flex-direction:column;gap:8px;margin:16px 0 10px}
+.stack button{padding:10px 14px;font-size:15px;text-align:left;letter-spacing:.04em;background:rgba(16,34,48,.92)}
+.stack button:hover:not(:disabled){background:#1c3446;padding-left:20px}
+.stack button.sub{color:#9ab0bc;font-size:13px;padding:7px 14px}
+#menu:not([data-screen=main]) .stack button{text-align:center}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.card{display:block;text-align:left;padding:9px;background:rgba(10,24,36,.92);font-size:11px}
+.card h3{margin:0 0 3px;font-size:14px;color:#e6eef2}
+.card .role{margin:0 0 6px!important;color:#8fa6b2!important;font-size:10.5px;min-height:3em}
+.card.on{border-color:#f0c070;background:#18324a;box-shadow:0 0 0 1px #f0c070 inset}
+.st{display:flex;justify-content:space-between;gap:6px}
+.st span{color:#8fa6b2}.st b{color:#e6eef2;font-weight:normal}
+.res{margin:10px auto;max-width:280px;font-size:14px;line-height:1.8}
+.info{color:#f0d8a0!important}
+.foot{margin-top:18px!important;font-size:11px;color:#7d94a0!important}
+.tabbody{text-align:left}
+.tabbody h3{margin:14px 0 4px;font-size:13px;color:#b8d0dc}
+.orow{display:grid;grid-template-columns:minmax(0,200px) 1fr 56px;gap:8px;align-items:center;margin:6px 0}
+.orow .val{text-align:right;color:#8fa6b2}
+.orow.chk{grid-template-columns:22px 1fr}
+.choices{display:flex;gap:6px;flex-wrap:wrap}
+@media (max-width:640px){.cards{grid-template-columns:1fr}.logo{font-size:30px}.orow{grid-template-columns:1fr 1fr 44px}}
