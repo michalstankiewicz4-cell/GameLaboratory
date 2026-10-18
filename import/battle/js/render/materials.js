@@ -1,17 +1,7 @@
-// Graphics styles. The style is chosen before the world is built (it decides materials, geometry detail,
-// particle shapes, the ocean shading branch and the post-process), so changing it needs a reload.
-//   pixel — original low-res pixel-art filter (shared with Capital Quarantine)
-//   real  — full resolution, PBR materials with procedural weathering, ACES tone mapping, bloom, shadows
-//   toon  — cel shading with banded light, ink outlines, stylised water rings
-//   paint — painterly: Kuwahara filter, ink edges, paper grain, watercolour palette
+// Realistic look: PBR material factory, procedural canvas textures (deck planks, weathering), merged box geometry
+// and the scene lighting. The game is developed for this one look (other styles were removed in 0.3.0).
 import * as THREE from '../../vendor/three.module.js';
 import { mulberry32 } from '../core/util.js';
-
-export const STYLES = ['real', 'pixel', 'toon', 'paint'];        // order shown in Options; 'real' is the default
-export const STYLE_ID = { pixel: 0, real: 1, toon: 2, paint: 3 };
-
-export const LOOK = { style: 'real', get detail() { return LOOK.style !== 'pixel'; } };
-export function setStyle(s) { LOOK.style = STYLES.includes(s) ? s : 'real'; }
 
 /* ---- procedural textures (canvas, generated once) ---- */
 function canvasTex(w, h, draw, repeat = true) {
@@ -57,42 +47,24 @@ export function grimeTex() {
     g.putImageData(img, 0, 0);
   });
 }
-// Toon light ramp: three hard bands.
-function toonRamp() {
-  if (texCache.ramp) return texCache.ramp;
-  const t = new THREE.DataTexture(new Uint8Array([70, 70, 70, 255, 165, 165, 165, 255, 255, 255, 255, 255]), 3, 1);
-  t.minFilter = t.magFilter = THREE.NearestFilter; t.needsUpdate = true;
-  return (texCache.ramp = t);
-}
-
 /* ---- material factory ---- */
 // kind: 'hull' | 'deck' | 'paint' | 'metal' | 'dark' | 'land' | 'tree' | 'fx'
 const cache = new Map();
 export function mat(color, kind = 'paint', extra = {}) {
-  const key = `${LOOK.style}|${color}|${kind}|${JSON.stringify(extra)}`;
+  const key = `${color}|${kind}|${JSON.stringify(extra)}`;
   if (cache.has(key)) return cache.get(key);
-  const s = LOOK.style;
-  let m;
-  if (s === 'pixel') m = new THREE.MeshLambertMaterial({ color, flatShading: kind !== 'fx', ...extra });
-  else if (s === 'toon') m = new THREE.MeshToonMaterial({ color, gradientMap: toonRamp(), ...extra });
-  else {
-    const p = { color, roughness: 0.7, metalness: 0.15, flatShading: kind === 'tree', ...extra };
-    if (kind === 'hull') Object.assign(p, { roughness: 0.55, metalness: 0.35, map: grimeTex() });
-    if (kind === 'paint') Object.assign(p, { roughness: 0.6, metalness: 0.3, map: grimeTex() });
-    if (kind === 'metal') Object.assign(p, { roughness: 0.4, metalness: 0.7 });
-    if (kind === 'dark') Object.assign(p, { roughness: 0.5, metalness: 0.5 });
-    if (kind === 'deck') Object.assign(p, { roughness: 0.85, metalness: 0, map: deckTex() });
-    if (kind === 'land') Object.assign(p, { roughness: 0.95, metalness: 0 });
-    if (kind === 'fx') Object.assign(p, { roughness: 1, metalness: 0 });
-    if (s === 'paint') { p.metalness *= 0.4; p.roughness = Math.min(1, p.roughness + 0.2); }
-    m = new THREE.MeshStandardMaterial(p);
-  }
+  const p = { color, roughness: 0.7, metalness: 0.15, flatShading: kind === 'tree', ...extra };
+  if (kind === 'hull') Object.assign(p, { roughness: 0.55, metalness: 0.35, map: grimeTex() });
+  if (kind === 'paint') Object.assign(p, { roughness: 0.6, metalness: 0.3, map: grimeTex() });
+  if (kind === 'metal') Object.assign(p, { roughness: 0.4, metalness: 0.7 });
+  if (kind === 'dark') Object.assign(p, { roughness: 0.5, metalness: 0.5 });
+  if (kind === 'deck') Object.assign(p, { roughness: 0.85, metalness: 0, map: deckTex() });
+  if (kind === 'land') Object.assign(p, { roughness: 0.95, metalness: 0 });
+  if (kind === 'fx') Object.assign(p, { roughness: 1, metalness: 0 });
+  const m = new THREE.MeshStandardMaterial(p);
   cache.set(key, m);
   return m;
 }
-
-// Particle geometry: boxes for pixel art, soft low-poly spheres elsewhere.
-export const fxGeometry = () => (LOOK.style === 'pixel' ? new THREE.BoxGeometry(1, 1, 1) : new THREE.IcosahedronGeometry(0.62, 1));
 
 // Merges [w,h,d,x,y,z,(rx,ry,rz)] boxes into one geometry (one draw call for many small parts).
 export function mergeBoxes(list) {
@@ -111,12 +83,5 @@ export function mergeBoxes(list) {
   return out;
 }
 
-// Lighting per style: { hemi, sun, sky, ground, bg }.
-export function lightFor(style) {
-  switch (style) {
-    case 'real': return { hemi: 1.1, sun: 3.4, sky: 0xbcd4e6, ground: 0x1e3040, sunColor: 0xffe4c0, bg: 0x9cb6c8 };
-    case 'toon': return { hemi: 1.5, sun: 2.4, sky: 0xe6f2ff, ground: 0x506a80, sunColor: 0xfff6e0, bg: 0x8fd0ee };
-    case 'paint': return { hemi: 1.4, sun: 2.6, sky: 0xf0e6d0, ground: 0x4a5a60, sunColor: 0xffe8c8, bg: 0xd8d0bc };
-    default: return { hemi: 1.9, sun: 2.6, sky: 0xd8e6f0, ground: 0x2a3a48, sunColor: 0xfff0d8, bg: 0x9fb8c8 };
-  }
-}
+// Scene lighting: hemisphere + sun; bg is the fog and horizon colour, zenith the top of the sky dome.
+export const LIGHT = { hemi: 1.1, sun: 3.4, sky: 0xbcd4e6, ground: 0x1e3040, sunColor: 0xffe4c0, bg: 0x9cb6c8, zenith: 0x4a7eb4 };

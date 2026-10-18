@@ -1,8 +1,8 @@
 // Low-poly ship models built from primitives: extruded hull with a pointed bow, deck, superstructure,
 // funnels and rotating turrets. Local axes: +z = bow, +x = starboard, y = up (waterline at 0).
-// Non-pixel styles add detail: railings, AA mounts, lifeboats, masts with radar, bridge windows, funnel caps.
+// Detail: railings, AA mounts, lifeboats, masts with radar, bridge windows, funnel caps; submarine casing details.
 import * as THREE from '../../vendor/three.module.js';
-import { mat, mergeBoxes, LOOK } from '../render/look.js';
+import { mat, mergeBoxes } from '../render/materials.js';
 
 const COLORS = {
   player: { hull: 0x6c7884, deck: 0x8f7c5e, top: 0x7e8a96, turret: 0x77838f, stripe: 0x2a3a4a },
@@ -31,7 +31,7 @@ function hullGeometry(L, W, H) {
   s.lineTo(-hw, -hl * 0.5);
   s.quadraticCurveTo(-hw, -hl * 0.85, -hw * 0.75, -hl);
   const depth = H + 0.5;
-  const g = new THREE.ExtrudeGeometry(s, { depth, bevelEnabled: false, curveSegments: LOOK.detail ? 10 : 4 });
+  const g = new THREE.ExtrudeGeometry(s, { depth, bevelEnabled: false, curveSegments: 10 });
   g.rotateX(Math.PI / 2);          // shape y (forward) -> +z, extrusion -> down
   g.translate(0, H, 0);            // deck at y = H, keel at -0.5
   // planks run along the ship: scale UVs to world units
@@ -44,31 +44,25 @@ function turret(spec, c) {
   const s = spec.size;
   const pivot = new THREE.Group();
   const tm = mat(c.turret, 'paint'), metal = mat(0x3a3e44, 'metal');
-  const base = cyl(s * 0.55, s * 0.6, s * 0.25, tm, LOOK.detail ? 16 : 10);
+  const base = cyl(s * 0.55, s * 0.6, s * 0.25, tm, 16);
   base.position.y = s * 0.12;
   const house = box(s * 1.0, s * 0.42, s * 1.15, tm);
   house.position.set(0, s * 0.42, -s * 0.05);
   pivot.add(base, house);
-  if (LOOK.detail) {
+  {
     const face = box(s * 0.9, s * 0.3, s * 0.08, tm); face.position.set(0, s * 0.48, s * 0.56); face.rotation.x = -0.35; pivot.add(face);
     const rf = box(s * 0.3, s * 0.12, s * 0.3, metal); rf.position.set(s * 0.25, s * 0.69, -s * 0.3); pivot.add(rf);   // rangefinder hood
   }
   const gap = s * 0.32;
   for (let i = 0; i < spec.barrels; i++) {
     const x = (i - (spec.barrels - 1) / 2) * gap;
-    if (LOOK.detail) {
-      const b = cyl(s * 0.05, s * 0.07, s * 1.5, metal, 8); b.rotation.x = Math.PI / 2; b.position.set(x, s * 0.45, s * 1.1); pivot.add(b);
-      const muz = cyl(s * 0.075, s * 0.075, s * 0.12, metal, 8); muz.rotation.x = Math.PI / 2; muz.position.set(x, s * 0.45, s * 1.83); pivot.add(muz);
-    } else {
-      const b = box(s * 0.12, s * 0.12, s * 1.5, metal);
-      b.position.set(x, s * 0.45, s * 1.1);
-      pivot.add(b);
-    }
+    const b = cyl(s * 0.05, s * 0.07, s * 1.5, metal, 8); b.rotation.x = Math.PI / 2; b.position.set(x, s * 0.45, s * 1.1); pivot.add(b);
+    const muz = cyl(s * 0.075, s * 0.075, s * 0.12, metal, 8); muz.rotation.x = Math.PI / 2; muz.position.set(x, s * 0.45, s * 1.83); pivot.add(muz);
   }
   return pivot;
 }
 
-// Extra detail for non-pixel styles (merged geometry per material).
+// Extra detail (merged geometry per material).
 function addDetail(body, cls, side, c) {
   const { L, W, H } = cls;
   const top = mat(c.top, 'paint'), metal = mat(0x40444a, 'metal'), dark = mat(0x22252a, 'dark'), white = mat(0xd8d6cc, 'paint');
@@ -140,11 +134,11 @@ export function buildShip(cls, side) {
   body.rotation.order = 'YXZ';
   group.add(body);
 
-  const deckM = LOOK.detail ? mat(DETAIL_DECK[side], 'deck') : mat(c.deck);
-  const hull = new THREE.Mesh(hullGeometry(L, W, H), [deckM, mat(c.hull, 'hull')]);
+  const deckM = cls.key === 'ss' ? mat(0x2e343a, 'paint') : mat(DETAIL_DECK[side], 'deck');
+  const hull = new THREE.Mesh(hullGeometry(L, W, H), [deckM, mat(cls.key === 'ss' ? (side === 'player' ? 0x434d57 : 0x4e4649) : c.hull, 'hull')]);
   body.add(hull);
   // waterline stripe (boot topping)
-  const stripe = box(W * 1.01, LOOK.detail ? 0.18 : 0.12, L * 0.62, mat(LOOK.detail ? 0x5a2420 : c.stripe, 'paint'));
+  const stripe = box(W * 1.01, 0.18, L * 0.62, mat(0x5a2420, 'paint'));
   stripe.position.set(0, 0.1, -L * 0.05);
   body.add(stripe);
 
@@ -152,25 +146,38 @@ export function buildShip(cls, side) {
   if (cls.key === 'dd') {
     const br = box(W * 0.7, 0.9, 1.3, top); br.position.set(0, H + 0.45, 1.8); body.add(br);
     const br2 = box(W * 0.5, 0.45, 0.7, top); br2.position.set(0, H + 1.1, 1.9); body.add(br2);
-    for (const z of [0.4, -0.9]) { const f = cyl(0.26, 0.3, 1.3, fun, LOOK.detail ? 14 : 8); f.position.set(0, H + 0.65, z); body.add(f); }
+    for (const z of [0.4, -0.9]) { const f = cyl(0.26, 0.3, 1.3, fun, 14); f.position.set(0, H + 0.65, z); body.add(f); }
     for (const z of [-0.2, -2.2]) { const tl = box(0.55, 0.3, 1.0, tor); tl.position.set(0, H + 0.15, z); body.add(tl); }
   } else if (cls.key === 'ca') {
     const br = box(W * 0.7, 1.1, 2.2, top); br.position.set(0, H + 0.55, 1.4); body.add(br);
     const tw = box(W * 0.45, 1.0, 0.9, top); tw.position.set(0, H + 1.6, 1.6); body.add(tw);
-    if (!LOOK.detail) { const mast = box(0.1, 1.6, 0.1, mat(0x3a3e44, 'metal')); mast.position.set(0, H + 2.7, 1.5); body.add(mast); }
-    for (const z of [0.1, -1.4]) { const f = cyl(0.34, 0.4, 1.6, fun, LOOK.detail ? 14 : 8); f.position.set(0, H + 0.8, z); body.add(f); }
+    for (const z of [0.1, -1.4]) { const f = cyl(0.34, 0.4, 1.6, fun, 14); f.position.set(0, H + 0.8, z); body.add(f); }
     const aft = box(W * 0.6, 0.7, 1.4, top); aft.position.set(0, H + 0.35, -2.8); body.add(aft);
+  } else if (cls.key === 'ss') {
+    // conning tower (sail) with a rounded front, periscopes and snorkel, dive planes, stern fin
+    const sailM = mat(side === 'player' ? 0x3e4852 : 0x4a4448, 'paint');
+    const sail = box(W * 0.5, 0.95, 1.5, sailM); sail.position.set(0, H + 0.47, 0.5); body.add(sail);
+    const nose = cyl(W * 0.25, W * 0.25, 0.95, sailM, 12); nose.position.set(0, H + 0.47, 1.25); body.add(nose);
+    const bridge = box(W * 0.42, 0.12, 1.1, mat(0x22252a, 'dark')); bridge.position.set(0, H + 0.98, 0.55); body.add(bridge);
+    for (const [x, z, h] of [[0.08, 0.75, 1.25], [-0.08, 0.45, 1.0], [0, 0.15, 0.8]]) {
+      const sc = cyl(0.035, 0.045, h, mat(0x30343a, 'metal'), 6); sc.position.set(x, H + 0.95 + h / 2, z); sc.name = 'scope'; body.add(sc);
+    }
+    for (const sx of [-1, 1]) {
+      const pl = box(0.9, 0.05, 0.35, sailM); pl.position.set(sx * (W * 0.5 + 0.35), H - 0.25, L * 0.32); body.add(pl);
+      const sp = box(0.8, 0.05, 0.3, sailM); sp.position.set(sx * (W * 0.5 + 0.25), 0.0, -L * 0.42); body.add(sp);
+    }
+    const fin = box(0.06, 0.8, 0.7, sailM); fin.position.set(0, H - 0.1, -L * 0.47); body.add(fin);
   } else {
     const br = box(W * 0.6, 1.2, 3.6, top); br.position.set(0, H + 0.6, 1.4); body.add(br);
     const tw = box(W * 0.42, 2.4, 1.4, top); tw.position.set(0, H + 2.0, 2.2); body.add(tw);
     const tw2 = box(W * 0.3, 0.6, 0.9, top); tw2.position.set(0, H + 3.4, 2.2); body.add(tw2);
-    const f = cyl(0.55, 0.65, 2.0, fun, LOOK.detail ? 16 : 8); f.position.set(0, H + 1.4, -0.4); body.add(f);
+    const f = cyl(0.55, 0.65, 2.0, fun, 16); f.position.set(0, H + 1.4, -0.4); body.add(f);
     const aft = box(W * 0.5, 0.9, 1.6, top); aft.position.set(0, H + 0.45, -2.9); body.add(aft);
     for (const sx of [-1, 1]) for (const z of [-1.6, 0, 1.6]) {
       const sec = box(0.4, 0.3, 0.45, dm); sec.position.set(sx * W * 0.38, H + 0.15, z); body.add(sec);
     }
   }
-  if (LOOK.detail) addDetail(body, cls, side, c);
+  if (cls.key === 'ss') addSubDetail(body, cls); else addDetail(body, cls, side, c);
 
   const turrets = cls.turrets.map((spec) => {
     const p = turret(spec, c);
@@ -180,8 +187,34 @@ export function buildShip(cls, side) {
     body.add(p);
     return p;
   });
-  group.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = LOOK.detail; } });
+  group.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
   return { group, body, turrets };
+}
+
+// Submarine detail: deck rail along the casing, limber holes strip, hatches, bow tube doors.
+function addSubDetail(body, cls) {
+  const { L, W, H } = cls;
+  const list = [], dark = [];
+  for (const sx of [-1, 1]) {
+    list.push([0.02, 0.02, L * 0.5, sx * W * 0.32, H + 0.2, -L * 0.05]);
+    for (let z = -L * 0.3; z <= L * 0.2; z += 0.45) list.push([0.02, 0.2, 0.02, sx * W * 0.32, H + 0.1, z]);
+    dark.push([0.02, 0.08, L * 0.6, sx * (W * 0.5 + 0.005), H - 0.12, -L * 0.04]);
+    for (let i = 0; i < 2; i++) dark.push([0.02, 0.14, 0.18, sx * (W * 0.33), 0.05, L * 0.4 - i * 0.25]);
+  }
+  for (const z of [L * 0.3, -L * 0.25]) dark.push([0.3, 0.03, 0.3, 0, H + 0.015, z]);
+  body.add(new THREE.Mesh(mergeBoxes(list), mat(0x40444a, 'metal')), new THREE.Mesh(mergeBoxes(dark), mat(0x1e2126, 'dark')));
+}
+
+// Underwater "ghost": while a submarine is below the surface its hull is drawn as a dark translucent silhouette
+// over the water (periscopes stay solid). Materials are swapped per mesh and restored when it surfaces.
+const GHOST = new THREE.MeshBasicMaterial({ color: 0x0a2638, transparent: true, opacity: 0.5, depthTest: false, depthWrite: false });
+export function setGhost(model, on, opacity = 0.5) {
+  GHOST.opacity = opacity;
+  model.group.traverse((o) => {
+    if (!o.isMesh || o.name === 'scope') return;
+    if (on) { if (!o.userData.mat0) { o.userData.mat0 = o.material; o.material = GHOST; o.renderOrder = 5; o.castShadow = false; } }
+    else if (o.userData.mat0) { o.material = o.userData.mat0; o.userData.mat0 = null; o.renderOrder = 0; o.castShadow = true; }
+  });
 }
 
 export const torpGeo = () => new THREE.BoxGeometry(0.22, 0.18, 1.1);
