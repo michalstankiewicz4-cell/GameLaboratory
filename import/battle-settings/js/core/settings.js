@@ -4,17 +4,18 @@ import { clamp } from './util.js';
 
 export const DEFAULTS = {
   lang: 'en',
-  gfx: { pixelH: 270, levels: 7, dither: 0.8, edge: 0.8, bright: 1.2, showFps: false },
+  gfx: { style: 'real', pixelH: 270, levels: 7, dither: 0.8, edge: 0.8, bright: 1.2, showFps: false },
   vol: 0.6,
   mouse: { zoomSens: 1, rotSens: 1 },
 };
-const num = (v, d, lo, hi) => (Number.isFinite(+v) ? clamp(+v, lo, hi) : d);
+const num = (v, d, lo, hi) => (v !== null && v !== undefined && v !== '' && Number.isFinite(+v) ? clamp(+v, lo, hi) : d);
 
 function sanitize(s) {
   const d = DEFAULTS, g = (s && s.gfx) || {}, m = (s && s.mouse) || {};
   return {
     lang: s && (s.lang === 'pl' || s.lang === 'en') ? s.lang : d.lang,
     gfx: {
+      style: ['pixel', 'real', 'toon', 'paint'].includes(g.style) ? g.style : d.gfx.style,
       pixelH: Math.round(num(g.pixelH, d.gfx.pixelH, 140, 540)),
       levels: Math.round(num(g.levels, d.gfx.levels, 3, 16)),
       dither: num(g.dither, d.gfx.dither, 0, 1),
