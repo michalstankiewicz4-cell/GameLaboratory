@@ -24,9 +24,9 @@ export function createHud(root) {
   const rep = h('div', { class: 'wslot' });
   const depth = h('div', { class: 'wslot', hidden: true });
   const weapons = h('div', { id: 'weap' }, guns, torps, rep, depth);
-  // periscope overlay: dark mask with a round view, reticle with bearing ticks
+  // optics overlay: periscope (one round view) or binoculars (two overlapping round views), hairlines, bearing
   const bearing = h('div', { class: 'brg' });
-  const scope = h('div', { id: 'scope', hidden: true }, h('div', { class: 'ring' }), h('div', { class: 'hair h' }), h('div', { class: 'hair v' }), bearing);
+  const scope = h('div', { id: 'scope', hidden: true }, h('div', { class: 'mask' }), h('div', { class: 'ring' }), h('div', { class: 'hair h' }), h('div', { class: 'hair v' }), bearing);
   const cross = h('div', { id: 'cross', hidden: true }, h('b'), h('span'));
   const labels = h('div', { id: 'labels' });
   const pops = h('div', { id: 'pops' });
@@ -41,6 +41,13 @@ export function createHud(root) {
   game.prepend(scope);
   root.append(game, fps);
 
+  let optic = null;
+  // Is a screen point inside the visible part of the optics (one circle, or one of the two binocular circles)?
+  const inOptic = (x, y) => {
+    const m = Math.min(innerWidth, innerHeight) / 100, cx = innerWidth / 2, cy = innerHeight / 2;
+    if (optic === 'scope') return Math.hypot(x - cx, y - cy) < 41 * m;
+    return Math.hypot(x - (cx - 17 * m), y - cy) < 38 * m || Math.hypot(x - (cx + 17 * m), y - cy) < 38 * m;
+  };
   const lab = new Map();           // ship id -> element
   let bannerT = 0, feedItems = [];
 
@@ -72,7 +79,13 @@ export function createHud(root) {
     show(on) { game.hidden = !on; if (!on) { lab.forEach((e) => e.remove()); lab.clear(); pops.replaceChildren(); } },
     showFps(on) { fps.hidden = !on; },
     // Gun camera: reticle style and the info line under it (zoom, how to take mouse control).
-    setGunView(on, periscope) { cross.classList.toggle('gun', on); gunInfo.hidden = !on; scope.hidden = !(on && periscope); },
+    setGunView(on) { cross.classList.toggle('gun', on); gunInfo.hidden = !on; if (!on) this.setOptic(null); },
+    // kind: 'scope' | 'bino' | null
+    setOptic(kind) {
+      if (optic === kind) return;
+      optic = kind; scope.hidden = !kind;
+      scope.classList.toggle('bino', kind === 'bino');
+    },
     // Salvo camera frame (the picture itself is drawn into the canvas); the kill feed moves below it.
     setPip(on) { if (pipBox.hidden === on) { pipBox.hidden = !on; feed.classList.toggle('low', on); pipBox.lastChild.textContent = t('hud.pip'); } },
     // Copies the salvo camera picture (x, y from the top-left of the main canvas, w × h) into the frame.
@@ -125,7 +138,7 @@ export function createHud(root) {
       if (S.threat > 0) warn.textContent = t('hud.torpWarn', { d: Math.round(S.threat * 10) });
       hint.textContent = t('hud.hint', { repair: keys.repair });
       hint.hidden = S.time > 30;                     // controls reminder only at the start of a run
-      if (keys.gun) gunInfo.textContent = t(keys.locked ? (p.sub ? 'hud.scopeOn' : 'hud.gunOn') : 'hud.gunClick', { z: keys.zoom.toFixed(1) });
+      if (keys.gun) gunInfo.textContent = t(keys.locked ? (p.sub ? 'hud.scopeOn' : keys.zoom >= 1.5 ? 'hud.binoOn' : 'hud.gunOn') : 'hud.gunClick', { z: keys.zoom.toFixed(1) });
     },
 
     // Per-frame: banners, feed fade, crosshair, labels, popups, minimap.
@@ -158,7 +171,7 @@ export function createHud(root) {
         const q = project(cam, s.x, s.cls.H + 4 + s.cls.L * 0.15, s.z);
         if (!q) { el.hidden = true; continue; }
         // periscope: only labels inside the round view
-        if (!scope.hidden && Math.hypot(q.x - innerWidth / 2, q.y - innerHeight / 2) > Math.min(innerWidth, innerHeight) * 0.4) { el.hidden = true; continue; }
+        if (optic && !inOptic(q.x, q.y)) { el.hidden = true; continue; }   // only labels inside the optics' view
         el.hidden = false;
         el.style.transform = `translate(${q.x}px,${q.y}px)`;
         el.firstChild.textContent = `${t('cls.short.' + s.cls.key)} ${s.name}`;

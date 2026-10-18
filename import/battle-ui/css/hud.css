@@ -59,7 +59,8 @@
 #cross.gun.far b,#cross.gun.far b::before{background:#f0a080}
 #gunInfo{position:fixed;left:50%;top:calc(50% + 46px);transform:translateX(-50%);font-size:11px;color:#c8f0c0;opacity:.8}
 /* periscope: round view in a black mask, thin hairlines with range ticks, bearing readout */
-#scope{position:fixed;inset:0;background:radial-gradient(circle at 50% 50%,transparent 0 41vmin,rgba(0,0,0,.6) 42vmin,#000 44vmin)}
+#scope{position:fixed;inset:0}
+#scope .mask{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,transparent 0 41vmin,rgba(0,0,0,.6) 42vmin,#000 44vmin)}
 #scope .ring{position:absolute;left:50%;top:50%;width:84vmin;height:84vmin;margin:-42vmin 0 0 -42vmin;border-radius:50%;box-shadow:inset 0 0 6vmin rgba(0,10,20,.55)}
 #scope .hair{position:absolute;background:rgba(10,20,20,.75)}
 #scope .hair.h{left:50%;top:50%;width:84vmin;height:1px;margin-left:-42vmin;background:repeating-linear-gradient(90deg,rgba(10,20,20,.8) 0 2px,transparent 2px 4.2vmin),rgba(10,20,20,.55)}
@@ -71,3 +72,13 @@
 #pip span{position:absolute;left:6px;top:4px;font-size:10px;letter-spacing:.12em;color:#e6eef2;text-transform:uppercase}
 #feed.low{top:202px}
 @media (max-width:900px){#pip{width:200px;height:113px}#feed.low{top:134px}}
+/* binoculars: black everywhere except two overlapping round views (each mask layer hides one circle; layers intersect) */
+#scope.bino .mask{background:#000;
+  -webkit-mask:radial-gradient(circle at calc(50% - 17vmin) 50%,transparent 36vmin,#000 38.5vmin),radial-gradient(circle at calc(50% + 17vmin) 50%,transparent 36vmin,#000 38.5vmin);
+  -webkit-mask-composite:source-in;
+  mask:radial-gradient(circle at calc(50% - 17vmin) 50%,transparent 36vmin,#000 38.5vmin),radial-gradient(circle at calc(50% + 17vmin) 50%,transparent 36vmin,#000 38.5vmin);
+  mask-composite:intersect}
+#scope.bino .ring{display:none}
+#scope.bino .hair.h{width:110vmin;margin-left:-55vmin}
+#scope.bino .hair.v{height:20vmin;margin-top:-10vmin}
+#scope.bino .brg{top:calc(50% - 36vmin)}
