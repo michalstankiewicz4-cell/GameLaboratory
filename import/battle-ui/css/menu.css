@@ -12,7 +12,8 @@
 .stack button:hover:not(:disabled){background:#1c3446;padding-left:20px}
 .stack button.sub{color:#9ab0bc;font-size:13px;padding:7px 14px}
 #menu:not([data-screen=main]) .stack button{text-align:center}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+#menu[data-screen=main] .screen{width:min(600px,calc(100vw - 32px))}
 .card{display:block;text-align:left;padding:9px;background:rgba(10,24,36,.92);font-size:11px}
 .card h3{margin:0 0 3px;font-size:14px;color:#e6eef2}
 .card .role{margin:0 0 6px!important;color:#8fa6b2!important;font-size:10.5px;min-height:3em}
@@ -30,4 +31,4 @@
 .orow.col{grid-template-columns:1fr;gap:4px}
 .orow.col>span:last-child{color:#7d94a0;font-size:11px}
 .choices{display:flex;gap:6px;flex-wrap:wrap}
-@media (max-width:640px){.cards{grid-template-columns:1fr}.logo{font-size:30px}.orow{grid-template-columns:1fr 1fr 44px}}
+@media (max-width:640px){.cards{grid-template-columns:1fr 1fr}.logo{font-size:30px}.orow{grid-template-columns:1fr 1fr 44px}}

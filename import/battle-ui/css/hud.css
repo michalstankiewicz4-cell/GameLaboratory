@@ -9,7 +9,7 @@
 #banner span{color:#d4e0e6;font-size:14px}
 #warn{position:fixed;left:50%;top:15%;transform:translateX(-50%);color:#ff6a4a;font-size:20px;letter-spacing:.1em;animation:blink .5s steps(2) infinite}
 @keyframes blink{50%{opacity:.35}}
-#ship{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);width:min(420px,calc(100vw - 420px));min-width:260px;background:rgba(5,14,22,.72);border:1px solid #23404f;padding:7px 10px}
+#ship{z-index:1;position:fixed;left:50%;bottom:14px;transform:translateX(-50%);width:min(420px,calc(100vw - 420px));min-width:260px;background:rgba(5,14,22,.72);border:1px solid #23404f;padding:7px 10px}
 .sname{font-size:12px;color:#b8ccd6;margin-bottom:3px}
 .hpbar{position:relative;height:14px;background:#1a2a20;border:1px solid #2f5040}
 .hpbar i{display:block;height:100%;background:#4fbf6a}
@@ -51,3 +51,23 @@
 #hint{position:fixed;left:12px;top:34px;max-width:300px;color:#8fa6b2;font-size:11px}
 #fps{position:fixed;left:12px;top:10px;z-index:6;color:#f0c070;text-shadow:0 0 3px #000;pointer-events:none}
 @media (max-width:900px){#mini{width:120px;height:120px}#hint{display:none}}
+/* gun camera: wide reticle with range ticks, info line under the screen centre */
+#cross.gun b{left:-40px;top:-1px;width:80px;height:1px;border:0;border-radius:0;background:#c8f0c0}
+#cross.gun b::before{left:39px;top:-14px;width:1px;height:12px}
+#cross.gun b::after{left:-60px;top:0;width:200px;height:1px;background:linear-gradient(90deg,#c8f0c0 0 20px,transparent 20px 180px,#c8f0c0 180px)}
+#cross.gun span{left:-50px;top:10px;width:100px;text-align:center}
+#cross.gun.far b,#cross.gun.far b::before{background:#f0a080}
+#gunInfo{position:fixed;left:50%;top:calc(50% + 46px);transform:translateX(-50%);font-size:11px;color:#c8f0c0;opacity:.8}
+/* periscope: round view in a black mask, thin hairlines with range ticks, bearing readout */
+#scope{position:fixed;inset:0;background:radial-gradient(circle at 50% 50%,transparent 0 41vmin,rgba(0,0,0,.6) 42vmin,#000 44vmin)}
+#scope .ring{position:absolute;left:50%;top:50%;width:84vmin;height:84vmin;margin:-42vmin 0 0 -42vmin;border-radius:50%;box-shadow:inset 0 0 6vmin rgba(0,10,20,.55)}
+#scope .hair{position:absolute;background:rgba(10,20,20,.75)}
+#scope .hair.h{left:50%;top:50%;width:84vmin;height:1px;margin-left:-42vmin;background:repeating-linear-gradient(90deg,rgba(10,20,20,.8) 0 2px,transparent 2px 4.2vmin),rgba(10,20,20,.55)}
+#scope .hair.v{left:50%;top:50%;width:1px;height:84vmin;margin-top:-42vmin}
+#scope .brg{position:absolute;left:50%;top:calc(50% - 39vmin);transform:translateX(-50%);color:#d8e8d8;font-size:13px;letter-spacing:.1em}
+/* salvo camera frame (top right); the kill feed drops below it while it is shown */
+#pip{z-index:3;background:#0a1824;position:fixed;right:12px;top:12px;width:320px;height:180px;box-sizing:border-box;border:1px solid #6a8a9a;box-shadow:0 0 0 1px rgba(0,0,0,.6)}
+#pip canvas{display:block;width:100%;height:100%}
+#pip span{position:absolute;left:6px;top:4px;font-size:10px;letter-spacing:.12em;color:#e6eef2;text-transform:uppercase}
+#feed.low{top:202px}
+@media (max-width:900px){#pip{width:200px;height:113px}#feed.low{top:134px}}

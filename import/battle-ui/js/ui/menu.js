@@ -3,7 +3,7 @@ import { h, btn, tx } from './dom.js';
 import { t, bind, LANGS } from '../i18n/index.js';
 import { CLASSES, CLASS_KEYS, KNOTS } from '../world/constants.js';
 import { VERSION } from '../version.js';
-import { STYLES } from '../render/look.js';
+import { GFX_PRESETS } from '../core/settings.js';
 
 export function createMenu(root, { actions, settings, progress }) {
   const screens = {};
@@ -63,26 +63,25 @@ export function createMenu(root, { actions, settings, progress }) {
     const up = (fn) => settings.update(fn);
     const pct = (v) => Math.round(v * 100) + '%';
     const langs = h('div', { class: 'choices' }, LANGS.map((l) => h('button', { type: 'button', class: d.lang === l.id ? 'on' : '', on: { click: () => { up((x) => { x.lang = l.id; }); drawOptions(); } } }, l.name)));
-    // graphics style: applied at start-up, so a change reloads the page (settings are saved first)
-    const pixel = d.gfx.style === 'pixel';
-    const styles = h('div', { class: 'choices' }, STYLES.map((id) => h('button', { type: 'button', class: d.gfx.style === id ? 'on' : '', on: { click: () => {
-      if (id === d.gfx.style) return;
-      up((x) => { x.gfx.style = id; });
-      location.reload();
-    } } }, t('style.' + id))));
-    const fpsChk = h('input', { type: 'checkbox' });
-    fpsChk.checked = d.gfx.showFps;
-    fpsChk.addEventListener('change', () => up((x) => { x.gfx.showFps = fpsChk.checked; }));
+    const check = (key, field) => {
+      const c = h('input', { type: 'checkbox' });
+      c.checked = d.gfx[field];
+      c.addEventListener('change', () => up((x) => { x.gfx[field] = c.checked; }));
+      return h('label', { class: 'orow chk' }, c, tx(key));
+    };
+    // presets set several graphics options at once; each one can still be changed afterwards
+    const presets = h('div', { class: 'choices' }, Object.keys(GFX_PRESETS).map((id) => h('button', { type: 'button', on: { click: () => {
+      up((x) => { Object.assign(x.gfx, GFX_PRESETS[id]); }); drawOptions();
+    } } }, t('preset.' + id))));
     opt.replaceChildren(...[
       tx('opt.lang', 'h3'), langs,
       tx('opt.gfx', 'h3'),
-      h('div', { class: 'orow col' }, tx('opt.style'), styles, tx('opt.styleNote', 'span')),
-      pixel ? slider('opt.pixelH', () => d.gfx.pixelH, (v) => up((x) => { x.gfx.pixelH = v; }), 140, 540, 10, (v) => v + ' px') : null,
-      pixel ? slider('opt.levels', () => d.gfx.levels, (v) => up((x) => { x.gfx.levels = v; }), 3, 16, 1) : null,
-      pixel ? slider('opt.dither', () => d.gfx.dither, (v) => up((x) => { x.gfx.dither = v; }), 0, 1, 0.05, pct) : null,
-      d.gfx.style !== 'real' ? slider('opt.edge', () => d.gfx.edge, (v) => up((x) => { x.gfx.edge = v; }), 0, 1, 0.05, pct) : null,
+      h('div', { class: 'orow col' }, tx('opt.preset'), presets),
+      slider('opt.scale', () => d.gfx.scale, (v) => up((x) => { x.gfx.scale = v; }), 0.5, 1, 0.05, pct),
+      slider('opt.fx', () => d.gfx.fx, (v) => up((x) => { x.gfx.fx = v; }), 0.25, 1, 0.05, pct),
       slider('opt.bright', () => d.gfx.bright, (v) => up((x) => { x.gfx.bright = v; }), 0.6, 2, 0.05, (v) => v.toFixed(2)),
-      h('label', { class: 'orow chk' }, fpsChk, tx('opt.fps')),
+      check('opt.shadows', 'shadows'), check('opt.aa', 'aa'), check('opt.bloom', 'bloom'), check('opt.water', 'water'),
+      check('opt.pip', 'pip'), check('opt.fps', 'showFps'),
       tx('opt.audio', 'h3'),
       slider('opt.vol', () => d.vol, (v) => up((x) => { x.vol = v; }), 0, 1, 0.05, pct),
       tx('opt.mouse', 'h3'),

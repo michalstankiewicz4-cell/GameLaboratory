@@ -22,14 +22,23 @@ export function createHud(root) {
   const guns = h('div', { class: 'wslot' });
   const torps = h('div', { class: 'wslot' });
   const rep = h('div', { class: 'wslot' });
-  const weapons = h('div', { id: 'weap' }, guns, torps, rep);
+  const depth = h('div', { class: 'wslot', hidden: true });
+  const weapons = h('div', { id: 'weap' }, guns, torps, rep, depth);
+  // periscope overlay: dark mask with a round view, reticle with bearing ticks
+  const bearing = h('div', { class: 'brg' });
+  const scope = h('div', { id: 'scope', hidden: true }, h('div', { class: 'ring' }), h('div', { class: 'hair h' }), h('div', { class: 'hair v' }), bearing);
   const cross = h('div', { id: 'cross', hidden: true }, h('b'), h('span'));
   const labels = h('div', { id: 'labels' });
   const pops = h('div', { id: 'pops' });
   const mini = h('canvas', { id: 'mini', width: 180, height: 180 });
   const fps = h('div', { id: 'fps', hidden: true });
   const hint = h('div', { id: 'hint' });
-  const game = h('div', { id: 'hud', hidden: true }, labels, pops, top, feed, banner, warn, panel, weapons, cross, mini, hint);
+  const gunInfo = h('div', { id: 'gunInfo', hidden: true });
+  // salvo camera: the picture is rendered into the main canvas, then copied here so it sits above HUD overlays
+  const pipCanvas = h('canvas', { width: 320, height: 180 });
+  const pipBox = h('div', { id: 'pip', hidden: true }, pipCanvas, h('span', {}, ''));
+  const game = h('div', { id: 'hud', hidden: true }, labels, pops, top, feed, banner, warn, panel, weapons, cross, mini, hint, gunInfo, pipBox);
+  game.prepend(scope);
   root.append(game, fps);
 
   const lab = new Map();           // ship id -> element
@@ -62,6 +71,16 @@ export function createHud(root) {
   return {
     show(on) { game.hidden = !on; if (!on) { lab.forEach((e) => e.remove()); lab.clear(); pops.replaceChildren(); } },
     showFps(on) { fps.hidden = !on; },
+    // Gun camera: reticle style and the info line under it (zoom, how to take mouse control).
+    setGunView(on, periscope) { cross.classList.toggle('gun', on); gunInfo.hidden = !on; scope.hidden = !(on && periscope); },
+    // Salvo camera frame (the picture itself is drawn into the canvas); the kill feed moves below it.
+    setPip(on) { if (pipBox.hidden === on) { pipBox.hidden = !on; feed.classList.toggle('low', on); pipBox.lastChild.textContent = t('hud.pip'); } },
+    // Copies the salvo camera picture (x, y from the top-left of the main canvas, w × h) into the frame.
+    copyPip(src, x, y, w, h) {
+      if (pipCanvas.width !== w) { pipCanvas.width = w; pipCanvas.height = h; }
+      pipCanvas.getContext('2d').drawImage(src, x, y, w, h, 0, 0, w, h);
+    },
+    setBearing(deg) { bearing.textContent = String(Math.round(((deg % 360) + 360) % 360)).padStart(3, '0') + '°'; },
     setFps(s) { fps.textContent = s; },
     banner: showBanner,
     feed: addFeed,
@@ -87,19 +106,26 @@ export function createHud(root) {
       const ready = p.turrets.filter((tr) => tr.reload <= 0).length;
       const minR = Math.min(...p.turrets.map((tr) => tr.reload));
       const frac = 1 - minR / cls.guns.reload;
-      slotBar(guns, t('w.guns'), '1', ready ? 1 : frac, (weapon === 'guns' ? 'sel ' : '') + (ready ? 'ok' : ''), ready ? `${ready}/${p.turrets.length}` : `${minR.toFixed(1)}s`);
+      const wet = p.sub && p.sub.y < -0.6;                  // submarine deck gun is under water
+      slotBar(guns, t('w.guns'), '1', wet ? 0 : ready ? 1 : frac, (weapon === 'guns' ? 'sel ' : '') + (ready && !wet ? 'ok' : ''), wet ? t('w.underwater') : ready ? `${ready}/${p.turrets.length}` : `${minR.toFixed(1)}s`);
       if (cls.torps) {
         const r = p.torpReload;
         slotBar(torps, t('w.torps'), '2', 1 - r / cls.torps.reload, (weapon === 'torps' ? 'sel ' : '') + (r <= 0 ? 'ok' : ''), r <= 0 ? `×${cls.torps.n}` : `${r.toFixed(0)}s`);
         torps.hidden = false;
       } else torps.hidden = true;
       const rp = p.repair;
+      if (p.sub) {
+        const lv = p.sub.level;
+        slotBar(depth, t('w.depth.' + lv), keys.depth, p.sub.batt, p.sub.batt > 0.25 ? 'ok' : '', `${t('w.batt')} ${Math.round(p.sub.batt * 100)}%`);
+        depth.hidden = false;
+      } else depth.hidden = true;
       slotBar(rep, t('w.repair'), keys.repair, rp.active > 0 ? rp.active / 10 : 1 - rp.cd / cls.repair.cd, rp.charges > 0 && rp.cd <= 0 ? 'ok' : '', rp.active > 0 ? t('w.active') : rp.cd > 0 ? `${rp.cd.toFixed(0)}s` : `×${rp.charges}`);
 
       warn.hidden = !(S.threat > 0);
       if (S.threat > 0) warn.textContent = t('hud.torpWarn', { d: Math.round(S.threat * 10) });
       hint.textContent = t('hud.hint', { repair: keys.repair });
       hint.hidden = S.time > 30;                     // controls reminder only at the start of a run
+      if (keys.gun) gunInfo.textContent = t(keys.locked ? (p.sub ? 'hud.scopeOn' : 'hud.gunOn') : 'hud.gunClick', { z: keys.zoom.toFixed(1) });
     },
 
     // Per-frame: banners, feed fade, crosshair, labels, popups, minimap.
@@ -116,7 +142,7 @@ export function createHud(root) {
         const g = p.cls.guns;
         const tt = weapon === 'torps' && p.cls.torps ? d / p.cls.torps.speed : Math.min(d, g.range) / g.speed;
         cross.lastChild.textContent = `${(d / 100).toFixed(1)} km · ${tt.toFixed(1)}s`;
-        cross.className = d > (weapon === 'torps' && p.cls.torps ? p.cls.torps.range : g.range) ? 'far' : '';
+        cross.classList.toggle('far', d > (weapon === 'torps' && p.cls.torps ? p.cls.torps.range : g.range));
       }
 
       // ship labels
@@ -131,6 +157,8 @@ export function createHud(root) {
         }
         const q = project(cam, s.x, s.cls.H + 4 + s.cls.L * 0.15, s.z);
         if (!q) { el.hidden = true; continue; }
+        // periscope: only labels inside the round view
+        if (!scope.hidden && Math.hypot(q.x - innerWidth / 2, q.y - innerHeight / 2) > Math.min(innerWidth, innerHeight) * 0.4) { el.hidden = true; continue; }
         el.hidden = false;
         el.style.transform = `translate(${q.x}px,${q.y}px)`;
         el.firstChild.textContent = `${t('cls.short.' + s.cls.key)} ${s.name}`;
@@ -142,7 +170,7 @@ export function createHud(root) {
       // damage popups
       while (S.popups.length) {
         const pp = S.popups.shift();
-        const txt = pp.kind === 'cit' ? t('pop.cit', { d: pp.dmg }) : pp.kind === 'torp' ? t('pop.torp', { d: pp.dmg }) : pp.kind === 'fire' ? t('pop.fire', { d: pp.dmg }) : `-${pp.dmg}`;
+        const txt = pp.kind === 'cit' ? t('pop.cit', { d: pp.dmg }) : pp.kind === 'torp' ? t('pop.torp', { d: pp.dmg }) : pp.kind === 'fire' ? t('pop.fire', { d: pp.dmg }) : pp.kind === 'charge' ? t('pop.charge', { d: pp.dmg }) : `-${pp.dmg}`;
         const el = h('div', { class: 'pop ' + (pp.mine ? 'mine ' : 'onme ') + pp.kind }, txt);
         pops.append(el);
         el._w = { x: pp.x, z: pp.z, t: 0 };
