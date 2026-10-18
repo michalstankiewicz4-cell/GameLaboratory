@@ -3,6 +3,7 @@ import { h, btn, tx } from './dom.js';
 import { t, bind, LANGS } from '../i18n/index.js';
 import { CLASSES, CLASS_KEYS, KNOTS } from '../world/constants.js';
 import { VERSION } from '../version.js';
+import { STYLES } from '../render/look.js';
 
 export function createMenu(root, { actions, settings, progress }) {
   const screens = {};
@@ -62,16 +63,24 @@ export function createMenu(root, { actions, settings, progress }) {
     const up = (fn) => settings.update(fn);
     const pct = (v) => Math.round(v * 100) + '%';
     const langs = h('div', { class: 'choices' }, LANGS.map((l) => h('button', { type: 'button', class: d.lang === l.id ? 'on' : '', on: { click: () => { up((x) => { x.lang = l.id; }); drawOptions(); } } }, l.name)));
+    // graphics style: applied at start-up, so a change reloads the page (settings are saved first)
+    const pixel = d.gfx.style === 'pixel';
+    const styles = h('div', { class: 'choices' }, STYLES.map((id) => h('button', { type: 'button', class: d.gfx.style === id ? 'on' : '', on: { click: () => {
+      if (id === d.gfx.style) return;
+      up((x) => { x.gfx.style = id; });
+      location.reload();
+    } } }, t('style.' + id))));
     const fpsChk = h('input', { type: 'checkbox' });
     fpsChk.checked = d.gfx.showFps;
     fpsChk.addEventListener('change', () => up((x) => { x.gfx.showFps = fpsChk.checked; }));
-    opt.replaceChildren(
+    opt.replaceChildren(...[
       tx('opt.lang', 'h3'), langs,
       tx('opt.gfx', 'h3'),
-      slider('opt.pixelH', () => d.gfx.pixelH, (v) => up((x) => { x.gfx.pixelH = v; }), 140, 540, 10, (v) => v + ' px'),
-      slider('opt.levels', () => d.gfx.levels, (v) => up((x) => { x.gfx.levels = v; }), 3, 16, 1),
-      slider('opt.dither', () => d.gfx.dither, (v) => up((x) => { x.gfx.dither = v; }), 0, 1, 0.05, pct),
-      slider('opt.edge', () => d.gfx.edge, (v) => up((x) => { x.gfx.edge = v; }), 0, 1, 0.05, pct),
+      h('div', { class: 'orow col' }, tx('opt.style'), styles, tx('opt.styleNote', 'span')),
+      pixel ? slider('opt.pixelH', () => d.gfx.pixelH, (v) => up((x) => { x.gfx.pixelH = v; }), 140, 540, 10, (v) => v + ' px') : null,
+      pixel ? slider('opt.levels', () => d.gfx.levels, (v) => up((x) => { x.gfx.levels = v; }), 3, 16, 1) : null,
+      pixel ? slider('opt.dither', () => d.gfx.dither, (v) => up((x) => { x.gfx.dither = v; }), 0, 1, 0.05, pct) : null,
+      d.gfx.style !== 'real' ? slider('opt.edge', () => d.gfx.edge, (v) => up((x) => { x.gfx.edge = v; }), 0, 1, 0.05, pct) : null,
       slider('opt.bright', () => d.gfx.bright, (v) => up((x) => { x.gfx.bright = v; }), 0.6, 2, 0.05, (v) => v.toFixed(2)),
       h('label', { class: 'orow chk' }, fpsChk, tx('opt.fps')),
       tx('opt.audio', 'h3'),
@@ -79,7 +88,7 @@ export function createMenu(root, { actions, settings, progress }) {
       tx('opt.mouse', 'h3'),
       slider('opt.zoom', () => d.mouse.zoomSens, (v) => up((x) => { x.mouse.zoomSens = v; }), 0.2, 3, 0.1, (v) => v.toFixed(1)),
       slider('opt.rot', () => d.mouse.rotSens, (v) => up((x) => { x.mouse.rotSens = v; }), 0.2, 3, 0.1, (v) => v.toFixed(1)),
-      h('div', { class: 'btns' }, btn('opt.reset', () => { settings.reset(); drawOptions(); })));
+      h('div', { class: 'btns' }, btn('opt.reset', () => { settings.reset(); drawOptions(); }))].filter(Boolean));
   }
   screen('options', tx('opt.title', 'h2'), opt, h('div', { class: 'stack' }, back()));
 

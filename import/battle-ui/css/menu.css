@@ -27,5 +27,7 @@
 .orow{display:grid;grid-template-columns:minmax(0,200px) 1fr 56px;gap:8px;align-items:center;margin:6px 0}
 .orow .val{text-align:right;color:#8fa6b2}
 .orow.chk{grid-template-columns:22px 1fr}
+.orow.col{grid-template-columns:1fr;gap:4px}
+.orow.col>span:last-child{color:#7d94a0;font-size:11px}
 .choices{display:flex;gap:6px;flex-wrap:wrap}
 @media (max-width:640px){.cards{grid-template-columns:1fr}.logo{font-size:30px}.orow{grid-template-columns:1fr 1fr 44px}}
