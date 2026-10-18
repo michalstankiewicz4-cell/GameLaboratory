@@ -4,9 +4,16 @@ import { clamp } from './util.js';
 
 export const DEFAULTS = {
   lang: 'en',
-  gfx: { style: 'real', pixelH: 270, levels: 7, dither: 0.8, edge: 0.8, bright: 1.2, showFps: false },
+  // scale: render resolution; fx: particle density; water: ripple detail and broken foam on the sea
+  gfx: { scale: 1, shadows: true, aa: true, bloom: true, fx: 1, water: true, pip: true, bright: 1.2, showFps: false },
   vol: 0.6,
   mouse: { zoomSens: 1, rotSens: 1 },
+};
+const bool = (v, d) => (typeof v === 'boolean' ? v : d);
+// Graphics presets for the Options buttons (light = for weaker computers).
+export const GFX_PRESETS = {
+  high: { scale: 1, shadows: true, aa: true, bloom: true, fx: 1, water: true, pip: true },
+  light: { scale: 0.7, shadows: false, aa: false, bloom: false, fx: 0.5, water: false, pip: false },
 };
 const num = (v, d, lo, hi) => (v !== null && v !== undefined && v !== '' && Number.isFinite(+v) ? clamp(+v, lo, hi) : d);
 
@@ -15,14 +22,17 @@ function sanitize(s) {
   return {
     lang: s && (s.lang === 'pl' || s.lang === 'en') ? s.lang : d.lang,
     gfx: {
-      style: ['pixel', 'real', 'toon', 'paint'].includes(g.style) ? g.style : d.gfx.style,
-      pixelH: Math.round(num(g.pixelH, d.gfx.pixelH, 140, 540)),
-      levels: Math.round(num(g.levels, d.gfx.levels, 3, 16)),
-      dither: num(g.dither, d.gfx.dither, 0, 1),
-      edge: num(g.edge, d.gfx.edge, 0, 1),
+      scale: num(g.scale, d.gfx.scale, 0.5, 1),
+      shadows: bool(g.shadows, d.gfx.shadows),
+      aa: bool(g.aa, d.gfx.aa),
+      bloom: bool(g.bloom, d.gfx.bloom),
+      fx: num(g.fx, d.gfx.fx, 0.25, 1),
+      water: bool(g.water, d.gfx.water),
+      pip: bool(g.pip, d.gfx.pip),
       bright: num(g.bright, d.gfx.bright, 0.6, 2),
       showFps: !!g.showFps,
     },
+
     vol: num(s && s.vol, d.vol, 0, 1),
     mouse: { zoomSens: num(m.zoomSens, 1, 0.2, 3), rotSens: num(m.rotSens, 1, 0.2, 3) },
   };
