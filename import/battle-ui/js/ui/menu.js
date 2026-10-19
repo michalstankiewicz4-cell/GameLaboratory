@@ -40,6 +40,10 @@ export function createMenu(root, { actions, settings, progress }) {
       btn('menu.multi', () => menu.go('multi'), 'sub'),
       btn('menu.options', () => menu.go('options'), 'sub')),
     best,
+    h('p', { class: 'labs' }, tx('menu.labs', 'span'), ' ',
+      h('a', { href: 'labs/ship.html' }, tx('menu.shipLab', 'span')), ' · ',
+      h('a', { href: 'labs/water.html' }, tx('menu.waterLab', 'span')), ' · ',
+      h('a', { href: 'labs.html' }, tx('menu.allLabs', 'span'))),
     h('p', { class: 'foot' }, 'v' + VERSION, ' · ', tx('menu.credit')));
   screen('multi', tx('multi.title', 'h2'), tx('multi.note', 'p'), h('div', { class: 'stack' }, back()));
   screen('pause', tx('pause.title', 'h2'), tx('pause.keys', 'p'),
