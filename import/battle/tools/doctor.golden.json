@@ -70,6 +70,7 @@
   "counts": {
    "arc": 1,
    "budget": 1,
+   "facing": 1,
    "floating": 1,
    "hidden": 1,
    "inverted": 1,

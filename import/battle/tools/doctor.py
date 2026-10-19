@@ -15,7 +15,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GOLDEN = os.path.join(ROOT, 'tools', 'doctor.golden.json')
 OUT = os.path.join(ROOT, 'tools', 'out'); os.makedirs(OUT, exist_ok=True)
 PORT = 8780
-CHECKS = ['nan', 'inverted', 'arc', 'zfight', 'floating', 'waterline', 'poke', 'budget', 'hidden', 'speck', 'sliver']
+CHECKS = ['nan', 'inverted', 'facing', 'arc', 'zfight', 'floating', 'waterline', 'poke', 'budget', 'hidden', 'speck', 'sliver']
 
 def main():
     errs, fails = [], []

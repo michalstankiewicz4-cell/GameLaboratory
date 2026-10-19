@@ -98,7 +98,7 @@ export function build(opt = {}) {
   const hp = new Part('hullFittings', mats);
   // forecastle break bulkhead (with doors) and a short bulwark at the step
   const yb0 = deckY(BREAK - 0.1), yb1 = deckY(BREAK + 0.1), wB = sideAt(lines, BREAK, yb1) * 2;
-  hp.box('paint', wB, yb1 - yb0, 0.1, [0, (yb0 + yb1) / 2, BREAK]);
+  hp.box('paint', wB - 0.08, yb1 - yb0, 0.1, [0, (yb0 + yb1) / 2, BREAK]);      // 4 cm inside the shell plating
   for (const sx of [-2.6, 2.6]) hp.box('dark', 0.8, 1.8, 0.05, [sx, yb0 + 0.92, BREAK - 0.06]);
   // bilge keels
   for (const sx of [-1, 1]) for (let z = -24; z < 18; z += 2) hp.box('hull', 0.06, 0.45, 2.05, [sx * (sideAt(lines, z, -1.9) - 0.15), -2.3, z], [0, 0, sx * 0.6]);
@@ -109,10 +109,10 @@ export function build(opt = {}) {
   for (let z = -48; z < -26; z += 1.8) port(z, deckY(z) - 1.05);
   // hawse pipes and anchors in their pockets
   for (const sx of [-1, 1]) {
-    const z = 51.2, y = 4.9, x = sx * (sideAt(lines, z, y) + 0.05);
-    hp.add('dark', new THREE.CircleGeometry(0.32, 12), [x, y + 0.3, z], [0, sx * Math.PI / 2, 0]);
-    hp.box('metal', 0.25, 1.4, 0.55, [x, y - 0.4, z - 0.1], [0, 0, 0]);
-    hp.box('metal', 0.25, 0.3, 1.2, [x, y - 1.1, z - 0.1]);
+    const z = 51.2, y = 4.9, sideX = (yy) => sx * (sideAt(lines, z, yy) + 0.14);   // anchor stowed against the flared plating
+    hp.add('dark', new THREE.CircleGeometry(0.32, 12), [sx * (sideAt(lines, z, y + 0.3) + 0.015), y + 0.3, z], [0, sx * Math.PI / 2, 0]);
+    hp.box('metal', 0.22, 1.4, 0.5, [sideX(y - 0.4), y - 0.4, z - 0.1]);
+    hp.box('metal', 0.22, 0.3, 1.2, [sideX(y - 1.1), y - 1.1, z - 0.1]);
   }
   // rudder, shafts, A-brackets, propellers (Ø 3.2 m, outward turning)
   hp.box('hull', 0.35, 2.6, 2.2, [0, -1.9, -54.6]);

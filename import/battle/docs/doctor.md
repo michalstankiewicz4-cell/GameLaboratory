@@ -29,6 +29,7 @@ Only solid meshes count (visible, opaque standard / physical / lambert / phong /
 |---|---|---|---|
 | nan | error | positions that aren't numbers | any non-finite vertex |
 | inverted | error | a closed shape built inside-out (outside culled) | negative signed volume in the geometry's own space; closed shapes only (box, closed cylinder, sphere, torus, extrusion, split boxes) |
+| facing | error | an open one-sided surface (hull shell, custom mesh) whose faces point inward: from outside you see through it and look at its inside | sampled faces: a ray along the face normal and one against it; a front boxed in by the model with a back looking out to open space = inward. Open surfaces with ≥ 20 triangles and a one-sided material (closed shapes are `inverted`'s job) |
 | arc | warning (AA: info) | a gun's line of fire hits the own ship inside its training arc | each mount trained through ±arc in 5° steps, guns level; a ray from each gun along its barrel, as long as the barrel; thin pieces (rails, wires, rods) do not count as obstacles. Tells the blocked bearings and what blocks them |
 | zfight | warning | two pieces' faces in one plane, overlapping: they flicker | triangles bucketed by plane (lab: 2 cm, otherwise 0.06 % of the model), 2D overlap of shrunk triangles. Skipped: same untextured material, `polygonOffset` decals. Tells the plane's normal and a point on it |
 | floating | warning | a piece that touches nothing of the main body | boxes grown by the tolerance (0.4 % of the model), connected groups; all but the biggest |
@@ -70,6 +71,15 @@ submarine 1 zfight; fixed in v0.7.1, all four are now clean:
 - Training arcs where the barrels reached the bridge or a pedestal at the end of the arc (`js/world/constants.js`):
   destroyer A ±145°, cruiser B (raised) ±130°, battleship B (raised) ±135°, battleship Y ±145°.
 - Doctor: a box's needle triangles (a wire) and the hull's flat extruded cap no longer count as slivers.
+
+## Missed and added (v0.7.3)
+
+The owner saw Błyskawica's hull "transparent from outside, textured inside". The lofted hull (`js/shipkit/hull.js`) was
+wound clockwise seen from outside, so its faces pointed inward; the deck surface pointed down. `inverted` only tests
+closed shapes (signed volume), and the hull is an open shell (the deck is a separate mesh), so nothing caught it. The new
+**facing** check finds it (48 of 48 sampled faces inward), the test bench has an inward open tube, and both windings are
+fixed; with the hull now visible from outside the doctor also found the forecastle-break bulkhead flush with the shell
+plating (inset 4 cm) and the anchors buried in the flare (now against the plating).
 
 ## Next
 

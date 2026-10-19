@@ -35,6 +35,9 @@ function testBench() {
   const inv = new THREE.BoxGeometry(1, 1, 1); inv.scale(-1, 1, 1);
   put('inside-out box', inv, grey, 0, 2.5, 6);
   put('zfight A', new THREE.BoxGeometry(1, 1, 1), red, 0, 2.5, 4); put('zfight B', new THREE.BoxGeometry(0.6, 1, 0.6), blue, 0.6, 2.5, 4);
+  const tube = new THREE.CylinderGeometry(0.4, 0.4, 1.2, 16, 1, true);
+  const ti = tube.index.array; for (let i = 0; i < ti.length; i += 3) { const k = ti[i]; ti[i] = ti[i + 1]; ti[i + 1] = k; }
+  put('inward tube', tube, grey, -1.2, 2.6, 7);
   put('floating box', new THREE.BoxGeometry(1, 1, 1), grey, 0, 7, 2);
   put('crate under water', new THREE.BoxGeometry(1, 1, 1), grey, 0, -0.5, 0);
   put('fender through the side', new THREE.BoxGeometry(0.5, 0.5, 0.5), grey, 2.1, 1, -2);

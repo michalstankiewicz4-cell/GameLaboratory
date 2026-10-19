@@ -33,7 +33,7 @@ export function loftHull(lines, opt = {}) {
   for (let s = 0; s < zs.length - 1; s++) {
     for (let i = 0; i < per - 1; i++) {
       const a = s * per + i, b = a + 1, c = a + per, d = c + 1;
-      idx.push(a, c, b, b, c, d);
+      idx.push(a, b, c, b, d, c);                            // counter-clockwise seen from outside: normals point out
     }
   }
   // transom: close the aft-most ring with a fan
@@ -42,7 +42,7 @@ export function loftHull(lines, opt = {}) {
   let cx = 0, cy = 0, cz = 0;
   st.forEach((p) => { cx += p[0]; cy += p[1]; cz += p[2]; });
   pos.push(cx / per, cy / per, cz / per); uv.push(0, 0);
-  for (let i = 0; i < per - 1; i++) idx.push(t0, i, i + 1);
+  for (let i = 0; i < per - 1; i++) idx.push(t0, i + 1, i);
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
@@ -125,7 +125,7 @@ export function deckSurface(hull, lines, regions, camber = 0.12) {
     }
     for (let a = 0; a < sel.length - 1; a++) for (let k = 0; k < across; k++) {
       const i0 = base + a * (across + 1) + k, i1 = i0 + 1, j0 = i0 + across + 1, j1 = j0 + 1;
-      idx.push(i0, i1, j0, i1, j1, j0);
+      idx.push(i0, j0, i1, i1, j0, j1);                      // normals up
     }
   }
   const g = new THREE.BufferGeometry();

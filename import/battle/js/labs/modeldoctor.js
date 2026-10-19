@@ -8,6 +8,8 @@
 // Checks (finding: { check, severity, parts, detail, meshes, src, extra }):
 //   nan        positions that aren't numbers — broken maths                                   error
 //   inverted   a closed shape built inside-out (one-sided material: the outside is culled)    error
+//   facing     an open surface (hull shell, custom mesh) whose faces point inward — seen from outside it is   error
+//              see-through and you look at its inside (what `inverted` cannot see: it needs a closed shape)
 //   arc        a gun's line of fire hits its own ship inside the mount's training arc         warning (AA: info)
 //   zfight     two pieces' faces in one plane, overlapping — they flicker                     warning
 //   floating   a piece that touches nothing of the rest of the model                          warning
@@ -33,11 +35,12 @@
 //   opts.budget      { triangles, drawCalls, measured: { triangles, drawCalls } } for "budget"
 import * as THREE from '../../vendor/three.module.js';
 
-export const CHECKS = ['nan', 'inverted', 'arc', 'zfight', 'floating', 'waterline', 'poke', 'budget', 'hidden', 'speck', 'sliver'];
-export const SEVERITY = { nan: 'error', inverted: 'error', arc: 'warning', zfight: 'warning', floating: 'warning', waterline: 'warning', poke: 'warning', budget: 'warning', hidden: 'info', speck: 'info', sliver: 'info' };
+export const CHECKS = ['nan', 'inverted', 'facing', 'arc', 'zfight', 'floating', 'waterline', 'poke', 'budget', 'hidden', 'speck', 'sliver'];
+export const SEVERITY = { nan: 'error', inverted: 'error', facing: 'error', arc: 'warning', zfight: 'warning', floating: 'warning', waterline: 'warning', poke: 'warning', budget: 'warning', hidden: 'info', speck: 'info', sliver: 'info' };
 export const ABOUT = {
   nan: 'positions that are not numbers (broken maths)',
   inverted: 'closed shape built inside-out: its outside is culled',
+  facing: 'open surface whose faces point inward: from outside you see through it',
   arc: 'gun line of fire hits the own ship inside the training arc',
   zfight: 'faces of two pieces in one plane overlap and flicker',
   floating: 'piece touches nothing of the main body',
@@ -165,6 +168,34 @@ export function examine(root, opts = {}) {
     if (vol < 0) add('inverted', [m], m.g.type === 'ExtrudeGeometry' ? 'extrusion wound the wrong way (the outline goes clockwise, or it was mirrored)' : 'built inside-out (volume ' + vol.toExponential(1) + '; a mirrored scale or rotation baked into the geometry?)');
   });
   lap('inverted', t);
+
+  // facing: for open one-sided surfaces, cast a ray from each sampled face along its normal and one against it;
+  // a face whose front is boxed in by the model while its back looks out to open space points inward
+  t = performance.now();
+  if (run.has('facing')) {
+    const solidAll = meshes.filter((m) => !m.nan);
+    const cand = solidAll.filter((m) => !closedShape(m.g) && m.tris >= 20 && matsOf(m.o).every((x) => x.side === THREE.FrontSide));
+    if (cand.length) {
+      const objs = solidAll.map((m) => m.o), saved = new Map();
+      objs.forEach((o) => matsOf(o).forEach((x) => { if (!saved.has(x)) saved.set(x, x.side); x.side = THREE.DoubleSide; }));
+      const ray = new THREE.Raycaster(), c = new THREE.Vector3(), nn = new THREE.Vector3(), o = new THREE.Vector3();
+      const hits = (from, dir) => { ray.set(from, dir); ray.far = L * 2; return ray.intersectObjects(objs, false).length; };
+      for (const m of cand) {
+        const step = Math.max(1, Math.floor(m.tris / 48));
+        let inward = 0, outward = 0;
+        for (let k = 0; k < m.tris; k += step) {
+          triVerts(m, k, v0, v1, v2);
+          nn.crossVectors(e1.subVectors(v1, v0), e2.subVectors(v2, v0)); if (nn.lengthSq() < 1e-12 * L * L) continue;
+          nn.normalize(); c.copy(v0).add(v1).add(v2).divideScalar(3).applyMatrix4(root.matrixWorld);
+          const front = hits(o.copy(c).addScaledVector(nn, 0.002 * L), nn), back = hits(o.copy(c).addScaledVector(nn, -0.002 * L), nn.clone().negate());
+          if (front > 0 && back === 0) inward++; else if (front === 0 && back > 0) outward++;
+        }
+        if (inward >= 5 && inward > outward * 2) add('facing', [m], `${inward} of ${inward + outward} sampled faces point inward (reverse the triangle winding)`);
+      }
+      saved.forEach((side, x) => { x.side = side; });
+    }
+  }
+  lap('facing', t);
 
   // arc: train every gun mount through its arc (5° steps, guns level) and cast its line of fire
   t = performance.now();
