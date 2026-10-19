@@ -41,6 +41,8 @@ def main():
             pg.click('#action'); time.sleep(1); pg.click('#stow')
             pg.evaluate("()=>{const d=document.getElementById('detail');d.value=0.5;d.dispatchEvent(new Event('change'));d.dispatchEvent(new Event('input'))}")
             time.sleep(3)
+            pg.evaluate("()=>{const d=document.getElementById('detail');d.value=1;d.dispatchEvent(new Event('change'));d.dispatchEvent(new Event('input'))}")
+            time.sleep(3)
             bad = pg.evaluate("()=>{let n=0;__lab.model.group.traverse(o=>{if(o.isMesh){const a=o.geometry.attributes.position.array;for(let i=0;i<a.length;i+=97)if(!isFinite(a[i]))n++;}});return n}")
             assert bad == 0, f'{bad} NaN vertices'
             for c in CAMS: snap(pg, c, os.path.join(OUT, 'lab-' + c.replace(' ', '_').replace('¾', '34').replace('&', 'and') + '.png'))

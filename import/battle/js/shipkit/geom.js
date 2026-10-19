@@ -3,6 +3,20 @@
 // draw calls instead of thousands.
 import * as THREE from '../../vendor/three.module.js';
 
+// KIT.unmerged: build one mesh per piece (for the model doctor) and remember where each piece was added
+// (file:line of the callers), so a finding points at the source line. Normal builds merge per material.
+export const KIT = { unmerged: false };
+function callSite() {
+  const out = [];
+  for (const l of (new Error().stack || '').split('\n').slice(1)) {
+    const m = l.match(/([\w.-]+\.js):(\d+):\d+\)?\s*$/);
+    if (!m || m[1] === 'geom.js') continue;
+    out.push(m[1] + ':' + m[2]);
+    if (out.length === 2 || m[1] !== 'parts.js') break;
+  }
+  return out.join(' ← ');
+}
+
 const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), E = new THREE.Euler(), V = new THREE.Vector3(), S = new THREE.Vector3();
 
 // Merges non-indexed copies of geometries (position, normal, uv) into one BufferGeometry.
@@ -32,6 +46,7 @@ export class Part {
     this.name = name;
     this.group = new THREE.Group();
     this.group.name = name;
+    this.group.userData.part = true;
     this.mats = materials;          // { key: THREE.Material }
     this.bins = new Map();          // material key -> [geometry]
   }
@@ -40,6 +55,10 @@ export class Part {
     E.set(r[0], r[1], r[2]); Q.setFromEuler(E);
     M.compose(V.set(p[0], p[1], p[2]), Q, Array.isArray(s) ? S.set(s[0], s[1], s[2]) : S.set(s, s, s));
     g.applyMatrix4(M);
+    return this.push(key, g);
+  }
+  push(key, g) {
+    if (KIT.unmerged) g.userData.src = callSite();
     if (!this.bins.has(key)) this.bins.set(key, []);
     this.bins.get(key).push(g);
     return this;
@@ -61,12 +80,19 @@ export class Part {
     const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
     M.compose(V.set((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2), q, S.set(1, 1, 1));
     g.applyMatrix4(M);
-    if (!this.bins.has(key)) this.bins.set(key, []);
-    this.bins.get(key).push(g);
-    return this;
+    return this.push(key, g);
   }
   // Builds the meshes (one per material). Returns the group.
   finish() {
+    if (KIT.unmerged) {
+      for (const [key, list] of this.bins) list.forEach((g) => {
+        const mesh = new THREE.Mesh(g, this.mats[key]);
+        mesh.name = `${this.name}:${key}`; mesh.userData.src = g.userData.src;
+        this.group.add(mesh);
+      });
+      this.bins.clear();
+      return this.group;
+    }
     for (const [key, list] of this.bins) {
       const mesh = new THREE.Mesh(mergeList(list), this.mats[key]);
       mesh.castShadow = true; mesh.receiveShadow = true;

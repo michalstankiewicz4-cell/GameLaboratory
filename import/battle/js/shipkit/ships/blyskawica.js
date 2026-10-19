@@ -99,7 +99,7 @@ export function build(opt = {}) {
   // forecastle break bulkhead (with doors) and a short bulwark at the step
   const yb0 = deckY(BREAK - 0.1), yb1 = deckY(BREAK + 0.1), wB = sideAt(lines, BREAK, yb1) * 2;
   hp.box('paint', wB, yb1 - yb0, 0.1, [0, (yb0 + yb1) / 2, BREAK]);
-  for (const sx of [-2.6, 2.6]) hp.box('dark', 0.8, 1.8, 0.05, [sx, yb0 + 0.9, BREAK - 0.06]);
+  for (const sx of [-2.6, 2.6]) hp.box('dark', 0.8, 1.8, 0.05, [sx, yb0 + 0.92, BREAK - 0.06]);
   // bilge keels
   for (const sx of [-1, 1]) for (let z = -24; z < 18; z += 2) hp.box('hull', 0.06, 0.45, 2.05, [sx * (sideAt(lines, z, -1.9) - 0.15), -2.3, z], [0, 0, sx * 0.6]);
   // portholes: two rows in the forecastle, one aft
@@ -138,7 +138,7 @@ export function build(opt = {}) {
   // bollards and fairleads
   for (const [z, sx] of [[46, 1], [46, -1], [12, 1], [12, -1], [-6, 1], [-6, -1], [-44, 1], [-44, -1], [-52, 1], [-52, -1]]) P.bollards(fit, d, [sx * (sideAt(lines, z, deckY(z)) - 0.7), deckY(z), z]);
   // ventilators
-  for (const [z, x, yaw] of [[44, 1.6, 0], [44, -1.6, 0], [-4, 2.3, Math.PI], [-4, -2.3, Math.PI], [-21.5, 2.2, 0], [-21.5, -2.2, 0], [-45, 1.8, Math.PI], [-45, -1.8, Math.PI]]) P.ventilator(fit, d, [x, deckY(z), z], 0.24, 1.1, yaw);
+  for (const [z, x, yaw] of [[47.6, 2.0, 0], [47.6, -2.0, 0], [-4, 2.3, Math.PI], [-4, -2.3, Math.PI], [-21.5, 2.2, 0], [-21.5, -2.2, 0], [-48.2, 3.4, Math.PI], [-48.2, -3.4, Math.PI]]) P.ventilator(fit, d, [x, deckY(z), z], 0.24, 1.1, yaw);
   // guard rails along both deck edges (stepping down at the break)
   for (const sx of [-1, 1]) {
     const fwd = [], aft = [];
@@ -166,10 +166,14 @@ export function build(opt = {}) {
   // deckhouse 1: rounded front at the B mount, full width under the bridge, narrowing aft to the funnel
   sup.add('paint', plan(roundRect(3.1, 15, 35.2, 2.4, 6), 2.4), [0, yF, 0]);
   sup.add('paint', plan(roundRect(1.9, -0.8, 15.5, 0.6, 3), 2.4), [0, yF - 0.05, 0]);
-  sup.box('deck', 6.2, 0.06, 20, [0, yF + 2.43, 25.1]);
+  sup.box('deck', 6.24, 0.06, 20.24, [0, yF + 2.43, 25.1]);
   // bridge level 2: wheelhouse with windows and side doors
-  sup.add('paint', plan(roundRect(3.5, 21.0, 28.0, 1.6, 5), 2.3), [0, yF + 2.4, 0]);
-  for (let i = -5; i <= 5; i++) sup.box('glass', 0.5, 0.55, 0.05, [i * 0.62, yF + 3.95, 28.02 - Math.abs(i) * 0.07]);
+  sup.add('paint', plan(roundRect(3.5, 21.0, 28.0, 1.6, 5), 2.26), [0, yF + 2.44, 0]);
+  for (let i = -5; i <= 5; i++) {
+    const x = i * 0.62, k = Math.max(0, Math.abs(x) - 1.9), a = Math.asin(Math.min(1, k / 1.6)) * Math.sign(x);
+    const zf = 28.0 - 1.6 + Math.sqrt(Math.max(0, 1.6 * 1.6 - k * k));
+    sup.box('glass', 0.5, 0.55, 0.05, [x + Math.sin(a) * 0.02, yF + 3.95, zf + Math.cos(a) * 0.02], [0, a, 0]);
+  }
   for (const sx of [-1, 1]) sup.box('dark', 0.05, 1.8, 0.7, [sx * 3.52, yF + 3.4, 23]);
   // level 3: open compass platform with wings, wind deflector, binnacle, 13.2 mm mounts on the wings
   sup.add('paint', plan(roundRect(4.6, 20.6, 28.4, 1.2, 4), 0.18), [0, yF + 4.7, 0]);
@@ -181,7 +185,7 @@ export function build(opt = {}) {
   // rangefinder tower aft of the open bridge (4 m Optique & Précision) and the searchlight tower behind it
   sup.add('paint', plan(roundRect(1.4, 19.6, 22.0, 0.5, 3), 1.2), [0, yF + 4.88, 0]);
   P.rangefinder(sup, d, 4.0, [0, yF + 6.1, 20.8]);
-  sup.add('paint', plan(roundRect(1.2, 16.4, 19.2, 0.4, 3), 4.6), [0, yF + 2.4, 0]);
+  sup.add('paint', plan(roundRect(1.2, 16.4, 19.2, 0.4, 3), 4.56), [0, yF + 2.44, 0]);
   sup.cyl('paint', 1.5, 1.5, 0.15, 16, [0, yF + 7.1, 17.8]);
   P.searchlight(sup, d, 1.1, [0, yF + 7.18, 17.8]);
   // boats: whaler and motor boat amidships (davits), second whaler further aft
@@ -231,54 +235,59 @@ export function build(opt = {}) {
   add('masts', mast.finish());
 
   /* ---------------- main battery ---------------- */
-  const m120 = (name, barrels, z, y, yaw) => {
+  const m120 = (name, barrels, z, y, yaw, arc = 150) => {
     const m = P.bofors120(mats, d, barrels);
-    m.part.position.set(0, y, z); m.part.rotation.y = yaw;
+    m.part.position.set(0, y, z); m.part.rotation.y = yaw; m.part.name = name;
     add('mainBattery', m.part);
-    mounts.push({ name, train: m.train, guns: m.guns, yaw0: yaw, arc: 150 });
+    mounts.push({ name, group: m.part, train: m.train, guns: m.guns, yaw0: yaw, arc });
   };
-  m120('A (twin)', 2, zOf(17), deckY(zOf(17)), 0);
-  m120('B (single, superfiring)', 1, 32.0, yF + 2.43, 0);
+  m120('A (twin)', 2, zOf(17), deckY(zOf(17)), 0, 145);
+  const sup2 = new Part('bBarbette', mats);
+  sup2.cyl('paint', 2.25, 2.3, 0.35, 32, [0, yF + 2.46 + 0.175, 32.0]);
+  add('superstructure', sup2.finish());
+  m120('B (single, superfiring)', 1, 32.0, yF + 2.46 + 0.35, 0, 140);
   // aft deckhouse with the superfiring X mount, searchlight platform, rangefinder, 13.2 mm sponsons
   const aft = new Part('aftHouse', mats);
   const yM = deckY(-28);
   aft.add('paint', plan(roundRect(3.0, -35.4, -22.6, 1.2, 4), 2.4), [0, yM, 0]);
   aft.box('deck', 5.9, 0.06, 12.6, [0, yM + 2.43, -29]);
-  aft.add('paint', plan(roundRect(1.3, -27.8, -24.6, 0.4, 3), 1.6), [0, yM + 2.4, 0]);
+  aft.add('paint', plan(roundRect(1.3, -27.8, -24.6, 0.4, 3), 1.56), [0, yM + 2.44, 0]);
   aft.cyl('paint', 1.25, 1.25, 0.14, 16, [0, yM + 4.07, -26.2]);
   P.searchlight(aft, d, 0.9, [0, yM + 4.14, -26.2], Math.PI);
   P.rangefinder(aft, d, 3.0, [0, yM + 2.45, -29.0]);
   for (const sx of [-1, 1]) aft.box('paint', 1.5, 0.12, 1.6, [sx * 3.55, yM + 2.38, -24.2]);
   add('superstructure', aft.finish());
-  m120('X (twin, superfiring)', 2, -33.2, yM + 2.43, Math.PI);
-  m120('Y (twin)', 2, zOf(96.3), deckY(zOf(96.3)), Math.PI);
+  m120('X (twin, superfiring)', 2, -33.2, yM + 2.43, Math.PI, 145);
+  m120('Y (twin)', 2, zOf(96.3), deckY(zOf(96.3)), Math.PI, 135);
 
   /* ---------------- torpedoes and AA ---------------- */
   const tt = (name, z) => {
     const m = P.torpedoTubes(mats, d); m.part.position.set(0, deckY(z), z);
-    m.part.rotation.y = 0; add('torpedoes', m.part); mounts.push({ name, train: m.train, guns: [], yaw0: 0, arc: 0, torp: true });
+    m.part.rotation.y = 0; m.part.name = name; add('torpedoes', m.part); mounts.push({ name, group: m.part, train: m.train, guns: [], yaw0: 0, arc: 0, torp: true });
   };
-  tt('Torpedo tubes 1', zOf(64.5)); tt('Torpedo tubes 2', -19.3);
+  tt('Torpedo tubes 1', zOf(65.4)); tt('Torpedo tubes 2', -19.3);
   // 40 mm platforms: behind the funnel and between the tube banks
   const aa = new Part('aaPlatforms', mats);
   for (const [z, h] of [[zOf(59.6), 2.6], [zOf(70.8), 2.4]]) {
     const y = deckY(z);
-    aa.add('paint', plan(roundRect(1.6, z - 1.6, z + 1.6, 0.8, 4), h), [0, y, 0]);
+    aa.add('paint', plan(roundRect(1.6, z - 1.6, Math.min(z + 1.6, BREAK - 0.08), 0.8, 4), h - 0.02), [0, y + 0.02, 0]);
     aa.cyl('deck', 2.15, 2.15, 0.1, 24, [0, y + h, z]);
   }
   add('antiAircraft', aa.finish());
   for (const [z, h] of [[zOf(59.6), 2.6], [zOf(70.8), 2.4]]) {
     const m = P.bofors40(mats, d); m.part.position.set(0, deckY(z) + h + 0.05, z);
-    m.part.rotation.y = z > -10 ? Math.PI : 0;
-    add('antiAircraft', m.part); mounts.push({ name: '40 mm twin', train: m.train, guns: m.guns, yaw0: m.part.rotation.y, arc: 150, aa: true });
+    m.part.rotation.y = z > -10 ? Math.PI : 0; m.part.name = z > -10 ? '40 mm twin (fwd)' : '40 mm twin (aft)';
+    add('antiAircraft', m.part); mounts.push({ name: m.part.name, group: m.part, train: m.train, guns: m.guns, yaw0: m.part.rotation.y, arc: z > -10 ? 135 : 150, aa: true });
   }
   for (const [x, y, z] of [[4.1, yF + 4.88, 24.0], [-4.1, yF + 4.88, 24.0], [3.55, yM + 2.44, -24.2], [-3.55, yM + 2.44, -24.2]]) {
     const m = P.hotchkiss(mats, d); m.part.position.set(x, y, z); m.part.rotation.y = x > 0 ? 0.8 : -0.8;
     if (z < 0) m.part.rotation.y = x > 0 ? 2.2 : -2.2;
-    add('antiAircraft', m.part); mounts.push({ name: '13.2 mm twin', train: m.train, guns: m.guns, yaw0: m.part.rotation.y, arc: 120, aa: true });
+    m.part.userData.doctorOk = 'speck';
+    m.part.name = `13.2 mm twin (${z > 0 ? 'bridge' : 'aft'}, ${x > 0 ? 'stbd' : 'port'})`;
+    add('antiAircraft', m.part); mounts.push({ name: m.part.name, group: m.part, train: m.train, guns: m.guns, yaw0: m.part.rotation.y, arc: 120, aa: true });
   }
 
-  for (const [k, g] of Object.entries(parts)) { g.name = k; root.add(g); }
+  for (const [k, g] of Object.entries(parts)) { g.name = k; g.userData.part = true; root.add(g); }
   root.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
   return { group: root, parts, mounts, info, lines, length: LOA, beam: B * 2 };
 }

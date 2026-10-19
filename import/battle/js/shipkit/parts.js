@@ -24,7 +24,7 @@ export function bofors120(mats, d, barrels = 2) {
   // sight hoods on the roof, ventilator, rear access hatch, roof ladder rungs
   for (const sx of [-1, 1]) shield.box('paint', 0.45, 0.32, 0.8, [sx * (w / 2 - 0.55), 0.35 + H + 0.16, 0.9]);
   shield.cyl('paint', 0.16, 0.16, 0.3, seg(10, d), [0, 0.35 + H + 0.15, -1.2]);
-  shield.box('dark', w * 0.5, 1.5, 0.05, [0, 1.3, -0.5 - L / 2 - 0.01]);
+  shield.box('dark', w * 0.5, 1.5, 0.05, [0, 1.3, -0.5 - L / 2 - 0.03]);
   for (let i = 0; i < 4; i++) shield.box('metal', 0.5, 0.04, 0.04, [w / 2 - 0.45, 0.6 + i * 0.45, -0.5 - L / 2 - 0.05]);
   // gun ports in the face
   const gap = barrels === 2 ? 1.5 : 0;
@@ -56,7 +56,7 @@ export function bofors40(mats, d) {
   part.cyl('deck', 1.92, 1.92, 0.04, seg(28, d), [0, 0.04, 0]);
   const train = new THREE.Group();
   const t = new Part('train', mats);
-  t.cyl('metal', 0.55, 0.7, 0.9, seg(14, d), [0, 0.45, 0]);
+  t.cyl('metal', 0.55, 0.7, 0.86, seg(14, d), [0, 0.49, 0]);
   t.box('metal', 1.3, 0.55, 1.2, [0, 1.1, 0]);
   for (const sx of [-1, 1]) {
     t.box('metal', 0.5, 0.08, 0.5, [sx * 1.05, 0.8, -0.2]);                       // layer seats
@@ -102,12 +102,12 @@ export function torpedoTubes(mats, d) {
   t.box('paint', 2.4, 0.3, 3.0, [0, 0.5, -0.3]);
   for (let i = -1; i <= 1; i++) {
     t.tubeZ('paint', 0.33, 0.33, 6.25, seg(14, d), [i * 0.72, 0.95, 0.5]);
-    t.cyl('dark', 0.3, 0.3, 0.05, seg(14, d), [i * 0.72, 0.95, 3.64], [Math.PI / 2, 0, 0]);   // muzzle
-    t.tubeZ('metal', 0.36, 0.36, 0.12, seg(14, d), [i * 0.72, 0.95, -2.55]);                  // rear door ring
-    for (const z of [-1.5, 0.6, 2.4]) t.tubeZ('metal', 0.345, 0.345, 0.08, seg(14, d), [i * 0.72, 0.95, z]);
+    t.cyl('dark', 0.3, 0.3, 0.05, seg(14, d), [i * 0.72, 0.95, 3.66], [Math.PI / 2, 0, 0]);   // muzzle
+    t.tubeZ('metal', 0.37, 0.37, 0.12, seg(14, d), [i * 0.72, 0.95, -2.64]);                  // rear door ring
+    for (const z of [-1.5, 0.6, 2.4]) t.tubeZ('metal', 0.37, 0.37, 0.08, seg(14, d), [i * 0.72, 0.95, z]);
   }
   t.box('paint', 1.0, 1.1, 0.9, [0, 1.6, -2.4]);                                              // trainer's shelter
-  t.box('glass', 0.7, 0.18, 0.02, [0, 1.9, -1.94]);
+  t.box('glass', 0.7, 0.18, 0.02, [0, 1.9, -1.93]);
   train.add(t.finish());
   part.group.add(train);
   part.finish();
@@ -118,7 +118,7 @@ export function torpedoTubes(mats, d) {
 export function searchlight(p, d, dia = 0.9, at = [0, 0, 0], yaw = 0) {
   p.cyl('metal', 0.1, 0.16, 0.6, seg(8, d), [at[0], at[1] + 0.3, at[2]]);
   p.tubeZ('paint', dia / 2, dia / 2, dia * 0.9, seg(16, d), [at[0], at[1] + 0.6 + dia / 2, at[2]], [0, yaw, 0]);
-  p.add('lamp', new THREE.CircleGeometry(dia * 0.42, seg(16, d)), [at[0] + Math.sin(yaw) * dia * 0.46, at[1] + 0.6 + dia / 2, at[2] + Math.cos(yaw) * dia * 0.46], [0, yaw, 0]);
+  p.add('lamp', new THREE.CircleGeometry(dia * 0.42, seg(16, d)), [at[0] + Math.sin(yaw) * (dia * 0.45 + 0.03), at[1] + 0.6 + dia / 2, at[2] + Math.cos(yaw) * (dia * 0.45 + 0.03)], [0, yaw, 0]);
 }
 
 // Coincidence rangefinder: horizontal tube of `len` metres with end hoods, on a pedestal with an operator's hood.

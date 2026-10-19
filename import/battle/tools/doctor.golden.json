@@ -1,0 +1,110 @@
+{
+ "game/bb": {
+  "counts": {
+   "arc": 2,
+   "sliver": 2,
+   "zfight": 6
+  },
+  "fingerprint": {
+   "drawCalls": 63,
+   "materials": 11,
+   "size": [
+    2.83,
+    7.44,
+    19
+   ],
+   "triangles": 5242
+  }
+ },
+ "game/ca": {
+  "counts": {
+   "arc": 1,
+   "sliver": 2,
+   "zfight": 10
+  },
+  "fingerprint": {
+   "drawCalls": 40,
+   "materials": 11,
+   "size": [
+    1.87,
+    5.79,
+    14
+   ],
+   "triangles": 3702
+  }
+ },
+ "game/dd": {
+  "counts": {
+   "arc": 2,
+   "hidden": 4,
+   "sliver": 1,
+   "zfight": 9
+  },
+  "fingerprint": {
+   "drawCalls": 28,
+   "materials": 12,
+   "size": [
+    1.31,
+    4.59,
+    10
+   ],
+   "triangles": 2566
+  }
+ },
+ "game/ss": {
+  "counts": {
+   "sliver": 1,
+   "zfight": 1
+  },
+  "fingerprint": {
+   "drawCalls": 22,
+   "materials": 10,
+   "size": [
+    2.75,
+    3.25,
+    9.08
+   ],
+   "triangles": 908
+  }
+ },
+ "lab/blyskawica": {
+  "counts": {
+   "budget": 1
+  },
+  "fingerprint": {
+   "drawCalls": 99,
+   "materials": 14,
+   "size": [
+    11.26,
+    31.08,
+    114.8
+   ],
+   "triangles": 33366
+  }
+ },
+ "test/bench": {
+  "counts": {
+   "arc": 1,
+   "budget": 1,
+   "floating": 1,
+   "hidden": 1,
+   "inverted": 1,
+   "nan": 1,
+   "poke": 1,
+   "sliver": 1,
+   "speck": 1,
+   "waterline": 1,
+   "zfight": 1
+  },
+  "fingerprint": {
+   "drawCalls": 999,
+   "materials": 4,
+   "size": [
+    4.35,
+    8.5,
+    20
+   ],
+   "triangles": 999999
+  }
+ }
+}
