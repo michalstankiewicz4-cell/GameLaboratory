@@ -1,61 +1,45 @@
 {
  "game/bb": {
-  "counts": {
-   "arc": 2,
-   "sliver": 2,
-   "zfight": 6
-  },
+  "counts": {},
   "fingerprint": {
    "drawCalls": 63,
    "materials": 11,
    "size": [
     2.83,
     7.44,
-    19
+    19.3
    ],
-   "triangles": 5242
+   "triangles": 5326
   }
  },
  "game/ca": {
-  "counts": {
-   "arc": 1,
-   "sliver": 2,
-   "zfight": 10
-  },
+  "counts": {},
   "fingerprint": {
    "drawCalls": 40,
    "materials": 11,
    "size": [
     1.87,
     5.79,
-    14
+    14.3
    ],
-   "triangles": 3702
+   "triangles": 3594
   }
  },
  "game/dd": {
-  "counts": {
-   "arc": 2,
-   "hidden": 4,
-   "sliver": 1,
-   "zfight": 9
-  },
+  "counts": {},
   "fingerprint": {
-   "drawCalls": 28,
+   "drawCalls": 27,
    "materials": 12,
    "size": [
     1.31,
     4.59,
-    10
+    10.3
    ],
-   "triangles": 2566
+   "triangles": 2362
   }
  },
  "game/ss": {
-  "counts": {
-   "sliver": 1,
-   "zfight": 1
-  },
+  "counts": {},
   "fingerprint": {
    "drawCalls": 22,
    "materials": 10,

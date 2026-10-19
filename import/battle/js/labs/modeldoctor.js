@@ -335,7 +335,7 @@ export function examine(root, opts = {}) {
   if (run.has('speck')) meshes.forEach((m) => { const s = m.box.getSize(v0).length(); if (s < 0.003 * L) add('speck', [m], 'size ' + (s < 1 ? (s * 100).toFixed(1) + ' cm' : s.toFixed(2)) + ' (' + (s / L * 100).toFixed(2) + ' % of the model)'); });
 
   if (run.has('sliver')) meshes.forEach((m) => {
-    if (rod(m.g)) return;
+    if (rod(m.g) || thin(m, L) || (closedShape(m.g) && m.tris <= 12)) return;   // a box's needles only come from it being a wire
     let bad = 0;
     for (let k = 0; k < m.tris; k++) {
       triVerts(m, k, v0, v1, v2);

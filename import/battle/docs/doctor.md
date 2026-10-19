@@ -59,14 +59,20 @@ be a game ship).
 - Wheelhouse windows were a straight row inside the rounded front (6 hidden): they now follow the curve.
 - 13.2 mm guns are small by nature: allow-listed for `speck`.
 
-**Game models** (not changed yet, see TODO): destroyer 2 arc / 9 zfight / 4 hidden, cruiser 1 arc / 10 zfight, battleship
-2 arc / 6 zfight, submarine 1 zfight. Notable: the raised forward turrets of the cruiser and battleship fire into the
-bridge at ±135–150°, the destroyer's aft gun hits a fitting dead astern and its forward gun the bridge at ±150°, the
-battleship's Y turret hits the pedestal of the raised X turret at ±150°.
+**Game models** — before: destroyer 2 arc / 9 zfight / 4 hidden, cruiser 1 arc / 10 zfight, battleship 2 arc / 6 zfight,
+submarine 1 zfight; fixed in v0.7.1, all four are now clean:
+- AA mounts are placed only where the whole mount (base, shield, raised barrels) clears everything already on deck —
+  turrets, deckhouses, funnels, boats, secondaries — on the deck or on a deckhouse roof. Before, the destroyer's
+  forward pair stood inside the bridge and others overlapped torpedo mounts, boats and secondaries.
+- Deckhouses, funnels and torpedo mounts reach 10–20 cm into the hull (staggered), so their bottoms no longer share the
+  deck plane; the anchor windlass is left out where it would sit under the forward turret (destroyer, cruiser); the
+  flagstaff stands right at the stern, out of the aft gun's line of fire; the submarine's sail nose is 2 cm lower.
+- Training arcs where the barrels reached the bridge or a pedestal at the end of the arc (`js/world/constants.js`):
+  destroyer A ±145°, cruiser B (raised) ±130°, battleship B (raised) ±135°, battleship Y ±145°.
+- Doctor: a box's needle triangles (a wire) and the hull's flat extruded cap no longer count as slivers.
 
 ## Next
 
-- Fix the game models' findings (in-game change: version bump, e2e).
 - Sweep check: a mount's own body (not just the barrel line) colliding while it trains (torpedo tubes, AA).
 - Elevation sweep for superfiring mounts (blast interlock zones), muzzle-blast clearance.
 - Unused materials and textures; draw calls per visible metre.

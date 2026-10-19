@@ -8,6 +8,8 @@ export const KNOTS = 4;               // display factor: u/s -> "knots"
 const DEG = Math.PI / 180;
 const FWD = { c: 0, w: 150 * DEG };           // forward turret arc (centre, half-width)
 const AFT = { c: Math.PI, w: 150 * DEG };     // aft turret arc
+// narrower arcs where the model doctor found the barrels would hit the own superstructure at the arc's end
+const fwd = (deg) => ({ c: 0, w: deg * DEG }), aft = (deg) => ({ c: Math.PI, w: deg * DEG });
 
 // Throttle telegraph: index 0 = astern, 1 = stop, 2..5 = 1/4 .. full.
 export const THROTTLE = [-0.25, 0, 0.25, 0.5, 0.75, 1];
@@ -18,7 +20,7 @@ export const CLASSES = {
   dd: {
     key: 'dd', L: 10, W: 1.3, H: 0.8, hp: 1700, speed: 9.5, accel: 3.2, turn: 0.42, rudderT: 0.6,
     turrets: [
-      { z: 3.2, y: 0, arc: FWD, barrels: 1, size: 0.55 },
+      { z: 3.2, y: 0, arc: fwd(145), barrels: 1, size: 0.55 },
       { z: -3.7, y: 0, arc: AFT, barrels: 1, size: 0.55 },
     ],
     guns: { reload: 2.8, speed: 46, range: 115, dmg: 130, disp: 5, apex: 0.1, fire: 0.1, cit: 0, traverse: 1.6, cal: 0.3 },
@@ -29,7 +31,7 @@ export const CLASSES = {
     key: 'ca', L: 14, W: 1.85, H: 1.0, hp: 3600, speed: 7.8, accel: 2.2, turn: 0.3, rudderT: 0.8,
     turrets: [
       { z: 4.7, y: 0, arc: FWD, barrels: 2, size: 0.75 },
-      { z: 3.2, y: 0.45, arc: FWD, barrels: 2, size: 0.75 },
+      { z: 3.2, y: 0.45, arc: fwd(130), barrels: 2, size: 0.75 },
       { z: -4.9, y: 0, arc: AFT, barrels: 2, size: 0.75 },
     ],
     guns: { reload: 6.5, speed: 52, range: 155, dmg: 260, disp: 7, apex: 0.12, fire: 0.07, cit: 0.08, traverse: 0.9, cal: 0.42 },
@@ -40,9 +42,9 @@ export const CLASSES = {
     key: 'bb', L: 19, W: 2.8, H: 1.25, hp: 7800, speed: 6.2, accel: 1.4, turn: 0.2, rudderT: 1.2,
     turrets: [
       { z: 6.7, y: 0, arc: FWD, barrels: 3, size: 1.05 },
-      { z: 4.7, y: 0.6, arc: FWD, barrels: 3, size: 1.05 },
+      { z: 4.7, y: 0.6, arc: fwd(135), barrels: 3, size: 1.05 },
       { z: -5.4, y: 0.6, arc: AFT, barrels: 3, size: 1.05 },
-      { z: -7.3, y: 0, arc: AFT, barrels: 3, size: 1.05 },
+      { z: -7.3, y: 0, arc: aft(145), barrels: 3, size: 1.05 },
     ],
     guns: { reload: 13, speed: 58, range: 195, dmg: 820, disp: 10, apex: 0.15, fire: 0.04, cit: 0.12, traverse: 0.45, cal: 0.6 },
     torps: null,

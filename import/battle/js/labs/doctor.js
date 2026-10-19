@@ -87,7 +87,7 @@ function buildModel(m) {
   const cls = CLASSES[m.cls];
   const g = buildGameShip(cls, 'player');
   const measured = countDraw(g.group);
-  g.body.children[0].name = 'hull'; g.body.children[1].name = 'boot-top stripe';
+  g.body.children[0].name = 'hull'; g.body.children[0].userData.doctorOk = 'sliver';   // flat extruded cap: its fan triangles are harmless g.body.children[1].name = 'boot-top stripe';
   g.group.updateMatrixWorld(true);
   explodeBoxes(g.group);
   const mounts = g.turrets.map((pivot, i) => {
