@@ -52,6 +52,15 @@ def main():
                 from PIL import Image
                 Image.open(tmp).convert('RGB').crop((60, 90, 1100, 675)).resize((1200, 675), Image.LANCZOS).save(os.path.join(ROOT, 'assets', 'labs', 'ship.jpg'), quality=85)
                 print('thumbnail written')
+            # water lab: loads, variants, presets, split screen, every effect toggled
+            pg.goto(f'http://localhost:{PORT}/labs/water.html')
+            pg.wait_for_function('window.__water && window.__water.vars.A.waves.length > 0', timeout=180000)
+            pg.click('#splitOn'); time.sleep(2)
+            for k in ['planar', 'clear', 'motion', 'bowWave', 'wake', 'hullFoam', 'wet', 'spray']: pg.click('#' + k); pg.click('#' + k)
+            pg.select_option('#seaPreset', 'gale'); pg.select_option('#lookPreset', 'storm'); pg.select_option('#grid', '96,90')
+            pg.evaluate("()=>[...document.querySelectorAll('#cams button')].find(b=>b.textContent==='Bridge').click()"); time.sleep(3)
+            pg.screenshot(path=os.path.join(OUT, 'lab-water-split.png'), timeout=600000)
+            assert pg.evaluate('__water.vars.A.waves.length') >= 4, 'no waves'
             b.close()
     finally:
         srv.kill()
