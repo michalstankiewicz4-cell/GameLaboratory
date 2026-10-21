@@ -1,7 +1,8 @@
 """Headless check of the model labs (Playwright + SwiftShader).
 
 Loads labs.html and labs/ship.html, waits for the ship to build, toggles parts, trains the mounts,
-rebuilds at another detail level and screenshots a few camera presets to tools/out/lab-*.png.
+rebuilds at another detail level and screenshots a few camera presets to tools/out/lab-*.png;
+then the water lab, the transformer and the look lab (weathers, look presets, split compare, cameras).
 Exit code 1 on page errors or a missing model. Slow without a GPU (first build ~15 s).
   py tools/lab-check.py            # check + screenshots
   py tools/lab-check.py --thumb    # also rewrite assets/labs/ship.jpg (clean Bow 3/4 view)
@@ -31,6 +32,7 @@ def main():
             pg.on('console', lambda m: errs.append(m.type + ' ' + m.text) if m.type == 'error' else None)
             pg.goto(f'http://localhost:{PORT}/labs.html')
             assert pg.locator('a.tile[href="labs/ship.html"]').count() == 1, 'ship tile missing'
+            assert pg.locator('a.tile[href="labs/look.html"]').count() == 1, 'look tile missing'
             pg.goto(f'http://localhost:{PORT}/labs/ship.html')
             pg.wait_for_function('window.__lab && window.__lab.model', timeout=180000)
             print('stats', ' '.join(pg.inner_text('#stats').split()))
@@ -71,6 +73,17 @@ def main():
             assert got and got[0] == 'hull' and got[1] > 0.4, f'ray hit {got}'
             pg.evaluate("()=>{const f=document.getElementById('fleet');f.value=6;f.dispatchEvent(new Event('input'))}"); time.sleep(3)
             pg.screenshot(path=os.path.join(OUT, 'lab-transform.png'), timeout=600000)
+            # look lab: ageing baked, every weather, every look preset, split compare, cameras
+            pg.goto(f'http://localhost:{PORT}/labs/look.html')
+            pg.wait_for_function('window.__look', timeout=300000)
+            print('look', pg.inner_text('#bake'))
+            for w in pg.evaluate("()=>[...document.querySelectorAll('#weather option')].map(o=>o.value)"):
+                pg.select_option('#weather', w); time.sleep(0.5)
+            for i in range(pg.locator('#presets button').count()): pg.locator('#presets button').nth(i).click(); time.sleep(0.5)
+            pg.click('#splitOn'); time.sleep(1)
+            for c in pg.locator('#cams button').all(): c.click(); time.sleep(1)
+            pg.keyboard.press('h'); time.sleep(3)
+            pg.screenshot(path=os.path.join(OUT, 'lab-look.png'), timeout=600000)
             b.close()
     finally:
         srv.kill()

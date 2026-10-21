@@ -232,7 +232,8 @@ export function polarGrid(segments = 192, rings = 160, r0 = 0.6, r1 = 6000) {
   return g;
 }
 
-export function waterMaterial(u) {
+// opt.sky: GLSL defining skyColor(d) (SkyKit) — reflections then show the same clouds as the sky dome
+export function waterMaterial(u, opt = {}) {
   return new THREE.ShaderMaterial({
     uniforms: u, transparent: true, depthWrite: true,
     vertexShader: GLSL_WAVES + GLSL_SHIP + /* glsl */`
@@ -252,10 +253,10 @@ export function waterMaterial(u) {
       uniform float uShine, uRipples, uCrest, uReflect, uPlanar, uAlpha, uPixelN, uFogFar;
       uniform sampler2D uReflTex, tNormal, tFoam; uniform vec2 uRes;
       varying vec3 vWorld; varying vec3 vN; varying float vFold; varying vec2 vXZ; varying float vShipH;
-      vec3 sky(vec3 d) {
+      ${opt.sky ? opt.sky + '\n      vec3 sky(vec3 d) { return skyColor(d); }' : `vec3 sky(vec3 d) {
         float h = d.y; vec3 c = h > 0.0 ? mix(uSkyH, uSkyZ, pow(h, 0.5)) : mix(uSkyH, uSkySea, clamp(-h * 6.0, 0.0, 1.0));
         float s = max(dot(d, uSun), 0.0); return c + uSunCol * pow(s, 10.0) * 0.25;
-      }
+      }`}
       void main() {
         float dist = length(cameraPosition - vWorld);
         vec3 N = vN; float fold = vFold;

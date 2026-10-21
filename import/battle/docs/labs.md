@@ -8,10 +8,10 @@ under `labs/`) and its kit (code under `js/` that the game will use once a lab's
 | **Models** | Ship Lab — ORP Błyskawica 1937 (`labs/ship.html`) | in progress | `js/shipkit/` | `docs/ships/blyskawica.md` |
 | | Light cruiser, submarine, aircraft and shore | soon | `js/shipkit/ships/` | |
 | **Environment** | Water and weather — sea and ship (`labs/water.html`) | in progress | `js/labs/waterkit.js` | `docs/water.md` |
-| | Sky and clouds | in progress (with the weather) | sky in WaterKit → `envkit` | |
-| | Weather: wind, rain, fog, squalls, storm | in progress | `envkit` | |
+| | Sky and clouds (in the Look Lab for now) | first version | `js/labs/skykit.js` | `docs/look.md` |
+| | Weather: wind → sea, clouds, haze (rain, fog, squalls next) | first version | `js/labs/skykit.js` | `docs/look.md` |
 | | Time of day, land and coast, night sky and space | soon | `envkit` | |
-| **Graphics and filters** | Look Lab: procedural ageing by surface type (see below), baked shading, tone and colour, exposure, lens (distortion, droplets, flare, grain, vignette), bodycam look, automatic resolution | next | `js/render/` (post pipeline) + ShipKit materials | |
+| **Graphics and filters** | Look Lab (`labs/look.html`): procedural ageing by surface type (see below), baked shading, tone and colour, exposure, lens (distortion, droplets, flare, grain, vignette), bodycam look, automatic resolution | first version | `js/render/look.js`, `js/shipkit/ageing.js` | `docs/look.md` |
 | **Special effects** | fire and explosions, water effects, smoke, destruction | soon | `fxkit`, transformer hitboxes | |
 | **Tools** | Transformer (`labs/transform.html`), Model Doctor (`labs/doctor.html`) | done, growing | `js/shipkit/transform.js`, `js/labs/modeldoctor.js` | `docs/transform.md`, `docs/doctor.md` |
 
@@ -28,7 +28,7 @@ under `labs/`) and its kit (code under `js/` that the game will use once a lab's
 - Every lab compares variants side by side and measures the cost of each effect; what the owner picks moves into the
   game's settings (High / Light presets and options), never as a separate visual style.
 
-## Procedural ageing (Look Lab, proposed 2026-10-21)
+## Procedural ageing (Look Lab, first version in v0.9.0 — see `docs/look.md`)
 
 One **age / wear** slider (0 new from the yard … 1 after a hard war winter) per ship, plus per-surface rules, all in the
 shader from the material key ShipKit already assigns (no texture files):
