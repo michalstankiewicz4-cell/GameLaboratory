@@ -1,8 +1,12 @@
-// Waterside Structures Lab: StructKit structures at real scale on the WaterKit sea under the SkyKit sky. First the
-// Super 300 jack-up: jack the legs down and the hull up (or float it for tow) in any water depth, skid the
-// cantilever, work the cranes; info panel with specifications, sources and parts.
+// Waterside Structures Lab: StructKit structures at real scale on the WaterKit sea under the SkyKit sky — the Super 300
+// jack-up (jack the legs down and the hull up, or float it for tow; skid the cantilever; work the cranes), quays in
+// three constructions (with ORP Błyskawica moored alongside if wanted) and breakwaters in three types. Each structure's
+// own settings come from its PARAMS; its height function is baked into a texture so the sea shows shallows and surf
+// along slopes and walls. Info panel with specifications, sources and parts.
 import * as THREE from '../../vendor/three.module.js';
-import { STRUCTURE_IDS, buildStructure, structureInfo } from '../structkit/index.js';
+import { STRUCTURE_IDS, buildStructure, structureInfo, structureParams } from '../structkit/index.js';
+import { heightTexture, landUniforms, setLand, GLSL_LAND } from '../env/landkit.js';
+import { transformShip } from '../shipkit/transform.js';
 import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment } from '../env/skykit.js';
 import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, LOOKS } from '../env/waterkit.js';
 import { LookPipeline, LOOK_PRESETS } from '../render/look.js';
@@ -11,7 +15,9 @@ const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
 const KEY = 'steelSalvo.structuresLab.v1';
 let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { saved = null; }
-const S = { id: STRUCTURE_IDS[0], depth: 60, air: 18, jspeed: 400, canti: 0, cranes: false, weather: 'fair', time: 'Day', ...(saved || {}) };
+const S = { id: STRUCTURE_IDS[0], depth: 60, air: 18, jspeed: 400, canti: 0, cranes: false, weather: 'fair', time: 'Day', params: {}, moor: true, ...(saved || {}) };
+S.params = S.params || {};
+S.depths = { super300: 60, quay: 11, breakwater: 11, ...(S.depths || {}) };     // each structure keeps its own water depth
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { /* private mode */ } };
 
 /* ---------------- renderer, sky, sea, seabed ---------------- */
@@ -29,8 +35,10 @@ sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096);
 Object.assign(sun.shadow.camera, { left: -110, right: 110, top: 110, bottom: -110, near: 1, far: 900 });
 sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.06;
 scene.add(hemi, sun, sun.target);
-const WU = Object.assign(waterUniforms(), skyU);
-const water = new THREE.Mesh(polarGrid(192, 160, 0.6, 16000), waterMaterial(WU, { sky: '#define SKY_NO_STARS\n' + GLSL_SKY }));
+// the sea reads the structure's heights (baked per structure) for shallows, surf and calmer water in its lee
+const OPEN = { size: 1000, res: 1, wrap: true, depth: 1000, relief: 0, barrier: 'none', h: new Float32Array([-1000]) }, openTex = heightTexture(OPEN);
+const WU = Object.assign(waterUniforms(), skyU, landUniforms(OPEN, openTex));
+const water = new THREE.Mesh(polarGrid(192, 160, 0.6, 16000), waterMaterial(WU, { sky: '#define SKY_NO_STARS\n' + GLSL_SKY, land: GLSL_LAND }));
 water.material.side = THREE.DoubleSide; water.frustumCulled = false; water.renderOrder = 1; scene.add(water);
 WU.uShipFx.value.set(0, 0, 0, 0); WU.uWetOn.value = 0; WU.uAlpha.value = 0.9;
 const seabed = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000, 1, 1).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x8a7d62, roughness: 1 }));
@@ -65,38 +73,92 @@ const jack = { legs: 1, air: S.air, target: 'up', phase: '' };
 function rebuild() {
   if (st) { scene.remove(st.group); st.group.traverse((o) => { if (o.isMesh) o.geometry.dispose(); }); }
   const t0 = performance.now();
-  st = buildStructure(S.id, { detail: 1 });
+  S.depth = S.depths[S.id] ?? S.depth; $('depth').value = S.depth; $('depthV').textContent = S.depth + ' m';
+  const P = structureParams(S.id), own = S.params[S.id] || (S.params[S.id] = Object.fromEntries(P.map((q) => [q.key, q.def])));
+  st = buildStructure(S.id, { detail: 1, depth: S.depth, ...own });
   buildMs = Math.round(performance.now() - t0);
   scene.add(st.group);
   st.group.traverse((o) => { if (o.isMesh && !o.material.isMeshBasicMaterial) { o.castShadow = true; o.receiveShadow = true; } });
   const inf = structureInfo(S.id);
   $('sName').textContent = inf.name; $('sSub').textContent = `${inf.type} · ${inf.year}`;
+  $('sNote').textContent = inf.note || '';
   $('specs').replaceChildren(...inf.specs.map(([k, v]) => el('tr', {}, el('td', { textContent: k }), el('td', { textContent: v }))));
   $('sources').replaceChildren(...inf.sources.map(([t, u]) => el('li', {}, el('a', { href: u, textContent: t, target: '_blank', rel: 'noopener' }))));
   $('parts').replaceChildren(...Object.entries(st.parts).map(([k, o]) => {
     const c = el('input', { type: 'checkbox', checked: true }); c.onchange = () => { o.visible = c.checked; };
     return el('label', { className: 'chk' }, c, k);
   }));
-  $('depth').max = Math.floor(st.dim.maxDepth);
+  const rig = !!st.pose;
+  $('rigPanel').hidden = !rig; $('paramPanel').hidden = !P.length; $('moorRow').hidden = S.id !== 'quay';
+  $('depth').max = rig ? Math.floor(st.dim.maxDepth) : 30;
+  if (+S.depth > +$('depth').max) { S.depth = +$('depth').max; $('depth').value = S.depth; $('depthV').textContent = S.depth + ' m'; }
+  fillParams(P, own);
+  bakeShore(); placeShip(); setCams();
   applyPose();
 }
 function applyPose() {
   if (!st) return;
-  st.pose({ depth: S.depth, air: jack.air, legsDown: jack.legs });
   seabed.position.y = -S.depth;
+  if (!st.pose) return;
+  st.pose({ depth: S.depth, air: jack.air, legsDown: jack.legs });
   st.cantilever.position.z = -S.canti;
+}
+// the structure's heights → a texture the sea reads (outside it: open water at the lab's depth)
+let shoreTex = null;
+function bakeShore() {
+  if (shoreTex) { shoreTex.dispose(); shoreTex = null; }
+  if (!st.heightAt) { setLand(WU, OPEN, openTex); WU.uLandOff.value.set(0, 0); return; }
+  const b = st.bounds, size = Math.max(b.x1 - b.x0, b.z1 - b.z0) + 80, N = 384, h = new Float32Array(N * N);
+  const cx = (b.x0 + b.x1) / 2, cz = (b.z0 + b.z1) / 2;
+  for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) h[j * N + i] = st.heightAt(cx - size / 2 + (i + 0.5) * size / N, cz - size / 2 + (j + 0.5) * size / N);
+  const T = { size, res: N, wrap: false, depth: S.depth, relief: 10, barrier: 'none', h };
+  shoreTex = heightTexture(T); setLand(WU, T, shoreTex); WU.uLandOff.value.set(size / 2 - cx, size / 2 - cz);
+}
+// ORP Błyskawica moored alongside the quay (starboard side to, on fenders), with bow, stern and spring lines
+let moored = null, lines = null;
+function placeShip() {
+  if (lines) { scene.remove(lines); lines.geometry.dispose(); lines = null; }
+  const want = S.id === 'quay' && S.moor;
+  if (!want) { if (moored) moored.visible = false; return; }
+  if (!moored) { moored = transformShip('blyskawica').lod; moored.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } }); scene.add(moored); }
+  moored.visible = true;
+  const x = 1.4 + 11.26 / 2 + 0.1;                                   // fender diameter + half the beam
+  moored.position.set(x, 0, 0); moored.rotation.set(0, 0, 0);
+  const b = st.anchors.bollards, near = (z) => b.reduce((best, p) => (Math.abs(p[2] - z) < Math.abs(best[2] - z) ? p : best), b[0]);
+  const pts = [];
+  for (const [sz, bz, sy] of [[50, 72, 5.5], [40, 15, 5.5], [-40, -15, 3.8], [-52, -72, 3.8]]) {   // bow line, forward spring, after spring, stern line
+    const q = near(bz); pts.push(x - 4.5, sy, sz, q[0], q[1], q[2]);
+  }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+  lines = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0x2a2a28 })); scene.add(lines);
+}
+// the structure's own settings (PARAMS): selects and sliders, rebuilt after a short pause
+let paramTimer = 0;
+function fillParams(P, own) {
+  $('params').replaceChildren(...P.map((q) => {
+    let input, out = el('output', {});
+    if (q.options) { input = el('select', {}); q.options.forEach(([v, t]) => input.append(el('option', { value: v, textContent: t }))); input.value = own[q.key]; }
+    else { input = el('input', { type: 'range', min: q.min, max: q.max, step: q.step }); input.value = own[q.key]; out.textContent = q.fmt(+own[q.key]); }
+    input.addEventListener(q.options ? 'change' : 'input', () => {
+      own[q.key] = q.options ? input.value : +input.value; if (!q.options) out.textContent = q.fmt(own[q.key]);
+      clearTimeout(paramTimer); paramTimer = setTimeout(() => { rebuild(); save(); }, q.options ? 0 : 250);
+    });
+    return el('div', { className: 'row' }, el('span', { textContent: q.label }), input, out);
+  }));
 }
 
 /* ---------------- UI ---------------- */
 for (const id of STRUCTURE_IDS) $('structure').append(el('option', { value: id, textContent: structureInfo(id).name }));
-for (const t of ['Quays (soon)', 'Piers and jetties (soon)', 'Breakwaters (soon)', 'Harbours (soon)', 'Lighthouses (soon)']) $('structure').append(el('option', { textContent: t, disabled: true }));
+for (const t of ['Piers and jetties (soon)', 'Harbours (soon)', 'Lighthouses (soon)']) $('structure').append(el('option', { textContent: t, disabled: true }));
 $('structure').value = S.id; $('structure').onchange = () => { S.id = $('structure').value; rebuild(); save(); };
 for (const [k, w] of Object.entries(WEATHER)) $('weather').append(el('option', { value: k, textContent: w.label }));
 $('weather').value = S.weather; $('weather').onchange = () => { S.weather = $('weather').value; updateSky(); save(); };
 for (const t of Object.keys(TIMES)) $('times').append(el('button', { type: 'button', textContent: t, onclick: () => { S.time = t; markTimes(); updateSky(); save(); } }));
 const markTimes = () => [...$('times').children].forEach((b) => b.classList.toggle('on', b.textContent === S.time));
 const bind = (id, fmt, fn) => { const r = $(id), o = $(id + 'V'); r.value = S[id]; o.textContent = fmt(+r.value); r.addEventListener('input', () => { S[id] = +r.value; o.textContent = fmt(S[id]); if (fn) fn(); save(); }); };
-bind('depth', (v) => v + ' m', applyPose);
+let depthTimer = 0;
+bind('depth', (v) => v + ' m', () => { S.depths[S.id] = S.depth; applyPose(); if (st && !st.pose) { clearTimeout(depthTimer); depthTimer = setTimeout(rebuild, 250); } });
+$('moor').checked = S.moor; $('moor').onchange = () => { S.moor = $('moor').checked; placeShip(); save(); };
 bind('air', (v) => v + ' m', () => { if (jack.target === 'up' && !jack.phase) jack.air = S.air; applyPose(); });
 bind('jspeed', (v) => '×' + v);
 bind('canti', (v) => v.toFixed(1) + ' m', applyPose);
@@ -120,9 +182,21 @@ function stepJack(dt) {
 
 /* ---------------- camera ---------------- */
 const orbit = { target: new THREE.Vector3(0, 20, 0), dist: 210, yaw: 2.4, pitch: 0.18, want: null };
-const CAMS = [['Overview', [0, 20, 0], 210, 2.4, 0.18], ['Helideck', [-22, 34, 17], 45, -0.9, 0.35], ['Drill floor', [0, 42, -41], 55, 2.9, 0.12],
-  ['Leg and jack house', [25.6, 30, -16], 32, 1.9, 0.1], ['From the sea', [0, 12, 0], 150, 3.4, 0.02], ['Underwater', [0, -25, 0], 70, 2.2, -0.15], ['High', [0, 0, 0], 420, 1.0, 0.75]];
-for (const [label, t, d, yaw, pitch] of CAMS) $('cams').append(el('button', { type: 'button', textContent: label, onclick: () => { orbit.want = { target: new THREE.Vector3(...t), dist: d, yaw, pitch }; } }));
+// camera presets per structure: [label, target, distance, yaw, pitch] (yaw: 0 looks from +z, π/2 from the sea side +x)
+function camsFor() {
+  const own = S.params[S.id] || {}, L = own.length || 200, z1 = L / 2, cope = own.cope || 2.6, crest = own.crest || 4.5;
+  if (S.id === 'quay') return [['Overview', [-12, 2, 0], Math.max(160, L * 0.8), 1.1, 0.35], ['From the sea', [0, 3, 0], 95, 1.45, 0.05], ['Along the quay', [0, 4, 0], L * 0.62, 2.9, 0.07],
+    ['Bollard and fender', [0, cope, -L / 2 + 15], 10, 1.0, 0.25], ['Underwater', [8, -6, 0], 45, 1.3, -0.1], ['High', [-20, 0, 0], Math.max(380, L * 1.4), 1.2, 0.9]];
+  if (S.id === 'breakwater') return [['Overview', [0, 0, 0], Math.max(200, L * 1.05), 0.9, 0.35], ['Seaward slope', [10, 1, 0], 45, 1.35, 0.15], ['Head and light', [0, 6, z1], 55, 0.5, 0.18],
+    ['On the crest', [-2, crest + 3, -L / 2 + 15], 30, 3.0, 0.08], ['Underwater', [22, -6, 0], 55, 1.4, -0.1], ['High', [0, 0, 0], Math.max(380, L * 1.6), 1.2, 0.9]];
+  return [['Overview', [0, 20, 0], 210, 2.4, 0.18], ['Helideck', [-22, 34, 17], 45, -0.9, 0.35], ['Drill floor', [0, 42, -41], 55, 2.9, 0.12],
+    ['Leg and jack house', [25.6, 30, -16], 32, 1.9, 0.1], ['From the sea', [0, 12, 0], 150, 3.4, 0.02], ['Underwater', [0, -25, 0], 70, 2.2, -0.15], ['High', [0, 0, 0], 420, 1.0, 0.75]];
+}
+function setCams() {
+  const cams = camsFor();
+  $('cams').replaceChildren(...cams.map(([label, t, d, yaw, pitch]) => el('button', { type: 'button', textContent: label, onclick: () => { orbit.want = { target: new THREE.Vector3(...t), dist: d, yaw, pitch }; } })));
+  const [, t, d, yaw, pitch] = cams[0]; orbit.want = { target: new THREE.Vector3(...t), dist: d, yaw, pitch };
+}
 let drag = null; const cv = renderer.domElement;
 cv.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY, b: e.button }; cv.setPointerCapture(e.pointerId); orbit.want = null; });
 cv.addEventListener('pointerup', () => { drag = null; });
@@ -145,8 +219,8 @@ function frame(now) {
   WU.uTime.value = simT; skyU.uCloudOff.value.x += dt * 0.006;
   stepJack(dt);
   // afloat: the hull rides the waves (heave only, the legs ride with it)
-  if (st && jack.air < 0 && !jack.phase) { st.hull.position.y = jack.air + heightAt(waves, 0, 0, simT) * 0.8; }
-  if (st && S.cranes) st.cranes.forEach((c, i) => { c.slew.rotation.y = c.yaw0 + Math.sin(simT * 0.08 + i * 2) * 0.9; c.boom.rotation.x = -0.32 - 0.25 * (0.5 + 0.5 * Math.sin(simT * 0.11 + i)); });
+  if (st && st.pose && jack.air < 0 && !jack.phase) { st.hull.position.y = jack.air + heightAt(waves, 0, 0, simT) * 0.8; }
+  if (st && st.cranes && S.cranes) st.cranes.forEach((c, i) => { c.slew.rotation.y = c.yaw0 + Math.sin(simT * 0.08 + i * 2) * 0.9; c.boom.rotation.x = -0.32 - 0.25 * (0.5 + 0.5 * Math.sin(simT * 0.11 + i)); });
   if (orbit.want) {
     const k = 1 - Math.exp(-dt * 4), w = orbit.want;
     orbit.target.lerp(w.target, k); orbit.dist += (w.dist - orbit.dist) * k;
@@ -173,8 +247,8 @@ function frame(now) {
   frames++;
   if (now - fpsT > 500) {
     $('fps').textContent = `${Math.round(frames * 1000 / (now - fpsT))} fps`; frames = 0; fpsT = now;
-    const legTop = st ? st.legs[0].group.position.y + st.legs[0].len : 0;
-    $('jackStatus').textContent = jack.phase ? `Jacking: ${jack.phase}…` : jack.air < 0 ? `Afloat, draught ${(-jack.air).toFixed(1)} m — legs raised for tow` : `Elevated: air gap ${jack.air.toFixed(1)} m, legs ${Math.max(0, legTop - jack.air - st.dim.D).toFixed(0)} m above the deck`;
+    const legTop = st && st.legs ? st.legs[0].group.position.y + st.legs[0].len : 0;
+    if (st && st.pose) $('jackStatus').textContent = jack.phase ? `Jacking: ${jack.phase}…` : jack.air < 0 ? `Afloat, draught ${(-jack.air).toFixed(1)} m — legs raised for tow` : `Elevated: air gap ${jack.air.toFixed(1)} m, legs ${Math.max(0, legTop - jack.air - st.dim.D).toFixed(0)} m above the deck`;
     $('stats').replaceChildren(...[['Build', buildMs + ' ms'], ['Draw calls', renderer.info.render.calls], ['Triangles', renderer.info.render.triangles.toLocaleString('en')], ['Camera', `${Math.round(camera.position.y)} m`]]
       .flatMap(([a, b]) => [el('span', { textContent: a }), el('b', { textContent: String(b) })]));
   }

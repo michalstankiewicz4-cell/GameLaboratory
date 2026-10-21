@@ -131,9 +131,21 @@ def main():
             assert abs(pg.evaluate('__land.wrapC(__land.T.size + 10)') - 10) < 1e-6
             gen({'wrap': True}); pg.keyboard.press('h'); time.sleep(4)
             pg.screenshot(path=os.path.join(OUT, 'lab-land.png'), timeout=600000)
-            # structures lab: the jack-up floats for tow and jacks up again; cantilever; cameras
+            # structures lab: every quay and breakwater type builds (units placed, shore heights baked, ship moored)
             pg.goto(f'http://localhost:{PORT}/labs/structures.html')
             pg.wait_for_function('window.__structures && window.__structures.st', timeout=300000)
+            pick = lambda k: pg.evaluate("(k)=>{const s=document.getElementById('structure');s.value=k;s.dispatchEvent(new Event('change'))}", k)
+            kind = lambda v: pg.evaluate("(v)=>{const e=document.querySelector('#params select');e.value=v;e.dispatchEvent(new Event('change'))}", v)
+            for s_id, kinds in [('quay', ['gravity', 'sheetpile', 'piled']), ('breakwater', ['tetrapod', 'rock', 'caisson'])]:
+                pick(s_id)
+                for k in kinds:
+                    kind(k); time.sleep(1)
+                    n = pg.evaluate('(()=>{let n=0;__structures.st.group.traverse(o=>{if(o.isInstancedMesh)n+=o.count});return n})()')
+                    assert pg.evaluate('!!__structures.st.heightAt') and (s_id == 'quay' and k != 'piled' or n > 300), f'{s_id}/{k}: {n} units'
+                print(s_id, kinds, 'ok')
+            pick('quay'); kind('gravity')
+            assert pg.evaluate("__structures.S.moor") is not False
+            pick('super300')
             pg.evaluate('()=>{__structures.S.jspeed=1e5}')
             def settle(cond):
                 for _ in range(120):

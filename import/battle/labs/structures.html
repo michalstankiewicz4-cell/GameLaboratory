@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
-<title>Waterside Structures Lab — jack-up drilling rig | Steel Salvo Labs</title>
-<meta name="description" content="Steel Salvo waterside structures lab: a jack-up drilling rig of the Super 300 class built from code at real scale — triangular hull, three 157 m truss legs with rack-and-pinion jack houses and spud cans, cantilevered drill floor and 49 m derrick, cranes, quarters, helideck, lifeboats — jacked up and down in any water depth.">
+<title>Waterside Structures Lab — jack-up rig, quays, breakwaters | Steel Salvo Labs</title>
+<meta name="description" content="Steel Salvo waterside structures lab: quays (gravity, sheet-pile, piled deck), breakwaters (rock, tetrapods, caissons) and a jack-up drilling rig of the Super 300 class built from code at real scale — triangular hull, three 157 m truss legs with rack-and-pinion jack houses and spud cans, cantilevered drill floor and 49 m derrick, cranes, quarters, helideck, lifeboats — jacked up and down in any water depth.">
 <link rel="canonical" href="https://michalstankiewicz4-cell.github.io/Battle/labs/structures.html">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Waterside Structures Lab — jack-up drilling rig">
@@ -33,22 +33,30 @@
   <div class="sub" id="sSub"></div>
   <table class="specs" id="specs"></table>
   <h3>Reconstruction</h3>
-  <p class="note">Built from code at real scale (1 unit = 1 m). Hull, legs, spud cans, derrick, cranes and quarters follow the published specification sheet; the deck layout (where each module stands), the leg truss pattern and the colours are reconstructed — every assumption is listed in <span class="mono">docs/structures/super300.md</span>.</p>
+  <p class="note" id="sNote"></p>
   <h3>Sources</h3>
   <ol class="src" id="sources"></ol>
   <h3>Parts</h3>
   <div id="parts"></div>
 </aside>
 <aside class="panel right" id="rightPanel">
+  <h3>Site</h3>
+  <div class="row"><span>Water depth</span><input type="range" id="depth" min="4" max="114" step="1"><output id="depthV"></output></div>
+  <div id="paramPanel" hidden>
+  <h3>Structure</h3>
+  <div id="params"></div>
+  <label class="chk" id="moorRow"><input type="checkbox" id="moor"> ORP Błyskawica moored alongside</label>
+  </div>
+  <div id="rigPanel">
   <h3>Jacking</h3>
   <div class="btns"><button type="button" id="afloat">Afloat (under tow)</button><button type="button" id="jackup">Jack up</button></div>
   <div class="status" id="jackStatus"></div>
-  <div class="row"><span>Water depth</span><input type="range" id="depth" min="12" max="114" step="1"><output id="depthV"></output></div>
   <div class="row"><span>Air gap</span><input type="range" id="air" min="6" max="30" step="0.5"><output id="airV"></output></div>
   <div class="row"><span>Jacking speed</span><input type="range" id="jspeed" min="1" max="2000" step="1"><output id="jspeedV"></output></div>
   <h3>Drilling</h3>
   <div class="row"><span>Cantilever out</span><input type="range" id="canti" min="0" max="18.3" step="0.1"><output id="cantiV"></output></div>
   <label class="chk"><input type="checkbox" id="cranesWork"> Cranes working (slew and luff)</label>
+  </div>
   <h3>Camera</h3>
   <div class="btns" id="cams"></div>
   <h3>Sea and light</h3>

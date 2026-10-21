@@ -14,6 +14,7 @@ export const info = {
   year: '1983 (built) · 2015 (last upgrade)',
   type: 'Self-elevating (jack-up) drilling unit, independent legs, cantilever',
   builder: 'Design: Marathon LeTourneau, Super 300 · modelled on a unit whose specification sheet is public (see sources)',
+  note: 'Built from code at real scale (1 unit = 1 m). Hull, legs, spud cans, derrick, cranes and quarters follow the published specification sheet; the deck layout, the leg truss pattern and the colours are reconstructed — every assumption is listed in docs/structures/super300.md.',
   specs: [
     ['Hull', '270 ft × 268 ft × 28 ft (82.3 × 81.7 × 8.5 m)'],
     ['Legs', '3 × 515 ft (157 m), square truss, rack and pinion'],
