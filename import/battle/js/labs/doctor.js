@@ -38,6 +38,9 @@ function testBench() {
   const tube = new THREE.CylinderGeometry(0.4, 0.4, 1.2, 16, 1, true);
   const ti = tube.index.array; for (let i = 0; i < ti.length; i += 3) { const k = ti[i]; ti[i] = ti[i + 1]; ti[i + 1] = k; }
   put('inward tube', tube, grey, -1.2, 2.6, 7);
+  const cup = new THREE.BoxGeometry(1, 1, 1).toNonIndexed(), cp = cup.attributes.position.array.slice(18);   // a box missing its +x side
+  const cupG = new THREE.BufferGeometry(); cupG.setAttribute('position', new THREE.Float32BufferAttribute(cp, 3)); cupG.computeVertexNormals();
+  put('box with a missing side', cupG, grey, 1.4, 2.5, 7);
   put('floating box', new THREE.BoxGeometry(1, 1, 1), grey, 0, 7, 2);
   put('crate under water', new THREE.BoxGeometry(1, 1, 1), grey, 0, -0.5, 0);
   put('fender through the side', new THREE.BoxGeometry(0.5, 0.5, 0.5), grey, 2.1, 1, -2);

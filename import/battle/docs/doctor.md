@@ -30,6 +30,7 @@ Only solid meshes count (visible, opaque standard / physical / lambert / phong /
 | nan | error | positions that aren't numbers | any non-finite vertex |
 | inverted | error | a closed shape built inside-out (outside culled) | negative signed volume in the geometry's own space; closed shapes only (box, closed cylinder, sphere, torus, extrusion, split boxes) |
 | facing | error | an open one-sided surface (hull shell, custom mesh) whose faces point inward: from outside you see through it and look at its inside | sampled faces: a ray along the face normal and one against it; a front boxed in by the model with a back looking out to open space = inward. Open surfaces with ≥ 20 triangles and a one-sided material (closed shapes are `inverted`'s job) |
+| seethrough | error | a hole or gap: looking at the model from outside you see the back of a one-sided face (a missing cap, a gap between surfaces) | an orthographic grid of rays (96 × 96) from each of 26 directions; a first hit on the back of a one-sided face counts; 5 or more per piece = a finding |
 | arc | warning (AA: info) | a gun's line of fire hits the own ship inside its training arc | each mount trained through ±arc in 5° steps, guns level; a ray from each gun along its barrel, as long as the barrel; thin pieces (rails, wires, rods) do not count as obstacles. Tells the blocked bearings and what blocks them |
 | zfight | warning | two pieces' faces in one plane, overlapping: they flicker | triangles bucketed by plane (lab: 2 cm, otherwise 0.06 % of the model), 2D overlap of shrunk triangles. Skipped: same untextured material, `polygonOffset` decals. Tells the plane's normal and a point on it |
 | floating | warning | a piece that touches nothing of the main body | boxes grown by the tolerance (0.4 % of the model), connected groups; all but the biggest |
@@ -80,6 +81,16 @@ closed shapes (signed volume), and the hull is an open shell (the deck is a sepa
 **facing** check finds it (48 of 48 sampled faces inward), the test bench has an inward open tube, and both windings are
 fixed; with the hull now visible from outside the doctor also found the forecastle-break bulkhead flush with the shell
 plating (inset 4 cm) and the anchors buried in the flare (now against the plating).
+
+## Missed and added (v0.7.4)
+
+The owner then saw a V-shaped hole in the stern and ventilator mouths turned the wrong way. The transom fan left out the
+triangle across the top (deck edge to deck edge); `facing` samples faces of the mesh itself, so a missing face is
+invisible to it. The new **seethrough** check looks at the model from outside and counts first hits on the back of a
+one-sided face: the old stern gives 18, the fixed one 0, and the test bench has a box with a missing side. The cowl
+ventilators had the bend's torus beside the pipe instead of on it and their mouth pointed backwards; that is a matter
+of intent (which way a part should face), which no geometric check can know — the ventilator builder is fixed and now
+has a bell mouth. The transom also has its own vertices now, so its flat face is not shaded with the sides' normals.
 
 ## Next
 

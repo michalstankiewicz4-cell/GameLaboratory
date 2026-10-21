@@ -63,7 +63,7 @@
     31.08,
     114.8
    ],
-   "triangles": 33366
+   "triangles": 33575
   }
  },
  "test/bench": {
@@ -76,6 +76,7 @@
    "inverted": 1,
    "nan": 1,
    "poke": 1,
+   "seethrough": 3,
    "sliver": 1,
    "speck": 1,
    "waterline": 1,

@@ -42,7 +42,10 @@ export function loftHull(lines, opt = {}) {
   let cx = 0, cy = 0, cz = 0;
   st.forEach((p) => { cx += p[0]; cy += p[1]; cz += p[2]; });
   pos.push(cx / per, cy / per, cz / per); uv.push(0, 0);
-  for (let i = 0; i < per - 1; i++) idx.push(t0, i + 1, i);
+  // the transom gets its own copy of the stern ring, so its flat normal is not blended with the sides' (shading rings)
+  st.forEach((p) => { pos.push(p[0], p[1], p[2]); uv.push(p[0] / 4, p[1] / 4); });
+  for (let i = 0; i < per - 1; i++) idx.push(t0, t0 + 2 + i, t0 + 1 + i);
+  idx.push(t0, t0 + 1, t0 + per);                             // across the top, deck edge to deck edge (closes the V)
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));

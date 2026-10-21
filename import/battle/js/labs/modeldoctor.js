@@ -10,6 +10,8 @@
 //   inverted   a closed shape built inside-out (one-sided material: the outside is culled)    error
 //   facing     an open surface (hull shell, custom mesh) whose faces point inward — seen from outside it is   error
 //              see-through and you look at its inside (what `inverted` cannot see: it needs a closed shape)
+//   seethrough a hole or gap: rays from viewpoints all around the model whose first hit is the BACK of a one-sided  error
+//              face (you look into the model — a missing cap, a gap between surfaces)
 //   arc        a gun's line of fire hits its own ship inside the mount's training arc         warning (AA: info)
 //   zfight     two pieces' faces in one plane, overlapping — they flicker                     warning
 //   floating   a piece that touches nothing of the rest of the model                          warning
@@ -35,12 +37,13 @@
 //   opts.budget      { triangles, drawCalls, measured: { triangles, drawCalls } } for "budget"
 import * as THREE from '../../vendor/three.module.js';
 
-export const CHECKS = ['nan', 'inverted', 'facing', 'arc', 'zfight', 'floating', 'waterline', 'poke', 'budget', 'hidden', 'speck', 'sliver'];
-export const SEVERITY = { nan: 'error', inverted: 'error', facing: 'error', arc: 'warning', zfight: 'warning', floating: 'warning', waterline: 'warning', poke: 'warning', budget: 'warning', hidden: 'info', speck: 'info', sliver: 'info' };
+export const CHECKS = ['nan', 'inverted', 'facing', 'seethrough', 'arc', 'zfight', 'floating', 'waterline', 'poke', 'budget', 'hidden', 'speck', 'sliver'];
+export const SEVERITY = { nan: 'error', inverted: 'error', facing: 'error', seethrough: 'error', arc: 'warning', zfight: 'warning', floating: 'warning', waterline: 'warning', poke: 'warning', budget: 'warning', hidden: 'info', speck: 'info', sliver: 'info' };
 export const ABOUT = {
   nan: 'positions that are not numbers (broken maths)',
   inverted: 'closed shape built inside-out: its outside is culled',
   facing: 'open surface whose faces point inward: from outside you see through it',
+  seethrough: 'a hole: looking at the model from outside you see the inside of a one-sided surface',
   arc: 'gun line of fire hits the own ship inside the training arc',
   zfight: 'faces of two pieces in one plane overlap and flicker',
   floating: 'piece touches nothing of the main body',
@@ -196,6 +199,42 @@ export function examine(root, opts = {}) {
     }
   }
   lap('facing', t);
+
+  // seethrough: look at the model from 26 directions; a first hit on the back of a one-sided face is a hole
+  t = performance.now();
+  if (run.has('seethrough')) {
+    const solidAll = meshes.filter((m) => !m.nan), objs = solidAll.map((m) => m.o);
+    const ray = new THREE.Raycaster(), ctr = all.getCenter(new THREE.Vector3()).applyMatrix4(root.matrixWorld), dir = new THREE.Vector3(), from = new THREE.Vector3(), nw = new THREE.Vector3();
+    const dirs = [];
+    for (const x of [-1, 0, 1]) for (const y of [-1, 0, 1]) for (const z of [-1, 0, 1]) if (x || y || z) dirs.push(new THREE.Vector3(x, y, z).normalize());
+    const back = new Map(), front = new Map(), sides = new Map();
+    objs.forEach((o) => matsOf(o).forEach((x) => { if (!sides.has(x)) sides.set(x, x.side); x.side = THREE.DoubleSide; }));   // so backs are hit too
+    let s = 12345; const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+    // an orthographic grid of rays per view direction, over the model's bounding sphere
+    const G = opts.seeGrid || 96, R = L / 2, uu = new THREE.Vector3(), vv = new THREE.Vector3();
+    for (const d0 of dirs) {
+      uu.set(0, 1, 0); if (Math.abs(d0.y) > 0.9) uu.set(1, 0, 0);
+      uu.sub(vv.copy(d0).multiplyScalar(uu.dot(d0))).normalize(); vv.crossVectors(d0, uu);
+      dir.copy(d0).negate();
+      for (let a = 0; a < G; a++) for (let b = 0; b < G; b++) {
+      from.copy(ctr).addScaledVector(d0, L * 1.5).addScaledVector(uu, ((a + 0.5) / G * 2 - 1) * R).addScaledVector(vv, ((b + 0.5) / G * 2 - 1) * R);
+      ray.set(from, dir); ray.far = L * 3;
+      const h = ray.intersectObjects(objs, false)[0];
+      if (!h || !h.face) continue;
+      const mats = matsOf(h.object), mat = Array.isArray(h.object.material) ? h.object.material[h.face.materialIndex || 0] : h.object.material;
+      if (!mats.length || sides.get(mat) !== THREE.FrontSide) continue;
+      nw.copy(h.face.normal).transformDirection(h.object.matrixWorld);
+      const map = nw.dot(dir) > 0.05 ? back : front;
+      map.set(h.object, (map.get(h.object) || 0) + 1);
+      }
+    }
+    sides.forEach((side, x) => { x.side = side; });
+    back.forEach((n, o) => {
+      const f = front.get(o) || 0, m = meshes.find((q) => q.o === o);
+      if (m && n >= 5) add('seethrough', [m], `${n} of ${n + f} outside views of this piece look at its back side: a hole or a missing cap`);
+    });
+  }
+  lap('seethrough', t);
 
   // arc: train every gun mount through its arc (5° steps, guns level) and cast its line of fire
   t = performance.now();

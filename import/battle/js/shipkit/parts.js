@@ -145,9 +145,15 @@ export function boat(p, d, len, at, motor = false) {
 export function ventilator(p, d, at, r = 0.25, h = 1.0, yaw = 0) {
   const [x, y, z] = at;
   p.cyl('paint', r, r, h, seg(10, d), [x, y + h / 2, z]);
-  const t = new THREE.TorusGeometry(r * 1.2, r * 0.95, seg(8, d), seg(10, d), Math.PI / 2);
-  p.add('paint', t, [x, y + h, z + Math.cos(yaw) * 0.01], [0, yaw - Math.PI / 2, 0]);
-  p.add('dark', new THREE.CircleGeometry(r * 0.95, seg(10, d)), [x + Math.sin(yaw) * r * 1.2, y + h + r * 1.2, z + Math.cos(yaw) * r * 1.2], [0, yaw, 0]);
+  // quarter-bend from the pipe top: the torus is shifted so its arc starts on the pipe axis going up and ends
+  // R further on, horizontal; local -x (where the arc ends) is turned to face `yaw`
+  const R = r * 1.3, sx = Math.sin(yaw), sz = Math.cos(yaw);
+  const t = new THREE.TorusGeometry(R, r, seg(8, d), seg(10, d), Math.PI / 2); t.translate(-R, 0, 0);
+  p.add('paint', t, [x, y + h, z], [0, yaw + Math.PI / 2, 0]);
+  // bell mouth (flared, open) and the dark inside, facing yaw
+  const bell = new THREE.CylinderGeometry(r * 1.35, r, r * 0.5, seg(12, d), 1, true); bell.rotateX(Math.PI / 2);
+  p.add('paint', bell, [x + sx * (R + r * 0.25), y + h + R, z + sz * (R + r * 0.25)], [0, yaw, 0]);
+  p.add('dark', new THREE.CircleGeometry(r * 0.98, seg(12, d)), [x + sx * (R - 0.02), y + h + R, z + sz * (R - 0.02)], [0, yaw, 0]);
 }
 
 // Pair of mooring bollards.
