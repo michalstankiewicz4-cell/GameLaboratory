@@ -29,12 +29,14 @@ def main():
         with sync_playwright() as pw:
             b = pw.chromium.launch(args=['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'])
             pg = b.new_page(viewport={'width': 1280, 'height': 720})
+            pg.set_default_navigation_timeout(300000)        # leaving a busy lab page can take a while headless
             pg.on('pageerror', lambda e: errs.append('pageerror ' + str(e) + ' @ ' + pg.url + ' ' + (e.stack or '')[:400]))
             pg.on('console', lambda m: errs.append(m.type + ' ' + m.text) if m.type == 'error' else None)
             pg.goto(f'http://localhost:{PORT}/labs.html')
             assert pg.locator('a.tile[href="labs/ship.html"]').count() == 1, 'ship tile missing'
             assert pg.locator('a.tile[href="labs/look.html"]').count() >= 1, 'look tile missing'
             assert pg.locator('a.tile[href="labs/land.html"]').count() == 1, 'land tile missing'
+            assert pg.locator('a.tile[href="labs/structures.html"]').count() == 1, 'structures tile missing'
             pg.goto(f'http://localhost:{PORT}/labs/ship.html')
             pg.wait_for_function('window.__lab && window.__lab.model', timeout=180000)
             print('stats', ' '.join(pg.inner_text('#stats').split()))
@@ -129,6 +131,25 @@ def main():
             assert abs(pg.evaluate('__land.wrapC(__land.T.size + 10)') - 10) < 1e-6
             gen({'wrap': True}); pg.keyboard.press('h'); time.sleep(4)
             pg.screenshot(path=os.path.join(OUT, 'lab-land.png'), timeout=600000)
+            # structures lab: the jack-up floats for tow and jacks up again; cantilever; cameras
+            pg.goto(f'http://localhost:{PORT}/labs/structures.html')
+            pg.wait_for_function('window.__structures && window.__structures.st', timeout=300000)
+            pg.evaluate('()=>{__structures.S.jspeed=1e5}')
+            def settle(cond):
+                for _ in range(120):
+                    if pg.evaluate(cond): return True
+                    time.sleep(0.5)
+                return False
+            pg.click('#afloat'); assert settle('__structures.jack.phase === "" && __structures.jack.air < 0 && __structures.jack.legs === 0'), 'rig did not float'
+            pg.click('#jackup'); assert settle('__structures.jack.phase === "" && __structures.jack.legs === 1 && __structures.jack.air === __structures.S.air'), 'rig did not jack up'
+            can = pg.evaluate('(()=>{const l=__structures.st.legs[0];return l.group.position.y - __structures.st.dim.spudH})()')
+            assert abs(can + pg.evaluate('__structures.S.depth') + 2) < 0.01, f'spud can not on the seabed: {can}'
+            pg.evaluate("()=>{const r=document.getElementById('canti');r.value=18;r.dispatchEvent(new Event('input'))}")
+            assert abs(pg.evaluate('__structures.st.cantilever.position.z') + 18) < 1e-6, 'cantilever did not skid'
+            for c in pg.locator('#cams button').all(): c.click(); time.sleep(0.5)
+            pg.evaluate("()=>[...document.querySelectorAll('#cams button')].find(b=>b.textContent==='Overview').click()")
+            pg.keyboard.press('h'); time.sleep(4)
+            pg.screenshot(path=os.path.join(OUT, 'lab-structures.png'), timeout=600000)
             b.close()
     finally:
         srv.kill()
