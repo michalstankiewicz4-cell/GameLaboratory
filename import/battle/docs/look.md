@@ -10,7 +10,8 @@ browser (`localStorage`, key `steelSalvo.lookLab.v1`) and can be copied as JSON.
 | File | What it does |
 |---|---|
 | `js/shipkit/ageing.js` | Procedural ageing. `bakeWear(group)` voxelises the ship (0.35 m), casts 7 short rays per voxel for occlusion and tests 4 directions for edge exposure, and writes one `aWear` vertex attribute (occlusion, edge) — ~80k vertices in ~0.3 s, geometry untouched. `ageMaterials(mats, u)` patches the ShipKit materials by material key (`AGE_KIND`): painted steel, hull paint, deck, bare metal, wood, canvas, brass, rope. |
-| `js/labs/skykit.js` | Procedural sky with a cloud layer (fbm), `WEATHER` presets (clear, fair, broken, overcast, storm), `applySky()` returns the sun, ambient and fog that match, `skyEnvironment()` makes the PMREM environment from the same GLSL, so ship, sea reflections and sky agree. WaterKit takes the sky GLSL via `waterMaterial(u, { sky })`. |
+| `js/labs/skykit.js` | Procedural sky with a cloud layer (fbm), `WEATHER` presets (clear, fair, broken, overcast, rain, sea fog, storm), rain curtains and fog in the sky (`uSkyFog`), `fogDensity(km)`, `applySky()` returns the sun, ambient and fog that match, `skyEnvironment()` makes the PMREM environment from the same GLSL, so ship, sea reflections and sky agree. WaterKit takes the sky GLSL via `waterMaterial(u, { sky })`. |
+| `js/labs/rainkit.js` | Falling rain in one draw call: line segments (each drop's motion blur) in a box that follows the camera and wraps; wind slants it, distance fades it, `setRain(0..1)` sets how many drops are drawn (up to 24k). |
 | `js/render/look.js` | `LookPipeline`: half-float target with mipmaps (MSAA optional, render scale) and one post shader: exposure (manual or automatic from the smallest mip), tone mapping ACES / AgX / Hable, contrast, saturation, temperature, tint, bloom from mips, vignette, grain, chromatic aberration, barrel distortion, droplets and dirt on the lens, sun glare/ghost, sharpen. `set(params, 'A'|'B')` and `split` draw two parameter sets side by side. `AutoResolution` lowers/raises the render scale to keep ~60 fps (with hysteresis). `LOOK_PRESETS`: Game clean, Cinematic, Bodycam. |
 
 ## Ageing rules (by surface)
@@ -31,9 +32,20 @@ moving `uAge` (and later from the transformer's damage).
 
 ## Weather
 
-Cloud cover, density, wind, haze and the sun's height/bearing. With "Wind sets the sea" the wind picks the sea state
+Seven weathers (clear, fair, broken, overcast, rain, sea fog, storm) or custom: cloud cover, density, wind, haze, rain,
+visibility and the sun's height/bearing. With "Wind sets the sea" the wind picks the sea state
 (significant height ≈ 0.0246 U², peak length ≈ 0.83 U²) and the water look (Atlantic, Baltic grey under thick cloud,
 storm). Overcast skies dim the sun and the environment light.
+
+**Rain** (0 … downpour): falling streaks around the camera (RainKit), rings from drops on the sea near the camera, a
+rougher sea with a duller glitter, wet ship (darker paint, glossy upward faces, water running down vertical faces, dry in
+sheltered spots — the baked occlusion decides), dark rain curtains on the horizon in the sky and in its reflections,
+the sun's disc hidden. **Squalls** make the rain come and go; **Rain on the lens** adds droplets to the look.
+
+**Visibility / fog**: one number in km, the distance at which a dark ship fades to 5 % (exponential-squared fog,
+density 1.73 / visibility). The thicker of fog, haze and rain wins; the same density fogs the ship (three.js
+`FogExp2`), the sea and the sky (path through a 260 m fog layer, so the zenith stays lighter and the sun shows as a
+pale disc). Fog and rain take the sun's light down and its glitter faster still (the glitter needs a sharp sun).
 
 ## Cameras
 
@@ -43,6 +55,6 @@ stays the default.
 
 ## Check
 
-`py tools/lab-check.py` loads the page, goes through every weather, every look preset, the split compare and every
+`py tools/lab-check.py` loads the page, goes through every weather (rain and fog included), every look preset, the split compare and every
 camera, and screenshots `tools/out/lab-look.png`. Performance on a real GPU has not been measured yet ("Measure the
 cost of each effect" in the lab does it on the user's machine).

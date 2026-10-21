@@ -5,6 +5,7 @@ import * as THREE from '../../vendor/three.module.js';
 import { buildShip, SHIPS } from '../shipkit/index.js';
 import { bakeWear, ageMaterials, ageUniforms } from '../shipkit/ageing.js';
 import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment } from './skykit.js';
+import { rainUniforms, rainMesh } from './rainkit.js';
 import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, hullTexture, LOOKS } from './waterkit.js';
 import { LookPipeline, AutoResolution, LOOK_PRESETS, LOOK_DEFAULTS } from '../render/look.js';
 
@@ -13,12 +14,13 @@ const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag)
 const KEY = 'steelSalvo.lookLab.v1';
 let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { saved = null; }
 const S = {
-  sky: { weather: 'broken', ...pick(WEATHER.broken), sunEl: 12, sunAz: 235, windSea: true },
+  sky: { weather: 'broken', ...pick(WEATHER.broken), sunEl: 12, sunAz: 235, windSea: true, squalls: true, rainLens: true },
   age: Object.fromEntries(Object.entries(ageUniforms()).map(([k, v]) => [k, v.value])),
   look: { ...LOOK_PRESETS.cinematic }, preset: 'cinematic',
   cam: { fov: 40, shake: 0 }, perf: { scale: 1, autoRes: false, aa: true, shadows: true },
   ...(saved || {}),
 };
+if (saved && saved.sky) S.sky = { ...pick(WEATHER.broken), squalls: true, rainLens: true, ...saved.sky };     // settings saved before rain and fog existed
 function pick(o) { const r = { ...o }; delete r.label; return r; }
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { /* private mode */ } };
 
@@ -32,7 +34,7 @@ const camera = new THREE.PerspectiveCamera(S.cam.fov, 1, 0.3, 9000);
 const look = new LookPipeline(renderer);
 const skyU = skyUniforms();
 const sky = skyDome(skyU); scene.add(sky);
-scene.fog = new THREE.Fog(0xc9d7e2, 900, 3200);
+scene.fog = new THREE.FogExp2(0xc9d7e2, 0.0005);
 const hemi = new THREE.HemisphereLight(0xdfe6ec, 0x2a3a46, 0.8);
 const sun = new THREE.DirectionalLight(0xfff0d8, 3);
 sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
@@ -65,19 +67,38 @@ function seaFromWind() {
   WU.uShipFx.value.set(1, 1, 1, 0);
 }
 
+/* ---------------- rain ---------------- */
+const RU = rainUniforms(), rain = rainMesh(RU); scene.add(rain);
+let rainNow = 0;                                                      // current rain amount (squalls make it come and go)
+
 /* ---------------- weather → light ---------------- */
 let envRT = null, envDirty = true, envT = 0;
 function updateSky() {
   const L = applySky(skyU, S.sky);
   sun.position.copy(L.sunDir).multiplyScalar(220); sun.color.copy(L.sunColor); sun.intensity = L.sunIntensity;
   hemi.intensity = L.ambient; hemi.color.copy(L.sky); hemi.groundColor.copy(L.ground);
-  scene.fog.color.copy(L.fog); scene.fog.far = L.fogFar; scene.fog.near = L.fogFar * 0.25;
-  WU.uSun.value.copy(L.sunDir); WU.uSunCol.value.copy(L.sunColor).multiplyScalar(1.1 * (1 - S.sky.coverage * S.sky.density * 0.8));
+  scene.fog.color.copy(L.fog); scene.fog.density = L.fogDensity; WU.uFogDen.value = L.fogDensity;
+  RU.uRainCol.value.copy(L.fog).lerp(new THREE.Color(1, 1, 1), 0.25);
+  visKm = L.visKm;
+  WU.uSun.value.copy(L.sunDir); WU.uSunCol.value.copy(L.sunColor).multiplyScalar(1.1 * (1 - S.sky.coverage * S.sky.density * 0.8) * L.sunSeen * L.sunSeen);   // glitter needs the sharp sun: fog and rain take it away faster than the light
   WU.uFogCol.value.copy(L.fog); WU.uFogFar.value = L.fogFar;
-  look.sunVisible = Math.max(0, 1 - S.sky.coverage * (0.4 + S.sky.density * 0.6));
+  look.sunVisible = Math.max(0, 1 - S.sky.coverage * (0.4 + S.sky.density * 0.6)) * L.sunSeen;
   scene.environmentIntensity = 0.85 - S.sky.coverage * S.sky.density * 0.45;           // less sky light under heavy cloud
   envDirty = true; seaFromWind();
+  WU.uShine.value *= 1 - S.sky.rain * 0.6;                                    // rain roughens the surface: a duller, wider glitter
 }
+let visKm = 10;
+function rainFrame(t) {
+  const r = S.sky.rain;
+  rainNow = r <= 0 ? 0 : S.sky.squalls ? r * Math.min(1, 0.35 + 0.65 * Math.max(0, Math.sin(t * 0.11) * 0.7 + Math.sin(t * 0.047 + 1.3) * 0.5 + 0.35)) : r;
+  rain.setRain(rainNow); RU.uRain.value = rainNow; WU.uRain.value = rainNow;
+  AU.uRainWet.value = r > 0 ? Math.min(1, 0.45 + r * 0.7) : 0; AU.uRainT.value = t;
+  RU.uTimeR.value = t; const w = S.sky.wind * 0.55; RU.uWindR.value.set(w * 0.894, w * 0.447);
+  const wetLens = S.sky.rainLens && rainNow > 0;
+  if (wetLens) look.set({ droplets: Math.max(S.look.droplets, rainNow * 0.5) }); else if (lensWas) look.set({ droplets: S.look.droplets });
+  lensWas = wetLens;
+}
+let lensWas = false;
 
 /* ---------------- UI ---------------- */
 const bindRange = (id, obj, key, fmt, after) => {
@@ -89,11 +110,13 @@ const bindRange = (id, obj, key, fmt, after) => {
 for (const [k, w] of Object.entries(WEATHER)) $('weather').append(el('option', { value: k, textContent: w.label }));
 $('weather').append(el('option', { value: 'custom', textContent: 'Custom' }));
 $('weather').value = S.sky.weather;
-$('weather').onchange = () => { const w = WEATHER[$('weather').value]; if (!w) return; Object.assign(S.sky, pick(w), { weather: $('weather').value }); ['coverage', 'density', 'wind', 'haze'].forEach((k) => { $(k).value = S.sky[k]; $(k + 'V').textContent = fmtSky[k](S.sky[k]); }); updateSky(); save(); };
-const fmtSky = { coverage: (v) => Math.round(v * 100) + '%', density: (v) => Math.round(v * 100) + '%', wind: (v) => v + ' m/s', haze: (v) => Math.round(v * 100) + '%', sunEl: (v) => v + '°', sunAz: (v) => v + '°' };
-for (const k of Object.keys(fmtSky)) bindRange(k, S.sky, k, fmtSky[k], () => { if (['coverage', 'density', 'wind', 'haze'].includes(k)) { S.sky.weather = 'custom'; $('weather').value = 'custom'; } updateSky(); });
+$('weather').onchange = () => { const w = WEATHER[$('weather').value]; if (!w) return; Object.assign(S.sky, pick(w), { weather: $('weather').value }); ['coverage', 'density', 'wind', 'haze', 'rain', 'vis'].forEach((k) => { $(k).value = S.sky[k]; $(k + 'V').textContent = fmtSky[k](S.sky[k]); }); updateSky(); save(); };
+const fmtSky = { coverage: (v) => Math.round(v * 100) + '%', density: (v) => Math.round(v * 100) + '%', wind: (v) => v + ' m/s', haze: (v) => Math.round(v * 100) + '%',
+  rain: (v) => (v ? Math.round(v * 100) + '%' : 'none'), vis: (v) => (v < 1 ? Math.round(v * 1000) + ' m' : v.toFixed(1) + ' km'), sunEl: (v) => v + '°', sunAz: (v) => v + '°' };
+for (const k of Object.keys(fmtSky)) bindRange(k, S.sky, k, fmtSky[k], () => { if (['coverage', 'density', 'wind', 'haze', 'rain', 'vis'].includes(k)) { S.sky.weather = 'custom'; $('weather').value = 'custom'; } updateSky(); });
+for (const k of ['squalls', 'rainLens']) { $(k).checked = !!S.sky[k]; $(k).onchange = () => { S.sky[k] = $(k).checked; applyLook(); save(); }; }
 $('windSea').checked = S.sky.windSea; $('windSea').onchange = () => { S.sky.windSea = $('windSea').checked; seaFromWind(); save(); };
-for (const k of Object.keys(AU)) bindRange(k, S.age, k, (v) => v.toFixed(2), () => { AU[k].value = S.age[k]; });
+for (const k of Object.keys(AU)) if ($(k)) bindRange(k, S.age, k, (v) => v.toFixed(2), () => { AU[k].value = S.age[k]; });
 
 const LOOK_SLIDERS = [['exposure', 'Exposure', 0.3, 2.5, 0.05], ['autoTarget', 'Auto exposure target', 0.08, 0.5, 0.01], ['contrast', 'Contrast', 0.7, 1.5, 0.01], ['saturation', 'Saturation', 0, 1.6, 0.01],
   ['temperature', 'Temperature', -0.5, 0.5, 0.01], ['tint', 'Tint', -0.3, 0.3, 0.01], ['bloom', 'Glow', 0, 2, 0.05], ['vignette', 'Vignette', 0, 1, 0.01], ['grain', 'Grain', 0, 1, 0.01],
@@ -155,7 +178,7 @@ $('measure').onclick = async () => {
   const keep = JSON.parse(JSON.stringify(S));
   const restore = () => { Object.assign(S.look, keep.look); for (const k of Object.keys(AU)) AU[k].value = keep.age[k]; Object.assign(S.sky, keep.sky); updateSky(); applyLook(); sun.castShadow = keep.perf.shadows; look.setAA(keep.perf.aa); };
   const tests = [
-    ['Ageing', () => { AU.uAge.value = 0; AU.uAO.value = 0; }], ['Clouds', () => { S.sky.coverage = 0; updateSky(); }],
+    ['Ageing', () => { AU.uAge.value = 0; AU.uAO.value = 0; }], ['Clouds', () => { S.sky.coverage = 0; updateSky(); }], ['Rain', () => { S.sky.rain = 0; updateSky(); }],
     ['Glow + lens dirt', () => { look.set({ bloom: 0, dirt: 0 }); }], ['Water on the lens', () => { look.set({ droplets: 0 }); }],
     ['Distortion + aberration', () => { look.set({ distortion: 0, ca: 0 }); }], ['Sun glare', () => { look.set({ glare: 0 }); }], ['Sharpen', () => { look.set({ sharpen: 0 }); }],
     ['Automatic exposure', () => { look.set({ autoExposure: 0 }); }], ['Shadows', () => { sun.castShadow = false; }], ['Anti-aliasing', () => { look.setAA(false); }],
@@ -177,6 +200,7 @@ const motion = { h: 0, p: 0, r: 0, vh: 0, vp: 0, vr: 0 };
 function frame(now) {
   const dtMs = now - last, dt = Math.min(0.05, dtMs / 1000); last = now; frameLog.push(dtMs); if (frameLog.length > 2000) frameLog.splice(0, 1000);
   simT += dt; shift += 4 * dt;
+  rainFrame(simT);
   WU.uTime.value = simT; WU.uShift.value = shift; skyU.uCloudOff.value.x += dt * S.sky.wind * 0.0012; skyU.uCloudOff.value.y += dt * S.sky.wind * 0.0006;
   // ship on the waves (heave, pitch, roll as damped springs)
   const hb = heightAt(waves, 0, 40, simT, shift), hs = heightAt(waves, 0, -40, simT, shift), hp = heightAt(waves, -4.5, 0, simT, shift), hst = heightAt(waves, 4.5, 0, simT, shift);
@@ -215,12 +239,12 @@ function frame(now) {
     $('fps').textContent = `${Math.round(frames * 1000 / (now - fpsT))} fps`; frames = 0; fpsT = now;
     const ms = frameLog.slice(-30), avg = ms.reduce((s, x) => s + x, 0) / Math.max(1, ms.length);
     $('stats').replaceChildren(el('span', { textContent: 'Frame' }), el('b', { textContent: avg.toFixed(1) + ' ms' }), el('span', { textContent: 'Draw calls' }), el('b', { textContent: renderer.info.render.calls }),
-      el('span', { textContent: 'Render scale' }), el('b', { textContent: Math.round(look.scale * 100) + '%' }), el('span', { textContent: 'Wave height' }), el('b', { textContent: (S.sky.windSea ? Math.min(6.5, 0.0246 * S.sky.wind ** 2) : 1.2).toFixed(1) + ' m' }));
+      el('span', { textContent: 'Render scale' }), el('b', { textContent: Math.round(look.scale * 100) + '%' }), el('span', { textContent: 'Visibility' }), el('b', { textContent: visKm < 1 ? Math.round(visKm * 1000) + ' m' : visKm.toFixed(1) + ' km' }), el('span', { textContent: 'Wave height' }), el('b', { textContent: (S.sky.windSea ? Math.min(6.5, 0.0246 * S.sky.wind ** 2) : 1.2).toFixed(1) + ' m' }));
   }
   requestAnimationFrame(frame);
 }
 
 fillLook(); markPreset(); applyLook(); updateSky(); look.setScale(S.perf.scale); look.setAA(S.perf.aa); sun.castShadow = S.perf.shadows; camera.fov = S.cam.fov; resize();
-$('status').textContent = 'ORP Błyskawica · procedural ageing · cloudy sky · camera look';
-window.__look = { S, AU, look, orbit, camera, scene, updateSky, applyLook, fillLook };
+$('status').textContent = 'ORP Błyskawica · procedural ageing · sky, rain and fog · camera look';
+window.__look = { S, AU, RU, WU, rain, look, orbit, camera, scene, updateSky, applyLook, fillLook };
 requestAnimationFrame(frame);

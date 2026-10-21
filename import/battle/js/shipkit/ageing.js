@@ -14,6 +14,7 @@ export function ageUniforms() {
   return {
     uAge: { value: 0.55 }, uAO: { value: 0.8 }, uGrime: { value: 0.7 }, uStreak: { value: 0.7 }, uRust: { value: 0.5 },
     uChip: { value: 0.6 }, uSalt: { value: 0.6 }, uPlate: { value: 0.7 }, uWood: { value: 0.7 }, uPatina: { value: 0.7 }, uCanvas: { value: 0.6 },
+    uRainWet: { value: 0 }, uRainT: { value: 0 },                  // wet from rain 0..1, time (s) for running water
   };
 }
 
@@ -136,6 +137,13 @@ const AGE_FRAG = /* glsl */`
     float pat = smoothstep(0.3, 0.68, n2 + ao * 0.35) * age * uPatina;
     c = mix(c, mix(vec3(0.17, 0.31, 0.24), vec3(0.28, 0.22, 0.12), n1), pat); metal = mix(metal, 0.2, pat); rough = mix(rough, 0.8, pat);
   } else if (uKind == 8) { c *= 1.0 - 0.35 * age; }                                              // rope
+  if (uRainWet > 0.0) {                                                                          // rain: darker, glossy, water running down
+    float open = 1.0 - smoothstep(0.35, 0.8, ao);                                                // sheltered spots stay drier
+    float run = smoothstep(0.6, 0.72, agFbm(vec3(P.x * 3.0, P.y * 0.35 + uRainT * 0.9, P.z * 3.0))) * vert;
+    float wet = uRainWet * open * (0.55 + 0.45 * max(N.y, 0.0));
+    c *= 1.0 - 0.32 * wet * (uKind == 5 || uKind == 6 || uKind == 8 ? 1.4 : 1.0);
+    rough = mix(rough, 0.12, clamp(wet * 0.75 + run * uRainWet * 0.6, 0.0, 1.0));
+  }
   diffuseColor.rgb = c; roughnessFactor = rough; metalnessFactor = metal;
 }
 `;
@@ -151,7 +159,7 @@ export function ageMaterials(mats, u) {
       if (prev) prev(sh, r);
       Object.assign(sh.uniforms, u, { uKind: { value: kind } });
       sh.vertexShader = 'attribute vec2 aWear;\nvarying vec2 vWear;\nvarying vec3 vAgePos, vAgeNor;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvWear = aWear; vAgePos = transformed; vAgeNor = objectNormal;');
-      sh.fragmentShader = 'uniform float uAge, uAO, uGrime, uStreak, uRust, uChip, uSalt, uPlate, uWood, uPatina, uCanvas;\nuniform int uKind;\nvarying vec2 vWear;\nvarying vec3 vAgePos, vAgeNor;\n' + GLSL_NOISE
+      sh.fragmentShader = 'uniform float uAge, uAO, uGrime, uStreak, uRust, uChip, uSalt, uPlate, uWood, uPatina, uCanvas, uRainWet, uRainT;\nuniform int uKind;\nvarying vec2 vWear;\nvarying vec3 vAgePos, vAgeNor;\n' + GLSL_NOISE
         + sh.fragmentShader.replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\n' + AGE_FRAG);
     };
     m.customProgramCacheKey = () => 'age' + kind + '|' + prevKey();

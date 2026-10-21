@@ -9,7 +9,7 @@ under `labs/`) and its kit (code under `js/` that the game will use once a lab's
 | | Light cruiser, submarine, aircraft and shore | soon | `js/shipkit/ships/` | |
 | **Environment** | Water and weather — sea and ship (`labs/water.html`) | in progress | `js/labs/waterkit.js` | `docs/water.md` |
 | | Sky and clouds (in the Look Lab for now) | first version | `js/labs/skykit.js` | `docs/look.md` |
-| | Weather: wind → sea, clouds, haze (rain, fog, squalls next) | first version | `js/labs/skykit.js` | `docs/look.md` |
+| | Weather: wind → sea, clouds, haze, rain and squalls, sea fog and visibility (thunder, snow and fog banks next) | first version | `js/labs/skykit.js`, `js/labs/rainkit.js` | `docs/look.md` |
 | | Time of day, land and coast, night sky and space | soon | `envkit` | |
 | **Graphics and filters** | Look Lab (`labs/look.html`): procedural ageing by surface type (see below), baked shading, tone and colour, exposure, lens (distortion, droplets, flare, grain, vignette), bodycam look, automatic resolution | first version | `js/render/look.js`, `js/shipkit/ageing.js` | `docs/look.md` |
 | **Special effects** | fire and explosions, water effects, smoke, destruction | soon | `fxkit`, transformer hitboxes | |

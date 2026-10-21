@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <title>Look Lab — ageing, weather and lens for ORP Błyskawica | Steel Salvo Labs</title>
-<meta name="description" content="Steel Salvo look lab: procedural ageing by surface (rust streaks, chipped paint, salt, greyed decks, patina), a cloudy sky and weather, and a camera look from clean to cinematic and bodycam — every effect switchable, compared side by side, with its cost.">
+<meta name="description" content="Steel Salvo look lab: procedural ageing by surface (rust streaks, chipped paint, salt, greyed decks, patina), a cloudy sky with rain and sea fog, and a camera look from clean to cinematic and bodycam — every effect switchable, compared side by side, with its cost.">
 <link rel="canonical" href="https://michalstankiewicz4-cell.github.io/Battle/labs/look.html">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Look Lab — ageing, weather and lens">
-<meta property="og:description" content="Procedural ageing, a cloudy sky and a bodycam camera look for a 1:1 destroyer, live in the browser.">
+<meta property="og:description" content="Procedural ageing, sky, rain and fog, and a bodycam camera look for a 1:1 destroyer, live in the browser.">
 <meta property="og:url" content="https://michalstankiewicz4-cell.github.io/Battle/labs/look.html">
 <meta property="og:image" content="https://michalstankiewicz4-cell.github.io/Battle/assets/labs/look.jpg">
 <meta name="twitter:card" content="summary_large_image">
@@ -35,9 +35,13 @@
   <div class="row"><span>Cloud cover</span><input type="range" id="coverage" min="0" max="1" step="0.01"><output id="coverageV"></output></div>
   <div class="row"><span>Cloud density</span><input type="range" id="density" min="0" max="1" step="0.01"><output id="densityV"></output></div>
   <div class="row"><span>Wind</span><input type="range" id="wind" min="0" max="25" step="0.5"><output id="windV"></output></div>
+  <div class="row"><span>Rain</span><input type="range" id="rain" min="0" max="1" step="0.01"><output id="rainV"></output></div>
+  <div class="row"><span>Visibility (fog)</span><input type="range" id="vis" min="0.1" max="25" step="0.05"><output id="visV"></output></div>
   <div class="row"><span>Haze</span><input type="range" id="haze" min="0" max="1" step="0.01"><output id="hazeV"></output></div>
   <div class="row"><span>Sun height</span><input type="range" id="sunEl" min="1" max="70" value="14"><output id="sunElV"></output></div>
   <div class="row"><span>Sun bearing</span><input type="range" id="sunAz" min="0" max="360" value="60"><output id="sunAzV"></output></div>
+  <label class="chk"><input type="checkbox" id="squalls" checked> Squalls (the rain comes and goes)</label>
+  <label class="chk"><input type="checkbox" id="rainLens" checked> Rain on the lens</label>
   <label class="chk"><input type="checkbox" id="windSea" checked> Wind sets the sea (wave height and length)</label>
   <h3>Ageing</h3>
   <div class="row"><span>Wear</span><input type="range" id="uAge" min="0" max="1" step="0.01"><output id="uAgeV"></output></div>

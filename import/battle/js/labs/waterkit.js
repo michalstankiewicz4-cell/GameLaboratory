@@ -202,7 +202,7 @@ export function waterUniforms() {
     uDeep: { value: new THREE.Color() }, uScatter: { value: new THREE.Color() },
     uShine: { value: 900 }, uRipples: { value: 0.5 }, uCrest: { value: 0.5 }, uReflect: { value: 1 }, uPlanar: { value: 0 },
     uReflTex: { value: null }, uRes: { value: new THREE.Vector2(1, 1) }, uAlpha: { value: 1 }, uPixelN: { value: 1 },
-    uFogCol: { value: new THREE.Color() }, uFogFar: { value: 2600 }, uWet: { value: 0.7 }, uWetOn: { value: 1 },
+    uFogCol: { value: new THREE.Color() }, uFogFar: { value: 2600 }, uFogDen: { value: 0 }, uRain: { value: 0 }, uWet: { value: 0.7 }, uWetOn: { value: 1 },
     tNormal: { value: tex.normal }, tFoam: { value: tex.foam },
   };
 }
@@ -250,7 +250,7 @@ export function waterMaterial(u, opt = {}) {
       }`,
     fragmentShader: GLSL_WAVES + GLSL_SHIP + /* glsl */`
       uniform vec3 uSun, uSunCol, uSkyH, uSkyZ, uSkySea, uDeep, uScatter, uFogCol;
-      uniform float uShine, uRipples, uCrest, uReflect, uPlanar, uAlpha, uPixelN, uFogFar;
+      uniform float uShine, uRipples, uCrest, uReflect, uPlanar, uAlpha, uPixelN, uFogFar, uFogDen, uRain;
       uniform sampler2D uReflTex, tNormal, tFoam; uniform vec2 uRes;
       varying vec3 vWorld; varying vec3 vN; varying float vFold; varying vec2 vXZ; varying float vShipH;
       ${opt.sky ? opt.sky + '\n      vec3 sky(vec3 d) { return skyColor(d); }' : `vec3 sky(vec3 d) {
@@ -269,6 +269,20 @@ export function waterMaterial(u, opt = {}) {
         vec3 r2 = texture2D(tNormal, q / 23.0 - vec2(uTime * 0.017, -uTime * 0.008)).xyz * 2.0 - 1.0;
         vec2 rip = (r1.xy + r2.xy) * uRipples * 0.35 * exp(-dist / 350.0);
         N = normalize(N + vec3(rip.x, 0.0, rip.y));
+        // rain: expanding rings from drops (two layers of cells, each cell one drop with its own phase) and a fine roughening
+        if (uRain > 0.0 && dist < 80.0) {
+          vec2 rr = vec2(0.0);
+          for (int l = 0; l < 2; l++) {
+            vec2 g = vXZ * (l == 0 ? 2.2 : 3.1) + float(l) * 7.3, ci = floor(g), cf = fract(g) - 0.5;
+            float h1 = fract(sin(dot(ci, vec2(127.1, 311.7))) * 43758.5453), h2 = fract(sin(dot(ci, vec2(269.5, 183.3))) * 43758.5453);
+            vec2 c = vec2(h1, h2) * 0.6 - 0.3;
+            float t = fract(uTime * (0.9 + h1 * 0.6) + h2), on = step(h1 * 0.7 + 0.3, uRain + 0.25);
+            vec2 dv = cf - c; float r = length(dv), ring = r - t * 0.45;
+            float w = exp(-ring * ring * 900.0) * (1.0 - t) * on;
+            rr += dv / max(r, 1e-3) * w * sin(ring * 60.0);
+          }
+          N = normalize(N + vec3(rr.x, 0.0, rr.y) * 0.6 * uRain * exp(-dist / 30.0));
+        }
         vec3 V = normalize(cameraPosition - vWorld), L = normalize(uSun);
         float NdV = max(dot(N, V), 0.0);
         float F = (0.02 + 0.98 * pow(1.0 - NdV, 5.0)) * uReflect;
@@ -295,7 +309,7 @@ export function waterMaterial(u, opt = {}) {
         vec3 foamCol = vec3(0.92, 0.95, 0.96) * (0.45 + 0.55 * max(dot(N, L), 0.0) * sunUp + 0.15);
         col = mix(col, foamCol, foam * 0.9);
         // aerial perspective
-        float fog = smoothstep(uFogFar * 0.25, uFogFar, dist);
+        float fog = uFogDen > 0.0 ? 1.0 - exp(-pow(dist * uFogDen, 2.0)) : smoothstep(uFogFar * 0.25, uFogFar, dist);
         col = mix(col, uFogCol, fog);
         gl_FragColor = vec4(col, mix(uAlpha, 1.0, max(F, foam)));
       }`,
