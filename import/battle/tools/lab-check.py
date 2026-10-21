@@ -2,7 +2,8 @@
 
 Loads labs.html and labs/ship.html, waits for the ship to build, toggles parts, trains the mounts,
 rebuilds at another detail level and screenshots a few camera presets to tools/out/lab-*.png;
-then the water lab, the transformer and the look lab (weathers, look presets, split compare, cameras).
+then the water lab, the transformer, the look lab (weathers, look presets, split compare, cameras) and the land
+lab (seamless wrap, exact land share, 100 % land, mountain barrier).
 Exit code 1 on page errors or a missing model. Slow without a GPU (first build ~15 s).
   py tools/lab-check.py            # check + screenshots
   py tools/lab-check.py --thumb    # also rewrite assets/labs/ship.jpg (clean Bow 3/4 view)
@@ -32,7 +33,8 @@ def main():
             pg.on('console', lambda m: errs.append(m.type + ' ' + m.text) if m.type == 'error' else None)
             pg.goto(f'http://localhost:{PORT}/labs.html')
             assert pg.locator('a.tile[href="labs/ship.html"]').count() == 1, 'ship tile missing'
-            assert pg.locator('a.tile[href="labs/look.html"]').count() == 1, 'look tile missing'
+            assert pg.locator('a.tile[href="labs/look.html"]').count() >= 1, 'look tile missing'
+            assert pg.locator('a.tile[href="labs/land.html"]').count() == 1, 'land tile missing'
             pg.goto(f'http://localhost:{PORT}/labs/ship.html')
             pg.wait_for_function('window.__lab && window.__lab.model', timeout=180000)
             print('stats', ' '.join(pg.inner_text('#stats').split()))
@@ -92,6 +94,20 @@ def main():
             assert pg.evaluate('window.__lookSalvos') == 1, 'salvo did not fire'
             pg.keyboard.press('h'); time.sleep(3)
             pg.screenshot(path=os.path.join(OUT, 'lab-look.png'), timeout=600000)
+            # land lab: seamless wrap, exact land share, 100 % land, bounded map with a mountain barrier
+            pg.goto(f'http://localhost:{PORT}/labs/land.html')
+            pg.wait_for_function('window.__land && window.__land.T', timeout=300000)
+            print('land', ' '.join(pg.inner_text('#genStats').split()))
+            seam = pg.evaluate('''()=>{const T=__land.T,N=T.res,h=T.h;let s=0,i=0;for(let j=0;j<N;j++){s+=Math.abs(h[j*N+N-1]-h[j*N]);for(let x=0;x<N-1;x+=7)i+=Math.abs(h[j*N+x+1]-h[j*N+x])}return [s/N, i/(N*Math.ceil((N-1)/7))]}''')
+            assert seam[0] < 3 * seam[1] + 0.5, f'wrap seam {seam}'
+            gen = lambda kw: pg.evaluate('(kw)=>{Object.assign(__land.S.map,kw);__land.generate();return [__land.T.landShare, __land.ship.on]}', kw)
+            share, on = gen({'land': 0.6}); assert abs(share - 0.6) < 0.01, f'land share {share}'
+            share, on = gen({'land': 1.0}); assert share > 0.999 and not on, f'100 % land {share} ship {on}'
+            gen({'land': 0.35, 'wrap': False, 'barrier': 'mountains'})
+            edge = pg.evaluate('__land.sampleHeight(20, __land.T.size / 2)'); assert edge > 100, f'mountain barrier {edge}'
+            assert abs(pg.evaluate('__land.wrapC(__land.T.size + 10)') - 10) < 1e-6
+            gen({'wrap': True}); pg.keyboard.press('h'); time.sleep(4)
+            pg.screenshot(path=os.path.join(OUT, 'lab-land.png'), timeout=600000)
             b.close()
     finally:
         srv.kill()

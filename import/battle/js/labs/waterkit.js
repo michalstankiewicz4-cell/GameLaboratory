@@ -234,14 +234,21 @@ export function polarGrid(segments = 192, rings = 160, r0 = 0.6, r1 = 6000) {
 }
 
 // opt.sky: GLSL defining skyColor(d) (SkyKit) — reflections then show the same clouds as the sky dome
+// opt.land: GLSL defining landH(xz) (LandKit GLSL_LAND; its uniforms must be in u) — waves die down over shallows,
+//           the water turns green-blue and clear where it is shallow (the sea floor shows), surf foam on the shore
 export function waterMaterial(u, opt = {}) {
+  const L = opt.land ? '#define LAND\n' + opt.land + '\nvarying float vDepth;\n' : '';
   return new THREE.ShaderMaterial({
     uniforms: u, transparent: true, depthWrite: true,
-    vertexShader: GLSL_WAVES + GLSL_SHIP + /* glsl */`
+    vertexShader: L + GLSL_WAVES + GLSL_SHIP + /* glsl */`
       varying vec3 vWorld; varying vec3 vN; varying float vFold; varying vec2 vXZ; varying float vShipH;
       void main() {
         vec2 p = (modelMatrix * vec4(position, 1.0)).xz;
         float fold; vec3 n; vec3 d = gerstner(p, n, fold);
+#ifdef LAND
+        float dep = -landH(p), damp = 0.12 + 0.88 * smoothstep(0.5, 16.0, dep);
+        d = vec3(p.x, 0.0, p.y) + (d - vec3(p.x, 0.0, p.y)) * damp; n = normalize(mix(vec3(0.0, 1.0, 0.0), n, damp)); fold *= damp; vDepth = dep;
+#endif
         float sh = shipWave(p);
         float e = 0.8, sx = shipWave(p + vec2(e, 0.0)) - sh, sz = shipWave(p + vec2(0.0, e)) - sh;   // ship wave slope
         n = normalize(n + vec3(-sx / e, 0.0, -sz / e));
@@ -249,7 +256,7 @@ export function waterMaterial(u, opt = {}) {
         vWorld = wp; vN = n; vFold = fold; vXZ = p; vShipH = sh;
         gl_Position = projectionMatrix * viewMatrix * vec4(wp, 1.0);
       }`,
-    fragmentShader: GLSL_WAVES + GLSL_SHIP + /* glsl */`
+    fragmentShader: L + GLSL_WAVES + GLSL_SHIP + /* glsl */`
       uniform vec3 uSun, uSunCol, uSkyH, uSkyZ, uSkySea, uDeep, uScatter, uFogCol;
       uniform float uShine, uRipples, uCrest, uReflect, uPlanar, uAlpha, uPixelN, uFogFar, uFogDen, uRain, uLight;
       uniform sampler2D uReflTex, tNormal, tFoam; uniform vec2 uRes; uniform vec4 uFlash;
@@ -297,6 +304,11 @@ export function waterMaterial(u, opt = {}) {
         float thick = clamp((vWorld.y + 0.6) * 0.45, 0.0, 1.0);
         float sss = pow(max(dot(V, -vec3(L.x, 0.0, L.z) * 0.9 + vec3(0.0, 0.25, 0.0)), 0.0), 3.0) * thick + thick * 0.25;
         body += uScatter * sss * (0.4 + 0.6 * sunUp);
+#ifdef LAND
+        float depth = -landH(vXZ);
+        if (depth < -0.4) discard;                                // dry land: no water drawn over beaches
+        body = mix(vec3(0.16, 0.42, 0.40) * (0.35 + 0.65 * sunUp), body, smoothstep(0.0, 14.0, depth));
+#endif
         body *= uLight;                                          // daylight (dusk and night darken the water body)
         vec3 col = mix(body, refl, F);
         // sun glitter
@@ -307,6 +319,9 @@ export function waterMaterial(u, opt = {}) {
         float noise = fn * 0.65 + fn2 * 0.35;
         float crest = smoothstep(1.0 - uCrest * 0.55, 1.15 - uCrest * 0.5, fold + noise * 0.35) * uCrest;
         float foam = clamp(crest + shipFoam(vXZ, noise), 0.0, 1.0);
+#ifdef LAND
+        foam = max(foam, smoothstep(1.6, 0.15, depth) * smoothstep(-0.4, 0.1, depth) * (0.55 + 0.45 * sin(uTime * 1.2 - depth * 3.0 + noise * 7.0)));   // surf
+#endif
         foam *= smoothstep(0.15, 0.55, noise + foam * 0.5);
         vec3 foamCol = vec3(0.92, 0.95, 0.96) * (0.45 + 0.55 * max(dot(N, L), 0.0) * sunUp + 0.15) * uLight;
         col = mix(col, foamCol, foam * 0.9);
@@ -319,7 +334,11 @@ export function waterMaterial(u, opt = {}) {
         // aerial perspective
         float fog = uFogDen > 0.0 ? 1.0 - exp(-pow(dist * uFogDen, 2.0)) : smoothstep(uFogFar * 0.25, uFogFar, dist);
         col = mix(col, uFogCol, fog);
-        gl_FragColor = vec4(col, mix(uAlpha, 1.0, max(F, foam)));
+        float alpha = uAlpha;
+#ifdef LAND
+        alpha *= 0.3 + 0.7 * smoothstep(0.0, 9.0, depth);         // shallow water is clear
+#endif
+        gl_FragColor = vec4(col, mix(alpha, 1.0, max(F * 0.8, foam)));
       }`,
   });
 }

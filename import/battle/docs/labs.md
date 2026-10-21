@@ -11,7 +11,7 @@ under `labs/`) and its kit (code under `js/` that the game will use once a lab's
 | | Sky and clouds (in the Look Lab for now) | first version | `js/labs/skykit.js` | `docs/look.md` |
 | | Weather: wind → sea, clouds, haze, rain and squalls, sea fog and visibility (thunder, snow and fog banks next) | first version | `js/labs/skykit.js`, `js/labs/rainkit.js` | `docs/look.md` |
 | | Time of day: dawn, dusk, night with stars and the moon (in the Look Lab) | first version | `js/labs/skykit.js` | `docs/look.md` |
-| | Land and coast: procedural terrain mixed with the sea, a wrap-around (torus) map you sail out of one side and into the other, or a map bounded by barriers | next | `envkit` | |
+| | Land Lab (`labs/land.html`): procedural land and sea (0–100 % land; islands, archipelago, coast, fjords, highlands; erosion, beaches, shallows, surf), wrap-around (torus) or bounded map (buoys, mountains, wall) | first version | `js/labs/landkit.js` | `docs/land.md` |
 | | Space | soon | | |
 | **Graphics and filters** | Look Lab (`labs/look.html`): procedural ageing by surface type (see below), baked shading, tone and colour, exposure, lens (distortion, droplets, flare, grain, vignette), bodycam look, automatic resolution | first version | `js/render/look.js`, `js/shipkit/ageing.js` | `docs/look.md` |
 | **Special effects** | fire and explosions, water effects, smoke, destruction | soon | `fxkit`, transformer hitboxes | |
