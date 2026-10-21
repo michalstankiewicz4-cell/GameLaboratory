@@ -88,7 +88,7 @@ button,select,input{font:inherit;color:inherit}
 .splitline{position:fixed;top:44px;bottom:36px;left:50%;z-index:2;width:0;border-left:2px solid var(--lab);pointer-events:none}
 .splitline span{position:absolute;top:8px;padding:1px 7px;border-radius:4px;background:rgba(12,15,19,.8);color:var(--lab);font:12px ui-monospace,Consolas,monospace}
 .splitline span:first-child{right:8px}.splitline span:last-child{left:8px}
-.row select,.row input[type=color]{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:6px;padding:2px 4px;height:24px}
+.row select,.row input[type=color],.row input[type=text]{color:inherit;font:inherit;width:100%;background:var(--card2);border:1px solid var(--line);border-radius:6px;padding:2px 4px;height:24px}
 .sw{display:inline-block;width:10px;height:10px;border-radius:2px;flex:none}
 .specs th{text-align:left;color:var(--dim);font-weight:600;font-size:11.5px;padding:3px 4px 3px 0}
 #levels td{padding:3px 6px 3px 0}#levels td:first-child{width:auto}

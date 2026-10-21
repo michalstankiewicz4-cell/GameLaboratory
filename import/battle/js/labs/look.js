@@ -5,7 +5,8 @@ import * as THREE from '../../vendor/three.module.js';
 import { buildShip, SHIPS } from '../shipkit/index.js';
 import { bakeWear, ageMaterials, ageUniforms } from '../shipkit/ageing.js';
 import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment, sunAt } from './skykit.js';
-import { rainUniforms, rainMesh } from './rainkit.js';
+import { rainUniforms, rainMesh, lightning } from './rainkit.js';
+import { navLights, gunFlashes, signalLamp } from '../shipkit/lights.js';
 import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, hullTexture, LOOKS } from './waterkit.js';
 import { LookPipeline, AutoResolution, LOOK_PRESETS, LOOK_DEFAULTS } from '../render/look.js';
 
@@ -14,13 +15,13 @@ const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag)
 const KEY = 'steelSalvo.lookLab.v1';
 let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { saved = null; }
 const S = {
-  sky: { weather: 'broken', ...pick(WEATHER.broken), sunEl: 12, sunAz: 235, windSea: true, squalls: true, rainLens: true, time: 15.2, moon: 0.8 },
+  sky: { weather: 'broken', ...pick(WEATHER.broken), sunEl: 12, sunAz: 235, windSea: true, squalls: true, rainLens: true, time: 15.2, moon: 0.8, lightning: 0, thunder: false, navLights: 'auto' },
   age: Object.fromEntries(Object.entries(ageUniforms()).map(([k, v]) => [k, v.value])),
   look: { ...LOOK_PRESETS.cinematic }, preset: 'cinematic',
   cam: { fov: 40, shake: 0 }, perf: { scale: 1, autoRes: false, aa: true, shadows: true },
   ...(saved || {}),
 };
-if (saved && saved.sky) S.sky = { ...pick(WEATHER.broken), squalls: true, rainLens: true, time: 15.2, moon: 0.8, ...saved.sky };
+if (saved && saved.sky) S.sky = { ...pick(WEATHER.broken), squalls: true, rainLens: true, time: 15.2, moon: 0.8, lightning: 0, thunder: false, navLights: 'auto', ...saved.sky };
 S.look = { ...LOOK_DEFAULTS, ...S.look };     // settings saved before rain and fog existed
 function pick(o) { const r = { ...o }; delete r.label; return r; }
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { /* private mode */ } };
@@ -48,7 +49,11 @@ const model = buildShip('blyskawica', { detail: 1 });
 const shipRoot = new THREE.Group(); shipRoot.add(model.group); scene.add(shipRoot);
 const lamps = [], lampOff = new THREE.MeshStandardMaterial({ color: 0xbfc4c0, roughness: 0.12, metalness: 0.6 });
 model.group.traverse((o) => { if (o.isMesh && o.material.isMeshBasicMaterial && o.material.color.r > 1) { lamps.push([o, o.material]); o.material = lampOff; } });   // searchlights: off by day, on at night
-const bake = bakeWear(model.group);
+const bake = bakeWear(model.group);                     // before the lights and shutters are added: they do not age
+const nav = navLights(model); model.group.add(nav);
+const flashes = gunFlashes(model, scene);
+const signal = signalLamp(model);
+const fwdLamp = lamps.find(([o]) => { o.geometry.computeBoundingBox(); return o.geometry.boundingBox.max.z > 0; });   // the searchlight that signals
 const AU = ageUniforms(); for (const k of Object.keys(AU)) AU[k].value = S.age[k] ?? AU[k].value;
 ageMaterials(model.materials, AU);
 $('bake').textContent = `Baked occlusion and edges for ${bake.vertices.toLocaleString('en')} vertices in ${bake.ms} ms (voxel grid ${(bake.voxels / 1e6).toFixed(1)} M cells).`;
@@ -71,6 +76,7 @@ function seaFromWind() {
 
 /* ---------------- rain ---------------- */
 const RU = rainUniforms(), rain = rainMesh(RU); scene.add(rain);
+const bolts = lightning(scene);
 let rainNow = 0;                                                      // current rain amount (squalls make it come and go)
 
 /* ---------------- weather → light ---------------- */
@@ -83,7 +89,9 @@ function updateSky() {
   RU.uRainCol.value.copy(L.fog).lerp(new THREE.Color(1, 1, 1), 0.25);
   visKm = L.visKm; dayNow = L.day;
   WU.uLight.value = 0.03 + 0.97 * L.day + 0.04 * S.sky.moon * L.night;
-  for (const [o, m] of lamps) o.material = L.night > 0.5 ? m : lampOff;
+  for (const [o, m] of lamps) o.material = L.night > 0.5 || (signal.sending && fwdLamp && o === fwdLamp[0]) ? m : lampOff;
+  nav.setOn(S.sky.navLights === 'on' ? 1 : S.sky.navLights === 'off' ? 0 : 1 - Math.min(1, Math.max(0, (S.sky.sunEl + 1) / 3)));   // auto: from sunset to sunrise
+  bolts.S.rate = S.sky.lightning; bolts.S.sound = S.sky.thunder; bolts.S.fogK = L.fogDensity;
   applyLook();
   WU.uSun.value.copy(L.sunDir); WU.uSunCol.value.copy(L.glitterColor).multiplyScalar(1.1 * (1 - S.sky.coverage * S.sky.density * 0.8) * L.sunSeen * L.sunSeen);   // glitter needs the sharp sun: fog and rain take it away faster than the light
   WU.uFogCol.value.copy(L.fog); WU.uFogFar.value = L.fogFar;
@@ -115,10 +123,10 @@ const bindRange = (id, obj, key, fmt, after) => {
 for (const [k, w] of Object.entries(WEATHER)) $('weather').append(el('option', { value: k, textContent: w.label }));
 $('weather').append(el('option', { value: 'custom', textContent: 'Custom' }));
 $('weather').value = S.sky.weather;
-$('weather').onchange = () => { const w = WEATHER[$('weather').value]; if (!w) return; Object.assign(S.sky, pick(w), { weather: $('weather').value }); ['coverage', 'density', 'wind', 'haze', 'rain', 'vis'].forEach((k) => { $(k).value = S.sky[k]; $(k + 'V').textContent = fmtSky[k](S.sky[k]); }); updateSky(); save(); };
+$('weather').onchange = () => { const w = WEATHER[$('weather').value]; if (!w) return; Object.assign(S.sky, pick(w), { weather: $('weather').value }); ['coverage', 'density', 'wind', 'haze', 'rain', 'vis', 'lightning'].forEach((k) => { $(k).value = S.sky[k]; $(k + 'V').textContent = fmtSky[k](S.sky[k]); }); updateSky(); save(); };
 const fmtSky = { coverage: (v) => Math.round(v * 100) + '%', density: (v) => Math.round(v * 100) + '%', wind: (v) => v + ' m/s', haze: (v) => Math.round(v * 100) + '%',
-  rain: (v) => (v ? Math.round(v * 100) + '%' : 'none'), moon: (v) => (v ? Math.round(v * 100) + '%' : 'new moon'), vis: (v) => (v < 1 ? Math.round(v * 1000) + ' m' : v.toFixed(1) + ' km'), sunEl: (v) => v + '°', sunAz: (v) => v + '°' };
-for (const k of Object.keys(fmtSky)) bindRange(k, S.sky, k, fmtSky[k], () => { if (['coverage', 'density', 'wind', 'haze', 'rain', 'vis'].includes(k)) { S.sky.weather = 'custom'; $('weather').value = 'custom'; } updateSky(); });
+  rain: (v) => (v ? Math.round(v * 100) + '%' : 'none'), lightning: (v) => (v ? Math.round(v * 100) + '%' : 'none'), moon: (v) => (v ? Math.round(v * 100) + '%' : 'new moon'), vis: (v) => (v < 1 ? Math.round(v * 1000) + ' m' : v.toFixed(1) + ' km'), sunEl: (v) => v + '°', sunAz: (v) => v + '°' };
+for (const k of Object.keys(fmtSky)) if (k !== 'lightning') bindRange(k, S.sky, k, fmtSky[k], () => { if (['coverage', 'density', 'wind', 'haze', 'rain', 'vis'].includes(k)) { S.sky.weather = 'custom'; $('weather').value = 'custom'; } updateSky(); });
 // time of day (local solar time, 55° N in late October — the North Atlantic convoy season) sets the sun's height and bearing
 const fmtTime = (v) => `${String(Math.floor(v)).padStart(2, '0')}:${String(Math.round((v % 1) * 60) % 60).padStart(2, '0')}`;
 function setTime(v) {
@@ -130,7 +138,29 @@ function setTime(v) {
 $('time').value = S.sky.time; $('timeV').textContent = fmtTime(S.sky.time);
 $('time').addEventListener('input', () => setTime(+$('time').value));
 for (const [label, v] of [['Dawn', 6.75], ['Morning', 9], ['Noon', 12], ['Afternoon', 15.2], ['Dusk', 17.25], ['Night', 21.5]]) $('times').append(el('button', { type: 'button', textContent: label, onclick: () => setTime(v) }));
-for (const k of ['squalls', 'rainLens']) { $(k).checked = !!S.sky[k]; $(k).onchange = () => { S.sky[k] = $(k).checked; applyLook(); save(); }; }
+$('lightning').value = S.sky.lightning; $('lightningV').textContent = fmtSky.lightning(S.sky.lightning);
+$('lightning').addEventListener('input', () => { S.sky.lightning = +$('lightning').value; $('lightningV').textContent = fmtSky.lightning(S.sky.lightning); bolts.S.rate = S.sky.lightning; save(); });
+$('strike').onclick = () => bolts.strikeNow(camera);
+$('thunder').addEventListener('change', () => { if ($('thunder').checked) bolts.unlock(); });
+$('navLights').value = S.sky.navLights; $('navLights').onchange = () => { S.sky.navLights = $('navLights').value; updateSky(); save(); };
+// broadside: main guns trained to one side within their arcs, a little elevation, then all fire together
+function trainTo(side) {
+  for (const m of model.mounts) {
+    if (m.aa || m.torp) continue;
+    const want = side * Math.PI / 2 - m.yaw0, d = Math.atan2(Math.sin(want), Math.cos(want)), lim = (m.arc || 150) * Math.PI / 180;
+    m.train.rotation.y = Math.max(-lim, Math.min(lim, d));
+    for (const g of m.guns) g.rotation.x = -0.1;
+  }
+}
+const salvo = () => { trainTo(S.salvoSide || 1); flashes.fire(); window.__lookSalvos = (window.__lookSalvos || 0) + 1; };
+$('salvo').onclick = salvo;
+$('signal').onclick = () => {
+  if (signal.sending) { signal.stop(); $('signal').classList.remove('on'); } else { signal.send('SOS'); $('signal').classList.add('on'); }
+  updateSky();
+};
+$('side').onchange = () => { S.salvoSide = +$('side').value; trainTo(S.salvoSide); };
+addEventListener('keydown', (e) => { if (e.code === 'KeyF' && !e.target.closest('input,select')) salvo(); });
+for (const k of ['squalls', 'rainLens', 'thunder']) { $(k).checked = !!S.sky[k]; $(k).onchange = () => { S.sky[k] = $(k).checked; applyLook(); save(); }; }
 $('windSea').checked = S.sky.windSea; $('windSea').onchange = () => { S.sky.windSea = $('windSea').checked; seaFromWind(); save(); };
 for (const k of Object.keys(AU)) if ($(k)) bindRange(k, S.age, k, (v) => v.toFixed(2), () => { AU[k].value = S.age[k]; });
 
@@ -198,7 +228,7 @@ $('measure').onclick = async () => {
   const keep = JSON.parse(JSON.stringify(S));
   const restore = () => { Object.assign(S.look, keep.look); for (const k of Object.keys(AU)) AU[k].value = keep.age[k]; Object.assign(S.sky, keep.sky); updateSky(); applyLook(); sun.castShadow = keep.perf.shadows; look.setAA(keep.perf.aa); };
   const tests = [
-    ['Ageing', () => { AU.uAge.value = 0; AU.uAO.value = 0; }], ['Clouds', () => { S.sky.coverage = 0; updateSky(); }], ['Rain', () => { S.sky.rain = 0; updateSky(); }],
+    ['Ageing', () => { AU.uAge.value = 0; AU.uAO.value = 0; }], ['Clouds', () => { S.sky.coverage = 0; updateSky(); }], ['Rain', () => { S.sky.rain = 0; updateSky(); }], ['Lightning', () => { bolts.S.rate = 0; }],
     ['Glow + lens dirt', () => { look.set({ bloom: 0, dirt: 0 }); }], ['Water on the lens', () => { look.set({ droplets: 0 }); }],
     ['Distortion + aberration', () => { look.set({ distortion: 0, ca: 0 }); }], ['Sun glare', () => { look.set({ glare: 0 }); }], ['Sharpen', () => { look.set({ sharpen: 0 }); }],
     ['Automatic exposure', () => { look.set({ autoExposure: 0 }); }], ['Shadows', () => { sun.castShadow = false; }], ['Anti-aliasing', () => { look.setAA(false); }],
@@ -221,6 +251,13 @@ function frame(now) {
   const dtMs = now - last, dt = Math.min(0.05, dtMs / 1000); last = now; frameLog.push(dtMs); if (frameLog.length > 2000) frameLog.splice(0, 1000);
   simT += dt; shift += 4 * dt;
   rainFrame(simT);
+  // lightning and gun flashes: light the sky, the sea and the ship for a moment
+  bolts.S.sound = S.sky.thunder; const lb = bolts.update(dt, camera);
+  if (lb.dir) skyU.uSkyBolt.value.set(lb.dir.x, lb.dir.y, lb.dir.z, lb.I * 1.6); else skyU.uSkyBolt.value.w = 0;
+  signal.update(dt, camera, 1 - dayNow * 0.85);
+  const fp = flashes.update(dt);
+  if (fp > 0) WU.uFlash.value.set(flashes.light.position.x, flashes.light.position.y, flashes.light.position.z, fp * 0.002);
+  else if (lb.I > 0 && lb.at) WU.uFlash.value.set(lb.at.x, 600, lb.at.z, lb.I * 4e4); else WU.uFlash.value.w = 0;
   WU.uTime.value = simT; WU.uShift.value = shift; skyU.uCloudOff.value.x += dt * S.sky.wind * 0.0012; skyU.uCloudOff.value.y += dt * S.sky.wind * 0.0006;
   // ship on the waves (heave, pitch, roll as damped springs)
   const hb = heightAt(waves, 0, 40, simT, shift), hs = heightAt(waves, 0, -40, simT, shift), hp = heightAt(waves, -4.5, 0, simT, shift), hst = heightAt(waves, 4.5, 0, simT, shift);
@@ -266,5 +303,5 @@ function frame(now) {
 
 fillLook(); markPreset(); applyLook(); updateSky(); look.setScale(S.perf.scale); look.setAA(S.perf.aa); sun.castShadow = S.perf.shadows; camera.fov = S.cam.fov; resize();
 $('status').textContent = 'ORP Błyskawica · procedural ageing · sky, rain and fog · camera look';
-window.__look = { S, AU, RU, WU, rain, look, orbit, camera, scene, updateSky, applyLook, fillLook };
+window.__look = { S, AU, RU, WU, rain, bolts, flashes, nav, salvo, signal, look, orbit, camera, scene, updateSky, applyLook, fillLook };
 requestAnimationFrame(frame);

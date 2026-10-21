@@ -28,7 +28,7 @@ def main():
         with sync_playwright() as pw:
             b = pw.chromium.launch(args=['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'])
             pg = b.new_page(viewport={'width': 1280, 'height': 720})
-            pg.on('pageerror', lambda e: errs.append('pageerror ' + str(e)))
+            pg.on('pageerror', lambda e: errs.append('pageerror ' + str(e) + ' @ ' + pg.url + ' ' + (e.stack or '')[:400]))
             pg.on('console', lambda m: errs.append(m.type + ' ' + m.text) if m.type == 'error' else None)
             pg.goto(f'http://localhost:{PORT}/labs.html')
             assert pg.locator('a.tile[href="labs/ship.html"]').count() == 1, 'ship tile missing'
@@ -45,6 +45,11 @@ def main():
             time.sleep(3)
             pg.evaluate("()=>{const d=document.getElementById('detail');d.value=1;d.dispatchEvent(new Event('change'));d.dispatchEvent(new Event('input'))}")
             time.sleep(3)
+            # signal lamp: the shutters open and close while it keys SOS
+            pg.click('#signal'); seen = set()
+            for _ in range(12): time.sleep(0.4); seen.add(round(pg.evaluate('__lab.signal.open')))
+            pg.click('#signal')
+            assert seen == {0, 1}, f'signal shutters {seen}'
             bad = pg.evaluate("()=>{let n=0;__lab.model.group.traverse(o=>{if(o.isMesh){const a=o.geometry.attributes.position.array;for(let i=0;i<a.length;i+=97)if(!isFinite(a[i]))n++;}});return n}")
             assert bad == 0, f'{bad} NaN vertices'
             for c in CAMS: snap(pg, c, os.path.join(OUT, 'lab-' + c.replace(' ', '_').replace('¾', '34').replace('&', 'and') + '.png'))
@@ -82,6 +87,9 @@ def main():
             for i in range(pg.locator('#presets button').count()): pg.locator('#presets button').nth(i).click(); time.sleep(0.5)
             pg.click('#splitOn'); time.sleep(1)
             for c in pg.locator('#cams button').all(): c.click(); time.sleep(1)
+            for c in pg.locator('#times button').all(): c.click(); time.sleep(0.5)
+            pg.click('#salvo'); pg.click('#strike'); pg.click('#signal'); time.sleep(2); pg.click('#signal')
+            assert pg.evaluate('window.__lookSalvos') == 1, 'salvo did not fire'
             pg.keyboard.press('h'); time.sleep(3)
             pg.screenshot(path=os.path.join(OUT, 'lab-look.png'), timeout=600000)
             b.close()

@@ -11,7 +11,8 @@ browser (`localStorage`, key `steelSalvo.lookLab.v1`) and can be copied as JSON.
 |---|---|
 | `js/shipkit/ageing.js` | Procedural ageing. `bakeWear(group)` voxelises the ship (0.35 m), casts 7 short rays per voxel for occlusion and tests 4 directions for edge exposure, and writes one `aWear` vertex attribute (occlusion, edge) — ~80k vertices in ~0.3 s, geometry untouched. `ageMaterials(mats, u)` patches the ShipKit materials by material key (`AGE_KIND`): painted steel, hull paint, deck, bare metal, wood, canvas, brass, rope. |
 | `js/labs/skykit.js` | Procedural sky with a cloud layer (fbm), `WEATHER` presets (clear, fair, broken, overcast, rain, sea fog, storm), rain curtains and fog in the sky (`uSkyFog`), `fogDensity(km)`, `sunAt(hour, lat, day)` (solar position), dawn/dusk glow, stars and the moon, `applySky()` returns the sun, ambient and fog that match, `skyEnvironment()` makes the PMREM environment from the same GLSL, so ship, sea reflections and sky agree. WaterKit takes the sky GLSL via `waterMaterial(u, { sky })`. |
-| `js/labs/rainkit.js` | Falling rain in one draw call: line segments (each drop's motion blur) in a box that follows the camera and wraps; wind slants it, distance fades it, `setRain(0..1)` sets how many drops are drawn (up to 24k). |
+| `js/labs/rainkit.js` | Falling rain in one draw call: line segments (each drop's motion blur) in a box that follows the camera and wraps; wind slants it, distance fades it, `setRain(0..1)` sets how many drops are drawn (up to 24k). `lightning(scene)`: jagged bolts with branches 1.5–6 km away, a few return strokes, lighting the clouds (SkyKit `uSkyBolt`), the scene (one directional light) and the sea; optional thunder (Web Audio) after distance ÷ 343 m/s. |
+| `js/shipkit/lights.js` | Ship lights from the model's `anchors`: `navLights()` (masthead white, side lights green starboard / red port, stern white, each shining only over its arc), `gunFlashes()` (flash sprites at the main guns' muzzles, one point light kept from the start, the sea lit through WaterKit `uFlash`), `signalLamp()` (the searchlight's venetian shutters keying Morse, glow and beam ahead while open) and `morse(text)`. |
 | `js/render/look.js` | `LookPipeline`: half-float target with mipmaps (MSAA optional, render scale) and one post shader: exposure (manual or automatic from the smallest mip), tone mapping ACES / AgX / Hable, contrast, saturation, temperature, tint, bloom from mips, vignette, grain, chromatic aberration, barrel distortion, droplets and dirt on the lens, sun glare/ghost, sharpen. `set(params, 'A'|'B')` and `split` draw two parameter sets side by side. `AutoResolution` lowers/raises the render scale to keep ~60 fps (with hysteresis). `LOOK_PRESETS`: Game clean, Cinematic, Bodycam. |
 
 ## Ageing rules (by surface)
@@ -57,6 +58,20 @@ there they only sparkled as noise); the **Moon** slider (new … full) sets moon
 the sun at 35°, moonlit cloud edges, a moon path on the sea and a weak blue light that casts shadows. Water, foam and
 fog darken with the daylight (`uLight` in WaterKit); the searchlights glow at night. With manual exposure the look
 pipeline adapts like the eye (up to ×3.6 at night); automatic exposure does it by itself.
+
+## Lights, guns and lightning
+
+- **Navigation lights**: from sunset to sunrise (or on/off): white masthead light on the foremast, green starboard and
+  red port side lights on the bridge-wing screens (112.5° arcs, so from ahead you see both, from the beam only one),
+  white stern light (135° aft).
+- **Fire a salvo (F)**: the 120 mm mounts train to the chosen side within their arcs and fire together; a flash and a
+  burning-gas cone at every muzzle and a tenth of a second of orange light on the ship and the sea.
+- **Signal SOS**: the searchlight behind the bridge keys · · · — — — · · · with its round venetian shutter (a ring on the
+  lens rim, slats cut to the circle; they swing in ~60 ms, dot 0.22 s, dash three dots); glow and beam ahead only while open. In the Ship Lab the same lamp sends any
+  short text (Morse A–Z, 0–9) and the camera moves in front of it.
+- **Lightning** (0 … frequent; Storm has it): bolts lighting the clouds around the strike, flickering return strokes,
+  the scene and the sea flashed blue-white; rain and fog hide the channel, not the flash; "Lightning strike now";
+  **Thunder** (sound) arrives after distance ÷ 343 m/s.
 
 ## Colour
 

@@ -4,6 +4,7 @@
 import * as THREE from '../../vendor/three.module.js';
 import { PostPipeline } from '../render/post.js';
 import { SHIP_IDS, buildShip, shipInfo } from '../shipkit/index.js';
+import { signalLamp } from '../shipkit/lights.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
@@ -114,7 +115,7 @@ for (const [label, t, dist, yaw, pitch] of CAMS) {
 }
 
 /* ---------------- ship ---------------- */
-let model = null, shipId = SHIP_IDS[0], buildMs = 0;
+let model = null, shipId = SHIP_IDS[0], buildMs = 0, signal = null;
 const partChecks = {};
 for (const id of SHIP_IDS) $('ship').append(el('option', { value: id, textContent: shipInfo(id).name + ' (' + shipInfo(id).year + ')' }));
 $('ship').onchange = () => { shipId = $('ship').value; rebuild(); fillInfo(); };
@@ -134,6 +135,8 @@ function rebuild() {
   model = buildShip(shipId, { detail: +$('detail').value });
   buildMs = performance.now() - t0;
   scene.add(model.group);
+  const was = signal && signal.sending ? signal.text : null;
+  signal = signalLamp(model); if (was) signal.send(was);
   $('parts').replaceChildren(...Object.keys(model.parts).map((k) => {
     const c = el('input', { type: 'checkbox', checked: partChecks[k] ?? true });
     c.onchange = () => { partChecks[k] = c.checked; model.parts[k].visible = c.checked; };
@@ -164,6 +167,13 @@ let train = 0, elev = 0, action = false;
 bindRange('train', (v) => v + '°', (v) => { train = v; applyGuns(); });
 bindRange('elev', (v) => v + '°', (v) => { elev = v; applyGuns(); });
 $('action').onclick = () => { action = !action; $('action').classList.toggle('on', action); };
+// signal lamp: the searchlight's shutters key a message in Morse (SOS by default), click again to stop
+$('signal').onclick = () => {
+  if (!signal) return;
+  if (signal.sending) { signal.stop(); $('signal').classList.remove('on'); return; }
+  signal.send(($('signalText').value || 'SOS').slice(0, 40)); $('signal').classList.add('on');
+  orbit.want = { target: new THREE.Vector3(0, 13.9, 18.3), dist: 8, yaw: 0.35, pitch: 0.12 };   // from ahead, over the bridge
+};
 $('stow').onclick = () => { action = false; $('action').classList.remove('on'); $('train').value = 0; $('elev').value = 0; $('train').oninput(); $('elev').oninput(); };
 function applyGuns(t = 0) {
   if (!model) return;
@@ -187,6 +197,7 @@ const panels = [$('infoPanel'), $('ctlPanel')];
 function idle() { idleT = 0; panels.forEach((p) => p.classList.remove('idle')); }
 addEventListener('pointermove', idle);
 addEventListener('keydown', (e) => {
+  if (e.target.closest && e.target.closest('input,select,textarea')) return;
   if (e.code === 'KeyH') panels.forEach((p) => { p.hidden = !p.hidden; });
   if (e.code === 'KeyF') orbit.want = { target: new THREE.Vector3(0, 4, 0), dist: 150 };
 });
@@ -265,6 +276,7 @@ function frame(now) {
   sky.position.copy(camera.position);
   seaNormal.offset.x = (now / 1000) * 0.004; seaNormal.offset.y = (now / 1000) * 0.0025;
   if (action) applyGuns(now / 1000);
+  if (signal) signal.update(dt, camera, 0.1);
   updateDims(); scaleBar();
   renderer.info.reset(); renderer.info.autoReset = false;
   post.render(scene, camera);
@@ -277,5 +289,5 @@ function frame(now) {
 }
 
 fillInfo(); rebuild(); setSun(); resize();
-window.__lab = { scene, camera, orbit, get model() { return model; }, rebuild };
+window.__lab = { scene, camera, orbit, get model() { return model; }, get signal() { return signal; }, rebuild };
 requestAnimationFrame(frame);

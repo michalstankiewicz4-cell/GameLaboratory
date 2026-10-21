@@ -203,6 +203,7 @@ export function waterUniforms() {
     uShine: { value: 900 }, uRipples: { value: 0.5 }, uCrest: { value: 0.5 }, uReflect: { value: 1 }, uPlanar: { value: 0 },
     uReflTex: { value: null }, uRes: { value: new THREE.Vector2(1, 1) }, uAlpha: { value: 1 }, uPixelN: { value: 1 },
     uFogCol: { value: new THREE.Color() }, uFogFar: { value: 2600 }, uFogDen: { value: 0 }, uRain: { value: 0 }, uLight: { value: 1 }, uWet: { value: 0.7 }, uWetOn: { value: 1 },
+    uFlash: { value: new THREE.Vector4(0, 0, 0, 0) },   // point flash on the sea: position, power (gun flashes, lightning)
     tNormal: { value: tex.normal }, tFoam: { value: tex.foam },
   };
 }
@@ -251,7 +252,7 @@ export function waterMaterial(u, opt = {}) {
     fragmentShader: GLSL_WAVES + GLSL_SHIP + /* glsl */`
       uniform vec3 uSun, uSunCol, uSkyH, uSkyZ, uSkySea, uDeep, uScatter, uFogCol;
       uniform float uShine, uRipples, uCrest, uReflect, uPlanar, uAlpha, uPixelN, uFogFar, uFogDen, uRain, uLight;
-      uniform sampler2D uReflTex, tNormal, tFoam; uniform vec2 uRes;
+      uniform sampler2D uReflTex, tNormal, tFoam; uniform vec2 uRes; uniform vec4 uFlash;
       varying vec3 vWorld; varying vec3 vN; varying float vFold; varying vec2 vXZ; varying float vShipH;
       ${opt.sky ? opt.sky + '\n      vec3 sky(vec3 d) { return skyColor(d); }' : `vec3 sky(vec3 d) {
         float h = d.y; vec3 c = h > 0.0 ? mix(uSkyH, uSkyZ, pow(h, 0.5)) : mix(uSkyH, uSkySea, clamp(-h * 6.0, 0.0, 1.0));
@@ -309,6 +310,12 @@ export function waterMaterial(u, opt = {}) {
         foam *= smoothstep(0.15, 0.55, noise + foam * 0.5);
         vec3 foamCol = vec3(0.92, 0.95, 0.96) * (0.45 + 0.55 * max(dot(N, L), 0.0) * sunUp + 0.15) * uLight;
         col = mix(col, foamCol, foam * 0.9);
+        // a point flash (gun or lightning) lighting the water and its foam
+        if (uFlash.w > 0.0) {
+          vec3 fv = uFlash.xyz - vWorld; float fd2 = dot(fv, fv); vec3 FL = fv * inversesqrt(fd2);
+          float fl = uFlash.w / (fd2 + 4.0);
+          col += vec3(1.0, 0.72, 0.45) * fl * (0.03 * max(dot(N, FL), 0.0) + foam * 0.25 + pow(max(dot(N, normalize(FL + V)), 0.0), 120.0) * 2.0);
+        }
         // aerial perspective
         float fog = uFogDen > 0.0 ? 1.0 - exp(-pow(dist * uFogDen, 2.0)) : smoothstep(uFogFar * 0.25, uFogFar, dist);
         col = mix(col, uFogCol, fog);

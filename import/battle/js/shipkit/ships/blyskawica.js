@@ -289,7 +289,14 @@ export function build(opt = {}) {
 
   for (const [k, g] of Object.entries(parts)) { g.name = k; g.userData.part = true; root.add(g); }
   root.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
-  return { group: root, parts, mounts, info, lines, materials: mats, length: LOA, beam: B * 2 };
+  // where the navigation lights and the signal lamp's shutters go (no geometry here; ShipKit's lights.js draws them): masthead light on the foremast,
+  // side lights on the outer faces of the bridge-wing screens (green starboard +x, red port −x), stern light on the flagstaff
+  const anchors = {
+    masthead: [0, 21.0, zFm - 0.35], starboard: [4.66, yF + 5.25, 24.2], port: [-4.66, yF + 5.25, 24.2], stern: [0, yf + 1.3, zf - 0.12],
+    // the 1.1 m searchlight on the tower behind the bridge doubles as the signal lamp: lens centre, diameter, facing
+    signal: { at: [0, yF + 7.18 + 0.6 + 0.55, 17.8 + 0.495], dia: 1.1, dir: [0, 0, 1] },
+  };
+  return { group: root, parts, mounts, info, lines, materials: mats, anchors, length: LOA, beam: B * 2 };
 }
 
 // Polish naval ensign (1919–1945 pattern simplified): white over red, the red eagle shield in the white field.

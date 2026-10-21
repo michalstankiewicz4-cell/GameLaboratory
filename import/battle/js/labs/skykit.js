@@ -6,13 +6,13 @@ import * as THREE from '../../vendor/three.module.js';
 // weather presets: cloud coverage 0..1, density (how dark and thick), haze (horizon), wind (m/s, moves the clouds),
 // rain 0..1 (light shower … downpour), vis = visibility in km (fog: the distance at which a dark ship fades to 5 %)
 export const WEATHER = {
-  clear: { label: 'Clear', coverage: 0.08, density: 0.25, haze: 0.18, wind: 4, scale: 1.0, rain: 0, vis: 25 },
-  fair: { label: 'Fair weather cumulus', coverage: 0.35, density: 0.35, haze: 0.25, wind: 6, scale: 1.0, rain: 0, vis: 20 },
-  broken: { label: 'Broken clouds', coverage: 0.6, density: 0.55, haze: 0.3, wind: 9, scale: 0.9, rain: 0, vis: 15 },
-  overcast: { label: 'Overcast', coverage: 0.86, density: 0.72, haze: 0.42, wind: 11, scale: 0.8, rain: 0, vis: 10 },
-  rain: { label: 'Rain', coverage: 0.94, density: 0.78, haze: 0.5, wind: 10, scale: 0.8, rain: 0.55, vis: 4 },
-  fog: { label: 'Sea fog', coverage: 0.75, density: 0.35, haze: 0.7, wind: 3, scale: 0.9, rain: 0, vis: 0.4 },
-  storm: { label: 'Storm', coverage: 0.97, density: 0.95, haze: 0.6, wind: 18, scale: 0.7, rain: 0.9, vis: 2.5 },
+  clear: { label: 'Clear', coverage: 0.08, density: 0.25, haze: 0.18, wind: 4, scale: 1.0, rain: 0, vis: 25, lightning: 0 },
+  fair: { label: 'Fair weather cumulus', coverage: 0.35, density: 0.35, haze: 0.25, wind: 6, scale: 1.0, rain: 0, vis: 20, lightning: 0 },
+  broken: { label: 'Broken clouds', coverage: 0.6, density: 0.55, haze: 0.3, wind: 9, scale: 0.9, rain: 0, vis: 15, lightning: 0 },
+  overcast: { label: 'Overcast', coverage: 0.86, density: 0.72, haze: 0.42, wind: 11, scale: 0.8, rain: 0, vis: 10, lightning: 0 },
+  rain: { label: 'Rain', coverage: 0.94, density: 0.78, haze: 0.5, wind: 10, scale: 0.8, rain: 0.55, vis: 4, lightning: 0 },
+  fog: { label: 'Sea fog', coverage: 0.75, density: 0.35, haze: 0.7, wind: 3, scale: 0.9, rain: 0, vis: 0.4, lightning: 0 },
+  storm: { label: 'Storm', coverage: 0.97, density: 0.95, haze: 0.6, wind: 18, scale: 0.7, rain: 0.9, vis: 2.5, lightning: 0.6 },
 };
 // fog density for three.js FogExp2 (exp(-(d·k)²)) so that contrast drops to 5 % at the visibility distance
 export const fogDensity = (visKm) => 1.73 / Math.max(50, visKm * 1000);
@@ -26,13 +26,14 @@ export function skyUniforms() {
     uSkyFog: { value: new THREE.Vector3(0, 0, 0) },                 // fog density (1/m), fog layer height (m), rain 0..1
     uSkyCloud: { value: new THREE.Color(1, 0.99, 0.97) },            // lit colour of the clouds (white by day, rose at dusk, grey by moon)
     uSkyGlow: { value: new THREE.Color(0, 0, 0) },                   // dawn/dusk glow along the horizon on the sun's side
+    uSkyBolt: { value: new THREE.Vector4(0, 0, 1, 0) },              // lightning: direction to the strike, brightness
     uSkyMoon: { value: new THREE.Vector3(0, -1, 0) }, uSkyNight: { value: new THREE.Vector2(0, 0) },   // moon direction; stars, moon brightness
   };
 }
 
 export const GLSL_SKY = /* glsl */`
 uniform vec3 uSkySun, uSkySunCol, uSkyHor, uSkyZen, uSkyLow;
-uniform vec4 uCloud; uniform vec2 uCloudOff; uniform vec3 uSkyFog, uSkyCloud, uSkyGlow, uSkyMoon; uniform vec2 uSkyNight;
+uniform vec4 uCloud; uniform vec2 uCloudOff; uniform vec3 uSkyFog, uSkyCloud, uSkyGlow, uSkyMoon; uniform vec2 uSkyNight; uniform vec4 uSkyBolt;
 float skHash(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
 float skNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
   return mix(mix(skHash(i), skHash(i + vec2(1, 0)), f.x), mix(skHash(i + vec2(0, 1)), skHash(i + vec2(1, 1)), f.x), f.y); }
@@ -71,6 +72,10 @@ vec3 skyColor(vec3 d) {
   cloud += uSkySunCol * pow(s, 6.0) * (cl.x * (1.0 - cl.x)) * 3.2 * (1.0 - den * 0.6);     // silver lining
   cloud += uSkySunCol * pow(s, 3.0) * 0.18 * cl.y;
   col = mix(col, cloud, cl.x);
+  if (uSkyBolt.w > 0.0) {                                    // lightning lights the clouds around the strike, a little everywhere
+    float near = pow(max(dot(d, uSkyBolt.xyz), 0.0), 6.0);
+    col += vec3(0.72, 0.78, 1.0) * uSkyBolt.w * (0.06 + 0.94 * near) * (0.25 + cl.x) * step(-0.02, h);
+  }
   col = mix(col, uSkyHor, smoothstep(0.18 + haze * 0.2, 0.0, abs(h)) * haze);              // haze at the horizon
   float through = 1.0 - smoothstep(0.15, 0.85, cl.x);                                         // sun through thin cloud
   if (uSkyNight.y > 0.0 && uSkyMoon.y > -0.02) {                                               // the moon: disc and halo, dimmed by cloud
