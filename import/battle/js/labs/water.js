@@ -1,10 +1,13 @@
 // Water lab: ORP Błyskawica (ShipKit, 1:1) on a Gerstner sea from WaterKit. Two variants (A/B) of sea state, look
 // and ship-water interaction can be compared side by side; every effect can be switched off and its cost measured.
-// The ship stays at the origin heading +z; the sea streams past it at the ship's speed.
+// The ship stays at the origin heading +z; the sea streams past it at the ship's speed. Water bodies (ocean, fjord,
+// lake, river) bring their own shore: a wrap-around channel from LandKit streams past at the ship's speed over the
+// ground (speed through the water minus the current), so a river visibly carries the ship back.
 import * as THREE from '../../vendor/three.module.js';
 import { PostPipeline } from '../render/post.js';
 import { buildShip, SHIPS } from '../shipkit/index.js';
-import { SEAS, LOOKS, waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, addWetHull, hullTexture } from './waterkit.js';
+import { SEAS, LOOKS, WATER_BODIES, waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, addWetHull, hullTexture } from '../env/waterkit.js';
+import { generateWaterway, heightTexture, terrainMeshes, landUniforms, setLand, GLSL_LAND } from '../env/landkit.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
@@ -57,24 +60,26 @@ const yBridge = S.lines.deck(20) + 8.6;
 
 /* ---------------- variants ---------------- */
 const DEFAULTS = {
-  A: { sea: 'moderate', ...pick(SEAS.moderate), dir: 30, look: 'atlantic', ...pick(LOOKS.atlantic), reflect: 1, planar: false, clear: false, kn: 18, motion: true, bowWave: true, wake: true, hullFoam: true, wet: true, spray: true },
-  B: { sea: 'rough', ...pick(SEAS.rough), dir: 30, look: 'baltic', ...pick(LOOKS.baltic), reflect: 1, planar: true, clear: false, kn: 18, motion: true, bowWave: true, wake: true, hullFoam: true, wet: true, spray: true },
+  A: { body: 'ocean', width: 700, wall: 650, steep: 0.85, depth: 180, meander: 0.12, current: 0, sea: 'moderate', ...pick(SEAS.moderate), dir: 30, look: 'atlantic', ...pick(LOOKS.atlantic), reflect: 1, planar: false, clear: false, kn: 18, motion: true, bowWave: true, wake: true, hullFoam: true, wet: true, spray: true },
+  B: { body: 'ocean', width: 700, wall: 650, steep: 0.85, depth: 180, meander: 0.12, current: 0, sea: 'rough', ...pick(SEAS.rough), dir: 30, look: 'baltic', ...pick(LOOKS.baltic), reflect: 1, planar: true, clear: false, kn: 18, motion: true, bowWave: true, wake: true, hullFoam: true, wet: true, spray: true },
 };
 function pick(o) { const r = { ...o }; delete r.label; return r; }
 const KEY = 'steelSalvo.waterLab.v1';
 let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { saved = null; }
 const V = { A: { ...DEFAULTS.A, ...(saved && saved.A) }, B: { ...DEFAULTS.B, ...(saved && saved.B) } };
+// no shore: a one-texel map 1 km deep, so the sea's shallows code sees open water everywhere
+const OPEN = { size: 1000, res: 1, wrap: true, depth: 1000, relief: 0, barrier: 'none', h: new Float32Array([-1000]) }, openTex = heightTexture(OPEN);
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(V)); } catch { /* private mode */ } };
 
 const geo = { current: null };
 function makeVariant(id) {
-  const u = waterUniforms();
+  const u = Object.assign(waterUniforms(), landUniforms(OPEN, openTex));
   u.uHull.value = hullTex.tex; u.uHullZ.value.set(hullTex.z0, hullTex.z1, hullTex.max, 0);
   u.uShip.value.set(0, S.lines.zBow, S.lines.zStern, model.beam / 2);
-  const mesh = new THREE.Mesh(geo.current, waterMaterial(u)); mesh.frustumCulled = false; mesh.renderOrder = 1;
+  const mesh = new THREE.Mesh(geo.current, waterMaterial(u, { land: GLSL_LAND })); mesh.frustumCulled = false; mesh.renderOrder = 1;
   scene.add(mesh);
   const spray = makeSpray(); scene.add(spray.points);
-  return { id, u, mesh, waves: [], spray, m: { heave: 0, pitch: 0, roll: 0, vh: 0, vp: 0, vr: 0 }, shift: 0 };
+  return { id, u, mesh, waves: [], spray, m: { heave: 0, pitch: 0, roll: 0, vh: 0, vp: 0, vr: 0 }, shift: 0, ground: 0, T: null, tex: null, terrain: null, bankKey: '', bankTimer: 0 };
 }
 function setGrid(spec) {
   const [s, r] = spec.split(',').map(Number);
@@ -105,6 +110,26 @@ function applyVariant(id) {
   u.uPlanar.value = p.planar ? 1 : 0; u.uAlpha.value = p.clear ? 0.78 : 1;
   u.uShipFx.value.set(p.bowWave ? 1 : 0, p.wake ? 1 : 0, p.hullFoam ? 1 : 0, 0);
   u.uPixelN.value = $('pixN').checked ? 1 : 0;
+  u.uCurrent.value = p.current || 0;
+  shore(v, p);
+}
+// the shore of the variant's water body: a channel generated once per set of bank parameters (debounced while dragging)
+function shore(v, p) {
+  const body = WATER_BODIES[p.body] || WATER_BODIES.ocean;
+  if (!body.banks) {
+    if (v.terrain) { v.terrain.group.visible = false; v.bankKey = ''; }
+    setLand(v.u, OPEN, openTex); return;
+  }
+  const opt = { width: p.width, wall: p.wall, steep: p.steep, depth: p.depth, meander: p.meander, seed: 7 }, key = JSON.stringify(opt);
+  if (key === v.bankKey) { if (v.terrain) v.terrain.group.visible = true; return; }
+  clearTimeout(v.bankTimer);
+  v.bankTimer = setTimeout(() => {
+    const T = generateWaterway(opt), tex = heightTexture(T);
+    if (v.tex) v.tex.dispose();
+    v.T = T; v.tex = tex; v.bankKey = key;
+    if (!v.terrain) { v.terrain = terrainMeshes(T, tex, { uniforms: v.u, n: 320, nFar: 160 }); scene.add(v.terrain.group); } else v.terrain.set(T, tex);
+    v.terrain.group.visible = true;
+  }, v.bankKey ? 250 : 0);
 }
 
 /* ---------------- spray ---------------- */
@@ -199,7 +224,9 @@ const clipBelow = [new THREE.Plane(new THREE.Vector3(0, -1, 0), 0.0)];
 function renderReflection(v) {
   const rt = reflTarget();
   // draw the ship mirrored in the waterline (only what is above the water), on a transparent background
-  scene.remove(shipRoot); mirror.add(shipRoot); mirror.scale.y = -1; mirror.updateMatrixWorld(true);
+  const land = v.terrain && v.terrain.group.visible ? v.terrain.group : null;     // fjord walls and banks are mirrored too
+  scene.remove(shipRoot); mirror.add(shipRoot); if (land) { scene.remove(land); mirror.add(land); }
+  mirror.scale.y = -1; mirror.updateMatrixWorld(true);
   const vis = []; scene.children.forEach((o) => { if (o !== mirror && o !== hemi && o !== sun && o !== sun.target) { vis.push([o, o.visible]); o.visible = false; } });
   const bg = scene.background, fog = scene.fog; scene.fog = null;
   renderer.setRenderTarget(rt); renderer.setClearColor(0x000000, 0); renderer.clear();
@@ -208,7 +235,7 @@ function renderReflection(v) {
   renderer.clippingPlanes = []; renderer.shadowMap.autoUpdate = true;
   renderer.setRenderTarget(null); renderer.setClearColor(0x000000, 1);
   vis.forEach(([o, s]) => { o.visible = s; }); scene.fog = fog; scene.background = bg;
-  mirror.remove(shipRoot); mirror.scale.y = 1; scene.add(shipRoot);
+  mirror.remove(shipRoot); mirror.scale.y = 1; scene.add(shipRoot); if (land) { mirror.remove(land); scene.add(land); }
   v.u.uReflTex.value = rt.texture; v.u.uRes.value.set(post.rt.width, post.rt.height);
 }
 
@@ -263,17 +290,25 @@ function placeCamera(dt, v) {
 
 /* ---------------- UI ---------------- */
 let edit = 'A';
+for (const [k, b] of Object.entries(WATER_BODIES)) $('body').append(el('option', { value: k, textContent: b.label, disabled: !!b.soon }));
+$('body').onchange = () => {
+  const k = $('body').value, b = WATER_BODIES[k]; if (!b || b.soon) return;
+  Object.assign(V[edit], { body: k, sea: b.sea, ...pick(SEAS[b.sea]), look: b.look, ...pick(LOOKS[b.look]), reflect: b.reflect, current: b.current, planar: !!b.planar }, b.banks || {});
+  fillUI(); changed();
+};
 for (const [k, s] of Object.entries(SEAS)) $('seaPreset').append(el('option', { value: k, textContent: s.label }));
 $('seaPreset').append(el('option', { value: 'custom', textContent: 'Custom' }));
 for (const [k, s] of Object.entries(LOOKS)) $('lookPreset').append(el('option', { value: k, textContent: s.label }));
 $('lookPreset').append(el('option', { value: 'custom', textContent: 'Custom' }));
 const FMT = { Hs: (x) => x.toFixed(1) + ' m', Lp: (x) => x + ' m', chop: (x) => x.toFixed(2), spread: (x) => x + '°', dir: (x) => (x === 0 ? 'ahead' : Math.abs(x) === 180 ? 'astern' : (x > 0 ? 'stbd ' : 'port ') + Math.abs(x) + '°'), n: (x) => x,
-  shine: (x) => x, ripples: (x) => x.toFixed(2), crest: (x) => x.toFixed(2), reflect: (x) => x.toFixed(2), kn: (x) => x + ' kn' };
+  shine: (x) => x, ripples: (x) => x.toFixed(2), crest: (x) => x.toFixed(2), reflect: (x) => x.toFixed(2), kn: (x) => x + ' kn',
+  width: (x) => x + ' m', wall: (x) => x + ' m', current: (x) => x.toFixed(1) + ' m/s' };
 const SEA_KEYS = ['Hs', 'Lp', 'chop', 'spread', 'n'], LOOK_KEYS = ['deep', 'scatter', 'shine', 'ripples', 'crest'];
 const CHECKS = ['planar', 'clear', 'motion', 'bowWave', 'wake', 'hullFoam', 'wet', 'spray'];
 function fillUI() {
   const p = V[edit];
-  $('seaPreset').value = p.sea; $('lookPreset').value = p.look;
+  $('seaPreset').value = p.sea; $('lookPreset').value = p.look; $('body').value = p.body || 'ocean';
+  const banks = !!(WATER_BODIES[p.body] || {}).banks; for (const k of ['width', 'wall']) $(k).disabled = !banks;
   for (const k of Object.keys(FMT)) { $(k).value = p[k]; $(k + 'V').textContent = FMT[k](+p[k]); }
   $('deep').value = p.deep; $('scatter').value = p.scatter;
   for (const k of CHECKS) $(k).checked = !!p[k];
@@ -281,7 +316,7 @@ function fillUI() {
   seaText();
 }
 function seaText() {
-  const s = (id) => `${id}: ${SEAS[V[id].sea] ? SEAS[V[id].sea].label.replace(/ \(.*/, '') : 'custom'} ${V[id].Hs.toFixed(1)} m, ${V[id].kn} kn`;
+  const s = (id) => `${id}: ${(WATER_BODIES[V[id].body] || WATER_BODIES.ocean).label}, ${SEAS[V[id].sea] ? SEAS[V[id].sea].label.replace(/ \(.*/, '').replace(/^.*: /, '') : 'custom'} ${V[id].Hs.toFixed(1)} m, ${V[id].kn} kn${V[id].current ? `, current ${V[id].current.toFixed(1)} m/s` : ''}`;
   $('seaTxt').textContent = $('splitOn').checked ? `${s('A')}  |  ${s('B')}` : `${s(edit)} · ${LOOKS[V[edit].look] ? LOOKS[V[edit].look].label : 'custom look'}`;
 }
 function changed(id = edit) { applyVariant(id); save(); seaText(); }
@@ -370,12 +405,17 @@ function prepare(v, dt) {
   const p = V[v.id];
   v.shift += p.kn * KN * dt;
   const u = v.u; u.uTime.value = clock.t; u.uShift.value = v.shift; u.uShip.value.x = p.kn * KN;
+  if (v.T) {                                                          // the shore streams past at the speed over the ground
+    v.ground = (v.ground + (p.kn * KN - (p.current || 0)) * dt) % v.T.size;
+    u.uLandOff.value.set(v.T.size / 2, v.ground);
+  }
   stepMotion(v, dt, clock.t); stepSpray(v, dt, clock.t);
 }
 let sceneCalls = 0;
 function drawPass(v, x0, w, H, others) {
   poseShip(v); hullFrom(v);
-  v.mesh.visible = true; v.spray.points.visible = V[v.id].spray; for (const o of others) { o.mesh.visible = false; o.spray.points.visible = false; }
+  v.mesh.visible = true; v.spray.points.visible = V[v.id].spray; for (const o of others) { o.mesh.visible = false; o.spray.points.visible = false; if (o.terrain) o.terrain.group.visible = false; }
+  if (v.terrain) { v.terrain.group.visible = !!(WATER_BODIES[V[v.id].body] || {}).banks; v.terrain.update(camera); }
   const s = Math.max(4, camera.position.y);
   v.spray.points.material.uniforms.uScale.value = renderer.getDrawingBufferSize(new THREE.Vector2()).y * 0.6;
   v.mesh.position.set(Math.round(camera.position.x / 2) * 2, 0, Math.round(camera.position.z / 2) * 2);
@@ -424,5 +464,5 @@ function frame(now) {
 }
 
 applyVariant('A'); applyVariant('B'); fillUI(); setSun(); resize();
-window.__water = { scene, camera, orbit, vars, V, model, shipRoot, applyVariant, fillUI, get edit() { return edit; }, set edit(x) { edit = x; fillUI(); } };
+window.__water = { scene, camera, orbit, vars, V, model, shipRoot, applyVariant, fillUI, bodies: WATER_BODIES, get edit() { return edit; }, set edit(x) { edit = x; fillUI(); } };
 requestAnimationFrame(frame);

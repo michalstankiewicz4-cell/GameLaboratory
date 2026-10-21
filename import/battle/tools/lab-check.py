@@ -70,6 +70,22 @@ def main():
             pg.evaluate("()=>[...document.querySelectorAll('#cams button')].find(b=>b.textContent==='Bridge').click()"); time.sleep(3)
             pg.screenshot(path=os.path.join(OUT, 'lab-water-split.png'), timeout=600000)
             assert pg.evaluate('__water.vars.A.waves.length') >= 4, 'no waves'
+            # water bodies: fjord, lake and river bring a shore that streams past (a river's current slows it)
+            pg.click('#splitOn')
+            for k in ['fjord', 'lake', 'river']:
+                pg.evaluate("(k)=>{__water.edit='A';const s=document.getElementById('body');s.value=k;s.dispatchEvent(new Event('change'))}", k)
+                for _ in range(240):                   # poll from Python: string predicates can trip the page's CSP
+                    if pg.evaluate('!!(__water.vars.A.T && __water.vars.A.terrain && __water.vars.A.terrain.group.visible)'): break
+                    time.sleep(0.5)
+                else: raise AssertionError(f'{k}: no shore')
+                g0 = pg.evaluate('__water.vars.A.ground')
+                for _ in range(40):                    # headless frames are slow: wait for a few
+                    time.sleep(0.5)
+                    if pg.evaluate('__water.vars.A.ground') != g0: break
+                else: raise AssertionError(f'{k}: the shore does not move ' + '; '.join(errs[:3]))
+            assert pg.evaluate('__water.vars.A.u.uCurrent.value') > 1, 'river without a current'
+            pg.screenshot(path=os.path.join(OUT, 'lab-water-river.png'), timeout=600000)
+            pg.evaluate("()=>{const s=document.getElementById('body');s.value='ocean';s.dispatchEvent(new Event('change'))}")
             # transformer: levels, hitboxes, damage through a ray, fleet
             pg.goto(f'http://localhost:{PORT}/labs/transform.html')
             pg.wait_for_function('window.__tf && window.__tf.T.levels.length === 3', timeout=300000)

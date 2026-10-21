@@ -1,4 +1,4 @@
-# Water lab (`labs/water.html`, `js/labs/water.js`, `js/labs/waterkit.js`)
+# Water lab (`labs/water.html`, `js/labs/water.js`, `js/env/waterkit.js`)
 
 A test bench for the look of the sea and its interaction with a ship, before any of it goes into the game. The ship is
 ORP Błyskawica from ShipKit at 1:1; units are metres and seconds. The ship stays at the origin heading +z and the sea
@@ -40,6 +40,25 @@ Settings are remembered in the browser (localStorage) and "Copy settings (JSON)"
   short waves out), followed by damped springs (periods 5.5 / 4.8 / 8.5 s); running trim and squat at speed.
 - **Spray**: CPU particles from the stem, continuous at speed and in bursts when the bow slams into a crest; air
   streams aft past the ship.
+
+## Water bodies
+
+`WATER_BODIES` in WaterKit: each body is a sea state, a look and a shore. *Open ocean* has no shore. *Fjord*, *Lake*
+and *River* get a wrap-around channel from LandKit (`generateWaterway`: width, wall/bank height, steepness, depth,
+meander) drawn by the terrain meshes and read by the sea for shallows and surf (`waterMaterial(u, { land })`). The ship
+stays at the origin; the water streams past at the speed through the water (`uShift`), the shore at the speed over the
+ground (`uLandOff` = speed − current), so in a river the banks pass slower going upstream. A river's current also draws
+foam streaks along the flow (`uCurrent`, more in the shallows). Still bodies (fjord, lake) switch the planar reflection
+on: the walls and banks are mirrored with the ship. Short waves fade with distance in the wave shader (they aliased
+into rings on the polar grid); this helps the ocean far away too.
+
+| Body | Sea | Look | Shore |
+|---|---|---|---|
+| Open ocean | moderate | North Atlantic | — |
+| Fjord | cat's-paws, 0.1 m | dark and still | 800 m wide, walls ~650 m, steep |
+| Lake | short wind chop, 0.25 m | fresh, peaty | 1.8 km wide, low hills |
+| River | ripples | silty | 240 m wide, low banks, current 1.8 m/s |
+| Harbour, Ice | — | — | coming |
 
 ## Not yet
 

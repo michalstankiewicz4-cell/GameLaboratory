@@ -2,9 +2,9 @@
 // transformer's ORP Błyskawica to sail through it. The map is a torus (sail out of one side, in at the other: the
 // heightmap and the waves both repeat across it) or bounded by a barrier (buoy line, mountain range, invisible wall).
 import * as THREE from '../../vendor/three.module.js';
-import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment } from './skykit.js';
-import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, LOOKS } from './waterkit.js';
-import { generateTerrain, heightTexture, terrainMeshes, sampleHeight, barrierBuoys, SHAPES, TERRAIN_DEFAULTS, GLSL_LAND } from './landkit.js';
+import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment } from '../env/skykit.js';
+import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, LOOKS } from '../env/waterkit.js';
+import { generateTerrain, heightTexture, terrainMeshes, sampleHeight, barrierBuoys, SHAPES, TERRAIN_DEFAULTS, GLSL_LAND } from '../env/landkit.js';
 import { transformShip } from '../shipkit/transform.js';
 import { LookPipeline, LOOK_PRESETS } from '../render/look.js';
 

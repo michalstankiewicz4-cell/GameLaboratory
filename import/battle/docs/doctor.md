@@ -1,4 +1,4 @@
-# Model doctor (`labs/doctor.html`, `js/labs/modeldoctor.js`, `tools/doctor.py`)
+# Model doctor (`labs/doctor.html`, `js/tools/modeldoctor.js`, `tools/doctor.py`)
 
 A deterministic check for the repeating mistakes of models built by code. Ported from the owner's *Space* repo
 (`tools/modeldoctor.js`, `tools/kitcheck.html`) and extended for a naval game: gun arcs, waterline, hull side and the
@@ -14,7 +14,7 @@ in-game budget. It examines every ShipKit lab model and every game class model (
   fingerprint or finding counts differ from `tools/doctor.golden.json`, or the page logs errors.
   A change meant to alter a model: check the diff, then `py tools/doctor.py --update` and commit the golden file with
   the change. `--shots` saves `tools/out/doctor-*.png`.
-- **API** `examine(root, opts)` in `js/labs/modeldoctor.js` works on any THREE object; `window.doctorReport` holds the
+- **API** `examine(root, opts)` in `js/tools/modeldoctor.js` works on any THREE object; `window.doctorReport` holds the
   results as plain data.
 
 Lab models are built **unmerged** (`KIT.unmerged = true` in `js/shipkit/geom.js`: one mesh per piece, and each piece

@@ -33,10 +33,15 @@
   <label class="chk"><input type="checkbox" id="splitOn"> Split screen: variant A left, B right</label>
   <div class="row"><span>Divider</span><input type="range" id="splitX" min="0.2" max="0.8" step="0.01" value="0.5"><output id="splitXV"></output></div>
   <div class="btns" id="edit"><button type="button" data-v="A" class="on">Edit A</button><button type="button" data-v="B">Edit B</button><button type="button" id="copyAB">Copy A → B</button><button type="button" id="swapAB">Swap</button></div>
+  <h3>Water body</h3>
+  <div class="row"><span>Body</span><select id="body"></select><output></output></div>
+  <div class="row"><span>Width (shore to shore)</span><input type="range" id="width" min="80" max="3000" step="10"><output id="widthV"></output></div>
+  <div class="row"><span>Walls / banks</span><input type="range" id="wall" min="5" max="1200" step="5"><output id="wallV"></output></div>
+  <div class="row"><span>Current (to the stern)</span><input type="range" id="current" min="0" max="4" step="0.1"><output id="currentV"></output></div>
   <h3>Sea state</h3>
   <div class="row"><span>Preset</span><select id="seaPreset"></select><output></output></div>
   <div class="row"><span>Wave height Hs</span><input type="range" id="Hs" min="0" max="9" step="0.1"><output id="HsV"></output></div>
-  <div class="row"><span>Wavelength</span><input type="range" id="Lp" min="6" max="260" step="1"><output id="LpV"></output></div>
+  <div class="row"><span>Wavelength</span><input type="range" id="Lp" min="2" max="260" step="1"><output id="LpV"></output></div>
   <div class="row"><span>Choppiness</span><input type="range" id="chop" min="0" max="1" step="0.01"><output id="chopV"></output></div>
   <div class="row"><span>Spread</span><input type="range" id="spread" min="0" max="90" step="1"><output id="spreadV"></output></div>
   <div class="row"><span>From (rel. bow)</span><input type="range" id="dir" min="-180" max="180" step="5"><output id="dirV"></output></div>

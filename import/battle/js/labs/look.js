@@ -4,10 +4,10 @@
 import * as THREE from '../../vendor/three.module.js';
 import { buildShip, SHIPS } from '../shipkit/index.js';
 import { bakeWear, ageMaterials, ageUniforms } from '../shipkit/ageing.js';
-import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment, sunAt } from './skykit.js';
-import { rainUniforms, rainMesh, lightning } from './rainkit.js';
+import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment, sunAt } from '../env/skykit.js';
+import { rainUniforms, rainMesh, lightning } from '../env/rainkit.js';
 import { navLights, gunFlashes, signalLamp } from '../shipkit/lights.js';
-import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, hullTexture, LOOKS } from './waterkit.js';
+import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, hullTexture, LOOKS } from '../env/waterkit.js';
 import { LookPipeline, AutoResolution, LOOK_PRESETS, LOOK_DEFAULTS } from '../render/look.js';
 
 const $ = (id) => document.getElementById(id);

@@ -3,7 +3,7 @@
 // (the rest fades) and, for gun arcs, trains the mount to the blocked bearing and draws the line of fire.
 // window.doctorReport holds every result as plain data (tools/doctor.py reads it).
 import * as THREE from '../../vendor/three.module.js';
-import { examine, explodeBoxes, CHECKS, SEVERITY, ABOUT } from './modeldoctor.js';
+import { examine, explodeBoxes, CHECKS, SEVERITY, ABOUT } from '../tools/modeldoctor.js';
 import { KIT } from '../shipkit/geom.js';
 import { SHIPS } from '../shipkit/index.js';
 import { transformShip } from '../shipkit/transform.js';

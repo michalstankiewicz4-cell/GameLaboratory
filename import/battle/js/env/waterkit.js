@@ -17,12 +17,30 @@ export const SEAS = {
   rough: { label: 'Rough (Beaufort 6)', Hs: 3.2, Lp: 70, chop: 0.7, spread: 35, n: 12 },
   gale: { label: 'Gale (Beaufort 8)', Hs: 6.0, Lp: 115, chop: 0.85, spread: 30, n: 14 },
   swell: { label: 'Long swell, light wind', Hs: 2.0, Lp: 190, chop: 0.25, spread: 12, n: 10 },
+  fjord: { label: 'Fjord: cat’s-paws on still water', Hs: 0.12, Lp: 7, chop: 0.25, spread: 60, n: 8 },
+  lake: { label: 'Lake: short wind chop', Hs: 0.25, Lp: 6, chop: 0.45, spread: 50, n: 8 },
+  river: { label: 'River: ripples', Hs: 0.06, Lp: 3.5, chop: 0.3, spread: 70, n: 6 },
 };
 export const LOOKS = {
   atlantic: { label: 'North Atlantic', deep: '#0a2536', scatter: '#1d6a68', shine: 900, ripples: 0.55, crest: 0.55 },
   baltic: { label: 'Baltic grey', deep: '#16272e', scatter: '#3a5c55', shine: 600, ripples: 0.45, crest: 0.5 },
   tropical: { label: 'Tropical', deep: '#03314d', scatter: '#11a3a0', shine: 1400, ripples: 0.6, crest: 0.45 },
   storm: { label: 'Storm slate', deep: '#121c22', scatter: '#2c4648', shine: 400, ripples: 0.7, crest: 0.7 },
+  fjord: { label: 'Fjord (dark, still)', deep: '#05141a', scatter: '#123c3a', shine: 1300, ripples: 0.22, crest: 0.08 },
+  lake: { label: 'Lake (fresh, peaty)', deep: '#141c12', scatter: '#34462a', shine: 1100, ripples: 0.4, crest: 0.05 },
+  river: { label: 'River (silty)', deep: '#24251a', scatter: '#4c4a30', shine: 700, ripples: 0.65, crest: 0 },
+};
+
+// Water bodies: a sea state, a look and the shore around it. banks: a channel (LandKit generateWaterway) with its
+// width, wall height, steepness and depth; current: m/s flowing towards the stern (the ship heads upstream).
+// planar: still water that mirrors its shore (planar reflection on). soon: listed in the lab but not built yet.
+export const WATER_BODIES = {
+  ocean: { label: 'Open ocean', sea: 'moderate', look: 'atlantic', reflect: 1, banks: null, current: 0, planar: false },
+  fjord: { label: 'Fjord', sea: 'fjord', look: 'fjord', reflect: 1.15, banks: { width: 800, wall: 650, steep: 0.7, depth: 180, meander: 0.12 }, current: 0, planar: true },
+  lake: { label: 'Lake', sea: 'lake', look: 'lake', reflect: 1.05, banks: { width: 1800, wall: 90, steep: 0.25, depth: 30, meander: 0.2 }, current: 0, planar: true },
+  river: { label: 'River', sea: 'river', look: 'river', reflect: 0.9, banks: { width: 240, wall: 22, steep: 0.35, depth: 9, meander: 0.18 }, current: 1.8, planar: false },
+  harbour: { label: 'Harbour (soon)', soon: true },
+  ice: { label: 'Ice and pack ice (soon)', soon: true },
 };
 
 // Builds a wave set: wavelengths spread (log) around the peak, amplitudes from a falloff, directions inside the
@@ -72,9 +90,13 @@ uniform int uWN;
 uniform float uTime, uShift;
 vec3 gerstner(vec2 p, out vec3 nrm, out float fold) {
   vec3 d = vec3(p.x, 0.0, p.y); vec3 tx = vec3(1.0, 0.0, 0.0), tz = vec3(0.0, 0.0, 1.0); fold = 0.0;
+  // waves too short for the grid at this distance fade out (the polar grid's cells grow ~6 % of the range):
+  // without it short waves alias into rings and moiré far from the camera
+  float range = length(p - cameraPosition.xz);
   for (int i = 0; i < MAXW; i++) {
     if (i >= uWN) break;
     vec4 a = uWA[i], b = uWB[i];
+    a.w *= smoothstep(0.1 * range, 0.26 * range, 6.2831853 / a.z);
     float th = a.z * dot(a.xy, p + vec2(0.0, uShift)) - b.x * uTime + b.y;
     float c = cos(th), s = sin(th), QA = b.z * a.w, WA = a.z * a.w;
     d.x += QA * a.x * c; d.z += QA * a.y * c; d.y += a.w * s;
@@ -202,7 +224,7 @@ export function waterUniforms() {
     uDeep: { value: new THREE.Color() }, uScatter: { value: new THREE.Color() },
     uShine: { value: 900 }, uRipples: { value: 0.5 }, uCrest: { value: 0.5 }, uReflect: { value: 1 }, uPlanar: { value: 0 },
     uReflTex: { value: null }, uRes: { value: new THREE.Vector2(1, 1) }, uAlpha: { value: 1 }, uPixelN: { value: 1 },
-    uFogCol: { value: new THREE.Color() }, uFogFar: { value: 2600 }, uFogDen: { value: 0 }, uRain: { value: 0 }, uLight: { value: 1 }, uWet: { value: 0.7 }, uWetOn: { value: 1 },
+    uFogCol: { value: new THREE.Color() }, uFogFar: { value: 2600 }, uFogDen: { value: 0 }, uRain: { value: 0 }, uLight: { value: 1 }, uCurrent: { value: 0 }, uWet: { value: 0.7 }, uWetOn: { value: 1 },
     uFlash: { value: new THREE.Vector4(0, 0, 0, 0) },   // point flash on the sea: position, power (gun flashes, lightning)
     tNormal: { value: tex.normal }, tFoam: { value: tex.foam },
   };
@@ -258,7 +280,7 @@ export function waterMaterial(u, opt = {}) {
       }`,
     fragmentShader: L + GLSL_WAVES + GLSL_SHIP + /* glsl */`
       uniform vec3 uSun, uSunCol, uSkyH, uSkyZ, uSkySea, uDeep, uScatter, uFogCol;
-      uniform float uShine, uRipples, uCrest, uReflect, uPlanar, uAlpha, uPixelN, uFogFar, uFogDen, uRain, uLight;
+      uniform float uShine, uRipples, uCrest, uReflect, uPlanar, uAlpha, uPixelN, uFogFar, uFogDen, uRain, uLight, uCurrent;
       uniform sampler2D uReflTex, tNormal, tFoam; uniform vec2 uRes; uniform vec4 uFlash;
       varying vec3 vWorld; varying vec3 vN; varying float vFold; varying vec2 vXZ; varying float vShipH;
       ${opt.sky ? opt.sky + '\n      vec3 sky(vec3 d) { return skyColor(d); }' : `vec3 sky(vec3 d) {
@@ -307,7 +329,7 @@ export function waterMaterial(u, opt = {}) {
 #ifdef LAND
         float depth = -landH(vXZ);
         if (depth < -0.4) discard;                                // dry land: no water drawn over beaches
-        body = mix(vec3(0.16, 0.42, 0.40) * (0.35 + 0.65 * sunUp), body, smoothstep(0.0, 14.0, depth));
+        body = mix(uScatter * 1.5 * (0.35 + 0.65 * sunUp), body, smoothstep(0.0, 14.0, depth));   // shallows take the water's own scatter colour
 #endif
         body *= uLight;                                          // daylight (dusk and night darken the water body)
         vec3 col = mix(body, refl, F);
@@ -323,6 +345,14 @@ export function waterMaterial(u, opt = {}) {
         foam = max(foam, smoothstep(1.6, 0.15, depth) * smoothstep(-0.4, 0.1, depth) * (0.55 + 0.45 * sin(uTime * 1.2 - depth * 3.0 + noise * 7.0)));   // surf
 #endif
         foam *= smoothstep(0.15, 0.55, noise + foam * 0.5);
+        if (uCurrent > 0.01) {                                   // a river: foam streaks drawn out along the flow, more where it is shallow
+          float st = texture2D(tFoam, vec2(q.x / 2.2, q.y / 38.0)).r * 0.6 + texture2D(tFoam, vec2(q.x / 0.9 + 0.3, q.y / 17.0)).r * 0.4;
+          float shallowK = 1.0;
+#ifdef LAND
+          shallowK = 0.35 + 0.65 * smoothstep(6.0, 1.0, depth);
+#endif
+          foam = max(foam, smoothstep(0.62, 0.9, st) * min(1.0, uCurrent / 2.5) * shallowK * 0.75);
+        }
         vec3 foamCol = vec3(0.92, 0.95, 0.96) * (0.45 + 0.55 * max(dot(N, L), 0.0) * sunUp + 0.15) * uLight;
         col = mix(col, foamCol, foam * 0.9);
         // a point flash (gun or lightning) lighting the water and its foam

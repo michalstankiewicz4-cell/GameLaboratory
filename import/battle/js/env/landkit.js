@@ -130,6 +130,37 @@ export function generateTerrain(opt = {}) {
   return { ...o, h, res: N, cell: o.size / N, landShare: nLand / h.length, maxH, minH, ms: Math.round(performance.now() - t0) };
 }
 
+/* ---------------- waterways: a channel along z for fjords, lakes and rivers ---------------- */
+// A wrap-around strip map with a channel running along z (repeating, so a ship can sail it forever): width (m) of the
+// water, height of the walls or banks, how steep they rise, water depth, a gentle meander. Same height format as
+// generateTerrain, so the same texture, terrain meshes and sea shallows work.
+export const WATERWAY_DEFAULTS = { seed: 7, res: 512, size: 4096, width: 600, wall: 500, steep: 0.7, depth: 120, meander: 0.12, rough: 0.55 };
+export function generateWaterway(opt = {}) {
+  const o = { ...WATERWAY_DEFAULTS, ...opt }, t0 = performance.now(), N = o.res | 0, seed = o.seed | 0;
+  const h = new Float32Array(N * N), c = o.size / N, half = o.width / 2;
+  const rise = Math.max(30, (1 - o.steep) * 900 + 40);             // metres over which the banks climb to the wall height
+  for (let j = 0; j < N; j++) {
+    const v = (j + 0.5) / N;
+    const xc = o.size / 2 + o.meander * o.width * (Math.sin(2 * Math.PI * v) * 0.7 + Math.sin(4 * Math.PI * v + 1.3) * 0.3);
+    for (let i = 0; i < N; i++) {
+      const u = (i + 0.5) / N, x = (i + 0.5) * c, d = Math.abs(x - xc) - half * (1 + 0.28 * fbm(u, v, 7, 4, 0.5, seed + 3));
+      const n = fbm(u, v, 5, 7, 0.4 + o.rough * 0.2, seed), r = fbm(u, v, 3, 6, 0.5, seed + 17, true);
+      let y;
+      if (d < 0) {                                                    // under water: a U-shaped bed, shallower near the banks
+        const t = Math.min(1, -d / Math.max(20, half * 0.6));
+        y = -(1.5 + (o.depth - 1.5) * Math.pow(t, 0.6)) + n * 1.5;
+      } else {
+        const t = Math.min(1, d / rise), k = t * t * (3 - 2 * t);
+        const side = 0.55 + 0.45 * Math.max(0, Math.min(1, r * 0.8 + 0.5));      // side valleys and spurs cut into the walls
+        y = 2.6 + d * 0.035 + o.wall * k * side * (0.7 + 0.3 * (n * 0.5 + 0.5)) + o.wall * 0.25 * Math.max(0, n) * k;
+      }
+      h[j * N + i] = y;
+    }
+  }
+  let nLand = 0, maxH = -Infinity, minH = Infinity; for (const y of h) { if (y > 0) nLand++; if (y > maxH) maxH = y; if (y < minH) minH = y; }
+  return { ...o, h, res: N, cell: c, wrap: true, barrier: 'none', relief: o.wall, landShare: nLand / h.length, maxH, minH, ms: Math.round(performance.now() - t0) };
+}
+
 /* ---------------- sampling (JS twin of the shader) ---------------- */
 // texel i covers [i·cell, (i+1)·cell); its value sits at its centre, as in the shader
 export function sampleHeight(T, x, z) {
@@ -163,12 +194,14 @@ export function heightTexture(T) {
   return tex;
 }
 
-// shared GLSL: the height at a world xz (wrap or clamp + outside), used by the terrain and the sea
+// shared GLSL: the height at a world xz (wrap or clamp + outside), used by the terrain and the sea.
+// uLandOff shifts the map under the world (map = world + offset): a scene that keeps its ship at the origin streams
+// the land past it by moving the offset (the Water Lab does).
 export const GLSL_LAND = /* glsl */`
 uniform sampler2D tLand; uniform vec4 uLand;      // map size (m), texels, wrap (1/0), barrier height outside (m)
-uniform float uLandDepth;
+uniform float uLandDepth; uniform vec2 uLandOff;
 float landH(vec2 xz) {
-  vec2 uv = xz / uLand.x;
+  vec2 uv = (xz + uLandOff) / uLand.x;
   if (uLand.z < 0.5) {
     vec2 c = clamp(uv, vec2(0.5 / uLand.y), vec2(1.0 - 0.5 / uLand.y));
     float off = length((uv - c) * uLand.x);
@@ -181,7 +214,7 @@ float landH(vec2 xz) {
 
 export function landUniforms(T, tex) {
   return {
-    tLand: { value: tex }, uLandDepth: { value: T.depth },
+    tLand: { value: tex }, uLandDepth: { value: T.depth }, uLandOff: { value: new THREE.Vector2() },
     uLand: { value: new THREE.Vector4(T.size, T.res, T.wrap ? 1 : 0, T.barrier === 'mountains' ? Math.max(T.relief, 250) * 1.2 : -T.depth) },
   };
 }
@@ -193,18 +226,18 @@ export function setLand(u, T, tex) {
 const TERRAIN_VERT_HEAD = /* glsl */`
 ${GLSL_LAND}
 uniform float uDrop;                               // the far grid sits a little lower, so the fine grid wins where they overlap
-varying vec3 vLandP; varying vec3 vLandN;
+varying vec3 vLandP; varying vec3 vLandN; varying vec2 vLandQ;
 `;
 const TERRAIN_VERT_NORMAL = /* glsl */`
   vec2 lxz = (modelMatrix * vec4(position, 1.0)).xz;
   float e = uLand.x / uLand.y;
   float lh = landH(lxz);
   vec3 objectNormal = normalize(vec3(landH(lxz - vec2(e, 0.0)) - landH(lxz + vec2(e, 0.0)), 2.0 * e, landH(lxz - vec2(0.0, e)) - landH(lxz + vec2(0.0, e))));
-  vLandN = objectNormal; vLandP = vec3(lxz.x, lh, lxz.y);
+  vLandN = objectNormal; vLandP = vec3(lxz.x, lh, lxz.y); vLandQ = lxz + uLandOff;
 `;
 const TERRAIN_FRAG_HEAD = /* glsl */`
 uniform vec3 uHole; uniform float uRelief, uTime;
-varying vec3 vLandP; varying vec3 vLandN;
+varying vec3 vLandP; varying vec3 vLandN; varying vec2 vLandQ;
 float lnHash(vec2 p) { p = fract(p * vec2(233.34, 851.73)); p += dot(p, p + 23.45); return fract(p.x * p.y); }
 float lnNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
   return mix(mix(lnHash(i), lnHash(i + vec2(1, 0)), f.x), mix(lnHash(i + vec2(0, 1)), lnHash(i + vec2(1, 1)), f.x), f.y); }
@@ -213,7 +246,7 @@ float lnFbm(vec2 p) { return lnNoise(p) * 0.5 + lnNoise(p * 2.1 + 3.1) * 0.3 + l
 const TERRAIN_FRAG_COLOR = /* glsl */`
   if (uHole.z > 0.0 && abs(vLandP.x - uHole.x) < uHole.z && abs(vLandP.z - uHole.y) < uHole.z) discard;
   float hh = vLandP.y, up = normalize(vLandN).y;
-  vec2 q = vLandP.xz;
+  vec2 q = vLandQ;                                       // map coordinates: the ground's texture moves with the ground
   // detail noise fades out with distance before it gets finer than a pixel (no shimmering, no moiré)
   float fd = length(cameraPosition - vLandP);
   float n0 = lnFbm(q * 0.006), n1 = lnFbm(q * 0.035);
@@ -226,7 +259,7 @@ const TERRAIN_FRAG_COLOR = /* glsl */`
   grass = mix(grass, vec3(0.22, 0.17, 0.16), smoothstep(0.6, 0.85, n2) * 0.35);        // heather
   grass *= 0.75 + 0.35 * n2 * (0.7 + 0.3 * n3);
   vec3 scrub = mix(vec3(0.27, 0.25, 0.18), vec3(0.2, 0.2, 0.14), n2) * (0.8 + 0.3 * n3);
-  vec3 rock = mix(vec3(0.24, 0.23, 0.22), vec3(0.36, 0.33, 0.29), n1) * (0.8 + 0.3 * n3) * (0.85 + 0.3 * n2);
+  vec3 rock = mix(vec3(0.18, 0.18, 0.17), vec3(0.3, 0.28, 0.25), n1) * (0.8 + 0.3 * n3) * (0.85 + 0.3 * n2);
   vec3 snow = vec3(0.92, 0.94, 0.97);
   vec3 bed = mix(vec3(0.55, 0.5, 0.38), vec3(0.2, 0.22, 0.2), smoothstep(-4.0, -40.0, hh));
   float rough = 0.95;
@@ -235,7 +268,7 @@ const TERRAIN_FRAG_COLOR = /* glsl */`
   else {
     float beach = smoothstep(4.5 + n2 * 2.5, 1.5, hh) * smoothstep(0.82, 0.93, up);
     float veg = smoothstep(0.7, 0.86, up + (n1 - 0.5) * 0.12) * (1.0 - smoothstep(0.45, 0.75, rel + n1 * 0.12));
-    float snowy = smoothstep(0.62, 0.8, rel + n1 * 0.15) * smoothstep(0.55, 0.75, up);
+    float snowy = smoothstep(0.62, 0.8, rel + n1 * 0.15) * smoothstep(0.55, 0.75, up) * smoothstep(280.0, 420.0, hh);   // only on real heights
     c = rock;
     c = mix(c, mix(scrub, grass, smoothstep(0.5, 0.2, rel)), veg);
     c = mix(c, snow, snowy);
@@ -277,7 +310,8 @@ function terrainDepthMaterial(lu, extra) {
 // Fine grid (texel cells, n×n) and far grid (4-texel cells, n×n) around the camera, snapped to their cells.
 export function terrainMeshes(T, tex, opt = {}) {
   const n = opt.n || 256, nf = opt.nFar || 192;
-  const lu = landUniforms(T, tex);
+  const lu = opt.uniforms || landUniforms(T, tex);      // pass the sea's land uniforms to share them
+  if (opt.uniforms) setLand(lu, T, tex);
   const common = { uRelief: { value: T.relief }, uTime: { value: 0 } };
   const mk = (cells, cell, drop, hole) => {
     const g = new THREE.PlaneGeometry(cells * cell, cells * cell, cells, cells); g.rotateX(-Math.PI / 2);
@@ -291,6 +325,7 @@ export function terrainMeshes(T, tex, opt = {}) {
   const group = new THREE.Group(); group.name = 'terrain';
   let fine, far;
   function build(T2) {
+    for (const m of group.children) { m.geometry.dispose(); m.material.dispose(); m.customDepthMaterial.dispose(); }
     group.clear();
     const c = T2.size / T2.res;
     fine = mk(n, c, 0, new THREE.Vector3(0, 0, 0));
@@ -302,10 +337,12 @@ export function terrainMeshes(T, tex, opt = {}) {
   return {
     group, uniforms: lu,
     set(T2, tex2) { setLand(lu, T2, tex2); build(T2); },
+    // snap each grid so its vertices sit on the map's lattice (map = world + offset): the land never swims
     update(camera) {
+      const ox = lu.uLandOff.value.x, oz = lu.uLandOff.value.y;
       for (const m of [fine, far]) {
         const c = m.userData.cell;
-        m.position.set(Math.round(camera.position.x / c) * c, 0, Math.round(camera.position.z / c) * c);
+        m.position.set(Math.round((camera.position.x + ox) / c) * c - ox, 0, Math.round((camera.position.z + oz) / c) * c - oz);
       }
       far.userData.extra.uHole.value.set(fine.position.x, fine.position.z, far.userData.extra.uHole.value.z);
     },

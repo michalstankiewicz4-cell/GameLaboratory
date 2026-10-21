@@ -7,15 +7,15 @@ under `labs/`) and its kit (code under `js/` that the game will use once a lab's
 |---|---|---|---|---|
 | **Models** | Ship Lab — ORP Błyskawica 1937 (`labs/ship.html`) | in progress | `js/shipkit/` | `docs/ships/blyskawica.md` |
 | | Light cruiser, submarine, aircraft and shore | soon | `js/shipkit/ships/` | |
-| **Environment** | Water and weather — sea and ship (`labs/water.html`) | in progress | `js/labs/waterkit.js` | `docs/water.md` |
-| | Sky and clouds (in the Look Lab for now) | first version | `js/labs/skykit.js` | `docs/look.md` |
-| | Weather: wind → sea, clouds, haze, rain and squalls, sea fog and visibility (thunder, snow and fog banks next) | first version | `js/labs/skykit.js`, `js/labs/rainkit.js` | `docs/look.md` |
-| | Time of day: dawn, dusk, night with stars and the moon (in the Look Lab) | first version | `js/labs/skykit.js` | `docs/look.md` |
-| | Land Lab (`labs/land.html`): procedural land and sea (0–100 % land; islands, archipelago, coast, fjords, highlands; erosion, beaches, shallows, surf), wrap-around (torus) or bounded map (buoys, mountains, wall) | first version | `js/labs/landkit.js` | `docs/land.md` |
+| **Environment** | Water Lab — sea and ship (`labs/water.html`), water bodies: ocean, fjord, lake, river (harbour, ice next); the Land Lab later mixes them by region | in progress | `js/env/waterkit.js`, `js/env/landkit.js` | `docs/water.md` |
+| | Sky and clouds (in the Look Lab for now) | first version | `js/env/skykit.js` | `docs/look.md` |
+| | Weather: wind → sea, clouds, haze, rain and squalls, sea fog and visibility (thunder, snow and fog banks next) | first version | `js/env/skykit.js`, `js/env/rainkit.js` | `docs/look.md` |
+| | Time of day: dawn, dusk, night with stars and the moon (in the Look Lab) | first version | `js/env/skykit.js` | `docs/look.md` |
+| | Land Lab (`labs/land.html`): procedural land and sea (0–100 % land; islands, archipelago, coast, fjords, highlands; erosion, beaches, shallows, surf), wrap-around (torus) or bounded map (buoys, mountains, wall) | first version | `js/env/landkit.js` | `docs/land.md` |
 | | Space | soon | | |
 | **Graphics and filters** | Look Lab (`labs/look.html`): procedural ageing by surface type (see below), baked shading, tone and colour, exposure, lens (distortion, droplets, flare, grain, vignette), bodycam look, automatic resolution | first version | `js/render/look.js`, `js/shipkit/ageing.js` | `docs/look.md` |
 | **Special effects** | fire and explosions, water effects, smoke, destruction | soon | `fxkit`, transformer hitboxes | |
-| **Tools** | Transformer (`labs/transform.html`), Model Doctor (`labs/doctor.html`) | done, growing | `js/shipkit/transform.js`, `js/labs/modeldoctor.js` | `docs/transform.md`, `docs/doctor.md` |
+| **Tools** | Transformer (`labs/transform.html`), Model Doctor (`labs/doctor.html`) | done, growing | `js/shipkit/transform.js`, `js/tools/modeldoctor.js` | `docs/transform.md`, `docs/doctor.md` |
 
 ## How they fit together
 
