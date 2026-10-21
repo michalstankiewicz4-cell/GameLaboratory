@@ -5,7 +5,7 @@ import { clamp } from './util.js';
 export const DEFAULTS = {
   lang: 'en',
   // scale: render resolution; fx: particle density; water: ripple detail and broken foam on the sea
-  gfx: { scale: 1, shadows: true, aa: true, bloom: true, fx: 1, water: true, pip: true, bright: 1.2, showFps: false },
+  gfx: { scale: 1, shadows: true, aa: true, bloom: true, fx: 1, water: true, pip: true, bright: 1.2, sat: 1, showFps: false },
   vol: 0.6,
   mouse: { zoomSens: 1, rotSens: 1 },
 };
@@ -30,6 +30,7 @@ function sanitize(s) {
       water: bool(g.water, d.gfx.water),
       pip: bool(g.pip, d.gfx.pip),
       bright: num(g.bright, d.gfx.bright, 0.6, 2),
+      sat: num(g.sat, d.gfx.sat, 0, 1.6),
       showFps: !!g.showFps,
     },
 
