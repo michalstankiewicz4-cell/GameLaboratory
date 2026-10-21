@@ -84,6 +84,7 @@ export function createMenu(root, { actions, settings, progress }) {
       slider('opt.scale', () => d.gfx.scale, (v) => up((x) => { x.gfx.scale = v; }), 0.5, 1, 0.05, pct),
       slider('opt.fx', () => d.gfx.fx, (v) => up((x) => { x.gfx.fx = v; }), 0.25, 1, 0.05, pct),
       slider('opt.bright', () => d.gfx.bright, (v) => up((x) => { x.gfx.bright = v; }), 0.6, 2, 0.05, (v) => v.toFixed(2)),
+      slider('opt.sat', () => d.gfx.sat, (v) => up((x) => { x.gfx.sat = v; }), 0, 1.6, 0.05, pct),
       check('opt.shadows', 'shadows'), check('opt.aa', 'aa'), check('opt.bloom', 'bloom'), check('opt.water', 'water'),
       check('opt.pip', 'pip'), check('opt.fps', 'showFps'),
       tx('opt.audio', 'h3'),
