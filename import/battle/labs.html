@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
-<title>Steel Salvo Labs — 3D ship models built from code</title>
+<title>Steel Salvo Labs — ships, sea, weather and effects built from code</title>
 <meta name="description" content="Steel Salvo Labs: detailed 1:1 3D reconstructions of real warships, built procedurally in the browser with three.js. First up: the Polish destroyer ORP Błyskawica as built in 1937.">
 <link rel="canonical" href="https://michalstankiewicz4-cell.github.io/Battle/labs.html">
 <meta property="og:type" content="website">
@@ -21,23 +21,46 @@
   <header>
     <div>
       <h1>Steel Salvo <span>Labs</span></h1>
-      <p class="lead">The workshop behind the game. Real warships rebuilt from code at true scale (1 unit = 1 m) from published dimensions and period descriptions, with every part toggleable and every gun trainable.</p>
+      <p class="lead">The workshop behind the game, in five areas: models (real warships rebuilt from code at true scale), environment (sea, weather, sky, time of day, land), graphics and filters, special effects, and the tools that check and optimise it all.</p>
     </div>
     <nav><a href="index.html">Play the game</a><a href="https://github.com/michalstankiewicz4-cell/Battle">Source</a></nav>
   </header>
 
-  <h2>Ships</h2>
+  <h2>Models</h2>
   <div class="grid">
     <a class="tile" href="labs/ship.html">
       <img src="assets/labs/ship.jpg" alt="3D model of the destroyer ORP Błyskawica at sea" width="1200" height="675">
-      <div class="t"><small>Ship Lab · 1937</small><b>ORP Błyskawica</b><p>Grom-class destroyer as built by J. Samuel White, Cowes: 114 m, seven 120 mm Bofors guns, two triple torpedo mounts. Orbit, measure, toggle parts, train the mounts.</p></div>
+      <div class="t"><small>Ship Lab · 1937 · in progress</small><b>ORP Błyskawica</b><p>Grom-class destroyer as built by J. Samuel White, Cowes: 114 m, seven 120 mm Bofors guns, two triple torpedo mounts. Orbit, measure, toggle parts, train the mounts.</p></div>
     </a>
+    <div class="tile soon"><div class="ph">Soon</div><div class="t"><small>Ship Lab</small><b>Light cruiser</b><p>Next hull for the kit.</p></div></div>
+    <div class="tile soon"><div class="ph">Soon</div><div class="t"><small>Ship Lab</small><b>Submarine</b><p>Next hull for the kit.</p></div></div>
+    <div class="tile soon"><div class="ph">Soon</div><div class="t"><small>Model Lab</small><b>Aircraft and shore</b><p>Seaplanes, harbour cranes, lighthouses, coastal guns.</p></div></div>
+  </div>
+
+  <h2>Environment</h2>
+  <div class="grid">
     <a class="tile" href="labs/water.html">
       <img src="assets/labs/water.jpg" alt="ORP Błyskawica at speed in a rough sea with bow wave and spray" width="1200" height="675">
-      <div class="t"><small>Water Lab</small><b>Sea and ship</b><p>Sea states from calm to gale, reflections, foam, bow wave, Kelvin wake, spray, wet hull and ship motion — two variants side by side, with the cost of every effect.</p></div>
+      <div class="t"><small>Water and weather · in progress</small><b>Sea and ship</b><p>Sea states from calm to gale, reflections, foam, bow wave, Kelvin wake, spray, wet hull and ship motion — two variants side by side, with the cost of every effect. Weather joins here.</p></div>
     </a>
-    <div class="tile soon"><div class="ph">Planned</div><div class="t"><small>Ship Lab</small><b>Light cruiser</b><p>Next hull for the kit.</p></div></div>
-    <div class="tile soon"><div class="ph">Planned</div><div class="t"><small>Ship Lab</small><b>Submarine</b><p>Next hull for the kit.</p></div></div>
+    <div class="tile soon"><div class="ph">In progress</div><div class="t"><small>Environment</small><b>Sky and clouds</b><p>Procedural cloud layers, the sun behind the clouds, the sky as the source of light and reflections.</p></div></div>
+    <div class="tile soon"><div class="ph">In progress</div><div class="t"><small>Environment</small><b>Weather</b><p>Wind, rain, fog banks, squalls and storms, driving the sea state.</p></div></div>
+    <div class="tile soon"><div class="ph">Soon</div><div class="t"><small>Environment</small><b>Time of day</b><p>Dawn, noon, dusk and night: sun path, moon, stars, ship lights.</p></div></div>
+    <div class="tile soon"><div class="ph">Soon</div><div class="t"><small>Environment</small><b>Land and coast</b><p>Islands, cliffs, beaches, shallows and surf, harbours.</p></div></div>
+    <div class="tile soon"><div class="ph">Soon</div><div class="t"><small>Environment</small><b>Night sky and space</b><p>Stars, moon phases, aurora: the view above the horizon at night.</p></div></div>
+  </div>
+
+  <h2>Graphics and filters</h2>
+  <div class="grid">
+    <div class="tile soon"><div class="ph">Next</div><div class="t"><small>Look Lab</small><b>Graphics and filters</b><p>Procedural ageing by surface (painted steel, bare metal, wooden decks, canvas, brass, rope) with one wear slider; baked shading; tone, colour grading and exposure; lens distortion, droplets, flare, grain and vignette; the bodycam look; automatic resolution. Every effect switchable, compared side by side, with its cost.</p></div></div>
+  </div>
+
+  <h2>Special effects</h2>
+  <div class="grid">
+    <div class="tile soon"><div class="ph">Soon</div><div class="t"><small>Effects Lab</small><b>Fire and explosions</b><p>Shell hits, magazine detonations, burning decks.</p></div></div>
+    <div class="tile soon"><div class="ph">Soon</div><div class="t"><small>Effects Lab</small><b>Water effects</b><p>Shell splashes, torpedo hits, depth charges, spray.</p></div></div>
+    <div class="tile soon"><div class="ph">Soon</div><div class="t"><small>Effects Lab</small><b>Smoke</b><p>Funnel smoke, smoke screens, burning wrecks.</p></div></div>
+    <div class="tile soon"><div class="ph">Soon</div><div class="t"><small>Effects Lab</small><b>Destruction</b><p>Procedural damage on the transformer’s hitboxes: falling debris, collapsing superstructure, flooding.</p></div></div>
   </div>
 
   <h2>Tools</h2>
@@ -48,7 +71,7 @@
     </a>
     <a class="tile" href="labs/doctor.html">
       <img src="assets/labs/doctor.jpg" alt="Model doctor highlighting a turret whose line of fire hits the bridge" width="1200" height="675">
-      <div class="t"><small>Tool · ModelDoctor</small><b>Model Doctor</b><p>Every lab and game ship examined for the repeating mistakes: inside-out shapes, flicker, floating pieces, guns firing into their own ship, fittings through the hull, over-budget models. Click a finding to see it.</p></div>
+      <div class="t"><small>Tool · ModelDoctor</small><b>Model Doctor</b><p>Every lab and game ship examined for the repeating mistakes: inside-out shapes, holes, flicker, floating pieces, guns firing into their own ship, fittings through the hull, over-budget models. Click a finding to see it.</p></div>
     </a>
   </div>
 </main>
