@@ -84,6 +84,11 @@ def main():
                     if pg.evaluate('__water.vars.A.ground') != g0: break
                 else: raise AssertionError(f'{k}: the shore does not move ' + '; '.join(errs[:3]))
             assert pg.evaluate('__water.vars.A.u.uCurrent.value') > 1, 'river without a current'
+            for k, expr in [('harbour', '__water.vars.A.u.uOil.value > 0.3'), ('ice', '__water.vars.A.u.uIce.value.x > 0.5')]:
+                pg.evaluate("(k)=>{const s=document.getElementById('body');s.value=k;s.dispatchEvent(new Event('change'))}", k)
+                assert pg.evaluate(expr), f'{k}: not set'
+                assert not pg.evaluate('__water.vars.A.terrain && __water.vars.A.terrain.group.visible'), f'{k}: should have no shore'
+            time.sleep(3); pg.screenshot(path=os.path.join(OUT, 'lab-water-ice.png'), timeout=600000)
             pg.screenshot(path=os.path.join(OUT, 'lab-water-river.png'), timeout=600000)
             pg.evaluate("()=>{const s=document.getElementById('body');s.value='ocean';s.dispatchEvent(new Event('change'))}")
             # transformer: levels, hitboxes, damage through a ray, fleet

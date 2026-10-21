@@ -20,6 +20,8 @@ export const SEAS = {
   fjord: { label: 'Fjord: cat’s-paws on still water', Hs: 0.12, Lp: 7, chop: 0.25, spread: 60, n: 8 },
   lake: { label: 'Lake: short wind chop', Hs: 0.25, Lp: 6, chop: 0.45, spread: 50, n: 8 },
   river: { label: 'River: ripples', Hs: 0.06, Lp: 3.5, chop: 0.3, spread: 70, n: 6 },
+  harbour: { label: 'Harbour: sheltered', Hs: 0.15, Lp: 6, chop: 0.3, spread: 60, n: 8 },
+  ice: { label: 'Ice: swell under the floes', Hs: 0.7, Lp: 40, chop: 0.25, spread: 25, n: 10 },
 };
 export const LOOKS = {
   atlantic: { label: 'North Atlantic', deep: '#0a2536', scatter: '#1d6a68', shine: 900, ripples: 0.55, crest: 0.55 },
@@ -29,18 +31,23 @@ export const LOOKS = {
   fjord: { label: 'Fjord (dark, still)', deep: '#05141a', scatter: '#123c3a', shine: 1300, ripples: 0.22, crest: 0.08 },
   lake: { label: 'Lake (fresh, peaty)', deep: '#141c12', scatter: '#34462a', shine: 1100, ripples: 0.4, crest: 0.05 },
   river: { label: 'River (silty)', deep: '#24251a', scatter: '#4c4a30', shine: 700, ripples: 0.65, crest: 0 },
+  harbour: { label: 'Harbour (murky)', deep: '#121a16', scatter: '#303c2e', shine: 900, ripples: 0.3, crest: 0.03 },
+  arctic: { label: 'Arctic (cold, clear)', deep: '#061a23', scatter: '#1a525c', shine: 900, ripples: 0.3, crest: 0.1 },
 };
 
 // Water bodies: a sea state, a look and the shore around it. banks: a channel (LandKit generateWaterway) with its
-// width, wall height, steepness and depth; current: m/s flowing towards the stern (the ship heads upstream).
-// planar: still water that mirrors its shore (planar reflection on). soon: listed in the lab but not built yet.
+// width, wall height, steepness and depth (everything built that touches the water — quays, piers, breakwaters,
+// harbours — belongs to the waterside-buildings lab, not here);
+// current: m/s flowing towards the stern (the ship heads upstream); oil: sheen patches 0..1; ice: floe cover 0..1,
+// floe size (m), freeboard (m). planar: still water that mirrors its shore (planar reflection on).
+const CALM = { current: 0, oil: 0, iceCover: 0, floe: 18, freeboard: 0.35 };
 export const WATER_BODIES = {
-  ocean: { label: 'Open ocean', sea: 'moderate', look: 'atlantic', reflect: 1, banks: null, current: 0, planar: false },
-  fjord: { label: 'Fjord', sea: 'fjord', look: 'fjord', reflect: 1.15, banks: { width: 800, wall: 650, steep: 0.7, depth: 180, meander: 0.12 }, current: 0, planar: true },
-  lake: { label: 'Lake', sea: 'lake', look: 'lake', reflect: 1.05, banks: { width: 1800, wall: 90, steep: 0.25, depth: 30, meander: 0.2 }, current: 0, planar: true },
-  river: { label: 'River', sea: 'river', look: 'river', reflect: 0.9, banks: { width: 240, wall: 22, steep: 0.35, depth: 9, meander: 0.18 }, current: 1.8, planar: false },
-  harbour: { label: 'Harbour (soon)', soon: true },
-  ice: { label: 'Ice and pack ice (soon)', soon: true },
+  ocean: { label: 'Open ocean', sea: 'moderate', look: 'atlantic', reflect: 1, banks: null, planar: false, ...CALM },
+  fjord: { label: 'Fjord', sea: 'fjord', look: 'fjord', reflect: 1.15, banks: { width: 800, wall: 650, steep: 0.7, depth: 180, meander: 0.12 }, planar: true, ...CALM },
+  lake: { label: 'Lake', sea: 'lake', look: 'lake', reflect: 1.05, banks: { width: 1800, wall: 90, steep: 0.25, depth: 30, meander: 0.2 }, planar: true, ...CALM },
+  river: { label: 'River', sea: 'river', look: 'river', reflect: 0.9, banks: { width: 240, wall: 22, steep: 0.35, depth: 9, meander: 0.18 }, planar: false, ...CALM, current: 1.8 },
+  harbour: { label: 'Harbour water (murky, oil)', sea: 'harbour', look: 'harbour', reflect: 1.05, banks: null, planar: true, ...CALM, oil: 0.55 },
+  ice: { label: 'Ice and pack ice', sea: 'ice', look: 'arctic', reflect: 0.9, banks: null, planar: false, ...CALM, iceCover: 0.7, floe: 18, freeboard: 0.35 },
 };
 
 // Builds a wave set: wavelengths spread (log) around the peak, amplitudes from a falloff, directions inside the
@@ -111,6 +118,43 @@ float waveHeight(vec2 p) { vec3 n; float f; vec3 d = gerstner(p, n, f); return d
 `;
 
 // ship frame: hull half-breadth at the waterline from a 1-D texture, speed, bow and stern positions
+// Ice floes as Voronoi cells in the water's own frame (they drift with it), and the lane a ship breaks through them.
+export const GLSL_ICE = /* glsl */`
+uniform vec4 uIce;   // floe cover 0..1, floe size (m), freeboard (m), lane behind the ship (1/0)
+vec2 icHash2(vec2 p) { p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3))); return fract(sin(p) * 43758.5453); }
+vec3 icVoro(vec2 g) {                                // x: distance to the cell's edge (cell units), y: the cell's random value
+  vec2 ci = floor(g), f = fract(g); float d1 = 9.0, d2 = 9.0; vec2 id = vec2(0.0);
+  for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) {
+    vec2 o = vec2(float(i), float(j)), c = o + 0.12 + 0.76 * icHash2(ci + o) - f; float d = dot(c, c);
+    if (d < d1) { d2 = d1; d1 = d; id = ci + o; } else if (d < d2) d2 = d;
+  }
+  return vec3((sqrt(d2) - sqrt(d1)) * 0.5, icHash2(id + 3.7).x, 0.0);
+}
+// w: the water's frame (floes drift with it), s: the ship's frame (the lane stays behind the ship);
+// returns x: 1 on ice, y: metres to the floe's edge, z: the floe's random value
+float icNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(icHash2(i).x, icHash2(i + vec2(1, 0)).x, f.x), mix(icHash2(i + vec2(0, 1)).x, icHash2(i + vec2(1, 1)).x, f.x), f.y); }
+vec3 iceAt(vec2 w, vec2 s) {
+  if (uIce.x <= 0.0) return vec3(0.0);
+  // warped cells: floes with irregular, broken outlines instead of a paving pattern
+  vec2 wq = w / uIce.y;
+  wq += (vec2(icNoise(wq * 0.7), icNoise(wq * 0.7 + 5.2)) - 0.5) * 0.7 + (vec2(icNoise(wq * 3.1 + 2.0), icNoise(wq * 3.1 + 9.0)) - 0.5) * 0.12;
+  vec3 v = icVoro(wq); float edge = v.x * uIce.y;
+  float gap = mix(1.8, 0.2, uIce.x);
+  float on = step(v.y, uIce.x * 1.08) * smoothstep(gap, gap + 0.35, edge);
+  if (uIce.w > 0.5) {
+    float zb = uShip.y + 1.5, hw = uShip.w * 1.8 + max(0.0, zb - s.y) * 0.05;
+    float lane = step(s.y, zb) * (1.0 - smoothstep(hw - 1.0, hw + 2.5, abs(s.x)));
+    if (lane > 0.0) {                                // broken ice in the lane: small pieces, wider gaps
+      vec3 b = icVoro(w / (uIce.y * 0.14) + 17.0); float be = b.x * uIce.y * 0.14;
+      float brash = step(b.y, 0.35 * uIce.x) * smoothstep(0.3, 0.5, be);
+      on = mix(on, brash, lane); edge = mix(edge, be, lane);
+    }
+  }
+  return vec3(on, edge, v.y);
+}
+`;
+
 export const GLSL_SHIP = /* glsl */`
 uniform sampler2D uHull;
 uniform vec4 uHullZ;      // zMin, zMax, max half-breadth, -
@@ -224,7 +268,7 @@ export function waterUniforms() {
     uDeep: { value: new THREE.Color() }, uScatter: { value: new THREE.Color() },
     uShine: { value: 900 }, uRipples: { value: 0.5 }, uCrest: { value: 0.5 }, uReflect: { value: 1 }, uPlanar: { value: 0 },
     uReflTex: { value: null }, uRes: { value: new THREE.Vector2(1, 1) }, uAlpha: { value: 1 }, uPixelN: { value: 1 },
-    uFogCol: { value: new THREE.Color() }, uFogFar: { value: 2600 }, uFogDen: { value: 0 }, uRain: { value: 0 }, uLight: { value: 1 }, uCurrent: { value: 0 }, uWet: { value: 0.7 }, uWetOn: { value: 1 },
+    uFogCol: { value: new THREE.Color() }, uFogFar: { value: 2600 }, uFogDen: { value: 0 }, uRain: { value: 0 }, uLight: { value: 1 }, uCurrent: { value: 0 }, uOil: { value: 0 }, uIce: { value: new THREE.Vector4(0, 18, 0.35, 1) }, uWet: { value: 0.7 }, uWetOn: { value: 1 },
     uFlash: { value: new THREE.Vector4(0, 0, 0, 0) },   // point flash on the sea: position, power (gun flashes, lightning)
     tNormal: { value: tex.normal }, tFoam: { value: tex.foam },
   };
@@ -262,7 +306,7 @@ export function waterMaterial(u, opt = {}) {
   const L = opt.land ? '#define LAND\n' + opt.land + '\nvarying float vDepth;\n' : '';
   return new THREE.ShaderMaterial({
     uniforms: u, transparent: true, depthWrite: true,
-    vertexShader: L + GLSL_WAVES + GLSL_SHIP + /* glsl */`
+    vertexShader: L + GLSL_WAVES + GLSL_SHIP + GLSL_ICE + /* glsl */`
       varying vec3 vWorld; varying vec3 vN; varying float vFold; varying vec2 vXZ; varying float vShipH;
       void main() {
         vec2 p = (modelMatrix * vec4(position, 1.0)).xz;
@@ -271,6 +315,11 @@ export function waterMaterial(u, opt = {}) {
         float dep = -landH(p), damp = 0.12 + 0.88 * smoothstep(0.5, 16.0, dep);
         d = vec3(p.x, 0.0, p.y) + (d - vec3(p.x, 0.0, p.y)) * damp; n = normalize(mix(vec3(0.0, 1.0, 0.0), n, damp)); fold *= damp; vDepth = dep;
 #endif
+        if (uIce.x > 0.0) {                                    // ice damps the waves and its floes ride above the water
+          float k = 1.0 - uIce.x * 0.75;
+          d = vec3(p.x, 0.0, p.y) + (d - vec3(p.x, 0.0, p.y)) * k; n = normalize(mix(vec3(0.0, 1.0, 0.0), n, k)); fold *= k * 0.3;
+          d.y += iceAt(p + vec2(0.0, uShift), p).x * uIce.z;
+        }
         float sh = shipWave(p);
         float e = 0.8, sx = shipWave(p + vec2(e, 0.0)) - sh, sz = shipWave(p + vec2(0.0, e)) - sh;   // ship wave slope
         n = normalize(n + vec3(-sx / e, 0.0, -sz / e));
@@ -278,9 +327,9 @@ export function waterMaterial(u, opt = {}) {
         vWorld = wp; vN = n; vFold = fold; vXZ = p; vShipH = sh;
         gl_Position = projectionMatrix * viewMatrix * vec4(wp, 1.0);
       }`,
-    fragmentShader: L + GLSL_WAVES + GLSL_SHIP + /* glsl */`
+    fragmentShader: L + GLSL_WAVES + GLSL_SHIP + GLSL_ICE + /* glsl */`
       uniform vec3 uSun, uSunCol, uSkyH, uSkyZ, uSkySea, uDeep, uScatter, uFogCol;
-      uniform float uShine, uRipples, uCrest, uReflect, uPlanar, uAlpha, uPixelN, uFogFar, uFogDen, uRain, uLight, uCurrent;
+      uniform float uShine, uRipples, uCrest, uReflect, uPlanar, uAlpha, uPixelN, uFogFar, uFogDen, uRain, uLight, uCurrent, uOil;
       uniform sampler2D uReflTex, tNormal, tFoam; uniform vec2 uRes; uniform vec4 uFlash;
       varying vec3 vWorld; varying vec3 vN; varying float vFold; varying vec2 vXZ; varying float vShipH;
       ${opt.sky ? opt.sky + '\n      vec3 sky(vec3 d) { return skyColor(d); }' : `vec3 sky(vec3 d) {
@@ -297,7 +346,13 @@ export function waterMaterial(u, opt = {}) {
         vec2 q = vXZ + vec2(0.0, uShift);
         vec3 r1 = texture2D(tNormal, q / 9.0 + vec2(uTime * 0.012, uTime * 0.02)).xyz * 2.0 - 1.0;
         vec3 r2 = texture2D(tNormal, q / 23.0 - vec2(uTime * 0.017, -uTime * 0.008)).xyz * 2.0 - 1.0;
-        vec2 rip = (r1.xy + r2.xy) * uRipples * 0.35 * exp(-dist / 350.0);
+        // oil: patches drifting with the water; a film calms the ripples and shows thin-film colours
+        float oilN = 0.0, oil = 0.0;
+        if (uOil > 0.0) {
+          oilN = texture2D(tFoam, q / 210.0 + vec2(uTime * 0.0004, 0.0)).r * 0.6 + texture2D(tFoam, q / 70.0 + 0.41).r * 0.4;
+          oil = smoothstep(0.5, 0.64, oilN + uOil * 0.18 - 0.09) * min(1.0, uOil * 1.6);
+        }
+        vec2 rip = (r1.xy + r2.xy) * uRipples * 0.35 * exp(-dist / 350.0) * (1.0 - oil * 0.85);
         N = normalize(N + vec3(rip.x, 0.0, rip.y));
         // rain: expanding rings from drops (two layers of cells, each cell one drop with its own phase) and a fine roughening
         if (uRain > 0.0 && dist < 80.0) {
@@ -333,6 +388,11 @@ export function waterMaterial(u, opt = {}) {
 #endif
         body *= uLight;                                          // daylight (dusk and night darken the water body)
         vec3 col = mix(body, refl, F);
+        if (oil > 0.0) {                                         // thin film: the colour depends on the film's thickness and the view angle
+          float th = texture2D(tFoam, q / 11.0).r * 1.4 + oilN * 2.2 + (1.0 - NdV) * 0.9;
+          vec3 irid = 0.5 + 0.5 * cos(6.2831853 * (th + vec3(0.0, 0.33, 0.67)));
+          col = mix(col, col * 0.88 + irid * (0.015 + 0.14 * F) * (0.4 + 0.6 * sunUp) * uLight, oil * 0.8);
+        }
         // sun glitter
         vec3 H = normalize(L + V); float spec = pow(max(dot(N, H), 0.0), uShine) * (uShine / 60.0) * smoothstep(-0.02, 0.08, L.y);
         col += uSunCol * spec * 1.6;
@@ -353,8 +413,24 @@ export function waterMaterial(u, opt = {}) {
 #endif
           foam = max(foam, smoothstep(0.62, 0.9, st) * min(1.0, uCurrent / 2.5) * shallowK * 0.75);
         }
+        foam *= 1.0 - oil * 0.6;
         vec3 foamCol = vec3(0.92, 0.95, 0.96) * (0.45 + 0.55 * max(dot(N, L), 0.0) * sunUp + 0.15) * uLight;
         col = mix(col, foamCol, foam * 0.9);
+        // ice: snow-covered floes and bare blue-grey ice, wet dark rims, lit by the sun and the sky
+        vec3 ice = iceAt(q, vXZ);
+        if (ice.x > 0.0) {
+          float sn = texture2D(tFoam, q / 6.0 + ice.z * 7.0).r * 0.6 + texture2D(tFoam, q / 1.7).r * 0.4;
+          vec3 bare = vec3(0.5, 0.64, 0.7), snow = vec3(0.9, 0.93, 0.96);
+          vec3 ic = mix(bare, snow, smoothstep(0.35, 0.6, sn + ice.z * 0.3 - 0.1));
+          ic = mix(ic * 0.55, ic, smoothstep(0.1, 0.9, ice.y));                       // wet rim at the edge
+          vec3 Ni = normalize(vec3((sn - 0.5) * 0.25, 1.0, (ice.z - 0.5) * 0.2));
+          vec3 lit = sky(vec3(0.0, 1.0, 0.0)) * 0.55 + uSunCol * max(dot(Ni, L), 0.0) * 0.95 * sunUp;
+          col = mix(col, ic * lit * uLight, ice.x); foam *= 1.0 - ice.x;
+        }
+        if (uIce.x > 0.0 && ice.x < 1.0) {                        // ice under the surface around the floes shows turquoise
+          float nearFloe = step(ice.z, uIce.x * 1.08) * (1.0 - smoothstep(0.2, 1.2, ice.y));   // only right beside a floe
+          col = mix(col, vec3(0.12, 0.34, 0.37) * (0.4 + 0.6 * sunUp) * uLight, (1.0 - ice.x) * nearFloe * 0.25 * uIce.x);
+        }
         // a point flash (gun or lightning) lighting the water and its foam
         if (uFlash.w > 0.0) {
           vec3 fv = uFlash.xyz - vWorld; float fd2 = dot(fv, fv); vec3 FL = fv * inversesqrt(fd2);
@@ -368,7 +444,7 @@ export function waterMaterial(u, opt = {}) {
 #ifdef LAND
         alpha *= 0.3 + 0.7 * smoothstep(0.0, 9.0, depth);         // shallow water is clear
 #endif
-        gl_FragColor = vec4(col, mix(alpha, 1.0, max(F * 0.8, foam)));
+        gl_FragColor = vec4(col, mix(alpha, 1.0, max(max(F * 0.8, foam), ice.x)));
       }`,
   });
 }

@@ -7,7 +7,8 @@ under `labs/`) and its kit (code under `js/` that the game will use once a lab's
 |---|---|---|---|---|
 | **Models** | Ship Lab — ORP Błyskawica 1937 (`labs/ship.html`) | in progress | `js/shipkit/` | `docs/ships/blyskawica.md` |
 | | Light cruiser, submarine, aircraft and shore | soon | `js/shipkit/ships/` | |
-| **Environment** | Water Lab — sea and ship (`labs/water.html`), water bodies: ocean, fjord, lake, river (harbour, ice next); the Land Lab later mixes them by region | in progress | `js/env/waterkit.js`, `js/env/landkit.js` | `docs/water.md` |
+| | Waterside buildings: everything built that touches the water — quays, piers, breakwaters, harbours, lighthouses | soon | | |
+| **Environment** | Water Lab — sea and ship (`labs/water.html`), water bodies: ocean, fjord, lake, river, harbour water (oil), ice and pack ice; the Land Lab later mixes them by region | in progress | `js/env/waterkit.js`, `js/env/landkit.js` | `docs/water.md` |
 | | Sky and clouds (in the Look Lab for now) | first version | `js/env/skykit.js` | `docs/look.md` |
 | | Weather: wind → sea, clouds, haze, rain and squalls, sea fog and visibility (thunder, snow and fog banks next) | first version | `js/env/skykit.js`, `js/env/rainkit.js` | `docs/look.md` |
 | | Time of day: dawn, dusk, night with stars and the moon (in the Look Lab) | first version | `js/env/skykit.js` | `docs/look.md` |

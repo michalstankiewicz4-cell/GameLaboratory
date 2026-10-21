@@ -58,7 +58,17 @@ into rings on the polar grid); this helps the ocean far away too.
 | Fjord | cat's-paws, 0.1 m | dark and still | 800 m wide, walls ~650 m, steep |
 | Lake | short wind chop, 0.25 m | fresh, peaty | 1.8 km wide, low hills |
 | River | ripples | silty | 240 m wide, low banks, current 1.8 m/s |
-| Harbour, Ice | — | — | coming |
+| Harbour water | sheltered, 0.15 m | murky, with **oil** sheen | — (quays, piers, breakwaters: waterside-buildings lab) |
+| Ice and pack ice | swell under the floes | arctic | — ; **floes** cover 70 %, 18 m, 0.35 m above the water |
+
+**Oil** (`uOil`, any body): patches drifting with the water; the film calms the ripples, dulls the foam and shows
+thin-film colours that change with the film's thickness and the viewing angle (strongest at grazing angles).
+
+**Ice** (`uIce`: cover, floe size, freeboard, lane; `GLSL_ICE`): floes are warped Voronoi cells in the water's frame (they
+drift with it) — snow-covered or bare blue-grey ice with wet rims, lit by the sun and the sky; cover near 100 % with
+large floes gives pack ice with thin leads. Ice damps the waves (the floes ride the swell) and the floes stand above the
+water by the freeboard. Behind the bow the ship leaves a **lane**: broken ice (brash) in open water, widening astern.
+Submerged ice shows turquoise right beside the floes.
 
 ## Not yet
 

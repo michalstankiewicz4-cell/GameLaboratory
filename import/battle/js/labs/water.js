@@ -60,8 +60,8 @@ const yBridge = S.lines.deck(20) + 8.6;
 
 /* ---------------- variants ---------------- */
 const DEFAULTS = {
-  A: { body: 'ocean', width: 700, wall: 650, steep: 0.85, depth: 180, meander: 0.12, current: 0, sea: 'moderate', ...pick(SEAS.moderate), dir: 30, look: 'atlantic', ...pick(LOOKS.atlantic), reflect: 1, planar: false, clear: false, kn: 18, motion: true, bowWave: true, wake: true, hullFoam: true, wet: true, spray: true },
-  B: { body: 'ocean', width: 700, wall: 650, steep: 0.85, depth: 180, meander: 0.12, current: 0, sea: 'rough', ...pick(SEAS.rough), dir: 30, look: 'baltic', ...pick(LOOKS.baltic), reflect: 1, planar: true, clear: false, kn: 18, motion: true, bowWave: true, wake: true, hullFoam: true, wet: true, spray: true },
+  A: { body: 'ocean', width: 700, wall: 650, steep: 0.85, depth: 180, meander: 0.12, current: 0, oil: 0, iceCover: 0, floe: 18, freeboard: 0.35, sea: 'moderate', ...pick(SEAS.moderate), dir: 30, look: 'atlantic', ...pick(LOOKS.atlantic), reflect: 1, planar: false, clear: false, kn: 18, motion: true, bowWave: true, wake: true, hullFoam: true, wet: true, spray: true },
+  B: { body: 'ocean', width: 700, wall: 650, steep: 0.85, depth: 180, meander: 0.12, current: 0, oil: 0, iceCover: 0, floe: 18, freeboard: 0.35, sea: 'rough', ...pick(SEAS.rough), dir: 30, look: 'baltic', ...pick(LOOKS.baltic), reflect: 1, planar: true, clear: false, kn: 18, motion: true, bowWave: true, wake: true, hullFoam: true, wet: true, spray: true },
 };
 function pick(o) { const r = { ...o }; delete r.label; return r; }
 const KEY = 'steelSalvo.waterLab.v1';
@@ -110,7 +110,8 @@ function applyVariant(id) {
   u.uPlanar.value = p.planar ? 1 : 0; u.uAlpha.value = p.clear ? 0.78 : 1;
   u.uShipFx.value.set(p.bowWave ? 1 : 0, p.wake ? 1 : 0, p.hullFoam ? 1 : 0, 0);
   u.uPixelN.value = $('pixN').checked ? 1 : 0;
-  u.uCurrent.value = p.current || 0;
+  u.uCurrent.value = p.current || 0; u.uOil.value = p.oil || 0;
+  u.uIce.value.set(p.iceCover || 0, p.floe || 18, p.freeboard ?? 0.35, 1);
   shore(v, p);
 }
 // the shore of the variant's water body: a channel generated once per set of bank parameters (debounced while dragging)
@@ -293,7 +294,8 @@ let edit = 'A';
 for (const [k, b] of Object.entries(WATER_BODIES)) $('body').append(el('option', { value: k, textContent: b.label, disabled: !!b.soon }));
 $('body').onchange = () => {
   const k = $('body').value, b = WATER_BODIES[k]; if (!b || b.soon) return;
-  Object.assign(V[edit], { body: k, sea: b.sea, ...pick(SEAS[b.sea]), look: b.look, ...pick(LOOKS[b.look]), reflect: b.reflect, current: b.current, planar: !!b.planar }, b.banks || {});
+  Object.assign(V[edit], { body: k, sea: b.sea, ...pick(SEAS[b.sea]), look: b.look, ...pick(LOOKS[b.look]), reflect: b.reflect, planar: !!b.planar,
+    current: b.current, oil: b.oil, iceCover: b.iceCover, floe: b.floe, freeboard: b.freeboard }, b.banks || {});
   fillUI(); changed();
 };
 for (const [k, s] of Object.entries(SEAS)) $('seaPreset').append(el('option', { value: k, textContent: s.label }));
@@ -302,7 +304,8 @@ for (const [k, s] of Object.entries(LOOKS)) $('lookPreset').append(el('option', 
 $('lookPreset').append(el('option', { value: 'custom', textContent: 'Custom' }));
 const FMT = { Hs: (x) => x.toFixed(1) + ' m', Lp: (x) => x + ' m', chop: (x) => x.toFixed(2), spread: (x) => x + '°', dir: (x) => (x === 0 ? 'ahead' : Math.abs(x) === 180 ? 'astern' : (x > 0 ? 'stbd ' : 'port ') + Math.abs(x) + '°'), n: (x) => x,
   shine: (x) => x, ripples: (x) => x.toFixed(2), crest: (x) => x.toFixed(2), reflect: (x) => x.toFixed(2), kn: (x) => x + ' kn',
-  width: (x) => x + ' m', wall: (x) => x + ' m', current: (x) => x.toFixed(1) + ' m/s' };
+  width: (x) => x + ' m', wall: (x) => x + ' m', current: (x) => x.toFixed(1) + ' m/s',
+  oil: (x) => Math.round(x * 100) + ' %', iceCover: (x) => Math.round(x * 100) + ' %', floe: (x) => x + ' m', freeboard: (x) => x.toFixed(2) + ' m' };
 const SEA_KEYS = ['Hs', 'Lp', 'chop', 'spread', 'n'], LOOK_KEYS = ['deep', 'scatter', 'shine', 'ripples', 'crest'];
 const CHECKS = ['planar', 'clear', 'motion', 'bowWave', 'wake', 'hullFoam', 'wet', 'spray'];
 function fillUI() {
