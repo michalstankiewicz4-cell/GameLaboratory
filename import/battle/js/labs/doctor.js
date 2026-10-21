@@ -6,6 +6,7 @@ import * as THREE from '../../vendor/three.module.js';
 import { examine, explodeBoxes, CHECKS, SEVERITY, ABOUT } from './modeldoctor.js';
 import { KIT } from '../shipkit/geom.js';
 import { SHIPS } from '../shipkit/index.js';
+import { transformShip } from '../shipkit/transform.js';
 import { sideAt } from '../shipkit/hull.js';
 import { buildShip as buildGameShip } from '../world/models.js';
 import { CLASSES } from '../world/constants.js';
@@ -19,6 +20,7 @@ const GAME_NAMES = { dd: 'Destroyer', ca: 'Cruiser', bb: 'Battleship', ss: 'Subm
 const MODELS = [
   ...Object.keys(SHIPS).map((id) => ({ id: 'lab/' + id, label: SHIPS[id].info.name, sub: 'Ship Lab · 1:1', kind: 'lab', ship: id })),
   ...Object.keys(CLASSES).map((k) => ({ id: 'game/' + k, label: GAME_NAMES[k] || k, sub: 'game model', kind: 'game', cls: k })),
+  ...Object.keys(SHIPS).flatMap((id) => [0, 1, 2].map((L) => ({ id: `lod/${id}/${L}`, label: `${SHIPS[id].info.name} LOD${L}`, sub: 'transformer', kind: 'lod', ship: id, level: L }))),
   { id: 'test/bench', label: 'Test bench', sub: 'one mistake per check', kind: 'test' },
 ];
 
@@ -72,8 +74,25 @@ function countDraw(root) {
   return { triangles: Math.round(tris), drawCalls: calls, materials: mats.size };
 }
 
+// per-level budgets the transformer aims at (LOD0 is only drawn close up)
+const LOD_BUDGET = [{ triangles: 40000, drawCalls: 70 }, { triangles: 15000, drawCalls: 35 }, { triangles: 3000, drawCalls: 10 }];
+const transformed = {};
 function buildModel(m) {
   if (m.kind === 'test') return testBench();
+  if (m.kind === 'lod') {
+    const T = transformed[m.ship] || (transformed[m.ship] = transformShip(m.ship));
+    const lv = T.levels[m.level], root = new THREE.Group(); root.name = lv.name;
+    lv.group.visible = true; root.add(lv.group);                       // out of the THREE.LOD, which hides the other levels
+    const mounts = T.mounts.map((mt) => {
+      const train = mt.trains[m.level]; if (!train || !mt.arc) return null;
+      return { name: mt.name, group: train, train, guns: mt.guns[m.level] || [], arc: mt.arc, base: train.rotation.y, aa: mt.aa };
+    }).filter((x) => x && x.guns.length);
+    return { root, measured: { triangles: lv.triangles, drawCalls: lv.drawCalls, materials: lv.materials }, opts: {
+      // merged levels: geometry checks only (arcs, slivers and the like were checked on the unmerged pieces); a coarser
+      // see-through grid, since every ray now tests whole merged meshes
+      checks: ['nan', 'inverted', 'facing', 'seethrough', 'zfight', 'floating', 'hidden', 'speck', 'budget'], seeGrid: 40,
+      mounts, planeEps: 0.02, budget: { ...LOD_BUDGET[m.level], measured: { triangles: lv.triangles, drawCalls: lv.drawCalls } } } };
+  }
   if (m.kind === 'lab') {
     const S = SHIPS[m.ship];
     const merged = S.build({ detail: 1 });
@@ -119,6 +138,7 @@ function examineModel(m) {
   const b = buildModel(m);
   const opts = { ...b.opts, tolerance: +$('tol').value, ignoreAllow: $('showOk').checked };
   if (m.kind === 'lab') opts.budget = { ...budget(), measured: b.measured };
+  if (m.kind === 'lod') opts.budget = b.opts.budget;
   const r = examine(b.root, opts);
   const counts = {}; CHECKS.forEach((c) => { counts[c] = 0; });
   r.findings.forEach((f) => counts[f.check]++);

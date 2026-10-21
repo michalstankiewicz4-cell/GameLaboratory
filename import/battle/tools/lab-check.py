@@ -61,6 +61,16 @@ def main():
             pg.evaluate("()=>[...document.querySelectorAll('#cams button')].find(b=>b.textContent==='Bridge').click()"); time.sleep(3)
             pg.screenshot(path=os.path.join(OUT, 'lab-water-split.png'), timeout=600000)
             assert pg.evaluate('__water.vars.A.waves.length') >= 4, 'no waves'
+            # transformer: levels, hitboxes, damage through a ray, fleet
+            pg.goto(f'http://localhost:{PORT}/labs/transform.html')
+            pg.wait_for_function('window.__tf && window.__tf.T.levels.length === 3', timeout=300000)
+            lv = pg.evaluate('__tf.T.levels.map(l => [l.name, l.triangles, l.drawCalls])'); print('levels', lv)
+            assert lv[0][2] > lv[1][2] > lv[2][2] and lv[0][1] > lv[1][1] > lv[2][1], 'levels must get cheaper'
+            n = pg.evaluate('__tf.T.hitboxes.length'); assert n >= 300, f'only {n} hitboxes'
+            got = pg.evaluate("async()=>{const THREE=await import('/vendor/three.module.js'); const r=__tf.T.raycast(new THREE.Ray(new THREE.Vector3(30,2,0), new THREE.Vector3(-1,0,0))); if(!r) return null; __tf.hit(r.box,0.5); return [r.box.kind, __tf.T.damage.level[r.box.id]]}")
+            assert got and got[0] == 'hull' and got[1] > 0.4, f'ray hit {got}'
+            pg.evaluate("()=>{const f=document.getElementById('fleet');f.value=6;f.dispatchEvent(new Event('input'))}"); time.sleep(3)
+            pg.screenshot(path=os.path.join(OUT, 'lab-transform.png'), timeout=600000)
             b.close()
     finally:
         srv.kill()

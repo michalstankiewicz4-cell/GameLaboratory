@@ -289,7 +289,7 @@ export function build(opt = {}) {
 
   for (const [k, g] of Object.entries(parts)) { g.name = k; g.userData.part = true; root.add(g); }
   root.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
-  return { group: root, parts, mounts, info, lines, length: LOA, beam: B * 2 };
+  return { group: root, parts, mounts, info, lines, materials: mats, length: LOA, beam: B * 2 };
 }
 
 // Polish naval ensign (1919–1945 pattern simplified): white over red, the red eagle shield in the white field.
