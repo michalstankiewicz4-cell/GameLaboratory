@@ -202,7 +202,7 @@ export function waterUniforms() {
     uDeep: { value: new THREE.Color() }, uScatter: { value: new THREE.Color() },
     uShine: { value: 900 }, uRipples: { value: 0.5 }, uCrest: { value: 0.5 }, uReflect: { value: 1 }, uPlanar: { value: 0 },
     uReflTex: { value: null }, uRes: { value: new THREE.Vector2(1, 1) }, uAlpha: { value: 1 }, uPixelN: { value: 1 },
-    uFogCol: { value: new THREE.Color() }, uFogFar: { value: 2600 }, uFogDen: { value: 0 }, uRain: { value: 0 }, uWet: { value: 0.7 }, uWetOn: { value: 1 },
+    uFogCol: { value: new THREE.Color() }, uFogFar: { value: 2600 }, uFogDen: { value: 0 }, uRain: { value: 0 }, uLight: { value: 1 }, uWet: { value: 0.7 }, uWetOn: { value: 1 },
     tNormal: { value: tex.normal }, tFoam: { value: tex.foam },
   };
 }
@@ -250,7 +250,7 @@ export function waterMaterial(u, opt = {}) {
       }`,
     fragmentShader: GLSL_WAVES + GLSL_SHIP + /* glsl */`
       uniform vec3 uSun, uSunCol, uSkyH, uSkyZ, uSkySea, uDeep, uScatter, uFogCol;
-      uniform float uShine, uRipples, uCrest, uReflect, uPlanar, uAlpha, uPixelN, uFogFar, uFogDen, uRain;
+      uniform float uShine, uRipples, uCrest, uReflect, uPlanar, uAlpha, uPixelN, uFogFar, uFogDen, uRain, uLight;
       uniform sampler2D uReflTex, tNormal, tFoam; uniform vec2 uRes;
       varying vec3 vWorld; varying vec3 vN; varying float vFold; varying vec2 vXZ; varying float vShipH;
       ${opt.sky ? opt.sky + '\n      vec3 sky(vec3 d) { return skyColor(d); }' : `vec3 sky(vec3 d) {
@@ -296,6 +296,7 @@ export function waterMaterial(u, opt = {}) {
         float thick = clamp((vWorld.y + 0.6) * 0.45, 0.0, 1.0);
         float sss = pow(max(dot(V, -vec3(L.x, 0.0, L.z) * 0.9 + vec3(0.0, 0.25, 0.0)), 0.0), 3.0) * thick + thick * 0.25;
         body += uScatter * sss * (0.4 + 0.6 * sunUp);
+        body *= uLight;                                          // daylight (dusk and night darken the water body)
         vec3 col = mix(body, refl, F);
         // sun glitter
         vec3 H = normalize(L + V); float spec = pow(max(dot(N, H), 0.0), uShine) * (uShine / 60.0) * smoothstep(-0.02, 0.08, L.y);
@@ -306,7 +307,7 @@ export function waterMaterial(u, opt = {}) {
         float crest = smoothstep(1.0 - uCrest * 0.55, 1.15 - uCrest * 0.5, fold + noise * 0.35) * uCrest;
         float foam = clamp(crest + shipFoam(vXZ, noise), 0.0, 1.0);
         foam *= smoothstep(0.15, 0.55, noise + foam * 0.5);
-        vec3 foamCol = vec3(0.92, 0.95, 0.96) * (0.45 + 0.55 * max(dot(N, L), 0.0) * sunUp + 0.15);
+        vec3 foamCol = vec3(0.92, 0.95, 0.96) * (0.45 + 0.55 * max(dot(N, L), 0.0) * sunUp + 0.15) * uLight;
         col = mix(col, foamCol, foam * 0.9);
         // aerial perspective
         float fog = uFogDen > 0.0 ? 1.0 - exp(-pow(dist * uFogDen, 2.0)) : smoothstep(uFogFar * 0.25, uFogFar, dist);

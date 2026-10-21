@@ -4,14 +4,14 @@
 //   lens: barrel distortion (wide-angle / bodycam), chromatic aberration, water droplets on the glass, lens dirt lit by
 //   bright light, sun glare (streak and ghosts, only when the sun is actually visible), vignette;
 //   light: exposure (manual or automatic from the scene's average brightness), bloom;
-//   colour: tone mapping (ACES, AgX, Hable), white balance (temperature, tint), contrast, saturation;
+//   colour: tone mapping (ACES, AgX, Hable), white balance (temperature, tint), contrast, saturation, vibrance (lifts muted colours, leaves strong ones);
 //   film: sharpening, grain (stronger in the shadows).
 // A second parameter set can be drawn on the left part of the screen to compare (split). AutoResolution lowers the
 // render scale in small steps when frames are slow and raises it again when they are fast, with hysteresis.
 import * as THREE from '../../vendor/three.module.js';
 
 export const LOOK_DEFAULTS = {
-  exposure: 1.1, autoExposure: 0, autoTarget: 0.22, tone: 0, contrast: 1.0, saturation: 1.0, temperature: 0, tint: 0,
+  exposure: 1.1, autoExposure: 0, autoTarget: 0.22, tone: 0, contrast: 1.0, saturation: 1.0, vibrance: 0, temperature: 0, tint: 0,
   bloom: 0.5, vignette: 0.3, grain: 0.15, ca: 0, distortion: 0, droplets: 0, dirt: 0, glare: 0, sharpen: 0,
 };
 export const LOOK_PRESETS = {
@@ -24,7 +24,7 @@ const VERT = 'varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0
 const FRAG = /* glsl */`
 precision highp float;
 uniform sampler2D tColor; uniform vec2 texel, res; uniform float time;
-uniform float exposure, autoExposure, autoTarget, tone, contrast, saturation, temperature, tint;
+uniform float exposure, autoExposure, autoTarget, tone, contrast, saturation, vibrance, temperature, tint;
 uniform float bloom, vignette, grain, ca, distortion, droplets, dirt, glare, sharpen;
 uniform vec3 sunScreen;            // xy in 0..1, z = above the horizon and in front of the camera
 varying vec2 vUv;
@@ -116,6 +116,8 @@ void main(){
   col = pow(col, vec3(1.0 / 2.2));
   float l = dot(col, vec3(0.2126, 0.7152, 0.0722));
   col = mix(vec3(l), col, saturation);
+  { float mx = max(col.r, max(col.g, col.b)), mn = min(col.r, min(col.g, col.b)), cs = (mx - mn) / max(mx, 1e-4);
+    col = mix(vec3(l), col, 1.0 + vibrance * (1.0 - cs)); }
   col = (col - 0.5) * contrast + 0.5;
   if (vignette > 0.0) col *= 1.0 - smoothstep(0.25, 1.05, length(q * vec2(1.0, 0.85)) * 1.25) * vignette * 0.75;
   if (distortion > 0.0) { vec2 e = abs(uv - 0.5) * 2.0; col *= smoothstep(1.02, 0.96, max(e.x, e.y)); }   // black beyond the glass

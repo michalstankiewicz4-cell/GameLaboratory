@@ -4,7 +4,7 @@
 import * as THREE from '../../vendor/three.module.js';
 import { buildShip, SHIPS } from '../shipkit/index.js';
 import { bakeWear, ageMaterials, ageUniforms } from '../shipkit/ageing.js';
-import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment } from './skykit.js';
+import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment, sunAt } from './skykit.js';
 import { rainUniforms, rainMesh } from './rainkit.js';
 import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, hullTexture, LOOKS } from './waterkit.js';
 import { LookPipeline, AutoResolution, LOOK_PRESETS, LOOK_DEFAULTS } from '../render/look.js';
@@ -14,13 +14,14 @@ const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag)
 const KEY = 'steelSalvo.lookLab.v1';
 let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { saved = null; }
 const S = {
-  sky: { weather: 'broken', ...pick(WEATHER.broken), sunEl: 12, sunAz: 235, windSea: true, squalls: true, rainLens: true },
+  sky: { weather: 'broken', ...pick(WEATHER.broken), sunEl: 12, sunAz: 235, windSea: true, squalls: true, rainLens: true, time: 15.2, moon: 0.8 },
   age: Object.fromEntries(Object.entries(ageUniforms()).map(([k, v]) => [k, v.value])),
   look: { ...LOOK_PRESETS.cinematic }, preset: 'cinematic',
   cam: { fov: 40, shake: 0 }, perf: { scale: 1, autoRes: false, aa: true, shadows: true },
   ...(saved || {}),
 };
-if (saved && saved.sky) S.sky = { ...pick(WEATHER.broken), squalls: true, rainLens: true, ...saved.sky };     // settings saved before rain and fog existed
+if (saved && saved.sky) S.sky = { ...pick(WEATHER.broken), squalls: true, rainLens: true, time: 15.2, moon: 0.8, ...saved.sky };
+S.look = { ...LOOK_DEFAULTS, ...S.look };     // settings saved before rain and fog existed
 function pick(o) { const r = { ...o }; delete r.label; return r; }
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { /* private mode */ } };
 
@@ -45,7 +46,8 @@ scene.add(hemi, sun, sun.target);
 /* ---------------- ship with ageing ---------------- */
 const model = buildShip('blyskawica', { detail: 1 });
 const shipRoot = new THREE.Group(); shipRoot.add(model.group); scene.add(shipRoot);
-model.group.traverse((o) => { if (o.isMesh && o.material.isMeshBasicMaterial && o.material.color.r > 1) o.material = new THREE.MeshStandardMaterial({ color: 0xbfc4c0, roughness: 0.12, metalness: 0.6 }); });   // searchlights off by day
+const lamps = [], lampOff = new THREE.MeshStandardMaterial({ color: 0xbfc4c0, roughness: 0.12, metalness: 0.6 });
+model.group.traverse((o) => { if (o.isMesh && o.material.isMeshBasicMaterial && o.material.color.r > 1) { lamps.push([o, o.material]); o.material = lampOff; } });   // searchlights: off by day, on at night
 const bake = bakeWear(model.group);
 const AU = ageUniforms(); for (const k of Object.keys(AU)) AU[k].value = S.age[k] ?? AU[k].value;
 ageMaterials(model.materials, AU);
@@ -56,7 +58,7 @@ const WU = Object.assign(waterUniforms(), skyU);
 const hullTex = hullTexture(SHIPS.blyskawica.lines);
 WU.uHull.value = hullTex.tex; WU.uHullZ.value.set(hullTex.z0, hullTex.z1, hullTex.max, 0);
 WU.uShip.value.set(4, SHIPS.blyskawica.lines.zBow, SHIPS.blyskawica.lines.zStern, model.beam / 2);
-const water = new THREE.Mesh(polarGrid(192, 160), waterMaterial(WU, { sky: GLSL_SKY })); water.frustumCulled = false; water.renderOrder = 1; scene.add(water);
+const water = new THREE.Mesh(polarGrid(192, 160), waterMaterial(WU, { sky: '#define SKY_NO_STARS\n' + GLSL_SKY })); water.frustumCulled = false; water.renderOrder = 1; scene.add(water);   // no stars in the sea: broken by the waves they only sparkle as noise
 let waves = [];
 function seaFromWind() {
   const U = Math.max(1.5, S.sky.wind), Hs = Math.min(6.5, 0.0246 * U * U), Lp = Math.min(200, Math.max(10, 0.83 * U * U));
@@ -79,15 +81,18 @@ function updateSky() {
   hemi.intensity = L.ambient; hemi.color.copy(L.sky); hemi.groundColor.copy(L.ground);
   scene.fog.color.copy(L.fog); scene.fog.density = L.fogDensity; WU.uFogDen.value = L.fogDensity;
   RU.uRainCol.value.copy(L.fog).lerp(new THREE.Color(1, 1, 1), 0.25);
-  visKm = L.visKm;
-  WU.uSun.value.copy(L.sunDir); WU.uSunCol.value.copy(L.sunColor).multiplyScalar(1.1 * (1 - S.sky.coverage * S.sky.density * 0.8) * L.sunSeen * L.sunSeen);   // glitter needs the sharp sun: fog and rain take it away faster than the light
+  visKm = L.visKm; dayNow = L.day;
+  WU.uLight.value = 0.03 + 0.97 * L.day + 0.04 * S.sky.moon * L.night;
+  for (const [o, m] of lamps) o.material = L.night > 0.5 ? m : lampOff;
+  applyLook();
+  WU.uSun.value.copy(L.sunDir); WU.uSunCol.value.copy(L.glitterColor).multiplyScalar(1.1 * (1 - S.sky.coverage * S.sky.density * 0.8) * L.sunSeen * L.sunSeen);   // glitter needs the sharp sun: fog and rain take it away faster than the light
   WU.uFogCol.value.copy(L.fog); WU.uFogFar.value = L.fogFar;
   look.sunVisible = Math.max(0, 1 - S.sky.coverage * (0.4 + S.sky.density * 0.6)) * L.sunSeen;
   scene.environmentIntensity = 0.85 - S.sky.coverage * S.sky.density * 0.45;           // less sky light under heavy cloud
   envDirty = true; seaFromWind();
   WU.uShine.value *= 1 - S.sky.rain * 0.6;                                    // rain roughens the surface: a duller, wider glitter
 }
-let visKm = 10;
+let visKm = 10, dayNow = 1;
 function rainFrame(t) {
   const r = S.sky.rain;
   rainNow = r <= 0 ? 0 : S.sky.squalls ? r * Math.min(1, 0.35 + 0.65 * Math.max(0, Math.sin(t * 0.11) * 0.7 + Math.sin(t * 0.047 + 1.3) * 0.5 + 0.35)) : r;
@@ -112,13 +117,24 @@ $('weather').append(el('option', { value: 'custom', textContent: 'Custom' }));
 $('weather').value = S.sky.weather;
 $('weather').onchange = () => { const w = WEATHER[$('weather').value]; if (!w) return; Object.assign(S.sky, pick(w), { weather: $('weather').value }); ['coverage', 'density', 'wind', 'haze', 'rain', 'vis'].forEach((k) => { $(k).value = S.sky[k]; $(k + 'V').textContent = fmtSky[k](S.sky[k]); }); updateSky(); save(); };
 const fmtSky = { coverage: (v) => Math.round(v * 100) + '%', density: (v) => Math.round(v * 100) + '%', wind: (v) => v + ' m/s', haze: (v) => Math.round(v * 100) + '%',
-  rain: (v) => (v ? Math.round(v * 100) + '%' : 'none'), vis: (v) => (v < 1 ? Math.round(v * 1000) + ' m' : v.toFixed(1) + ' km'), sunEl: (v) => v + '°', sunAz: (v) => v + '°' };
+  rain: (v) => (v ? Math.round(v * 100) + '%' : 'none'), moon: (v) => (v ? Math.round(v * 100) + '%' : 'new moon'), vis: (v) => (v < 1 ? Math.round(v * 1000) + ' m' : v.toFixed(1) + ' km'), sunEl: (v) => v + '°', sunAz: (v) => v + '°' };
 for (const k of Object.keys(fmtSky)) bindRange(k, S.sky, k, fmtSky[k], () => { if (['coverage', 'density', 'wind', 'haze', 'rain', 'vis'].includes(k)) { S.sky.weather = 'custom'; $('weather').value = 'custom'; } updateSky(); });
+// time of day (local solar time, 55° N in late October — the North Atlantic convoy season) sets the sun's height and bearing
+const fmtTime = (v) => `${String(Math.floor(v)).padStart(2, '0')}:${String(Math.round((v % 1) * 60) % 60).padStart(2, '0')}`;
+function setTime(v) {
+  S.sky.time = v; Object.assign(S.sky, sunAt(v)); S.sky.sunEl = Math.round(S.sky.sunEl * 10) / 10; S.sky.sunAz = Math.round(S.sky.sunAz);
+  $('time').value = v; $('timeV').textContent = fmtTime(v);
+  for (const k of ['sunEl', 'sunAz']) { $(k).value = S.sky[k]; $(k + 'V').textContent = fmtSky[k](S.sky[k]); }
+  updateSky(); save();
+}
+$('time').value = S.sky.time; $('timeV').textContent = fmtTime(S.sky.time);
+$('time').addEventListener('input', () => setTime(+$('time').value));
+for (const [label, v] of [['Dawn', 6.75], ['Morning', 9], ['Noon', 12], ['Afternoon', 15.2], ['Dusk', 17.25], ['Night', 21.5]]) $('times').append(el('button', { type: 'button', textContent: label, onclick: () => setTime(v) }));
 for (const k of ['squalls', 'rainLens']) { $(k).checked = !!S.sky[k]; $(k).onchange = () => { S.sky[k] = $(k).checked; applyLook(); save(); }; }
 $('windSea').checked = S.sky.windSea; $('windSea').onchange = () => { S.sky.windSea = $('windSea').checked; seaFromWind(); save(); };
 for (const k of Object.keys(AU)) if ($(k)) bindRange(k, S.age, k, (v) => v.toFixed(2), () => { AU[k].value = S.age[k]; });
 
-const LOOK_SLIDERS = [['exposure', 'Exposure', 0.3, 2.5, 0.05], ['autoTarget', 'Auto exposure target', 0.08, 0.5, 0.01], ['contrast', 'Contrast', 0.7, 1.5, 0.01], ['saturation', 'Saturation', 0, 1.6, 0.01],
+const LOOK_SLIDERS = [['exposure', 'Exposure', 0.3, 2.5, 0.05], ['autoTarget', 'Auto exposure target', 0.08, 0.5, 0.01], ['contrast', 'Contrast', 0.7, 1.5, 0.01], ['saturation', 'Saturation', 0, 1.6, 0.01], ['vibrance', 'Vibrance', -1, 1, 0.01],
   ['temperature', 'Temperature', -0.5, 0.5, 0.01], ['tint', 'Tint', -0.3, 0.3, 0.01], ['bloom', 'Glow', 0, 2, 0.05], ['vignette', 'Vignette', 0, 1, 0.01], ['grain', 'Grain', 0, 1, 0.01],
   ['ca', 'Chromatic aberration', 0, 1, 0.01], ['distortion', 'Lens distortion', 0, 1, 0.01], ['droplets', 'Water on the lens', 0, 1, 0.01], ['dirt', 'Lens dirt', 0, 1, 0.01], ['glare', 'Sun glare', 0, 1.5, 0.01], ['sharpen', 'Sharpen', 0, 1, 0.01]];
 for (const [k, label, mn, mx, st] of LOOK_SLIDERS) {
@@ -134,7 +150,11 @@ $('tone').onchange = () => { S.look.tone = +$('tone').value; S.preset = 'custom'
 $('autoExposure').onchange = () => { S.look.autoExposure = $('autoExposure').checked ? 1 : 0; S.preset = 'custom'; markPreset(); applyLook(); save(); };
 for (const [k, p] of Object.entries(LOOK_PRESETS)) $('presets').append(el('button', { type: 'button', textContent: p.label, onclick: () => { S.look = pick(p); S.preset = k; fillLook(); markPreset(); applyLook(); save(); } }));
 function markPreset() { [...$('presets').children].forEach((b, i) => b.classList.toggle('on', Object.keys(LOOK_PRESETS)[i] === S.preset)); }
-function applyLook() { look.set(S.look, 'A'); look.set({ ...LOOK_DEFAULTS, exposure: S.look.exposure }, 'B'); }
+// eye adaptation: with manual exposure, dusk and night are brightened as the eye would (auto exposure does it by itself)
+function applyLook() {
+  const adapt = S.look.autoExposure ? 1 : 1 + 2.6 * (1 - dayNow);
+  look.set({ ...S.look, exposure: S.look.exposure * adapt }, 'A'); look.set({ ...LOOK_DEFAULTS, exposure: S.look.exposure * adapt }, 'B');
+}
 const splitR = $('splitX');
 $('splitOn').onchange = () => { $('split').hidden = !$('splitOn').checked; };
 splitR.addEventListener('input', () => { $('splitXV').textContent = Math.round(+splitR.value * 100) + '%'; }); $('splitXV').textContent = '50%';

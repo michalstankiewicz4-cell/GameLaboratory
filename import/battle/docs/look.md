@@ -10,7 +10,7 @@ browser (`localStorage`, key `steelSalvo.lookLab.v1`) and can be copied as JSON.
 | File | What it does |
 |---|---|
 | `js/shipkit/ageing.js` | Procedural ageing. `bakeWear(group)` voxelises the ship (0.35 m), casts 7 short rays per voxel for occlusion and tests 4 directions for edge exposure, and writes one `aWear` vertex attribute (occlusion, edge) — ~80k vertices in ~0.3 s, geometry untouched. `ageMaterials(mats, u)` patches the ShipKit materials by material key (`AGE_KIND`): painted steel, hull paint, deck, bare metal, wood, canvas, brass, rope. |
-| `js/labs/skykit.js` | Procedural sky with a cloud layer (fbm), `WEATHER` presets (clear, fair, broken, overcast, rain, sea fog, storm), rain curtains and fog in the sky (`uSkyFog`), `fogDensity(km)`, `applySky()` returns the sun, ambient and fog that match, `skyEnvironment()` makes the PMREM environment from the same GLSL, so ship, sea reflections and sky agree. WaterKit takes the sky GLSL via `waterMaterial(u, { sky })`. |
+| `js/labs/skykit.js` | Procedural sky with a cloud layer (fbm), `WEATHER` presets (clear, fair, broken, overcast, rain, sea fog, storm), rain curtains and fog in the sky (`uSkyFog`), `fogDensity(km)`, `sunAt(hour, lat, day)` (solar position), dawn/dusk glow, stars and the moon, `applySky()` returns the sun, ambient and fog that match, `skyEnvironment()` makes the PMREM environment from the same GLSL, so ship, sea reflections and sky agree. WaterKit takes the sky GLSL via `waterMaterial(u, { sky })`. |
 | `js/labs/rainkit.js` | Falling rain in one draw call: line segments (each drop's motion blur) in a box that follows the camera and wraps; wind slants it, distance fades it, `setRain(0..1)` sets how many drops are drawn (up to 24k). |
 | `js/render/look.js` | `LookPipeline`: half-float target with mipmaps (MSAA optional, render scale) and one post shader: exposure (manual or automatic from the smallest mip), tone mapping ACES / AgX / Hable, contrast, saturation, temperature, tint, bloom from mips, vignette, grain, chromatic aberration, barrel distortion, droplets and dirt on the lens, sun glare/ghost, sharpen. `set(params, 'A'|'B')` and `split` draw two parameter sets side by side. `AutoResolution` lowers/raises the render scale to keep ~60 fps (with hysteresis). `LOOK_PRESETS`: Game clean, Cinematic, Bodycam. |
 
@@ -46,6 +46,22 @@ the sun's disc hidden. **Squalls** make the rain come and go; **Rain on the lens
 density 1.73 / visibility). The thicker of fog, haze and rain wins; the same density fogs the ship (three.js
 `FogExp2`), the sea and the sky (path through a 260 m fog layer, so the zenith stays lighter and the sun shows as a
 pale disc). Fog and rain take the sun's light down and its glitter faster still (the glitter needs a sharp sun).
+
+## Time of day
+
+A **Time** slider (local solar time at 55° N in late October — the North Atlantic convoy season) and buttons Dawn,
+Morning, Noon, Afternoon, Dusk, Night set the sun's height and bearing (`sunAt()`); both can still be moved by hand
+(the sun can go to −18°). Dusk and dawn: warm glow along the horizon under the sun, rose-lit clouds, a bluer zenith.
+From nautical twilight (−6° … −14°) the stars come out (hidden by cloud and near the horizon, not reflected in the sea —
+there they only sparkled as noise); the **Moon** slider (new … full) sets moonlight: the moon's disc and halo opposite
+the sun at 35°, moonlit cloud edges, a moon path on the sea and a weak blue light that casts shadows. Water, foam and
+fog darken with the daylight (`uLight` in WaterKit); the searchlights glow at night. With manual exposure the look
+pipeline adapts like the eye (up to ×3.6 at night); automatic exposure does it by itself.
+
+## Colour
+
+Saturation (0 grey … 1.6) and **Vibrance** (lifts muted colours, leaves strong ones alone; −1 … 1) in the look panel.
+The game has its own **Colour saturation** in Options > Graphics (0 … 160 %, saved with the other settings).
 
 ## Cameras
 
