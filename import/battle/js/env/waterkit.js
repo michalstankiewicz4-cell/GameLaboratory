@@ -134,20 +134,22 @@ vec3 icVoro(vec2 g) {                                // x: distance to the cell'
 // returns x: 1 on ice, y: metres to the floe's edge, z: the floe's random value
 float icNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
   return mix(mix(icHash2(i).x, icHash2(i + vec2(1, 0)).x, f.x), mix(icHash2(i + vec2(0, 1)).x, icHash2(i + vec2(1, 1)).x, f.x), f.y); }
+float gIceK = 1.0;                                  // regions scale the cover per place (RegionKit)
 vec3 iceAt(vec2 w, vec2 s) {
-  if (uIce.x <= 0.0) return vec3(0.0);
+  float cover = uIce.x * gIceK;
+  if (cover <= 0.0) return vec3(0.0);
   // warped cells: floes with irregular, broken outlines instead of a paving pattern
   vec2 wq = w / uIce.y;
   wq += (vec2(icNoise(wq * 0.7), icNoise(wq * 0.7 + 5.2)) - 0.5) * 0.7 + (vec2(icNoise(wq * 3.1 + 2.0), icNoise(wq * 3.1 + 9.0)) - 0.5) * 0.12;
   vec3 v = icVoro(wq); float edge = v.x * uIce.y;
-  float gap = mix(1.8, 0.2, uIce.x);
-  float on = step(v.y, uIce.x * 1.08) * smoothstep(gap, gap + 0.35, edge);
+  float gap = mix(1.8, 0.2, cover);
+  float on = step(v.y, cover * 1.08) * smoothstep(gap, gap + 0.35, edge);
   if (uIce.w > 0.5) {
     float zb = uShip.y + 1.5, hw = uShip.w * 1.8 + max(0.0, zb - s.y) * 0.05;
     float lane = step(s.y, zb) * (1.0 - smoothstep(hw - 1.0, hw + 2.5, abs(s.x)));
     if (lane > 0.0) {                                // broken ice in the lane: small pieces, wider gaps
       vec3 b = icVoro(w / (uIce.y * 0.14) + 17.0); float be = b.x * uIce.y * 0.14;
-      float brash = step(b.y, 0.35 * uIce.x) * smoothstep(0.3, 0.5, be);
+      float brash = step(b.y, 0.35 * cover) * smoothstep(0.3, 0.5, be);
       on = mix(on, brash, lane); edge = mix(edge, be, lane);
     }
   }
@@ -302,8 +304,10 @@ export function polarGrid(segments = 192, rings = 160, r0 = 0.6, r1 = 6000) {
 // opt.sky: GLSL defining skyColor(d) (SkyKit) — reflections then show the same clouds as the sky dome
 // opt.land: GLSL defining landH(xz) (LandKit GLSL_LAND; its uniforms must be in u) — waves die down over shallows,
 //           the water turns green-blue and clear where it is shallow (the sea floor shows), surf foam on the shore
+// opt.regions: GLSL defining regionAt(xz) (RegionKit GLSL_REGIONS, after opt.land; its uniforms must be in u) — the
+//           water's look, waves, ripples, foam, oil, ice cover and current blend by the region map
 export function waterMaterial(u, opt = {}) {
-  const L = opt.land ? '#define LAND\n' + opt.land + '\nvarying float vDepth;\n' : '';
+  const L = (opt.land ? '#define LAND\n' + opt.land + '\nvarying float vDepth;\n' : '') + (opt.land && opt.regions ? '#define REGIONS\n' + opt.regions + '\n' : '');
   return new THREE.ShaderMaterial({
     uniforms: u, transparent: true, depthWrite: true,
     vertexShader: L + GLSL_WAVES + GLSL_SHIP + GLSL_ICE + /* glsl */`
@@ -315,8 +319,12 @@ export function waterMaterial(u, opt = {}) {
         float dep = -landH(p), damp = 0.12 + 0.88 * smoothstep(0.5, 16.0, dep);
         d = vec3(p.x, 0.0, p.y) + (d - vec3(p.x, 0.0, p.y)) * damp; n = normalize(mix(vec3(0.0, 1.0, 0.0), n, damp)); fold *= damp; vDepth = dep;
 #endif
-        if (uIce.x > 0.0) {                                    // ice damps the waves and its floes ride above the water
-          float k = 1.0 - uIce.x * 0.75;
+#ifdef REGIONS
+        Region rgV = regionAt(p); float wk = rgV.p.x;                // sheltered water: only part of the open sea's waves get in
+        d = vec3(p.x, 0.0, p.y) + (d - vec3(p.x, 0.0, p.y)) * wk; n = normalize(mix(vec3(0.0, 1.0, 0.0), n, wk)); fold *= wk; gIceK = rgV.q.y;
+#endif
+        if (uIce.x * gIceK > 0.0) {                            // ice damps the waves and its floes ride above the water
+          float k = 1.0 - uIce.x * gIceK * 0.75;
           d = vec3(p.x, 0.0, p.y) + (d - vec3(p.x, 0.0, p.y)) * k; n = normalize(mix(vec3(0.0, 1.0, 0.0), n, k)); fold *= k * 0.3;
           d.y += iceAt(p + vec2(0.0, uShift), p).x * uIce.z;
         }
@@ -339,20 +347,29 @@ export function waterMaterial(u, opt = {}) {
       void main() {
         float dist = length(cameraPosition - vWorld);
         vec3 N = vN; float fold = vFold;
+        // the water's character: the uniforms, or (with regions) the blend of the bodies at this place
+        vec3 cDeep = uDeep, cScat = uScatter; float cShine = uShine, cRip = uRipples, cCrest = uCrest, cRefl = uReflect, cOil = uOil, cCur = uCurrent;
+        vec2 cFlow = vec2(0.0);
+#ifdef REGIONS
+        Region rg = regionAt(vXZ);
+        cDeep = rg.deep; cScat = rg.scat; cRip = rg.p.y; cCrest = rg.p.z * mix(1.0, uCrest / 0.55, rg.p.x); cShine = rg.p.w * uShine / 900.0;
+        cRefl = rg.q.z * uReflect; cOil = uOil * rg.q.x; gIceK = rg.q.y; cFlow = rg.flow; cCur = length(cFlow);
+#endif
         if (uPixelN > 0.5 && dist < 900.0) { vec3 n2; float f2; gerstner(vXZ, n2, f2);
           float sh = vShipH, e = 0.8; vec2 sl = vec2(shipWave(vXZ + vec2(e, 0.0)) - sh, shipWave(vXZ + vec2(0.0, e)) - sh) / e;
           N = normalize(n2 + vec3(-sl.x, 0.0, -sl.y)); fold = f2; }
         // detail ripples (two scrolling layers), fading with distance
         vec2 q = vXZ + vec2(0.0, uShift);
-        vec3 r1 = texture2D(tNormal, q / 9.0 + vec2(uTime * 0.012, uTime * 0.02)).xyz * 2.0 - 1.0;
-        vec3 r2 = texture2D(tNormal, q / 23.0 - vec2(uTime * 0.017, -uTime * 0.008)).xyz * 2.0 - 1.0;
+        vec2 qf = q - cFlow * uTime;                               // the surface drifts with the current (ripples, foam, oil)
+        vec3 r1 = texture2D(tNormal, qf / 9.0 + vec2(uTime * 0.012, uTime * 0.02)).xyz * 2.0 - 1.0;
+        vec3 r2 = texture2D(tNormal, qf / 23.0 - vec2(uTime * 0.017, -uTime * 0.008)).xyz * 2.0 - 1.0;
         // oil: patches drifting with the water; a film calms the ripples and shows thin-film colours
         float oilN = 0.0, oil = 0.0;
-        if (uOil > 0.0) {
-          oilN = texture2D(tFoam, q / 210.0 + vec2(uTime * 0.0004, 0.0)).r * 0.6 + texture2D(tFoam, q / 70.0 + 0.41).r * 0.4;
-          oil = smoothstep(0.5, 0.64, oilN + uOil * 0.18 - 0.09) * min(1.0, uOil * 1.6);
+        if (cOil > 0.0) {
+          oilN = texture2D(tFoam, qf / 210.0 + vec2(uTime * 0.0004, 0.0)).r * 0.6 + texture2D(tFoam, qf / 70.0 + 0.41).r * 0.4;
+          oil = smoothstep(0.5, 0.64, oilN + cOil * 0.18 - 0.09) * min(1.0, cOil * 1.6);
         }
-        vec2 rip = (r1.xy + r2.xy) * uRipples * 0.35 * exp(-dist / 350.0) * (1.0 - oil * 0.85);
+        vec2 rip = (r1.xy + r2.xy) * cRip * 0.35 * exp(-dist / 350.0) * (1.0 - oil * 0.85);
         N = normalize(N + vec3(rip.x, 0.0, rip.y));
         // rain: expanding rings from drops (two layers of cells, each cell one drop with its own phase) and a fine roughening
         if (uRain > 0.0 && dist < 80.0) {
@@ -370,54 +387,60 @@ export function waterMaterial(u, opt = {}) {
         }
         vec3 V = normalize(cameraPosition - vWorld), L = normalize(uSun);
         float NdV = max(dot(N, V), 0.0);
-        float F = (0.02 + 0.98 * pow(1.0 - NdV, 5.0)) * uReflect;
+        float F = (0.02 + 0.98 * pow(1.0 - NdV, 5.0)) * cRefl;
         vec3 R = reflect(-V, N); R.y = abs(R.y);
         vec3 refl = sky(R);
         if (uPlanar > 0.5) { vec2 uv = gl_FragCoord.xy / uRes + N.xz * 0.04; uv.x = clamp(uv.x, 0.001, 0.999); uv.y = clamp(uv.y, 0.001, 0.999);
           vec4 pr = texture2D(uReflTex, uv); refl = mix(refl, pr.rgb, pr.a); }
         // water body: deep colour lit by the sky, light scattered through wave crests towards the viewer
         float sunUp = clamp(L.y * 1.6, 0.0, 1.0);
-        vec3 body = uDeep * (0.35 + 0.65 * sunUp);
+        vec3 body = cDeep * (0.35 + 0.65 * sunUp);
         float thick = clamp((vWorld.y + 0.6) * 0.45, 0.0, 1.0);
         float sss = pow(max(dot(V, -vec3(L.x, 0.0, L.z) * 0.9 + vec3(0.0, 0.25, 0.0)), 0.0), 3.0) * thick + thick * 0.25;
-        body += uScatter * sss * (0.4 + 0.6 * sunUp);
+        body += cScat * sss * (0.4 + 0.6 * sunUp);
 #ifdef LAND
         float depth = -landH(vXZ);
         if (depth < -0.4) discard;                                // dry land: no water drawn over beaches
-        body = mix(uScatter * 1.5 * (0.35 + 0.65 * sunUp), body, smoothstep(0.0, 14.0, depth));   // shallows take the water's own scatter colour
+        body = mix(cScat * 1.5 * (0.35 + 0.65 * sunUp), body, smoothstep(0.0, 14.0, depth));   // shallows take the water's own scatter colour
 #endif
         body *= uLight;                                          // daylight (dusk and night darken the water body)
         vec3 col = mix(body, refl, F);
         if (oil > 0.0) {                                         // thin film: the colour depends on the film's thickness and the view angle
-          float th = texture2D(tFoam, q / 11.0).r * 1.4 + oilN * 2.2 + (1.0 - NdV) * 0.9;
+          float th = texture2D(tFoam, qf / 11.0).r * 1.4 + oilN * 2.2 + (1.0 - NdV) * 0.9;
           vec3 irid = 0.5 + 0.5 * cos(6.2831853 * (th + vec3(0.0, 0.33, 0.67)));
           col = mix(col, col * 0.88 + irid * (0.015 + 0.14 * F) * (0.4 + 0.6 * sunUp) * uLight, oil * 0.8);
         }
         // sun glitter
-        vec3 H = normalize(L + V); float spec = pow(max(dot(N, H), 0.0), uShine) * (uShine / 60.0) * smoothstep(-0.02, 0.08, L.y);
+        vec3 H = normalize(L + V); float spec = pow(max(dot(N, H), 0.0), cShine) * (cShine / 60.0) * smoothstep(-0.02, 0.08, L.y);
         col += uSunCol * spec * 1.6;
         // foam: crests (fold of the Gerstner surface) and the ship's foam
-        float fn = texture2D(tFoam, q / 14.0).r, fn2 = texture2D(tFoam, q / 3.5 + vec2(0.31, 0.77)).r;
+        float fn = texture2D(tFoam, qf / 14.0).r, fn2 = texture2D(tFoam, qf / 3.5 + vec2(0.31, 0.77)).r;
         float noise = fn * 0.65 + fn2 * 0.35;
-        float crest = smoothstep(1.0 - uCrest * 0.55, 1.15 - uCrest * 0.5, fold + noise * 0.35) * uCrest;
+        float crest = smoothstep(1.0 - cCrest * 0.55, 1.15 - cCrest * 0.5, fold + noise * 0.35) * cCrest;
         float foam = clamp(crest + shipFoam(vXZ, noise), 0.0, 1.0);
 #ifdef LAND
         foam = max(foam, smoothstep(1.6, 0.15, depth) * smoothstep(-0.4, 0.1, depth) * (0.55 + 0.45 * sin(uTime * 1.2 - depth * 3.0 + noise * 7.0)));   // surf
 #endif
         foam *= smoothstep(0.15, 0.55, noise + foam * 0.5);
-        if (uCurrent > 0.01) {                                   // a river: foam streaks drawn out along the flow, more where it is shallow
-          float st = texture2D(tFoam, vec2(q.x / 2.2, q.y / 38.0)).r * 0.6 + texture2D(tFoam, vec2(q.x / 0.9 + 0.3, q.y / 17.0)).r * 0.4;
+        if (cCur > 0.01) {                                       // a river: foam streaks drawn out along the flow, more where it is shallow
+          // streak frame: across and along the flow (with regions the flow's own direction, drifting with it; else the ship's frame)
+          vec2 fd = cCur > 0.01 && length(cFlow) > 0.01 ? cFlow / length(cFlow) : vec2(0.0, 1.0);
+          vec2 sq = length(cFlow) > 0.01 ? vec2(dot(qf, vec2(fd.y, -fd.x)), dot(qf, fd)) : q;
+          float st = texture2D(tFoam, vec2(sq.x / 2.2, sq.y / 38.0)).r * 0.6 + texture2D(tFoam, vec2(sq.x / 0.9 + 0.3, sq.y / 17.0)).r * 0.4;
           float shallowK = 1.0;
 #ifdef LAND
           shallowK = 0.35 + 0.65 * smoothstep(6.0, 1.0, depth);
 #endif
-          foam = max(foam, smoothstep(0.62, 0.9, st) * min(1.0, uCurrent / 2.5) * shallowK * 0.75);
+          foam = max(foam, smoothstep(0.62, 0.9, st) * min(1.0, cCur / 2.5) * shallowK * 0.75);
         }
         foam *= 1.0 - oil * 0.6;
         vec3 foamCol = vec3(0.92, 0.95, 0.96) * (0.45 + 0.55 * max(dot(N, L), 0.0) * sunUp + 0.15) * uLight;
         col = mix(col, foamCol, foam * 0.9);
         // ice: snow-covered floes and bare blue-grey ice, wet dark rims, lit by the sun and the sky
         vec3 ice = iceAt(q, vXZ);
+        // far away the floes are smaller than a pixel: draw their average (the cover) instead of a flickering pattern
+        float iceFar = smoothstep(uIce.y * 70.0, uIce.y * 220.0, dist);
+        if (iceFar > 0.0 && uIce.x * gIceK > 0.0) { ice.x = mix(ice.x, min(1.0, uIce.x * gIceK * 1.05), iceFar); ice.y = mix(ice.y, 2.0, iceFar); ice.z = mix(ice.z, 0.5, iceFar); }
         if (ice.x > 0.0) {
           float sn = texture2D(tFoam, q / 6.0 + ice.z * 7.0).r * 0.6 + texture2D(tFoam, q / 1.7).r * 0.4;
           vec3 bare = vec3(0.5, 0.64, 0.7), snow = vec3(0.9, 0.93, 0.96);
@@ -427,9 +450,9 @@ export function waterMaterial(u, opt = {}) {
           vec3 lit = sky(vec3(0.0, 1.0, 0.0)) * 0.55 + uSunCol * max(dot(Ni, L), 0.0) * 0.95 * sunUp;
           col = mix(col, ic * lit * uLight, ice.x); foam *= 1.0 - ice.x;
         }
-        if (uIce.x > 0.0 && ice.x < 1.0) {                        // ice under the surface around the floes shows turquoise
-          float nearFloe = step(ice.z, uIce.x * 1.08) * (1.0 - smoothstep(0.2, 1.2, ice.y));   // only right beside a floe
-          col = mix(col, vec3(0.12, 0.34, 0.37) * (0.4 + 0.6 * sunUp) * uLight, (1.0 - ice.x) * nearFloe * 0.25 * uIce.x);
+        if (uIce.x * gIceK > 0.0 && ice.x < 1.0) {               // ice under the surface around the floes shows turquoise
+          float nearFloe = step(ice.z, uIce.x * gIceK * 1.08) * (1.0 - smoothstep(0.2, 1.2, ice.y));   // only right beside a floe
+          col = mix(col, vec3(0.12, 0.34, 0.37) * (0.4 + 0.6 * sunUp) * uLight, (1.0 - ice.x) * nearFloe * 0.25 * uIce.x * gIceK);
         }
         // a point flash (gun or lightning) lighting the water and its foam
         if (uFlash.w > 0.0) {

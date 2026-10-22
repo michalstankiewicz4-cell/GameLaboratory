@@ -29,7 +29,7 @@ function pnoise(x, y, P, seed) {
   return 1.41 * ((n00 + (n10 - n00) * u) + ((n01 + (n11 - n01) * u) - (n00 + (n10 - n00) * u)) * v);
 }
 // fbm over the unit square (u, v in 0..1), base frequency F cells, octaves, persistence; ridged = sharp crests
-function fbm(u, v, F, oct, pers, seed, ridged = false) {
+export function fbm(u, v, F, oct, pers, seed, ridged = false) {
   let s = 0, a = 1, norm = 0, f = F, prev = 1;
   for (let i = 0; i < oct; i++) {
     let n = pnoise(u * f, v * f, f, seed + i * 101);

@@ -70,6 +70,13 @@ large floes gives pack ice with thin leads. Ice damps the waves (the floes ride 
 water by the freeboard. Behind the bow the ship leaves a **lane**: broken ice (brash) in open water, widening astern.
 Submerged ice shows turquoise right beside the floes.
 
+**Mixed by region** (`waterMaterial(u, { land, regions })` with RegionKit's `GLSL_REGIONS`): instead of one body for the
+whole sea, a region map gives every place a blend of the six bodies and a flow; the shader takes the look (deep and
+scatter colours, glitter, ripples, crest foam, reflection), the share of the open sea's waves that gets in, oil, ice
+cover and the current (ripples, foam and oil drift with it; foam streaks run along it) from that blend. Far away the
+floes are drawn as their average cover (they flickered as a pattern smaller than a pixel). Used by the Land Lab — see
+`docs/land.md`, *Water bodies by region*.
+
 ## Not yet
 
 Underwater view and caustics, ship shadows on the water, foam that persists from frame to frame (a foam map), true

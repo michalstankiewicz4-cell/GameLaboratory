@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
-<title>Land Lab — procedural coasts, islands and terrain | Steel Salvo Labs</title>
-<meta name="description" content="Steel Salvo land lab: procedural land and sea from 0 to 100 % land — islands, archipelagos, coasts, fjords, highlands with erosion, beaches and surf — on a wrap-around map (sail out one side, in at the other) or a map bounded by buoys or mountains, with ORP Błyskawica to sail through it.">
+<title>Land Lab — procedural coasts, terrain and mixed waters | Steel Salvo Labs</title>
+<meta name="description" content="Steel Salvo land lab: procedural land and sea from 0 to 100 % land — islands, archipelagos, coasts, fjords, highlands with erosion, beaches and surf — on a wrap-around map (sail out one side, in at the other) or a map bounded by buoys or mountains, with ORP Błyskawica to sail through it; rivers, lakes, fjords, harbours and ice mixed by region with seamless transitions.">
 <link rel="canonical" href="https://michalstankiewicz4-cell.github.io/Battle/labs/land.html">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Land Lab — procedural coasts and terrain">
@@ -40,6 +40,14 @@
   <div class="row"><span>Sea depth</span><input type="range" id="depth" min="8" max="250" step="1"><output id="depthV"></output></div>
   <div class="row"><span>Roughness</span><input type="range" id="rough" min="0" max="1" step="0.01"><output id="roughV"></output></div>
   <div class="row"><span>Erosion</span><input type="range" id="erosion" min="0" max="1" step="0.01"><output id="erosionV"></output></div>
+  <h3>Water bodies</h3>
+  <div class="row"><span>Layout</span><select id="layout"></select><output></output></div>
+  <p class="note" id="layoutNote"></p>
+  <div class="row"><span>Water</span><select id="body"></select><output></output></div>
+  <div class="row"><span>Transition</span><input type="range" id="blend" min="60" max="1600" step="20"><output id="blendV"></output></div>
+  <div class="row"><span>Rivers</span><input type="range" id="rivers" min="0" max="6" step="1"><output id="riversV"></output></div>
+  <div class="row"><span>Ice from the north</span><input type="range" id="ice" min="0" max="1" step="0.01"><output id="iceV"></output></div>
+  <div class="stats" id="bodyShare"></div>
   <h3>Map edge</h3>
   <div class="row"><span>Topology</span><select id="wrap"><option value="1">Wrap-around (torus)</option><option value="0">Bounded</option></select><output></output></div>
   <div class="row"><span>Barrier</span><select id="barrier"><option value="buoys">Buoy line (minefield)</option><option value="mountains">Mountain range</option><option value="wall">Invisible wall</option></select><output></output></div>
@@ -51,7 +59,8 @@
 <aside class="panel right" id="rightPanel">
   <h3>Chart</h3>
   <canvas id="mini" class="minimap" width="256" height="256"></canvas>
-  <p class="note">Click the chart to move the ship (or the camera) there.</p>
+  <label class="chk"><input type="checkbox" id="labels" checked> Names of the waters on the chart</label>
+  <p class="note">Click the chart to move the ship (or the camera) there. Water is tinted by body: ocean blue, fjord dark, lake green, river brown, harbour grey, ice white.</p>
   <h3>Ship</h3>
   <label class="chk"><input type="checkbox" id="sail" checked> Sail ORP Błyskawica (W/S speed, A/D rudder)</label>
   <div class="status" id="shipStatus"></div>

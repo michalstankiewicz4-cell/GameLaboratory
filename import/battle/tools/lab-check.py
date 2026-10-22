@@ -142,10 +142,26 @@ def main():
             assert pg.evaluate('window.__lookSalvos') == 1, 'salvo did not fire'
             pg.keyboard.press('h'); time.sleep(3)
             pg.screenshot(path=os.path.join(OUT, 'lab-look.png'), timeout=600000)
-            # land lab: seamless wrap, exact land share, 100 % land, bounded map with a mountain barrier
+            # land lab: water-body layouts; seamless wrap, exact land share, 100 % land, bounded map with a mountain barrier
             pg.goto(f'http://localhost:{PORT}/labs/land.html')
             pg.wait_for_function('window.__land && window.__land.T', timeout=300000)
             print('land', ' '.join(pg.inner_text('#genStats').split()))
+            # water bodies mixed by region: every layout builds, its bodies are there, weights sum to 1 and change smoothly
+            lay = lambda l, kw={}: pg.evaluate('([l,kw])=>{__land.S.water.layout=l;Object.assign(__land.S.water,kw);__land.generate();const T=__land.T,R=T.regions,N=T.res,NB=6;let jump=0,bad=0;for(let k=0;k<N*N;k+=3){let s=0;for(let c=0;c<NB;c++)s+=R.w[k*NB+c];if(Math.abs(s-1)>0.02)bad++;if(k%N<N-1)for(let c=0;c<NB;c++)jump=Math.max(jump,Math.abs(R.w[(k+1)*NB+c]-R.w[k*NB+c]));}return {share:R.share,labels:R.labels,jump,bad,ms:T.ms}}', [l, kw])
+            want = {'estuary': ('river', 0.04), 'lake': ('lake', 0.2), 'fjord': ('fjord', 0.1), 'harbour': ('harbour', 0.03), 'iceEdge': ('ice', 0.3)}
+            for l, (wb, mn) in want.items():
+                r = lay(l)
+                assert r['share'][wb] > mn and r['bad'] == 0 and r['jump'] < 0.12, f'layout {l}: {wb} {r["share"][wb]:.3f} bad {r["bad"]} jump {r["jump"]:.3f}'
+                print('layout', l, f"{wb} {r['share'][wb] * 100:.0f} %", f"max step {r['jump']:.3f}", f"{r['ms']} ms")
+            lay('estuary')
+            fl = pg.evaluate("(()=>{const L=__land.T.regions.labels.find(x=>x[0]==='River');const r=__land.regionAt(L[1],L[2]);return [Math.hypot(r.flow[0],r.flow[1]), r.w.river, r.waves]})()")
+            assert fl[0] > 0.5 and fl[1] > 0.9 and fl[2] < 0.3, f'river current {fl}'
+            pg.evaluate("()=>{Object.assign(__land.S.map,{shape:'islands',land:0.55,seed:7});}")
+            r = lay('mixed', {'rivers': 4, 'ice': 0.3})
+            assert any(x[0].startswith('River') for x in r['labels']) and r['share']['lake'] > 0 and r['share']['ice'] > 0.05 and r['bad'] == 0, f'mixed {r["share"]} {r["labels"]}'
+            print('layout mixed', {k: round(v, 3) for k, v in r['share'].items() if v > 0})
+            pg.evaluate("()=>{Object.assign(__land.S.map,{seed:1939,land:0.35});Object.assign(__land.S.water,{layout:'single',body:'ocean',ice:0})}")
+            pg.evaluate("()=>__land.generate()")
             seam = pg.evaluate('''()=>{const T=__land.T,N=T.res,h=T.h;let s=0,i=0;for(let j=0;j<N;j++){s+=Math.abs(h[j*N+N-1]-h[j*N]);for(let x=0;x<N-1;x+=7)i+=Math.abs(h[j*N+x+1]-h[j*N+x])}return [s/N, i/(N*Math.ceil((N-1)/7))]}''')
             assert seam[0] < 3 * seam[1] + 0.5, f'wrap seam {seam}'
             gen = lambda kw: pg.evaluate('(kw)=>{Object.assign(__land.S.map,kw);__land.generate();return [__land.T.landShare, __land.ship.on]}', kw)

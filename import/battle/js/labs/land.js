@@ -1,10 +1,14 @@
 // Land Lab: procedural land and sea (LandKit) under the SkyKit sky, the WaterKit sea with shallows and surf, and the
 // transformer's ORP Błyskawica to sail through it. The map is a torus (sail out of one side, in at the other: the
 // heightmap and the waves both repeat across it) or bounded by a barrier (buoy line, mountain range, invisible wall).
+// Water bodies are mixed by region (RegionKit): one body everywhere, hand-shaped layouts (river mouth, lake and canal,
+// fjord over its sill, harbour bay, ice edge) or mixed from the seed; the sea blends their looks, waves and currents.
 import * as THREE from '../../vendor/three.module.js';
 import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment } from '../env/skykit.js';
 import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, LOOKS } from '../env/waterkit.js';
-import { generateTerrain, heightTexture, terrainMeshes, sampleHeight, barrierBuoys, SHAPES, TERRAIN_DEFAULTS, GLSL_LAND } from '../env/landkit.js';
+import { heightTexture, terrainMeshes, sampleHeight, barrierBuoys, SHAPES, TERRAIN_DEFAULTS, GLSL_LAND } from '../env/landkit.js';
+import { generateWorld, regionTextures, regionUniforms, setRegions, regionAt, GLSL_REGIONS, LAYOUTS, WORLD_DEFAULTS, BODY_ORDER, CHART } from '../env/regionkit.js';
+import { WATER_BODIES } from '../env/waterkit.js';
 import { transformShip } from '../shipkit/transform.js';
 import { LookPipeline, LOOK_PRESETS } from '../render/look.js';
 
@@ -12,8 +16,8 @@ const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
 const KEY = 'steelSalvo.landLab.v1';
 let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { saved = null; }
-const S = { map: { ...TERRAIN_DEFAULTS }, sky: { weather: 'fair', sunEl: 24, sunAz: 210 }, sail: true, cam: 'Chase', ...(saved || {}) };
-S.map = { ...TERRAIN_DEFAULTS, ...S.map };
+const S = { map: { ...TERRAIN_DEFAULTS }, water: { ...WORLD_DEFAULTS }, sky: { weather: 'fair', sunEl: 24, sunAz: 210 }, sail: true, cam: 'Chase', ...(saved || {}) };
+S.map = { ...TERRAIN_DEFAULTS, ...S.map }; S.water = { ...WORLD_DEFAULTS, ...(S.water || {}) };
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { /* private mode */ } };
 
 /* ---------------- renderer, sky, light ---------------- */
@@ -33,13 +37,14 @@ sun.shadow.bias = -0.0005; sun.shadow.normalBias = 0.4;
 scene.add(hemi, sun, sun.target);
 
 /* ---------------- terrain ---------------- */
-let T = generateTerrain(S.map), tex = heightTexture(T);
+let T = generateWorld(S.map, S.water), tex = heightTexture(T), rtex = regionTextures(T);
 const terrain = terrainMeshes(T, tex); scene.add(terrain.group);
+const RU = regionUniforms(rtex);
 let buoys = null;
 
 /* ---------------- sea (shares the land uniforms: shallows, surf, waves dying on the shore) ---------------- */
-const WU = Object.assign(waterUniforms(), skyU, terrain.uniforms);
-const water = new THREE.Mesh(polarGrid(192, 160, 0.6, 16000), waterMaterial(WU, { sky: '#define SKY_NO_STARS\n' + GLSL_SKY, land: GLSL_LAND }));
+const WU = Object.assign(waterUniforms(), skyU, terrain.uniforms, RU);
+const water = new THREE.Mesh(polarGrid(192, 160, 0.6, 16000), waterMaterial(WU, { sky: '#define SKY_NO_STARS\n' + GLSL_SKY, land: GLSL_LAND, regions: GLSL_REGIONS }));
 water.frustumCulled = false; water.renderOrder = 1; scene.add(water);
 WU.uShipFx.value.set(0, 0, 0, 0); WU.uWetOn.value = 0;
 let waves = [];
@@ -87,8 +92,14 @@ function clearAt(x, z, hd, minDepth = DRAUGHT + 0.5) {
 /* ---------------- map (re)generation ---------------- */
 function generate() {
   const t0 = performance.now();
-  T = generateTerrain(S.map); if (tex) tex.dispose(); tex = heightTexture(T);
+  T = generateWorld(S.map, S.water); if (tex) tex.dispose(); tex = heightTexture(T);
   terrain.set(T, tex);
+  rtex.a.dispose(); rtex.b.dispose(); rtex = regionTextures(T); setRegions(WU, rtex);
+  const sh = T.regions.share;
+  WU.uIce.value.set(sh.ice > 0.001 ? 1 : 0, 18, 0.35, 0); WU.uOil.value = sh.harbour > 0.001 ? 1 : 0;
+  for (const k of ['shape', 'land', 'wrap']) $(k).disabled = !['single', 'mixed'].includes(S.water.layout);
+  $('body').disabled = S.water.layout !== 'single'; $('rivers').disabled = $('ice').disabled = S.water.layout !== 'mixed';
+  $('bodyShare').replaceChildren(...BODY_ORDER.filter((b) => sh[b] > 0.005).flatMap((b) => [el('span', { textContent: WATER_BODIES[b].label.replace(/ \(.*/, '') }), el('b', { textContent: `${(sh[b] * 100).toFixed(0)} %` })]));
   if (buoys) { scene.remove(buoys); buoys.geometry.dispose(); buoys = null; }
   if (!T.wrap && T.barrier === 'buoys') { buoys = barrierBuoys(T); scene.add(buoys); }
   seaFor(WEATHER[S.sky.weather]?.wind ?? 6);
@@ -102,7 +113,8 @@ function generate() {
     ['Grid', `${T.res}² · ${T.cell.toFixed(1)} m`], ['Ship', ship.on ? 'afloat' : 'no water deep enough']].flatMap(([a, b]) => [el('span', { textContent: a }), el('b', { textContent: b })]));
   $('edgeNote').textContent = T.wrap ? 'Wrap-around: sail out of one edge and you come in at the opposite one — land, sea and waves continue without a seam.' : ({ buoys: 'Bounded by a line of buoys 60 m inside the edge; the ship stops at it.', mountains: 'Bounded by a mountain range along the edge.', wall: 'Bounded by an invisible wall 60 m inside the edge.' })[T.barrier];
   $('barrier').disabled = T.wrap;
-  $('status').textContent = `${SHAPES[T.shape].label} · ${(T.landShare * 100).toFixed(0)} % land · ${T.size / 1000} km ${T.wrap ? 'wrap-around' : 'bounded'} map · seed ${T.seed}`;
+  const lay = S.water.layout, what = lay === 'single' ? `${SHAPES[T.shape].label}, ${WATER_BODIES[S.water.body].label.replace(/ \(.*/, '').toLowerCase()}` : lay === 'mixed' ? `Mixed (${SHAPES[T.shape].label})` : LAYOUTS[lay].label.replace(/:.*/, '');
+  $('status').textContent = `${what} · ${(T.landShare * 100).toFixed(0)} % land · ${T.size / 1000} km ${T.wrap ? 'wrap-around' : 'bounded'} map · seed ${T.seed}`;
   window.__landGenMs = performance.now() - t0;
 }
 
@@ -114,7 +126,11 @@ function drawChartBase() {
   for (let j = 0; j < W; j++) for (let i = 0; i < W; i++) {
     const h = sampleHeight(T, (i + 0.5) / W * T.size, (j + 0.5) / W * T.size), k = (j * W + i) * 4;
     let c;
-    if (h < 0) { const d = Math.min(1, -h / T.depth); c = [40 - 25 * d, 110 - 60 * d, 150 - 50 * d]; if (-h < 3) c = [90, 160, 170]; }
+    if (h < 0) {
+      const d = Math.min(1, -h / Math.max(T.depth, 1)), r = regionAt(T, (i + 0.5) / W * T.size, (j + 0.5) / W * T.size); c = [0, 0, 0];
+      for (const b of BODY_ORDER) for (let q = 0; q < 3; q++) c[q] += CHART[b][q] * r.w[b];
+      c = c.map((x) => x * (1.15 - 0.45 * d)); if (-h < 3) c = c.map((x) => x * 0.6 + 70);
+    }
     else { const r = h / Math.max(1, T.relief); c = r < 0.012 ? [205, 190, 140] : r < 0.45 ? [80 + 60 * r, 110 - 20 * r, 55] : r < 0.75 ? [125, 112, 96] : [235, 238, 242]; }
     img.data[k] = c[0]; img.data[k + 1] = c[1]; img.data[k + 2] = c[2]; img.data[k + 3] = 255;
   }
@@ -134,6 +150,10 @@ function drawChart() {
     mg.fillStyle = '#f2b84b'; mg.beginPath(); mg.moveTo(sx + fx * 7, sz + fz * 7); mg.lineTo(sx - fx * 4 + fz * 3, sz - fz * 4 - fx * 3); mg.lineTo(sx - fx * 4 - fz * 3, sz - fz * 4 + fx * 3); mg.closePath(); mg.fill();
   }
   if (!T.wrap) { mg.strokeStyle = 'rgba(220,60,50,.8)'; const m = 60 / T.size * W; mg.strokeRect(m, m, W - 2 * m, W - 2 * m); }
+  if ($('labels').checked) {
+    mg.font = '600 10px system-ui, sans-serif'; mg.textAlign = 'center';
+    for (const [t, x, z] of T.regions.labels) { const lx = x / T.size * W, lz = z / T.size * W; mg.fillStyle = 'rgba(0,0,0,.55)'; mg.fillText(t, lx + 1, lz + 1); mg.fillStyle = '#fff'; mg.fillText(t, lx, lz); }
+  }
 }
 mini.addEventListener('click', (e) => {
   const r = mini.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * T.size, z = (e.clientY - r.top) / r.height * T.size;
@@ -160,6 +180,18 @@ function updateSky() {
 /* ---------------- UI ---------------- */
 for (const [k, s] of Object.entries(SHAPES)) $('shape').append(el('option', { value: k, textContent: s.label }));
 for (const [k, w] of Object.entries(WEATHER)) $('weather').append(el('option', { value: k, textContent: w.label }));
+for (const [k, l] of Object.entries(LAYOUTS)) $('layout').append(el('option', { value: k, textContent: l.label }));
+for (const b of BODY_ORDER) $('body').append(el('option', { value: b, textContent: WATER_BODIES[b].label }));
+const NOTES = {
+  single: 'The whole map is one water body: the terrain comes from the generator above.',
+  estuary: 'A river winds down to the coast, widens into an estuary and pushes a brown, brackish plume out to sea. The current is strongest upstream and fans out at the mouth.',
+  lake: 'An inland lake, dark and peaty, reaches the sea down a dredged canal (7.5 m); the canal water turns from lake to sea along its length.',
+  fjord: 'Open sea, skerries, then a sill at the fjord mouth (about 38 m) and the deep, still basin between high walls.',
+  harbour: 'A bay sheltered by a low sandy spit, dredged to 11 m, calm and murky with oil; the entrance is the gap at the west end of the spit.',
+  iceEdge: 'Open sea to the south; loose floes thicken into pack ice to the north, with open leads (polynyas).',
+  mixed: 'The generator\u2019s terrain classified: open sea, enclosed lakes, narrow inlets between high ground become fjords; rivers are carved from the hills to the sea; an ice edge from the north.',
+};
+const showNote = () => { $('layoutNote').textContent = NOTES[S.water.layout] || ''; };
 let genTimer = 0;
 const regen = () => { clearTimeout(genTimer); genTimer = setTimeout(() => { generate(); save(); }, 250); };
 const fmts = { land: (v) => Math.round(v * 100) + ' %', relief: (v) => v + ' m', depth: (v) => v + ' m', rough: (v) => v.toFixed(2), erosion: (v) => v.toFixed(2) };
@@ -167,6 +199,12 @@ for (const [k, f] of Object.entries(fmts)) {
   const r = $(k), o = $(k + 'V'); r.value = S.map[k]; o.textContent = f(+r.value);
   r.addEventListener('input', () => { S.map[k] = +r.value; o.textContent = f(+r.value); regen(); });
 }
+$('layout').value = S.water.layout; $('layout').onchange = () => { S.water.layout = $('layout').value; showNote(); regen(); };
+$('body').value = S.water.body; $('body').onchange = () => { S.water.body = $('body').value; regen(); };
+const wfmt = { blend: (v) => v + ' m', rivers: (v) => String(v), ice: (v) => Math.round(v * 100) + ' %' };
+for (const [k, f] of Object.entries(wfmt)) { const r = $(k), o = $(k + 'V'); r.value = S.water[k]; o.textContent = f(+r.value); r.addEventListener('input', () => { S.water[k] = +r.value; o.textContent = f(+r.value); regen(); }); }
+$('labels').onchange = () => drawChart();
+showNote();
 $('seed').value = S.map.seed; $('seed').addEventListener('change', () => { S.map.seed = Math.max(0, Math.min(999999, +$('seed').value | 0)); regen(); });
 $('random').onclick = () => { S.map.seed = Math.floor(Math.random() * 1e6); $('seed').value = S.map.seed; generate(); save(); };
 $('gen').onclick = () => { generate(); save(); };
@@ -234,15 +272,20 @@ function sailStep(dt) {
     nx = wx; nz = wz;
   }
   ship.x = nx; ship.z = nz;
+  // the water it is in: the current carries it, sheltered water has smaller waves
+  const rg = regionAt(T, ship.x, ship.z); ship.rg = rg;
+  if (clearAt(ship.x + rg.flow[0] * dt, ship.z + rg.flow[1] * dt, ship.hd)) { ship.x += rg.flow[0] * dt; ship.z += rg.flow[1] * dt; }
   const fx = Math.sin(ship.hd), fz = Math.cos(ship.hd);
-  const hb = heightAt(waves, ship.x + fx * 40, ship.z + fz * 40, simT), hs = heightAt(waves, ship.x - fx * 40, ship.z - fz * 40, simT);
+  const hb = heightAt(waves, ship.x + fx * 40, ship.z + fz * 40, simT) * rg.waves, hs = heightAt(waves, ship.x - fx * 40, ship.z - fz * 40, simT) * rg.waves;
   const sp = (x, v, tg, Tn, z) => { const w = 2 * Math.PI / Tn, a = w * w * (tg - x) - 2 * z * w * v; return [x + (v + a * dt) * dt, v + a * dt]; };
   [ship.h, ship.vh] = sp(ship.h, ship.vh, (hb + hs) / 2 - 0.05, 5.5, 0.55);
   [ship.p, ship.vp] = sp(ship.p, ship.vp, Math.atan((hb - hs) / 80), 4.8, 0.5);
   [ship.r, ship.vr] = sp(ship.r, ship.vr, -ship.rud * Math.min(1, ship.v / 20) * 0.05, 6, 0.4);
   ship.obj.position.set(ship.x, ship.h, ship.z); ship.obj.rotation.set(-ship.p, ship.hd, ship.r, 'YXZ');
-  ship.msgT -= dt; if (ship.msgT <= 0 && ship.msg) { ship.msg = ''; $('shipStatus').textContent = `${(ship.v * 1.944).toFixed(0)} kn · engines ${['astern', 'stop', 'slow', 'half', 'full', 'flank'][ship.thr + 1]}`; }
-  else if (!ship.msg) $('shipStatus').textContent = `${(ship.v * 1.944).toFixed(0)} kn · engines ${['astern', 'stop', 'slow', 'half', 'full', 'flank'][ship.thr + 1]}`;
+  const cur = Math.hypot(rg.flow[0], rg.flow[1]), inW = BODY_ORDER.filter((b) => rg.w[b] > 0.08).sort((a, b) => rg.w[b] - rg.w[a]).map((b) => `${WATER_BODIES[b].label.replace(/ \(.*/, '')} ${Math.round(rg.w[b] * 100)} %`).join(', ');
+  const line = `${(ship.v * 1.944).toFixed(0)} kn · engines ${['astern', 'stop', 'slow', 'half', 'full', 'flank'][ship.thr + 1]} · ${inW}${cur > 0.05 ? ` · current ${cur.toFixed(1)} m/s` : ''}`;
+  ship.msgT -= dt; if (ship.msgT <= 0 && ship.msg) { ship.msg = ''; $('shipStatus').textContent = line; }
+  else if (!ship.msg) $('shipStatus').textContent = line;
 }
 function placeCamera(dt) {
   const on = ship.on && S.sail;
@@ -303,5 +346,5 @@ function frame(now) {
 }
 
 generate(); updateSky(); setCam(ship.on && S.sail ? (S.cam === 'Free flight' ? 'Chase' : S.cam || 'Chase') : 'Overview'); resize();
-window.__land = { S, get T() { return T; }, ship, camera, orbit, free, generate, setCam, sampleHeight: (x, z) => sampleHeight(T, x, z), clearAt, wrapC, sailStep };
+window.__land = { S, get T() { return T; }, regionAt: (x, z) => regionAt(T, x, z), ship, camera, orbit, free, generate, setCam, sampleHeight: (x, z) => sampleHeight(T, x, z), clearAt, wrapC, sailStep };
 requestAnimationFrame(frame);
