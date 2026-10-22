@@ -82,7 +82,7 @@ function makeHitboxes(b) {
   root.traverse((o) => {
     if (!o.isMesh || mountGroups.some((g) => inTree(o, g))) return;
     const part = topPart(o, root), kind = KIND_OF_PART[part] || 'fitting';
-    if (kind === 'hull' || o.name === 'ensign' || o.name === 'sternName' || thinPiece(o)) return;
+    if (kind === 'hull' || o.name === 'ensign' || o.name === 'sternName' || o.userData.decal || thinPiece(o)) return;
     const pb = box3().setFromObject(o);
     if (pb.isEmpty()) return;
     const i0 = Math.floor(pb.min.x / CELL.x), i1 = Math.floor(pb.max.x / CELL.x), j0 = Math.floor(pb.min.y / CELL.y), j1 = Math.floor(pb.max.y / CELL.y), k0 = Math.floor(pb.min.z / CELL.z), k1 = Math.floor(pb.max.z / CELL.z);
@@ -245,7 +245,7 @@ export function transformShip(id, opt = {}) {
     const shipInv = root.matrixWorld.clone().invert();
     root.traverse((o) => {
       if (!o.isMesh) return;
-      if (o.name === 'ensign' || o.name === 'sternName') { if (!spec.proxy) extras.push(o); return; }
+      if (o.name === 'ensign' || o.name === 'sternName' || o.userData.decal) { if (!spec.proxy) extras.push(o); return; }
       if (b.mounts.some((m) => rotates(m) && inTree(o, m.train))) return;          // handled with its mount below
       const part = topPart(o, root);
       if (spec.dropThin && thinPiece(o) && !(spec.proxy && part === 'masts')) return;

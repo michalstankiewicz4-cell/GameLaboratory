@@ -66,6 +66,23 @@
    "triangles": 33575
   }
  },
+ "lab/orzel": {
+  "counts": {
+   "arc": 1,
+   "budget": 1,
+   "speck": 2
+  },
+  "fingerprint": {
+   "drawCalls": 49,
+   "materials": 13,
+   "size": [
+    6.7,
+    12.54,
+    84.33
+   ],
+   "triangles": 17083
+  }
+ },
  "lod/blyskawica/0": {
   "counts": {},
   "fingerprint": {
@@ -103,6 +120,45 @@
     113.75
    ],
    "triangles": 2695
+  }
+ },
+ "lod/orzel/0": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 27,
+   "materials": 13,
+   "size": [
+    6.7,
+    12.54,
+    84.33
+   ],
+   "triangles": 17057
+  }
+ },
+ "lod/orzel/1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 15,
+   "materials": 10,
+   "size": [
+    6.7,
+    12.54,
+    83.99
+   ],
+   "triangles": 6559
+  }
+ },
+ "lod/orzel/2": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 4,
+   "materials": 3,
+   "size": [
+    6.7,
+    11.94,
+    83.99
+   ],
+   "triangles": 1423
   }
  },
  "test/bench": {

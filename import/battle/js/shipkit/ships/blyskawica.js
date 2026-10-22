@@ -157,7 +157,7 @@ export function build(opt = {}) {
   fit.rod('metal', [0, yf, zf], [0, yf + 4.2, zf - 0.2], 0.05);
   add('fittings', fit.finish());
   // naval ensign (white over red with the eagle shield), stern name in red letters
-  root.add(ensign(mats, [0, yf + 3.3, zf - 0.75]));
+  root.add(P.ensign(mats, [0, yf + 3.3, zf - 0.75]));
   root.add(sternName([0, 2.2, -56.86]));
 
   /* ---------------- forward superstructure and bridge ---------------- */
@@ -299,22 +299,6 @@ export function build(opt = {}) {
   return { group: root, parts, mounts, info, lines, materials: mats, anchors, length: LOA, beam: B * 2 };
 }
 
-// Polish naval ensign (1919–1945 pattern simplified): white over red, the red eagle shield in the white field.
-function ensign(mats, at) {
-  const c = document.createElement('canvas'); c.width = 128; c.height = 80;
-  const g = c.getContext('2d');
-  g.fillStyle = '#f2f2ee'; g.fillRect(0, 0, 128, 40); g.fillStyle = '#c4161c'; g.fillRect(0, 40, 128, 40);
-  g.beginPath(); g.moveTo(16, 8); g.lineTo(40, 8); g.lineTo(40, 26); g.quadraticCurveTo(28, 38, 16, 26); g.closePath(); g.fill();
-  g.fillStyle = '#f2f2ee'; g.beginPath(); g.ellipse(28, 18, 6, 7, 0, 0, 7); g.fill();
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
-  const m = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 0.94, 8, 2), new THREE.MeshStandardMaterial({ map: t, side: THREE.DoubleSide, roughness: 0.9 }));
-  const p = m.geometry.attributes.position;                               // a little wave in the cloth
-  for (let i = 0; i < p.count; i++) p.setZ(i, Math.sin((p.getX(i) + 0.75) * 4) * 0.06 * (p.getX(i) + 0.75));
-  m.geometry.computeVertexNormals();
-  m.position.set(at[0], at[1], at[2]); m.rotation.y = Math.PI / 2; m.name = 'ensign';
-  return m;
-}
-
 // The ship's name painted in red on the transom.
 function sternName(at) {
   const c = document.createElement('canvas'); c.width = 512; c.height = 64;
@@ -326,3 +310,19 @@ function sternName(at) {
   m.position.set(at[0], at[1], at[2]); m.rotation.y = Math.PI; m.name = 'sternName';
   return m;
 }
+
+// What the Ship Lab shows for this ship: camera presets, dimension labels, part names, where to look when signalling.
+export const view = {
+  cams: [
+    ['Bow ¾', [0, 4, 6], 105, 0.85, 0.2], ['Profile', [0, 4, 0], 150, Math.PI / 2, 0.02], ['Stern ¾', [0, 4, -8], 100, 2.35, 0.22],
+    ['Top', [0, 0, 0], 170, Math.PI / 2, 1.5], ['Bridge', [0, 10, 24], 28, 1.0, 0.22], ['Forecastle', [0, 6, 42], 32, 0.7, 0.4],
+    ['Funnel & tubes', [0, 7, -6], 34, 1.9, 0.3], ['Quarterdeck', [0, 5, -42], 30, -0.6, 0.45], ['Waterline', [0, 0.5, 0], 95, 2.0, -0.02],
+  ],
+  dims: {
+    loa: 8.5, beamAt: [7, -14],
+    labels: [['LOA 114.0 m', [0, 9, 0]], ['Beam 11.26 m', [0, 7.6, -14]], ['Draught 3.15 / 3.45 m', [0, -1.6, 52]], ['Stem', [0, 7.6, 57.2]], ['Stern', [0, 4.3, -57.2]],
+      ['Funnel top 15.8 m', [0, 16.6, 1.6]], ['Mast ~27 m', [0, 27.6, 14.8]]],
+  },
+  partNames: { hull: 'Hull, decks, propellers', superstructure: 'Superstructure & bridge', funnel: 'Funnel', masts: 'Masts & rigging', mainBattery: 'Main battery (120 mm)', antiAircraft: 'AA (40 mm, 13.2 mm)', torpedoes: 'Torpedo tubes', fittings: 'Deck fittings, rails, boats' },
+  signalCam: { target: [0, 13.9, 18.3], dist: 8, yaw: 0.35, pitch: 0.12 },
+};

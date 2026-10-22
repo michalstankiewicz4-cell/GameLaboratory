@@ -5,7 +5,7 @@ under `labs/`) and its kit (code under `js/` that the game will use once a lab's
 
 | Area | Lab | Status | Kit (code) | Docs |
 |---|---|---|---|---|
-| **Models** | Ship Lab — ORP Błyskawica 1937 (`labs/ship.html`) | in progress | `js/shipkit/` | `docs/ships/blyskawica.md` |
+| **Models** | Ship Lab — ORP Błyskawica 1937, ORP Orzeł 1939 (`labs/ship.html`) | in progress | `js/shipkit/` | `docs/ships/blyskawica.md`, `docs/ships/orzel.md` |
 | | Light cruiser, submarine, aircraft and shore | soon | `js/shipkit/ships/` | |
 | | Paint Lab: paint schemes and camouflage as data, fitted to one ship or assigned to another (owner's idea, later) | later | ShipKit materials | |
 | | Waterside Structures Lab (`labs/structures.html`): jack-up drilling rig (Super 300 class), quay walls (gravity, sheet-pile, piled deck), breakwaters (rock, tetrapods, caissons); next piers, harbours, lighthouses | in progress | `js/structkit/` | `docs/structures.md`, `docs/structures/super300.md` |

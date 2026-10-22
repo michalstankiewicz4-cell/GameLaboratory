@@ -3,7 +3,7 @@
 // dimension labels, part toggles, turret training/elevation and statistics. Uses only ShipKit's public API.
 import * as THREE from '../../vendor/three.module.js';
 import { PostPipeline } from '../render/post.js';
-import { SHIP_IDS, buildShip, shipInfo } from '../shipkit/index.js';
+import { SHIP_IDS, buildShip, shipInfo, shipView } from '../shipkit/index.js';
 import { signalLamp } from '../shipkit/lights.js';
 
 const $ = (id) => document.getElementById(id);
@@ -104,21 +104,19 @@ renderer.domElement.addEventListener('dblclick', (e) => {
   const hit = model && r.intersectObject(model.group, true)[0];
   if (hit) orbit.want = { target: hit.point.clone(), dist: Math.max(6, orbit.dist * 0.5) };
 });
-// camera presets: [label, target, dist, yaw, pitch]
-const CAMS = [
-  ['Bow ¾', [0, 4, 6], 105, 0.85, 0.2], ['Profile', [0, 4, 0], 150, Math.PI / 2, 0.02], ['Stern ¾', [0, 4, -8], 100, 2.35, 0.22],
-  ['Top', [0, 0, 0], 170, Math.PI / 2, 1.5], ['Bridge', [0, 10, 24], 28, 1.0, 0.22], ['Forecastle', [0, 6, 42], 32, 0.7, 0.4],
-  ['Funnel & tubes', [0, 7, -6], 34, 1.9, 0.3], ['Quarterdeck', [0, 5, -42], 30, -0.6, 0.45], ['Waterline', [0, 0.5, 0], 95, 2.0, -0.02],
-];
-for (const [label, t, dist, yaw, pitch] of CAMS) {
-  $('cams').append(el('button', { type: 'button', textContent: label, onclick: () => { orbit.want = { target: new THREE.Vector3(...t), dist, yaw, pitch }; } }));
+// camera presets per ship (the ship module's view.cams): [label, target, dist, yaw, pitch]
+function setCams() {
+  $('cams').replaceChildren(...(shipView(shipId).cams || []).map(([label, t, dist, yaw, pitch]) =>
+    el('button', { type: 'button', textContent: label, onclick: () => { orbit.want = { target: new THREE.Vector3(...t), dist, yaw, pitch }; } })));
 }
 
 /* ---------------- ship ---------------- */
-let model = null, shipId = SHIP_IDS[0], buildMs = 0, signal = null;
+const asked = new URLSearchParams(location.search).get('ship');            // ?ship=orzel opens that ship
+let model = null, shipId = SHIP_IDS.includes(asked) ? asked : SHIP_IDS[0], buildMs = 0, signal = null;
 const partChecks = {};
 for (const id of SHIP_IDS) $('ship').append(el('option', { value: id, textContent: shipInfo(id).name + ' (' + shipInfo(id).year + ')' }));
-$('ship').onchange = () => { shipId = $('ship').value; rebuild(); fillInfo(); };
+$('ship').value = shipId; document.querySelector('a[href^="doctor.html"]').href = 'doctor.html?model=lab/' + shipId;
+$('ship').onchange = () => { shipId = $('ship').value; document.querySelector('a[href^="doctor.html"]').href = 'doctor.html?model=lab/' + shipId; dive.keel = dive.want = null; rebuild(); fillInfo(); setCams(); buildDimLines(); const c = shipView(shipId).cams; if (c) orbit.want = { target: new THREE.Vector3(...c[0][1]), dist: c[0][2], yaw: c[0][3], pitch: c[0][4] }; };
 
 function fillInfo() {
   const inf = shipInfo(shipId);
@@ -128,21 +126,24 @@ function fillInfo() {
   document.title = `Ship Lab — ${inf.name} 1:1 3D model | Steel Salvo Labs`;
 }
 
-const PART_NAMES = { hull: 'Hull, decks, propellers', superstructure: 'Superstructure & bridge', funnel: 'Funnel', masts: 'Masts & rigging', mainBattery: 'Main battery (120 mm)', antiAircraft: 'AA (40 mm, 13.2 mm)', torpedoes: 'Torpedo tubes', fittings: 'Deck fittings, rails, boats' };
 function rebuild() {
   if (model) { scene.remove(model.group); model.group.traverse((o) => { if (o.isMesh) o.geometry.dispose(); }); }
   const t0 = performance.now();
-  model = buildShip(shipId, { detail: +$('detail').value });
+  model = buildShip(shipId, { detail: +$('detail').value, interior: true });
   buildMs = performance.now() - t0;
   scene.add(model.group);
+  SHIP_DIMS[shipId] = { L: model.length, B: model.beam };
   const was = signal && signal.sending ? signal.text : null;
   signal = signalLamp(model); if (was) signal.send(was);
   $('parts').replaceChildren(...Object.keys(model.parts).map((k) => {
     const c = el('input', { type: 'checkbox', checked: partChecks[k] ?? true });
     c.onchange = () => { partChecks[k] = c.checked; model.parts[k].visible = c.checked; };
     model.parts[k].visible = c.checked;
-    return el('label', { className: 'chk' }, c, PART_NAMES[k] || k);
+    return el('label', { className: 'chk' }, c, (shipView(shipId).partNames || {})[k] || k);
   }));
+  $('signalPanel').hidden = !(model.anchors && model.anchors.signal);
+  $('subPanel').hidden = !model.pose;
+  if (model.pose) { if (dive.keel === null) setDive(0, true); else model.pose(dive.pose); }
   applyWire(); applyGuns(); stats();
 }
 
@@ -172,7 +173,8 @@ $('signal').onclick = () => {
   if (!signal) return;
   if (signal.sending) { signal.stop(); $('signal').classList.remove('on'); return; }
   signal.send(($('signalText').value || 'SOS').slice(0, 40)); $('signal').classList.add('on');
-  orbit.want = { target: new THREE.Vector3(0, 13.9, 18.3), dist: 8, yaw: 0.35, pitch: 0.12 };   // from ahead, over the bridge
+  const sc = shipView(shipId).signalCam;                                // from ahead, over the bridge
+  if (sc) orbit.want = { target: new THREE.Vector3(...sc.target), dist: sc.dist, yaw: sc.yaw, pitch: sc.pitch };
 };
 $('stow').onclick = () => { action = false; $('action').classList.remove('on'); $('train').value = 0; $('elev').value = 0; $('train').oninput(); $('elev').oninput(); };
 function applyGuns(t = 0) {
@@ -185,6 +187,43 @@ function applyGuns(t = 0) {
     for (const g of m.guns) g.rotation.x = -THREE.MathUtils.degToRad(m.aa ? Math.max(e, 0) * 2.5 : e);
   }
 }
+// submarine: diving (keel depth) with the matching pose — periscopes, radio mast, 40 mm in or out of its well, bow
+// hydroplanes folded or rigged out. The boat sinks at about 0.3 m/s (an emergency dive took about 50 s).
+// [label, keel depth below the surface (from the boat's draught and casing height), pose]
+const DIVES = [
+  ['Surfaced', (s) => s.draught, { periscopes: 0, search: 0, mast: 0, aa: 1, planes: 0, flag: 1 }],
+  ['Decks awash', (s) => s.draught + s.deck, { periscopes: 0, search: 0, mast: 0, aa: 0, planes: 1, flag: 0 }],
+  ['Periscope depth', () => 12, { periscopes: 1, search: 1, mast: 0, aa: 0, planes: 1, flag: 0 }],
+  ['Deep (40 m)', () => 40, { periscopes: 0, search: 0, mast: 0, aa: 0, planes: 1, flag: 0 }],
+];
+const dive = { keel: null, want: null, pose: {}, target: {} };
+function setDive(i, now = false) {
+  if (!model || !model.pose) return;
+  const [, keel, p] = DIVES[i];
+  dive.want = keel(model.sub);
+  dive.target = { ...p };
+  if (now || dive.keel === null) { dive.keel = dive.want; dive.pose = { ...p }; model.pose(dive.pose); }
+  [...$('dives').children].forEach((b, j) => b.classList.toggle('on', j === i));
+}
+$('dives').replaceChildren(...DIVES.map(([label], i) => el('button', { type: 'button', textContent: label, onclick: () => setDive(i) })));
+$('peri').onchange = () => { dive.target.periscopes = dive.target.search = $('peri').checked ? 1 : 0; };
+$('aaUp').onchange = () => { dive.target.aa = $('aaUp').checked ? 1 : 0; };
+$('planes').onchange = () => { dive.target.planes = $('planes').checked ? 1 : 0; };
+function updateDive(dt) {
+  if (!model || !model.pose || dive.keel === null) return;
+  const dk = dive.want - dive.keel; dive.keel += Math.sign(dk) * Math.min(Math.abs(dk), 0.3 * dt * ($('fastDive').checked ? 8 : 1));
+  let moved = Math.abs(dk) > 1e-4;
+  for (const [k, v] of Object.entries(dive.target)) {
+    const c = dive.pose[k] ?? v, nv = c + Math.sign(v - c) * Math.min(Math.abs(v - c), dt * 0.35 * ($('fastDive').checked ? 6 : 1));
+    if (nv !== c) moved = true; dive.pose[k] = nv;
+  }
+  if (moved) model.pose(dive.pose);
+  model.group.position.y = -(dive.keel - model.sub.draught);
+  $('peri').checked = (dive.target.periscopes ?? 0) > 0.5; $('aaUp').checked = (dive.target.aa ?? 0) > 0.5; $('planes').checked = (dive.target.planes ?? 0) > 0.5;
+  const head = model.sub.periscopeTop - model.sub.raise * (1 - (dive.pose.search ?? 0)) - (dive.keel - model.sub.draught);
+  $('diveStatus').textContent = `Keel ${dive.keel.toFixed(1)} m below the surface · ` + (dive.keel - model.sub.draught < 0.05 ? 'surfaced' : head > 0 ? `periscope head ${head.toFixed(1)} m above the sea` : `periscope head ${(-head).toFixed(1)} m under`);
+}
+
 $('sea').onchange = () => { const s = $('sea').checked; sea.visible = s; dock.visible = blocks.visible = !s; };
 $('grid').onchange = () => { grid.visible = $('grid').checked; };
 $('spin').onchange = () => {};
@@ -199,19 +238,14 @@ addEventListener('pointermove', idle);
 addEventListener('keydown', (e) => {
   if (e.target.closest && e.target.closest('input,select,textarea')) return;
   if (e.code === 'KeyH') panels.forEach((p) => { p.hidden = !p.hidden; });
-  if (e.code === 'KeyF') orbit.want = { target: new THREE.Vector3(0, 4, 0), dist: 150 };
+  if (e.code === 'KeyF') orbit.want = { target: new THREE.Vector3(0, 4, 0), dist: 150 * (model ? model.length / 114 : 1) };
 });
 
 /* ---------------- dimension labels ---------------- */
 const dimEls = [];
 function dimLabels() {
-  if (!model) return [];
-  const L = model.length, b = model.beam;
-  return [
-    [`LOA ${L.toFixed(1)} m`, [0, 9, 0], 'loa'], [`Beam ${b.toFixed(2)} m`, [0, 7.6, -14], 'beam'],
-    ['Draught 3.15 / 3.45 m', [0, -1.6, 52], 'dr'], ['Stem', [0, 7.6, 57.2], 's'], ['Stern', [0, 4.3, -57.2], 'st'],
-    ['Funnel top 15.8 m', [0, 16.6, 1.6], 'f'], ['Mast ~27 m', [0, 27.6, 14.8], 'm'],
-  ];
+  const v = shipView(shipId).dims;
+  return model && v ? v.labels : [];
 }
 const V = new THREE.Vector3();
 const dimLines = new THREE.Group(); scene.add(dimLines);
@@ -219,10 +253,14 @@ function buildDimLines() {
   dimLines.clear();
   const mat = new THREE.LineBasicMaterial({ color: 0xf2b84b, depthTest: false, transparent: true, opacity: 0.85 });
   const seg = (a, b) => { const g = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...a), new THREE.Vector3(...b)]); const l = new THREE.Line(g, mat); l.renderOrder = 10; dimLines.add(l); };
-  seg([0, 8.5, -57], [0, 8.5, 57]); seg([0, 8, -57], [0, 9, -57]); seg([0, 8, 57], [0, 9, 57]);
-  seg([-5.63, 7, -14], [5.63, 7, -14]);
+  const v = shipView(shipId).dims, inf = SHIP_DIMS[shipId];
+  if (!v || !inf) return;
+  const h = inf.L / 2, y = v.loa, [by, bz] = v.beamAt;
+  seg([0, y, -h], [0, y, h]); seg([0, y - 0.5, -h], [0, y + 0.5, -h]); seg([0, y - 0.5, h], [0, y + 0.5, h]);
+  seg([-inf.B / 2, by, bz], [inf.B / 2, by, bz]);
 }
-buildDimLines();
+// overall length and beam per ship (for the dimension lines), from a quick build of each
+const SHIP_DIMS = {};
 function updateDims() {
   const on = $('dimsChk').checked && model;
   dimLines.visible = !!on;
@@ -230,7 +268,7 @@ function updateDims() {
   while (dimEls.length < list.length) { const d = el('div', { className: 'dim' }); $('dims').append(d); dimEls.push(d); }
   dimEls.forEach((d, i) => {
     if (i >= list.length) { d.hidden = true; return; }
-    V.set(...list[i][1]).project(camera);
+    V.set(...list[i][1]); V.y += dimLines.position.y; V.project(camera);
     d.hidden = V.z > 1;
     d.textContent = list[i][0];
     d.style.transform = `translate(${(V.x + 1) / 2 * innerWidth}px,${(1 - V.y) / 2 * innerHeight}px) translate(-50%,-50%)`;
@@ -277,6 +315,8 @@ function frame(now) {
   seaNormal.offset.x = (now / 1000) * 0.004; seaNormal.offset.y = (now / 1000) * 0.0025;
   if (action) applyGuns(now / 1000);
   if (signal) signal.update(dt, camera, 0.1);
+  updateDive(dt);
+  dimLines.position.y = model ? model.group.position.y : 0;
   updateDims(); scaleBar();
   renderer.info.reset(); renderer.info.autoReset = false;
   post.render(scene, camera);
@@ -288,6 +328,7 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 
-fillInfo(); rebuild(); setSun(); resize();
-window.__lab = { scene, camera, orbit, get model() { return model; }, get signal() { return signal; }, rebuild };
+fillInfo(); setCams(); rebuild(); SHIP_DIMS[shipId] = { L: model.length, B: model.beam }; buildDimLines(); setSun(); resize();
+if (shipId !== SHIP_IDS[0]) { const c = shipView(shipId).cams; if (c) { orbit.target.set(...c[0][1]); orbit.dist = c[0][2]; orbit.yaw = c[0][3]; orbit.pitch = c[0][4]; } }
+window.__lab = { scene, camera, orbit, get model() { return model; }, get signal() { return signal; }, rebuild, setDive, dive };
 requestAnimationFrame(frame);

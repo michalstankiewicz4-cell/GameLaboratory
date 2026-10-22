@@ -34,6 +34,7 @@ def main():
             pg.on('console', lambda m: errs.append(m.type + ' ' + m.text) if m.type == 'error' else None)
             pg.goto(f'http://localhost:{PORT}/labs.html')
             assert pg.locator('a.tile[href="labs/ship.html"]').count() == 1, 'ship tile missing'
+            assert pg.locator('a.tile[href="labs/ship.html?ship=orzel"]').count() == 1, 'orzel tile missing'
             assert pg.locator('a.tile[href="labs/look.html"]').count() >= 1, 'look tile missing'
             assert pg.locator('a.tile[href="labs/land.html"]').count() == 1, 'land tile missing'
             assert pg.locator('a.tile[href="labs/structures.html"]').count() == 1, 'structures tile missing'
@@ -63,6 +64,30 @@ def main():
                 from PIL import Image
                 Image.open(tmp).convert('RGB').crop((60, 90, 1100, 675)).resize((1200, 675), Image.LANCZOS).save(os.path.join(ROOT, 'assets', 'labs', 'ship.jpg'), quality=85)
                 print('thumbnail written')
+            # ORP Orzeł: builds with its own cameras, dives to periscope depth (40 mm into its well, periscopes up, ensign struck)
+            pg.goto(f'http://localhost:{PORT}/labs/ship.html?ship=orzel')
+            pg.wait_for_function("window.__lab && window.__lab.model && window.__lab.model.info.id === 'orzel'", timeout=180000)
+            print('orzel', ' '.join(pg.inner_text('#stats').split()))
+            assert pg.locator('#cams button').count() >= 8 and not pg.locator('#subPanel').is_hidden() and pg.locator('#signalPanel').is_hidden(), 'orzel panels'
+            for c in pg.locator('#parts input').all(): c.click(); c.click()
+            pg.evaluate("()=>{document.getElementById('fastDive').checked=true;__lab.setDive(2);__lab.dive.keel=__lab.dive.want}")   # headless frames are slow: jump the depth, let the pose run
+            for _ in range(120):
+                time.sleep(0.5)
+                if pg.evaluate('Math.abs(__lab.dive.keel-12)<0.05 && __lab.dive.pose.search>0.99 && __lab.dive.pose.aa<0.01'): break
+            st = pg.evaluate("({y:__lab.model.group.position.y, aa:__lab.model.group.getObjectByName('40 mm twin (retractable)').position.y, flag:__lab.model.group.getObjectByName('ensign').visible, txt:document.getElementById('diveStatus').textContent})")
+            assert abs(st['y'] + (12 - 4.17)) < 0.1 and st['aa'] < -2 and not st['flag'] and 'above the sea' in st['txt'], f'orzel dive {st}'
+            print('orzel dive', st['txt'])
+            pg.evaluate("()=>{__lab.setDive(0);__lab.dive.keel=__lab.dive.want}")
+            for _ in range(120):
+                time.sleep(0.5)
+                if pg.evaluate('Math.abs(__lab.dive.keel-4.17)<0.01 && __lab.dive.pose.aa>0.99'): break
+            assert pg.evaluate("__lab.model.group.getObjectByName('40 mm twin (retractable)').position.y") == 0, 'orzel 40 mm not raised'
+            if '--thumb' in sys.argv:
+                pg.keyboard.press('h'); pg.evaluate("()=>{const c=document.getElementById('dimsChk');if(c.checked)c.click()}")
+                tmp = os.path.join(OUT, 'lab-thumb-orzel.png'); snap(pg, 'Bow ¾', tmp)
+                from PIL import Image
+                Image.open(tmp).convert('RGB').crop((60, 90, 1100, 675)).resize((1200, 675), Image.LANCZOS).save(os.path.join(ROOT, 'assets', 'labs', 'orzel.jpg'), quality=85)
+                print('orzel thumbnail written')
             # water lab: loads, variants, presets, split screen, every effect toggled
             pg.goto(f'http://localhost:{PORT}/labs/water.html')
             pg.wait_for_function('window.__water && window.__water.vars.A.waves.length > 0', timeout=180000)
