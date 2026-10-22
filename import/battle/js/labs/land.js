@@ -7,7 +7,7 @@ import * as THREE from '../../vendor/three.module.js';
 import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment } from '../env/skykit.js';
 import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, LOOKS } from '../env/waterkit.js';
 import { heightTexture, terrainMeshes, sampleHeight, barrierBuoys, SHAPES, TERRAIN_DEFAULTS, GLSL_LAND } from '../env/landkit.js';
-import { generateWorld, regionTextures, regionUniforms, setRegions, regionAt, GLSL_REGIONS, LAYOUTS, WORLD_DEFAULTS, BODY_ORDER, CHART } from '../env/regionkit.js';
+import { generateWorld, regionTextures, regionUniforms, setRegions, regionAt, GLSL_REGIONS, LAYOUTS, WORLD_DEFAULTS, BODY_ORDER, CHART, BIOMES, BIOME_ORDER, BIOME_CHART, biomeTexture, biomeAt } from '../env/regionkit.js';
 import { WATER_BODIES } from '../env/waterkit.js';
 import { transformShip } from '../shipkit/transform.js';
 import { LookPipeline, LOOK_PRESETS } from '../render/look.js';
@@ -38,7 +38,8 @@ scene.add(hemi, sun, sun.target);
 
 /* ---------------- terrain ---------------- */
 let T = generateWorld(S.map, S.water), tex = heightTexture(T), rtex = regionTextures(T);
-const terrain = terrainMeshes(T, tex); scene.add(terrain.group);
+let btex = biomeTexture(T);
+const terrain = terrainMeshes(T, tex, { biome: btex }); scene.add(terrain.group);
 const RU = regionUniforms(rtex);
 let buoys = null;
 
@@ -95,6 +96,9 @@ function generate() {
   T = generateWorld(S.map, S.water); if (tex) tex.dispose(); tex = heightTexture(T);
   terrain.set(T, tex);
   rtex.a.dispose(); rtex.b.dispose(); rtex = regionTextures(T); setRegions(WU, rtex);
+  btex.dispose(); btex = biomeTexture(T); terrain.setBiome(btex);
+  $('biomeBlend').disabled = S.water.biome !== 'zones';
+  $('biomeShare').replaceChildren(...BIOME_ORDER.filter((b) => T.biomes.share[b] > 0.005).flatMap((b) => [el('span', { textContent: BIOMES[b].label.replace(/ \(.*/, '') }), el('b', { textContent: `${(T.biomes.share[b] * 100).toFixed(0)} %` })]));
   const sh = T.regions.share;
   WU.uIce.value.set(sh.ice > 0.001 ? 1 : 0, 18, 0.35, 0); WU.uOil.value = sh.harbour > 0.001 ? 1 : 0;
   for (const k of ['shape', 'land', 'wrap']) $(k).disabled = !['single', 'mixed'].includes(S.water.layout);
@@ -131,7 +135,12 @@ function drawChartBase() {
       for (const b of BODY_ORDER) for (let q = 0; q < 3; q++) c[q] += CHART[b][q] * r.w[b];
       c = c.map((x) => x * (1.15 - 0.45 * d)); if (-h < 3) c = c.map((x) => x * 0.6 + 70);
     }
-    else { const r = h / Math.max(1, T.relief); c = r < 0.012 ? [205, 190, 140] : r < 0.45 ? [80 + 60 * r, 110 - 20 * r, 55] : r < 0.75 ? [125, 112, 96] : [235, 238, 242]; }
+    else {
+      const r = h / Math.max(1, T.relief), bm = biomeAt(T, (i + 0.5) / W * T.size, (j + 0.5) / W * T.size);
+      const ct = r < 0.012 ? [205, 190, 140] : r < 0.45 ? [80 + 60 * r, 110 - 20 * r, 55] : r < 0.75 ? [125, 112, 96] : [235, 238, 242];
+      const cd = h < 2 ? [205, 190, 140] : r > 0.3 ? [150, 108, 80] : BIOME_CHART.desert, cp = h < 2 ? [205, 190, 140] : BIOME_CHART.plains;
+      c = [0, 1, 2].map((q) => ct[q] * bm.temperate + cp[q] * bm.plains + cd[q] * bm.desert);
+    }
     img.data[k] = c[0]; img.data[k + 1] = c[1]; img.data[k + 2] = c[2]; img.data[k + 3] = 255;
   }
   chartBase = img;
@@ -201,9 +210,11 @@ for (const [k, f] of Object.entries(fmts)) {
 }
 $('layout').value = S.water.layout; $('layout').onchange = () => { S.water.layout = $('layout').value; showNote(); regen(); };
 $('body').value = S.water.body; $('body').onchange = () => { S.water.body = $('body').value; regen(); };
-const wfmt = { blend: (v) => v + ' m', rivers: (v) => String(v), ice: (v) => Math.round(v * 100) + ' %' };
+const wfmt = { blend: (v) => v + ' m', rivers: (v) => String(v), ice: (v) => Math.round(v * 100) + ' %', biomeBlend: (v) => (v / 1000).toFixed(1) + ' km' };
 for (const [k, f] of Object.entries(wfmt)) { const r = $(k), o = $(k + 'V'); r.value = S.water[k]; o.textContent = f(+r.value); r.addEventListener('input', () => { S.water[k] = +r.value; o.textContent = f(+r.value); regen(); }); }
 $('labels').onchange = () => drawChart();
+for (const [k, b] of Object.entries(BIOMES)) $('biome').append(el('option', { value: k, textContent: b.label }));
+$('biome').value = S.water.biome; $('biome').onchange = () => { S.water.biome = $('biome').value; regen(); };
 showNote();
 $('seed').value = S.map.seed; $('seed').addEventListener('change', () => { S.map.seed = Math.max(0, Math.min(999999, +$('seed').value | 0)); regen(); });
 $('random').onclick = () => { S.map.seed = Math.floor(Math.random() * 1e6); $('seed').value = S.map.seed; generate(); save(); };

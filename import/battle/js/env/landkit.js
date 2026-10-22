@@ -237,6 +237,7 @@ const TERRAIN_VERT_NORMAL = /* glsl */`
 `;
 const TERRAIN_FRAG_HEAD = /* glsl */`
 uniform vec3 uHole; uniform float uRelief, uTime;
+uniform vec4 uLand; uniform sampler2D tBiome; uniform float uBiomeOn;   // map size; biome weights (temperate, plains, desert, -) over the map (RegionKit)
 varying vec3 vLandP; varying vec3 vLandN; varying vec2 vLandQ;
 float lnHash(vec2 p) { p = fract(p * vec2(233.34, 851.73)); p += dot(p, p + 23.45); return fract(p.x * p.y); }
 float lnNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
@@ -276,6 +277,35 @@ const TERRAIN_FRAG_COLOR = /* glsl */`
     float wet = smoothstep(1.4, 0.3, hh) * beach;
     c = mix(c, wetSand, wet); rough = mix(0.95, 0.35, wet);
     c *= 0.82 + 0.18 * smoothstep(0.5, 0.95, up);                                     // steeper ground reads darker (soil, shadowed gullies)
+    vec4 bw = uBiomeOn > 0.5 ? texture2D(tBiome, q / uLand.x) : vec4(1.0, 0.0, 0.0, 0.0);
+    if (bw.g + bw.b > 0.004) {
+      // plains: lush lowland meadow, and farmland — fields of wheat, stubble, ploughland and pasture on the flat ground
+      vec3 meadow = mix(vec3(0.2, 0.27, 0.1), vec3(0.32, 0.35, 0.15), n1) * (0.8 + 0.3 * n2 * (0.7 + 0.3 * n3));
+      vec2 fq = q + (vec2(lnNoise(q * 0.004), lnNoise(q * 0.004 + 9.1)) - 0.5) * 140.0;   // fields follow the land a little, not a ruler grid
+      vec2 FS = vec2(320.0, 110.0);                                                       // long strips, as farmland is divided
+      vec2 fc = floor(fq / FS); float fh = lnHash(fc + 0.37);
+      vec3 field = fh < 0.14 ? vec3(0.5, 0.45, 0.27) : fh < 0.24 ? vec3(0.4, 0.35, 0.23) : fh < 0.32 ? vec3(0.3, 0.25, 0.18) : mix(meadow, vec3(0.25, 0.32, 0.12), lnHash(fc + 3.1));
+      field = mix(meadow, field, 0.8);
+      vec2 fe = abs(fract(fq / FS) - 0.5);
+      float hedge = smoothstep(0.47, 0.495, max(fe.x, fe.y)) * smoothstep(2500.0, 400.0, fd);   // hedges and tracks between the fields
+      field = mix(field * (0.92 + 0.12 * n2), vec3(0.14, 0.18, 0.08), hedge * 0.6);
+      float farm = smoothstep(0.96, 0.99, up) * smoothstep(3.0, 6.0, hh) * smoothstep(0.3, 0.55, lnNoise(q * 0.0011 + 4.0));
+      vec3 cp = mix(meadow, field, farm);
+      cp = mix(cp, rock * 1.1, smoothstep(0.8, 0.6, up) * 0.6);
+      float beachP = smoothstep(2.4 + n2 * 1.2, 0.9, hh) * smoothstep(0.82, 0.93, up);       // lowland: only a narrow beach at the water
+      cp = mix(cp, sand, beachP); cp = mix(cp, wetSand, smoothstep(1.4, 0.3, hh) * beachP);
+      // desert: warm sand with wind ripples, dark desert varnish on the flat stony plateaus, red-brown rock on cliffs
+      vec3 sandD = mix(vec3(0.6, 0.43, 0.26), vec3(0.7, 0.53, 0.33), n1) * (0.88 + 0.16 * n2);
+      sandD *= 0.85 + 0.15 * smoothstep(0.75, 0.97, up);                                   // slip faces a little darker
+      sandD *= 1.0 + 0.05 * sin(dot(q, vec2(0.83, 0.55)) * 2.6 + n2 * 9.0) * smoothstep(160.0, 30.0, fd);   // ripples, only close up
+      vec3 rockD = mix(vec3(0.46, 0.3, 0.2), vec3(0.6, 0.42, 0.28), n1) * (0.8 + 0.3 * n3) * (0.85 + 0.3 * n2);
+      vec3 varnish = mix(vec3(0.38, 0.28, 0.2), vec3(0.3, 0.22, 0.16), n2);
+      vec3 cd = mix(sandD, varnish, smoothstep(0.25, 0.4, rel) * smoothstep(0.9, 0.97, up) * 0.75);
+      cd = mix(cd, rockD, smoothstep(0.85, 0.62, up));
+      cd = mix(cd, wetSand * vec3(1.05, 0.98, 0.9), wet);
+      float bs = bw.r + bw.g + bw.b + 1e-4;
+      c = (c * bw.r + cp * bw.g + cd * bw.b) / bs;
+    }
   }
   diffuseColor.rgb = c;
 `;
@@ -307,12 +337,15 @@ function terrainDepthMaterial(lu, extra) {
   return m;
 }
 
+let _noBiome = null;
+const NO_BIOME = () => _noBiome || (_noBiome = Object.assign(new THREE.DataTexture(new Uint8Array([255, 0, 0, 0]), 1, 1), { needsUpdate: true }));
+
 // Fine grid (texel cells, n×n) and far grid (4-texel cells, n×n) around the camera, snapped to their cells.
 export function terrainMeshes(T, tex, opt = {}) {
   const n = opt.n || 256, nf = opt.nFar || 192;
   const lu = opt.uniforms || landUniforms(T, tex);      // pass the sea's land uniforms to share them
   if (opt.uniforms) setLand(lu, T, tex);
-  const common = { uRelief: { value: T.relief }, uTime: { value: 0 } };
+  const common = { uRelief: { value: T.relief }, uTime: { value: 0 }, tBiome: { value: opt.biome || NO_BIOME() }, uBiomeOn: { value: opt.biome ? 1 : 0 } };
   const mk = (cells, cell, drop, hole) => {
     const g = new THREE.PlaneGeometry(cells * cell, cells * cell, cells, cells); g.rotateX(-Math.PI / 2);
     const extra = { ...common, uDrop: { value: drop }, uHole: { value: hole } };
@@ -337,6 +370,8 @@ export function terrainMeshes(T, tex, opt = {}) {
   return {
     group, uniforms: lu,
     set(T2, tex2) { setLand(lu, T2, tex2); build(T2); },
+    // biome weights texture (RegionKit biomeTexture) or null: one temperate palette everywhere
+    setBiome(bt) { common.tBiome.value = bt || NO_BIOME(); common.uBiomeOn.value = bt ? 1 : 0; },
     // snap each grid so its vertices sit on the map's lattice (map = world + offset): the land never swims
     update(camera) {
       const ox = lu.uLandOff.value.x, oz = lu.uLandOff.value.y;

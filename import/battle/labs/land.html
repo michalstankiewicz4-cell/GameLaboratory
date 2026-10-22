@@ -40,6 +40,11 @@
   <div class="row"><span>Sea depth</span><input type="range" id="depth" min="8" max="250" step="1"><output id="depthV"></output></div>
   <div class="row"><span>Roughness</span><input type="range" id="rough" min="0" max="1" step="0.01"><output id="roughV"></output></div>
   <div class="row"><span>Erosion</span><input type="range" id="erosion" min="0" max="1" step="0.01"><output id="erosionV"></output></div>
+  <h3>Biome</h3>
+  <div class="row"><span>Land</span><select id="biome"></select><output></output></div>
+  <div class="row"><span>Zone transition</span><input type="range" id="biomeBlend" min="200" max="4000" step="100"><output id="biomeBlendV"></output></div>
+  <div class="stats" id="biomeShare"></div>
+  <p class="note">Ground only: shape and colour of the land. Plants and rocks as objects come in their own labs.</p>
   <h3>Water bodies</h3>
   <div class="row"><span>Layout</span><select id="layout"></select><output></output></div>
   <p class="note" id="layoutNote"></p>

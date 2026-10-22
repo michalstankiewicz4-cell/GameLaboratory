@@ -51,6 +51,22 @@ game's map generator (scale, spawn points, balance, objectives) comes later on t
 take **land biomes** (desert, tundra, tropical…: another set of weights driving the terrain's palette and vegetation)
 and, further on, **other planets** (a bundle of sky, water and biome palettes).
 
+## Biomes (land)
+
+A second set of region weights — **temperate** (northern: grass, heather, rock, snow on real heights), **plains**,
+**desert** — reshapes the land and picks the terrain's palette; *Zones* lays the three out by region (large noise
+fields) with a *Zone transition* of 0.2–4 km. The heights blend by weight, so a desert slides into plains without a step.
+
+| Biome | Shape | Ground |
+|---|---|---|
+| Northern | the generator's terrain as it is | muted grass, dry patches, heather, scrub, rock on steep faces, snow on high gentle slopes |
+| Plains | relief pressed to a few tens of metres (≤ ~40 m), long low swells (~1.6 km) and small hummocks (~0.5 km), a beach only right at the water | lush meadow; farmland on the flat ground — long strips of wheat, stubble, ploughland and pasture, hedges and tracks between them (fades with distance) |
+| Desert | stepped plateaus (mesas) with cliffs where the ground is high, dune fields where it is low: crests across a west-south-west wind, ~330 m apart, up to ~24 m, long windward slope and a short slip face, in dune seas with flat stony plains between | warm sand with wind ripples close up, desert varnish on flat stony plateaus, red-brown rock on cliffs |
+
+Ground only: **plants and rocks as objects** (trees, bushes, grass blades, boulders, scree) get their own labs — the
+terrain's colours stand in for them until then. Rivers carved in *Mixed* follow the reshaped land (a meander swings
+the course from side to side down the distance-to-the-sea field).
+
 ## Map edge
 
 | Topology | What happens at the edge |
@@ -80,7 +96,8 @@ and stops at a barrier. Click the chart to move the ship (if the water there is 
 
 ## Check
 
-`py tools/lab-check.py` checks the land lab: every water-body layout builds with its body present, weights summing to 1
+`py tools/lab-check.py` checks the land lab: plains stay below 80 m and still roll, the desert keeps its plateaus, zones
+hold all three biomes; every water-body layout builds with its body present, weights summing to 1
 and changing by less than 0.12 per texel, the river carries a current with small waves, and the mixed map has rivers,
 lakes and ice; then the wrap seam is no rougher than the inside of the map, the land share
 matches the request (60 %), 100 % land leaves no ship, the mountain barrier stands at the edge of a bounded map, and

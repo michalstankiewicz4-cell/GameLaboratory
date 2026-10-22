@@ -160,7 +160,14 @@ def main():
             r = lay('mixed', {'rivers': 4, 'ice': 0.3})
             assert any(x[0].startswith('River') for x in r['labels']) and r['share']['lake'] > 0 and r['share']['ice'] > 0.05 and r['bad'] == 0, f'mixed {r["share"]} {r["labels"]}'
             print('layout mixed', {k: round(v, 3) for k, v in r['share'].items() if v > 0})
-            pg.evaluate("()=>{Object.assign(__land.S.map,{seed:1939,land:0.35});Object.assign(__land.S.water,{layout:'single',body:'ocean',ice:0})}")
+            # biomes: plains stay low and gently rolling, the desert gets plateaus, zones mix all three
+            bio = lambda b: pg.evaluate("(b)=>{Object.assign(__land.S.map,{seed:1939,land:0.5,shape:'islands'});Object.assign(__land.S.water,{layout:'single',biome:b});__land.generate();const T=__land.T;let n=0,s=0,s2=0;for(let k=0;k<T.h.length;k+=5)if(T.h[k]>0){n++;s+=T.h[k];s2+=T.h[k]*T.h[k]}return {share:T.biomes.share,maxH:T.maxH,mean:s/n,sd:Math.sqrt(s2/n-(s/n)**2)}}", b)
+            pl, de, zo = bio('plains'), bio('desert'), bio('zones')
+            assert pl['maxH'] < 80 and pl['sd'] > 2 and pl['share']['plains'] > 0.99, f'plains {pl}'
+            assert de['maxH'] > 150 and de['share']['desert'] > 0.99, f'desert {de}'
+            assert all(zo['share'][b] > 0.05 for b in ['temperate', 'plains', 'desert']), f'zones {zo["share"]}'
+            print('biomes', f"plains max {pl['maxH']:.0f} m sd {pl['sd']:.1f} m", f"desert max {de['maxH']:.0f} m", 'zones', {k: round(v, 2) for k, v in zo['share'].items()})
+            pg.evaluate("()=>{Object.assign(__land.S.map,{seed:1939,land:0.35});Object.assign(__land.S.water,{layout:'single',body:'ocean',ice:0,biome:'temperate'})}")
             pg.evaluate("()=>__land.generate()")
             seam = pg.evaluate('''()=>{const T=__land.T,N=T.res,h=T.h;let s=0,i=0;for(let j=0;j<N;j++){s+=Math.abs(h[j*N+N-1]-h[j*N]);for(let x=0;x<N-1;x+=7)i+=Math.abs(h[j*N+x+1]-h[j*N+x])}return [s/N, i/(N*Math.ceil((N-1)/7))]}''')
             assert seam[0] < 3 * seam[1] + 0.5, f'wrap seam {seam}'

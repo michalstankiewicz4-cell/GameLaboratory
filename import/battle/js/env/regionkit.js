@@ -34,7 +34,18 @@ export const LAYOUTS = {
   iceEdge: { label: 'Ice edge: open sea, loose floes, pack ice' },
   mixed: { label: 'Mixed from the seed: lakes, fjords, rivers, ice' },
 };
-export const WORLD_DEFAULTS = { layout: 'estuary', body: 'ocean', blend: 400, rivers: 3, ice: 0 };
+export const WORLD_DEFAULTS = { layout: 'estuary', body: 'ocean', blend: 400, rivers: 3, ice: 0, biome: 'temperate', biomeBlend: 1200 };
+
+// Land biomes: a second set of region weights (temperate, plains, desert, one spare) shaping the land's heights and the
+// terrain's palette (LandKit reads the texture). Plants and rocks as objects belong to their own labs, not here.
+export const BIOME_ORDER = ['temperate', 'plains', 'desert'];
+export const BIOMES = {
+  temperate: { label: 'Northern (grass, heather, rock, snow on the peaks)' },
+  plains: { label: 'Plains (flat, gently rolling lowland, meadows and fields)' },
+  desert: { label: 'Desert (dunes, stony plateaus, mesas with cliffs)' },
+  zones: { label: 'Zones: northern, plains and desert by region' },
+};
+export const BIOME_CHART = { temperate: null, plains: [104, 128, 60], desert: [196, 160, 108] };
 
 const sm = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
@@ -210,36 +221,50 @@ function mixed(T, o) {
   // 3. rivers: from the hills down the distance-to-the-sea field, carved into the land, with their current
   if (o.rivers > 0 && sea >= 0) {
     const h0 = Float32Array.from(h);
-    const ds = new Float32Array(N * N).fill(1e9), q = [];
-    for (let k = 0; k < N * N; k++) if (comp[k] === sea) { ds[k] = 0; q.push(k); }
-    for (let qi = 0; qi < q.length; qi++) {
-      const p = q[qi], pi = p % N, pj = (p / N) | 0;
-      for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-        const a = pi + di, b = pj + dj; if (!inside(a, b)) continue;
-        const p2 = wrapI(b) * N + wrapI(a); if (ds[p2] > ds[p] + 1) { ds[p2] = ds[p] + 1; q.push(p2); }
+    // distance to the sea in texels (chamfer, so the way down has no grid bias)
+    const ds = new Float32Array(N * N).fill(1e9);
+    for (let k = 0; k < N * N; k++) if (comp[k] === sea) ds[k] = 0;
+    const pass2 = (fwd) => {
+      for (let jj = 0; jj < N; jj++) for (let ii = 0; ii < N; ii++) {
+        const j = fwd ? jj : N - 1 - jj, i = fwd ? ii : N - 1 - ii, k = j * N + i; if (ds[k] === 0) continue;
+        for (const [di, dj, c] of (fwd ? [[-1, 0, 1], [0, -1, 1], [-1, -1, 1.414], [1, -1, 1.414]] : [[1, 0, 1], [0, 1, 1], [1, 1, 1.414], [-1, 1, 1.414]])) {
+          const a = i + di, b = j + dj; if (!inside(a, b)) continue;
+          const v = ds[wrapI(b) * N + wrapI(a)] + c; if (v < ds[k]) ds[k] = v;
+        }
       }
-    }
+    };
+    pass2(true); pass2(false); pass2(true); pass2(false);
+    let hMax = 0; for (let k = 0; k < N * N; k++) hMax = Math.max(hMax, h[k]);
     const r = rng(o.seed * 7 + 3), cands = [];
-    for (let k = 0; k < N * N; k += 7) if (h[k] > 0.25 * T.maxH && ds[k] * cell > 1500 && ds[k] < 1e8) cands.push(k);
-    const sources = [];
-    for (let t = 0; t < 400 && sources.length < o.rivers && cands.length; t++) {
-      const k = cands[Math.floor(r() * cands.length)], x = k % N, z = (k / N) | 0;
-      if (sources.every((s) => Math.hypot(s[0] - x, s[1] - z) * cell > 2200)) sources.push([x, z]);
-    }
-    sources.forEach(([sx, sz], ri) => {
-      // walk downhill in distance-to-sea, with a little meander
+    for (let k = 0; k < N * N; k += 7) if (h[k] > 0.25 * hMax && ds[k] * cell > 900 && ds[k] < 1e8) cands.push(k);
+    // walk downhill in the distance to the sea, swung from side to side (a meander of amplitude amp, radians);
+    // returns the path, or null if it never got to the sea
+    const walk = (sx, sz, amp, ri) => {
       const path = [[sx, sz]], visited = new Set([sz * N + sx]); let x = sx, z = sz;
+      const ph = r() * 6.28, per = 14 + r() * 12;
       for (let step = 0; step < N * 3; step++) {
-        const k = wrapI(z) * N + wrapI(x); if (comp[k] === sea) break;
+        const k = wrapI(z) * N + wrapI(x); if (comp[k] === sea) return path;
+        const at = (a, b) => { const v = ds[wrapI(b) * N + wrapI(a)]; return v > 1e8 ? ds[k] : v; };
+        const gx = at(x - 6, z) - at(x + 6, z), gz = at(x, z - 6) - at(x, z + 6);
+        const head = Math.atan2(gz, gx) + amp * (Math.sin(step / per + ph) + 0.5 * fbm(x / N, z / N, 6, 3, 0.5, o.seed + ri * 13));
         let best = null, bv = Infinity;
         for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]]) {
           const a = x + di, b = z + dj; if (!inside(a, b) || visited.has(wrapI(b) * N + wrapI(a))) continue;
-          // downhill towards the sea, bent by a slow noise field so the course meanders instead of running straight
-          const v = ds[wrapI(b) * N + wrapI(a)] + (di && dj ? 0.41 : 0) + 3.5 * fbm(a / N, b / N, 8, 3, 0.5, o.seed + ri * 13) + r() * 0.6; if (v < bv) { bv = v; best = [a, b]; }
+          const v = (ds[wrapI(b) * N + wrapI(a)] - ds[k]) * 0.5 + 1.5 * (1 - Math.cos(Math.atan2(dj, di) - head)) + r() * 0.25; if (v < bv) { bv = v; best = [a, b]; }
         }
-        if (!best) break; x = best[0]; z = best[1]; path.push([x, z]); visited.add(wrapI(z) * N + wrapI(x));
+        if (!best) return null; x = best[0]; z = best[1]; path.push([x, z]); visited.add(wrapI(z) * N + wrapI(x));
       }
-      if (comp[wrapI(z) * N + wrapI(x)] !== sea) return;                     // never reached the sea: no river here
+      return null;
+    };
+    const sources = [], paths = [];
+    for (let t = 0; t < 400 && paths.length < o.rivers && cands.length; t++) {
+      const k = cands[Math.floor(r() * cands.length)], x = k % N, z = (k / N) | 0;
+      if (!sources.every((s) => Math.hypot(s[0] - x, s[1] - z) * cell > 2200)) continue;
+      let path = null;
+      for (const amp of [1.05, 0.55, 0]) { path = walk(x, z, amp, paths.length); if (path) break; }    // less meander if it got lost
+      if (path) { sources.push([x, z]); paths.push(path); }
+    }
+    paths.forEach((path, ri) => {
       // smooth the path, then carve and paint: width and depth grow downstream, the current slows towards the mouth;
       // the valley's sides blend from the river down from the original ground (h0), so carving twice changes nothing
       const P = path.map((_, i) => { let ax = 0, az = 0, n = 0; for (let d = -3; d <= 3; d++) { const p = path[clamp(i + d, 0, path.length - 1)]; ax += p[0]; az += p[1]; n++; } return [ax / n, az / n]; });
@@ -251,7 +276,7 @@ function mixed(T, o) {
           const gi = Math.round(cx) + di, gj = Math.round(cz) + dj; if (!inside(gi, gj)) continue;
           const k = wrapI(gj) * N + wrapI(gi), d = Math.hypot(gi - cx, gj - cz) * cell;
           if (d < wd) h[k] = Math.min(h[k], -(1 + dep * (1 - (d / wd) ** 2)));
-          else if (d < wd + VAL && h0[k] > 0) { const f = sm(wd + VAL, wd + 40, d); h[k] = Math.min(h[k], h0[k] + (2.5 + (d - wd) * 0.03 - h0[k]) * f); }   // the valley
+          else if (d < wd + VAL && h0[k] > 0) { const f = sm(wd + VAL, wd + 40, d); h[k] = Math.min(h[k], h0[k] + (Math.min(1.2 + (d - wd) * 0.05, 3.5 + (d - wd) * 0.02) - h0[k]) * f); }   // the valley
           if (d < wd * 1.2 && comp[k] !== sea) {
             const kk = k * NB; for (let c = 0; c < NB; c++) w[kk + c] = 0; w[kk + 3] = 1;
             flow[k * 2] = tx / tl * sp; flow[k * 2 + 1] = tz / tl * sp;
@@ -307,6 +332,52 @@ function boxBlur(a, N, C, r, wrap) {
   for (let p = 0; p < 2; p++) { run((l, i) => l * N + i); run((l, i) => i * N + l); }
 }
 
+/* ---------------- biomes: weights, then the land reshaped by them ---------------- */
+function applyBiomes(T, o) {
+  const N = T.res, h = T.h, bw = new Float32Array(N * N * 4), seed = (T.seed | 0) + 70, S = T.size;
+  const one = BIOME_ORDER.indexOf(o.biome);
+  for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+    const k = j * N + i, u = (i + 0.5) / N, v = (j + 0.5) / N;
+    if (one >= 0) { bw[k * 4 + one] = 1; continue; }
+    const des = sm(0.04, 0.2, fbm(u, v, 2, 3, 0.5, seed + 1)), pl = sm(-0.02, 0.14, fbm(u, v, 2, 3, 0.5, seed + 2)) * (1 - des);
+    bw[k * 4] = 1 - des - pl; bw[k * 4 + 1] = pl; bw[k * 4 + 2] = des;
+  }
+  if (one < 0) {
+    boxBlur(bw, N, 4, Math.round(o.biomeBlend / T.cell / 2), T.wrap);
+    for (let k = 0; k < N * N; k++) { const s = bw[k * 4] + bw[k * 4 + 1] + bw[k * 4 + 2] || 1; for (let c = 0; c < 3; c++) bw[k * 4 + c] /= s; }
+  }
+  // dunes: crests across a wind from the west-south-west, wave vector whole cycles over the map (a torus stays seamless)
+  const nx = Math.max(1, Math.round(S / 330 * 0.93)), nz = Math.round(S / 330 * 0.37), R = Math.max(T.relief, 60);
+  for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+    const k = j * N + i; if (h[k] <= 0 || bw[k * 4] > 0.999) continue;
+    const u = (i + 0.5) / N, v = (j + 0.5) / N, t = clamp(h[k] / R, 0, 1), coast = sm(0.004, 0.05, t);
+    // plains: the relief pressed down to a few tens of metres, long low swells and small hummocks on top
+    const hp = Math.max(0.35, 0.4 + 5 * sm(0, 0.03, t) + 34 * Math.pow(t, 0.85) + (7 * fbm(u, v, 5, 4, 0.5, seed + 3) + 3.5 * fbm(u, v, 16, 4, 0.5, seed + 4)) * coast);
+    // desert: stepped plateaus (mesas) with cliffs where the ground is high, dune fields where it is low
+    const s4 = Math.pow(t, 1.1) * 4, f4 = Math.floor(s4), terr = (f4 + sm(0.72, 0.93, s4 - f4)) / 4;
+    const ph = 2 * Math.PI * (nx * u + nz * v) + 5 * fbm(u, v, 3, 3, 0.5, seed + 5), x = ((ph / (2 * Math.PI)) % 1 + 1) % 1;
+    const prof = x < 0.72 ? Math.pow(x / 0.72, 1.4) : Math.pow(1 - (x - 0.72) / 0.28, 0.8);   // long windward slope, short steep slip face
+    const erg = sm(-0.15, 0.25, fbm(u, v, 3, 3, 0.5, seed + 6));                               // dune seas and flat stony plains between
+    const hd = 0.4 + 5 * sm(0, 0.03, t) + R * 0.75 * terr + 24 * prof * erg * coast * (1 - sm(0.25, 0.45, t)) * (0.6 + 0.4 * fbm(u, v, 8, 3, 0.5, seed + 7));
+    h[k] = h[k] * bw[k * 4] + hp * bw[k * 4 + 1] + hd * bw[k * 4 + 2];
+  }
+  const share = Object.fromEntries(BIOME_ORDER.map((b) => [b, 0])); let n = 0;
+  for (let k = 0; k < N * N; k++) if (h[k] > 0) { n++; BIOME_ORDER.forEach((b, c) => { share[b] += bw[k * 4 + c]; }); }
+  for (const b of BIOME_ORDER) share[b] = n ? share[b] / n : 0;
+  return { w: bw, share, biome: o.biome };
+}
+export function biomeTexture(T) {
+  const N = T.res, D = new Uint8Array(N * N * 4), w = T.biomes.w;
+  for (let k = 0; k < N * N * 4; k++) D[k] = Math.round(clamp(w[k], 0, 1) * 255);
+  const t = new THREE.DataTexture(D, N, N, THREE.RGBAFormat); t.wrapS = t.wrapT = T.wrap ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+  t.magFilter = t.minFilter = THREE.LinearFilter; t.generateMipmaps = false; t.needsUpdate = true;
+  return t;
+}
+export function biomeAt(T, x, z) {
+  const N = T.res, i = clamp(Math.floor(x / T.cell), 0, N - 1), j = clamp(Math.floor(z / T.cell), 0, N - 1), k = (T.wrap ? (((j % N) + N) % N) * N + (((i % N) + N) % N) : j * N + i) * 4;
+  return Object.fromEntries(BIOME_ORDER.map((b, c) => [b, T.biomes.w[k + c]]));
+}
+
 /* ---------------- the world ---------------- */
 // map: LandKit terrain options (seed, size, res, relief, depth, shape, land, wrap, barrier…); water: WORLD_DEFAULTS
 export function generateWorld(map, water = {}) {
@@ -314,6 +385,7 @@ export function generateWorld(map, water = {}) {
   let T, R;
   if (o.layout === 'single' || o.layout === 'mixed' || !LAYOUT_FN[o.layout]) {
     T = generateTerrain(map);
+    T.biomes = applyBiomes(T, o);
     if (o.layout === 'mixed') R = mixed(T, { ...o, seed: map.seed | 0 });
     else {
       const w = new Float32Array(T.res * T.res * NB), b = Math.max(0, BODY_ORDER.indexOf(o.body));
@@ -324,6 +396,7 @@ export function generateWorld(map, water = {}) {
     const N = map.res | 0, S = map.size;
     R = LAYOUT_FN[o.layout](N, S, { ...map, seed: map.seed | 0 });
     T = { ...map, wrap: false, barrier: map.barrier === 'mountains' ? 'wall' : map.barrier, shape: o.layout, h: R.h, res: N, cell: S / N };
+    T.biomes = applyBiomes(T, o);
   }
   fillLand(T, R.w, R.flow);
   const rad = Math.round(o.blend / T.cell / 2);
