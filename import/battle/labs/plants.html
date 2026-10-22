@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Plants Lab — procedural trees, palms, shrubs and grass | Steel Salvo Labs</title>
+<meta name="description" content="Steel Salvo plants lab: procedural trees, palms and shrubs at real scale — Norway spruce, Scots pine, silver birch, pedunculate oak, date palm, umbrella thorn acacia, juniper, saltbush — moving in the wind, with impostors far away and blades of grass, placed by biome over a landscape.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/Battle/labs/plants.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Plants Lab — procedural trees and grass">
+<meta property="og:description" content="Trees, palms, shrubs and grass grown from code, in the wind, from a single specimen to a whole landscape.">
+<meta property="og:url" content="https://michalstankiewicz4-cell.github.io/Battle/labs/plants.html">
+<meta property="og:image" content="https://michalstankiewicz4-cell.github.io/Battle/assets/labs/plants.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="../assets/favicon-32.png">
+<link rel="stylesheet" href="../css/lab.css">
+</head>
+<body class="lab">
+<div id="view"></div>
+<div class="bar">
+  <b>Plants Lab</b>
+  <div class="btns" id="modes"></div>
+  <span class="sp"></span>
+  <a href="land.html">Land Lab</a>
+  <a href="ship.html">Ship Lab</a>
+  <a href="../labs.html">Labs</a>
+  <a href="../index.html">Play the game</a>
+</div>
+<aside class="panel left" id="leftPanel">
+  <div id="specPanel">
+    <h3>Specimen</h3>
+    <div class="row"><span>Species</span><select id="species"></select><output></output></div>
+    <div class="row"><span>Seed</span><input type="number" id="seed" min="1" max="99999" step="1"><output></output></div>
+    <div class="btns"><button type="button" id="another">Another one</button></div>
+    <div class="row"><span>Size</span><input type="range" id="size" min="0.4" max="1.2" step="0.05"><output id="sizeV"></output></div>
+    <div class="row"><span>Detail</span><input type="range" id="detail" min="0.5" max="1.5" step="0.25"><output id="detailV"></output></div>
+    <div class="row"><span>Season</span><input type="range" id="season" min="0" max="1" step="0.01"><output id="seasonV"></output></div>
+    <label class="chk"><input type="checkbox" id="compare" checked> Its impostor beside it (what is drawn far away)</label>
+    <h2 id="spName"></h2>
+    <p class="note" id="spNote"></p>
+    <div class="stats" id="spStats"></div>
+  </div>
+  <div id="landPanel" hidden>
+    <h3>Landscape</h3>
+    <div class="row"><span>Biome</span><select id="biome"></select><output></output></div>
+    <div class="row"><span>Map seed</span><input type="number" id="mapSeed" min="0" max="99999" step="1"><output></output></div>
+    <div class="btns"><button type="button" id="newMap">New landscape</button></div>
+    <div class="row"><span>Plants</span><input type="range" id="density" min="0.2" max="2" step="0.05"><output id="densityV"></output></div>
+    <div class="row"><span>Grass</span><input type="range" id="grass" min="0" max="1.5" step="0.05"><output id="grassV"></output></div>
+    <div class="row"><span>Grass radius</span><input type="range" id="grassR" min="15" max="90" step="5"><output id="grassRV"></output></div>
+    <div class="row"><span>Full models to</span><input type="range" id="lod" min="30" max="400" step="10"><output id="lodV"></output></div>
+    <label class="chk"><input type="checkbox" id="impostors" checked> Impostors beyond that (off: full models only, capped)</label>
+    <div class="stats" id="landStats"></div>
+    <p class="note">Plants stand by biome, height, slope and water: spruce and pine forests with birch at their edges and juniper on the heath; copses and lone oaks on the plains; palm oases by the water, acacias and saltbush in the desert. Rocks come in their own lab.</p>
+  </div>
+</aside>
+<aside class="panel right" id="rightPanel">
+  <h3>Camera</h3>
+  <div class="btns" id="cams"></div>
+  <h3>Wind</h3>
+  <div class="row"><span>Strength</span><input type="range" id="wind" min="0" max="1.5" step="0.05"><output id="windV"></output></div>
+  <div class="row"><span>Direction</span><input type="range" id="windDir" min="0" max="355" step="5"><output id="windDirV"></output></div>
+  <h3>Light and weather</h3>
+  <div class="row"><span>Weather</span><select id="weather"></select><output></output></div>
+  <div class="row"><span>Sun height</span><input type="range" id="sunEl" min="-6" max="70" step="1"><output id="sunElV"></output></div>
+  <div class="row"><span>Sun bearing</span><input type="range" id="sunAz" min="0" max="360" step="2"><output id="sunAzV"></output></div>
+  <h3>Performance</h3>
+  <div class="stats" id="stats"></div>
+  <p class="note">Specimen: drag to orbit, wheel to zoom. Landscape: drag to look, W/A/S/D to move, Q/E down/up, Shift faster. H hides the panels.</p>
+</aside>
+<div class="foot">
+  <span id="fps"></span>
+  <span class="sp"></span>
+  <span>Steel Salvo Labs</span>
+</div>
+<script type="module" src="../js/labs/plants.js"></script>
+</body>
+</html>

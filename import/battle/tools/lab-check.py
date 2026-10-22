@@ -38,6 +38,7 @@ def main():
             assert pg.locator('a.tile[href="labs/look.html"]').count() >= 1, 'look tile missing'
             assert pg.locator('a.tile[href="labs/land.html"]').count() == 1, 'land tile missing'
             assert pg.locator('a.tile[href="labs/structures.html"]').count() == 1, 'structures tile missing'
+            assert pg.locator('a.tile[href="labs/plants.html"]').count() == 1, 'plants tile missing'
             pg.goto(f'http://localhost:{PORT}/labs/ship.html')
             pg.wait_for_function('window.__lab && window.__lab.model', timeout=180000)
             print('stats', ' '.join(pg.inner_text('#stats').split()))
@@ -179,6 +180,20 @@ def main():
             assert abs(pg.evaluate('__land.wrapC(__land.T.size + 10)') - 10) < 1e-6
             gen({'wrap': True}); pg.keyboard.press('h'); time.sleep(4)
             pg.screenshot(path=os.path.join(OUT, 'lab-land.png'), timeout=600000)
+            # plants lab: every species grows (foliage and wood), its impostor bakes; a landscape per biome places plants, splits them into full models and impostors, grows grass
+            pg.goto(f'http://localhost:{PORT}/labs/plants.html')
+            pg.wait_for_function('window.__plants && window.__plants.plant', timeout=300000)
+            for sp in ['spruce', 'pine', 'birch', 'oak', 'palm', 'acacia', 'juniper', 'saltbush']:
+                inf = pg.evaluate("(s)=>{const P=__plants; P.S.species=s; P.S.compare=true; P.buildSpecimen(); return P.specInfo}", sp)
+                assert inf['tris'] > 50 and inf['H'] > 0.4, f'plant {sp} {inf}'
+            print('plants', 'all eight species grow')
+            for bio in ['temperate', 'plains', 'desert']:
+                r = pg.evaluate("(bio)=>{const P=__plants; P.S.biome=bio; P.setMode('landscape'); P.buildLand(); P.forest.update(P.camera); const by={}; for (const p of P.forest.list) by[p.id]=(by[p.id]||0)+1; return {by, near:P.forest.counts.near, far:P.forest.counts.far, tufts:P.grass.userData.tufts}}", bio)
+                assert sum(r['by'].values()) > 500 and r['near'] + r['far'] == sum(r['by'].values()) and r['tufts'] > 1000, f'landscape {bio} {r}'
+                want = {'temperate': 'spruce', 'plains': 'oak', 'desert': 'palm'}[bio]
+                assert r['by'].get(want, 0) > 20, f'landscape {bio} has no {want}: {r["by"]}'
+                print('landscape', bio, r['by'], 'near', r['near'], 'impostors', r['far'])
+            pg.evaluate("()=>__plants.setMode('specimen')")
             # structures lab: every quay and breakwater type builds (units placed, shore heights baked, ship moored)
             pg.goto(f'http://localhost:{PORT}/labs/structures.html')
             pg.wait_for_function('window.__structures && window.__structures.st', timeout=300000)

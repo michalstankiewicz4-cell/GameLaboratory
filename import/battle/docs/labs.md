@@ -13,6 +13,7 @@ under `labs/`) and its kit (code under `js/` that the game will use once a lab's
 | | Sky and clouds (in the Look Lab for now) | first version | `js/env/skykit.js` | `docs/look.md` |
 | | Weather: wind → sea, clouds, haze, rain and squalls, sea fog and visibility (thunder, snow and fog banks next) | first version | `js/env/skykit.js`, `js/env/rainkit.js` | `docs/look.md` |
 | | Time of day: dawn, dusk, night with stars and the moon (in the Look Lab) | first version | `js/env/skykit.js` | `docs/look.md` |
+| | Plants Lab (`labs/plants.html`): eight species grown from code (spruce, pine, birch, oak, date palm, acacia, juniper, saltbush), wind, autumn, impostors, forests by biome, grass blades | first version | `js/env/plantkit.js`, `js/env/forestkit.js` | `docs/plants.md` |
 | | Land Lab (`labs/land.html`): procedural land and sea (0–100 % land; islands, archipelago, coast, fjords, highlands; erosion, beaches, shallows, surf), wrap-around (torus) or bounded map (buoys, mountains, wall) | first version | `js/env/landkit.js` | `docs/land.md` |
 | | Space | soon | | |
 | **Graphics and filters** | Look Lab (`labs/look.html`): procedural ageing by surface type (see below), baked shading, tone and colour, exposure, lens (distortion, droplets, flare, grain, vignette), bodycam look, automatic resolution | first version | `js/render/look.js`, `js/shipkit/ageing.js` | `docs/look.md` |
