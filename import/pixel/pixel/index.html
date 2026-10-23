@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Pixel Studio — pixel art from 3D models, generators and a pixel editor</title>
+<meta name="description" content="Pixel Studio: pixel art made four ways — 3D models rendered small with hard, hue-shifted light; sprites and seamless tiles drawn by rules; a pixel editor; and the hybrid of all three — checked by a Pixel Doctor and exported as PNG or GIF with a transparent background.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/Battle/pixel/">
+<link rel="icon" type="image/png" href="../assets/favicon-32.png">
+<link rel="stylesheet" href="../css/lab.css">
+<link rel="stylesheet" href="../css/pixel.css">
+</head>
+<body class="lab pix">
+<div class="bar">
+  <b>Pixel Studio</b>
+  <div class="btns" id="modes"></div>
+  <span class="sp"></span>
+  <span class="status" id="status"></span>
+  <a href="https://github.com/michalstankiewicz4-cell/Battle/blob/main/docs/pixel.md">How it works</a>
+</div>
+<aside class="panel left">
+  <div id="p3d">
+    <h3>3D model</h3>
+    <div class="row"><span>Subject</span><select id="sub"></select><output></output></div>
+    <div class="row" id="optRow"><span>Kind</span><select id="option"></select><output></output></div>
+    <div class="row"><span>Seed</span><input type="number" id="seed" min="1" max="99999" step="1"><output></output></div>
+    <div class="btns"><button type="button" id="newSeed">Another one</button></div>
+    <div class="row"><span>Animation</span><select id="anim"></select><output></output></div>
+    <div class="row"><span>Frames</span><input type="number" id="frames" min="1" max="32" step="1"><output></output></div>
+    <h3>Camera</h3>
+    <div class="btns" id="views"></div>
+    <div class="row"><span>Turn</span><input type="range" id="yaw" min="-180" max="180" step="5"><output id="yawV"></output></div>
+    <div class="row"><span>Tilt</span><input type="range" id="pitch" min="-10" max="89" step="1"><output id="pitchV"></output></div>
+    <div class="row"><span>Zoom</span><input type="range" id="zoom3d" min="0.5" max="2" step="0.05"><output id="zoom3dV"></output></div>
+    <h3>Light</h3>
+    <div class="row"><span>From (side)</span><input type="range" id="lightAz" min="-180" max="180" step="5"><output id="lightAzV"></output></div>
+    <div class="row"><span>Height</span><input type="range" id="lightEl" min="0" max="90" step="5"><output id="lightElV"></output></div>
+    <div class="row"><span>Light steps</span><input type="range" id="steps" min="2" max="6" step="1"><output id="stepsV"></output></div>
+    <div class="row"><span>Contrast</span><input type="range" id="contrast" min="0.3" max="1.8" step="0.05"><output id="contrastV"></output></div>
+    <div class="row"><span>Hue shift</span><input type="range" id="hueShift" min="0" max="1.5" step="0.05"><output id="hueShiftV"></output></div>
+    <div class="row"><span>Ambient</span><input type="range" id="ambient" min="0" max="0.8" step="0.05"><output id="ambientV"></output></div>
+    <h3>Pixels</h3>
+    <div class="row"><span>Supersample</span><input type="range" id="ss" min="1" max="4" step="1"><output id="ssV"></output></div>
+    <div class="row"><span>Inner lines</span><input type="range" id="inner" min="0" max="0.06" step="0.005"><output id="innerV"></output></div>
+    <p class="note">Rendered at the chosen size times the supersample, lit in hard steps (shadows cooler, lights warmer), reduced to the palette, then each pixel takes the colour most of its sub-pixels have — no blur. Depth jumps become inner lines.</p>
+  </div>
+  <div id="pgen" hidden>
+    <h3>Generate</h3>
+    <div class="row"><span>Generator</span><select id="gen"></select><output></output></div>
+    <div class="row"><span>Seed</span><input type="number" id="gSeed" min="1" max="99999" step="1"><output></output></div>
+    <div class="btns"><button type="button" id="gNew">Another one</button></div>
+    <div class="row"><span>Frames</span><input type="number" id="gFrames" min="1" max="48" step="1"><output></output></div>
+    <div id="gparams"></div>
+    <p class="note">Drawn straight in pixels by rules: light from the top-left, shades from a hue-shifted ramp, dithering only at the edges between two shades. Tiles repeat seamlessly.</p>
+  </div>
+  <div id="pdraw" hidden>
+    <h3>Tools</h3>
+    <div class="btns" id="tools"></div>
+    <label class="chk"><input type="checkbox" id="mirror"> Mirror left–right</label>
+    <label class="chk"><input type="checkbox" id="onion"> Onion skin (previous frame)</label>
+    <h3>Colour</h3>
+    <div class="row"><span>Pick</span><input type="color" id="color"><output></output></div>
+    <div class="swatches" id="swatches"></div>
+    <h3>Frames and history</h3>
+    <div class="btns"><button type="button" id="fAdd">New frame</button><button type="button" id="fDup">Duplicate</button><button type="button" id="fDel">Delete</button><button type="button" id="clear">Clear</button></div>
+    <div class="btns"><button type="button" id="undo">Undo (Ctrl+Z)</button><button type="button" id="redo">Redo</button></div>
+    <h3>Samples and text</h3>
+    <div class="row"><span>Sample</span><select id="sample"></select><output></output></div>
+    <div class="btns"><button type="button" id="loadSample">Load sample</button></div>
+    <textarea id="text" class="mono" rows="7" spellcheck="false" placeholder='{"w":16,"h":16,"palette":{"o":"#1a1420"},"frames":[["...."]]}'></textarea>
+    <div class="btns"><button type="button" id="textOut">Drawing → text</button><button type="button" id="textIn">Text → drawing</button></div>
+    <p class="note" id="textMsg">One character per pixel, '.' is empty; the palette maps characters to colours. Right button erases.</p>
+  </div>
+</aside>
+<main class="stagewrap">
+  <div class="checker"><canvas id="stage"></canvas></div>
+  <div class="frames btns"><button type="button" id="prev">◀</button><span id="frameNo" class="mono"></span><button type="button" id="next">▶</button><button type="button" id="play">Pause</button></div>
+  <div class="truesize"><span>1×</span><canvas id="true1" class="checker"></canvas><span>2×</span><canvas id="true2" class="checker"></canvas></div>
+</main>
+<aside class="panel right">
+  <h3>Size</h3>
+  <div class="row"><span>Width</span><input type="number" id="w" min="4" max="256" step="1"><output>px</output></div>
+  <div class="row"><span>Height</span><input type="number" id="h" min="4" max="256" step="1"><output>px</output></div>
+  <div class="btns" id="sizes"></div>
+  <div id="pipe">
+    <h3>Palette</h3>
+    <div class="row"><span>Palette</span><select id="palette"></select><output></output></div>
+    <div class="row"><span>Auto colours</span><input type="range" id="autoN" min="2" max="32" step="1"><output id="autoNV"></output></div>
+    <div class="row"><span>Dither</span><select id="dither"><option value="none">None</option><option value="bayer2">Ordered 2×2</option><option value="bayer4">Ordered 4×4</option></select><output></output></div>
+    <div class="row"><span>Dither amount</span><input type="range" id="ditherK" min="0" max="1" step="0.05"><output id="ditherKV"></output></div>
+    <h3>Outline and clean-up</h3>
+    <div class="row"><span>Outline</span><select id="outline"><option value="none">None</option><option value="dark">Dark</option><option value="selout">Selective (shade of the colour)</option></select><output></output></div>
+    <label class="chk"><input type="checkbox" id="corners"> Outline corners too</label>
+    <label class="chk"><input type="checkbox" id="orphans"> Remove lone pixels</label>
+    <label class="chk"><input type="checkbox" id="perfect"> Pixel-perfect lines</label>
+    <div class="btns"><button type="button" id="toDraw">Edit in Draw (retouch by hand)</button></div>
+  </div>
+  <h3>Preview</h3>
+  <div class="row"><span>Zoom</span><input type="range" id="zoom" min="1" max="24" step="1"><output id="zoomV"></output></div>
+  <div class="row"><span>Speed</span><input type="range" id="fps" min="1" max="24" step="1"><output id="fpsV"></output></div>
+  <h3>Export (transparent background)</h3>
+  <div class="row"><span>Scale</span><select id="exScale"><option value="1">1×</option><option value="2">2×</option><option value="4" selected>4×</option><option value="8">8×</option><option value="16">16×</option></select><output></output></div>
+  <div class="btns"><button type="button" id="png">PNG frame</button><button type="button" id="sheet">PNG sprite sheet</button><button type="button" id="gif">GIF animation</button></div>
+  <h3>Pixel Doctor</h3>
+  <div class="doc"><span class="score" id="score"></span><span class="dimtxt">score for the frame shown</span></div>
+  <div id="findings"></div>
+</aside>
+<script type="module" src="../js/pixel/app.js"></script>
+</body>
+</html>
