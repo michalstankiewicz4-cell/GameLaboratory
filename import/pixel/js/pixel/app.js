@@ -257,6 +257,17 @@ addEventListener('keydown', (e) => {
   if (e.code === 'Space') { e.preventDefault(); $('play').click(); }
 });
 
+// settings in and out: every slider as JSON, to share a picture exactly (the drawing is not included — use the text)
+$('setCopy').onclick = async () => {
+  const t = JSON.stringify(S); $('setText').value = t; $('setText').select();
+  try { await navigator.clipboard.writeText(t); $('setMsg').textContent = 'Copied to the clipboard.'; } catch { $('setMsg').textContent = 'Selected — copy it with Ctrl+C.'; }
+};
+$('setApply').onclick = () => {
+  try { const v = JSON.parse($('setText').value); if (!v || typeof v !== 'object' || Array.isArray(v)) throw new Error('not an object'); Object.assign(S, v); save(); location.reload(); }
+  catch (e) { $('setMsg').textContent = 'Not valid settings: ' + e.message; }
+};
+$('setReset').onclick = () => { try { localStorage.removeItem(KEY); } catch { /* private mode */ } location.reload(); };
+
 // start
 try { const t = JSON.parse(localStorage.getItem(KEY + '.doc') || 'null'); if (t) { const fr = t.frames.map((rows) => { const f = new PixelImage(t.w, t.h); rows.forEach((row, y) => [...row].forEach((ch, x) => { if (ch !== '.' && t.palette[ch]) f.set(x, y, [...hex(t.palette[ch]), 255]); })); return f; }); doc.frames = fr; } } catch { /* nothing saved */ }
 syncRes(); subjectUI(); genUI(); swatches(); $('gFrames').value = S.gFrames;

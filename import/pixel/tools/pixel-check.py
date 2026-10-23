@@ -94,6 +94,20 @@ def main():
             # Doctor fixes run
             nfix = pg.evaluate("()=>{const b=[...document.querySelectorAll('#findings button')].filter(x=>x.textContent==='Fix');b.forEach(x=>x.click());return b.length}")
             print('doctor fixes clicked', nfix)
+            # settings: copy, change, apply the copy back
+            pg.evaluate("()=>__pixel.setMode('3d')"); settle(pg)
+            pg.click('#setCopy'); txt = pg.input_value('#setText')
+            yaw0 = json.loads(txt)['yaw']
+            pg.evaluate("()=>{const e=document.getElementById('yaw');e.value=-90;e.dispatchEvent(new Event('input'))}")
+            pg.fill('#setText', txt); pg.click('#setApply'); pg.wait_for_function('window.__pixel', timeout=120000); settle(pg)
+            if pg.evaluate("()=>__pixel.S.yaw") != yaw0: fails.append('settings apply')
+            # narrow windows: every panel reachable, no sideways scroll
+            for vw in (1024, 390):
+                pg.set_viewport_size({'width': vw, 'height': 844}); time.sleep(0.5)
+                lay = pg.evaluate("()=>({sw:document.documentElement.scrollWidth,l:document.querySelector('.panel.left').getBoundingClientRect().width,r:document.querySelector('.panel.right').getBoundingClientRect().width,st:document.getElementById('stage').getBoundingClientRect().width})")
+                print('layout', vw, lay)
+                if lay['sw'] > vw or lay['l'] < 200 or lay['r'] < 200 or lay['st'] > vw: fails.append(f'layout {vw}')
+                pg.screenshot(path=os.path.join(OUT, f'pixel-narrow-{vw}.png'), full_page=True)
             br.close()
     finally:
         srv.terminate()

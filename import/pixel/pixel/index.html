@@ -102,6 +102,10 @@
   <h3>Export (transparent background)</h3>
   <div class="row"><span>Scale</span><select id="exScale"><option value="1">1×</option><option value="2">2×</option><option value="4" selected>4×</option><option value="8">8×</option><option value="16">16×</option></select><output></output></div>
   <div class="btns"><button type="button" id="png">PNG frame</button><button type="button" id="sheet">PNG sprite sheet</button><button type="button" id="gif">GIF animation</button></div>
+  <h3>Settings</h3>
+  <div class="btns"><button type="button" id="setCopy">Copy settings</button><button type="button" id="setApply">Apply pasted settings</button><button type="button" id="setReset">Reset</button></div>
+  <textarea id="setText" class="mono" rows="3" spellcheck="false" placeholder="Copy settings puts them here and on the clipboard; paste settings here and Apply to get exactly the same picture."></textarea>
+  <p class="note" id="setMsg"></p>
   <h3>Pixel Doctor</h3>
   <div class="doc"><span class="score" id="score"></span><span class="dimtxt">score for the frame shown</span></div>
   <div id="findings"></div>

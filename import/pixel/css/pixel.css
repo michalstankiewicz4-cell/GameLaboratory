@@ -3,7 +3,7 @@
 .stagewrap{position:fixed;top:52px;bottom:12px;left:356px;right:326px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;overflow:auto;padding:12px}
 .checker{background-color:#2a2f37;background-image:linear-gradient(45deg,#3a404a 25%,transparent 25%,transparent 75%,#3a404a 75%),linear-gradient(45deg,#3a404a 25%,transparent 25%,transparent 75%,#3a404a 75%);background-size:16px 16px;background-position:0 0,8px 8px;border:1px solid var(--line);border-radius:4px}
 .stagewrap>.checker{display:inline-block;line-height:0;max-width:100%;max-height:100%;overflow:auto}
-#stage{display:block;image-rendering:pixelated}
+#stage{display:block;image-rendering:pixelated;max-width:100%;height:auto}
 #stage.drawing{cursor:crosshair;touch-action:none}
 .frames{align-items:center}
 .frames span{min-width:60px;text-align:center;color:var(--dim)}
@@ -19,4 +19,13 @@
 .pix .find{cursor:default;display:flex;flex-direction:column;gap:4px}
 .pix .find.sev2{border-left-color:#e04b50}.pix .find.sev1{border-left-color:#f2b84b}.pix .find.ok{border-left-color:var(--ok);color:var(--ok)}
 .pix .find .btns{margin:0}
-@media (max-width:1100px){.stagewrap{position:static;margin:52px 0 0;padding-bottom:20px}.pix{overflow:auto}.pix .panel{position:static;width:auto;margin:12px}}
+/* narrow windows: one scrolling column — the preview first, then the mode's controls, then output; nothing hidden */
+@media (max-width:1100px){
+  .pix{overflow:auto;display:flex;flex-direction:column}
+  .pix .bar{position:sticky;flex-wrap:wrap;row-gap:6px}
+  .pix .stagewrap{position:static;order:1;padding:12px 12px 4px;overflow:visible}
+  .pix .stagewrap>.checker{max-height:none}
+  .pix .panel,.pix .panel.left,.pix .panel.right{display:block;position:static;order:2;width:auto;max-height:none;overflow:visible;margin:8px 12px}
+  .pix .panel.right{order:3}
+}
+@media (max-width:640px){.pix .bar b{flex-basis:100%}.pix .bar .sp{display:none}.pix .row{grid-template-columns:96px 1fr 44px}}

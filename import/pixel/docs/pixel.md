@@ -26,6 +26,12 @@ Every result has a **transparent background**, any size from 4 to 256 pixels eac
 4. **Clean-up**: remove lone pixels (orphans), pixel-perfect lines (drop the L-corner pixel that makes a 1-px line look
    doubled, on the outline colour).
 
+## Settings
+
+*Copy settings* puts every slider (mode, size, palette, subject, camera, light, generator…) as JSON in the box and on the
+clipboard; *Apply pasted settings* loads such JSON and redraws exactly the same picture; *Reset* returns to the defaults.
+The drawing itself is not part of it — share that with *Drawing → text*.
+
 ## Pixel Doctor
 
 The rules of pixel art as checks on the frame shown, with a score (100 minus 18 per severe and 8 per minor finding),
