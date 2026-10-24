@@ -55,10 +55,10 @@ function run() {
   busy = setTimeout(async () => {
     const t0 = performance.now();
     try {
-      const fr = await make(S.dir, S.anim, (d, n) => { loader(true, `Rendering frame ${d} of ${n}`, d, n); $('status').textContent = `rendering ${d} / ${n}…`; }, () => my !== job);
+      const fr = await make(S.dir, S.anim, (d, n, what) => { if (what === 'compile') { loader(true, 'Preparing the renderer (first time only, can take a while)…', 0, 1); return; } const f = Math.min(n, Math.floor(d) + 1); loader(true, `Rendering frame ${f} of ${n}`, d, n); $('status').textContent = `rendering ${f} / ${n}…`; }, () => my !== job);
       if (!fr || my !== job) return;
       frames = fr; $('status').textContent = `${frames.length} frames · ${S.frame}×${S.frame} · ${S.style === 'real' ? 'realistic' : 'pixel art ' + S.px + ' px'} · ${((performance.now() - t0) / 1000).toFixed(1)} s`;
-    } catch (e) { $('status').textContent = 'error: ' + e.message; console.error(e); }
+    } catch (e) { $('status').textContent = 'error: ' + e.message; console.error(e); loader(true, 'Error: ' + e.message, 0, 1); return; }
     loader(false); shown = 0; draw(); drawSheet();
   }, 60);
 }
@@ -93,7 +93,7 @@ async function exportAll() {
   let k = 0;
   for (const anim of anims) for (const dir of DIRS) {
     const sheetNo = ++k, sheets = anims.length * DIRS.length;
-    const fr = await make(dir, anim, (d, n) => { loader(true, `ZIP: sheet ${sheetNo} of ${sheets} (${ANIMS[anim].replace(/ \(.*/, '')}, ${dir}°) · frame ${d} of ${n}`, (sheetNo - 1) * n + d, sheets * n); $('status').textContent = `ZIP ${sheetNo} / ${sheets}…`; }), name = tag(dir, anim);
+    const fr = await make(dir, anim, (d, n) => { loader(true, `ZIP: sheet ${sheetNo} of ${sheets} (${ANIMS[anim].replace(/ \(.*/, '')}, ${dir}°) · frame ${Math.min(n, Math.floor(d) + 1)} of ${n}`, (sheetNo - 1) * n + d, sheets * n); $('status').textContent = `ZIP ${sheetNo} / ${sheets}…`; }), name = tag(dir, anim);
     files.push({ name: `Zombie_${Z.seed}/${name}.png`, data: await pngBytes(sheet(fr, S.cols)) });
     files.push({ name: `Zombie_${Z.seed}/${name}.json`, data: JSON.stringify(meta(name, fr.length, dir, anim), null, 1) });
   }

@@ -122,6 +122,7 @@ uniform vec4 uOut3;     // eyes (0 milky, 1 yellow, 2 red), lost arm (0 none, 1 
 uniform vec3 uSkin, uCloth, uPants, uHairC;
 uniform mat3 uCam; uniform vec3 uCamPos; uniform vec2 uSpan; uniform vec3 uLight;
 uniform vec3 uBoxMin, uBoxMax;
+uniform int uZero;       // 0: loop bounds the compiler cannot unroll (ANGLE/D3D on Windows chokes on unrolled ray-march loops)
 varying vec2 vUv;
 
 float hash(vec3 p) { p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
@@ -164,7 +165,7 @@ Parts parts(vec3 p) {
   float lost = uOut3.y;
   float ab = 1.0 + 0.2 * b;
   q.arms = 1e9;
-  for (int k = 0; k < 2; k++) { vec3 a = uJ[4 + 4 * k], e = uJ[5 + 4 * k];
+  for (int k = uZero; k < 2; k++) { vec3 a = uJ[4 + 4 * k], e = uJ[5 + 4 * k];
     float up = smin(sdRC(p, a, e, 0.052 * s * ab, 0.04 * s), length(p - mix(a, e, 0.45)) - 0.047 * s * ab, 0.04 * s);   // biceps
     up = smin(up, length(p - mix(a, e, 0.08)) - 0.058 * s * ab, 0.03 * s);                                          // deltoid
     q.arms = min(q.arms, up); }
@@ -173,18 +174,18 @@ Parts parts(vec3 p) {
   q.fore = min(q.fore, foreR);
   // hands: a palm and four clawed fingers and a thumb, curled towards the palm side (the hand's own -z… its forward)
   q.hands = 1e9;
-  for (int k = 0; k < 2; k++) {
+  for (int k = uZero; k < 2; k++) {
     if (k == 1 && lost > 0.5) break;
     vec3 w = uJ[6 + 4 * k], h = uJ[7 + 4 * k], ax = normalize(h - w), side = normalize(cross(ax, vec3(0.0, 0.0, 1.0)) + vec3(1e-4)), fw = normalize(cross(side, ax));
     float hd = sdRC(p, w, mix(w, h, 0.55), 0.03 * s, 0.033 * s);
-    for (int f = 0; f < 4; f++) { float o = (float(f) - 1.5) * 0.017 * s; vec3 b0 = mix(w, h, 0.5) + side * o, b1 = b0 + ax * 0.045 * s + fw * 0.012 * s, b2 = b1 + ax * 0.028 * s + fw * 0.022 * s;
+    for (int f = uZero; f < 4; f++) { float o = (float(f) - 1.5) * 0.017 * s; vec3 b0 = mix(w, h, 0.5) + side * o, b1 = b0 + ax * 0.045 * s + fw * 0.012 * s, b2 = b1 + ax * 0.028 * s + fw * 0.022 * s;
       hd = smin(hd, min(sdRC(p, b0, b1, 0.0095 * s, 0.008 * s), sdRC(p, b1, b2, 0.008 * s, 0.005 * s)), 0.006 * s); }
     vec3 t0 = mix(w, h, 0.2) + side * 0.03 * s, t1 = t0 + ax * 0.04 * s + fw * 0.02 * s - side * 0.01 * s;
     hd = smin(hd, sdRC(p, t0, t1, 0.012 * s, 0.008 * s), 0.008 * s);
     q.hands = min(q.hands, hd); }
   q.thigh = min(sdRC(p, uJ[12], uJ[13], 0.082 * s * (1.0 + 0.25 * b), 0.05 * s), sdRC(p, uJ[16], uJ[17], 0.082 * s * (1.0 + 0.25 * b), 0.05 * s));
   q.shin = 1e9;
-  for (int k = 0; k < 2; k++) { vec3 kn = uJ[13 + 4 * k], an = uJ[14 + 4 * k];
+  for (int k = uZero; k < 2; k++) { vec3 kn = uJ[13 + 4 * k], an = uJ[14 + 4 * k];
     q.shin = min(q.shin, smin(sdRC(p, kn, an, 0.05 * s, 0.032 * s), length(p - mix(kn, an, 0.3) + normalize(cross(an - kn, vec3(1.0, 0.0, 0.0)) + vec3(1e-4)) * 0.0) - 0.052 * s, 0.05 * s)); }
   q.feet = min(sdRC(p, uJ[14], uJ[15], 0.04 * s, 0.032 * s), sdRC(p, uJ[18], uJ[19], 0.04 * s, 0.032 * s));
   return q;
@@ -197,16 +198,15 @@ float map(vec3 p) {
   float skin = smin(smin(smin(q.torso, q.neck, 0.03 * s), q.head, 0.02 * s), smin(smin(q.arms, q.fore, 0.02 * s), q.hands, 0.015 * s), 0.035 * s);
   skin = smin(skin, smin(smin(q.thigh, q.shin, 0.03 * s), q.feet, 0.02 * s), 0.05 * s);
   float d = skin; gId = 0.0;
-  float tear = tearHoles(p, uLook.z);
   if (uOut.x > 0.5) {                               // hazmat suit: one baggy shell with folds, a hood around the face
-    float fold = (fbm(p * vec3(7.0, 3.0, 7.0)) - 0.5) * 0.03;
+    float suit0 = min(q.torso, q.thigh) - 0.06 * s, fold = suit0 < 0.12 ? (fbm(p * vec3(7.0, 3.0, 7.0)) - 0.5) * 0.03 : 0.0;
     float suit = smin(smin(q.torso - 0.06 * s, q.arms - 0.04 * s, 0.05 * s), smin(q.fore - 0.034 * s, smin(q.thigh - 0.05 * s, q.shin - 0.042 * s, 0.05 * s), 0.03 * s), 0.04 * s) + fold * 1.4;
     suit = smin(suit, q.neck - 0.05 * s, 0.05 * s);
     vec3 ph = (p - uJ[3]) * uHeadR;
     float hood = sdEll(ph - vec3(0.0, 0.1, -0.01) * s, vec3(0.115, 0.135, 0.13) * s);
     hood = max(hood, -sdEll(ph - vec3(0.0, 0.085, 0.12) * s, vec3(0.07, 0.085, 0.08) * s));
     suit = smin(suit, hood, 0.04 * s);
-    suit = max(suit, tear * 0.6);
+    if (suit < 0.03 && uLook.z > 0.0) suit = max(suit, tearHoles(p, uLook.z) * 0.6);
     if (suit < d) { d = suit; gId = 1.0; }
     float glove = q.hands - 0.012 * s, boot = min(q.feet - 0.018 * s, q.shin - 0.026 * s + max(0.0, p.y - 0.3 * s) * 2.0);
     if (glove < d) { d = glove; gId = 7.0; } if (boot < d) { d = boot; gId = 7.0; }
@@ -228,6 +228,7 @@ float map(vec3 p) {
         if (tie < d) { d = tie; gId = 8.0; }
       }
     }
+    float tear = min(top, bot) < 0.03 ? tearHoles(p, uLook.z) : -1.0;
     top = max(top, tear); bot = max(bot, tear * 0.8);
     if (top < d) { d = top; gId = 1.0; }
     if (gId > 7.5 && top < d + 0.002) gId = 1.0;
@@ -249,12 +250,14 @@ float map(vec3 p) {
   gPh = ph;
   return d;
 }
-vec3 normalAt(vec3 p) { vec2 e = vec2(0.0012, -0.0012);
-  return normalize(e.xyy * map(p + e.xyy) + e.yyx * map(p + e.yyx) + e.yxy * map(p + e.yxy) + e.xxx * map(p + e.xxx)); }
+vec3 normalAt(vec3 p) {                            // tetrahedron of samples in a loop: map() is compiled once here, not four times
+  vec3 n = vec3(0.0);
+  for (int i = uZero; i < 4; i++) { vec3 e = 0.5773 * (2.0 * vec3(float(((i + 3) >> 1) & 1), float((i >> 1) & 1), float(i & 1)) - 1.0); n += e * map(p + e * 0.0012); }
+  return normalize(n); }
 float shadow(vec3 ro, vec3 rd) { float res = 1.0, t = 0.02;
-  for (int i = 0; i < 28; i++) { float h = map(ro + rd * t); res = min(res, 10.0 * h / t); t += clamp(h, 0.01, 0.12); if (res < 0.01 || t > 2.5) break; }
+  for (int i = uZero; i < 20; i++) { float h = map(ro + rd * t); res = min(res, 10.0 * h / t); t += clamp(h, 0.015, 0.15); if (res < 0.01 || t > 2.5) break; }
   return clamp(res, 0.0, 1.0); }
-float occl(vec3 p, vec3 n) { float o = 0.0, w = 1.0; for (int i = 1; i <= 5; i++) { float h = 0.025 * float(i); o += w * (h - map(p + n * h)); w *= 0.6; } return clamp(1.0 - 3.0 * o, 0.0, 1.0); }
+float occl(vec3 p, vec3 n) { float o = 0.0, w = 1.0; for (int i = uZero + 1; i <= 4; i++) { float h = 0.03 * float(i); o += w * (h - map(p + n * h)); w *= 0.6; } return clamp(1.0 - 3.0 * o, 0.0, 1.0); }
 vec3 aces(vec3 x) { return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0); }
 bool box(vec3 ro, vec3 rd, out float t0, out float t1) { vec3 inv = 1.0 / rd, a = (uBoxMin - ro) * inv, b = (uBoxMax - ro) * inv, lo = min(a, b), hi = max(a, b);
   t0 = max(max(lo.x, lo.y), lo.z); t1 = min(min(hi.x, hi.y), hi.z); return t1 > max(t0, 0.0); }
@@ -263,7 +266,7 @@ void main() {
   vec3 ro = uCamPos + uCam * vec3(uv, 0.0), rd = uCam * vec3(0.0, 0.0, -1.0);
   float t0, t1; if (!box(ro, rd, t0, t1)) { gl_FragColor = vec4(0.0); return; }
   float t = max(t0, 0.0); bool hit = false;
-  for (int i = 0; i < 140; i++) { float h = map(ro + rd * t); if (h < 0.0006) { hit = true; break; } t += h * 0.9; if (t > t1) break; }
+  for (int i = uZero; i < 110; i++) { float h = map(ro + rd * t); if (h < 0.0008) { hit = true; break; } t += h * 0.9; if (t > t1) break; }
   if (!hit) { gl_FragColor = vec4(0.0); return; }
   vec3 p = ro + rd * t; map(p); float id = gId; vec3 ph = gPh; vec3 n = normalAt(p);
   float s = uBody.x, seed = uLook.w;
@@ -327,11 +330,12 @@ function renderer() {
     uBody: { value: new THREE.Vector4() }, uLook: { value: new THREE.Vector4() }, uOut: { value: new THREE.Vector4() }, uOut2: { value: new THREE.Vector4() }, uOut3: { value: new THREE.Vector4() },
     uSkin: { value: new THREE.Color() }, uCloth: { value: new THREE.Color() }, uPants: { value: new THREE.Color() }, uHairC: { value: new THREE.Color() },
     uCam: { value: new THREE.Matrix3() }, uCamPos: { value: new THREE.Vector3() }, uSpan: { value: new THREE.Vector2(2, 2) }, uLight: { value: new THREE.Vector3(0.5, 0.8, 0.6) },
-    uBoxMin: { value: new THREE.Vector3() }, uBoxMax: { value: new THREE.Vector3() },
+    uBoxMin: { value: new THREE.Vector3() }, uBoxMax: { value: new THREE.Vector3() }, uZero: { value: 0 },
   };
   const mat = new THREE.ShaderMaterial({ uniforms: u, vertexShader: VERT, fragmentShader: FRAG, depthTest: false, depthWrite: false });
   const scene = new THREE.Scene(), quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat); quad.frustumCulled = false; scene.add(quad);
-  R3 = { r, u, scene, cam: new THREE.Camera(), rt: null };
+  R3 = { r, u, scene, cam: new THREE.Camera(), rt: null, compiled: false, lost: false };
+  canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); R3.lost = true; });
   return R3;
 }
 const lin = (hex) => new THREE.Color(hex);   // three converts sRGB hex to linear working colour
@@ -373,8 +377,20 @@ function* frameGen(o) {
     const mn = new THREE.Vector3(Infinity, Infinity, Infinity), mx = new THREE.Vector3(-Infinity, -Infinity, -Infinity);
     for (const p of P.pts) { mn.min(p); mx.max(p); }
     u.uBoxMin.value.copy(mn).subScalar(0.25); u.uBoxMax.value.copy(mx).addScalar(0.25);
-    R0.r.setRenderTarget(R0.rt); R0.r.setClearColor(0x000000, 0); R0.r.clear(); R0.r.render(R0.scene, R0.cam);
-    R0.r.readRenderTargetPixels(R0.rt, 0, 0, W, W, buf);
+    // in horizontal bands, each its own draw: no single draw runs long enough for the driver to reset the GPU
+    // (Windows stops a GPU task after ~2 s), and the page gets a moment between bands
+    const rt = R0.rt; rt.scissorTest = false;
+    R0.r.setRenderTarget(rt); R0.r.setClearColor(0x000000, 0); R0.r.clear();
+    const bands = Math.max(1, Math.ceil(W / 128)), bh = Math.ceil(W / bands);
+    for (let b = 0; b < bands; b++) {
+      rt.scissor.set(0, b * bh, W, Math.min(bh, W - b * bh)); rt.scissorTest = true; rt.viewport.set(0, 0, W, W);
+      R0.r.setRenderTarget(rt); R0.r.render(R0.scene, R0.cam);
+      if (b < bands - 1) yield { band: b + 1, bands };
+    }
+    rt.scissorTest = false;
+    if (R0.lost) throw new Error('the graphics card stopped the render (WebGL context lost) — reload the page and try a smaller frame or the pixel-art style');
+    R0.r.setRenderTarget(rt);
+    R0.r.readRenderTargetPixels(rt, 0, 0, W, W, buf);
     // box-filter the supersamples (premultiplied), then a hard alpha edge; rows flipped (GL is bottom-up)
     const img = { w: size, h: size, data: new Uint8ClampedArray(size * size * 4) };
     for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
@@ -387,13 +403,20 @@ function* frameGen(o) {
     yield img;
   }
 }
-export function renderZombie(o) { return { frames: [...frameGen(o)] }; }
+export function renderZombie(o) { return { frames: [...frameGen(o)].filter((x) => !x.band) }; }
 // the same, a frame at a time, giving the page a moment between frames (a loader can move); onFrame(done, total);
 // cancelled() → true stops early (a newer render was asked for) and returns null
 export async function renderZombieAsync(o, onFrame, cancelled) {
-  const out = [], N = Math.max(1, o.frames | 0);
-  for (const img of frameGen(o)) {
-    out.push(img); if (onFrame) onFrame(out.length, N);
+  const out = [], N = Math.max(1, o.frames | 0), R0 = renderer();
+  if (!R0.compiled) {                                // compile in the background where the browser can (KHR_parallel_shader_compile)
+    if (onFrame) onFrame(0, N, 'compile');
+    await new Promise((r) => setTimeout(r, 30));
+    try { await R0.r.compileAsync(R0.scene, R0.cam); } catch { /* falls back to compiling on the first draw */ }
+    R0.compiled = true;
+  }
+  for (const x of frameGen(o)) {
+    if (x.band) { if (onFrame) onFrame(out.length + x.band / x.bands, N); }
+    else { out.push(x); if (onFrame) onFrame(out.length, N); }
     await new Promise((r) => setTimeout(r, 0));
     if (cancelled && cancelled()) return null;
   }
