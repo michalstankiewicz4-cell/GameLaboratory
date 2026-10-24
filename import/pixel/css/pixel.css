@@ -29,3 +29,8 @@
   .pix .panel.right{order:3}
 }
 @media (max-width:640px){.pix .bar b{flex-basis:100%}.pix .bar .sp{display:none}.pix .row{grid-template-columns:96px 1fr 44px}}
+/* Zombie Generator */
+.zomb #stage{max-width:min(100%,512px);height:auto}
+.zomb #stage.px{image-rendering:pixelated}
+.zomb .sheetbox{display:block;line-height:0;max-width:100%}
+.zomb #sheetView{display:block;max-width:100%;height:auto}

@@ -67,6 +67,10 @@ text* writes it, *Text → drawing* reads it — sprites can be written, read an
   pixels, no half-transparent ones, colour count, a Doctor report), GIF/PNG signatures and downloads, a pencil stroke,
   undo, the text round trip, Doctor fixes; screenshots `tools/out/pixel-*.png`.
 
+## Zombie Generator
+
+`pixel/zombies.html` — original zombies as Unity sprite sheets, realistic or pixel art: see `docs/zombies.md`.
+
 ## Known limits / next
 
 - Trees from PlantKit read dark (foliage normals are per card); a canopy-sphere normal would light them like a volume.

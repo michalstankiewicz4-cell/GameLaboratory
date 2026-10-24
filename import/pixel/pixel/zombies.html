@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Zombie Generator — sprite sheets for Unity, realistic or pixel art</title>
+<meta name="description" content="Zombie Generator: original zombies from a seed — body, face, decay, outfit, blood and dirt — animated in 12 frames from eight directions and exported as Unity sprite sheets (512×512 frames, pivot at the feet) with JSON and an editor script, realistic or as pixel art.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/Battle/pixel/zombies.html">
+<link rel="icon" type="image/png" href="../assets/favicon-32.png">
+<link rel="stylesheet" href="../css/lab.css">
+<link rel="stylesheet" href="../css/pixel.css">
+</head>
+<body class="lab pix zomb">
+<div class="bar">
+  <b>Zombie Generator</b>
+  <span class="dimtxt">Pixel Studio</span>
+  <span class="sp"></span>
+  <span class="status" id="status"></span>
+  <a href="index.html">Pixel Studio</a>
+  <a href="https://github.com/michalstankiewicz4-cell/Battle/blob/main/docs/zombies.md">How it works</a>
+</div>
+<aside class="panel left">
+  <h3>Zombie</h3>
+  <div class="row"><span>Seed</span><input type="number" id="seed" min="1" max="99999" step="1"><output></output></div>
+  <div class="btns"><button type="button" id="another">Another zombie</button></div>
+  <div id="traits"></div>
+  <p class="note">Every zombie is made here from its seed — body, face, decay, clothes, blood and dirt — and every trait can be changed.</p>
+</aside>
+<main class="stagewrap">
+  <div class="checker"><canvas id="stage"></canvas></div>
+  <div class="frames btns"><button type="button" id="prev">◀</button><span id="frameNo" class="mono"></span><button type="button" id="next">▶</button><button type="button" id="play">Pause</button></div>
+  <div class="checker sheetbox"><canvas id="sheetView"></canvas></div>
+</main>
+<aside class="panel right">
+  <h3>Animation</h3>
+  <div class="row"><span>Animation</span><select id="anim"></select><output></output></div>
+  <div class="row"><span>Direction</span><select id="dir"></select><output></output></div>
+  <div class="row"><span>Frames</span><input type="number" id="frames" min="2" max="24" step="1"><output></output></div>
+  <div class="row"><span>Speed</span><input type="range" id="fps" min="4" max="24" step="1"><output id="fpsV"></output></div>
+  <h3>Camera and light</h3>
+  <div class="row"><span>Camera height</span><input type="range" id="pitch" min="0" max="45" step="1"><output id="pitchV"></output></div>
+  <div class="row"><span>Light from</span><input type="range" id="lightAz" min="-150" max="150" step="5"><output id="lightAzV"></output></div>
+  <div class="row"><span>Light height</span><input type="range" id="lightEl" min="10" max="80" step="5"><output id="lightElV"></output></div>
+  <h3>Style</h3>
+  <div class="row"><span>Style</span><select id="style"><option value="real">Realistic</option><option value="pixel">Pixel art</option></select><output></output></div>
+  <div id="pxRows">
+    <div class="row"><span>Pixel size</span><input type="range" id="px" min="32" max="256" step="16"><output id="pxV"></output></div>
+    <div class="row"><span>Colours</span><input type="range" id="colours" min="6" max="48" step="1"><output id="coloursV"></output></div>
+    <div class="row"><span>Outline</span><select id="outline"><option value="selout">Selective</option><option value="dark">Dark</option><option value="none">None</option></select><output></output></div>
+  </div>
+  <h3>Sheet (Unity)</h3>
+  <div class="row"><span>Frame</span><select id="frame"><option value="256">256 × 256</option><option value="512">512 × 512</option><option value="1024">1024 × 1024</option></select><output>px</output></div>
+  <div class="row"><span>Columns</span><input type="number" id="cols" min="1" max="12" step="1"><output></output></div>
+  <div class="row"><span>Feet above edge</span><input type="range" id="foot" min="0" max="40" step="1"><output id="footV"></output></div>
+  <div class="row"><span>Pixels per unit</span><input type="number" id="ppu" min="1" max="1000" step="1"><output></output></div>
+  <div class="btns"><button type="button" id="png">PNG sheet</button><button type="button" id="json">JSON</button><button type="button" id="gifB">GIF preview</button></div>
+  <div class="btns"><button type="button" id="all">All 8 directions (ZIP)</button><button type="button" id="cs">Unity slicer (.cs)</button></div>
+  <label class="chk"><input type="checkbox" id="allAnims"> ZIP: every animation, not only this one</label>
+  <p class="note">Default sheet: 12 frames of 512 × 512 in 6 columns × 2 rows, frame 0 top-left, transparent background with a hard edge, pivot in the centre 9 px above the bottom, 100 pixels per unit. The ZIP holds the sheets, their JSON, the slicer script and a README.</p>
+</aside>
+<script type="module" src="../js/pixel/zombieapp.js"></script>
+</body>
+</html>

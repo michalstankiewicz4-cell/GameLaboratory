@@ -3,7 +3,8 @@
 Every 3D subject, every generator and every sample sprite is made at a few sizes; each result must have opaque
 pixels, no half-transparent ones, a sane colour count and a Pixel Doctor report. GIF and PNG exports are encoded and
 their signatures checked; the Draw mode is exercised (pencil stroke, fill, undo, text round trip, Edit in Draw).
-Screenshots go to tools/out/pixel-*.png. Exit code 1 on page errors or a failed check.
+The Zombie Generator renders a zombie realistic and as pixel art (hard alpha, feet on the pivot line), its sheet
+metadata follows Unity's bottom-left rects and the ZIP is valid. Screenshots go to tools/out/pixel-*.png. Exit code 1 on page errors or a failed check.
   py tools/pixel-check.py
 """
 import os, sys, time, subprocess, json
@@ -108,6 +109,24 @@ def main():
                 print('layout', vw, lay)
                 if lay['sw'] > vw or lay['l'] < 200 or lay['r'] < 200 or lay['st'] > vw: fails.append(f'layout {vw}')
                 pg.screenshot(path=os.path.join(OUT, f'pixel-narrow-{vw}.png'), full_page=True)
+            # Zombie Generator: a zombie renders (realistic and pixel art), the sheet metadata matches the Unity layout,
+            # the ZIP is a zip and the slicer script is there
+            pg.goto(f'http://localhost:{PORT}/pixel/zombies.html')
+            pg.evaluate("()=>localStorage.clear()"); pg.reload()
+            pg.wait_for_function('window.__zombies', timeout=120000)
+            zr = pg.evaluate("""()=>{const Z=__zombies;Object.assign(Z.S,{frame:256,frames:2,cols:2,style:'real'});const out={};
+              for (const st of ['real','pixel']) { Z.S.style=st; Z.S.px=64; const fr=Z.make(0,'shamble'); let op=0,semi=0,low=1e9;
+                for (const f of fr) for (let y=0;y<f.h;y++) for (let x=0;x<f.w;x++){const a=f.data[(y*f.w+x)*4+3]; if(a===255){op++;low=Math.min(low,f.h-1-y);} else if(a) semi++;}
+                out[st]={n:fr.length,w:fr[0].w,op,semi,feet:low}; }
+              const m=Z.meta('t',12,0,'shamble'); out.meta=[m.width,m.height,m.sprites[0].y,m.sprites[6].y,m.pivot.y];
+              const z=Z.zip([{name:'a.txt',data:'hi'}]); out.zip=[z[0],z[1],z[2],z[3]]; out.cs=Z.SLICER.includes('SpriteMetaData'); return out;}""")
+            print('zombies', zr)
+            for st in ('real', 'pixel'):
+                r = zr[st]
+                if r['n'] != 2 or r['w'] != 256 or r['op'] < 2000 or r['semi'] != 0 or r['feet'] > 12: fails.append('zombie ' + st)
+            if zr['meta'][:4] != [512, 1536, 1280, 512]: fails.append('zombie sheet layout ' + str(zr['meta']))   # 2 columns of 256: frame 0 top-left
+            if zr['zip'] != [80, 75, 3, 4] or not zr['cs']: fails.append('zombie zip/slicer')
+            pg.screenshot(path=os.path.join(OUT, 'pixel-zombies.png'))
             br.close()
     finally:
         srv.terminate()
