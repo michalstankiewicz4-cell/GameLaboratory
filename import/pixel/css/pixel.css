@@ -1,6 +1,8 @@
 /* Pixel Studio (pixel/index.html): on top of lab.css. Not part of the game. */
 .pix .panel{top:52px;bottom:12px}
-.stagewrap{position:fixed;top:52px;bottom:12px;left:356px;right:326px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;overflow:auto;padding:12px}
+.stagewrap{position:fixed;top:52px;bottom:12px;left:356px;right:326px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:10px;overflow:auto;padding:12px}
+/* centred while it fits, scrolls from the top when it does not (justify-content:center would cut the top off) */
+.stagewrap>*{flex:none}.stagewrap>:first-child{margin-top:auto}.stagewrap>:last-child{margin-bottom:auto}
 .checker{background-color:#2a2f37;background-image:linear-gradient(45deg,#3a404a 25%,transparent 25%,transparent 75%,#3a404a 75%),linear-gradient(45deg,#3a404a 25%,transparent 25%,transparent 75%,#3a404a 75%);background-size:16px 16px;background-position:0 0,8px 8px;border:1px solid var(--line);border-radius:4px}
 .stagewrap>.checker{display:inline-block;line-height:0;max-width:100%;max-height:100%;overflow:auto}
 #stage{display:block;image-rendering:pixelated;max-width:100%;height:auto}
