@@ -11,6 +11,7 @@ import { SUBJECTS, SUBJECT_IDS, render3d, innerLines } from './render3d.js';
 import { examine } from './doctor.js';
 import { encodeGIF } from './gif.js';
 import { SPRITES } from './sprites.js';
+import { VERSION } from '../version.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
@@ -269,6 +270,7 @@ $('setApply').onclick = () => {
 $('setReset').onclick = () => { try { localStorage.removeItem(KEY); } catch { /* private mode */ } location.reload(); };
 
 // start
+$('ver').textContent = 'v' + VERSION;
 try { const t = JSON.parse(localStorage.getItem(KEY + '.doc') || 'null'); if (t) { const fr = t.frames.map((rows) => { const f = new PixelImage(t.w, t.h); rows.forEach((row, y) => [...row].forEach((ch, x) => { if (ch !== '.' && t.palette[ch]) f.set(x, y, [...hex(t.palette[ch]), 255]); })); return f; }); doc.frames = fr; } } catch { /* nothing saved */ }
 syncRes(); subjectUI(); genUI(); swatches(); $('gFrames').value = S.gFrames;
 setMode(S.mode);

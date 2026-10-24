@@ -33,7 +33,7 @@ def main():
             pg.on('console', lambda m: errs.append(m.type + ' ' + m.text) if m.type == 'error' else None)
             pg.goto(f'http://localhost:{PORT}/pixel/')
             pg.evaluate("()=>localStorage.clear()"); pg.reload()
-            pg.wait_for_function('window.__pixel', timeout=120000); settle(pg)
+            pg.wait_for_function('() => window.__pixel', timeout=120000); settle(pg)
             def check(label, st, min_op=12):
                 ok = st['op'] >= min_op and st['semi'] == 0 and 2 <= st['cols'] <= 64 and st['score'] is not None
                 print(('ok  ' if ok else 'FAIL'), label, json.dumps(st))
@@ -100,7 +100,7 @@ def main():
             pg.click('#setCopy'); txt = pg.input_value('#setText')
             yaw0 = json.loads(txt)['yaw']
             pg.evaluate("()=>{const e=document.getElementById('yaw');e.value=-90;e.dispatchEvent(new Event('input'))}")
-            pg.fill('#setText', txt); pg.click('#setApply'); pg.wait_for_function('window.__pixel', timeout=120000); settle(pg)
+            pg.fill('#setText', txt); pg.click('#setApply'); pg.wait_for_function('() => window.__pixel', timeout=120000); settle(pg)
             if pg.evaluate("()=>__pixel.S.yaw") != yaw0: fails.append('settings apply')
             # narrow windows: every panel reachable, no sideways scroll
             for vw in (1024, 390):

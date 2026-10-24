@@ -6,6 +6,7 @@ import { OUTFITS, ANIMS, DIRS, randomZombie, renderZombieAsync } from './zombie.
 import { PixelImage, autoPalette, quantize, outline, removeOrphans, modeDownsample, toCanvas, sheet } from './core.js';
 import { encodeGIF } from './gif.js';
 import { zip } from './zip.js';
+import { VERSION } from '../version.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
@@ -202,6 +203,7 @@ $('prev').onclick = () => { shown = (shown + frames.length - 1) % frames.length;
 $('next').onclick = () => { shown = (shown + 1) % frames.length; draw(); };
 $('png').onclick = exportSheet; $('json').onclick = exportJSON; $('gifB').onclick = exportGIF; $('all').onclick = exportAll;
 $('cs').onclick = () => download(SLICER, 'ZombieSheetSlicer.cs', 'text/plain');
+$('ver').textContent = 'v' + VERSION; document.title = document.title.replace(/^Zombie Generator/, `Zombie Generator v${VERSION}`);
 $('stage').width = $('stage').height = S.frame;   // the frame's size from the start, so the loader covers it
 zombieUI(); styleUI(); run();
 window.__zombies = { S, get Z() { return Z; }, set Z(v) { Z = v; zombieUI(); run(); }, get frames() { return frames; }, make, meta, run, zip, SLICER };

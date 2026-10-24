@@ -35,9 +35,12 @@ and a README into one ZIP (`js/pixel/zip.js`, stored).
 - **Animations** (12 frames, looped, in place — the feet stay on the pivot line): shamble, lurch (dragging a leg),
   lunge (attack), idle (sway), crawl. Forward kinematics on a three.js bone hierarchy; the lowest point is put on the
   ground every frame.
-- **Render**: ray-marched on the GPU (orthographic, the same camera for every frame): key light with soft shadow, sky
-  fill, ground bounce, rim, ambient occlusion, a little scattering in the skin, ACES tone mapping; 2× supersampled,
-  then cut out with a hard edge. The light turns with the camera, so every direction is lit the same way (as sprites
+- **Render**: per frame the field becomes a mesh in JS — surface nets on a grid of ~1.6 px, sampled only in a narrow
+  band round the surface (a coarse pass first) — with normals from the field's gradient plus a little bump, colours
+  and occlusion per vertex; drawn with three.js standard materials (orthographic, the same camera for every frame):
+  key light with soft shadows, sky and ground fill, rim light, ACES; glowing red eyes are small unlit spheres;
+  2× supersampled, then cut out with a hard edge. (v0.25–0.26 ray-marched the field in one fragment shader: fine in
+  Chrome on Linux, but Direct3D on Windows did not finish compiling it after minutes — the reason for the mesh.) The light turns with the camera, so every direction is lit the same way (as sprites
   in a 2D game are).
 - **Waiting**: frames render one at a time (`renderZombieAsync`) with a loader over the preview (spinner, frame count,
   progress bar; for the ZIP also the sheet, animation and direction); changing anything cancels the render in progress.

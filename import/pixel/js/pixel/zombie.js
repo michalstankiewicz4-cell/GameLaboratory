@@ -1,7 +1,9 @@
 // Zombie generator: original undead characters from a seed, rendered as sprite-sheet frames.
 // The body is a signed distance field (smoothly joined round cones and ellipsoids on a skeleton), clothes are shells
-// over it with tears, the whole figure is ray-marched on the GPU with a key light (soft shadow), sky fill, ground
-// bounce, rim light and ambient occlusion — a realistic render, cut out with a hard (1-bit) alpha edge.
+// over it with tears. Per frame the field is turned into a mesh in JS (surface nets over a narrow band), coloured per
+// vertex (decay, wounds, dirt, blood, occlusion) and drawn with ordinary three.js materials — key light with soft
+// shadows, sky and ground fill, rim light, ACES — then cut out with a hard (1-bit) alpha edge. (A first version
+// ray-marched the field in one shader; Direct3D on Windows took minutes to compile it.)
 // The skeleton is posed with forward kinematics per frame (shamble, lurch, lunge, idle, crawl); every frame of an
 // animation uses the same camera, so the sprite does not jump; the feet stay on the pivot line.
 import * as THREE from '../../vendor/three.module.js';
@@ -109,313 +111,320 @@ function pose(n, z, anim, t) {
   return { pts, head: rot('head'), chest: rot('chest'), pelvis: rot('pelvis'), jaw };
 }
 
-/* ---------------- the shader ---------------- */
-const FRAG = /* glsl */`
-precision highp float;
-uniform vec3 uJ[${NJ}];
-uniform mat3 uHeadR, uChestR, uPelvisR;
-uniform vec4 uBody;     // height scale, build, decay, jaw
-uniform vec4 uLook;     // blood, dirt, tears, seed
-uniform vec4 uOut;      // suit, shirt (0 none, 1 short, 2 long), pants (0 none, 1 short, 2 long), gown
-uniform vec4 uOut2;     // tie, overall, rags, hair (0 none, 1 short, 2 sparse, 3 long)
-uniform vec4 uOut3;     // eyes (0 milky, 1 yellow, 2 red), lost arm (0 none, 1 right), -, -
-uniform vec3 uSkin, uCloth, uPants, uHairC;
-uniform mat3 uCam; uniform vec3 uCamPos; uniform vec2 uSpan; uniform vec3 uLight;
-uniform vec3 uBoxMin, uBoxMax;
-uniform int uZero;       // 0: loop bounds the compiler cannot unroll (ANGLE/D3D on Windows chokes on unrolled ray-march loops)
-varying vec2 vUv;
 
-float hash(vec3 p) { p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
-float noise(vec3 x) { vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
-  return mix(mix(mix(hash(i), hash(i + vec3(1, 0, 0)), f.x), mix(hash(i + vec3(0, 1, 0)), hash(i + vec3(1, 1, 0)), f.x), f.y),
-             mix(mix(hash(i + vec3(0, 0, 1)), hash(i + vec3(1, 0, 1)), f.x), mix(hash(i + vec3(0, 1, 1)), hash(i + vec3(1, 1, 1)), f.x), f.y), f.z); }
-float fbm(vec3 p) { float a = 0.5, s = 0.0; for (int i = 0; i < 4; i++) { s += a * noise(p); p = p * 2.03 + 7.1; a *= 0.5; } return s; }
-float smin(float a, float b, float k) { float h = max(k - abs(a - b), 0.0) / k; return min(a, b) - h * h * k * 0.25; }
-float sdEll(vec3 p, vec3 r) { float k0 = length(p / r), k1 = length(p / (r * r)); return k0 * (k0 - 1.0) / k1; }
-float sdRC(vec3 p, vec3 a, vec3 b, float r1, float r2) {
-  vec3 ba = b - a; float l2 = dot(ba, ba), rr = r1 - r2, a2 = l2 - rr * rr, il2 = 1.0 / l2;
-  vec3 pa = p - a; float y = dot(pa, ba), z = y - l2; vec3 xv = pa * l2 - ba * y; float x2 = dot(xv, xv), y2 = y * y * l2, z2 = z * z * l2;
-  float k = sign(rr) * rr * rr * x2;
-  if (sign(z) * a2 * z2 > k) return sqrt(x2 + z2) * il2 - r2;
-  if (sign(y) * a2 * y2 < k) return sqrt(x2 + y2) * il2 - r1;
-  return (sqrt(x2 * a2 * il2) + y * rr) * il2 - r1;
+/* ---------------- the distance field (JS) ---------------- */
+// Everything in metres, world frame, the character facing +z. A field is built per frame from the posed skeleton;
+// field(x, y, z) returns the distance and leaves the material in F.id (0 skin, 1 top/suit, 2 trousers, 3 shoes,
+// 4 hair, 5 eye, 7 gloves/boots, 8 tie) and the head-local point in F.hx, F.hy, F.hz (for the face's colours).
+const fract = (v) => v - Math.floor(v);
+function hash(x, y, z) { x = fract(x * 0.3183099 + 0.1) * 17; y = fract(y * 0.3183099 + 0.1) * 17; z = fract(z * 0.3183099 + 0.1) * 17; return fract(x * y * z * (x + y + z)); }
+function noise(x, y, z) {
+  const ix = Math.floor(x), iy = Math.floor(y), iz = Math.floor(z); let fx = x - ix, fy = y - iy, fz = z - iz;
+  fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy); fz = fz * fz * (3 - 2 * fz);
+  const a = hash(ix, iy, iz), b = hash(ix + 1, iy, iz), c = hash(ix, iy + 1, iz), d = hash(ix + 1, iy + 1, iz);
+  const e = hash(ix, iy, iz + 1), f = hash(ix + 1, iy, iz + 1), g = hash(ix, iy + 1, iz + 1), h = hash(ix + 1, iy + 1, iz + 1);
+  const x1 = a + (b - a) * fx, x2 = c + (d - c) * fx, x3 = e + (f - e) * fx, x4 = g + (h - g) * fx;
+  const y1 = x1 + (x2 - x1) * fy, y2 = x3 + (x4 - x3) * fy; return y1 + (y2 - y1) * fz;
 }
-// body parts (skin) — returned separately so clothes can cover them
-struct Parts { float torso, arms, fore, hands, thigh, shin, feet, head, neck; };
-Parts parts(vec3 p) {
-  Parts q; float s = uBody.x, b = uBody.y;
-  vec3 pc = (p - uJ[1]) * uChestR, pp = (p - uJ[0]) * uPelvisR;
-  float chest = sdEll(pc - vec3(0.0, 0.02, 0.0) * s, vec3(0.175 + 0.03 * b, 0.17, 0.11 + 0.03 * b) * s);
-  float belly = sdEll(pp - vec3(0.0, 0.17, 0.025 + 0.04 * b) * s, vec3(0.15 + 0.05 * b, 0.16, 0.1 + 0.07 * b) * s);
-  float hips = sdEll(pp - vec3(0.0, 0.01, 0.0), vec3(0.165 + 0.03 * b, 0.12, 0.11 + 0.02 * b) * s);
-  q.torso = smin(smin(chest, belly, 0.08 * s), hips, 0.06 * s);
-  q.torso = smin(q.torso, sdRC(p, uJ[4], uJ[8], 0.06 * s, 0.06 * s), 0.07 * s);                 // shoulders
-  q.neck = sdRC(p, uJ[1] + (uJ[2] - uJ[1]) * 0.6, uJ[3], 0.052 * s, 0.045 * s);
-  vec3 ph = (p - uJ[3]) * uHeadR;
-  float skull = sdEll(ph - vec3(0.0, 0.1, -0.005) * s, vec3(0.08, 0.1, 0.098) * s);
-  vec3 pj = ph - vec3(0.0, 0.05, 0.03) * s; float ja = uBody.w * 0.45; pj.yz = mat2(cos(ja), -sin(ja), sin(ja), cos(ja)) * pj.yz;
-  float jaw = sdEll(pj - vec3(0.0, -0.035, 0.035) * s, vec3(0.058, 0.035, 0.05) * s);
-  float face = smin(skull, jaw, 0.03 * s);
-  face = smin(face, sdEll(ph - vec3(0.0, 0.085, 0.098) * s, vec3(0.014, 0.022, 0.018) * s), 0.012 * s);   // nose
-  for (int i = -1; i <= 1; i += 2) face = smin(face, sdEll(ph - vec3(float(i) * 0.08, 0.095, 0.0) * s, vec3(0.012, 0.025, 0.018) * s), 0.01 * s);   // ears
-  // eye sockets and the open mouth
-  for (int i = -1; i <= 1; i += 2) face = max(face, -sdEll(ph - vec3(float(i) * 0.033, 0.115, 0.09) * s, vec3(0.019, 0.014, 0.018) * s));
-  face = max(face, -sdEll(ph - vec3(0.0, 0.045 - ja * 0.05, 0.095) * s, vec3(0.03, 0.006 + ja * 0.03, 0.03) * s));
-  q.head = face;
-  float lost = uOut3.y;
-  float ab = 1.0 + 0.2 * b;
-  q.arms = 1e9;
-  for (int k = uZero; k < 2; k++) { vec3 a = uJ[4 + 4 * k], e = uJ[5 + 4 * k];
-    float up = smin(sdRC(p, a, e, 0.052 * s * ab, 0.04 * s), length(p - mix(a, e, 0.45)) - 0.047 * s * ab, 0.04 * s);   // biceps
-    up = smin(up, length(p - mix(a, e, 0.08)) - 0.058 * s * ab, 0.03 * s);                                          // deltoid
-    q.arms = min(q.arms, up); }
-  q.fore = smin(sdRC(p, uJ[5], uJ[6], 0.042 * s, 0.027 * s), length(p - mix(uJ[5], uJ[6], 0.25)) - 0.04 * s, 0.03 * s);
-  float foreR = lost > 0.5 ? sdRC(p, uJ[9], mix(uJ[9], uJ[10], 0.45), 0.042 * s, 0.034 * s) : smin(sdRC(p, uJ[9], uJ[10], 0.042 * s, 0.027 * s), length(p - mix(uJ[9], uJ[10], 0.25)) - 0.04 * s, 0.03 * s);
-  q.fore = min(q.fore, foreR);
-  // hands: a palm and four clawed fingers and a thumb, curled towards the palm side (the hand's own -z… its forward)
-  q.hands = 1e9;
-  for (int k = uZero; k < 2; k++) {
-    if (k == 1 && lost > 0.5) break;
-    vec3 w = uJ[6 + 4 * k], h = uJ[7 + 4 * k], ax = normalize(h - w), side = normalize(cross(ax, vec3(0.0, 0.0, 1.0)) + vec3(1e-4)), fw = normalize(cross(side, ax));
-    float hd = sdRC(p, w, mix(w, h, 0.55), 0.03 * s, 0.033 * s);
-    for (int f = uZero; f < 4; f++) { float o = (float(f) - 1.5) * 0.017 * s; vec3 b0 = mix(w, h, 0.5) + side * o, b1 = b0 + ax * 0.045 * s + fw * 0.012 * s, b2 = b1 + ax * 0.028 * s + fw * 0.022 * s;
-      hd = smin(hd, min(sdRC(p, b0, b1, 0.0095 * s, 0.008 * s), sdRC(p, b1, b2, 0.008 * s, 0.005 * s)), 0.006 * s); }
-    vec3 t0 = mix(w, h, 0.2) + side * 0.03 * s, t1 = t0 + ax * 0.04 * s + fw * 0.02 * s - side * 0.01 * s;
-    hd = smin(hd, sdRC(p, t0, t1, 0.012 * s, 0.008 * s), 0.008 * s);
-    q.hands = min(q.hands, hd); }
-  q.thigh = min(sdRC(p, uJ[12], uJ[13], 0.082 * s * (1.0 + 0.25 * b), 0.05 * s), sdRC(p, uJ[16], uJ[17], 0.082 * s * (1.0 + 0.25 * b), 0.05 * s));
-  q.shin = 1e9;
-  for (int k = uZero; k < 2; k++) { vec3 kn = uJ[13 + 4 * k], an = uJ[14 + 4 * k];
-    q.shin = min(q.shin, smin(sdRC(p, kn, an, 0.05 * s, 0.032 * s), length(p - mix(kn, an, 0.3) + normalize(cross(an - kn, vec3(1.0, 0.0, 0.0)) + vec3(1e-4)) * 0.0) - 0.052 * s, 0.05 * s)); }
-  q.feet = min(sdRC(p, uJ[14], uJ[15], 0.04 * s, 0.032 * s), sdRC(p, uJ[18], uJ[19], 0.04 * s, 0.032 * s));
-  return q;
+function fbm(x, y, z) { let a = 0.5, s = 0; for (let i = 0; i < 4; i++) { s += a * noise(x, y, z); x = x * 2.03 + 7.1; y = y * 2.03 + 7.1; z = z * 2.03 + 7.1; a *= 0.5; } return s; }
+const smin = (a, b, k) => { const h = Math.max(k - Math.abs(a - b), 0) / k; return Math.min(a, b) - h * h * k * 0.25; };
+const sdEll = (x, y, z, rx, ry, rz) => { const k0 = Math.hypot(x / rx, y / ry, z / rz), k1 = Math.hypot(x / (rx * rx), y / (ry * ry), z / (rz * rz)); return k0 * (k0 - 1) / k1; };
+const sph = (x, y, z, c, r) => Math.hypot(x - c[0], y - c[1], z - c[2]) - r;
+// round cone (iq), a and b as [x, y, z]
+function sdRC(px, py, pz, a, b, r1, r2) {
+  const bx = b[0] - a[0], by = b[1] - a[1], bz = b[2] - a[2], l2 = bx * bx + by * by + bz * bz, rr = r1 - r2, a2 = l2 - rr * rr, il2 = 1 / l2;
+  const qx = px - a[0], qy = py - a[1], qz = pz - a[2], y = qx * bx + qy * by + qz * bz, zz = y - l2;
+  const xx = qx * l2 - bx * y, xy = qy * l2 - by * y, xz = qz * l2 - bz * y, x2 = xx * xx + xy * xy + xz * xz, y2 = y * y * l2, z2 = zz * zz * l2;
+  const k = Math.sign(rr) * rr * rr * x2;
+  if (Math.sign(zz) * a2 * z2 > k) return Math.sqrt(x2 + z2) * il2 - r2;
+  if (Math.sign(y) * a2 * y2 < k) return Math.sqrt(x2 + y2) * il2 - r1;
+  return (Math.sqrt(x2 * a2 * il2) + y * rr) * il2 - r1;
 }
-// material ids: 0 skin, 1 top, 2 bottom, 3 shoes, 4 hair, 5 eye, 6 wound/inside of mouth, 7 gloves/boots of the suit
-float gId; vec3 gPh;
-float tearHoles(vec3 p, float k) { return k > 0.0 ? (fbm(p * 9.0 + uLook.w) - (1.02 - k * 0.42)) * 0.05 : -1.0; }
-float map(vec3 p) {
-  Parts q = parts(p); float s = uBody.x;
-  float skin = smin(smin(smin(q.torso, q.neck, 0.03 * s), q.head, 0.02 * s), smin(smin(q.arms, q.fore, 0.02 * s), q.hands, 0.015 * s), 0.035 * s);
-  skin = smin(skin, smin(smin(q.thigh, q.shin, 0.03 * s), q.feet, 0.02 * s), 0.05 * s);
-  float d = skin; gId = 0.0;
-  if (uOut.x > 0.5) {                               // hazmat suit: one baggy shell with folds, a hood around the face
-    float suit0 = min(q.torso, q.thigh) - 0.06 * s, fold = suit0 < 0.12 ? (fbm(p * vec3(7.0, 3.0, 7.0)) - 0.5) * 0.03 : 0.0;
-    float suit = smin(smin(q.torso - 0.06 * s, q.arms - 0.04 * s, 0.05 * s), smin(q.fore - 0.034 * s, smin(q.thigh - 0.05 * s, q.shin - 0.042 * s, 0.05 * s), 0.03 * s), 0.04 * s) + fold * 1.4;
-    suit = smin(suit, q.neck - 0.05 * s, 0.05 * s);
-    vec3 ph = (p - uJ[3]) * uHeadR;
-    float hood = sdEll(ph - vec3(0.0, 0.1, -0.01) * s, vec3(0.115, 0.135, 0.13) * s);
-    hood = max(hood, -sdEll(ph - vec3(0.0, 0.085, 0.12) * s, vec3(0.07, 0.085, 0.08) * s));
-    suit = smin(suit, hood, 0.04 * s);
-    if (suit < 0.03 && uLook.z > 0.0) suit = max(suit, tearHoles(p, uLook.z) * 0.6);
-    if (suit < d) { d = suit; gId = 1.0; }
-    float glove = q.hands - 0.012 * s, boot = min(q.feet - 0.018 * s, q.shin - 0.026 * s + max(0.0, p.y - 0.3 * s) * 2.0);
-    if (glove < d) { d = glove; gId = 7.0; } if (boot < d) { d = boot; gId = 7.0; }
-  } else {
-    float top = 1e9, bot = 1e9;
-    if (uOut.w > 0.5) {                             // gown: a loose shell to the knees, short sleeves
-      top = min(q.torso - 0.03 * s, q.arms - 0.018 * s);
-      float skirt = sdRC(p, uJ[0] + vec3(0.0, 0.1, 0.0), mix(uJ[13], uJ[17], 0.5) + vec3(0.0, 0.05, 0.0), 0.2 * s, 0.24 * s);
-      top = smin(top, skirt, 0.08 * s);
+const lerp3 = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+const add3 = (a, b, k = 1) => [a[0] + b[0] * k, a[1] + b[1] * k, a[2] + b[2] * k];
+const norm3 = (a) => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+const cross3 = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+
+export const F = { id: 0, hx: 0, hy: 0, hz: 0 };
+export { surface as _surface };
+function makeField(z, P) {
+  const O = OUTFITS[z.outfit] || OUTFITS.casual, s = z.height / 1.75, b = z.build, J = P.pts.map((v) => [v.x, v.y, v.z]);
+  const loc = (m, o) => { const e = m.elements; return (x, y, zz, out) => { const vx = x - o[0], vy = y - o[1], vz = zz - o[2]; out[0] = e[0] * vx + e[1] * vy + e[2] * vz; out[1] = e[3] * vx + e[4] * vy + e[5] * vz; out[2] = e[6] * vx + e[7] * vy + e[8] * vz; }; };
+  const toChest = loc(P.chest, J[1]), toPelvis = loc(P.pelvis, J[0]), toHead = loc(P.head, J[3]);
+  const ja = P.jaw * 0.45, cj = Math.cos(ja), sj = Math.sin(ja), lost = z.armLost === 'right', seed = (z.seed % 97) * 0.37;
+  const suit = !!O.suit, shirt = O.shirt === 'long' ? 2 : O.shirt === 'short' ? 1 : 0, pants = O.pants === 'long' ? 2 : O.pants === 'short' ? 1 : 0;
+  const hair = suit ? 0 : ({ none: 0, short: 1, sparse: 2, long: 3 }[z.hair] || 0), tears = z.tears;
+  // fixed per frame: hands (palm, four clawed fingers, a thumb), the neck's base
+  const hands = [];
+  for (let k = 0; k < 2; k++) {
+    if (k === 1 && lost) break;
+    const w = J[6 + 4 * k], h = J[7 + 4 * k], ax = norm3([h[0] - w[0], h[1] - w[1], h[2] - w[2]]), side = norm3(add3(cross3(ax, [0, 0, 1]), [1e-4, 1e-4, 1e-4])), fw = norm3(cross3(side, ax));
+    const segs = [[w, lerp3(w, h, 0.55), 0.03 * s, 0.033 * s]];
+    for (let f = 0; f < 4; f++) { const o = (f - 1.5) * 0.017 * s, b0 = add3(lerp3(w, h, 0.5), side, o), b1 = add3(add3(b0, ax, 0.045 * s), fw, 0.012 * s), b2 = add3(add3(b1, ax, 0.028 * s), fw, 0.022 * s); segs.push([b0, b1, 0.0095 * s, 0.008 * s], [b1, b2, 0.008 * s, 0.005 * s]); }
+    const t0 = add3(lerp3(w, h, 0.2), side, 0.03 * s); segs.push([t0, add3(add3(add3(t0, ax, 0.04 * s), fw, 0.02 * s), side, -0.01 * s), 0.012 * s, 0.008 * s]);
+    hands.push(segs);
+  }
+  const neckA = lerp3(J[1], J[2], 0.6), ab = 1 + 0.2 * b, kneeMid = lerp3(J[13], J[17], 0.5);
+  const pc = [0, 0, 0], pp = [0, 0, 0], ph = [0, 0, 0];
+  const field = (x, y, zz) => {
+    toChest(x, y, zz, pc); toPelvis(x, y, zz, pp); toHead(x, y, zz, ph);
+    // torso
+    const chest = sdEll(pc[0], pc[1] - 0.02 * s, pc[2], (0.175 + 0.03 * b) * s, 0.17 * s, (0.11 + 0.03 * b) * s);
+    const belly = sdEll(pp[0], pp[1] - 0.17 * s, pp[2] - (0.025 + 0.04 * b) * s, (0.15 + 0.05 * b) * s, 0.16 * s, (0.1 + 0.07 * b) * s);
+    const hips = sdEll(pp[0], pp[1] - 0.01, pp[2], (0.165 + 0.03 * b) * s, 0.12 * s, (0.11 + 0.02 * b) * s);
+    let torso = smin(smin(chest, belly, 0.08 * s), hips, 0.06 * s);
+    torso = smin(torso, sdRC(x, y, zz, J[4], J[8], 0.06 * s, 0.06 * s), 0.07 * s);
+    const neck = sdRC(x, y, zz, neckA, J[3], 0.052 * s, 0.045 * s);
+    // head: skull, jaw (opens), nose, ears, eye sockets, mouth
+    const skull = sdEll(ph[0], ph[1] - 0.1 * s, ph[2] + 0.005 * s, 0.08 * s, 0.1 * s, 0.098 * s);
+    let jy = ph[1] - 0.05 * s, jz = ph[2] - 0.03 * s; const ry = cj * jy - sj * jz, rz = sj * jy + cj * jz;
+    let face = smin(skull, sdEll(ph[0], ry + 0.035 * s, rz - 0.035 * s, 0.058 * s, 0.035 * s, 0.05 * s), 0.03 * s);
+    face = smin(face, sdEll(ph[0], ph[1] - 0.085 * s, ph[2] - 0.098 * s, 0.014 * s, 0.022 * s, 0.018 * s), 0.012 * s);
+    for (const i of [-1, 1]) face = smin(face, sdEll(ph[0] - i * 0.08 * s, ph[1] - 0.095 * s, ph[2], 0.012 * s, 0.025 * s, 0.018 * s), 0.01 * s);
+    for (const i of [-1, 1]) face = Math.max(face, -sdEll(ph[0] - i * 0.033 * s, ph[1] - 0.115 * s, ph[2] - 0.09 * s, 0.019 * s, 0.014 * s, 0.018 * s));
+    face = Math.max(face, -sdEll(ph[0], ph[1] - (0.045 - ja * 0.05) * s, ph[2] - 0.095 * s, 0.03 * s, (0.006 + ja * 0.03) * s, 0.03 * s));
+    // limbs
+    let arms = 1e9;
+    for (let k = 0; k < 2; k++) { const a = J[4 + 4 * k], e = J[5 + 4 * k];
+      let up = smin(sdRC(x, y, zz, a, e, 0.052 * s * ab, 0.04 * s), sph(x, y, zz, lerp3(a, e, 0.45), 0.047 * s * ab), 0.04 * s);
+      up = smin(up, sph(x, y, zz, lerp3(a, e, 0.08), 0.058 * s * ab), 0.03 * s); arms = Math.min(arms, up); }
+    let fore = smin(sdRC(x, y, zz, J[5], J[6], 0.042 * s, 0.027 * s), sph(x, y, zz, lerp3(J[5], J[6], 0.25), 0.04 * s), 0.03 * s);
+    fore = Math.min(fore, lost ? sdRC(x, y, zz, J[9], lerp3(J[9], J[10], 0.45), 0.042 * s, 0.034 * s)
+      : smin(sdRC(x, y, zz, J[9], J[10], 0.042 * s, 0.027 * s), sph(x, y, zz, lerp3(J[9], J[10], 0.25), 0.04 * s), 0.03 * s));
+    let hnd = 1e9;
+    for (const segs of hands) { let hd = sdRC(x, y, zz, segs[0][0], segs[0][1], segs[0][2], segs[0][3]); for (let i = 1; i < segs.length; i++) hd = smin(hd, sdRC(x, y, zz, segs[i][0], segs[i][1], segs[i][2], segs[i][3]), 0.006 * s); hnd = Math.min(hnd, hd); }
+    const thigh = Math.min(sdRC(x, y, zz, J[12], J[13], 0.082 * s * (1 + 0.25 * b), 0.05 * s), sdRC(x, y, zz, J[16], J[17], 0.082 * s * (1 + 0.25 * b), 0.05 * s));
+    let shin = 1e9;
+    for (let k = 0; k < 2; k++) { const kn = J[13 + 4 * k], an = J[14 + 4 * k]; shin = Math.min(shin, smin(sdRC(x, y, zz, kn, an, 0.05 * s, 0.032 * s), sph(x, y, zz, lerp3(kn, an, 0.3), 0.052 * s), 0.05 * s)); }
+    const feet = Math.min(sdRC(x, y, zz, J[14], J[15], 0.04 * s, 0.032 * s), sdRC(x, y, zz, J[18], J[19], 0.04 * s, 0.032 * s));
+    let skin = smin(smin(smin(torso, neck, 0.03 * s), face, 0.02 * s), smin(smin(arms, fore, 0.02 * s), hnd, 0.015 * s), 0.035 * s);
+    skin = smin(skin, smin(smin(thigh, shin, 0.03 * s), feet, 0.02 * s), 0.05 * s);
+    let d = skin, id = 0;
+    const tearAt = () => (fbm(x * 9 + seed, y * 9 + seed, zz * 9 + seed) - (1.02 - tears * 0.42)) * 0.05;
+    if (suit) {                                      // hazmat: one baggy shell with folds, a hood round the face
+      const s0 = Math.min(torso, thigh) - 0.06 * s, fold = s0 < 0.12 ? (fbm(x * 7, y * 3, zz * 7) - 0.5) * 0.042 : 0;
+      let sd = smin(smin(torso - 0.06 * s, arms - 0.04 * s, 0.05 * s), smin(fore - 0.034 * s, smin(thigh - 0.05 * s, shin - 0.042 * s, 0.05 * s), 0.03 * s), 0.04 * s) + fold;
+      sd = smin(sd, neck - 0.05 * s, 0.05 * s);
+      let hood = sdEll(ph[0], ph[1] - 0.1 * s, ph[2] + 0.01 * s, 0.115 * s, 0.135 * s, 0.13 * s);
+      hood = Math.max(hood, -sdEll(ph[0], ph[1] - 0.085 * s, ph[2] - 0.12 * s, 0.07 * s, 0.085 * s, 0.08 * s));
+      sd = smin(sd, hood, 0.04 * s);
+      if (sd < 0.03 && tears > 0) sd = Math.max(sd, tearAt() * 0.6);
+      if (sd < d) { d = sd; id = 1; }
+      const glove = hnd - 0.012 * s, boot = Math.min(feet - 0.018 * s, shin - 0.026 * s + Math.max(0, y - 0.3 * s) * 2);
+      if (glove < d) { d = glove; id = 7; } if (boot < d) { d = boot; id = 7; }
     } else {
-      if (uOut.y > 0.5) { top = min(q.torso - 0.016 * s, q.arms - 0.012 * s); if (uOut.y > 1.5) top = min(top, q.fore - 0.01 * s); }
-      if (uOut2.y > 0.5) top = min(top, min(q.thigh - 0.02 * s, q.shin - 0.016 * s));     // overalls: one piece
-      if (uOut.z > 0.5) { bot = min(q.thigh - 0.018 * s, max(q.torso - 0.018 * s, (dot(p - uJ[0], vec3(0.0, 1.0, 0.0)) - 0.06 * s))); if (uOut.z > 1.5) bot = min(bot, q.shin - 0.015 * s); }
-      if (uOut2.z > 0.5) { float ragged = (fbm(p * 14.0) - 0.5) * 0.08; bot = max(bot, p.y - (uJ[13].y + 0.05 + ragged)); top = max(top, (uJ[0].y - 0.05 + ragged) - p.y); }   // rags: frayed hems
-      if (uOut2.x > 0.5) {                          // tie
-        vec3 pc = (p - uJ[1]) * uChestR;
-        float tie = sdRC(pc, vec3(0.0, 0.12, 0.13) * s, vec3(0.0, -0.18, 0.15 + 0.03 * uBody.y) * s, 0.012 * s, 0.03 * s);
-        tie = max(tie, abs(pc.z - (0.125 + 0.03 * uBody.y) * s) - 0.025 * s);
-        if (tie < d) { d = tie; gId = 8.0; }
+      let top = 1e9, bot = 1e9;
+      if (O.gown) {
+        top = Math.min(torso - 0.03 * s, arms - 0.018 * s);
+        top = smin(top, sdRC(x, y, zz, add3(J[0], [0, 0.1, 0]), add3(kneeMid, [0, 0.05, 0]), 0.2 * s, 0.24 * s), 0.08 * s);
+      } else {
+        if (shirt) { top = Math.min(torso - 0.016 * s, arms - 0.012 * s); if (shirt > 1) top = Math.min(top, fore - 0.01 * s); }
+        if (O.overall) top = Math.min(top, Math.min(thigh - 0.02 * s, shin - 0.016 * s));
+        if (pants) { bot = Math.min(thigh - 0.018 * s, Math.max(torso - 0.018 * s, (y - J[0][1]) - 0.06 * s)); if (pants > 1) bot = Math.min(bot, shin - 0.015 * s); }
+        if (O.rags) { const rg = (fbm(x * 14, y * 14, zz * 14) - 0.5) * 0.08; bot = Math.max(bot, y - (J[13][1] + 0.05 + rg)); top = Math.max(top, (J[0][1] - 0.05 + rg) - y); }
+        if (O.tie) {
+          const tz = (0.125 + 0.03 * b) * s; let tie = sdRC(pc[0], pc[1], pc[2], [0, 0.12 * s, 0.13 * s], [0, -0.18 * s, (0.15 + 0.03 * b) * s], 0.012 * s, 0.03 * s);
+          tie = Math.max(tie, Math.abs(pc[2] - tz) - 0.025 * s); if (tie < d) { d = tie; id = 8; }
+        }
+      }
+      if (Math.min(top, bot) < 0.03 && tears > 0) { const t = tearAt(); top = Math.max(top, t); bot = Math.max(bot, t * 0.8); }
+      if (top < d) { d = top; id = 1; }
+      if (bot < d) { d = bot; id = 2; }
+      const shoe = feet - 0.014 * s; if (shoe < d && !O.rags) { d = shoe; id = 3; }
+      if (hair) {
+        let hr = sdEll(ph[0], ph[1] - 0.112 * s, ph[2] + 0.012 * s, 0.088 * s, 0.1 * s, 0.104 * s);
+        hr = Math.max(hr, -(ph[1] - (0.105 - (hair > 2 ? 0.05 : 0)) * s) + Math.max(0, ph[2] - 0.02 * s) * 1.4);
+        if (hair === 2 && hr < 0.02) hr = Math.max(hr, (0.55 - fbm(ph[0] * 40, ph[1] * 40, ph[2] * 40)) * 0.02);
+        if (hair === 3) hr = smin(hr, sdEll(ph[0], ph[1] - 0.03 * s, ph[2] + 0.06 * s, 0.085 * s, 0.1 * s, 0.05 * s), 0.03);
+        if (hr < d) { d = hr; id = 4; }
       }
     }
-    float tear = min(top, bot) < 0.03 ? tearHoles(p, uLook.z) : -1.0;
-    top = max(top, tear); bot = max(bot, tear * 0.8);
-    if (top < d) { d = top; gId = 1.0; }
-    if (gId > 7.5 && top < d + 0.002) gId = 1.0;
-    if (bot < d) { d = bot; gId = 2.0; }
-    float shoe = q.feet - 0.014 * s; if (shoe < d && uOut2.z < 0.5) { d = shoe; gId = 3.0; }
-    // hair: a cap over the skull, sparse or long
-    if (uOut2.w > 0.5) {
-      vec3 ph = (p - uJ[3]) * uHeadR;
-      float hair = sdEll(ph - vec3(0.0, 0.112, -0.012) * s, vec3(0.088, 0.1, 0.104) * s);
-      hair = max(hair, -(ph.y - (0.105 - 0.05 * step(2.5, uOut2.w)) * s) + max(0.0, ph.z - 0.02 * s) * 1.4);
-      if (uOut2.w > 1.5 && uOut2.w < 2.5) hair = max(hair, (0.55 - fbm(ph * 40.0)) * 0.02);
-      if (uOut2.w > 2.5) hair = smin(hair, sdEll(ph - vec3(0.0, 0.03, -0.06) * s, vec3(0.085, 0.1, 0.05) * s), 0.03);
-      if (hair < d) { d = hair; gId = 4.0; }
+    for (const i of [-1, 1]) { const e = Math.hypot(ph[0] - i * 0.033 * s, ph[1] - 0.114 * s, ph[2] - 0.083 * s) - 0.013 * s; if (e < d) { d = e; id = 5; } }
+    F.id = id; F.hx = ph[0]; F.hy = ph[1]; F.hz = ph[2];
+    return d;
+  };
+  return { field, s, O, J };
+}
+
+/* ---------------- surface: surface nets over a narrow band ---------------- */
+// The field is sampled on a coarse grid; only coarse cells near the surface get the fine grid. A vertex sits in every
+// fine cell the surface crosses (at the mean of its edge crossings), a quad joins the four cells round every crossed
+// edge. Normals come from the field's gradient, so the facets do not show.
+let GRID = null;
+function surface(field, box, h) {
+  const nx = Math.ceil((box[3] - box[0]) / h) + 1, ny = Math.ceil((box[4] - box[1]) / h) + 1, nz = Math.ceil((box[5] - box[2]) / h) + 1, N = nx * ny * nz;
+  if (!GRID || GRID.v.length < N) GRID = { v: new Float32Array(N), cell: new Int32Array(N) };
+  const V = GRID.v, cellIx = GRID.cell; V.fill(NaN); cellIx.fill(-1);   // NaN: not sampled yet
+  const C = 4, at = (i, j, k) => (k * ny + j) * nx + i, X = (i) => box[0] + i * h, Y = (j) => box[1] + j * h, Z = (k) => box[2] + k * h;
+  // coarse pass: blocks of C³ cells, the fine grid only where the surface may be
+  for (let k = 0; k < nz - 1; k += C) for (let j = 0; j < ny - 1; j += C) for (let i = 0; i < nx - 1; i += C) {
+    const cx = X(Math.min(nx - 1, i + C / 2)), cy = Y(Math.min(ny - 1, j + C / 2)), cz = Z(Math.min(nz - 1, k + C / 2));
+    const dc = field(cx, cy, cz), far = Math.abs(dc) > h * C * 1.2 + 0.006;   // margin: the field is only a bound in places
+    // far from the surface the block takes the centre's value (its sign is all that matters there); near it, every point
+    for (let kk = k; kk <= Math.min(nz - 1, k + C); kk++) for (let jj = j; jj <= Math.min(ny - 1, j + C); jj++) for (let ii = i; ii <= Math.min(nx - 1, i + C); ii++) {
+      const a = at(ii, jj, kk);
+      if (far) { if (V[a] !== V[a]) V[a] = dc; } else if (V[a] !== V[a] || Math.abs(V[a]) > h * C * 1.2) V[a] = field(X(ii), Y(jj), Z(kk)) || 1e-6;
     }
   }
-  // eyes in their sockets
-  vec3 ph = (p - uJ[3]) * uHeadR;
-  for (int i = -1; i <= 1; i += 2) { float e = length(ph - vec3(float(i) * 0.033, 0.114, 0.083) * s) - 0.013 * s; if (e < d) { d = e; gId = 5.0; } }
-  gPh = ph;
-  return d;
+  const pos = [], idx = [];
+  const corner = [[0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 0], [0, 0, 1], [1, 0, 1], [0, 1, 1], [1, 1, 1]];
+  const edges = [[0, 1], [2, 3], [4, 5], [6, 7], [0, 2], [1, 3], [4, 6], [5, 7], [0, 4], [1, 5], [2, 6], [3, 7]];
+  const d8 = new Float32Array(8);
+  for (let k = 0; k < nz - 1; k++) for (let j = 0; j < ny - 1; j++) for (let i = 0; i < nx - 1; i++) {
+    let inside = 0;
+    for (let c = 0; c < 8; c++) { const q = corner[c]; d8[c] = V[at(i + q[0], j + q[1], k + q[2])]; if (d8[c] < 0) inside++; }
+    if (inside === 0 || inside === 8) continue;
+    let sx = 0, sy = 0, sz = 0, n = 0;
+    for (const [a, b2] of edges) { if ((d8[a] < 0) === (d8[b2] < 0)) continue; const t = d8[a] / (d8[a] - d8[b2]), qa = corner[a], qb = corner[b2];
+      sx += qa[0] + (qb[0] - qa[0]) * t; sy += qa[1] + (qb[1] - qa[1]) * t; sz += qa[2] + (qb[2] - qa[2]) * t; n++; }
+    cellIx[at(i, j, k)] = pos.length / 3; pos.push(X(i) + sx / n * h, Y(j) + sy / n * h, Z(k) + sz / n * h);
+  }
+  // quads round every crossed edge, each turned so its normal points out of the solid (along the edge, towards the outside)
+  const quad = (a, b2, c, d, ax, ay, az) => {
+    if (a < 0 || b2 < 0 || c < 0 || d < 0) return;
+    const P = (q) => q * 3, ux = pos[P(b2)] - pos[P(a)], uy = pos[P(b2) + 1] - pos[P(a) + 1], uz = pos[P(b2) + 2] - pos[P(a) + 2];
+    const vx = pos[P(c)] - pos[P(a)], vy = pos[P(c) + 1] - pos[P(a) + 1], vz = pos[P(c) + 2] - pos[P(a) + 2];
+    const dot = (uy * vz - uz * vy) * ax + (uz * vx - ux * vz) * ay + (ux * vy - uy * vx) * az;
+    if (dot >= 0) idx.push(a, b2, c, a, c, d); else idx.push(a, c, b2, a, d, c);
+  };
+  for (let k = 1; k < nz - 1; k++) for (let j = 1; j < ny - 1; j++) for (let i = 1; i < nx - 1; i++) {
+    const in0 = V[at(i, j, k)] < 0, o = in0 ? 1 : -1;
+    if ((V[at(i + 1, j, k)] < 0) !== in0) quad(cellIx[at(i, j - 1, k - 1)], cellIx[at(i, j, k - 1)], cellIx[at(i, j, k)], cellIx[at(i, j - 1, k)], o, 0, 0);
+    if ((V[at(i, j + 1, k)] < 0) !== in0) quad(cellIx[at(i - 1, j, k - 1)], cellIx[at(i - 1, j, k)], cellIx[at(i, j, k)], cellIx[at(i, j, k - 1)], 0, o, 0);
+    if ((V[at(i, j, k + 1)] < 0) !== in0) quad(cellIx[at(i - 1, j - 1, k)], cellIx[at(i, j - 1, k)], cellIx[at(i, j, k)], cellIx[at(i - 1, j, k)], 0, 0, o);
+  }
+  return { pos, idx };
 }
-vec3 normalAt(vec3 p) {                            // tetrahedron of samples in a loop: map() is compiled once here, not four times
-  vec3 n = vec3(0.0);
-  for (int i = uZero; i < 4; i++) { vec3 e = 0.5773 * (2.0 * vec3(float(((i + 3) >> 1) & 1), float((i >> 1) & 1), float(i & 1)) - 1.0); n += e * map(p + e * 0.0012); }
-  return normalize(n); }
-float shadow(vec3 ro, vec3 rd) { float res = 1.0, t = 0.02;
-  for (int i = uZero; i < 20; i++) { float h = map(ro + rd * t); res = min(res, 10.0 * h / t); t += clamp(h, 0.015, 0.15); if (res < 0.01 || t > 2.5) break; }
-  return clamp(res, 0.0, 1.0); }
-float occl(vec3 p, vec3 n) { float o = 0.0, w = 1.0; for (int i = uZero + 1; i <= 4; i++) { float h = 0.03 * float(i); o += w * (h - map(p + n * h)); w *= 0.6; } return clamp(1.0 - 3.0 * o, 0.0, 1.0); }
-vec3 aces(vec3 x) { return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0); }
-bool box(vec3 ro, vec3 rd, out float t0, out float t1) { vec3 inv = 1.0 / rd, a = (uBoxMin - ro) * inv, b = (uBoxMax - ro) * inv, lo = min(a, b), hi = max(a, b);
-  t0 = max(max(lo.x, lo.y), lo.z); t1 = min(min(hi.x, hi.y), hi.z); return t1 > max(t0, 0.0); }
-void main() {
-  vec2 uv = (vUv - 0.5) * uSpan;
-  vec3 ro = uCamPos + uCam * vec3(uv, 0.0), rd = uCam * vec3(0.0, 0.0, -1.0);
-  float t0, t1; if (!box(ro, rd, t0, t1)) { gl_FragColor = vec4(0.0); return; }
-  float t = max(t0, 0.0); bool hit = false;
-  for (int i = uZero; i < 110; i++) { float h = map(ro + rd * t); if (h < 0.0008) { hit = true; break; } t += h * 0.9; if (t > t1) break; }
-  if (!hit) { gl_FragColor = vec4(0.0); return; }
-  vec3 p = ro + rd * t; map(p); float id = gId; vec3 ph = gPh; vec3 n = normalAt(p);
-  float s = uBody.x, seed = uLook.w;
-  // albedo, roughness, bump
-  vec3 alb; float rough = 0.75, sss = 0.0, bump = 0.0;
-  float big = fbm(p * 6.0 + seed), fine = noise(p * 60.0 + seed);
-  float blood = smoothstep(0.68 - uLook.x * 0.14, 0.72 - uLook.x * 0.14, fbm(p * 4.5 + seed + 3.0) + 0.1 * fbm(p * 30.0));   // patches, not a coat
-  float dirt = uLook.y * (0.5 * smoothstep(0.7 * s, 0.0, p.y) + 0.25 * smoothstep(0.6, 0.8, fbm(p * 3.0 + seed + 9.0)));   // mostly from the ground up
-  if (id < 0.5) {                                   // skin: decaying, mottled, veined, wounded
-    alb = uSkin;
-    float mott = fbm(p * 9.0 + seed * 1.3);
-    alb = mix(alb, alb * vec3(0.75, 0.82, 0.68), smoothstep(0.35, 0.75, mott) * uBody.z);
-    alb = mix(alb, vec3(0.32, 0.24, 0.3), smoothstep(0.6, 0.85, fbm(p * 5.0 + seed + 1.7)) * uBody.z * 0.7);     // bruises
-    float vein = 1.0 - abs(noise(p * 22.0 + seed) * 2.0 - 1.0); alb *= 1.0 - smoothstep(0.88, 0.98, vein) * 0.25 * uBody.z;
-    float wound = smoothstep(0.7 - uBody.z * 0.12, 0.74 - uBody.z * 0.12, fbm(p * 7.0 + seed + 5.0));
-    alb = mix(alb, mix(vec3(0.06, 0.008, 0.006), vec3(0.22, 0.12, 0.09), fine * 0.35), wound); rough = mix(0.6, 0.22, wound);
-    // around the mouth and down the chin: dried and wet blood
-    float mouth = smoothstep(0.06 * s, 0.0, length((ph - vec3(0.0, 0.035, 0.09) * s) * vec3(1.0, 0.6, 1.0)));
-    alb = mix(alb, vec3(0.035, 0.005, 0.004), clamp(mouth * (0.4 + uLook.x), 0.0, 1.0));
-    alb = mix(alb, alb * 0.6, smoothstep(0.03 * s, 0.0, abs(length((ph - vec3(0.0, 0.115, 0.07) * s) * vec3(1.0, 1.6, 1.0)) - 0.04 * s)) * 0.6);   // sunken eyes
-    sss = 1.0; bump = (big - 0.5) * 0.6 + (fine - 0.5) * 0.25;
-    // inside the mouth
-    if (length((ph - vec3(0.0, 0.045, 0.085) * s) / vec3(0.032, 0.012 + uBody.w * 0.03, 0.03) / s) < 1.0) { alb = vec3(0.12, 0.02, 0.02); sss = 0.0; }
-  } else if (id < 1.5) { alb = uCloth; rough = uOut.x > 0.5 ? 0.42 : 0.85; bump = (noise(p * 140.0) - 0.5) * 0.3 + (fbm(p * vec3(26.0, 9.0, 26.0)) - 0.5) * 1.3; }   // weave and creases
-  else if (id < 2.5) { alb = uPants; bump = (noise(p * vec3(160.0, 30.0, 160.0)) - 0.5) * 0.35 + (fbm(p * vec3(30.0, 10.0, 30.0)) - 0.5) * 1.2; }
-  else if (id < 3.5) { alb = vec3(0.09, 0.075, 0.065); rough = 0.5; }
-  else if (id < 4.5) { alb = uHairC * (0.7 + 0.5 * noise(ph * vec3(200.0, 30.0, 200.0))); rough = 0.6; bump = (noise(ph * vec3(300.0, 20.0, 300.0)) - 0.5) * 0.6; }
-  else if (id < 5.5) { alb = uOut3.x > 1.5 ? vec3(1.6, 0.15, 0.08) : uOut3.x > 0.5 ? vec3(0.85, 0.75, 0.3) : vec3(0.78, 0.8, 0.74); rough = 0.15; }
-  else if (id < 7.5) { alb = vec3(0.12, 0.12, 0.1); rough = 0.55; bump = (noise(p * 90.0) - 0.5) * 0.3; }
-  else { alb = vec3(0.16, 0.025, 0.035); rough = 0.6; }                      // tie
-  if (id > 0.5 && id < 3.5 || id > 6.5) { alb = mix(alb, alb * vec3(0.55, 0.48, 0.4), clamp(dirt * 0.75 * (0.6 + 0.8 * fine), 0.0, 0.7)); alb = mix(alb, mix(vec3(0.028, 0.005, 0.004), vec3(0.075, 0.01, 0.007), fine), blood * 0.9); if (blood > 0.5) rough = 0.35; }   // dried blood is nearly black-brown, wet blood dark red
-  // bump: tilt the normal by the noise's gradient (cheap, along the surface)
-  vec3 bg = vec3(noise(p * 40.0 + 1.0), noise(p * 40.0 + 2.0), noise(p * 40.0 + 3.0)) - 0.5; n = normalize(n + (bg - n * dot(bg, n)) * bump * 0.8);
-  // light: key (soft shadow), sky fill, ground bounce, rim, occlusion; skin scatters a little
-  vec3 L = normalize(uLight), V = -rd, H = normalize(L + V);
-  float ndl = dot(n, L), dif = sss > 0.5 ? clamp((ndl + 0.35) / 1.35, 0.0, 1.0) : max(ndl, 0.0);
-  float sh = shadow(p + n * 0.004, L), ao = occl(p, n);
-  float spec = pow(max(dot(n, H), 0.0), mix(8.0, 90.0, 1.0 - rough)) * (1.0 - rough) * 0.6;
-  vec3 col = alb * vec3(1.0, 0.95, 0.88) * 2.0 * dif * sh;
-  col += alb * vec3(0.42, 0.48, 0.56) * (0.55 + 0.45 * n.y) * ao * 0.75;
-  col += alb * vec3(0.3, 0.27, 0.22) * clamp(-n.y, 0.0, 1.0) * 0.4 * ao;
-  col += vec3(0.6, 0.68, 0.8) * pow(1.0 - max(dot(n, V), 0.0), 3.0) * 0.35 * ao;
-  col += vec3(1.0, 0.95, 0.88) * spec * sh;
-  if (sss > 0.5) col += alb * vec3(0.5, 0.15, 0.1) * 0.25 * (1.0 - max(ndl, 0.0)) * ao;
-  if (id > 4.5 && id < 5.5 && uOut3.x > 1.5) col += vec3(1.2, 0.1, 0.05);   // red eyes glow
-  col = aces(col * 0.85);
-  gl_FragColor = vec4(pow(col, vec3(1.0 / 2.2)), 1.0);
-}`;
 
-const VERT = 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }';
+/* ---------------- colours (per vertex) ---------------- */
+const C3 = (hex) => { const c = new THREE.Color(hex); return [c.r, c.g, c.b]; };   // linear
+const mixc = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+const ss01 = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+function shadeVertex(z, x, y, zz, id, hx, hy, hz, s, cols) {
+  const seed = (z.seed % 97) * 0.37, fine = noise(x * 60 + seed, y * 60, zz * 60), big = fbm(x * 6 + seed, y * 6, zz * 6);
+  const blood = ss01(0.68 - z.blood * 0.14, 0.72 - z.blood * 0.14, fbm(x * 4.5 + seed + 3, y * 4.5 + 3, zz * 4.5 + 3) + 0.1 * fbm(x * 30, y * 30, zz * 30));
+  const dirt = z.dirt * (0.5 * ss01(0.7 * s, 0, y) + 0.25 * ss01(0.6, 0.8, fbm(x * 3 + seed + 9, y * 3 + 9, zz * 3 + 9)));
+  let c, rough = 0.75;
+  if (id === 0) {
+    c = cols.skin.slice();
+    c = mixc(c, [c[0] * 0.75, c[1] * 0.82, c[2] * 0.68], ss01(0.35, 0.75, fbm(x * 9 + seed * 1.3, y * 9, zz * 9)) * z.decay);
+    c = mixc(c, [0.32, 0.24, 0.3], ss01(0.6, 0.85, fbm(x * 5 + seed + 1.7, y * 5 + 1.7, zz * 5 + 1.7)) * z.decay * 0.7);
+    const vein = 1 - Math.abs(noise(x * 22 + seed, y * 22, zz * 22) * 2 - 1); c = c.map((v) => v * (1 - ss01(0.88, 0.98, vein) * 0.25 * z.decay));
+    const wound = ss01(0.7 - z.decay * 0.12, 0.74 - z.decay * 0.12, fbm(x * 7 + seed + 5, y * 7 + 5, zz * 7 + 5));
+    c = mixc(c, mixc([0.06, 0.008, 0.006], [0.22, 0.12, 0.09], fine * 0.35), wound);
+    const mouth = ss01(0.06 * s, 0, Math.hypot(hx, (hy - 0.035 * s) * 0.6, hz - 0.09 * s));
+    c = mixc(c, [0.035, 0.005, 0.004], Math.min(1, mouth * (0.4 + z.blood)));
+    const eye = Math.abs(Math.hypot(hx, (hy - 0.115 * s) * 1.6, hz - 0.07 * s) - 0.04 * s); c = mixc(c, c.map((v) => v * 0.6), ss01(0.03 * s, 0, eye) * 0.6);
+    if (Math.hypot(hx / 0.032, (hy - 0.045 * s) / (0.012 + z.jaw * 0.03), (hz - 0.085 * s) / 0.03) / s < 1) c = [0.12, 0.02, 0.02];
+    rough = 0.6;
+  } else if (id === 1) c = cols.cloth.slice();
+  else if (id === 2) c = cols.pants.slice();
+  else if (id === 3) c = [0.09, 0.075, 0.065];
+  else if (id === 4) c = cols.hair.map((v) => v * (0.7 + 0.5 * noise(hx * 200, hy * 30, hz * 200)));
+  else if (id === 5) c = z.eyes === 'red' ? [0.9, 0.08, 0.04] : z.eyes === 'yellow' ? [0.85, 0.75, 0.3] : [0.78, 0.8, 0.74];
+  else if (id === 7) c = [0.12, 0.12, 0.1];
+  else c = [0.16, 0.025, 0.035];
+  if ((id >= 1 && id <= 3) || id === 7) {
+    c = mixc(c, [c[0] * 0.55, c[1] * 0.48, c[2] * 0.4], Math.min(0.7, dirt * 0.75 * (0.6 + 0.8 * fine)));
+    c = mixc(c, mixc([0.028, 0.005, 0.004], [0.075, 0.01, 0.007], fine), blood * 0.9);
+  }
+  // a little variation at the pixel scale, so flat colours do not look like plastic
+  const v = 0.92 + 0.16 * (big * 0.6 + fine * 0.4); c = c.map((q) => q * v);
+  return c;
+}
 
-/* ---------------- renderer ---------------- */
+/* ---------------- render ---------------- */
 let R3 = null;
-function renderer() {
+function stage() {
   if (R3) return R3;
   const canvas = document.createElement('canvas');
-  const r = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, preserveDrawingBuffer: false });
-  r.setPixelRatio(1);
-  const u = {
-    uJ: { value: Array.from({ length: NJ }, () => new THREE.Vector3()) }, uHeadR: { value: new THREE.Matrix3() }, uChestR: { value: new THREE.Matrix3() }, uPelvisR: { value: new THREE.Matrix3() },
-    uBody: { value: new THREE.Vector4() }, uLook: { value: new THREE.Vector4() }, uOut: { value: new THREE.Vector4() }, uOut2: { value: new THREE.Vector4() }, uOut3: { value: new THREE.Vector4() },
-    uSkin: { value: new THREE.Color() }, uCloth: { value: new THREE.Color() }, uPants: { value: new THREE.Color() }, uHairC: { value: new THREE.Color() },
-    uCam: { value: new THREE.Matrix3() }, uCamPos: { value: new THREE.Vector3() }, uSpan: { value: new THREE.Vector2(2, 2) }, uLight: { value: new THREE.Vector3(0.5, 0.8, 0.6) },
-    uBoxMin: { value: new THREE.Vector3() }, uBoxMax: { value: new THREE.Vector3() }, uZero: { value: 0 },
-  };
-  const mat = new THREE.ShaderMaterial({ uniforms: u, vertexShader: VERT, fragmentShader: FRAG, depthTest: false, depthWrite: false });
-  const scene = new THREE.Scene(), quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat); quad.frustumCulled = false; scene.add(quad);
-  R3 = { r, u, scene, cam: new THREE.Camera(), rt: null, compiled: false, lost: false };
-  canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); R3.lost = true; });
+  const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true, premultipliedAlpha: false });
+  r.setPixelRatio(1); r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap;
+  r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.15; r.outputColorSpace = THREE.SRGBColorSpace;
+  const scene = new THREE.Scene(), cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 20);
+  const key = new THREE.DirectionalLight(0xfff2e0, 2.6), rim = new THREE.DirectionalLight(0x9fb4d0, 1.1), hemi = new THREE.HemisphereLight(0x8fa0b8, 0x4a4036, 0.9);
+  key.castShadow = true; key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -0.0004; key.shadow.normalBias = 0.01; key.shadow.radius = 3;
+  scene.add(key, key.target, rim, rim.target, hemi);
+  const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.78, metalness: 0 });
+  const mesh = new THREE.Mesh(new THREE.BufferGeometry(), mat); mesh.castShadow = mesh.receiveShadow = true; scene.add(mesh);
+  const eyeMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(1.0, 0.12, 0.05) }), eyes = [0, 1].map(() => { const m = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 8), eyeMat); scene.add(m); return m; });
+  const out2 = document.createElement('canvas'), g2 = out2.getContext('2d', { willReadFrequently: true });
+  R3 = { r, scene, cam, key, rim, hemi, mesh, eyes, out2, g2 };
   return R3;
 }
-const lin = (hex) => new THREE.Color(hex);   // three converts sRGB hex to linear working colour
 
 // Renders the frames of one animation from one direction.
 // o: { zombie, anim, frames, dir (deg, 0 = facing the camera), pitch (deg), size (px), ss (supersample), light: [az, el] (deg),
-//      span (m shown across the frame), foot (px from the bottom edge to the feet) }
-//      raw: true → no supersampling (the pixel-art pipeline downsamples itself)
-// returns { frames: [ImageData-like {w, h, data}] } with a hard alpha edge
+//      span (m shown across the frame), foot (px from the bottom edge to the feet), raw (no supersampling) }
+// returns frames as { w, h, data } with a hard alpha edge. One frame per step of the generator.
 function* frameGen(o) {
-  const z = o.zombie, R0 = renderer(), u = R0.u, N = Math.max(1, o.frames | 0), size = o.size, ss = o.raw ? 1 : (o.ss || 2), W = size * ss;
-  if (!R0.rt || R0.rt.width !== W) { if (R0.rt) R0.rt.dispose(); R0.rt = new THREE.WebGLRenderTarget(W, W, { depthBuffer: false }); }
+  const z = o.zombie, R0 = stage(), N = Math.max(1, o.frames | 0), size = o.size, ss = o.raw ? 1 : (o.ss || 2), W = size * ss;
   R0.r.setSize(W, W, false);
-  const n = skeleton(z), s = z.height / 1.75;
-  const O = OUTFITS[z.outfit] || OUTFITS.casual;
-  u.uBody.value.set(s, z.build, z.decay, 0); u.uLook.value.set(z.blood, z.dirt, z.tears, (z.seed % 97) * 0.37);
-  u.uOut.value.set(O.suit ? 1 : 0, O.shirt === 'long' ? 2 : O.shirt === 'short' ? 1 : 0, O.pants === 'long' ? 2 : O.pants === 'short' ? 1 : 0, O.gown ? 1 : 0);
-  u.uOut2.value.set(O.tie ? 1 : 0, O.overall ? 1 : 0, O.rags ? 1 : 0, O.suit ? 0 : ({ none: 0, short: 1, sparse: 2, long: 3 }[z.hair] || 0));
-  u.uOut3.value.set({ milky: 0, yellow: 1, red: 2 }[z.eyes] || 0, z.armLost === 'right' ? 1 : 0, 0, 0);
-  u.uSkin.value.copy(lin(z.skin)); u.uCloth.value.copy(lin(z.cloth)); u.uPants.value.copy(lin(z.pants)); u.uHairC.value.copy(lin(z.hairCol));
-  // camera: orthographic, turned around the figure; the ground line sits `foot` px above the bottom edge
-  const yaw = (o.dir || 0) * Math.PI / 180, pitch = (o.pitch ?? 6) * Math.PI / 180, span = o.span || 2.03;
-  // back: from the figure towards the camera (yaw 0 = in front of it, pitch above it); rays run along -back
+  const n = skeleton(z), span = o.span || 2.03;
+  const yaw = (o.dir || 0) * Math.PI / 180, pitch = (o.pitch ?? 6) * Math.PI / 180;
   const back = new THREE.Vector3(Math.sin(yaw) * Math.cos(pitch), Math.sin(pitch), Math.cos(yaw) * Math.cos(pitch)), right = new THREE.Vector3(0, 1, 0).cross(back).normalize(), up = back.clone().cross(right).normalize();
-  u.uCam.value.set(right.x, up.x, back.x, right.y, up.y, back.y, right.z, up.z, back.z);
-  // the centre of the frame: the ground point under the figure projected `foot` px above the bottom edge
-  const centreUp = span / 2 - (o.foot ?? 9) / size * span;
-  const c = new THREE.Vector3(0, 0, 0).addScaledVector(up, centreUp);
-  u.uCamPos.value.copy(c).addScaledVector(back, 5); u.uSpan.value.set(span, span);
+  // orthographic camera; the ground point under the figure sits `foot` px above the bottom edge
+  const centreUp = span / 2 - (o.foot ?? 9) / size * span, c = new THREE.Vector3().addScaledVector(up, centreUp);
+  R0.cam.position.copy(c).addScaledVector(back, 6); R0.cam.up.copy(up); R0.cam.lookAt(c);
+  Object.assign(R0.cam, { left: -span / 2, right: span / 2, top: span / 2, bottom: -span / 2 }); R0.cam.updateProjectionMatrix();
+  // the light turns with the camera (the sprite is lit the same way from every direction, as sprites in a 2D game are)
   const la = (o.light?.[0] ?? -35) * Math.PI / 180, le = (o.light?.[1] ?? 40) * Math.PI / 180;
-  // the light turns with the camera (the sprite is lit the same way from every direction, as in a 2D game)
-  const Lw = new THREE.Vector3().addScaledVector(right, Math.sin(la) * Math.cos(le)).addScaledVector(up, Math.sin(le)).addScaledVector(back, Math.cos(la) * Math.cos(le));
-  u.uLight.value.copy(Lw.normalize());
-  const buf = new Uint8Array(W * W * 4);
+  const L = new THREE.Vector3().addScaledVector(right, Math.sin(la) * Math.cos(le)).addScaledVector(up, Math.sin(le)).addScaledVector(back, Math.cos(la) * Math.cos(le)).normalize();
+  R0.key.position.copy(L).multiplyScalar(4); R0.key.target.position.set(0, 0.9, 0);
+  Object.assign(R0.key.shadow.camera, { left: -1.4, right: 1.4, top: 1.4, bottom: -1.4, near: 0.5, far: 9 }); R0.key.shadow.camera.updateProjectionMatrix();
+  R0.rim.position.copy(back).multiplyScalar(-4).addScaledVector(up, 2).addScaledVector(right, -Math.sign(Math.sin(la)) * 1.5); R0.rim.target.position.set(0, 0.9, 0);
+  const cols = { skin: C3(z.skin), cloth: C3(z.cloth), pants: C3(z.pants), hair: C3(z.hairCol) };
+  const h = Math.max(0.0045, span / size * 1.6);                     // the mesh step: about 1.6 px of the frame
+  const g2 = R0.g2; R0.out2.width = W; R0.out2.height = W;
   for (let f = 0; f < N; f++) {
-    const P = pose(n, z, o.anim, f / N);
-    P.pts.forEach((p, i) => u.uJ.value[i].copy(p));
-    u.uHeadR.value.copy(P.head); u.uChestR.value.copy(P.chest); u.uPelvisR.value.copy(P.pelvis); u.uBody.value.w = P.jaw;
-    const mn = new THREE.Vector3(Infinity, Infinity, Infinity), mx = new THREE.Vector3(-Infinity, -Infinity, -Infinity);
-    for (const p of P.pts) { mn.min(p); mx.max(p); }
-    u.uBoxMin.value.copy(mn).subScalar(0.25); u.uBoxMax.value.copy(mx).addScalar(0.25);
-    // in horizontal bands, each its own draw: no single draw runs long enough for the driver to reset the GPU
-    // (Windows stops a GPU task after ~2 s), and the page gets a moment between bands
-    const rt = R0.rt; rt.scissorTest = false;
-    R0.r.setRenderTarget(rt); R0.r.setClearColor(0x000000, 0); R0.r.clear();
-    const bands = Math.max(1, Math.ceil(W / 128)), bh = Math.ceil(W / bands);
-    for (let b = 0; b < bands; b++) {
-      rt.scissor.set(0, b * bh, W, Math.min(bh, W - b * bh)); rt.scissorTest = true; rt.viewport.set(0, 0, W, W);
-      R0.r.setRenderTarget(rt); R0.r.render(R0.scene, R0.cam);
-      if (b < bands - 1) yield { band: b + 1, bands };
+    const P = pose(n, z, o.anim, f / N), Fd = makeField(z, P);
+    const mn = [Infinity, Infinity, Infinity], mx = [-Infinity, -Infinity, -Infinity];
+    for (const p of Fd.J) for (let a = 0; a < 3; a++) { mn[a] = Math.min(mn[a], p[a]); mx[a] = Math.max(mx[a], p[a]); }
+    const box = [mn[0] - 0.22, Math.max(-0.05, mn[1] - 0.22), mn[2] - 0.22, mx[0] + 0.22, mx[1] + 0.22, mx[2] + 0.22];
+    const sf = surface(Fd.field, box, h);
+    yield { stage: 'mesh' };
+    // normals from the gradient, colours, a touch of occlusion from the field itself, small bumps
+    const nv = sf.pos.length / 3, nrm = new Float32Array(nv * 3), col = new Float32Array(nv * 3), e = 0.0015;
+    for (let v = 0; v < nv; v++) {
+      const x = sf.pos[v * 3], y = sf.pos[v * 3 + 1], zz = sf.pos[v * 3 + 2];
+      Fd.field(x, y, zz); const id = F.id, hx = F.hx, hy = F.hy, hz = F.hz;
+      let gx = Fd.field(x + e, y, zz) - Fd.field(x - e, y, zz), gy = Fd.field(x, y + e, zz) - Fd.field(x, y - e, zz), gz = Fd.field(x, y, zz + e) - Fd.field(x, y, zz - e);
+      const bump = id === 0 ? 0.35 : id === 1 || id === 2 ? 0.55 : 0.2, bn = (noise(x * 40, y * 40, zz * 40) - 0.5) * bump, bm = (noise(x * 40 + 5, y * 40 + 5, zz * 40 + 5) - 0.5) * bump, bo = (noise(x * 40 + 9, y * 40 + 9, zz * 40 + 9) - 0.5) * bump;
+      const gl = Math.hypot(gx, gy, gz) || 1; gx = gx / gl + bn; gy = gy / gl + bm; gz = gz / gl + bo; const gl2 = Math.hypot(gx, gy, gz) || 1;
+      nrm[v * 3] = gx / gl2; nrm[v * 3 + 1] = gy / gl2; nrm[v * 3 + 2] = gz / gl2;
+      let ao = 0, w = 1; for (let i = 1; i <= 3; i++) { const d = 0.03 * i; ao += w * (d - Fd.field(x + nrm[v * 3] * d, y + nrm[v * 3 + 1] * d, zz + nrm[v * 3 + 2] * d)); w *= 0.6; }
+      const occ = Math.min(1, Math.max(0.35, 1 - 3 * ao));
+      const c3 = shadeVertex(z, x, y, zz, id, hx, hy, hz, Fd.s, cols);
+      col[v * 3] = c3[0] * occ; col[v * 3 + 1] = c3[1] * occ; col[v * 3 + 2] = c3[2] * occ;
     }
-    rt.scissorTest = false;
-    if (R0.lost) throw new Error('the graphics card stopped the render (WebGL context lost) — reload the page and try a smaller frame or the pixel-art style');
-    R0.r.setRenderTarget(rt);
-    R0.r.readRenderTargetPixels(rt, 0, 0, W, W, buf);
-    // box-filter the supersamples (premultiplied), then a hard alpha edge; rows flipped (GL is bottom-up)
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(sf.pos, 3)); g.setAttribute('normal', new THREE.BufferAttribute(nrm, 3)); g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    g.setIndex(nv > 65535 ? new THREE.Uint32BufferAttribute(sf.idx, 1) : new THREE.Uint16BufferAttribute(sf.idx, 1));
+    R0.mesh.geometry.dispose(); R0.mesh.geometry = g;
+    // glowing red eyes
+    const red = z.eyes === 'red', hm = new THREE.Matrix4().setFromMatrix3(P.head);
+    R0.eyes.forEach((m, i) => { m.visible = red; if (!red) return; const p = new THREE.Vector3((i ? 1 : -1) * 0.033 * Fd.s, 0.114 * Fd.s, 0.088 * Fd.s).applyMatrix4(hm).add(P.pts[3]); m.position.copy(p); m.scale.setScalar(0.009 * Fd.s); });
+    R0.r.setClearColor(0x000000, 0); R0.r.render(R0.scene, R0.cam);
+    g2.clearRect(0, 0, W, W); g2.drawImage(R0.r.domElement, 0, 0);
+    const buf = g2.getImageData(0, 0, W, W).data;
+    // box-filter the supersamples (weighted by coverage), then a hard alpha edge
     const img = { w: size, h: size, data: new Uint8ClampedArray(size * size * 4) };
     for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
-      let r = 0, g = 0, b = 0, a = 0;
-      for (let j = 0; j < ss; j++) for (let i = 0; i < ss; i++) { const k = ((W - 1 - (y * ss + j)) * W + x * ss + i) * 4, al = buf[k + 3]; r += buf[k] * al; g += buf[k + 1] * al; b += buf[k + 2] * al; a += al; }
+      let r = 0, gg = 0, bb = 0, a = 0;
+      for (let j = 0; j < ss; j++) for (let i = 0; i < ss; i++) { const k = ((y * ss + j) * W + x * ss + i) * 4, al = buf[k + 3]; r += buf[k] * al; gg += buf[k + 1] * al; bb += buf[k + 2] * al; a += al; }
       const k = (y * size + x) * 4;
-      if (a / (ss * ss) >= 127.5) { img.data[k] = r / a; img.data[k + 1] = g / a; img.data[k + 2] = b / a; img.data[k + 3] = 255; }
+      if (a / (ss * ss) >= 127.5) { img.data[k] = r / a; img.data[k + 1] = gg / a; img.data[k + 2] = bb / a; img.data[k + 3] = 255; }
     }
-    R0.r.setRenderTarget(null);
     yield img;
   }
 }
-export function renderZombie(o) { return { frames: [...frameGen(o)].filter((x) => !x.band) }; }
-// the same, a frame at a time, giving the page a moment between frames (a loader can move); onFrame(done, total);
+export function renderZombie(o) { return { frames: [...frameGen(o)].filter((x) => !x.stage) }; }
+// the same, a step at a time, giving the page a moment between steps (the loader moves); onFrame(done, total);
 // cancelled() → true stops early (a newer render was asked for) and returns null
 export async function renderZombieAsync(o, onFrame, cancelled) {
-  const out = [], N = Math.max(1, o.frames | 0), R0 = renderer();
-  if (!R0.compiled) {                                // compile in the background where the browser can (KHR_parallel_shader_compile)
-    if (onFrame) onFrame(0, N, 'compile');
-    await new Promise((r) => setTimeout(r, 30));
-    try { await R0.r.compileAsync(R0.scene, R0.cam); } catch { /* falls back to compiling on the first draw */ }
-    R0.compiled = true;
-  }
+  const out = [], N = Math.max(1, o.frames | 0);
   for (const x of frameGen(o)) {
-    if (x.band) { if (onFrame) onFrame(out.length + x.band / x.bands, N); }
+    if (x.stage) { if (onFrame) onFrame(out.length + 0.5, N); }
     else { out.push(x); if (onFrame) onFrame(out.length, N); }
     await new Promise((r) => setTimeout(r, 0));
     if (cancelled && cancelled()) return null;
