@@ -6,7 +6,8 @@
 import * as THREE from '../../vendor/three.module.js';
 import { PostPipeline } from '../render/post.js';
 import { buildShip, SHIPS } from '../shipkit/index.js';
-import { SEAS, LOOKS, WATER_BODIES, waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, addWetHull, hullTexture } from '../env/waterkit.js';
+import { SEAS, LOOKS, WATER_BODIES, waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, addWetHull, hullTexture, GLSL_SHIP } from '../env/waterkit.js';
+import { FoamMap, breaking } from '../env/foamkit.js';
 import { generateWaterway, heightTexture, terrainMeshes, landUniforms, setLand, GLSL_LAND } from '../env/landkit.js';
 
 const $ = (id) => document.getElementById(id);
@@ -60,8 +61,8 @@ const yBridge = S.lines.deck(20) + 8.6;
 
 /* ---------------- variants ---------------- */
 const DEFAULTS = {
-  A: { body: 'ocean', width: 700, wall: 650, steep: 0.85, depth: 180, meander: 0.12, current: 0, oil: 0, iceCover: 0, floe: 18, freeboard: 0.35, sea: 'moderate', ...pick(SEAS.moderate), dir: 30, look: 'atlantic', ...pick(LOOKS.atlantic), reflect: 1, planar: false, clear: false, kn: 18, motion: true, bowWave: true, wake: true, hullFoam: true, wet: true, spray: true },
-  B: { body: 'ocean', width: 700, wall: 650, steep: 0.85, depth: 180, meander: 0.12, current: 0, oil: 0, iceCover: 0, floe: 18, freeboard: 0.35, sea: 'rough', ...pick(SEAS.rough), dir: 30, look: 'baltic', ...pick(LOOKS.baltic), reflect: 1, planar: true, clear: false, kn: 18, motion: true, bowWave: true, wake: true, hullFoam: true, wet: true, spray: true },
+  A: { body: 'ocean', width: 700, wall: 650, steep: 0.85, depth: 180, meander: 0.12, current: 0, oil: 0, iceCover: 0, floe: 18, freeboard: 0.35, sea: 'moderate', ...pick(SEAS.moderate), dir: 30, look: 'atlantic', ...pick(LOOKS.atlantic), reflect: 1, planar: false, clear: false, kn: 18, motion: true, bowWave: true, wake: true, hullFoam: true, wet: true, spray: true, foamMap: true },
+  B: { body: 'ocean', width: 700, wall: 650, steep: 0.85, depth: 180, meander: 0.12, current: 0, oil: 0, iceCover: 0, floe: 18, freeboard: 0.35, sea: 'rough', ...pick(SEAS.rough), dir: 30, look: 'baltic', ...pick(LOOKS.baltic), reflect: 1, planar: true, clear: false, kn: 18, motion: true, bowWave: true, wake: true, hullFoam: true, wet: true, spray: true, foamMap: true },
 };
 function pick(o) { const r = { ...o }; delete r.label; return r; }
 const KEY = 'steelSalvo.waterLab.v1';
@@ -79,7 +80,9 @@ function makeVariant(id) {
   const mesh = new THREE.Mesh(geo.current, waterMaterial(u, { land: GLSL_LAND })); mesh.frustumCulled = false; mesh.renderOrder = 1;
   scene.add(mesh);
   const spray = makeSpray(); scene.add(spray.points);
-  return { id, u, mesh, waves: [], spray, m: { heave: 0, pitch: 0, roll: 0, vh: 0, vp: 0, vr: 0 }, shift: 0, ground: 0, T: null, tex: null, terrain: null, bankKey: '', bankTimer: 0 };
+  const splash = makeSpray(2600, 0.55); scene.add(splash.points);
+  const foam = new FoamMap(renderer, u, GLSL_SHIP);
+  return { id, u, mesh, waves: [], spray, splash, foam, events: [], ringSlot: 0, m: { heave: 0, pitch: 0, roll: 0, vh: 0, vp: 0, vr: 0 }, shift: 0, ground: 0, T: null, tex: null, terrain: null, bankKey: '', bankTimer: 0 };
 }
 function setGrid(spec) {
   const [s, r] = spec.split(',').map(Number);
@@ -104,11 +107,12 @@ function hullFrom(v) {
 function applyVariant(id) {
   const p = V[id], v = vars[id], u = v.u;
   v.waves = waveSet({ Hs: p.Hs, Lp: p.Lp, chop: p.chop, spread: p.spread, n: p.n }, p.dir + 180, id === 'A' ? 7 : 7);
-  setWaves(u, v.waves);
+  setWaves(u, v.waves); v.brk = breaking(v.waves, p.Hs, p.crest);
   u.uDeep.value.set(p.deep); u.uScatter.value.set(p.scatter);
   u.uShine.value = p.shine; u.uRipples.value = p.ripples; u.uCrest.value = p.crest; u.uReflect.value = p.reflect;
   u.uPlanar.value = p.planar ? 1 : 0; u.uAlpha.value = p.clear ? 0.78 : 1;
-  u.uShipFx.value.set(p.bowWave ? 1 : 0, p.wake ? 1 : 0, p.hullFoam ? 1 : 0, 0);
+  u.uShipFx.value.set(p.bowWave ? 1 : 0, p.wake ? 1 : 0, p.hullFoam ? 1 : 0, p.foamMap ? 1 : 0);
+  if (!p.foamMap) { v.foam.clear(); u.uFoamWin.value.w = 0; }
   u.uPixelN.value = $('pixN').checked ? 1 : 0;
   u.uCurrent.value = p.current || 0; u.uOil.value = p.oil || 0;
   u.uIce.value.set(p.iceCover || 0, p.floe || 18, p.freeboard ?? 0.35, 1);
@@ -134,7 +138,7 @@ function shore(v, p) {
 }
 
 /* ---------------- spray ---------------- */
-function makeSpray(N = 1400) {
+function makeSpray(N = 1400, alpha = 0.32) {
   const g = new THREE.BufferGeometry();
   const pos = new Float32Array(N * 3), life = new Float32Array(N), size = new Float32Array(N);
   g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('aLife', new THREE.BufferAttribute(life, 1)); g.setAttribute('aSize', new THREE.BufferAttribute(size, 1));
@@ -143,7 +147,7 @@ function makeSpray(N = 1400) {
     transparent: true, depthWrite: false,
     uniforms: { uScale: { value: 600 }, uLight: { value: 1 } },
     vertexShader: 'attribute float aLife,aSize;uniform float uScale;varying float vL;void main(){vL=aLife;vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=aLife>0.?aSize*uScale/-mv.z:0.;gl_Position=projectionMatrix*mv;}',
-    fragmentShader: 'uniform float uLight;varying float vL;void main(){vec2 c=gl_PointCoord-.5;float d=dot(c,c)*4.;if(d>1.)discard;float a=(1.-d)*(1.-d)*smoothstep(0.,.35,vL)*min(vL*1.6,1.)*.32;gl_FragColor=vec4(vec3(.93,.96,.98)*uLight,a);}',
+    fragmentShader: `uniform float uLight;varying float vL;void main(){vec2 c=gl_PointCoord-.5;float d=dot(c,c)*4.;if(d>1.)discard;float a=(1.-d)*(1.-d)*smoothstep(0.,.35,vL)*min(vL*1.6,1.)*${alpha.toFixed(2)};gl_FragColor=vec4(vec3(.93,.96,.98)*uLight,a);}`,
   });
   const points = new THREE.Points(g, mat); points.frustumCulled = false; points.renderOrder = 3;
   return { points, pos, life, size, vel: new Float32Array(N * 3), N, next: 0, acc: 0 };
@@ -167,6 +171,10 @@ function stepSpray(v, dt, t) {
         0.45 + Math.random() * 0.9 + slam * 0.4, 0.8 + Math.random() * 1.2);
     }
   }
+  integrate(sp, dt, vs);
+}
+// particles: gravity, drag, and the air streaming aft past the ship at its speed (still air over still water)
+function integrate(sp, dt, vs) {
   for (let i = 0; i < sp.N; i++) {
     if (sp.life[i] <= 0) continue;
     sp.life[i] -= dt;
@@ -179,6 +187,47 @@ function stepSpray(v, dt, t) {
   }
   const g = sp.points.geometry;
   g.attributes.position.needsUpdate = g.attributes.aLife.needsUpdate = g.attributes.aSize.needsUpdate = true;
+}
+
+/* ---------------- shell splashes and torpedo tracks ---------------- */
+// Positions are kept in the water's frame (q = ship frame + (0, shift)): a splash stays where it fell as the ship sails on.
+function shellSalvo(v) {
+  const t = clock.t;
+  for (let i = 0; i < 4; i++) {
+    const r = 70 + Math.random() * 260, a = (Math.random() * 2 - 1) * 1.4;
+    v.events.push({ kind: 'shell', t0: t + i * 0.18 + Math.random() * 0.25, x: Math.sin(a) * r, z: Math.cos(a) * r + v.shift, size: 0.8 + Math.random() * 0.5, done: false });
+  }
+}
+function torpedoRun(v) {
+  const t = clock.t, side = Math.random() < 0.5 ? -1 : 1, vt = 45 * KN, ang = side * (1.2 + Math.random() * 0.4);
+  // starts off one bow and runs across ahead of the ship
+  v.events.push({ kind: 'torpedo', t0: t, x: -side * 420, z: 260 + v.shift + Math.random() * 120, vx: Math.sin(ang) * vt, vz: -Math.abs(Math.cos(ang)) * vt * 0.4, life: 34 });
+}
+function stepEvents(v, dt) {
+  const t = clock.t;
+  for (const e of v.events) {
+    if (e.kind === 'shell' && !e.done && t >= e.t0) {
+      e.done = true;
+      v.foam.stamp(e.x, e.z, 5 * e.size, { active: 1, foam: 0.95, ring: 0.7, life: 1.6 });   // froth while the column falls back
+      v.u.uSplash.value[v.ringSlot].set(e.x, e.z, t, e.size); v.ringSlot = (v.ringSlot + 1) % 4;
+      const px = e.x, pz = e.z - v.shift, wy = heightAt(v.waves, px, pz, t, v.shift);
+      for (let k = 0; k < 1100; k++) {
+        // the column: water thrown up at every speed (so it fills from the sea to a ragged top, widening as it rises),
+        // and a crown thrown outwards at its foot
+        const core = k < 750, a = Math.random() * 6.283, rr = (core ? 1.4 : 2.5) * Math.sqrt(Math.random()) * e.size, sq = Math.sqrt(e.size);
+        const up = core ? (8 + Math.pow(Math.random(), 0.6) * 28) * sq : (3 + Math.random() * 6) * sq, out = core ? 0.4 + Math.random() * 1.8 : 5 + Math.random() * 7;
+        emitSpray(v.splash, px + Math.cos(a) * rr, wy + Math.random() * 0.5, pz + Math.sin(a) * rr, Math.cos(a) * out, up, Math.sin(a) * out, (core ? 0.9 : 1.3) * e.size + Math.random() * 0.8, 2.2 + Math.random() * 2.6);
+      }
+    }
+    if (e.kind === 'torpedo' && t >= e.t0) {                             // the bubble track, a little behind the torpedo
+      const age = t - e.t0, x = e.x + e.vx * age, z = e.z + e.vz * age;
+      v.foam.stamp(x, z, 2.6, { active: 0.15, foam: 0.85, ring: 0, life: 0.01 });
+      e.life -= dt;
+    }
+  }
+  v.events = v.events.filter((e) => (e.kind === 'shell' ? !e.done || t - e.t0 < 1 : e.life > 0));
+  integrate(v.splash, dt, V[v.id].kn * KN);
+  const g = v.splash.points.geometry; g.attributes.position.needsUpdate = g.attributes.aLife.needsUpdate = g.attributes.aSize.needsUpdate = true;
 }
 
 /* ---------------- ship motion ---------------- */
@@ -307,7 +356,7 @@ const FMT = { Hs: (x) => x.toFixed(1) + ' m', Lp: (x) => x + ' m', chop: (x) => 
   width: (x) => x + ' m', wall: (x) => x + ' m', current: (x) => x.toFixed(1) + ' m/s',
   oil: (x) => Math.round(x * 100) + ' %', iceCover: (x) => Math.round(x * 100) + ' %', floe: (x) => x + ' m', freeboard: (x) => x.toFixed(2) + ' m' };
 const SEA_KEYS = ['Hs', 'Lp', 'chop', 'spread', 'n'], LOOK_KEYS = ['deep', 'scatter', 'shine', 'ripples', 'crest'];
-const CHECKS = ['planar', 'clear', 'motion', 'bowWave', 'wake', 'hullFoam', 'wet', 'spray'];
+const CHECKS = ['planar', 'clear', 'motion', 'bowWave', 'wake', 'hullFoam', 'wet', 'spray', 'foamMap'];
 function fillUI() {
   const p = V[edit];
   $('seaPreset').value = p.sea; $('lookPreset').value = p.look; $('body').value = p.body || 'ocean';
@@ -352,6 +401,8 @@ $('bloom').onchange = () => post.setParams({ bloom: $('bloom').checked });
 $('shadows').onchange = () => { sun.castShadow = $('shadows').checked; };
 $('grid').onchange = () => setGrid($('grid').value);
 $('pixN').onchange = () => { applyVariant('A'); applyVariant('B'); };
+$('shells').onclick = () => { for (const v of Object.values(vars)) shellSalvo(v); };
+$('torpedo').onclick = () => { for (const v of Object.values(vars)) torpedoRun(v); };
 $('splitOn').onchange = () => { $('split').hidden = !$('splitOn').checked; seaText(); };
 addEventListener('keydown', (e) => { if (e.code === 'KeyH' && !e.target.closest('input,select')) [$('leftPanel'), $('rightPanel')].forEach((p) => p.classList.toggle('hidden-panel')); });
 
@@ -379,6 +430,7 @@ $('measure').onclick = async () => {
     ['Per-pixel normals', () => { const o = $('pixN').checked; $('pixN').checked = false; $('pixN').onchange(); return () => { $('pixN').checked = o; $('pixN').onchange(); }; }],
     ['Water mesh → Light', () => { const o = $('grid').value; $('grid').value = '96,90'; setGrid('96,90'); return () => { $('grid').value = o; setGrid(o); }; }],
     ['Wake + hull foam + bow wave', () => { const o = [p.wake, p.hullFoam, p.bowWave]; p.wake = p.hullFoam = p.bowWave = false; changed(); return () => { [p.wake, p.hullFoam, p.bowWave] = o; changed(); }; }],
+    ['Foam with memory', () => { const o = p.foamMap; p.foamMap = false; changed(); return () => { p.foamMap = o; changed(); }; }],
     ['Spray', () => { const o = p.spray; p.spray = false; changed(); return () => { p.spray = o; changed(); }; }],
     ['Wet hull', () => { const o = p.wet; p.wet = false; changed(); return () => { p.wet = o; changed(); }; }],
     ['Ship shadows', () => { const o = sun.castShadow; sun.castShadow = false; return () => { sun.castShadow = o; }; }],
@@ -412,15 +464,19 @@ function prepare(v, dt) {
     v.ground = (v.ground + (p.kn * KN - (p.current || 0)) * dt) % v.T.size;
     u.uLandOff.value.set(v.T.size / 2, v.ground);
   }
-  stepMotion(v, dt, clock.t); stepSpray(v, dt, clock.t);
+  stepMotion(v, dt, clock.t); stepSpray(v, dt, clock.t); stepEvents(v, dt);
+  const a = (p.dir + 180) * Math.PI / 180;                             // the waves (and the wind) run this way
+  v.brk = v.brk || breaking(v.waves, p.Hs, p.crest);
+  v.foam.update(dt, { centre: [0, v.shift], residualLife: 1 + 3.2 * p.Hs, shipLife: 150, brk: v.brk,
+    windDir: [Math.sin(a), Math.cos(a)], windRows: Math.min(1, Math.max(0, (p.Hs - 3) / 4)), on: !!p.foamMap });
 }
 let sceneCalls = 0;
 function drawPass(v, x0, w, H, others) {
   poseShip(v); hullFrom(v);
-  v.mesh.visible = true; v.spray.points.visible = V[v.id].spray; for (const o of others) { o.mesh.visible = false; o.spray.points.visible = false; if (o.terrain) o.terrain.group.visible = false; }
+  v.mesh.visible = true; v.spray.points.visible = V[v.id].spray; v.splash.points.visible = true; for (const o of others) { o.mesh.visible = false; o.spray.points.visible = false; o.splash.points.visible = false; if (o.terrain) o.terrain.group.visible = false; }
   if (v.terrain) { v.terrain.group.visible = !!(WATER_BODIES[V[v.id].body] || {}).banks; v.terrain.update(camera); }
   const s = Math.max(4, camera.position.y);
-  v.spray.points.material.uniforms.uScale.value = renderer.getDrawingBufferSize(new THREE.Vector2()).y * 0.6;
+  v.spray.points.material.uniforms.uScale.value = v.splash.points.material.uniforms.uScale.value = renderer.getDrawingBufferSize(new THREE.Vector2()).y * 0.6;
   v.mesh.position.set(Math.round(camera.position.x / 2) * 2, 0, Math.round(camera.position.z / 2) * 2);
   v.mesh.scale.setScalar(1 + s * 0.0);
   if (V[v.id].planar) renderReflection(v);
@@ -467,5 +523,7 @@ function frame(now) {
 }
 
 applyVariant('A'); applyVariant('B'); fillUI(); setSun(); resize();
-window.__water = { scene, camera, orbit, vars, V, model, shipRoot, applyVariant, fillUI, bodies: WATER_BODIES, get edit() { return edit; }, set edit(x) { edit = x; fillUI(); } };
+window.__water = { scene, camera, orbit, vars, V, model, shipRoot, applyVariant, fillUI, shellSalvo, torpedoRun, get t() { return clock.t; },
+  // tests: run the sea (motion, spray, foam) for some seconds without drawing
+  simulate(sec, dt = 0.05) { const cur = $('splitOn').checked ? null : vars[edit]; for (let s = 0; s < sec; s += dt) { clock.t += dt; for (const v of Object.values(vars)) if (!cur || v === cur) prepare(v, dt); } }, bodies: WATER_BODIES, get edit() { return edit; }, set edit(x) { edit = x; fillUI(); } };
 requestAnimationFrame(frame);

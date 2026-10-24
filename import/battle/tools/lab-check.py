@@ -119,6 +119,24 @@ def main():
             time.sleep(3); pg.screenshot(path=os.path.join(OUT, 'lab-water-ice.png'), timeout=600000)
             pg.screenshot(path=os.path.join(OUT, 'lab-water-river.png'), timeout=600000)
             pg.evaluate("()=>{const s=document.getElementById('body');s.value='ocean';s.dispatchEvent(new Event('change'))}")
+            # foam with memory: whitecap coverage on Monahan & O'Muircheartaigh (within 35 %), the wake trail stays behind
+            # the ship, a shell splash and a torpedo leave foam where they were (water frame)
+            for sea in ['moderate', 'gale']:
+                r = pg.evaluate("""async(sea)=>{const W=__water;const {SEAS}=await import('../js/env/waterkit.js');const {monahan,windFromHs}=await import('../js/env/foamkit.js');
+                  Object.assign(W.V.A,SEAS[sea],{sea,foamMap:true,kn:18});W.edit='A';W.applyVariant('A');W.vars.A.foam.clear();W.simulate(40);
+                  const v=W.vars.A,sh=v.u.uShift.value,s=v.foam.sample(60,sh+40,560,sh+540),w=v.foam.sample(-12,sh-260,12,sh-80);
+                  return {sea,target:monahan(windFromHs(SEAS[sea].Hs)),cov:s[3],active:s[4],wake:w[2]}}""", sea)
+                print('whitecaps', sea, f"{r['cov']*100:.2f} % (Monahan {r['target']*100:.2f} %, active {r['active']*100:.2f} %), wake {r['wake']:.2f}")
+                assert 0.65 < r['cov'] / r['target'] < 1.35, f'whitecap coverage off for {sea}'
+                assert r['wake'] > 0.1, 'no wake trail in the foam map'
+            ev = pg.evaluate("""()=>{const W=__water,v=W.vars.A;v.events.length=0;const sh=v.u.uShift.value;
+              v.events.push({kind:'shell',t0:W.t,x:120,z:sh+200,size:1,done:false});W.simulate(3);const a=v.foam.sample(115,sh+195,125,sh+205);
+              v.events.push({kind:'torpedo',t0:W.t,x:-200,z:sh+300,vx:23,vz:0,life:12});W.simulate(10);const b=v.foam.sample(-150,sh+298.5,-50,sh+301.5);return [a[2],b[2]]}""")
+            print('splash / torpedo foam', [round(x, 2) for x in ev])
+            assert ev[0] > 0.3 and ev[1] > 0.12, 'shell splash or torpedo track left no foam'
+            pg.evaluate("()=>{const W=__water;Object.assign(W.V.A,{sea:'moderate'});document.getElementById('seaPreset').value='moderate';document.getElementById('seaPreset').dispatchEvent(new Event('change'))}")
+            pg.evaluate("()=>{[...document.querySelectorAll('#cams button')].find(b=>b.textContent==='Wake').click();const o=__water.orbit;o.target.copy(o.want.target);o.dist=o.want.dist;o.yaw=o.want.yaw;o.pitch=o.want.pitch;o.want=null}")
+            time.sleep(3); pg.screenshot(path=os.path.join(OUT, 'lab-water-foam.png'), timeout=600000)
             # transformer: levels, hitboxes, damage through a ray, fleet
             pg.goto(f'http://localhost:{PORT}/labs/transform.html')
             pg.wait_for_function('window.__tf && window.__tf.T.levels.length === 3', timeout=300000)

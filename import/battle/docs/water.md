@@ -41,6 +41,44 @@ Settings are remembered in the browser (localStorage) and "Copy settings (JSON)"
 - **Spray**: CPU particles from the stem, continuous at speed and in bursts when the bow slams into a crest; air
   streams aft past the ship.
 
+## Foam with memory (`js/env/foamkit.js`)
+
+A **foam map** keeps the foam of a 1.5 km square of sea (1024² float texels, 1.5 m each) in the water's own frame, so
+foam stays where it was made and drifts with the water while the ship sails on. The window follows the ship in whole
+texels (no blur), 70 % of it astern for the wake. Every frame one GPU pass updates three densities:
+
+- **Active breaking** (R): where the fold of the Gerstner surface (Σ Q·k·A·sin θ) passes a threshold; dense froth that
+  lives ~0.45 s. Crests break in segments (a noise fixed in the water jitters the threshold).
+- **Residual foam** (G): left behind by the breaking; it lives `1 + 3.2·Hs` s (~5 s at Beaufort 4, ~20 s in a gale).
+- **Ship foam** (B): the turbulent wake (a source ~30 m long behind the stern; the memory makes the trail), the foam
+  lines the bow wave leaves along the hull, shell splashes and torpedo tracks; lives 150 s and spreads sideways
+  (diffusion 1.6 m²/s). Long after it stops showing as foam it still **calms the ripples**: the slick behind a ship.
+
+The water shader draws the densities through a **bubble-raft pattern** (two scales of Voronoi borders): dense foam is
+solid, thinning foam keeps only the network (lace), and in a gale the rafts stretch along the wind into **wind rows**.
+Far away (beyond ~500 m) the pattern turns into its average so it does not shimmer. Outside the window the old
+analytic crests and wake are drawn. The Kelvin arms and the foam right at the hull stay analytic (they belong to the
+ship, not to the water's history).
+
+**Whitecap calibration.** The wind follows from the significant wave height of a developed sea (Hs ≈ 0.0246·U²) and the
+whitecap coverage from Monahan & O'Muircheartaigh (1980): W = 3.84·10⁻⁶·U^3.41. The fold is close to normal with
+σ² = Σ(Q·k·A)²/2, so the threshold is set at the quantile that makes 42 % of W actively breaking (the rest is
+residual); the residual starts dense enough to stay over half opaque for 3.6 s, whatever its life, and then turns to
+lace. `tools/lab-check.py` measures the coverage (texels with foam over half opaque, after 40 s) and fails outside
+±35 % of Monahan.
+
+| Sea (Hs) | Wind U | Monahan | Measured | Actively breaking |
+|---|---|---|---|---|
+| Moderate (1.2 m) | 7.0 m/s | 0.29 % | 0.27 % | 0.11 % |
+| Gale (6 m) | 15.6 m/s | 4.5 % | 5.6 % | 2.2 % |
+
+**Shell splashes and torpedo tracks** (buttons in *Ship and water*): a salvo of four splashes 70–330 m out — a column of
+spray falling back over ~4 s, froth and a foam patch that spreads and stays, rings running out across the water; a
+torpedo running across ahead at 45 kn leaves its bubble track, which stays for minutes.
+
+Inspired by the two-stage foam and the calibration of [Open Water](https://github.com/Leonxlnx/open-water) (Leonxlnx,
+MIT); written anew here for ships (they have no ships, no wake).
+
 ## Water bodies
 
 `WATER_BODIES` in WaterKit: each body is a sea state, a look and a shore. *Open ocean* has no shore. *Fjord*, *Lake*
@@ -79,6 +117,6 @@ floes are drawn as their average cover (they flickered as a pattern smaller than
 
 ## Not yet
 
-Underwater view and caustics, ship shadows on the water, foam that persists from frame to frame (a foam map), true
+Underwater view and caustics, ship shadows on the water, true
 screen-space refraction, shore and island interaction, the game's ocean replaced by this one (after the owner picks a
 variant).

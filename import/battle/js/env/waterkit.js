@@ -5,6 +5,7 @@
 // Units: metres, seconds; y = 0 is the still waterline; the ship sits at the origin heading +z and the water streams
 // past it (uShift), so the ship-relative effects are computed in the ship's frame.
 import * as THREE from '../../vendor/three.module.js';
+import { GLSL_FOAMMAP } from './foamkit.js';
 
 export const MAXW = 16;
 const G = 9.81;
@@ -161,7 +162,7 @@ export const GLSL_SHIP = /* glsl */`
 uniform sampler2D uHull;
 uniform vec4 uHullZ;      // zMin, zMax, max half-breadth, -
 uniform vec4 uShip;       // speed (m/s), bow z, stern z, half beam
-uniform vec4 uShipFx;     // bow wave, wake, hull foam, - (0/1)
+uniform vec4 uShipFx;     // bow wave, wake, hull foam, foam map (0/1: the map carries the wake, see FoamKit)
 float hullHW(float z) {
   float u = (z - uHullZ.x) / (uHullZ.y - uHullZ.x);
   if (u < 0.0 || u > 1.0) return -1.0;
@@ -187,7 +188,7 @@ float shipFoam(vec2 p, float n) {
   float v = uShip.x, vk = clamp(v / 18.0, 0.0, 1.4), f = 0.0;
   float ax = abs(p.x), hw = hullHW(p.y), ub = uShip.y - p.y, us = uShip.z - p.y;
   if (uShipFx.y > 0.5 && v > 0.3) {
-    if (us > -2.0) { float u2 = max(us, 0.0), w = uShip.w * 0.85 + u2 * 0.032 + sqrt(u2) * 0.35;   // turbulent wake
+    if (us > -2.0 && uShipFx.w < 0.5) { float u2 = max(us, 0.0), w = uShip.w * 0.85 + u2 * 0.032 + sqrt(u2) * 0.35;   // turbulent wake
       float core = smoothstep(w, w * 0.2, ax), age = exp(-u2 / (70.0 + 380.0 * vk));
       f += core * age * smoothstep(0.3 + 0.45 * (1.0 - age), 0.95, n + 0.2) * 0.95 * vk; }
     if (ub > 0.0) { float arm = abs(ax - ub * 0.3536), bw = 0.8 + ub * 0.018;                // Kelvin arms: faint, broken
@@ -273,6 +274,9 @@ export function waterUniforms() {
     uFogCol: { value: new THREE.Color() }, uFogFar: { value: 2600 }, uFogDen: { value: 0 }, uRain: { value: 0 }, uLight: { value: 1 }, uCurrent: { value: 0 }, uOil: { value: 0 }, uIce: { value: new THREE.Vector4(0, 18, 0.35, 1) }, uWet: { value: 0.7 }, uWetOn: { value: 1 },
     uFlash: { value: new THREE.Vector4(0, 0, 0, 0) },   // point flash on the sea: position, power (gun flashes, lightning)
     tNormal: { value: tex.normal }, tFoam: { value: tex.foam },
+    // foam with memory (FoamKit): off until a FoamMap is attached; splash rings: water-frame x, z, start time, size
+    tFoamMap: { value: null }, uFoamWin: { value: new THREE.Vector4(0, 0, 1, 0) }, uFoamLook: { value: new THREE.Vector4(0, 1, 0, 0) },
+    uSplash: { value: Array.from({ length: 4 }, () => new THREE.Vector4(0, 0, -99, 0)) },
   };
 }
 export function setWaves(u, waves) {
@@ -335,7 +339,8 @@ export function waterMaterial(u, opt = {}) {
         vWorld = wp; vN = n; vFold = fold; vXZ = p; vShipH = sh;
         gl_Position = projectionMatrix * viewMatrix * vec4(wp, 1.0);
       }`,
-    fragmentShader: L + GLSL_WAVES + GLSL_SHIP + GLSL_ICE + /* glsl */`
+    fragmentShader: L + GLSL_WAVES + GLSL_SHIP + GLSL_ICE + GLSL_FOAMMAP + /* glsl */`
+      uniform vec4 uSplash[4];
       uniform vec3 uSun, uSunCol, uSkyH, uSkyZ, uSkySea, uDeep, uScatter, uFogCol;
       uniform float uShine, uRipples, uCrest, uReflect, uPlanar, uAlpha, uPixelN, uFogFar, uFogDen, uRain, uLight, uCurrent, uOil;
       uniform sampler2D uReflTex, tNormal, tFoam; uniform vec2 uRes; uniform vec4 uFlash;
@@ -369,7 +374,17 @@ export function waterMaterial(u, opt = {}) {
           oilN = texture2D(tFoam, qf / 210.0 + vec2(uTime * 0.0004, 0.0)).r * 0.6 + texture2D(tFoam, qf / 70.0 + 0.41).r * 0.4;
           oil = smoothstep(0.5, 0.64, oilN + cOil * 0.18 - 0.09) * min(1.0, cOil * 1.6);
         }
-        vec2 rip = (r1.xy + r2.xy) * cRip * 0.35 * exp(-dist / 350.0) * (1.0 - oil * 0.85);
+        vec4 fmap = foamMapAt(q);                                 // foam with memory (FoamKit)
+        vec2 rip = (r1.xy + r2.xy) * cRip * 0.35 * exp(-dist / 350.0) * (1.0 - oil * 0.85) * (1.0 - 0.65 * smoothstep(0.03, 0.4, fmap.b + fmap.r));   // the slick behind a ship is calm
+        // rings spreading from shell splashes
+        if (dist < 900.0) for (int i = 0; i < 4; i++) {
+          vec4 sp = uSplash[i]; float age = uTime - sp.z;
+          if (sp.w > 0.0 && age > 0.0 && age < 16.0) {
+            vec2 dv = q - sp.xy; float r = length(dv), ring = r - (1.0 + age * 3.4) * sp.w;
+            float w = exp(-ring * ring / (2.0 + age * 0.9)) * exp(-age / 5.0);
+            rip += dv / max(r, 0.01) * w * sin(ring * 1.7) * 0.55;
+          }
+        }
         N = normalize(N + vec3(rip.x, 0.0, rip.y));
         // rain: expanding rings from drops (two layers of cells, each cell one drop with its own phase) and a fine roughening
         if (uRain > 0.0 && dist < 80.0) {
@@ -417,7 +432,7 @@ export function waterMaterial(u, opt = {}) {
         float fn = texture2D(tFoam, qf / 14.0).r, fn2 = texture2D(tFoam, qf / 3.5 + vec2(0.31, 0.77)).r;
         float noise = fn * 0.65 + fn2 * 0.35;
         float crest = smoothstep(1.0 - cCrest * 0.55, 1.15 - cCrest * 0.5, fold + noise * 0.35) * cCrest;
-        float foam = clamp(crest + shipFoam(vXZ, noise), 0.0, 1.0);
+        float foam = clamp(crest * (1.0 - fmap.w) + shipFoam(vXZ, noise), 0.0, 1.0);   // inside the foam map's window the map draws the crests
 #ifdef LAND
         foam = max(foam, smoothstep(1.6, 0.15, depth) * smoothstep(-0.4, 0.1, depth) * (0.55 + 0.45 * sin(uTime * 1.2 - depth * 3.0 + noise * 7.0)));   // surf
 #endif
@@ -433,8 +448,23 @@ export function waterMaterial(u, opt = {}) {
 #endif
           foam = max(foam, smoothstep(0.62, 0.9, st) * min(1.0, cCur / 2.5) * shallowK * 0.75);
         }
+        float foamP = 0.75;                                      // foam thickness shading (the raft pattern)
+        if (fmap.w > 0.0) {                                      // foam with memory
+          // a bubble-raft network: dense foam is solid, thinning foam keeps only the network (lace); in a gale the
+          // rafts stretch along the wind into rows
+          vec2 wd = uFoamLook.xy, rq = vec2(dot(q, vec2(wd.y, -wd.x)), dot(q, wd) / (1.0 + 3.0 * uFoamLook.z));
+          rq += (vec2(texture2D(tFoam, q / 31.0).r, texture2D(tFoam, q / 31.0 + 0.5).r) - 0.5) * 9.0;   // warped: no honeycomb
+          vec3 cell = icVoro(rq / 2.6); vec3 cell2 = icVoro(rq / 0.9 + 11.0);
+          float P = (1.0 - smoothstep(0.02, 0.2, cell.x)) * 0.38 + (1.0 - smoothstep(0.02, 0.28, cell2.x)) * 0.22 + fn * 0.22 + fn2 * 0.25;
+          float far = smoothstep(140.0, 520.0, dist); P = mix(P, 0.55, far);
+          float fa = smoothstep(0.3, 0.62, fmap.r + (P - 0.5) * 0.55);                 // froth: solid core, frayed rim
+          float dr = fmap.g * 1.2, ds = fmap.b * 1.5 - 0.15;
+          float fr = mix(smoothstep(1.0 - dr - 0.1, 1.0 - dr + 0.1, P), clamp(dr, 0.0, 1.0), far);
+          float fs = mix(smoothstep(1.0 - ds - 0.12, 1.0 - ds + 0.12, P), clamp(ds, 0.0, 1.0), far);
+          foam = max(foam, max(fa, max(fr * 0.85, fs * 0.95))); foamP = mix(P, 0.75, far);
+        }
         foam *= 1.0 - oil * 0.6;
-        vec3 foamCol = vec3(0.92, 0.95, 0.96) * (0.45 + 0.55 * max(dot(N, L), 0.0) * sunUp + 0.15) * uLight;
+        vec3 foamCol = vec3(0.92, 0.95, 0.96) * (0.45 + 0.55 * max(dot(N, L), 0.0) * sunUp + 0.15) * uLight * (0.8 + 0.27 * foamP);
         col = mix(col, foamCol, foam * 0.9);
         // ice: snow-covered floes and bare blue-grey ice, wet dark rims, lit by the sun and the sky
         vec3 ice = iceAt(q, vXZ);
