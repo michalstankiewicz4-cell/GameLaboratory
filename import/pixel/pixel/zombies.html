@@ -15,6 +15,8 @@
 <div class="bar">
   <b>Zombie Generator</b> <span class="ver mono" id="ver"></span>
   <span class="dimtxt">Pixel Studio</span>
+  <div class="btns menu"><span class="dimtxt">Renderer</span><span class="seg" id="engine"><button type="button" data-e="gpu" title="The distance field on the graphics card: fast; the first time it compiles (about 20 s on Windows)">GPU</button><button type="button" data-e="cpu" title="Everything in JavaScript: slower, works everywhere">CPU</button></span>
+    <button type="button" id="start" class="go">Start render</button></div>
   <span class="sp"></span>
   <span class="status" id="status"></span>
   <a href="index.html">Pixel Studio</a>
@@ -29,7 +31,7 @@
 </aside>
 <main class="stagewrap">
   <div class="stagebox"><div class="checker"><canvas id="stage"></canvas></div>
-    <div class="loader" id="loader" hidden><i></i><span id="loaderTxt"></span><b><em id="loaderBar"></em></b></div></div>
+    <div class="loader" id="loader" hidden><i></i><span id="loaderTxt"></span><b><em id="loaderBar"></em></b><button type="button" id="startIn" class="go">Start render</button></div></div>
   <div class="frames btns"><button type="button" id="prev">◀</button><span id="frameNo" class="mono"></span><button type="button" id="next">▶</button><button type="button" id="play">Pause</button></div>
   <div class="checker sheetbox"><canvas id="sheetView"></canvas></div>
 </main>
@@ -44,7 +46,7 @@
   <div class="row"><span>Light from</span><input type="range" id="lightAz" min="-150" max="150" step="5"><output id="lightAzV"></output></div>
   <div class="row"><span>Light height</span><input type="range" id="lightEl" min="10" max="80" step="5"><output id="lightElV"></output></div>
   <h3>Style</h3>
-  <div class="row"><span>Style</span><select id="style"><option value="real">Realistic</option><option value="pixel">Pixel art</option></select><output></output></div>
+  <div class="row"><span>Style</span><select id="style"><option value="pixel">Pixel art</option><option value="real">Realistic</option></select><output></output></div>
   <div id="pxRows">
     <div class="row"><span>Pixel size</span><input type="range" id="px" min="32" max="256" step="16"><output id="pxV"></output></div>
     <div class="row"><span>Colours</span><input type="range" id="colours" min="6" max="48" step="1"><output id="coloursV"></output></div>

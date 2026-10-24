@@ -42,6 +42,10 @@ and a README into one ZIP (`js/pixel/zip.js`, stored).
   2× supersampled, then cut out with a hard edge. (v0.25–0.26 ray-marched the field in one fragment shader: fine in
   Chrome on Linux, but Direct3D on Windows did not finish compiling it after minutes — the reason for the mesh.) The light turns with the camera, so every direction is lit the same way (as sprites
   in a 2D game are).
+- **Renderer** (top bar): *GPU* (default) evaluates the field on the graphics card, batch by batch, with one small
+  shader (the first compile on Windows takes about 20 s, then it is cached by the browser); *CPU* does it all in
+  JavaScript. The mesh, colours and drawing are the same either way.
+- **Start render**: nothing renders by itself; after a change the preview says the frames are out of date.
 - **Waiting**: frames render one at a time (`renderZombieAsync`) with a loader over the preview (spinner, frame count,
   progress bar; for the ZIP also the sheet, animation and direction); changing anything cancels the render in progress.
 - **Pixel art** style: rendered at the pixel size × 4, auto palette, majority downsampling, selective outline, lone

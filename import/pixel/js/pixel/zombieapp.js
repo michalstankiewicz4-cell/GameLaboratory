@@ -12,7 +12,8 @@ const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
 const KEY = 'steelSalvo.zombieGen.v1';
 let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { saved = null; }
-const S = { style: 'real', frame: 512, frames: 12, cols: 6, anim: 'shamble', dir: 0, pitch: 6, lightAz: -35, lightEl: 40, foot: 9, ppu: 100, px: 96, colours: 24, outline: 'selout', zoom: 1, fps: 10, ...(saved && saved.S) };
+const S = { style: 'pixel', engine: 'gpu', frame: 512, frames: 12, cols: 6, anim: 'shamble', dir: 0, pitch: 6, lightAz: -35, lightEl: 40, foot: 9, ppu: 100, px: 96, colours: 24, outline: 'selout', zoom: 1, fps: 10, ...(saved && saved.S) };
+if (saved && saved.S && !saved.S.engine) { S.style = 'pixel'; S.engine = 'gpu'; }   // settings from before the renderer menu: the new defaults
 let Z = (saved && saved.Z) || randomZombie(17);
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ S, Z })); } catch { /* private mode */ } };
 
@@ -21,7 +22,7 @@ const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ S, Z })); 
 // reduced to a palette, majority-downsampled, outlined, cleaned, then scaled up (nearest) to the frame size.
 // onFrame(done, total) reports progress; cancelled() → true abandons the render (returns null)
 async function make(dir = S.dir, anim = S.anim, onFrame = null, cancelled = null) {
-  const base = { zombie: Z, anim, frames: S.frames, dir, pitch: S.pitch, light: [S.lightAz, S.lightEl], span: 2.03 * (anim === 'crawl' ? 1.15 : 1) };
+  const base = { zombie: Z, engine: S.engine, anim, frames: S.frames, dir, pitch: S.pitch, light: [S.lightAz, S.lightEl], span: 2.03 * (anim === 'crawl' ? 1.15 : 1) };
   if (S.style === 'real') { const r = await renderZombieAsync({ ...base, size: S.frame, ss: 2, foot: S.foot }, onFrame, cancelled); return r && r.frames.map((f) => new PixelImage(f.w, f.h, f.data)); }
   const ss = 4, px = S.px, r = await renderZombieAsync({ ...base, size: px * ss, raw: true, foot: S.foot * px / S.frame * ss }, onFrame, cancelled);
   if (!r) return null;
@@ -44,23 +45,31 @@ function upscale(g, size) {                               // nearest, centred ho
 }
 
 /* ---------------- preview ---------------- */
-let frames = [], shown = 0, busy = 0, job = 0, exporting = false;
-// the loader over the preview: a spinner, what is being made, and a bar filling frame by frame
-function loader(on, text = '', done = 0, total = 1) {
+let frames = [], shown = 0, busy = 0, job = 0, exporting = false, dirty = true, rendering = false;
+// the loader over the preview: a spinner, what is being made, and a bar filling frame by frame — or, when nothing is
+// rendering and the settings changed, a note and the Start render button
+function loader(on, text = '', done = 0, total = 1, idle = false) {
   $('loader').hidden = !on; if (!on) return;
+  $('loader').classList.toggle('idle', idle);
   $('loaderTxt').textContent = text; $('loaderBar').style.width = Math.round(done / total * 100) + '%';
+}
+// nothing renders by itself: a change marks the frames out of date and shows Start render
+function changed() {
+  dirty = true; $('start').classList.add('due');
+  if (!rendering && !exporting) loader(true, frames.length ? 'Settings changed — the frames are out of date.' : 'Ready. Choose a zombie and press Start render.', 0, 1, true);
 }
 function run() {
   clearTimeout(busy); if (exporting) return;
+  dirty = false; rendering = true; $('start').classList.remove('due');
   const my = ++job; loader(true, 'Preparing…', 0, 1);
   busy = setTimeout(async () => {
     const t0 = performance.now();
     try {
-      const fr = await make(S.dir, S.anim, (d, n, what) => { if (what === 'compile') { loader(true, 'Preparing the renderer (first time only, can take a while)…', 0, 1); return; } const f = Math.min(n, Math.floor(d) + 1); loader(true, `Rendering frame ${f} of ${n}`, d, n); $('status').textContent = `rendering ${f} / ${n}…`; }, () => my !== job);
+      const fr = await make(S.dir, S.anim, (d, n, what) => { if (what === 'compile') { loader(true, 'Preparing the GPU renderer: the first time it compiles (about 20 s on Windows), then the browser keeps it.', 0, 1); return; } const f = Math.min(n, Math.floor(d) + 1); loader(true, `Rendering frame ${f} of ${n}`, d, n); $('status').textContent = `rendering ${f} / ${n}…`; }, () => my !== job);
       if (!fr || my !== job) return;
-      frames = fr; $('status').textContent = `${frames.length} frames · ${S.frame}×${S.frame} · ${S.style === 'real' ? 'realistic' : 'pixel art ' + S.px + ' px'} · ${((performance.now() - t0) / 1000).toFixed(1)} s`;
-    } catch (e) { $('status').textContent = 'error: ' + e.message; console.error(e); loader(true, 'Error: ' + e.message, 0, 1); return; }
-    loader(false); shown = 0; draw(); drawSheet();
+      rendering = false; frames = fr; $('status').textContent = `${frames.length} frames · ${S.frame}×${S.frame} · ${S.style === 'real' ? 'realistic' : 'pixel art ' + S.px + ' px'} · ${((performance.now() - t0) / 1000).toFixed(1)} s`;
+    } catch (e) { rendering = false; $('status').textContent = 'error: ' + e.message; console.error(e); loader(true, 'Error: ' + e.message + (S.engine === 'gpu' ? ' — try the CPU renderer.' : ''), 0, 1, true); return; }
+    if (dirty) changed(); else loader(false); shown = 0; draw(); drawSheet();
   }, 60);
 }
 function draw() {
@@ -84,9 +93,10 @@ function meta(name, n, dir, anim) {
 }
 const pngBytes = (img) => new Promise((res) => toCanvas(img, 1).toBlob(async (b) => res(new Uint8Array(await b.arrayBuffer())), 'image/png'));
 function download(data, name, type) { const a = el('a', { href: URL.createObjectURL(new Blob([data], { type })), download: name }); document.body.append(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500); }
-async function exportSheet() { const name = tag(S.dir, S.anim); download(await pngBytes(sheet(frames, S.cols)), name + '.png', 'image/png'); }
+const fresh = () => { if (dirty || !frames.length) { $('status').textContent = 'Press Start render first — the frames are out of date.'; return false; } return true; };
+async function exportSheet() { if (!fresh()) return; const name = tag(S.dir, S.anim); download(await pngBytes(sheet(frames, S.cols)), name + '.png', 'image/png'); }
 function exportJSON() { const name = tag(S.dir, S.anim); download(JSON.stringify(meta(name, frames.length, S.dir, S.anim), null, 1), name + '.json', 'application/json'); }
-function exportGIF() { download(encodeGIF(frames.map((f) => (S.style === 'real' ? half(f) : f)), { delay: 1000 / S.fps }), tag(S.dir, S.anim) + '.gif', 'image/gif'); }
+function exportGIF() { if (!fresh()) return; download(encodeGIF(frames.map((f) => (S.style === 'real' ? half(f) : f)), { delay: 1000 / S.fps }), tag(S.dir, S.anim) + '.gif', 'image/gif'); }
 function half(f) { const g = new PixelImage(f.w / 2, f.h / 2); for (let y = 0; y < g.h; y++) for (let x = 0; x < g.w; x++) { const i = ((y * 2) * f.w + x * 2) * 4, o = (y * g.w + x) * 4; for (let c = 0; c < 4; c++) g.data[o + c] = f.data[i + c]; } return g; }
 async function exportAll() {
   const btn = $('all'); btn.disabled = true; const files = []; exporting = true; job++;
@@ -101,7 +111,7 @@ async function exportAll() {
   files.push({ name: `Zombie_${Z.seed}/Editor/ZombieSheetSlicer.cs`, data: SLICER }, { name: `Zombie_${Z.seed}/README.txt`, data: README() });
   download(zip(files), `Zombie_${Z.seed}.zip`, 'application/zip');
   loader(false); exporting = false;
-  $('status').textContent = `${files.length} files in Zombie_${Z.seed}.zip`; btn.disabled = false; run();
+  $('status').textContent = `${files.length} files in Zombie_${Z.seed}.zip`; btn.disabled = false; if (dirty) changed();
 }
 const README = () => `Zombie ${Z.seed} — sprite sheets from the Zombie Generator (Pixel Studio).
 Each sheet: ${S.frames} frames of ${S.frame}x${S.frame} px in a ${S.cols}-column grid, frame 0 top-left, transparent
@@ -176,14 +186,14 @@ const FIELDS = [
 function zombieUI() {
   $('traits').replaceChildren(...FIELDS.map(([k, label, type, opt]) => {
     let i, o = el('output');
-    if (type === 'select') { i = el('select'); for (const [v, t] of opt) i.append(el('option', { value: v, textContent: t })); i.value = Z[k]; i.onchange = () => { Z[k] = i.value; save(); run(); }; }
-    else if (type === 'color') { i = el('input', { type: 'color', value: Z[k] }); i.oninput = () => { Z[k] = i.value; save(); run(); }; }
-    else { const [mn, mx, st, f] = opt; i = el('input', { type: 'range', min: mn, max: mx, step: st, value: Z[k] }); o.textContent = f(+Z[k]); i.oninput = () => { Z[k] = +i.value; o.textContent = f(Z[k]); save(); run(); }; }
+    if (type === 'select') { i = el('select'); for (const [v, t] of opt) i.append(el('option', { value: v, textContent: t })); i.value = Z[k]; i.onchange = () => { Z[k] = i.value; save(); changed(); }; }
+    else if (type === 'color') { i = el('input', { type: 'color', value: Z[k] }); i.oninput = () => { Z[k] = i.value; save(); changed(); }; }
+    else { const [mn, mx, st, f] = opt; i = el('input', { type: 'range', min: mn, max: mx, step: st, value: Z[k] }); o.textContent = f(+Z[k]); i.oninput = () => { Z[k] = +i.value; o.textContent = f(Z[k]); save(); changed(); }; }
     return el('div', { className: 'row' }, el('span', { textContent: label }), i, o);
   }));
   $('seed').value = Z.seed;
 }
-function bind(id, key, fmt, num = true, after = run) {
+function bind(id, key, fmt, num = true, after = changed) {
   const i = $(id), o = $(id + 'V'); i.value = S[key]; if (o && fmt) o.textContent = fmt(S[key]);
   i.addEventListener(i.tagName === 'SELECT' || i.type === 'number' ? 'change' : 'input', () => { S[key] = num ? +i.value : i.value; if (o && fmt) o.textContent = fmt(S[key]); save(); styleUI(); after(); });
 }
@@ -196,8 +206,13 @@ bind('pitch', 'pitch', (v) => v + '°'); bind('lightAz', 'lightAz', (v) => v + '
 bind('foot', 'foot', (v) => v + ' px'); bind('ppu', 'ppu', null, true, () => {});
 bind('px', 'px', (v) => v + ' px'); bind('colours', 'colours', (v) => v); bind('outline', 'outline', null, false);
 bind('fps', 'fps', (v) => v + ' fps', true, () => {});
-$('seed').onchange = () => { Z = randomZombie(Math.max(1, +$('seed').value | 0)); zombieUI(); save(); run(); };
-$('another').onclick = () => { Z = randomZombie(1 + Math.floor(Math.random() * 99999)); zombieUI(); save(); run(); };
+$('seed').onchange = () => { Z = randomZombie(Math.max(1, +$('seed').value | 0)); zombieUI(); save(); changed(); };
+$('another').onclick = () => { Z = randomZombie(1 + Math.floor(Math.random() * 99999)); zombieUI(); save(); changed(); };
+$('start').onclick = $('startIn').onclick = () => run();
+// renderer menu: GPU (the field on the graphics card) or CPU (all in JavaScript)
+const engineUI = () => [...$('engine').children].forEach((b) => b.classList.toggle('on', b.dataset.e === S.engine));
+$('engine').addEventListener('click', (e) => { const b = e.target.closest('[data-e]'); if (!b || b.dataset.e === S.engine) return; S.engine = b.dataset.e; save(); engineUI(); changed(); });
+engineUI();
 $('play').onclick = () => { playing = !playing; $('play').textContent = playing ? 'Pause' : 'Play'; };
 $('prev').onclick = () => { shown = (shown + frames.length - 1) % frames.length; draw(); };
 $('next').onclick = () => { shown = (shown + 1) % frames.length; draw(); };
@@ -205,5 +220,5 @@ $('png').onclick = exportSheet; $('json').onclick = exportJSON; $('gifB').onclic
 $('cs').onclick = () => download(SLICER, 'ZombieSheetSlicer.cs', 'text/plain');
 $('ver').textContent = 'v' + VERSION; document.title = document.title.replace(/^Zombie Generator/, `Zombie Generator v${VERSION}`);
 $('stage').width = $('stage').height = S.frame;   // the frame's size from the start, so the loader covers it
-zombieUI(); styleUI(); run();
-window.__zombies = { S, get Z() { return Z; }, set Z(v) { Z = v; zombieUI(); run(); }, get frames() { return frames; }, make, meta, run, zip, SLICER };
+zombieUI(); styleUI(); changed();
+window.__zombies = { S, get Z() { return Z; }, set Z(v) { Z = v; zombieUI(); changed(); }, get frames() { return frames; }, make, meta, run, zip, SLICER };

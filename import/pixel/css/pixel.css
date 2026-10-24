@@ -43,3 +43,10 @@
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.loader i{animation-duration:2.4s}}
 .bar .ver{color:var(--dim);font-size:12px;font-weight:400;margin-left:-6px}
+.zomb .menu{margin:0;align-items:center;gap:8px}
+.zomb .seg{display:inline-flex}.zomb .seg button{border-radius:0}.zomb .seg button:first-child{border-radius:7px 0 0 7px}.zomb .seg button:last-child{border-radius:0 7px 7px 0;margin-left:-1px}
+.zomb button.go{background:#2a2312;border-color:var(--lab);color:var(--lab);font-weight:600}
+.zomb button.go.due{background:var(--lab);color:#14100a}
+.loader .go{display:none}
+.loader.idle i,.loader.idle b{display:none}.loader.idle .go{display:inline-block;padding:6px 14px}
+.loader .go{border:1px solid var(--lab);border-radius:7px;cursor:pointer;font:inherit}

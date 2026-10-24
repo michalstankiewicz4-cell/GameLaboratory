@@ -112,21 +112,27 @@ def main():
             # Zombie Generator: a zombie renders (realistic and pixel art), the sheet metadata matches the Unity layout,
             # the ZIP is a zip and the slicer script is there
             # small first render (same origin as the studio page): the default 12 × 512² render blocks SwiftShader for minutes
-            pg.evaluate("()=>localStorage.setItem('steelSalvo.zombieGen.v1', JSON.stringify({S:{frame:256,frames:2,cols:2}}))")
+            pg.evaluate("()=>localStorage.setItem('steelSalvo.zombieGen.v1', JSON.stringify({S:{frame:256,frames:2,cols:2,engine:'cpu'}}))")
             pg.goto(f'http://localhost:{PORT}/pixel/zombies.html', timeout=600000)
-            pg.wait_for_function('() => window.__zombies && window.__zombies.frames.length > 0', timeout=1200000)   # the first render blocks the page for a while on SwiftShader
+            # nothing renders by itself: the page waits with Start render
+            pg.wait_for_function("() => window.__zombies && document.getElementById('loader').classList.contains('idle')", timeout=120000)
+            assert pg.evaluate('__zombies.frames.length') == 0, 'rendered by itself'
+            pg.click('#start')
+            pg.wait_for_function('() => window.__zombies && window.__zombies.frames.length > 0', timeout=1200000)
             zr = pg.evaluate("""async()=>{const Z=__zombies;Object.assign(Z.S,{frame:256,frames:2,cols:2,style:'real'});const out={};
-              for (const st of ['real','pixel']) { Z.S.style=st; Z.S.px=64; const fr=await Z.make(0,'shamble'); let op=0,semi=0,low=1e9;
+              for (const st of ['real','pixel','gpu']) { Z.S.style=st==='gpu'?'real':st; Z.S.engine=st==='gpu'?'gpu':'cpu'; Z.S.px=64; const fr=await Z.make(0,'shamble'); let op=0,semi=0,low=1e9;
                 for (const f of fr) for (let y=0;y<f.h;y++) for (let x=0;x<f.w;x++){const a=f.data[(y*f.w+x)*4+3]; if(a===255){op++;low=Math.min(low,f.h-1-y);} else if(a) semi++;}
                 out[st]={n:fr.length,w:fr[0].w,op,semi,feet:low}; }
               const m=Z.meta('t',12,0,'shamble'); out.meta=[m.width,m.height,m.sprites[0].y,m.sprites[6].y,m.pivot.y];
               const z=Z.zip([{name:'a.txt',data:'hi'}]); out.zip=[z[0],z[1],z[2],z[3]]; out.cs=Z.SLICER.includes('SpriteMetaData'); return out;}""")
             print('zombies', zr)
             # the loader shows while frames render and goes away when they are done
+            if abs(zr['gpu']['op'] - zr['real']['op']) > zr['real']['op'] * 0.08: fails.append('zombie GPU and CPU differ')
             pg.evaluate("()=>{const e=document.getElementById('anim');e.value='idle';e.dispatchEvent(new Event('change'))}")
-            pg.wait_for_function("() => !document.getElementById('loader').hidden", timeout=60000)
+            pg.wait_for_function("() => document.getElementById('loader').classList.contains('idle') && /changed/.test(document.getElementById('loaderTxt').textContent)", timeout=60000)
+            pg.click('#startIn')
             pg.wait_for_function("() => document.getElementById('loader').hidden", timeout=900000)
-            for st in ('real', 'pixel'):
+            for st in ('real', 'pixel', 'gpu'):
                 r = zr[st]
                 if r['n'] != 2 or r['w'] != 256 or r['op'] < 2000 or r['semi'] != 0 or r['feet'] > 12: fails.append('zombie ' + st)
             if zr['meta'][:4] != [512, 1536, 1280, 512]: fails.append('zombie sheet layout ' + str(zr['meta']))   # 2 columns of 256: frame 0 top-left

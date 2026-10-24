@@ -7,6 +7,7 @@
 // The skeleton is posed with forward kinematics per frame (shamble, lurch, lunge, idle, crawl); every frame of an
 // animation uses the same camera, so the sprite does not jump; the feet stay on the pivot line.
 import * as THREE from '../../vendor/three.module.js';
+import { prepareGPU, gpuReady, setGPUPose, sampleGPU } from './zombie-gpu.js';
 
 /* ---------------- options ---------------- */
 export const OUTFITS = {
@@ -243,7 +244,7 @@ function makeField(z, P) {
     F.id = id; F.hx = ph[0]; F.hy = ph[1]; F.hz = ph[2];
     return d;
   };
-  return { field, s, O, J };
+  return { field, s, O, J, toHead };
 }
 
 /* ---------------- surface: surface nets over a narrow band ---------------- */
@@ -251,21 +252,27 @@ function makeField(z, P) {
 // fine cell the surface crosses (at the mean of its edge crossings), a quad joins the four cells round every crossed
 // edge. Normals come from the field's gradient, so the facets do not show.
 let GRID = null;
-function surface(field, box, h) {
+// sample(xyz) → { d, id }: the field for a batch of points (CPU loop or GPU)
+function surface(sample, box, h) {
   const nx = Math.ceil((box[3] - box[0]) / h) + 1, ny = Math.ceil((box[4] - box[1]) / h) + 1, nz = Math.ceil((box[5] - box[2]) / h) + 1, N = nx * ny * nz;
   if (!GRID || GRID.v.length < N) GRID = { v: new Float32Array(N), cell: new Int32Array(N) };
   const V = GRID.v, cellIx = GRID.cell; V.fill(NaN); cellIx.fill(-1);   // NaN: not sampled yet
   const C = 4, at = (i, j, k) => (k * ny + j) * nx + i, X = (i) => box[0] + i * h, Y = (j) => box[1] + j * h, Z = (k) => box[2] + k * h;
-  // coarse pass: blocks of C³ cells, the fine grid only where the surface may be
-  for (let k = 0; k < nz - 1; k += C) for (let j = 0; j < ny - 1; j += C) for (let i = 0; i < nx - 1; i += C) {
-    const cx = X(Math.min(nx - 1, i + C / 2)), cy = Y(Math.min(ny - 1, j + C / 2)), cz = Z(Math.min(nz - 1, k + C / 2));
-    const dc = field(cx, cy, cz), far = Math.abs(dc) > h * C * 1.2 + 0.006;   // margin: the field is only a bound in places
-    // far from the surface the block takes the centre's value (its sign is all that matters there); near it, every point
-    for (let kk = k; kk <= Math.min(nz - 1, k + C); kk++) for (let jj = j; jj <= Math.min(ny - 1, j + C); jj++) for (let ii = i; ii <= Math.min(nx - 1, i + C); ii++) {
-      const a = at(ii, jj, kk);
-      if (far) { if (V[a] !== V[a]) V[a] = dc; } else if (V[a] !== V[a] || Math.abs(V[a]) > h * C * 1.2) V[a] = field(X(ii), Y(jj), Z(kk)) || 1e-6;
-    }
-  }
+  // coarse pass: the centre of every block of C³ cells
+  const blocks = [];
+  for (let k = 0; k < nz - 1; k += C) for (let j = 0; j < ny - 1; j += C) for (let i = 0; i < nx - 1; i += C) blocks.push(i, j, k);
+  const nb = blocks.length / 3, cxyz = new Float32Array(nb * 3);
+  for (let q = 0; q < nb; q++) { cxyz[q * 3] = X(Math.min(nx - 1, blocks[q * 3] + C / 2)); cxyz[q * 3 + 1] = Y(Math.min(ny - 1, blocks[q * 3 + 1] + C / 2)); cxyz[q * 3 + 2] = Z(Math.min(nz - 1, blocks[q * 3 + 2] + C / 2)); }
+  const dc = sample(cxyz).d, lim = h * C * 1.2 + 0.006;      // margin: the field is only a bound in places
+  // near the surface every grid point of the block is sampled; far from it the block takes its centre's value
+  const queue = [];
+  const corners = (q, fn) => { const i = blocks[q * 3], j = blocks[q * 3 + 1], k = blocks[q * 3 + 2];
+    for (let kk = k; kk <= Math.min(nz - 1, k + C); kk++) for (let jj = j; jj <= Math.min(ny - 1, j + C); jj++) for (let ii = i; ii <= Math.min(nx - 1, i + C); ii++) fn(at(ii, jj, kk), ii, jj, kk); };
+  for (let q = 0; q < nb; q++) if (Math.abs(dc[q]) <= lim) corners(q, (a, ii, jj, kk) => { if (V[a] !== V[a]) { V[a] = Infinity; queue.push(a, ii, jj, kk); } });
+  const nq = queue.length / 4, fxyz = new Float32Array(nq * 3);
+  for (let q = 0; q < nq; q++) { fxyz[q * 3] = X(queue[q * 4 + 1]); fxyz[q * 3 + 1] = Y(queue[q * 4 + 2]); fxyz[q * 3 + 2] = Z(queue[q * 4 + 3]); }
+  const fd = sample(fxyz).d; for (let q = 0; q < nq; q++) V[queue[q * 4]] = fd[q] || 1e-6;
+  for (let q = 0; q < nb; q++) if (Math.abs(dc[q]) > lim) corners(q, (a) => { if (V[a] !== V[a]) V[a] = dc[q]; });
   const pos = [], idx = [];
   const corner = [[0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 0], [0, 0, 1], [1, 0, 1], [0, 1, 1], [1, 1, 1]];
   const edges = [[0, 1], [2, 3], [4, 5], [6, 7], [0, 2], [1, 3], [4, 6], [5, 7], [0, 4], [1, 5], [2, 6], [3, 7]];
@@ -295,6 +302,7 @@ function surface(field, box, h) {
   }
   return { pos, idx };
 }
+const cpuSampler = (field) => (xyz) => { const n = xyz.length / 3, d = new Float32Array(n), id = new Uint8Array(n); for (let i = 0; i < n; i++) { d[i] = field(xyz[i * 3], xyz[i * 3 + 1], xyz[i * 3 + 2]); id[i] = F.id; } return { d, id }; };
 
 /* ---------------- colours (per vertex) ---------------- */
 const C3 = (hex) => { const c = new THREE.Color(hex); return [c.r, c.g, c.b]; };   // linear
@@ -377,24 +385,37 @@ function* frameGen(o) {
   const h = Math.max(0.0045, span / size * 1.6);                     // the mesh step: about 1.6 px of the frame
   const g2 = R0.g2; R0.out2.width = W; R0.out2.height = W;
   for (let f = 0; f < N; f++) {
-    const P = pose(n, z, o.anim, f / N), Fd = makeField(z, P);
+    const P = pose(n, z, o.anim, f / N), Fd = makeField(z, P), gpuOn = o.engine === 'gpu';
+    if (gpuOn) setGPUPose(z, P);
+    const sample = gpuOn ? sampleGPU : cpuSampler(Fd.field);
     const mn = [Infinity, Infinity, Infinity], mx = [-Infinity, -Infinity, -Infinity];
     for (const p of Fd.J) for (let a = 0; a < 3; a++) { mn[a] = Math.min(mn[a], p[a]); mx[a] = Math.max(mx[a], p[a]); }
     const box = [mn[0] - 0.22, Math.max(-0.05, mn[1] - 0.22), mn[2] - 0.22, mx[0] + 0.22, mx[1] + 0.22, mx[2] + 0.22];
-    const sf = surface(Fd.field, box, h);
+    const sf = surface(sample, box, h);
     yield { stage: 'mesh' };
-    // normals from the gradient, colours, a touch of occlusion from the field itself, small bumps
+    // normals from the gradient (6 taps), the material at the vertex, then occlusion along the normal (3 taps) — in two
+    // batches, so the GPU sampler gets them all at once; colours and small bumps on the CPU
     const nv = sf.pos.length / 3, nrm = new Float32Array(nv * 3), col = new Float32Array(nv * 3), e = 0.0015;
+    const T1 = [[0, 0, 0], [e, 0, 0], [-e, 0, 0], [0, e, 0], [0, -e, 0], [0, 0, e], [0, 0, -e]], t1 = new Float32Array(nv * 21);
+    for (let v = 0; v < nv; v++) for (let k = 0; k < 7; k++) for (let c = 0; c < 3; c++) t1[(v * 7 + k) * 3 + c] = sf.pos[v * 3 + c] + T1[k][c];
+    const r1 = sample(t1);
+    yield { stage: 'normals' };
+    const t2 = new Float32Array(nv * 9);
     for (let v = 0; v < nv; v++) {
-      const x = sf.pos[v * 3], y = sf.pos[v * 3 + 1], zz = sf.pos[v * 3 + 2];
-      Fd.field(x, y, zz); const id = F.id, hx = F.hx, hy = F.hy, hz = F.hz;
-      let gx = Fd.field(x + e, y, zz) - Fd.field(x - e, y, zz), gy = Fd.field(x, y + e, zz) - Fd.field(x, y - e, zz), gz = Fd.field(x, y, zz + e) - Fd.field(x, y, zz - e);
+      const x = sf.pos[v * 3], y = sf.pos[v * 3 + 1], zz = sf.pos[v * 3 + 2], b0 = v * 7, id = r1.id[b0];
+      let gx = r1.d[b0 + 1] - r1.d[b0 + 2], gy = r1.d[b0 + 3] - r1.d[b0 + 4], gz = r1.d[b0 + 5] - r1.d[b0 + 6];
       const bump = id === 0 ? 0.35 : id === 1 || id === 2 ? 0.55 : 0.2, bn = (noise(x * 40, y * 40, zz * 40) - 0.5) * bump, bm = (noise(x * 40 + 5, y * 40 + 5, zz * 40 + 5) - 0.5) * bump, bo = (noise(x * 40 + 9, y * 40 + 9, zz * 40 + 9) - 0.5) * bump;
       const gl = Math.hypot(gx, gy, gz) || 1; gx = gx / gl + bn; gy = gy / gl + bm; gz = gz / gl + bo; const gl2 = Math.hypot(gx, gy, gz) || 1;
       nrm[v * 3] = gx / gl2; nrm[v * 3 + 1] = gy / gl2; nrm[v * 3 + 2] = gz / gl2;
-      let ao = 0, w = 1; for (let i = 1; i <= 3; i++) { const d = 0.03 * i; ao += w * (d - Fd.field(x + nrm[v * 3] * d, y + nrm[v * 3 + 1] * d, zz + nrm[v * 3 + 2] * d)); w *= 0.6; }
+      for (let i = 1; i <= 3; i++) for (let c = 0; c < 3; c++) t2[(v * 3 + i - 1) * 3 + c] = sf.pos[v * 3 + c] + nrm[v * 3 + c] * 0.03 * i;
+    }
+    const r2 = sample(t2), ph = [0, 0, 0];
+    for (let v = 0; v < nv; v++) {
+      const x = sf.pos[v * 3], y = sf.pos[v * 3 + 1], zz = sf.pos[v * 3 + 2];
+      let ao = 0, w = 1; for (let i = 1; i <= 3; i++) { ao += w * (0.03 * i - r2.d[v * 3 + i - 1]); w *= 0.6; }
       const occ = Math.min(1, Math.max(0.35, 1 - 3 * ao));
-      const c3 = shadeVertex(z, x, y, zz, id, hx, hy, hz, Fd.s, cols);
+      Fd.toHead(x, y, zz, ph);
+      const c3 = shadeVertex(z, x, y, zz, r1.id[v * 7], ph[0], ph[1], ph[2], Fd.s, cols);
       col[v * 3] = c3[0] * occ; col[v * 3 + 1] = c3[1] * occ; col[v * 3 + 2] = c3[2] * occ;
     }
     const g = new THREE.BufferGeometry();
@@ -423,6 +444,7 @@ export function renderZombie(o) { return { frames: [...frameGen(o)].filter((x) =
 // cancelled() → true stops early (a newer render was asked for) and returns null
 export async function renderZombieAsync(o, onFrame, cancelled) {
   const out = [], N = Math.max(1, o.frames | 0);
+  if (o.engine === 'gpu' && !gpuReady()) { if (onFrame) onFrame(0, N, 'compile'); await new Promise((r) => setTimeout(r, 30)); await prepareGPU(); }
   for (const x of frameGen(o)) {
     if (x.stage) { if (onFrame) onFrame(out.length + 0.5, N); }
     else { out.push(x); if (onFrame) onFrame(out.length, N); }
