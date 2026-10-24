@@ -270,8 +270,8 @@ void main() {
   // albedo, roughness, bump
   vec3 alb; float rough = 0.75, sss = 0.0, bump = 0.0;
   float big = fbm(p * 6.0 + seed), fine = noise(p * 60.0 + seed);
-  float blood = smoothstep(0.62 - uLook.x * 0.22, 0.7 - uLook.x * 0.22, fbm(p * 4.5 + seed + 3.0) + 0.12 * fbm(p * 30.0));
-  float dirt = uLook.y * (0.45 * smoothstep(0.9 * s, 0.0, p.y) + 0.35 * smoothstep(0.45, 0.75, fbm(p * 3.0 + seed + 9.0)));
+  float blood = smoothstep(0.68 - uLook.x * 0.14, 0.72 - uLook.x * 0.14, fbm(p * 4.5 + seed + 3.0) + 0.1 * fbm(p * 30.0));   // patches, not a coat
+  float dirt = uLook.y * (0.5 * smoothstep(0.7 * s, 0.0, p.y) + 0.25 * smoothstep(0.6, 0.8, fbm(p * 3.0 + seed + 9.0)));   // mostly from the ground up
   if (id < 0.5) {                                   // skin: decaying, mottled, veined, wounded
     alb = uSkin;
     float mott = fbm(p * 9.0 + seed * 1.3);

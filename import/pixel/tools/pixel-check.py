@@ -111,9 +111,10 @@ def main():
                 pg.screenshot(path=os.path.join(OUT, f'pixel-narrow-{vw}.png'), full_page=True)
             # Zombie Generator: a zombie renders (realistic and pixel art), the sheet metadata matches the Unity layout,
             # the ZIP is a zip and the slicer script is there
-            pg.goto(f'http://localhost:{PORT}/pixel/zombies.html')
-            pg.evaluate("()=>localStorage.clear()"); pg.reload()
-            pg.wait_for_function('window.__zombies', timeout=120000)
+            # small first render (same origin as the studio page): the default 12 × 512² render blocks SwiftShader for minutes
+            pg.evaluate("()=>localStorage.setItem('steelSalvo.zombieGen.v1', JSON.stringify({S:{frame:256,frames:2,cols:2}}))")
+            pg.goto(f'http://localhost:{PORT}/pixel/zombies.html', timeout=600000)
+            pg.wait_for_function('() => window.__zombies && window.__zombies.frames.length > 0', timeout=1200000)   # the first render blocks the page for a while on SwiftShader
             zr = pg.evaluate("""()=>{const Z=__zombies;Object.assign(Z.S,{frame:256,frames:2,cols:2,style:'real'});const out={};
               for (const st of ['real','pixel']) { Z.S.style=st; Z.S.px=64; const fr=Z.make(0,'shamble'); let op=0,semi=0,low=1e9;
                 for (const f of fr) for (let y=0;y<f.h;y++) for (let x=0;x<f.w;x++){const a=f.data[(y*f.w+x)*4+3]; if(a===255){op++;low=Math.min(low,f.h-1-y);} else if(a) semi++;}
