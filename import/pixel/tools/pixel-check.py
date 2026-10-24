@@ -137,6 +137,11 @@ def main():
                 if r['n'] != 2 or r['w'] != 256 or r['op'] < 2000 or r['semi'] != 0 or r['feet'] > 12: fails.append('zombie ' + st)
             if zr['meta'][:4] != [512, 1536, 1280, 512]: fails.append('zombie sheet layout ' + str(zr['meta']))   # 2 columns of 256: frame 0 top-left
             if zr['zip'] != [80, 75, 3, 4] or not zr['cs']: fails.append('zombie zip/slicer')
+            # Reset to default: the saved settings go, the defaults come back
+            pg.click('#resetAll'); pg.wait_for_function("() => window.__zombies && document.getElementById('loader').classList.contains('idle')", timeout=120000)
+            rs = pg.evaluate("()=>[__zombies.S.style, __zombies.S.engine, __zombies.S.frame, __zombies.Z.seed]")
+            print('reset', rs)
+            if rs != ['pixel', 'gpu', 512, 17]: fails.append('reset to default ' + str(rs))
             pg.screenshot(path=os.path.join(OUT, 'pixel-zombies.png'))
             br.close()
     finally:

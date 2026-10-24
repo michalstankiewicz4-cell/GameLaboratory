@@ -209,6 +209,8 @@ bind('fps', 'fps', (v) => v + ' fps', true, () => {});
 $('seed').onchange = () => { Z = randomZombie(Math.max(1, +$('seed').value | 0)); zombieUI(); save(); changed(); };
 $('another').onclick = () => { Z = randomZombie(1 + Math.floor(Math.random() * 99999)); zombieUI(); save(); changed(); };
 $('start').onclick = $('startIn').onclick = () => run();
+// back to the defaults: the saved settings and zombie are forgotten and the page starts afresh
+$('resetAll').onclick = () => { job++; try { localStorage.removeItem(KEY); } catch { /* private mode */ } location.reload(); };
 // renderer menu: GPU (the field on the graphics card) or CPU (all in JavaScript)
 const engineUI = () => [...$('engine').children].forEach((b) => b.classList.toggle('on', b.dataset.e === S.engine));
 $('engine').addEventListener('click', (e) => { const b = e.target.closest('[data-e]'); if (!b || b.dataset.e === S.engine) return; S.engine = b.dataset.e; save(); engineUI(); changed(); });

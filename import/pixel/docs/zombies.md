@@ -46,6 +46,7 @@ and a README into one ZIP (`js/pixel/zip.js`, stored).
   shader (the first compile on Windows takes about 20 s, then it is cached by the browser); *CPU* does it all in
   JavaScript. The mesh, colours and drawing are the same either way.
 - **Start render**: nothing renders by itself; after a change the preview says the frames are out of date.
+  **Reset to default** forgets the saved settings and zombie and starts the page afresh.
 - **Waiting**: frames render one at a time (`renderZombieAsync`) with a loader over the preview (spinner, frame count,
   progress bar; for the ZIP also the sheet, animation and direction); changing anything cancels the render in progress.
 - **Pixel art** style: rendered at the pixel size × 4, auto palette, majority downsampling, selective outline, lone
