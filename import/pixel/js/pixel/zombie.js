@@ -341,7 +341,7 @@ const lin = (hex) => new THREE.Color(hex);   // three converts sRGB hex to linea
 //      span (m shown across the frame), foot (px from the bottom edge to the feet) }
 //      raw: true → no supersampling (the pixel-art pipeline downsamples itself)
 // returns { frames: [ImageData-like {w, h, data}] } with a hard alpha edge
-export function renderZombie(o) {
+function* frameGen(o) {
   const z = o.zombie, R0 = renderer(), u = R0.u, N = Math.max(1, o.frames | 0), size = o.size, ss = o.raw ? 1 : (o.ss || 2), W = size * ss;
   if (!R0.rt || R0.rt.width !== W) { if (R0.rt) R0.rt.dispose(); R0.rt = new THREE.WebGLRenderTarget(W, W, { depthBuffer: false }); }
   R0.r.setSize(W, W, false);
@@ -365,7 +365,7 @@ export function renderZombie(o) {
   // the light turns with the camera (the sprite is lit the same way from every direction, as in a 2D game)
   const Lw = new THREE.Vector3().addScaledVector(right, Math.sin(la) * Math.cos(le)).addScaledVector(up, Math.sin(le)).addScaledVector(back, Math.cos(la) * Math.cos(le));
   u.uLight.value.copy(Lw.normalize());
-  const out = [], buf = new Uint8Array(W * W * 4);
+  const buf = new Uint8Array(W * W * 4);
   for (let f = 0; f < N; f++) {
     const P = pose(n, z, o.anim, f / N);
     P.pts.forEach((p, i) => u.uJ.value[i].copy(p));
@@ -383,8 +383,19 @@ export function renderZombie(o) {
       const k = (y * size + x) * 4;
       if (a / (ss * ss) >= 127.5) { img.data[k] = r / a; img.data[k + 1] = g / a; img.data[k + 2] = b / a; img.data[k + 3] = 255; }
     }
-    out.push(img);
+    R0.r.setRenderTarget(null);
+    yield img;
   }
-  R0.r.setRenderTarget(null);
+}
+export function renderZombie(o) { return { frames: [...frameGen(o)] }; }
+// the same, a frame at a time, giving the page a moment between frames (a loader can move); onFrame(done, total);
+// cancelled() → true stops early (a newer render was asked for) and returns null
+export async function renderZombieAsync(o, onFrame, cancelled) {
+  const out = [], N = Math.max(1, o.frames | 0);
+  for (const img of frameGen(o)) {
+    out.push(img); if (onFrame) onFrame(out.length, N);
+    await new Promise((r) => setTimeout(r, 0));
+    if (cancelled && cancelled()) return null;
+  }
   return { frames: out };
 }

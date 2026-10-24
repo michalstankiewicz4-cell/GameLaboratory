@@ -2,7 +2,7 @@
 // frames from any of eight directions, exported as sprite sheets for Unity (512×512 frames in a 6×2 grid, pivot at
 // the feet, 100 pixels per unit) with a JSON description and an editor script that slices them — realistic, or as
 // pixel art through the Pixel Studio pipeline (palette, majority downsampling, selective outline, clean-up).
-import { OUTFITS, ANIMS, DIRS, randomZombie, renderZombie } from './zombie.js';
+import { OUTFITS, ANIMS, DIRS, randomZombie, renderZombieAsync } from './zombie.js';
 import { PixelImage, autoPalette, quantize, outline, removeOrphans, modeDownsample, toCanvas, sheet } from './core.js';
 import { encodeGIF } from './gif.js';
 import { zip } from './zip.js';
@@ -18,10 +18,13 @@ const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ S, Z })); 
 /* ---------------- making frames ---------------- */
 // realistic: rendered at the frame size, 2× supersampled, hard alpha. Pixel art: rendered at the pixel size × 4,
 // reduced to a palette, majority-downsampled, outlined, cleaned, then scaled up (nearest) to the frame size.
-function make(dir = S.dir, anim = S.anim) {
+// onFrame(done, total) reports progress; cancelled() → true abandons the render (returns null)
+async function make(dir = S.dir, anim = S.anim, onFrame = null, cancelled = null) {
   const base = { zombie: Z, anim, frames: S.frames, dir, pitch: S.pitch, light: [S.lightAz, S.lightEl], span: 2.03 * (anim === 'crawl' ? 1.15 : 1) };
-  if (S.style === 'real') return renderZombie({ ...base, size: S.frame, ss: 2, foot: S.foot }).frames.map((f) => new PixelImage(f.w, f.h, f.data));
-  const ss = 4, px = S.px, raw = renderZombie({ ...base, size: px * ss, raw: true, foot: S.foot * px / S.frame * ss }).frames.map((f) => new PixelImage(f.w, f.h, f.data));
+  if (S.style === 'real') { const r = await renderZombieAsync({ ...base, size: S.frame, ss: 2, foot: S.foot }, onFrame, cancelled); return r && r.frames.map((f) => new PixelImage(f.w, f.h, f.data)); }
+  const ss = 4, px = S.px, r = await renderZombieAsync({ ...base, size: px * ss, raw: true, foot: S.foot * px / S.frame * ss }, onFrame, cancelled);
+  if (!r) return null;
+  const raw = r.frames.map((f) => new PixelImage(f.w, f.h, f.data));
   const pal = autoPalette(raw, S.colours);
   return raw.map((f) => {
     let g = modeDownsample(quantize(f, pal), ss);
@@ -40,15 +43,24 @@ function upscale(g, size) {                               // nearest, centred ho
 }
 
 /* ---------------- preview ---------------- */
-let frames = [], shown = 0, busy = 0;
+let frames = [], shown = 0, busy = 0, job = 0, exporting = false;
+// the loader over the preview: a spinner, what is being made, and a bar filling frame by frame
+function loader(on, text = '', done = 0, total = 1) {
+  $('loader').hidden = !on; if (!on) return;
+  $('loaderTxt').textContent = text; $('loaderBar').style.width = Math.round(done / total * 100) + '%';
+}
 function run() {
-  clearTimeout(busy); $('status').textContent = 'rendering…';
-  busy = setTimeout(() => {
+  clearTimeout(busy); if (exporting) return;
+  const my = ++job; loader(true, 'Preparing…', 0, 1);
+  busy = setTimeout(async () => {
     const t0 = performance.now();
-    try { frames = make(); $('status').textContent = `${frames.length} frames · ${S.frame}×${S.frame} · ${S.style === 'real' ? 'realistic' : 'pixel art ' + S.px + ' px'} · ${Math.round(performance.now() - t0)} ms`; }
-    catch (e) { $('status').textContent = 'error: ' + e.message; console.error(e); }
-    shown = 0; draw(); drawSheet();
-  }, 50);
+    try {
+      const fr = await make(S.dir, S.anim, (d, n) => { loader(true, `Rendering frame ${d} of ${n}`, d, n); $('status').textContent = `rendering ${d} / ${n}…`; }, () => my !== job);
+      if (!fr || my !== job) return;
+      frames = fr; $('status').textContent = `${frames.length} frames · ${S.frame}×${S.frame} · ${S.style === 'real' ? 'realistic' : 'pixel art ' + S.px + ' px'} · ${((performance.now() - t0) / 1000).toFixed(1)} s`;
+    } catch (e) { $('status').textContent = 'error: ' + e.message; console.error(e); }
+    loader(false); shown = 0; draw(); drawSheet();
+  }, 60);
 }
 function draw() {
   const f = frames[shown % frames.length]; if (!f) return;
@@ -76,17 +88,18 @@ function exportJSON() { const name = tag(S.dir, S.anim); download(JSON.stringify
 function exportGIF() { download(encodeGIF(frames.map((f) => (S.style === 'real' ? half(f) : f)), { delay: 1000 / S.fps }), tag(S.dir, S.anim) + '.gif', 'image/gif'); }
 function half(f) { const g = new PixelImage(f.w / 2, f.h / 2); for (let y = 0; y < g.h; y++) for (let x = 0; x < g.w; x++) { const i = ((y * 2) * f.w + x * 2) * 4, o = (y * g.w + x) * 4; for (let c = 0; c < 4; c++) g.data[o + c] = f.data[i + c]; } return g; }
 async function exportAll() {
-  const btn = $('all'); btn.disabled = true; const files = [];
+  const btn = $('all'); btn.disabled = true; const files = []; exporting = true; job++;
   const anims = $('allAnims').checked ? Object.keys(ANIMS) : [S.anim];
   let k = 0;
   for (const anim of anims) for (const dir of DIRS) {
-    $('status').textContent = `rendering ${++k} / ${anims.length * DIRS.length}: ${anim} ${dir}°…`; await new Promise((r) => setTimeout(r, 0));
-    const fr = make(dir, anim), name = tag(dir, anim);
+    const sheetNo = ++k, sheets = anims.length * DIRS.length;
+    const fr = await make(dir, anim, (d, n) => { loader(true, `ZIP: sheet ${sheetNo} of ${sheets} (${ANIMS[anim].replace(/ \(.*/, '')}, ${dir}°) · frame ${d} of ${n}`, (sheetNo - 1) * n + d, sheets * n); $('status').textContent = `ZIP ${sheetNo} / ${sheets}…`; }), name = tag(dir, anim);
     files.push({ name: `Zombie_${Z.seed}/${name}.png`, data: await pngBytes(sheet(fr, S.cols)) });
     files.push({ name: `Zombie_${Z.seed}/${name}.json`, data: JSON.stringify(meta(name, fr.length, dir, anim), null, 1) });
   }
   files.push({ name: `Zombie_${Z.seed}/Editor/ZombieSheetSlicer.cs`, data: SLICER }, { name: `Zombie_${Z.seed}/README.txt`, data: README() });
   download(zip(files), `Zombie_${Z.seed}.zip`, 'application/zip');
+  loader(false); exporting = false;
   $('status').textContent = `${files.length} files in Zombie_${Z.seed}.zip`; btn.disabled = false; run();
 }
 const README = () => `Zombie ${Z.seed} — sprite sheets from the Zombie Generator (Pixel Studio).
@@ -189,5 +202,6 @@ $('prev').onclick = () => { shown = (shown + frames.length - 1) % frames.length;
 $('next').onclick = () => { shown = (shown + 1) % frames.length; draw(); };
 $('png').onclick = exportSheet; $('json').onclick = exportJSON; $('gifB').onclick = exportGIF; $('all').onclick = exportAll;
 $('cs').onclick = () => download(SLICER, 'ZombieSheetSlicer.cs', 'text/plain');
+$('stage').width = $('stage').height = S.frame;   // the frame's size from the start, so the loader covers it
 zombieUI(); styleUI(); run();
 window.__zombies = { S, get Z() { return Z; }, set Z(v) { Z = v; zombieUI(); run(); }, get frames() { return frames; }, make, meta, run, zip, SLICER };

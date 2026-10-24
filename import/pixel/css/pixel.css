@@ -34,3 +34,11 @@
 .zomb #stage.px{image-rendering:pixelated}
 .zomb .sheetbox{display:block;line-height:0;max-width:100%}
 .zomb #sheetView{display:block;max-width:100%;height:auto}
+.zomb .stagebox{position:relative;display:inline-block;line-height:0}
+.zomb .stagebox>.checker{display:inline-block}
+.loader{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:rgba(10,13,17,.62);border-radius:4px;line-height:1.4;color:var(--head);font-size:13px;text-align:center;padding:12px}
+.loader i{width:38px;height:38px;border-radius:50%;border:3px solid rgba(242,184,75,.22);border-top-color:var(--lab);animation:spin .8s linear infinite}
+.loader b{display:block;width:min(240px,80%);height:6px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden}
+.loader em{display:block;height:100%;width:0;background:var(--lab);transition:width .15s}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.loader i{animation-duration:2.4s}}

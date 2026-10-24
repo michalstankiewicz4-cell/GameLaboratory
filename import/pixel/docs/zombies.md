@@ -39,6 +39,8 @@ and a README into one ZIP (`js/pixel/zip.js`, stored).
   fill, ground bounce, rim, ambient occlusion, a little scattering in the skin, ACES tone mapping; 2× supersampled,
   then cut out with a hard edge. The light turns with the camera, so every direction is lit the same way (as sprites
   in a 2D game are).
+- **Waiting**: frames render one at a time (`renderZombieAsync`) with a loader over the preview (spinner, frame count,
+  progress bar; for the ZIP also the sheet, animation and direction); changing anything cancels the render in progress.
 - **Pixel art** style: rendered at the pixel size × 4, auto palette, majority downsampling, selective outline, lone
   pixels removed, then scaled up (nearest) to the frame size with the feet on the same line.
 
