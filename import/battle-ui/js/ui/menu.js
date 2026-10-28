@@ -18,7 +18,7 @@ export function createMenu(root, { actions, settings, progress }) {
   function drawCards() {
     cards.replaceChildren(...CLASS_KEYS.map((k) => {
       const c = CLASSES[k];
-      return h('button', { type: 'button', class: 'card' + (k === pick ? ' on' : ''), on: { click: () => { pick = k; progress.cls = k; progress.save(); drawCards(); } } },
+      return h('button', { type: 'button', class: 'card' + (k === pick ? ' on' : ''), on: { click: () => { pick = k; progress.cls = k; progress.save(); drawCards(); actions.pick?.(k); } } },
         h('h3', {}, t('cls.' + k)),
         h('p', { class: 'role' }, t('role.' + k)),
         stat('st.hp', c.hp),
@@ -87,6 +87,8 @@ export function createMenu(root, { actions, settings, progress }) {
       slider('opt.sat', () => d.gfx.sat, (v) => up((x) => { x.gfx.sat = v; }), 0, 1.6, 0.05, pct),
       check('opt.shadows', 'shadows'), check('opt.aa', 'aa'), check('opt.bloom', 'bloom'), check('opt.water', 'water'),
       check('opt.pip', 'pip'), check('opt.fps', 'showFps'),
+      tx('opt.play', 'h3'),
+      (() => { const c = h('input', { type: 'checkbox' }); c.checked = d.play.god; c.addEventListener('change', () => up((x) => { x.play.god = c.checked; })); return h('label', { class: 'orow chk' }, c, tx('opt.god')); })(),
       tx('opt.audio', 'h3'),
       slider('opt.vol', () => d.vol, (v) => up((x) => { x.vol = v; }), 0, 1, 0.05, pct),
       tx('opt.mouse', 'h3'),
