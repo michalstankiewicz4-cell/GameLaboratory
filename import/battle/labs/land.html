@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Land Lab — procedural coasts, terrain and mixed waters | Steel Salvo Labs</title>
+<meta name="description" content="Steel Salvo land lab: procedural land and sea from 0 to 100 % land — islands, archipelagos, coasts, fjords, highlands with erosion, beaches and surf — on a wrap-around map (sail out one side, in at the other) or a map bounded by buoys or mountains, with ORP Błyskawica to sail through it; rivers, lakes, fjords, harbours and ice mixed by region with seamless transitions.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/Battle/labs/land.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Land Lab — procedural coasts and terrain">
+<meta property="og:description" content="Procedural islands, coasts and fjords on a wrap-around or bounded map, sailed by a 1:1 destroyer, live in the browser.">
+<meta property="og:url" content="https://michalstankiewicz4-cell.github.io/Battle/labs/land.html">
+<meta property="og:image" content="https://michalstankiewicz4-cell.github.io/Battle/assets/labs/land.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="../assets/favicon-32.png">
+<link rel="stylesheet" href="../css/lab.css">
+</head>
+<body class="lab">
+<div id="view"></div>
+<div class="bar">
+  <b>Land Lab</b>
+  <span class="dimtxt" id="status">generating…</span>
+  <span class="sp"></span>
+  <a href="ship.html">Ship Lab</a>
+  <a href="water.html">Water lab</a>
+  <a href="look.html">Look Lab</a>
+  <a href="../labs.html">Labs</a>
+  <a href="../index.html">Play the game</a>
+</div>
+<aside class="panel left" id="leftPanel">
+  <h3>Map</h3>
+  <div class="row"><span>Seed</span><input type="number" id="seed" min="0" max="999999" step="1"><output></output></div>
+  <div class="btns"><button type="button" id="random">New random map</button><button type="button" id="gen">Generate</button></div>
+  <div class="row"><span>Shape</span><select id="shape"></select><output></output></div>
+  <div class="row"><span>Land</span><input type="range" id="land" min="0" max="1" step="0.01"><output id="landV"></output></div>
+  <div class="row"><span>Map size</span><select id="size"><option value="4000">4 km</option><option value="8000">8 km</option><option value="16000">16 km</option><option value="32000">32 km</option></select><output></output></div>
+  <div class="row"><span>Detail</span><select id="res"><option value="256">256²</option><option value="512">512²</option><option value="1024">1024²</option></select><output></output></div>
+  <div class="row"><span>Highest peaks</span><input type="range" id="relief" min="20" max="1500" step="10"><output id="reliefV"></output></div>
+  <div class="row"><span>Sea depth</span><input type="range" id="depth" min="8" max="250" step="1"><output id="depthV"></output></div>
+  <div class="row"><span>Roughness</span><input type="range" id="rough" min="0" max="1" step="0.01"><output id="roughV"></output></div>
+  <div class="row"><span>Erosion</span><input type="range" id="erosion" min="0" max="1" step="0.01"><output id="erosionV"></output></div>
+  <h3>Biome</h3>
+  <div class="row"><span>Land</span><select id="biome"></select><output></output></div>
+  <div class="row"><span>Zone transition</span><input type="range" id="biomeBlend" min="200" max="4000" step="100"><output id="biomeBlendV"></output></div>
+  <div class="stats" id="biomeShare"></div>
+  <p class="note">Ground only: shape and colour of the land. Plants and rocks as objects come in their own labs.</p>
+  <h3>Water bodies</h3>
+  <div class="row"><span>Layout</span><select id="layout"></select><output></output></div>
+  <p class="note" id="layoutNote"></p>
+  <div class="row"><span>Water</span><select id="body"></select><output></output></div>
+  <div class="row"><span>Transition</span><input type="range" id="blend" min="60" max="1600" step="20"><output id="blendV"></output></div>
+  <div class="row"><span>Rivers</span><input type="range" id="rivers" min="0" max="6" step="1"><output id="riversV"></output></div>
+  <div class="row"><span>Ice from the north</span><input type="range" id="ice" min="0" max="1" step="0.01"><output id="iceV"></output></div>
+  <div class="stats" id="bodyShare"></div>
+  <h3>Map edge</h3>
+  <div class="row"><span>Topology</span><select id="wrap"><option value="1">Wrap-around (torus)</option><option value="0">Bounded</option></select><output></output></div>
+  <div class="row"><span>Barrier</span><select id="barrier"><option value="buoys">Buoy line (minefield)</option><option value="mountains">Mountain range</option><option value="wall">Invisible wall</option></select><output></output></div>
+  <p class="note" id="edgeNote"></p>
+  <div class="stats" id="genStats"></div>
+  <div class="btns"><button type="button" id="copy">Copy settings (JSON)</button></div>
+  <p class="note" id="copied">Same seed and settings always give the same map.</p>
+</aside>
+<aside class="panel right" id="rightPanel">
+  <h3>Chart</h3>
+  <canvas id="mini" class="minimap" width="256" height="256"></canvas>
+  <label class="chk"><input type="checkbox" id="labels" checked> Names of the waters on the chart</label>
+  <p class="note">Click the chart to move the ship (or the camera) there. Water is tinted by body: ocean blue, fjord dark, lake green, river brown, harbour grey, ice white.</p>
+  <h3>Ship</h3>
+  <label class="chk"><input type="checkbox" id="sail" checked> Sail ORP Błyskawica (W/S speed, A/D rudder)</label>
+  <div class="status" id="shipStatus"></div>
+  <h3>Camera</h3>
+  <div class="btns" id="cams"></div>
+  <h3>Light and weather</h3>
+  <div class="row"><span>Weather</span><select id="weather"></select><output></output></div>
+  <div class="row"><span>Sun height</span><input type="range" id="sunEl" min="-10" max="70" step="0.5"><output id="sunElV"></output></div>
+  <div class="row"><span>Sun bearing</span><input type="range" id="sunAz" min="0" max="360"><output id="sunAzV"></output></div>
+  <h3>Performance</h3>
+  <div class="stats" id="stats"></div>
+  <p class="note">Drag to orbit, wheel to zoom. Free flight: W/A/S/D, Q/E down/up, Shift faster. H hides the panels.</p>
+</aside>
+<div class="foot">
+  <span id="fps"></span>
+  <span class="sp"></span>
+  <span>Steel Salvo Labs</span>
+</div>
+<script type="module" src="../js/labs/land.js"></script>
+</body>
+</html>

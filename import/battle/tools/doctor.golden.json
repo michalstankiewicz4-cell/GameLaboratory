@@ -1,0 +1,191 @@
+{
+ "game/bb": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 63,
+   "materials": 11,
+   "size": [
+    2.83,
+    7.44,
+    19.3
+   ],
+   "triangles": 5326
+  }
+ },
+ "game/ca": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 40,
+   "materials": 11,
+   "size": [
+    1.87,
+    5.79,
+    14.3
+   ],
+   "triangles": 3594
+  }
+ },
+ "game/dd": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 27,
+   "materials": 12,
+   "size": [
+    1.31,
+    4.59,
+    10.3
+   ],
+   "triangles": 2362
+  }
+ },
+ "game/ss": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 22,
+   "materials": 10,
+   "size": [
+    2.75,
+    3.25,
+    9.08
+   ],
+   "triangles": 908
+  }
+ },
+ "lab/blyskawica": {
+  "counts": {
+   "budget": 1
+  },
+  "fingerprint": {
+   "drawCalls": 99,
+   "materials": 14,
+   "size": [
+    11.26,
+    31.08,
+    114.8
+   ],
+   "triangles": 33575
+  }
+ },
+ "lab/orzel": {
+  "counts": {
+   "arc": 1,
+   "budget": 1,
+   "speck": 2
+  },
+  "fingerprint": {
+   "drawCalls": 49,
+   "materials": 13,
+   "size": [
+    6.7,
+    12.54,
+    84.33
+   ],
+   "triangles": 17083
+  }
+ },
+ "lod/blyskawica/0": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 65,
+   "materials": 14,
+   "size": [
+    11.26,
+    31.08,
+    114.8
+   ],
+   "triangles": 33551
+  }
+ },
+ "lod/blyskawica/1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 31,
+   "materials": 9,
+   "size": [
+    11.26,
+    26.47,
+    114.8
+   ],
+   "triangles": 12238
+  }
+ },
+ "lod/blyskawica/2": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 7,
+   "materials": 3,
+   "size": [
+    11.26,
+    30.41,
+    113.75
+   ],
+   "triangles": 2695
+  }
+ },
+ "lod/orzel/0": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 27,
+   "materials": 13,
+   "size": [
+    6.7,
+    12.54,
+    84.33
+   ],
+   "triangles": 17057
+  }
+ },
+ "lod/orzel/1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 15,
+   "materials": 10,
+   "size": [
+    6.7,
+    12.54,
+    83.99
+   ],
+   "triangles": 6559
+  }
+ },
+ "lod/orzel/2": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 4,
+   "materials": 3,
+   "size": [
+    6.7,
+    11.94,
+    83.99
+   ],
+   "triangles": 1423
+  }
+ },
+ "test/bench": {
+  "counts": {
+   "arc": 1,
+   "budget": 1,
+   "facing": 1,
+   "floating": 1,
+   "hidden": 1,
+   "inverted": 1,
+   "nan": 1,
+   "poke": 1,
+   "seethrough": 3,
+   "sliver": 1,
+   "speck": 1,
+   "waterline": 1,
+   "zfight": 1
+  },
+  "fingerprint": {
+   "drawCalls": 999,
+   "materials": 4,
+   "size": [
+    4.35,
+    8.5,
+    20
+   ],
+   "triangles": 999999
+  }
+ }
+}

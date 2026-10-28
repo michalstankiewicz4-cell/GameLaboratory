@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Water Lab — sea states, wake and spray around ORP Błyskawica | Steel Salvo Labs</title>
+<meta name="description" content="Steel Salvo water lab: compare looks of the sea and how it plays with a 1:1 destroyer — Gerstner sea states from calm to gale, reflections, foam, bow wave, Kelvin wake, spray, wet hull, ship motion — side by side, with the cost of every effect.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/Battle/labs/water.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Water Lab — the sea around ORP Błyskawica">
+<meta property="og:description" content="Sea states, reflections, foam, bow wave, wake and ship motion, compared side by side in the browser.">
+<meta property="og:url" content="https://michalstankiewicz4-cell.github.io/Battle/labs/water.html">
+<meta property="og:image" content="https://michalstankiewicz4-cell.github.io/Battle/assets/labs/water.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="../assets/favicon-32.png">
+<link rel="stylesheet" href="../css/lab.css">
+</head>
+<body class="lab">
+<div id="view"></div>
+<div id="split" class="splitline" hidden><span>A</span><span>B</span></div>
+<div class="bar">
+  <b>Water Lab</b>
+  <span class="dimtxt" id="seaTxt"></span>
+  <span class="sp"></span>
+  <a href="ship.html">Ship Lab</a>
+  <a href="doctor.html">Model doctor</a>
+  <a href="../labs.html">Labs</a>
+  <a href="../index.html">Play the game</a>
+</div>
+<aside class="panel left" id="leftPanel">
+  <h3>Compare</h3>
+  <label class="chk"><input type="checkbox" id="splitOn"> Split screen: variant A left, B right</label>
+  <div class="row"><span>Divider</span><input type="range" id="splitX" min="0.2" max="0.8" step="0.01" value="0.5"><output id="splitXV"></output></div>
+  <div class="btns" id="edit"><button type="button" data-v="A" class="on">Edit A</button><button type="button" data-v="B">Edit B</button><button type="button" id="copyAB">Copy A → B</button><button type="button" id="swapAB">Swap</button></div>
+  <h3>Water body</h3>
+  <div class="row"><span>Body</span><select id="body"></select><output></output></div>
+  <div class="row"><span>Width (shore to shore)</span><input type="range" id="width" min="80" max="3000" step="10"><output id="widthV"></output></div>
+  <div class="row"><span>Walls / banks</span><input type="range" id="wall" min="5" max="1200" step="5"><output id="wallV"></output></div>
+  <div class="row"><span>Current (to the stern)</span><input type="range" id="current" min="0" max="4" step="0.1"><output id="currentV"></output></div>
+  <div class="row"><span>Oil sheen</span><input type="range" id="oil" min="0" max="1" step="0.05"><output id="oilV"></output></div>
+  <div class="row"><span>Ice cover</span><input type="range" id="iceCover" min="0" max="1" step="0.01"><output id="iceCoverV"></output></div>
+  <div class="row"><span>Floe size</span><input type="range" id="floe" min="3" max="80" step="1"><output id="floeV"></output></div>
+  <div class="row"><span>Ice above water</span><input type="range" id="freeboard" min="0.05" max="1.5" step="0.05"><output id="freeboardV"></output></div>
+  <h3>Sea state</h3>
+  <div class="row"><span>Preset</span><select id="seaPreset"></select><output></output></div>
+  <div class="row"><span>Wave height Hs</span><input type="range" id="Hs" min="0" max="9" step="0.1"><output id="HsV"></output></div>
+  <div class="row"><span>Wavelength</span><input type="range" id="Lp" min="2" max="260" step="1"><output id="LpV"></output></div>
+  <div class="row"><span>Choppiness</span><input type="range" id="chop" min="0" max="1" step="0.01"><output id="chopV"></output></div>
+  <div class="row"><span>Spread</span><input type="range" id="spread" min="0" max="90" step="1"><output id="spreadV"></output></div>
+  <div class="row"><span>From (rel. bow)</span><input type="range" id="dir" min="-180" max="180" step="5"><output id="dirV"></output></div>
+  <div class="row"><span>Wave count</span><input type="range" id="n" min="4" max="16" step="1"><output id="nV"></output></div>
+  <h3>Look</h3>
+  <div class="row"><span>Preset</span><select id="lookPreset"></select><output></output></div>
+  <div class="row"><span>Deep colour</span><input type="color" id="deep"><output></output></div>
+  <div class="row"><span>Scatter colour</span><input type="color" id="scatter"><output></output></div>
+  <div class="row"><span>Sun glitter</span><input type="range" id="shine" min="100" max="2400" step="50"><output id="shineV"></output></div>
+  <div class="row"><span>Ripples</span><input type="range" id="ripples" min="0" max="1.5" step="0.05"><output id="ripplesV"></output></div>
+  <div class="row"><span>Crest foam</span><input type="range" id="crest" min="0" max="1" step="0.05"><output id="crestV"></output></div>
+  <div class="row"><span>Reflection</span><input type="range" id="reflect" min="0" max="1.5" step="0.05"><output id="reflectV"></output></div>
+  <label class="chk"><input type="checkbox" id="planar"> Planar reflection of the ship</label>
+  <label class="chk"><input type="checkbox" id="clear"> Translucent water (hull visible below)</label>
+  <h3>Ship and water</h3>
+  <div class="row"><span>Speed</span><input type="range" id="kn" min="0" max="39" step="1"><output id="knV"></output></div>
+  <label class="chk"><input type="checkbox" id="motion"> Ship motion (heave, pitch, roll)</label>
+  <label class="chk"><input type="checkbox" id="bowWave"> Bow wave and Kelvin waves</label>
+  <label class="chk"><input type="checkbox" id="wake"> Wake foam</label>
+  <label class="chk"><input type="checkbox" id="hullFoam"> Foam along the hull</label>
+  <label class="chk"><input type="checkbox" id="wet"> Wet band on the hull</label>
+  <label class="chk"><input type="checkbox" id="spray"> Bow spray</label>
+  <label class="chk"><input type="checkbox" id="foamMap"> Foam with memory (whitecaps leave lace, the wake stays for minutes)</label>
+  <div class="btns"><button type="button" id="shells">Shell splashes</button><button type="button" id="torpedo">Torpedo track</button></div>
+  <div class="btns"><button type="button" id="copyJson">Copy settings (JSON)</button><button type="button" id="reset">Reset variant</button></div>
+  <p class="note" id="copied"></p>
+</aside>
+<aside class="panel right" id="rightPanel">
+  <h3>Camera</h3>
+  <div class="btns" id="cams"></div>
+  <label class="chk"><input type="checkbox" id="follow" checked> Camera rides with the ship</label>
+  <h3>Light</h3>
+  <div class="row"><span>Sun height</span><input type="range" id="sun" min="2" max="80" value="28"><output id="sunV"></output></div>
+  <div class="row"><span>Sun bearing</span><input type="range" id="sunAz" min="0" max="360" value="150"><output id="sunAzV"></output></div>
+  <div class="row"><span>Exposure</span><input type="range" id="exp" min="0.6" max="1.8" step="0.05" value="1.15"><output id="expV"></output></div>
+  <div class="row"><span>Time speed</span><input type="range" id="tscale" min="0" max="2" step="0.05" value="1"><output id="tscaleV"></output></div>
+  <h3>Performance</h3>
+  <div class="row"><span>Water mesh</span><select id="grid"><option value="96,90">Light (17k tris)</option><option value="192,160" selected>Medium (61k)</option><option value="320,240">High (153k)</option><option value="480,320">Ultra (307k)</option></select><output></output></div>
+  <label class="chk"><input type="checkbox" id="pixN" checked> Per-pixel wave normals</label>
+  <div class="row"><span>Render scale</span><input type="range" id="scale" min="0.5" max="1" step="0.05" value="1"><output id="scaleV"></output></div>
+  <label class="chk"><input type="checkbox" id="aa" checked> Anti-aliasing (MSAA)</label>
+  <label class="chk"><input type="checkbox" id="bloom" checked> Glow</label>
+  <label class="chk"><input type="checkbox" id="shadows" checked> Ship shadows</label>
+  <div class="stats" id="stats"></div>
+  <div class="btns"><button type="button" id="measure">Measure the cost of each effect</button></div>
+  <table class="specs" id="costs"></table>
+  <p class="note">Mouse: drag to orbit, right-drag to pan, wheel to zoom. H hides the panels. Settings are remembered in this browser; "Copy settings" gives the JSON to paste back to the developer.</p>
+</aside>
+<div class="foot">
+  <span id="fps"></span>
+  <span id="motionTxt" class="mono"></span>
+  <span class="sp"></span>
+  <span>Steel Salvo Labs</span>
+</div>
+<script type="module" src="../js/labs/water.js"></script>
+</body>
+</html>

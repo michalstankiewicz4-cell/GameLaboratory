@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Look Lab — ageing, weather and lens for ORP Błyskawica | Steel Salvo Labs</title>
+<meta name="description" content="Steel Salvo look lab: procedural ageing by surface (rust streaks, chipped paint, salt, greyed decks, patina), a cloudy sky with rain, sea fog and time of day from dawn to a moonlit night, lightning, navigation lights and gun flashes, and a camera look from clean to cinematic and bodycam — every effect switchable, compared side by side, with its cost.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/Battle/labs/look.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Look Lab — ageing, weather and lens">
+<meta property="og:description" content="Procedural ageing, sky, rain and fog, and a bodycam camera look for a 1:1 destroyer, live in the browser.">
+<meta property="og:url" content="https://michalstankiewicz4-cell.github.io/Battle/labs/look.html">
+<meta property="og:image" content="https://michalstankiewicz4-cell.github.io/Battle/assets/labs/look.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="../assets/favicon-32.png">
+<link rel="stylesheet" href="../css/lab.css">
+</head>
+<body class="lab">
+<div id="view"></div>
+<div id="split" class="splitline" hidden><span>clean</span><span>look</span></div>
+<div class="bar">
+  <b>Look Lab</b>
+  <span class="dimtxt" id="status">building…</span>
+  <span class="sp"></span>
+  <a href="ship.html">Ship Lab</a>
+  <a href="water.html">Water lab</a>
+  <a href="transform.html">Transformer</a>
+  <a href="../labs.html">Labs</a>
+  <a href="../index.html">Play the game</a>
+</div>
+<aside class="panel left" id="leftPanel">
+  <h3>Weather and sky</h3>
+  <div class="row"><span>Weather</span><select id="weather"></select><output></output></div>
+  <div class="row"><span>Cloud cover</span><input type="range" id="coverage" min="0" max="1" step="0.01"><output id="coverageV"></output></div>
+  <div class="row"><span>Cloud density</span><input type="range" id="density" min="0" max="1" step="0.01"><output id="densityV"></output></div>
+  <div class="row"><span>Wind</span><input type="range" id="wind" min="0" max="25" step="0.5"><output id="windV"></output></div>
+  <div class="row"><span>Rain</span><input type="range" id="rain" min="0" max="1" step="0.01"><output id="rainV"></output></div>
+  <div class="row"><span>Visibility (fog)</span><input type="range" id="vis" min="0.1" max="25" step="0.05"><output id="visV"></output></div>
+  <div class="row"><span>Haze</span><input type="range" id="haze" min="0" max="1" step="0.01"><output id="hazeV"></output></div>
+  <div class="row"><span>Lightning</span><input type="range" id="lightning" min="0" max="1" step="0.05"><output id="lightningV"></output></div>
+  <div class="btns"><button type="button" id="strike">Lightning strike now</button></div>
+  <label class="chk"><input type="checkbox" id="thunder"> Thunder (sound, arrives after distance ÷ 343 m/s)</label>
+  <label class="chk"><input type="checkbox" id="squalls" checked> Squalls (the rain comes and goes)</label>
+  <label class="chk"><input type="checkbox" id="rainLens" checked> Rain on the lens</label>
+  <label class="chk"><input type="checkbox" id="windSea" checked> Wind sets the sea (wave height and length)</label>
+  <h3>Time of day</h3>
+  <div class="btns" id="times"></div>
+  <div class="row"><span>Time</span><input type="range" id="time" min="0" max="24" step="0.05"><output id="timeV"></output></div>
+  <div class="row"><span>Moon</span><input type="range" id="moon" min="0" max="1" step="0.05"><output id="moonV"></output></div>
+  <div class="row"><span>Sun height</span><input type="range" id="sunEl" min="-18" max="70" step="0.1" value="14"><output id="sunElV"></output></div>
+  <div class="row"><span>Sun bearing</span><input type="range" id="sunAz" min="0" max="360" value="60"><output id="sunAzV"></output></div>
+  <h3>Lights and guns</h3>
+  <div class="row"><span>Navigation lights</span><select id="navLights"><option value="auto">Sunset to sunrise</option><option value="on">On</option><option value="off">Off</option></select><output></output></div>
+  <div class="row"><span>Broadside</span><select id="side"><option value="1">Starboard</option><option value="-1">Port</option></select><output></output></div>
+  <div class="btns"><button type="button" id="salvo">Fire a salvo (F)</button><button type="button" id="signal">Signal SOS</button></div>
+  <h3>Ageing</h3>
+  <div class="row"><span>Wear</span><input type="range" id="uAge" min="0" max="1" step="0.01"><output id="uAgeV"></output></div>
+  <div class="row"><span>Shading in corners</span><input type="range" id="uAO" min="0" max="1" step="0.01"><output id="uAOV"></output></div>
+  <div class="row"><span>Grime</span><input type="range" id="uGrime" min="0" max="1" step="0.01"><output id="uGrimeV"></output></div>
+  <div class="row"><span>Rust streaks</span><input type="range" id="uStreak" min="0" max="1" step="0.01"><output id="uStreakV"></output></div>
+  <div class="row"><span>Rust spots</span><input type="range" id="uRust" min="0" max="1" step="0.01"><output id="uRustV"></output></div>
+  <div class="row"><span>Chipped paint</span><input type="range" id="uChip" min="0" max="1" step="0.01"><output id="uChipV"></output></div>
+  <div class="row"><span>Salt and growth</span><input type="range" id="uSalt" min="0" max="1" step="0.01"><output id="uSaltV"></output></div>
+  <div class="row"><span>Hull plating</span><input type="range" id="uPlate" min="0" max="1" step="0.01"><output id="uPlateV"></output></div>
+  <div class="row"><span>Wood greying</span><input type="range" id="uWood" min="0" max="1" step="0.01"><output id="uWoodV"></output></div>
+  <div class="row"><span>Brass patina</span><input type="range" id="uPatina" min="0" max="1" step="0.01"><output id="uPatinaV"></output></div>
+  <div class="row"><span>Canvas</span><input type="range" id="uCanvas" min="0" max="1" step="0.01"><output id="uCanvasV"></output></div>
+  <p class="note" id="bake"></p>
+</aside>
+<aside class="panel right" id="rightPanel">
+  <h3>Look</h3>
+  <div class="btns" id="presets"></div>
+  <label class="chk"><input type="checkbox" id="splitOn"> Compare: clean on the left</label>
+  <div class="row"><span>Divider</span><input type="range" id="splitX" min="0.1" max="0.9" step="0.01" value="0.5"><output id="splitXV"></output></div>
+  <div class="row"><span>Tone mapping</span><select id="tone"><option value="0">ACES</option><option value="1">AgX</option><option value="2">Hable</option></select><output></output></div>
+  <label class="chk"><input type="checkbox" id="autoExposure"> Automatic exposure</label>
+  <div id="sliders"></div>
+  <h3>Camera</h3>
+  <div class="btns" id="cams"></div>
+  <div class="row"><span>Field of view</span><input type="range" id="fov" min="20" max="95" value="40"><output id="fovV"></output></div>
+  <div class="row"><span>Hand-held shake</span><input type="range" id="shake" min="0" max="1" step="0.05" value="0"><output id="shakeV"></output></div>
+  <h3>Performance</h3>
+  <div class="row"><span>Render scale</span><input type="range" id="scale" min="0.5" max="1" step="0.05" value="1"><output id="scaleV"></output></div>
+  <label class="chk"><input type="checkbox" id="autoRes"> Automatic resolution (keeps ~60 fps)</label>
+  <label class="chk"><input type="checkbox" id="aa" checked> Anti-aliasing (MSAA)</label>
+  <label class="chk"><input type="checkbox" id="shadows" checked> Shadows</label>
+  <div class="stats" id="stats"></div>
+  <div class="btns"><button type="button" id="measure">Measure the cost of each effect</button><button type="button" id="copy">Copy settings (JSON)</button></div>
+  <table class="specs" id="costs"></table>
+  <p class="note" id="copied">Drag to orbit, right-drag to pan, wheel to zoom, H hides the panels.</p>
+</aside>
+<div class="foot">
+  <span id="fps"></span>
+  <span class="sp"></span>
+  <span>Steel Salvo Labs</span>
+</div>
+<script type="module" src="../js/labs/look.js"></script>
+</body>
+</html>
