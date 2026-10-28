@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D Train Physics Simulator – Realistic Railway Sim in the Browser | aTrain</title>
+<meta name="version" content="1.1.0">
+<meta name="description" content="Free 3D train simulator in your browser with real physics: wheel–rail contact with flanges, Janney knuckle and chain couplers, sprung buffers, rail joints, turnouts and derailments. A diesel locomotive and two wagons on a procedural coast with a mountain, cliffs, sea and forest.">
+<meta name="keywords" content="train simulator, 3D train simulator, train physics simulation, railway simulator online, browser train game, free train simulator, realistic train physics, wheel rail contact, wheel flange physics, Janney knuckle coupler, chain coupler, railway buffers, rail joints sound, railway turnout, derailment simulation, diesel locomotive simulator, model railway, WebGL train, three.js train, procedural terrain, day and night cycle">
+<meta name="author" content="Michał Stankiewicz">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/aTrain/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="aTrain">
+<meta property="og:title" content="3D Train Physics Simulator – real wheel–rail physics in the browser">
+<meta property="og:description" content="A diesel locomotive and two wagons on a coastal line with a mountain, cliffs and sea. Real physics: flanges, couplers, buffers, rail joints, turnouts, wheel slip and derailments.">
+<meta property="og:url" content="https://michalstankiewicz4-cell.github.io/aTrain/">
+<meta property="og:image" content="https://michalstankiewicz4-cell.github.io/aTrain/assets/screenshot.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A diesel locomotive and two goods wagons on a railway line by the sea, with a mountain and forest">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="3D Train Physics Simulator in the browser">
+<meta name="twitter:description" content="Real wheel–rail physics, couplers, buffers, turnouts and derailments on a procedural coast.">
+<meta name="twitter:image" content="https://michalstankiewicz4-cell.github.io/aTrain/assets/screenshot.jpg">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "aTrain – 3D Train Physics Simulator",
+  "url": "https://michalstankiewicz4-cell.github.io/aTrain/",
+  "image": "https://michalstankiewicz4-cell.github.io/aTrain/assets/screenshot.jpg",
+  "description": "Browser-based 3D train simulator with real physics: wheel–rail contact with flanges, Janney knuckle and chain couplers, sprung buffers, rail joints with gaps, turnouts, wheel slip and derailments, on a procedural coast with a mountain, cliffs, sea and forest.",
+  "genre": ["Simulation", "Train simulator"],
+  "gamePlatform": "Web browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any",
+  "inLanguage": "pl",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Person", "name": "Michał Stankiewicz" },
+  "keywords": "train simulator, train physics, railway simulation, Janney coupler, rail joints, turnout, derailment, WebGL, three.js"
+}
+</script>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: pełnoekranowa scena 3D, panel nastawnika przyklejony do dołu */
+  :root {
+    --panel: rgba(24, 28, 31, 0.86);
+    --panel-line: rgba(232, 226, 210, 0.14);
+    --ink: #ece6d6;
+    --ink-dim: #a49d8c;
+    --amber: #e3a72f;
+    --red: #d2553f;
+    --sky: #b8c3c6;
+    --f-label: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+    --f-num: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    color-scheme: dark;
+  }
+  html, body { height: 100%; }
+  body { background: var(--sky); color: var(--ink); overflow: hidden; font-family: var(--f-label); }
+  #view { position: fixed; inset: 0; display: block; }
+  canvas { display: block; touch-action: none; }
+  .hud {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    padding-block: 10px calc(10px + env(safe-area-inset-bottom, 0px));
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    background: var(--panel); border-top: 1px solid var(--panel-line);
+    backdrop-filter: blur(6px);
+    max-height: 58vh; overflow-y: auto;
+    display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: stretch;
+  }
+  .grp { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .lab { font-size: 12px; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-dim); font-weight: 600; }
+  .num { font-family: var(--f-num); font-variant-numeric: tabular-nums; }
+  .speedo { display: flex; align-items: baseline; gap: 6px; }
+  .speedo .big { font-family: var(--f-num); font-size: 30px; font-weight: 500; line-height: 1; min-width: 4.2ch; text-align: right; font-variant-numeric: tabular-nums; }
+  .speedo .unit { font-size: 13px; color: var(--ink-dim); }
+  .row { display: flex; align-items: center; gap: 8px; }
+  input[type=range] { width: 170px; max-width: 42vw; accent-color: var(--amber); }
+  .val { font-family: var(--f-num); font-size: 13px; min-width: 7ch; font-variant-numeric: tabular-nums; }
+  button {
+    font-family: var(--f-label); font-size: 15px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--ink); background: rgba(255,255,255,0.06); border: 1px solid var(--panel-line);
+    padding: 7px 12px; border-radius: 4px; cursor: pointer;
+  }
+  button:hover { background: rgba(255,255,255,0.11); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+  button[aria-pressed="true"] { background: var(--amber); color: #1b1a16; border-color: var(--amber); }
+  button.danger[aria-pressed="true"] { background: var(--red); border-color: var(--red); color: #fff; }
+  .bar { width: 90px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+  .bar > i { display: block; height: 100%; width: 0; background: var(--red); }
+  .masses { display: grid; grid-template-columns: auto auto auto; gap: 3px 8px; align-items: center; }
+  .masses input[type=range] { width: 120px; }
+  .masses span:first-child { font-size: 14px; }
+  .uitoggle { position: fixed; top: calc(8px + env(safe-area-inset-top, 0px)); left: max(16px, env(safe-area-inset-left, 0px)); z-index: 6;
+    font-size: 13px; padding: 4px 9px; background: var(--panel); backdrop-filter: blur(6px); }
+  body.noui .help, body.noui .fx, body.noui .snd, body.noui .cams, body.noui .hud { display: none; }
+  body.noui .uitoggle { opacity: 0.55; }
+  body.noui .uitoggle:hover { opacity: 1; }
+  .fx .brk { flex-basis: 100%; height: 0; }
+  .fx button.small { font-size: 13px; padding: 3px 9px; }
+  .help { position: fixed; top: calc(10px + env(safe-area-inset-top, 0px)); left: calc(max(16px, env(safe-area-inset-left, 0px)) + 108px);
+    font-size: 13px; color: #2b2f30; letter-spacing: .03em; background: rgba(236,232,220,0.7); padding: 4px 8px; border-radius: 3px; }
+  .cams { position: fixed; left: max(16px, env(safe-area-inset-left, 0px)); top: calc(46px + env(safe-area-inset-top, 0px));
+    background: var(--panel); border: 1px solid var(--panel-line); border-radius: 4px; padding: 8px;
+    display: flex; flex-direction: column; gap: 5px; backdrop-filter: blur(6px);
+    max-height: calc(100% - 46px - 40vh); overflow-y: auto; }
+  .cams button { text-align: left; font-size: 14px; padding: 6px 10px; }
+  .cams .sub { margin-top: 4px; }
+  @media (max-width: 640px) { .cams { top: calc(40px + env(safe-area-inset-top, 0px)); padding: 6px; } .cams button { font-size: 13px; padding: 5px 8px; } }
+  .fx { position: fixed; top: calc(10px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%);
+    background: var(--panel); border: 1px solid var(--panel-line); border-radius: 4px; padding: 6px 12px; backdrop-filter: blur(6px);
+    display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; max-width: calc(100% - 32px); }
+  .fx label { display: flex; align-items: center; gap: 6px; font-size: 15px; cursor: pointer; }
+  .fx input { accent-color: var(--amber); width: 15px; height: 15px; margin: 0; }
+  .fx input[type=range] { width: 140px; height: auto; }
+  .fx .val { min-width: 5ch; }
+  .fx select { font-family: var(--f-label); font-size: 15px; background: rgba(255,255,255,0.06); color: var(--ink); border: 1px solid var(--panel-line); border-radius: 3px; padding: 2px 6px; }
+  .fx select option { background: #1e2225; color: var(--ink); }
+  @media (max-width: 900px) { .help { display: none; } .cams { top: calc(56px + env(safe-area-inset-top, 0px)); } }
+  .broken { position: fixed; left: 50%; top: 40%; transform: translate(-50%, -50%); background: var(--panel); color: var(--ink);
+    border: 1px solid var(--red); border-radius: 4px; padding: 12px 16px; font-size: 16px; max-width: calc(100% - 32px); z-index: 5; }
+  .snd { position: fixed; top: calc(10px + env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px));
+    background: var(--panel); border: 1px solid var(--panel-line); border-radius: 4px; padding: 8px 12px;
+    display: flex; flex-direction: column; gap: 4px; backdrop-filter: blur(6px); }
+  .snd label { display: flex; align-items: center; gap: 7px; font-size: 15px; cursor: pointer; letter-spacing: .02em; }
+  .snd input { accent-color: var(--amber); width: 15px; height: 15px; margin: 0; }
+  @media (max-width: 640px) { .hud { gap: 8px 14px; } .speedo .big { font-size: 24px; } }
+</style>
+</head>
+<body>
+<noscript>
+  <h1>3D Train Physics Simulator</h1>
+  <p>A free browser train simulator with real physics. A diesel locomotive and two goods wagons run on a railway line by the sea:
+  wheels with flanges roll on real rail profiles, a Janney knuckle coupler and a chain coupler with slack link the vehicles, sprung buffers
+  and suspension react to every force, rail joints have physical gaps, turnouts can derail the train, and powerful starts make the wheels slip.
+  The line runs around a high mountain, along cliffs above the ocean and past a forest. Day and night, train lights, shadows, procedural
+  sounds and retro filters (pixel art, scanlines, CRT). This simulator needs JavaScript and WebGL.</p>
+</noscript>
+<div id="view"></div>
+<button id="ui-toggle" class="uitoggle" aria-pressed="false" title="Ukryj lub pokaż menu (klawisz H)">Ukryj menu</button>
+<div class="help">WSAD: ruch · lewy przycisk: obrót · prawy: przesuw · kółko: przybliżenie</div>
+<div class="fx" role="group" aria-label="Filtry obrazu">
+  <span class="lab">Filtry</span>
+  <label><input type="checkbox" id="fx-pixel"> Pixelart</label>
+  <label><input type="checkbox" id="fx-scan"> Scanlines</label>
+  <label><input type="checkbox" id="fx-crt"> CRT</label>
+  <label class="pal"><span class="lab">Paleta</span>
+    <select id="fx-pal">
+      <option value="0" selected>Naturalna</option>
+      <option value="1">Czarno-biała</option>
+      <option value="2">Sepia</option>
+      <option value="3">Odcienie szarości</option>
+      <option value="4">CGA</option>
+    </select>
+  </label>
+  <label class="pal"><span class="lab">Pora dnia</span><input type="range" id="tod" min="0" max="24" step="0.25" value="12"><span class="val num" id="todV">12:00</span></label>
+  <span class="brk"></span>
+  <label class="pal"><span class="lab">Pogoda</span><select id="wx"></select></label>
+  <button id="wx-var" class="small" aria-pressed="false" title="Pogoda sama się zmienia: chmury, deszcz, mgła, burza">Zmienne warunki</button>
+  <label class="pal"><span class="lab">Wygląd</span>
+    <select id="lk-preset">
+      <option value="natural" selected>Naturalny</option>
+      <option value="film">Filmowy</option>
+      <option value="bodycam">Bodycam</option>
+    </select>
+  </label>
+  <label class="pal"><span class="lab">Tony</span>
+    <select id="lk-tone">
+      <option value="0" selected>ACES</option>
+      <option value="1">AgX</option>
+      <option value="2">Hable</option>
+    </select>
+  </label>
+  <span class="brk"></span>
+  <span class="lab">Obiektyw</span>
+  <label><input type="checkbox" id="lk-vig"> Winieta</label>
+  <label><input type="checkbox" id="lk-grain"> Ziarno</label>
+  <label><input type="checkbox" id="lk-ca"> Aberracja</label>
+  <label><input type="checkbox" id="lk-dist"> Dystorsja</label>
+  <label><input type="checkbox" id="lk-drops"> Krople</label>
+  <label><input type="checkbox" id="lk-dirt"> Brud</label>
+  <label><input type="checkbox" id="lk-glare"> Odblask słońca</label>
+  <label><input type="checkbox" id="lk-sharp"> Wyostrzenie</label>
+</div>
+<div id="broken" class="broken" role="alert" hidden>Obliczenia fizyki się rozbiegły. Naciśnij <b>Restart</b>, żeby zacząć od nowa.</div>
+<div class="snd" role="group" aria-label="Dźwięki">
+  <span class="lab">Dźwięki</span>
+  <label><input type="checkbox" id="snd-friction" data-s="friction"> Tarcie kół</label>
+  <label><input type="checkbox" id="snd-chain" data-s="chain"> Łańcuch</label>
+  <label><input type="checkbox" id="snd-knuckle" data-s="knuckle"> Sprzęg Janneya</label>
+  <label><input type="checkbox" id="snd-joint" data-s="joint"> Styki szyn</label>
+  <label><input type="checkbox" id="snd-buffer" data-s="buffer"> Zderzaki</label>
+  <label><input type="checkbox" id="snd-sleeper" data-s="sleeper"> Koło o podkład</label>
+  <label><input type="checkbox" id="snd-thunder" data-s="thunder"> Grzmoty</label>
+</div>
+<nav class="cams" aria-label="Widoki kamery">
+  <span class="lab">Kamera</span>
+  <button id="cam" aria-pressed="false">Perspektywa</button>
+  <span class="lab sub">Widok</span>
+  <button class="fol" data-f="" aria-pressed="true">Wolna</button>
+  <button class="fol" data-f="loco" aria-pressed="false">Lokomotywa</button>
+  <button class="fol" data-f="side" aria-pressed="false">Koła lokomotywy</button>
+  <button class="fol" data-f="flange" aria-pressed="false">Obrzeże od spodu</button>
+  <button class="fol" data-f="c0" aria-pressed="false">Sprzęg kłowy</button>
+  <button class="fol" data-f="c1" aria-pressed="false">Łańcuch</button>
+  <button class="fol" data-f="sw1" aria-pressed="false">Rozjazd 1</button>
+  <button class="fol" data-f="sw2" aria-pressed="false">Rozjazd 2</button>
+</nav>
+<div class="hud" role="group" aria-label="Sterowanie">
+  <div class="grp">
+    <span class="lab">Prędkość</span>
+    <div class="speedo"><span class="big" id="spd">0.0</span><span class="unit">km/h</span></div>
+    <span class="lab num" id="trac" style="text-transform:none;letter-spacing:0">siła: 0 kN</span>
+  </div>
+  <div class="grp">
+    <label class="lab" for="target">Prędkość zadana</label>
+    <div class="row"><input type="range" id="target" min="0" max="80" step="1" value="0"><span class="val" id="targetV">0 km/h</span></div>
+    <div class="row"><button id="dir" aria-pressed="false" title="Kierunek jazdy">Kierunek: naprzód</button><button id="restart">Restart</button></div>
+  </div>
+  <div class="grp">
+    <label class="lab" for="power">Moc silnika</label>
+    <div class="row"><input type="range" id="power" min="100" max="3000" step="50" value="200"><span class="val" id="powerV" style="min-width:13ch">200 kW · 50 kN</span></div>
+  </div>
+  <div class="grp">
+    <span class="lab">Hamulec</span>
+    <div class="row">
+      <button id="brake" aria-pressed="false">Hamuj</button>
+      <button id="lock" class="danger" aria-pressed="false">Blokada kół</button>
+    </div>
+    <div class="row"><span class="lab" style="font-size:11px">Ciśn. w cyl.</span><div class="bar"><i id="pbar"></i></div></div>
+  </div>
+  <div class="grp">
+    <span class="lab">Masa pudła</span>
+    <div class="masses">
+      <span>Lokomotywa</span><input type="range" id="m0" min="10" max="60" step="1" value="18" aria-label="Masa lokomotywy"><span class="val" id="m0v">18 t</span>
+      <span>Wagon 1</span><input type="range" id="m1" min="5" max="60" step="1" value="12" aria-label="Masa wagonu 1"><span class="val" id="m1v">12 t</span>
+      <span>Wagon 2</span><input type="range" id="m2" min="5" max="60" step="1" value="12" aria-label="Masa wagonu 2"><span class="val" id="m2v">12 t</span>
+    </div>
+  </div>
+  <div class="grp">
+    <span class="lab">Tor</span>
+    <div class="row"><button class="swb" data-sw="0" aria-pressed="false">Zwrotnica 1: łuk</button><button class="swb" data-sw="1" aria-pressed="false">Zwrotnica 2: łuk</button></div>
+    <div class="row"><button id="cpl1" aria-pressed="false">Sprzęg 1: rozprzęgnij</button><button id="cpl2" aria-pressed="false">Sprzęg 2: zdejmij z haka</button></div>
+    <div class="row"><label class="lab" for="gap" style="font-size:11px">Szczelina styków</label><input type="range" id="gap" min="0" max="30" step="1" value="25" style="width:110px"><span class="val" id="gapV">25 mm</span></div>
+    <div class="row"><label class="lab" for="clr" style="font-size:11px">Luz obrzeży</label><input type="range" id="clr" min="0" max="15" step="0.5" value="4.6" style="width:110px"><span class="val" id="clrV">4.6 mm</span></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/CopyShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/Pass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+<script src="js/physics.js"></script>
+<script src="js/land.js"></script>
+<script src="js/texkit.js"></script>
+<script src="js/stock.js"></script>
+<script src="js/plants.js"></script>
+<script src="js/world.js"></script>
+<script src="js/weather.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
