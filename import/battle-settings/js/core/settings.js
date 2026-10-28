@@ -8,6 +8,8 @@ export const DEFAULTS = {
   gfx: { scale: 1, shadows: true, aa: true, bloom: true, fx: 1, water: true, pip: true, bright: 1.2, sat: 1, showFps: false },
   vol: 0.6,
   mouse: { zoomSens: 1, rotSens: 1 },
+  // gameplay: god = the player's ship takes no damage (for trying things out; balance comes later)
+  play: { god: false },
 };
 const bool = (v, d) => (typeof v === 'boolean' ? v : d);
 // Graphics presets for the Options buttons (light = for weaker computers).
@@ -36,6 +38,7 @@ function sanitize(s) {
 
     vol: num(s && s.vol, d.vol, 0, 1),
     mouse: { zoomSens: num(m.zoomSens, 1, 0.2, 3), rotSens: num(m.rotSens, 1, 0.2, 3) },
+    play: { god: !!(s && s.play && s.play.god) },
   };
 }
 
