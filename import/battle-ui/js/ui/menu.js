@@ -24,7 +24,7 @@ export function createMenu(root, { actions, settings, progress }) {
         stat('st.hp', c.hp),
         stat('st.speed', `${(c.speed * KNOTS).toFixed(0)} ${t('hud.kn')}`),
         stat('st.guns', `${c.turrets.length}×${c.turrets[0].barrels} · ${c.guns.reload}s`),
-        stat('st.range', `${(c.guns.range / 100).toFixed(1)} km`),
+        stat('st.range', `${(c.guns.range / 1000).toFixed(1)} km`),
         stat('st.torps', c.torps ? `${c.torps.n} · ${c.torps.reload}s` : '—'));
     }));
   }

@@ -3,7 +3,7 @@
 import * as THREE from '../../vendor/three.module.js';
 import { h } from './dom.js';
 import { t } from '../i18n/index.js';
-import { THROTTLE, KNOTS, EDGE } from '../world/constants.js';
+import { THROTTLE, KNOTS, EDGE, U } from '../world/constants.js';
 
 const V = new THREE.Vector3();
 
@@ -135,7 +135,7 @@ export function createHud(root) {
       slotBar(rep, t('w.repair'), keys.repair, rp.active > 0 ? rp.active / 10 : 1 - rp.cd / cls.repair.cd, rp.charges > 0 && rp.cd <= 0 ? 'ok' : '', rp.active > 0 ? t('w.active') : rp.cd > 0 ? `${rp.cd.toFixed(0)}s` : `×${rp.charges}`);
 
       warn.hidden = !(S.threat > 0);
-      if (S.threat > 0) warn.textContent = t('hud.torpWarn', { d: Math.round(S.threat * 10) });
+      if (S.threat > 0) warn.textContent = t('hud.torpWarn', { d: Math.round(S.threat) });
       hint.textContent = t('hud.hint', { repair: keys.repair });
       hint.hidden = S.time > 30;                     // controls reminder only at the start of a run
       if (keys.gun) gunInfo.textContent = t(keys.locked ? (p.sub ? 'hud.scopeOn' : keys.zoom >= 1.5 ? 'hud.binoOn' : 'hud.gunOn') : 'hud.gunClick', { z: keys.zoom.toFixed(1) });
@@ -154,7 +154,7 @@ export function createHud(root) {
         const d = Math.hypot(aim.x - p.x, aim.z - p.z);
         const g = p.cls.guns;
         const tt = weapon === 'torps' && p.cls.torps ? d / p.cls.torps.speed : Math.min(d, g.range) / g.speed;
-        cross.lastChild.textContent = `${(d / 100).toFixed(1)} km · ${tt.toFixed(1)}s`;
+        cross.lastChild.textContent = `${(d / 1000).toFixed(1)} km · ${tt.toFixed(1)}s`;
         cross.classList.toggle('far', d > (weapon === 'torps' && p.cls.torps ? p.cls.torps.range : g.range));
       }
 
@@ -168,7 +168,7 @@ export function createHud(root) {
           el = h('div', { class: 'lab ' + s.side }, h('span'), h('div', { class: 'bar' }, h('i')));
           labels.append(el); lab.set(s.id, el);
         }
-        const q = project(cam, s.x, s.cls.H + 4 + s.cls.L * 0.15, s.z);
+        const q = project(cam, s.x, s.cls.H + 4 * U + s.cls.L * 0.15, s.z);
         if (!q) { el.hidden = true; continue; }
         // periscope: only labels inside the round view
         if (optic && !inOptic(q.x, q.y)) { el.hidden = true; continue; }   // only labels inside the optics' view
@@ -190,7 +190,7 @@ export function createHud(root) {
       }
       for (const el of [...pops.children]) {
         const w = el._w; w.t += dt;
-        const q = project(cam, w.x, 6, w.z);
+        const q = project(cam, w.x, 6 * U, w.z);
         if (w.t > 1.6 || !q) { el.remove(); continue; }
         el.style.transform = `translate(${q.x}px,${q.y - w.t * 40}px)`;
         el.style.opacity = String(Math.min(1, 2 * (1.6 - w.t)));
