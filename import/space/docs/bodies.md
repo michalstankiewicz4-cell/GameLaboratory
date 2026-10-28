@@ -1,0 +1,570 @@
+# Body lab (`bodies.html`) and BodyKit
+
+A standalone preview page for procedurally generated celestial bodies,
+the companion of [`ship.html`](ship.md) and built on the same scheme.
+The bodies themselves live in **`js/bodykit/bodykit.js` (BodyKit)**, one
+file shared by the lab and the game (since v2.10.0), exactly like
+ShipKit: a body tuned in the lab is the body the game shows. There is no
+copy to keep in sync.
+
+Open `bodies.html` straight from disk (double-click). No server, no build
+step and no network are needed: the fonts come from the repo's own
+`css/fonts.css` / `fonts/` (they load from disk too, checked in Chromium). The page
+itself (the viewer) is a dev tool and needs no version bump, but
+**`js/bodykit/bodykit.js` is part of the game**: changing it needs the
+bump (`js/version.js`, `CHANGELOG.md`, the `?v=` params).
+
+## File layout
+
+| Part | What it is | Needed by the game? |
+|---|---|---|
+| 1. `vendor/three-r128.min.js`, `vendor/three-r128-examples/OrbitControls.js` | Three.js r128 (the game's own copy; pasted into the page until the 2026-10 review) and the preview's mouse camera | Three.js yes |
+| 2. `js/labkit/labkit.js` + `css/lab.css` | Shared with the ship lab: grain, sliders, toggles, HUD scale, performance counters, the IMAGE EFFECTS render (see docs/ship.md) | No |
+| 3. `js/bodykit/bodykit.js` (`<script id="bodykit" src=…>`) | **BodyKit's core**: the shared GLSL (noise, the body uniforms), the shared blocks, the groups and their parameter schemas, the public API (`window.BodyKit`; its header repeats it), and `BodyKit._`: the internals the kind files build with (not a public API). | **Yes**, `index.html` loads it (`defer`, after Three.js and ShipKit) |
+| 3b. `js/bodykit/kinds/planets.js`, `giants.js`, `pulsars.js`, `suns.js`, `rocks.js`, `holes.js`, `sky.js` | **One file per kind of body** (split out 2026-10-03; the core went from ~2330 to ~725 lines).<br>Each holds its shaders and builder(s) and registers them in `KINDS`. A group's `build` names its kind: `"planet"`, `"giant"`, `"rings"`, `"pulsar"`, `"sun"`, `"rock"`, `"comet"`, `"hole"` or `"sky"`.<br>Their public parts (`planetTerrain`, `GLSL_PLANET`, `GLSL_PLANET_SURFACE`, `GLSL_SUN`, `GLSL_ROCK`, `GLSL_HOLE`, `GLSL_SKY`) are added to `window.BodyKit` by these files.<br>Load order matters: `planets.js` before `giants.js`, because the giants use the planets' atmosphere. | **Yes**, after `bodykit.js` everywhere |
+| 4. `js/labs/bodies.js` (`<script id="viewer">`; in the page until 2026-10-03) | Preview page: sky, camera, HUD, sliders generated from the schemas, statistics, counters | No |
+
+## Groups
+
+Bodies are organized in groups, and **each group has its own parameter
+schema**. A comet needs no oceans, so the viewer builds a group's sliders
+from its schema.
+
+| Group | Parameters | Bodies | Lab statistics |
+|---|---|---|---|
+| LAVA WORLDS | size, lava level, continents, mountains, roughness, molten lowlands, ash clouds, drift, atmosphere, hue | CINDER (1), MAGMA (2) | measured land / water / lava / ice / clouds |
+| EARTH-LIKE | size, water level, continents, mountains, roughness, climate, ice caps, clouds, drift, atmosphere, hue | TERRA-1 (3), PELAGIA (5) | the same |
+| ICE WORLDS | size, frozen-sea level, continents, mountains, roughness, ice caps, frozen seas, clouds, drift, atmosphere, hue | RIME (6), GLACIES (7) | the same |
+| DESERT WORLDS | size, terrain scale, mountains, roughness, rust, craters, polar caps, thin clouds, drift, atmosphere, hue | MARS (lab only) | the same |
+| CLOUD WORLDS | size, cloud deck, band contrast, haze colour, wind speed, atmosphere, hue | VENUS (lab only) | the same (clouds 100%) |
+| MOONS | size, terrain scale, relief height, roughness, craters, maria, ray craters | LUNA (lab only) | the same |
+| AIRLESS | size, terrain scale, relief height, roughness, craters, ray craters | MERCURY (lab only) | the same |
+| RINGS | size, density, style (broad / narrow / dust / debris) | HALO, FILAMENT, GOSSAMER, SHARD BELT (lab only) | style, inner and outer edge |
+| PULSARS | size, sweep rate (slowed), magnetic tilt, beam length / width / hue, surface temperature, glow, field lines, real spin period | METRONOME · PSR J0731+1337 (invented, lab only) | the real period, the shown rate, temperature, magnetic tilt |
+| GAS GIANTS | size, bands, turbulence, band contrast, colour, great storm (size, latitude), white ovals, polar haze, wind speed, polish, rings, flattening, polar hexagon, polar haze colour, golden tint, ice giant tint and hue, ring style, atmosphere, hue | JUPITER, SATURN, URANUS, NEPTUNE (lab only) | belts / zones, the storm's width, the rings' outer edge, flattening |
+| SUNS | size, temperature, granulation, sunspots, activity, corona, brightness | SOL (slot 0) | temperature, spectral class, luminosity |
+| COMETS | the rock parameters + coma, tail length, dust tail, ion tail hue | COMET (kind `comet`: every comet) | shape in km |
+| ROCKS | the rock parameters: size, lumpiness, elongation, craters, albedo, color, ice, metal veins | FERRUM (slot 8, the meteoroid) | shape in km, albedo |
+| BLACK HOLES | size, disk reach, disk temperature, turbulence, disk speed, Doppler beaming, lensing glow, brightness | ABYSS (slot 9) | mass, horizon radius, disk size |
+| SKY | nebula coverage, brightness, scale, two nebula colors, dark dust, Milky Way, stars, star brightness, twinkle, pulsars | DEEP FIELD (kind `sky`: the game's backdrop) | stars, pulsars, bake size |
+
+Each group also sets `kmPerSize` (the real radius of `size` 1, for the
+statistics), `view` (the lab camera's distance when the group is
+opened: a comet's tail is long) and `layers` (the names of the two layer
+toggles: CLOUDS / ATMOSPHERE, CORONA, COMA & TAILS, DISK & LENSING,
+STARS / NEBULAE). The SKY group has no `kmPerSize` (no radius statistics)
+and `common: false` (no spin / tilt / damage sliders).
+
+**The six planet groups are one planet** (`buildPlanet`, one shader):
+they differ only in which sliders they show (`planetParams([...])`, a
+subset of `PLANET_PARAMS`, optionally relabelled — "Lava level" is `sea`
+— or with another default) and in `fixed` values a group sets without a
+slider (lava worlds: no ice caps; desert worlds: no sea, arid; cloud worlds: a closed deck, no relief; airless: no sea, clouds or air). Split
+in 2026-10 because one shared set of 15 sliders let a slider put things
+on a planet that don't belong there. Every planet's values stayed exactly
+the same (checked key by key). COPY VALUES also writes the body's own
+values for keys its group has no slider for.
+
+Every body also has the **common** parameters: rotation speed
+(`spin`, 1 = 0.6 rad/s), axial tilt (`tilt`, degrees) and `damage`
+(0–1, a preview of the game's health: `1 − health / maxHealth`).
+
+### The game's bodies
+
+Every body with a `slot` is the body on that fixed orbit of the game's
+solar system (`world/solarSystem.js`); the HUD title shows it
+("TERRA-1 · ORBIT 3"). A body with `kind` is the look of every game
+body of that kind that comes and goes (comets). Since v2.11.0 every
+body in the game is a BodyKit body: SOL (0), the six planets below,
+FERRUM (8), ABYSS (9) and COMET.
+
+| Body | Slot | Game kind | Character |
+|---|---|---|---|
+| `cinder` CINDER | 1 | volcanic | small, basalt continents, molten lowlands (≈36% lava), ash clouds |
+| `magma` MAGMA | 2 | volcanic | mostly molten (≈59% lava), rough |
+| `terra` TERRA-1 | 3 | neutral | the Earth-like default (43% land) |
+| `pelagia` PELAGIA | 5 | neutral | ocean world (≈83% water), cloudy |
+| `rime` RIME | 6 | ice | frozen seas, tundra continents (≈78% ice & snow) |
+| `glacies` GLACIES | 7 | ice | almost fully frozen (≈95%) |
+| `luna` LUNA | — | (lab only) | the Moon: cratered highlands, dark maria with fewer craters, a few ray craters (`maria`) |
+| `mars` MARS | — | (lab only) | rust-red dust, dark basalt regions, cratered highlands, a polar cap, thin air (`rust`, `craters`) |
+| `venus` VENUS | — | (lab only) | wrapped in a closed cream-to-ochre cloud deck with wind streaks (`overcast`, `bands`, `haze`); modelled on a real photo of Venus |
+| `mercury` MERCURY | — | (lab only) | airless and cratered, bright ray craters (`airless`, `rays`); modelled on a real photo of Mercury |
+
+`size` only matters in the lab (it's set to the relative game radius);
+the game sizes each body to its own radius.
+
+### Planet parameters (`PLANET_PARAMS`; each planet group shows a subset)
+
+| Key | Slider | Range | Default |
+|---|---|---|---|
+| `size` | Size (Earth radii) | 0.3–2.5 | 1 |
+| `sea` | Water level (also the lava / frozen-sea level) | −0.6–0.6 | 0.04 |
+| `continents` | Continent scale (noise frequency) | 0.5–3.5 | 1.4 |
+| `mountains` | Mountain height (vertex displacement, fraction of radius) | 0–0.15 | 0.045 |
+| `roughness` | Terrain roughness (fBm persistence) | 0.35–0.7 | 0.52 |
+| `climate` | Climate, lush → arid | 0–1 | 0.35 |
+| `ice` | Ice caps (reach toward the equator and snow line) | 0–1 | 0.3 |
+| `clouds` | Cloud cover (≈ the measured coverage) | 0–1 | 0.35 |
+| `cloudDrift` | Cloud drift over the surface | 0–1 | 0.3 |
+| `atmosphere` | Atmosphere strength | 0–1 | 0.6 |
+| `atmoHue` | Atmosphere hue (degrees) | 0–360 | 205 |
+| `lava` | Molten lowlands: the seas become lava, land becomes basalt, clouds turn to ash | 0–1 | 0 |
+| `frozen` | Frozen seas: cracked ice sheets, frosted tundra land | 0–1 | 0 |
+| `airless` | Airless, cratered: grey regolith, craters of three sizes (fewer on the low plains), no seas, a sharp terminator | 0–1 | 0 |
+| `rays` | Ray craters: a few young craters with bright radial rays | 0–1.5 | 0 |
+| `rust` | Rust: oxidised red dust with dark basalt regions and paler highlands; no snow on the peaks | 0–1 | 0 |
+| `craters` | Craters on any planet (relief + darker floors), fewer on the low plains; `airless` implies them | 0–1 | 0 |
+| `maria` | Maria: dark, smooth basalt plains (a moon's "seas"), with 80% fewer craters | 0–1 | 0 |
+| `overcast` | Cloud deck: the cloud shell closes into an opaque, banded deck (counted as 100% clouds) | 0–1 | 0 |
+| `bands` | Band contrast of the deck | 0–1 | 0.6 |
+| `haze` | The deck's colour, white → ochre | 0–1 | 0.5 |
+| `seed` | Seed ("NEW SEED" button) | any | 1 |
+
+## How the planet is made
+
+- **No textures at all.** Every pixel is computed on the GPU from 3D
+  simplex noise (Ashima Arts / Stefan Gustavson, MIT), so every
+  parameter is a shader uniform and a slider change is instant.
+- **Terrain**: domain-warped fBm with a runtime octave count. Oceans
+  stay at sea level, and land is displaced in the vertex shader by
+  `mountains`.
+- **Colors**: ocean depth gradient, beaches, lush-to-arid vegetation
+  driven by a moisture noise and `climate`, rock at altitude, polar ice
+  with a noisy edge, and snow above a snow line.
+- **Lava** (`lava`, `lavaFlowAt`): below sea level, bright rivers of
+  molten rock (ridged noise, slowly moving) through a dark crust; the
+  land is basalt and its shores glow. Lava is matte (no sun glint) and
+  **self-lit**: it glows on the night side too.
+- **Frozen seas** (`frozen`, `iceSheetAt`): the sea surface is an ice
+  sheet with darker pressure cracks and a duller glint; land turns to
+  grey tundra rock with frost.
+- **Airless worlds** (`airless`, `craterRelief`, `rayAt`): `craterField`
+  (shared with the rocks) at three sizes is added to the height, so the
+  craters are real relief; the bump normal gives crater walls a much
+  stronger slope (`kc`) than the continents, or the terrain turned into
+  black stripes. No seas (`seaAt`, also in the probe), grey regolith with
+  darker patches and brownish plains, dark floors and bright rims. Rays:
+  for a few seed-picked centres, noise of the *direction* around the
+  centre — it only changes with the angle, so it draws radial streaks.
+- **Desert worlds** (`rust`, `craters`): the land turns to oxidised dust
+  (two reds from the moisture noise) with dark basalt regions (an fBm
+  threshold) and paler highlands; `craters` gives any planet the airless
+  crater relief without its grey regolith. The water level at its minimum
+  (−0.6) means no sea at all (`seaAt`), so crater floors stay dry; the ice
+  cap's snowy peaks are off on a rust world.
+- **Cloud worlds** (`overcast`, `hazeAt`): `cloudAt` reaches 1 everywhere
+  (so the probe counts 100% clouds), and the cloud shell draws a deck:
+  fBm stretched along the latitude lines (bands) plus warped swirls and
+  fine streaks, drifting with `cloudDrift` (the wind), cream to ochre,
+  darker toward the limb, lit a little past the terminator. The group
+  fixes `mountains` at 0: relief would poke through the shell.
+- **Damage** (`damage` / `setDamage`, `crackAt`): a network of glowing
+  cracks (two ridged-noise scales) whose reach spreads over the surface
+  as damage grows, darkening the ground; self-lit like lava.
+- **Relief lighting**: the height is sampled at two nearby points on the
+  sphere (object space, one octave less, land only).
+- **Lighting**: done inside the shaders, fully in world space, from a
+  sun direction. THREE lights don't affect the bodies, and no camera
+  has to be passed in.
+- **Clouds**: a separate shell (radius 1.018) whose fBm threshold is the
+  inverse of the noise's roughly normal distribution. That makes
+  `clouds = 0.25 / 0.5 / 0.75` measure as ≈ 27% / 52% / 76% coverage.
+  Over a lava world they are grey ash.
+- **Atmosphere**: an additive back-face shell (radius 1.12) with a
+  day-side-only rim glow, plus a matching haze on the surface limb.
+- **Coverage statistics** (land, water, lava, ice & snow, clouds): a
+  probe shader renders the classification into a 256×128 equirect render
+  target, using **the same GLSL functions** as the surface. The pixels
+  are read back and weighted by cos(latitude), so the numbers are
+  exactly what is drawn. The probe's "sea" counts as lava when
+  `lava ≥ 0.5`, and as ice when `frozen ≥ 0.5`.
+- **Output**: the shaders write their final color directly (no THREE
+  tone-mapping or sRGB chunks). The lab and the game render with the
+  same pipeline (sRGB output, ACES), so a body looks the same in both.
+
+## How the other bodies are made
+
+- **Sun** (`buildSun`, `GLSL_SUN`): the color is a black body at the
+  temperature (`blackbody()`, 5778 K ≈ white). The surface is bright
+  enough that the center goes white; convection cells (ridged noise,
+  slowly boiling — `activity` sets the speed) and supergranulation on
+  top; sunspots (umbra + penumbra) only in two activity belts, with
+  bright faculae around them near the limb; strong limb darkening toward
+  orange. The **corona** is a billboard (`makeBillboard`): a bright rim,
+  streamers drifting outward (noise along the angle), a wide soft glow
+  and prominences standing on the limb; its size follows `corona`.
+  Self-lit.
+- **Rocks** (`rockParts`, `GLSL_ROCK`): a sphere displaced **on the GPU**
+  into a lumpy, elongated shape (fBm + two crater fields), normals from
+  two nearby displaced points in the vertex shader. `craterField()` is a
+  cell noise with a crater (bowl + raised rim) in a `craters` share of the
+  cells. Fine craters and grit are relief in the fragment shader; colors
+  from grey to rusty, darker crater floors, frost patches (`ice`) and
+  glinting metal veins (`metal`), lit by the sun direction.
+- **Comet** (`buildComet`): a rock nucleus (icy, dark) with a **coma**
+  (billboard glow) and two **tails** (`makeTail`, `GLSL_TAIL_VERTEX`):
+  ribbons built in the vertex shader from the body's world position,
+  pointing away from the light and always turned toward the camera. The
+  ion tail is straight, narrow and blue (`ionHue`); the dust tail is
+  wider, warm and bent back along `-opts.velocity`. `opts.activity`
+  scales the coma and the tail length.
+- **Gas giant** (`buildGiant`, `GLSL_GIANT`): one sphere, no surface,
+  modelled on a real photo of Jupiter. The latitude is pushed around by a
+  **marbled flow** — fBm warped by fBm (most on the band edges), smooth
+  curls instead of torn edges, thin bright veins along it (the user saw
+  "polished granite or marble"; `sheen` adds a soft polish) — then
+  `sin(lat × bands)` splits it into pastel zones and belts: uneven widths,
+  narrower toward the poles, thin sub-bands, some belts redder, some zones
+  bluish; every band turns at its own speed (`bandDrift`, `wind`). The
+  great storm (`vortex()`: a sharp oval, darker centre, a rim, a pale
+  collar outside) has a **turbulent wake** west of it — big folded white
+  curls (fBm warped by fBm, stretched along the band; fBm here is centred
+  on 0, about ±0.6, so its thresholds sit near 0) — and a rusty streak
+  east. White ovals ride their own band; muted poles, limb darkening, a
+  soft terminator; the atmosphere shell is the planets'.
+- **Saturn** (the same giant, data + four parameters, from two real
+  photos): `gold` tints zones and belts golden, `oblate` flattens the
+  surface mesh (10%), `hexagon` draws the north polar hexagon — a hexagon
+  in polar coordinates (`0.28 / cos(φ mod 60° − 30°)`) with a blue swirling
+  interior, a bright jet on its edge, a pale eye — and `polarBlue` turns
+  the polar haze blue. **Rings** (`rings`): a flat annulus in the spin
+  frame (`RingGeometry` rotated into XZ and baked, so its own position
+  gives the radius); `ringDensity(r)` / `ringColor(r)` follow the real
+  layout in planet radii — C 1.24–1.53 faint and dusky, B 1.53–1.95 the
+  densest and creamy, the Cassini division, A 2.03–2.27 greyer with the
+  Encke gap, the thin F ring, fine ringlets everywhere. They stay bright
+  even with the light low (ice scatters). `uSunObj`, the light in the
+  spin frame (`onUpdate`), drives both shadows: the rings on the planet
+  (`ringShadow`: from the surface point to the ring plane, the density
+  there) and the planet on the rings (`bodyShadow`: a ray to the light
+  against the flattened sphere). The lab's second layer button is RINGS.
+- **Ice giants** (URANUS, NEPTUNE: the giant with `iceTint`): zones and
+  belts from a methane-blue palette (`iceHue`: 184° cyan Uranus, 222° deep
+  blue Neptune), nearly featureless when calm (the belt colour moves
+  toward the zone's at low contrast), a pale polar cap, and a storm drawn
+  as a *dark* spot (Neptune's). `ringStyle` 1 swaps Saturn's broad rings
+  for Uranus's narrow dark ones (9 ringlets in planet radii, epsilon the
+  widest). The tilt slider goes to 180° (Uranus lies on its side, 98°).
+- **Ring systems** (`buildRingSystem`, the RINGS group): the giants' ring
+  material with no body in the middle (`uNoBody`: no shadow). Four
+  styles — broad and icy, narrow and dark, a faint reddish dust ring, and
+  the debris of a broken moon: clumps along the orbit (fBm of the angle)
+  and glinting chunks of ice (a cell hash in angle × radius, only inside
+  the belt).
+- **Pulsar** (`buildPulsar`, the PULSARS group): a tiny self-lit sphere
+  coloured by its temperature (`blackbody`, ~1 MK: blue-white) with hot
+  spots at the magnetic poles; the magnet frame is tilted (`magTilt`) and
+  turns at `rate` (slowed for the eye; `periodMs` is the real period, for
+  the statistics), carrying two open cones (the beams: brightest along
+  their axis and near the star, flickering, additive) and dipole field
+  lines (`r = L·sin²θ`, charges running along them). A billboard glow
+  flashes when a beam sweeps past the camera (`opts.center`; in the game
+  without it, no flash). The invented METRONOME is an old, lone pulsar
+  ticking every 89.3 ms.
+- **Seamless craters** (`craterField`, 2026-10): every crater in the 27
+  neighbouring cells is added up and faded in by its share, and a world
+  without seas doesn't clamp its relief at sea level — taking the nearest
+  cell, a hard cut-off and the clamp drew straight seams and contour lines.
+- **Black hole** (`buildBlackHole`, `GLSL_HOLE`): a black horizon sphere,
+  an **accretion disk** (a ring whose radius is remapped in the vertex
+  shader to `disk`, turbulent noise turning with the disk, hotter and
+  whiter inside, and relativistic beaming: the side moving toward the
+  camera is brighter and bluer) and a billboard for the thin photon ring
+  and the lensed glow around the shadow. Self-lit.
+
+- **Sky** (`buildSky`, `GLSL_SKY`): not a body but the backdrop, built
+  with the same blocks. `skyColor(dir)` is black space, a Milky Way band
+  (clumps, dust lanes) and nebulae (regions of domain-warped noise:
+  glowing gas, wisps, hot cores, two colors, dark dust dimming only the
+  gas). That's heavy, so it's **baked into a cube map** (`CubeCamera`,
+  1024² per face at detail 1, 2048² at 2) and a sphere just samples it;
+  it re-bakes only after a change (`apply()` / `setOctaves` mark it
+  dirty; `update` bakes when `opts.renderer` is given). Stars and 0–6
+  pulsars are one `THREE.Points` (`fillStars`, seeded, colors from
+  `blackbody`, 40% near the band, some twinkling, pulsars with beams).
+  `opts.center` keeps it on the camera.
+
+### TERRA-1, measured
+
+| | |
+|---|---|
+| Coverage (defaults) | 43% land, 57% water, 17.8% ice & snow, ≈36% clouds |
+| Meshes | 3 (surface, clouds, atmosphere) plus 1 probe quad (tools only) |
+| Triangles by `detail` | 0.2 ≈ 2.3k · 0.3 ≈ 5.4k · 0.5 ≈ 15k · 1 ≈ 62k · 2 ≈ 248k |
+| Custom shaders | 3 (+1 probe) |
+| Textures | 0 |
+
+## BodyKit API (`window.BodyKit`)
+
+```js
+const body = BodyKit.buildBody("earthlike", "terra", { detail: 0.4, values: { seed: 7 } });
+scene.add(body.group);
+body.setRadius(1.9);                  // world units
+// every frame:
+body.update(t, dt);                   // lit from a sun at (0,0,0) by default
+body.setDamage(0.3);                  // cheap, fine every frame
+// later:
+BodyKit.disposeBody(body);
+```
+
+| Member | Description |
+|---|---|
+| `buildBody(groupId, bodyId, { detail, values })` | Builds a body. `detail` is 0.2–2 and scales the sphere segments; `values` overrides the defaults. Returns a body handle. |
+| `disposeBody(body)` | Removes the group and frees its geometries, materials and the probe render target |
+| `modelStats(group)` | Mesh, triangle, vertex and shader counts |
+| `QUALITY_OCTAVES` | Noise octaves for the render-quality presets LOW..MAX (`[3, 4, 5, 6, 8]`), used by the lab and the game |
+| `GAME_BODIES`, `GAME_KINDS` | `{ slot: { groupId, bodyId } }` and `{ kind: { groupId, bodyId } }`, built from the bodies' `slot` and `kind` fields |
+| `SPIN_RAD_PER_UNIT` | 0.6: `values.spin` 1 in rad/s |
+| `GROUPS`, `COMMON_PARAMS`, `defaultValues(group, body)` | Registry and schemas (`defaultValues` = slider defaults + the group's `fixed` + the body's values) |
+| `PLANET_PARAMS`, `PLANET_DEFAULTS` | Every planet parameter and its default; the planet groups show subsets |
+| `GLSL_NOISE`, `GLSL_BODY`, `GLSL_PLANET`, `GLSL_SUN`, `GLSL_ROCK`, `GLSL_HOLE` | Shader code, reusable for new bodies |
+
+Body handle:
+
+| Field | Description |
+|---|---|
+| `id`, `groupId`, `detail` | What was built |
+| `group` | `THREE.Group`, origin at the center; spins about +Y and is tilted by `values.tilt` about Z |
+| `pickMesh` | The surface mesh to raycast. The cloud and atmosphere shells ignore raycasts. |
+| `surfaceRoot` | The group that turns with the surface, in units of the radius. Attach anything that must stay on the ground here (the game's scorch marks). |
+| `radius` | Current radius in world units |
+| `update(t, dt, opts)` | Per frame. The light direction comes from `opts.sunDir` (world direction toward the light) or `opts.sunPosition` (world position, default (0,0,0)) together with the body's own world position. Also applies spin and tilt. A comet also reads `opts.velocity` (dust tail bend) and `opts.activity` (default 1). |
+| `setRadius(units)` | Radius in world units; overrides `values.size` |
+| `setValues(values)` | Changes parameters live (uniforms only) |
+| `setDamage(x)` | Damage 0–1, a single uniform write (use it per frame instead of `setValues`) |
+| (`update` `opts.lights`) | Up to `MAX_POINT_LIGHTS` (4) nearby point lights `{ position (world), color, intensity, distance }`; planets and rocks (incl. a comet's nucleus) add them to their lighting (`pointLightAt()` in `GLSL_BODY`), self-lit bodies ignore them |
+| `setOctaves(n)` | Noise octaves per pixel (2–8), a quality/cost knob |
+| `setLayers({ clouds, atmosphere })` | Shows or hides the layers |
+| `describe(renderer)` | The group's own statistics for the lab: `[[label, text], …]` |
+| `measure(renderer)` | Planets only (else `null`): `{ water, lava, land, ice, clouds }` coverage in 0–1, measured on the GPU (tools only: it reads pixels back and stalls the GPU briefly) |
+
+## Building blocks and rules (DRY)
+
+BodyKit follows the same rules as ShipKit ([`docs/ship.md`](ship.md),
+"Building blocks"): **one file, nothing written twice**. What exists to
+be reused:
+
+| Block | What it gives you |
+|---|---|
+| `GLSL_NOISE` | `snoise` (3D simplex) and `fbm(p, octaves, persistence)` with a runtime octave count |
+| `GLSL_BODY` | What every body shader includes next: the common uniforms (`uSeed`, `uTime`, `uDamage`, `uOctaves`, the point lights), `crackAt()` (the damage cracks), `pointLightAt()` (nearby point lights), `hash33()` and `craterField(p, freq, share)` (rocks and airless planets) |
+| `bodyUniforms(v)` | Those uniforms + `uSunDir`, for a new build to extend |
+| `makeBodyHandle({ v, U, group, spin, pickMesh, apply, layers, onUpdate, describe, measure, dispose })` | **The whole body handle** (sun direction, spin, tilt, radius, seed, damage, octaves, layer toggles); a build only passes what's its own |
+| `GLSL_SPHERE_VERTEX` | The plain lit-sphere vertex shader (`vDir`, `vWorldPos`, `vNormalW`): clouds, atmosphere, sun surface |
+| `makeBillboard(U, halfSize, fragment)` | A camera-facing quad in body radii (`vQ`, `uHalfSize`): sun corona, comet coma, black hole lensing |
+| `blackbody(kelvin, color)` | Star / hot gas color from a temperature: the Sun, the black hole's disk |
+| `rockParts(v, detail)` | A rock's uniforms, mesh and `apply()`: ROCKS uses it as is, COMETS adds a coma and tails |
+| `GLSL_PLANET` | The planet's shared uniforms and functions: `heightOct` / `heightAt`, `moistureAt`, `iceAt`, `cloudAt`, `lavaFlowAt`, `iceSheetAt`. Used by the surface, the clouds **and** the coverage probe. |
+| `GLSL_ROCK` | `rockHeight()`, `rockPoint()`, `rockDetail()`: the rock's shape and relief (craters from `GLSL_BODY`) |
+| `ROCK_PARAMS` | The rock sliders, shared by ROCKS and COMETS |
+| `GLSL_SKY`, `seededRandom(seed)` | The sky's color function; a deterministic RNG (same sky for everyone) |
+| `COMMON_PARAMS` | Spin, tilt and damage for every body in every group |
+| `QUALITY_OCTAVES` | Octaves per quality preset, for the lab and the game |
+| The body handle contract | `update`, `setRadius`, `setValues`, `setDamage`, `setOctaves`, `setLayers`, `describe`, `measure`, `pickMesh`, `surfaceRoot`: every group's `build()` returns it (through `makeBodyHandle`), so the lab and the game need no per-group code |
+
+Rules, for every new body and every change:
+
+1. **A new body of an existing kind is data, not code.** Another planet
+   is a `bodies` entry with `values` (and a `slot` if the game shows it).
+   If the look you want isn't reachable, add a **parameter** to the
+   group (like `lava` and `frozen`), not a second copy of the shader.
+2. **Classification lives in `GLSL_PLANET`, once.** Anything the
+   statistics should count (water, lava, ice, clouds) is a function
+   there, called by both the surface and the probe — so the numbers are
+   always what's drawn. Never re-derive it in one shader only.
+3. **The second use moves it into the shared code.** When a new group
+   (suns, comets…) needs something a planet already has (noise, the
+   atmosphere shell, crack damage, the sun-direction update), move it out
+   of the planet into a shared function or GLSL string and switch the
+   planet to it. Check the planet looks the same afterwards (same
+   camera, before/after screenshot; the lab's statistics unchanged).
+4. **Every group returns the full handle contract** (table above), even
+   when a method does nothing for it — the game and the lab call them
+   blindly. `setDamage` in particular: every body the game can bite
+   needs to show damage.
+5. **Per-frame calls allocate nothing** (`update`, `setDamage`): scratch
+   vectors outside, uniform writes only.
+6. **Per-body state stays per body**: every body has its own uniform
+   object `U`, so bodies animate and take damage independently.
+7. **Game-facing numbers live in BodyKit, game logic in the game**: which
+   body sits on which orbit (`slot`) and how it looks are BodyKit's;
+   radius, orbit, health and spin-independent game state stay in
+   `world/solarSystem.js` / `world/bodies.js`.
+
+## Adding a body or a group
+
+- **Another planet**: add an entry to the fitting planet group's `bodies` (`lava`, `earthlike`, `icy`, `desert`, `clouded`, `airless`), e.g.
+  `{ id: "ocean", name: "…", values: { sea: 0.35, clouds: 0.6 } }`. The
+  body-navigation arrows pick it up. Give it `slot: n` to put it on that
+  orbit in the game (one body per slot).
+- **A new kind** (a gas giant, a nebula, …): a new file
+  `js/bodykit/kinds/<kind>.js`, shaped like the others.
+  - It takes what it needs from `BodyKit._`.
+  - It holds the kind's shaders and a `build(values, detail)` that composes
+    the building blocks and returns `makeBodyHandle({...})`.
+  - It registers the builder: `KINDS.<kind> = build…`.
+
+  In the core's `GROUPS`, the new group gets its own `params` schema,
+  `kmPerSize` / `view` / `layers`, `build: "<kind>"` and at least one body.
+
+  Load the new file after `bodykit.js` on every page that loads BodyKit:
+  `index.html` (`defer`), `bodies.html`, `systems.html`, `scale.html`,
+  `surface.html` and `tools/kitcheck.html`. Add it to
+  `js/versionCheck.js#MODULE_FILES`, then run `tools/kitcheck.html`. The viewer generates
+  the sliders and statistics from these, so no viewer code is needed.
+  Give the body a `slot` or a `kind` and the game draws it
+  (`world/bodyVisual.js#bodyLookRef`).
+
+## BodyKit in the game
+
+Since v2.10.0 the game's planets, since v2.11.0 **every** body (the
+Sun, the meteoroid, comets, the black hole) and since v2.12.0 the sky
+(`scene/skybox.js`) are BodyKit's
+(`world/bodyVisual.js`; full story in `docs/rendering.md`'s
+"Rendering and ShipKit models"):
+
+1. **Loading**: `index.html` loads `js/bodykit/bodykit.js` as a `defer`
+   classic script after Three.js and ShipKit.
+2. **Build**: `materializePlanet()` calls
+   `makeBodyLook(bodyLookRef(slot, kind), radius)` — the slot's body
+   (`GAME_BODIES`) or else the kind's (`GAME_KINDS`, comets). The body is
+   sized to the game radius (`setRadius`) at `detail = gfxDetail × 0.5`
+   (≈15k triangles for a planet at the default), with
+   `QUALITY_OCTAVES[gfxQuality]` octaves. The black hole
+   (`world/blackholes.js#materializeBlackHole`, not in `ctx.planets`)
+   uses the same `makeBodyLook`, with its own invisible pick sphere
+   (2.5 × radius, so the disk is clickable).
+3. **The game's `p.mesh`** stays, as an **invisible sphere**
+   (`MeshBasicMaterial({ visible: false })`): it's what picking raycasts
+   (an invisible material still hits), what moves along the orbit and
+   what carries the body's color for bite particles and debris. The
+   BodyKit group is its child.
+4. **Light**: the Sun is at (0,0,0), BodyKit's default light position,
+   so `updateBodyLooks(dt)` (main loop) just calls `body.update(t, dt)`.
+5. **Spin**: the body spins itself at its lab rate (`values.spin`), the
+   same for every player; `p.spin` only reports it (rad/s) to the info
+   panel. The old random orbital ring is gone.
+   **Comets**: `look.opts.velocity` is the comet's live velocity (the
+   dust tail bends back along it) and `updateBodies()` sets
+   `look.opts.activity = cometActivity(distance from the Sun)`
+   (`COMET_ACTIVITY_DISTANCE` / distance, 0.3–1.5): the coma and tails
+   grow near the Sun. **The Sun** keeps the game's PointLight (for
+   standard-material objects: ships, the station).
+6. **Damage**: `applyHealthVisual()` calls `look.setDamage(1 − health /
+   maxHealth)` — glowing cracks in the shader (the old crack overlay,
+   halo sprite, sun rays, flat comet tail and their canvas textures are
+   removed). Scorch marks keep their canvas overlay, attached to
+   `surfaceRoot` (`look.attach()`) so they turn with the ground;
+   `paintScorch()` maps the hit point in the scorch mesh's own frame.
+7. **Graphics settings**: a geometry detail change rebuilds the bodies
+   (attached scorch marks move to the new body); a quality change only
+   sets the octaves.
+8. **Fog**: the shaders don't use THREE's fog; the game's `FogExp2`
+   (0.0007) is thin enough that this barely shows.
+9. **Cost**: at the default settings, the six planets add ≈90k
+   triangles, the other bodies little; the pixel cost only matters when
+   a body fills the screen (the ship cam, the PLANET INFO miniature, the
+   Sun's corona up close). Dev Tools → Performance stats shows FPS,
+   frame time, draw calls and triangles live.
+10. **Ship glow lights** (v2.11.1, Setup → Graphics, off by default):
+    `updateBodyLooks()` gathers the visible ship lights (`ships/swarm.js`:
+    behind the engines, intensity following the engine power; bodies get
+    `SHIP_BODY_LIGHT_INTENSITY` / `SHIP_BODY_LIGHT_RANGE`, stronger than the
+    scene light's own) once per frame and gives
+    every body the nearest ones that reach it (at most 4) as
+    `opts.lights`. The lab's **SHIP LIGHT** toggle circles the same kind
+    of light around the body.
+11. **Multiplayer**: nothing is sent — the look is fixed per slot and the
+    health that drives damage is already synced.
+
+## Viewer (preview page)
+
+- **IMAGE EFFECTS** (right panel, v2.25.1): PostKit's lab panel, as in
+  the ship lab, plus SUN FLARE and LIGHT RAYS (the SUNS tab's sun, else
+  the light sprite; both fade out when the sun fills the view) and LENSING (the BLACK HOLES tab's hole: hidden while the scene
+  renders, drawn over the warped picture). The camera's picture, not
+  part of the body.
+- **Backdrop**: the game's own sky (BodyKit's kind `sky`), so a body looks
+  here exactly as in the game; hidden while the SKY tab shows a sky of its
+  own.
+- **Camera distance**: a group's `view`, or a body's own `view` (SATURN:
+  its rings need more room), applied when the group or the body changes.
+- **Left panel**: group tabs (LAVA WORLDS / EARTH-LIKE / ICE WORLDS / DESERT WORLDS / CLOUD WORLDS / AIRLESS / GAS GIANTS / SUNS / COMETS / ROCKS / BLACK HOLES / SKY), body
+  navigation, PHYSICAL statistics and MODEL statistics, and toggles for
+  auto-rotate, the two layers (named by the group), wireframe, GAME BUILD
+  (the body at the detail the game builds it: × `BodyKit.GAME_DETAIL_SCALE`,
+  0.5; the sky as is) and SHIP LIGHT (a teal light circling the body, as a
+  ship's glow light does in the game). The clouds and
+  atmosphere toggles are hidden for empty groups.
+  - PHYSICAL: radius in km (size × the group's `kmPerSize`), surface
+    area, then the body's own `describe()` rows (a planet: the measured
+    land, water, lava, ice and cloud coverage, re-measured after each
+    change and every 2 s while clouds drift).
+  - MODEL: meshes, triangles, vertices, shaders, octaves and textures.
+- **Right panel**: COMMON and group parameters, generated from the
+  schemas, plus NEW SEED, RESET and **COPY VALUES**.
+- **COPY VALUES**: the sliders only change the preview (a reload goes
+  back to the file); the game shows what's in `js/bodykit/bodykit.js`.
+  This button copies the current body as a ready `bodies` entry (id,
+  name, slot, and only the values that differ from the group defaults,
+  plus the seed; `damage` left out) — paste it over the body's line in
+  `bodykit.js` to make the change permanent (then the usual version
+  bump). Also printed to the console, in case the clipboard is blocked.
+- **OPTIMIZATION**:
+  - **Render quality**, 5 presets (octaves from `BodyKit.QUALITY_OCTAVES`):
+
+    | Preset | Pixel ratio | Noise octaves |
+    |---|---|---|
+    | LOW | 0.5 | 3 |
+    | MEDIUM | 0.75 | 4 |
+    | HIGH | 1 | 5 |
+    | ULTRA (default) | device pixel ratio, clamped to 1–2 | 6 |
+    | MAX | 1.5 × device pixel ratio, up to 3 | 8 |
+
+  - **Geometry detail** (20–200%) rebuilds the body live and keeps the
+    current values.
+- **PERFORMANCE**: FPS, frame time, CPU time per frame, triangles and
+  draw calls per frame, render resolution, and an FPS graph.
+- **Scaling**: all panels share one CSS scale factor (`--ui`), exactly
+  as in `ship.html`: it follows the window only, and a panel taller than
+  the window scrolls, so switching tabs never changes the UI size.
+
+## Gotchas
+
+- **Staircase coastlines from `dFdx` bump**: an earlier version derived
+  the relief normal from screen-space derivatives of the height. Those
+  are evaluated per 2×2 pixel quad, so the height's kink at the coast
+  produced visible 2-pixel steps along every shoreline. Sampling the
+  height at nearby points in object space fixed it.
+- **GLSL name clashes**: every planet shader concatenates `GLSL_NOISE` and
+  `GLSL_PLANET`, so a local variable in a shared function (e.g. `q` in
+  `cloudAt`) must not clash with another local in the same function.
+  This happened once and failed the shader compile.
+- **Uniforms in the fragment stage**: `modelMatrix` is declared by THREE
+  only in the vertex prefix. The surface fragment shader declares
+  `uniform mat4 modelMatrix;` itself, and THREE uploads it by name.
+- **Cloud coverage vs slider**: a linear threshold made 50% on the
+  slider look like ≈7% coverage. The threshold is now the inverse of
+  the noise distribution (logistic approximation, sd ≈ 0.11).
+- **Billboards and tails aren't where their geometry is**: the vertex
+  shader places them (`makeBillboard`, `makeTail`), so their meshes have
+  `frustumCulled = false` (three.js would otherwise cull them by the
+  small quad) and `raycast` disabled. Same for the rock (displaced beyond
+  the unit sphere) and the black hole's disk (radius remapped).
+- **A billboard's fragment shader needs `uHalfSize` and `vQ` declared**:
+  `makeBillboard` prepends them; a shader string must not declare them
+  again.
+- **The sky's cube map lookup**: sampling the baked
+  `WebGLCubeRenderTarget` with `textureCube(uCube, dir)` (no x flip — that
+  flip is only for loaded `CubeTexture`s) matches the live shader; this
+  was checked by rendering both from the same camera (mean difference
+  ≈0.2/255).
+- **Decals on a spinning body**: the body spins its inner group, not
+  its `group`. Anything parented to `group` (or the game's `p.mesh`)
+  stays put while the ground turns under it — attach to `surfaceRoot`.
+- **Headless testing**: WebGL runs through SwiftShader
+  (`--use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader`)
+  at 1–4 FPS, and the probe logs a harmless "GPU stall due to
+  ReadPixels" warning. With `--use-angle=d3d11 --enable-gpu
+  --ignore-gpu-blocklist` Playwright uses the real GPU.

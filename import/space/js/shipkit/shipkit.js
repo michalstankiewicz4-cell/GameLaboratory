@@ -1,0 +1,1864 @@
+/* =======================================================================
+   SHIPKIT — procedural spaceship models for Swarm Protocol
+   =======================================================================
+   One classic script (window.ShipKit), shared by the ship lab (ship.html)
+   and the game (index.html loads it after Three.js) — not copied between
+   them. The lab's viewer is its own <script> in ship.html.
+
+   Dependencies: the global THREE (r128, same as the game) and a DOM
+   (<canvas> for texture generation). No OrbitControls, no other libs.
+
+   -----------------------------------------------------------------------
+   API (window.ShipKit)
+   -----------------------------------------------------------------------
+   buildShipModel(id, { detail = 1 })  -> model
+       id      "codewing", "scribe" (the drone) or "swarmer" (the swarm ship)
+       detail  0.2 .. 2, scales every segment count
+               (measured for "codewing": 0.2 ≈ 4.7k tris, 1 ≈ 70k, 2 ≈ 276k)
+       model = {
+         id, detail,
+         group,                 THREE.Group — add it to your scene
+         update(t, dt, opts),   call every frame; t = seconds since start,
+                                dt = frame delta (s),
+                                opts.power 0..1 engine throttle (smooth it
+                                yourself), opts.particles false = no exhaust
+                                particles (cheap mode for many ships)
+         setLights(on),         running/nav lights on/off
+         actions,               [{ id, label, kind, enabled }]: the standard set
+                                (fire, scan, print, offline — disabled where the
+                                ship has no animation for it) + ship extras
+         damageEnabled          false if the ship opted out of damage effects
+         act(id, on),           run an action / set a toggle
+         setDamage(0..1),       procedural damage: scorch marks, smoke, sparks,
+                                embers, flickering lights, parts breaking off
+         destroyed              true after act("destroy"): the ship blew apart
+                                (build a new model to get it back)
+         size,                  THREE.Vector3 size of the solid hull (units;
+                                plumes/glows/particles excluded)
+         radius,                half the size diagonal (units)
+       }
+   disposeShipModel(model)  removes the group from its parent and frees its
+                            geometries + per-model materials (shared cached
+                            materials and textures are kept for reuse)
+   modelStats(group)        object/figure/triangle/material/texture counts
+   SHIP_DEFS                registry; add a ship = push one more entry
+   allTextures              Set of every generated texture (anisotropy etc.)
+   makePlating / makeBrushed / makeGlow, util.{rng, valueNoise, fbm, ...}
+                            generators, reusable for other game objects
+
+   Model conventions: origin at the ship's center, nose along +X, up +Y,
+   "codewing" measures 12.06 × 5.78 × 9.76 units (length × height × span). Each model has its own shader uniforms,
+   so many instances can animate/throttle independently.
+
+   -----------------------------------------------------------------------
+   IN THE GAME (see docs/ship.md "ShipKit in the game")
+   -----------------------------------------------------------------------
+   buildShipModel(id, { detail, merge: true, fxRoot: scene }) + makeGameHolder
+   (model, length) — +Z forward, scaled; effects placed in the scene. The
+   game's detail is Setup's geometry detail × GAME_DETAIL[id] (a swarm ship
+   is a speck most of the time); the ship lab's GAME BUILD uses the same. The
+   game renders like the labs (sRGB output, ACES, scene.environment from
+   makeEnvironment()) and skips userData.shipkit objects in its color
+   conversion. Mark animated/toggled parts userData.dynamic (mergeStatic).
+   Changing this file changes the game: bump js/version.js, CHANGELOG.md
+   and the ?v= params in index.html. English comments, no trademarked
+   franchise names (CLAUDE.md).
+   ======================================================================= */
+window.ShipKit = (function () {
+"use strict";
+
+// =====================================================================
+// Small procedural toolkit: seeded RNG + tileable value noise / fBm.
+// =====================================================================
+function rng(seed) {
+  let s = seed >>> 0;
+  return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+}
+// Tileable 2D value noise on a (cx × cy) lattice, sampled in [0,1)².
+function valueNoise(rand, cx, cy) {
+  const g = new Float32Array(cx * cy);
+  for (let i = 0; i < g.length; i++) g[i] = rand();
+  const at = (x, y) => g[((y % cy + cy) % cy) * cx + ((x % cx + cx) % cx)];
+  return (u, v) => {
+    const fx = u * cx, fy = v * cy, x0 = Math.floor(fx), y0 = Math.floor(fy);
+    let tx = fx - x0, ty = fy - y0;
+    tx = tx * tx * (3 - 2 * tx); ty = ty * ty * (3 - 2 * ty);
+    const a = at(x0, y0), b = at(x0 + 1, y0), c = at(x0, y0 + 1), d = at(x0 + 1, y0 + 1);
+    return (a + (b - a) * tx) * (1 - ty) + (c + (d - c) * tx) * ty;
+  };
+}
+function fbm(rand, baseX, baseY, octaves) {
+  const layers = [];
+  for (let o = 0; o < octaves; o++) layers.push(valueNoise(rand, baseX << o, baseY << o));
+  return (u, v) => {
+    let sum = 0, amp = 0.5, norm = 0;
+    for (const n of layers) { sum += n(u, v) * amp; norm += amp; amp *= 0.5; }
+    return sum / norm;
+  };
+}
+function canvas(w, h) {
+  const c = document.createElement("canvas");
+  c.width = w; c.height = h;
+  return [c, c.getContext("2d")];
+}
+// Fill a canvas per-pixel from f(u,v) -> [r,g,b] (0..255).
+function paintPixels(ctx, w, h, f) {
+  const img = ctx.createImageData(w, h), d = img.data;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const [r, g, b] = f(x / w, y / h), i = (y * w + x) * 4;
+    d[i] = r; d[i + 1] = g; d[i + 2] = b; d[i + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+}
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+
+// =====================================================================
+// Hull plating generator: recursively split panels, seams, rivets,
+// grime streaks, painted stripes and hull markings. Produces matching
+// color / roughness / bump / emissive maps from one layout, so the
+// seams that look dark are also grooved and rougher.
+// =====================================================================
+function makePlating({ size = 1024, seed = 1, base = [150, 156, 170], minPanel = 70, maxPanel = 240,
+                       stripes = [], markings = [], windows = [] }) {
+  const rand = rng(seed);
+  const W = size, H = size;
+  const [cCol, col] = canvas(W, H);
+  const [cRough, rough] = canvas(W, H);
+  const [cBump, bump] = canvas(W, H);
+  const [cEmi, emi] = canvas(W, H);
+
+  // 1. base metal: low-frequency mottling + fine grain.
+  const mottle = fbm(rand, 4, 4, 5), grain = fbm(rand, 64, 64, 2);
+  paintPixels(col, W, H, (u, v) => {
+    const m = (mottle(u, v) - 0.5) * 38 + (grain(u, v) - 0.5) * 14;
+    return [clamp(base[0] + m, 0, 255), clamp(base[1] + m, 0, 255), clamp(base[2] + m * 1.05, 0, 255)];
+  });
+  paintPixels(rough, W, H, (u, v) => { const r = 120 + (mottle(u, v) - 0.5) * 60; return [r, r, r]; });
+  bump.fillStyle = "#808080"; bump.fillRect(0, 0, W, H);
+  emi.fillStyle = "#000"; emi.fillRect(0, 0, W, H);
+
+  // 2. panels (recursive split).
+  const panels = [];
+  (function split(x, y, w, h, depth) {
+    const big = w > maxPanel || h > maxPanel;
+    const canSplit = w > minPanel * 2 || h > minPanel * 2;
+    if (canSplit && (big || (depth < 5 && rand() < 0.55))) {
+      if (w > h ? rand() < 0.8 : rand() < 0.2) {
+        const k = Math.round(w * (0.3 + rand() * 0.4));
+        if (k >= minPanel && w - k >= minPanel) { split(x, y, k, h, depth + 1); split(x + k, y, w - k, h, depth + 1); return; }
+      } else {
+        const k = Math.round(h * (0.3 + rand() * 0.4));
+        if (k >= minPanel && h - k >= minPanel) { split(x, y, w, k, depth + 1); split(x, y + k, w, h - k, depth + 1); return; }
+      }
+    }
+    panels.push([x, y, w, h]);
+  })(0, 0, W, H, 0);
+
+  for (const [x, y, w, h] of panels) {
+    const tone = (rand() - 0.5) * 0.18;
+    col.fillStyle = tone > 0 ? `rgba(255,255,255,${tone})` : `rgba(10,14,24,${-tone})`;
+    col.fillRect(x, y, w, h);
+    const r = 70 + rand() * 90;
+    rough.fillStyle = `rgba(${r},${r},${r},0.55)`; rough.fillRect(x, y, w, h);
+    // a few panels get a subtle bevel (raised plate)
+    if (rand() < 0.35) {
+      const gr = bump.createLinearGradient(x, y, x, y + h);
+      gr.addColorStop(0, "#9a9a9a"); gr.addColorStop(0.1, "#8a8a8a"); gr.addColorStop(0.9, "#8a8a8a"); gr.addColorStop(1, "#777");
+      bump.fillStyle = gr; bump.fillRect(x + 3, y + 3, w - 6, h - 6);
+    }
+  }
+  // 3. grime streaks running "down" the hull (along +v)
+  for (let i = 0; i < 180; i++) {
+    const x = rand() * W, y = rand() * H, len = 30 + rand() * 160, wdt = 2 + rand() * 7;
+    const gr = col.createLinearGradient(x, y, x, y + len);
+    gr.addColorStop(0, `rgba(20,18,22,${0.10 + rand() * 0.18})`); gr.addColorStop(1, "rgba(20,18,22,0)");
+    col.fillStyle = gr; col.fillRect(x, y, wdt, len);
+  }
+  // 4. seams + rivets
+  for (const [x, y, w, h] of panels) {
+    col.strokeStyle = "rgba(18,22,32,0.85)"; col.lineWidth = 2.2; col.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+    col.strokeStyle = "rgba(255,255,255,0.10)"; col.lineWidth = 1; col.strokeRect(x + 2.5, y + 2.5, w - 5, h - 5);
+    bump.strokeStyle = "#1a1a1a"; bump.lineWidth = 3; bump.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+    rough.strokeStyle = "#d0d0d0"; rough.lineWidth = 3; rough.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+    if (rand() < 0.7) {
+      const step = 13;
+      const dot = (px, py) => {
+        col.fillStyle = "rgba(40,44,56,0.8)"; col.beginPath(); col.arc(px, py, 1.9, 0, 7); col.fill();
+        col.fillStyle = "rgba(255,255,255,0.35)"; col.beginPath(); col.arc(px - 0.5, py - 0.5, 0.9, 0, 7); col.fill();
+        bump.fillStyle = "#e8e8e8"; bump.beginPath(); bump.arc(px, py, 2.1, 0, 7); bump.fill();
+      };
+      for (let px = x + 8; px < x + w - 6; px += step) { dot(px, y + 7); dot(px, y + h - 7); }
+      for (let py = y + 8 + step; py < y + h - 6 - step; py += step) { dot(x + 7, py); dot(x + w - 7, py); }
+    }
+  }
+  // 5. painted stripes (full-width bands: rings around a lathe hull)
+  for (const s of stripes) {
+    col.fillStyle = s.color; col.globalAlpha = 0.92; col.fillRect(0, s.y * H, W, s.h * H); col.globalAlpha = 1;
+    // paint wears off a little: re-dust with grain
+    for (let i = 0; i < 900; i++) {
+      col.fillStyle = `rgba(90,94,104,${rand() * 0.5})`;
+      col.fillRect(rand() * W, s.y * H + rand() * s.h * H, 1 + rand() * 3, 1 + rand() * 2);
+    }
+    rough.fillStyle = "rgba(170,170,170,0.8)"; rough.fillRect(0, s.y * H, W, s.h * H);
+  }
+  // 6. markings (rotated text)
+  for (const m of markings) {
+    col.save(); col.translate(m.x * W, m.y * H); col.rotate(m.rot || 0);
+    col.font = `600 ${m.size}px "Oswald", "Arial Narrow", sans-serif`;
+    if (m.max) {                                   // a long text shrinks to fit its place
+      const w = col.measureText(m.text).width;
+      if (w > m.max) col.font = `600 ${Math.floor(m.size * m.max / w)}px "Oswald", "Arial Narrow", sans-serif`;
+    }
+    col.textAlign = "center"; col.textBaseline = "middle";
+    col.fillStyle = m.color; col.globalAlpha = 0.9; col.fillText(m.text, 0, 0); col.restore();
+  }
+  // 7. lit windows (emissive only)
+  for (const wdw of windows) {
+    for (let i = 0; i < wdw.count; i++) {
+      const x = wdw.x * W - 5, y = (wdw.y + i * wdw.gap) * H;
+      col.fillStyle = "#1b2130"; col.fillRect(x - 1, y - 1, 12, 8);
+      if (rand() < 0.85) {
+        emi.fillStyle = rand() < 0.75 ? "#ffcf8a" : "#9fb6ff"; emi.fillRect(x, y, 10, 6);
+        emi.fillStyle = "rgba(255,210,150,0.25)"; emi.fillRect(x - 3, y - 3, 16, 12);
+      }
+    }
+  }
+  const tex = (c, srgb) => {
+    const t = new THREE.CanvasTexture(c);
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.anisotropy = 8;
+    if (srgb) t.encoding = THREE.sRGBEncoding;
+    return t;
+  };
+  return { map: tex(cCol, true), roughnessMap: tex(cRough), bumpMap: tex(cBump), emissiveMap: tex(cEmi, true) };
+}
+
+// Brushed metal: anisotropic streaks along v (length), with machined
+// ring grooves across it.
+function makeBrushed({ size = 512, seed = 3, tint = [175, 180, 192], rings = 6 }) {
+  const rand = rng(seed);
+  const [c, ctx] = canvas(size, size);
+  const streak = fbm(rand, 128, 2, 3), soft = fbm(rand, 8, 4, 3);
+  paintPixels(ctx, size, size, (u, v) => {
+    const s = (streak(u, v) - 0.5) * 60 + (soft(u, v) - 0.5) * 30;
+    return [clamp(tint[0] + s, 0, 255), clamp(tint[1] + s, 0, 255), clamp(tint[2] + s, 0, 255)];
+  });
+  for (let i = 0; i < rings; i++) {
+    const y = (i + 0.5) / rings * size;
+    ctx.fillStyle = "rgba(20,22,30,0.7)"; ctx.fillRect(0, y, size, 3);
+    ctx.fillStyle = "rgba(255,255,255,0.25)"; ctx.fillRect(0, y + 3, size, 1);
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8; t.encoding = THREE.sRGBEncoding;
+  return t;
+}
+
+// Soft radial glow sprite texture.
+function makeGlow(inner = "rgba(255,255,255,1)", mid = "rgba(255,200,120,0.5)") {
+  const [c, ctx] = canvas(128, 128);
+  const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+  g.addColorStop(0, inner); g.addColorStop(0.25, mid); g.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, 128, 128);
+  return new THREE.CanvasTexture(c);
+}
+
+// =====================================================================
+// Shared resources (created lazily, cached for the whole page/game)
+// =====================================================================
+const GOLD = 0xf8bb56, BLUE = 0x5f77f7;
+const shadowed = (m) => { m.castShadow = m.receiveShadow = true; return m; };
+const allTextures = new Set();     // every generated texture (e.g. to set anisotropy)
+const sharedMaterials = new Set(); // cached per ship type, never disposed with a model
+const trackTextures = (...ts) => { for (const t of ts) if (t) allTextures.add(t); };
+let _glow = null;
+function glowTextures() {          // soft sprite textures shared by all ships
+  if (_glow) return _glow;
+  _glow = {
+    engine: makeGlow("rgba(255,255,255,1)", "rgba(140,170,255,0.55)"),
+    nav: makeGlow("rgba(255,255,255,1)", "rgba(255,255,255,0.35)"),
+    core: makeGlow("rgba(220,230,255,1)", "rgba(95,119,247,0.6)"),
+  };
+  trackTextures(_glow.engine, _glow.nav, _glow.core);
+  return _glow;
+}
+
+// Shader factories take U = { uTime, uPower } — one uniform set per built
+// model, so every ship instance animates / throttles independently.
+function makePlumeMaterial(color, U) {
+  return new THREE.ShaderMaterial({
+    uniforms: { uTime: U.uTime, uPower: U.uPower, uColor: { value: new THREE.Color(color) } },
+    vertexShader: `
+      varying vec2 vUv; varying vec3 vN; varying vec3 vView;
+      void main(){
+        vUv = uv;
+        vN = normalize(normalMatrix * normal);
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        vView = normalize(-mv.xyz);
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: `
+      uniform float uTime; uniform float uPower; uniform vec3 uColor;
+      varying vec2 vUv; varying vec3 vN; varying vec3 vView;
+      float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+      float noise(vec2 p){
+        vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f);
+        return mix(mix(hash(i), hash(i+vec2(1,0)), f.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), f.x), f.y);
+      }
+      void main(){
+        float along = vUv.y;                       // 1 at the nozzle, 0 at the tail end
+        float flick = noise(vec2(vUv.x * 12.0, along * 6.0 - uTime * 9.0));
+        float shock = 0.5 + 0.5 * sin(along * 38.0 - uTime * 30.0);   // shock diamonds
+        float edge = pow(abs(dot(normalize(vN), normalize(vView))), 1.6); // bright core, soft rim
+        float a = pow(along, 1.8) * (0.55 + 0.45 * flick) * (0.75 + 0.25 * shock) * edge * uPower;
+        vec3 col = mix(uColor, vec3(1.0), pow(along, 5.0) * 0.8);
+        gl_FragColor = vec4(col * a * 2.6, 1.0);   // additive: alpha 1, brightness carried by rgb
+      }`,
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+  });
+}
+
+function makeCoreMaterial(U) {
+  return new THREE.ShaderMaterial({
+    uniforms: { uTime: U.uTime, uOn: U.uOn || { value: 1 } },
+    vertexShader: `
+      varying vec3 vN; varying vec3 vView; varying vec3 vPos;
+      void main(){
+        vN = normalize(normalMatrix * normal); vPos = position;
+        vec4 mv = modelViewMatrix * vec4(position, 1.0); vView = normalize(-mv.xyz);
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: `
+      uniform float uTime; uniform float uOn; varying vec3 vN; varying vec3 vView; varying vec3 vPos;
+      void main(){
+        float fres = pow(1.0 - abs(dot(normalize(vN), normalize(vView))), 2.0);
+        float scan = 0.5 + 0.5 * sin(vPos.y * 40.0 - uTime * 6.0);           // scrolling "data" lines
+        float pulse = 0.75 + 0.25 * sin(uTime * 2.3);
+        vec3 base = vec3(0.23, 0.33, 0.95), hot = vec3(0.75, 0.85, 1.0);
+        vec3 col = mix(base, hot, fres) * (0.6 + 0.5 * scan) * pulse + fres * 0.6;
+        gl_FragColor = vec4(col * (0.05 + 0.95 * uOn), 1.0);         // uOn 0 = offline
+      }`,
+  });
+}
+
+function makeParticleMaterial(U) {
+  return new THREE.ShaderMaterial({
+    uniforms: { uPower: U.uPower },
+    vertexShader: `
+      attribute float life; varying float vLife; uniform float uPower;
+      void main(){
+        vLife = life;
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        gl_PointSize = (1.0 - life) * 70.0 * uPower / -mv.z;
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: `
+      varying float vLife;
+      void main(){
+        float d = length(gl_PointCoord - 0.5);
+        float a = smoothstep(0.5, 0.0, d) * (1.0 - vLife) * 0.6;
+        vec3 col = mix(vec3(1.0, 0.85, 0.6), vec3(0.4, 0.5, 1.0), vLife);
+        gl_FragColor = vec4(col * a, a);
+      }`,
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+  });
+}
+
+function additiveSprite(map, color = 0xffffff) {
+  return new THREE.Sprite(new THREE.SpriteMaterial({ map, color, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
+}
+
+// =====================================================================
+// SHARED EFFECTS — every ship gets these for free (see buildShipModel):
+//   • action helpers a ship can use: laser bolts, a scan wave, glowing
+//     text; a ship lists its own actions in `actions` and handles them in
+//     `act(id, on)`,
+//   • OFFLINE mode (engines and lights off; the ship dims its own parts),
+//   • procedural damage: scorch marks, smoke, sparks, embers, flickering
+//     lights and, when badly hit, small parts breaking off.
+// =====================================================================
+let _fxTex = null;
+function fxTextures() {             // soft smoke puff + ragged scorch mark, shared
+  if (_fxTex) return _fxTex;
+  const blob = (seed, fn) => {
+    const rand = rng(seed), n = fbm(rand, 5, 5, 4);
+    const [c, ctx] = canvas(128, 128), img = ctx.createImageData(128, 128), d = img.data;
+    for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) {
+      const r = Math.hypot(x - 64, y - 64) / 64, i = (y * 128 + x) * 4;
+      const [cr, cg, cb, a] = fn(r, n(x / 128, y / 128));
+      d[i] = cr; d[i + 1] = cg; d[i + 2] = cb; d[i + 3] = clamp(a, 0, 1) * 255;
+    }
+    ctx.putImageData(img, 0, 0);
+    return new THREE.CanvasTexture(c);
+  };
+  _fxTex = {
+    smoke: blob(55, (r, n) => { const a = clamp(1 - r, 0, 1); return [255, 255, 255, a * a * (0.55 + (n - 0.5) * 1.6)]; }),
+    scorch: blob(57, (r, n) => [22, 15, 10, (1 - r) * 1.7 - (n - 0.5) * 1.3 - 0.25]),
+  };
+  trackTextures(_fxTex.smoke, _fxTex.scorch);
+  return _fxTex;
+}
+
+// Glowing text on a transparent canvas (for the drone's print()), cached.
+const _textTex = new Map();
+function textTexture(text, color = "#ffb45a") {
+  const key = text + color;
+  if (_textTex.has(key)) return _textTex.get(key);
+  const [c, ctx] = canvas(512, 128);
+  ctx.font = '700 72px "Oswald", "Arial Narrow", sans-serif';
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.shadowColor = color; ctx.shadowBlur = 24; ctx.fillStyle = color;
+  ctx.fillText(text, 256, 66); ctx.shadowBlur = 0; ctx.fillStyle = "#fff4dc"; ctx.fillText(text, 256, 66);
+  const t = new THREE.CanvasTexture(c);
+  _textTex.set(key, t);
+  if (_textTex.size > 24) {                    // arbitrary texts: keep the cache small
+    const [oldKey, oldTex] = _textTex.entries().next().value;
+    _textTex.delete(oldKey); oldTex.dispose();
+  }
+  return t;
+}
+
+// Effects that leave the ship (bolts, scan waves, print clouds) live under
+// env.fxRoot when the caller gives one — in the game, the scene, so a
+// turning ship doesn't drag its own shots along — otherwise under the
+// ship. Positions/directions are given in ship space and converted here;
+// sizes and speeds follow the ship's world scale. Objects placed outside
+// the ship are remembered in env.owned so disposeShipModel frees them.
+function fxHost(ship, env) {
+  const root = (env && env.fxRoot) || effectsPart(ship);
+  const toRoot = new THREE.Matrix4(), a = new THREE.Vector3(), b = new THREE.Vector3();
+  return {
+    root,
+    add(...objs) {
+      for (const o of objs) o.userData.shipkit = true;   // authored for sRGB output + tone mapping
+      root.add(...objs); if (root !== ship && env) env.owned.push(...objs);
+    },
+    // ship-space point -> root space (in place); returns ship/root scale ratio
+    point(v) {
+      ship.updateMatrixWorld(true); root.updateMatrixWorld(true);
+      toRoot.copy(root.matrixWorld).invert();
+      v.applyMatrix4(ship.matrixWorld).applyMatrix4(toRoot);
+      return ship.getWorldScale(a).x / root.getWorldScale(b).x;
+    },
+    // world-space point -> root space (in place)
+    worldPoint(v) { root.updateMatrixWorld(true); return root.worldToLocal(v); },
+    // ship-space direction -> root space (in place, normalized)
+    dir(v) { return v.transformDirection(ship.matrixWorld).transformDirection(toRoot); },
+  };
+}
+
+// A pool of laser bolts (glowing rods) plus a muzzle flash.
+// fire(origin, dir, target?) launches one: origin and dir in ship space,
+// or aimed at `target` (a world-space point) when given; update(dt) moves
+// them.
+function makeBoltPool(ship, env, color, { count = 12, length = 0.9, radius = 0.045, speed = 28 } = {}) {
+  const host = fxHost(ship, env);
+  const G = glowTextures();
+  const geo = new THREE.CylinderGeometry(radius, radius, length, 8, 1, true);
+  geo.rotateZ(-Math.PI / 2); // along +X
+  const mat = new THREE.MeshBasicMaterial({ color, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
+  const pool = [], X = new THREE.Vector3(1, 0, 0);
+  for (let i = 0; i < count; i++) {
+    const g = new THREE.Group();
+    g.add(new THREE.Mesh(geo, mat));
+    const glow = additiveSprite(G.nav, color);
+    glow.scale.setScalar(length * 0.9); g.add(glow);
+    g.userData.dynamic = true; // moves on its own: never merged
+    g.visible = false; host.add(g);
+    pool.push({ g, v: new THREE.Vector3(), age: 0 });
+  }
+  const flash = additiveSprite(G.engine, color);
+  flash.visible = false; host.add(flash);
+  let flashT = 0, flashK = 1;
+  return {
+    fire(origin, dir, target) {
+      const b = pool.find((p) => !p.g.visible) || pool[0];
+      const o = origin.clone(), k = host.point(o);
+      let d;
+      if (target) d = host.worldPoint(target.clone()).sub(o).normalize();
+      else d = host.dir(dir.clone());
+      b.g.visible = true; b.g.scale.setScalar(k);
+      b.g.position.copy(o).addScaledVector(d, length * k / 2);
+      b.g.quaternion.setFromUnitVectors(X, d);
+      b.v.copy(d).multiplyScalar(speed * k); b.age = 0;
+      flash.position.copy(o); flash.visible = true; flashT = 1; flashK = k;
+    },
+    update(dt) {
+      for (const b of pool) {
+        if (!b.g.visible) continue;
+        b.g.position.addScaledVector(b.v, dt);
+        if ((b.age += dt) > 1.4) b.g.visible = false;
+      }
+      if (flash.visible) {
+        flashT -= dt * 7; flash.material.opacity = Math.max(0, flashT);
+        flash.scale.setScalar((0.4 + (1 - flashT) * 0.9) * flashK);
+        if (flashT <= 0) flash.visible = false;
+      }
+    },
+  };
+}
+
+// An expanding sensor shell: Fresnel-bright rim with latitude scan lines,
+// fading as it grows. start(position, maxRadius), both in ship space.
+function makeScanWave(ship, env, color) {
+  const host = fxHost(ship, env);
+  const uniforms = { uT: { value: 0 }, uColor: { value: new THREE.Color(color) } };
+  const mat = new THREE.ShaderMaterial({
+    uniforms,
+    vertexShader: `
+      varying vec3 vN; varying vec3 vView; varying vec3 vP;
+      void main(){
+        vP = position; vN = normalize(normalMatrix * normal);
+        vec4 mv = modelViewMatrix * vec4(position, 1.0); vView = normalize(-mv.xyz);
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: `
+      uniform float uT; uniform vec3 uColor; varying vec3 vN; varying vec3 vView; varying vec3 vP;
+      void main(){
+        float fres = pow(1.0 - abs(dot(normalize(vN), normalize(vView))), 2.5);
+        float lines = 0.55 + 0.45 * sin(vP.y * 60.0);
+        float a = (fres * 0.9 + 0.06) * lines * pow(1.0 - uT, 1.5);
+        gl_FragColor = vec4(uColor * a * 1.8, 1.0);
+      }`,
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+  });
+  const mesh = new THREE.Mesh(new THREE.SphereGeometry(1, 48, 24), mat);
+  mesh.userData.dynamic = true;
+  mesh.visible = false; host.add(mesh);
+  let t = -1, maxR = 8;
+  return {
+    start(pos, radius = 8) {
+      const p = pos.clone(), k = host.point(p);
+      mesh.position.copy(p); maxR = radius * k; t = 0; mesh.visible = true;
+    },
+    update(dt) {
+      if (t < 0) return;
+      t += dt / 1.7;
+      if (t >= 1) { t = -1; mesh.visible = false; return; }
+      mesh.scale.setScalar(0.3 + maxR * (1 - Math.pow(1 - t, 3)));
+      uniforms.uT.value = t;
+    },
+  };
+}
+
+// Break one mesh into `pieces` chunks: triangles are grouped around
+// randomly chosen seed triangles (nearest centroid), each group becomes its
+// own mesh centered on itself (so it spins around its own middle), placed
+// exactly where that part of the original was. The original is hidden.
+function fractureMesh(mesh, pieces, rand) {
+  const g = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry;
+  const pos = g.attributes.position, tris = pos.count / 3;
+  const comp = (a, i, k) => a.array[i * a.itemSize + k]; // r128 has no getComponent()
+  const cent = new Float32Array(tris * 3);
+  for (let t = 0; t < tris; t++) for (let k = 0; k < 3; k++) {
+    cent[t * 3 + k] = (comp(pos, t * 3, k) + comp(pos, t * 3 + 1, k) + comp(pos, t * 3 + 2, k)) / 3;
+  }
+  const seeds = [];
+  for (let i = 0; i < pieces; i++) seeds.push(Math.floor(rand() * tris));
+  const bucket = new Int32Array(tris), counts = new Array(pieces).fill(0);
+  for (let t = 0; t < tris; t++) {
+    let best = 0, bd = Infinity;
+    for (let i = 0; i < pieces; i++) {
+      const s = seeds[i];
+      const d = (cent[t * 3] - cent[s * 3]) ** 2 + (cent[t * 3 + 1] - cent[s * 3 + 1]) ** 2 + (cent[t * 3 + 2] - cent[s * 3 + 2]) ** 2;
+      if (d < bd) { bd = d; best = i; }
+    }
+    bucket[t] = best; counts[best]++;
+  }
+  const chunks = [];
+  for (let i = 0; i < pieces; i++) {
+    if (!counts[i]) continue;
+    const cg = new THREE.BufferGeometry(), center = new THREE.Vector3();
+    for (const name of Object.keys(g.attributes)) {
+      const src = g.attributes[name], n = src.itemSize, out = new Float32Array(counts[i] * 3 * n);
+      let w = 0;
+      for (let t = 0; t < tris; t++) {
+        if (bucket[t] !== i) continue;
+        for (let v = 0; v < 3; v++) for (let c = 0; c < n; c++) out[w++] = comp(src, t * 3 + v, c);
+      }
+      cg.setAttribute(name, new THREE.BufferAttribute(out, n));
+    }
+    for (let t = 0; t < tris; t++) if (bucket[t] === i) center.x += cent[t * 3], center.y += cent[t * 3 + 1], center.z += cent[t * 3 + 2];
+    center.divideScalar(counts[i]);
+    cg.translate(-center.x, -center.y, -center.z);
+    const chunk = new THREE.Mesh(cg, mesh.material);
+    chunk.castShadow = chunk.receiveShadow = true;
+    chunk.position.copy(center);
+    mesh.add(chunk);
+    chunks.push(chunk);
+  }
+  if (g !== mesh.geometry) g.dispose();
+  return chunks;
+}
+
+// Procedural damage, attached by buildShipModel to every model.
+// Damage sites are sampled once (seeded) on the ship's big solid meshes:
+// a random triangle, a random point on it, its outward normal. Each site
+// carries a scorch decal and an ember glow as children of that mesh (so
+// they follow any animation), and emits smoke and spark bursts. Small
+// parts are the debris candidates. setDamage(0..1) decides how much of
+// it shows; update() animates it.
+function createDamageFx(ship, radius) {
+  const T = fxTextures(), G = glowTextures(), rand = rng(101);
+  ship.updateMatrixWorld(true);
+  const big = [], small = [];
+  ship.traverse((o) => {
+    if (!o.isMesh || o.isInstancedMesh || !o.geometry || !o.geometry.attributes.position) return;
+    const m = o.material;
+    if (!m || m.isShaderMaterial || m.transparent || m.blending === THREE.AdditiveBlending) return;
+    o.geometry.computeBoundingSphere();
+    const s = new THREE.Vector3();
+    o.matrixWorld.decompose(new THREE.Vector3(), new THREE.Quaternion(), s);
+    const r = o.geometry.boundingSphere.radius * Math.max(s.x, s.y, s.z);
+    if (r > radius * 0.3) big.push({ o, r });
+    else if (r < radius * 0.12) small.push(o);
+  });
+
+  // --- damage sites
+  const decalMat = new THREE.MeshBasicMaterial({ map: T.scorch, transparent: true, depthWrite: false,
+    polygonOffset: true, polygonOffsetFactor: -4 });
+  const sites = [], SITES = 8;
+  const pickBig = () => {
+    let x = rand() * big.reduce((a, b) => a + b.r, 0);
+    for (const b of big) if ((x -= b.r) <= 0) return b.o;
+    return big[0].o;
+  };
+  const va = new THREE.Vector3(), vb = new THREE.Vector3(), vc = new THREE.Vector3();
+  for (let i = 0; i < SITES && big.length; i++) {
+    const o = pickBig(), g = o.geometry, pos = g.attributes.position, idx = g.index;
+    const tri = Math.floor(rand() * (idx ? idx.count : pos.count) / 3);
+    const at = (k) => (idx ? idx.getX(tri * 3 + k) : tri * 3 + k);
+    va.fromBufferAttribute(pos, at(0)); vb.fromBufferAttribute(pos, at(1)); vc.fromBufferAttribute(pos, at(2));
+    let u = rand(), v = rand(); if (u + v > 1) { u = 1 - u; v = 1 - v; }
+    const p = va.clone().addScaledVector(vb.clone().sub(va), u).addScaledVector(vc.clone().sub(va), v);
+    const n = vb.clone().sub(va).cross(vc.clone().sub(va)).normalize();
+    if (!isFinite(n.x) || n.lengthSq() === 0) n.set(0, 1, 0);
+    if (n.dot(p.clone().sub(g.boundingSphere.center)) < 0) n.negate();
+    const decal = new THREE.Mesh(new THREE.CircleGeometry(1, 20), decalMat);
+    const size = 0.38 + rand() * 0.34;
+    decal.position.copy(p).addScaledVector(n, 0.012);
+    decal.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), n);
+    decal.userData.size = size; decal.visible = false;
+    o.add(decal);
+    const ember = additiveSprite(G.engine, 0xff5a1a);
+    ember.position.copy(p).addScaledVector(n, 0.05); ember.visible = false;
+    o.add(ember);
+    sites.push({ o, decal, ember, n, sparkT: rand() * 2, world: new THREE.Vector3(), dir: new THREE.Vector3() });
+  }
+
+  // --- smoke: soft grey puffs, normal blending, rising and spreading
+  const SMOKE = 180, sGeo = new THREE.BufferGeometry();
+  const sPos = new Float32Array(SMOKE * 3), sLife = new Float32Array(SMOKE).fill(1), sAlpha = new Float32Array(SMOKE);
+  const sVel = new Float32Array(SMOKE * 3), sRate = new Float32Array(SMOKE);
+  for (let i = 0; i < SMOKE; i++) { sLife[i] = rand(); sRate[i] = 0.25 + rand() * 0.2; }
+  sGeo.setAttribute("position", new THREE.BufferAttribute(sPos, 3));
+  sGeo.setAttribute("life", new THREE.BufferAttribute(sLife, 1));
+  sGeo.setAttribute("alpha", new THREE.BufferAttribute(sAlpha, 1));
+  const smoke = new THREE.Points(sGeo, new THREE.ShaderMaterial({
+    uniforms: { uTex: { value: T.smoke } },
+    vertexShader: `
+      attribute float life; attribute float alpha; varying float vLife; varying float vAlpha;
+      void main(){
+        vLife = life; vAlpha = alpha;
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        gl_PointSize = (0.35 + life * 1.8) * 420.0 / -mv.z;
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: `
+      uniform sampler2D uTex; varying float vLife; varying float vAlpha;
+      void main(){
+        float a = texture2D(uTex, gl_PointCoord).a * vAlpha * (1.0 - vLife) * smoothstep(0.0, 0.12, vLife);
+        gl_FragColor = vec4(mix(vec3(0.34, 0.31, 0.29), vec3(0.06), vLife), a * 0.95);
+      }`,
+    transparent: true, depthWrite: false,
+  }));
+  const fxp = effectsPart(ship);
+  smoke.frustumCulled = false; fxp.add(smoke);
+
+  // --- sparks: short-lived additive points in bursts, with drag
+  const SPARKS = 220, kGeo = new THREE.BufferGeometry();
+  const kPos = new Float32Array(SPARKS * 3), kLife = new Float32Array(SPARKS).fill(1), kVel = new Float32Array(SPARKS * 3), kRate = new Float32Array(SPARKS);
+  kGeo.setAttribute("position", new THREE.BufferAttribute(kPos, 3));
+  kGeo.setAttribute("life", new THREE.BufferAttribute(kLife, 1));
+  const sparks = new THREE.Points(kGeo, new THREE.ShaderMaterial({
+    vertexShader: `
+      attribute float life; varying float vLife;
+      void main(){
+        vLife = life;
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        gl_PointSize = (1.0 - life) * 70.0 / -mv.z;
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: `
+      varying float vLife;
+      void main(){
+        float a = smoothstep(0.5, 0.0, length(gl_PointCoord - 0.5)) * (1.0 - vLife);
+        gl_FragColor = vec4(mix(vec3(1.0, 0.96, 0.8), vec3(1.0, 0.42, 0.08), vLife) * a * 2.0, 1.0);
+      }`,
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+  }));
+  sparks.frustumCulled = false; fxp.add(sparks);
+  let kNext = 0;
+  const burst = (s, n) => {
+    for (let j = 0; j < n; j++) {
+      const i = kNext = (kNext + 1) % SPARKS;
+      kPos[i * 3] = s.world.x; kPos[i * 3 + 1] = s.world.y; kPos[i * 3 + 2] = s.world.z;
+      const sp = 1.2 + rand() * 2.2;
+      kVel[i * 3] = (s.dir.x + (rand() - 0.5) * 1.4) * sp;
+      kVel[i * 3 + 1] = (s.dir.y + (rand() - 0.5) * 1.4) * sp;
+      kVel[i * 3 + 2] = (s.dir.z + (rand() - 0.5) * 1.4) * sp;
+      kLife[i] = 0; kRate[i] = 1.4 + rand() * 2.2;
+    }
+  };
+
+  // --- debris: small parts that break off, in a fixed (seeded) order
+  for (let i = small.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [small[i], small[j]] = [small[j], small[i]]; }
+  const loose = small.slice(0, 6).map((o) => ({ o, off: false }));
+  const shipCenter = new THREE.Vector3();
+
+  // --- final destruction: flash, fireball, shockwave, then the ship comes
+  // apart — its top-level parts (engines, eye, crown, wings…) fly off whole,
+  // the big hull pieces are fractured first. Burning sites stay attached to
+  // the chunk they landed on, so the wreckage trails smoke.
+  const builtParts = new Set(ship.children);  // snapshot before any effect objects are added below
+  const flash = additiveSprite(G.engine, 0xffe2b0), fireballs = [];
+  flash.visible = false; fxp.add(flash);
+  for (let i = 0; i < 7; i++) {
+    const f = additiveSprite(G.engine, i % 2 ? 0xff6a1a : 0xffb45a);
+    f.visible = false; fxp.add(f);
+    fireballs.push({ s: f, off: new THREE.Vector3(rand() - 0.5, rand() - 0.5, rand() - 0.5).multiplyScalar(radius * 0.8), delay: rand() * 0.35 });
+  }
+  const shock = makeScanWave(ship, null, 0xff8a3c);
+  const flying = [];
+  let boomT = -1;
+  function breakApart() {
+    // parts = children of the group that holds most of the ship (the
+    // drone keeps everything in a bobbing `body` group, codewing doesn't)
+    const meshCount = (o) => { let n = 0; o.traverse((c) => { if (c.isMesh) n++; }); return n; };
+    let parts = ship.children.filter((c) => builtParts.has(c));   // not the effects added since
+    const total = meshCount(ship);
+    for (;;) {
+      const g = parts.find((c) => !c.isMesh && c.children.length && meshCount(c) > total * 0.5);
+      if (!g) break;
+      parts = parts.filter((c) => c !== g).concat(g.children.slice());
+    }
+    parts = parts.filter((o) => (o.isMesh || (o.isGroup && meshCount(o) > 0)) && !o.isPoints && !o.isSprite && o.visible);
+    ship.updateMatrixWorld(true);
+    const pieces = [];
+    for (const o of parts) {
+      const solid = o.isMesh && !o.isInstancedMesh && o.material && !o.material.transparent && !o.material.isShaderMaterial;
+      let r = 0;
+      if (solid) { o.geometry.computeBoundingSphere(); const sc = new THREE.Vector3(); o.matrixWorld.decompose(new THREE.Vector3(), new THREE.Quaternion(), sc); r = o.geometry.boundingSphere.radius * Math.max(sc.x, sc.y, sc.z); }
+      if (solid && r > radius * 0.3) {
+        const chunks = fractureMesh(o, 6 + Math.floor(rand() * 4), rand);
+        o.updateMatrixWorld(true);
+        for (const s of sites) if (s.o === o) {      // move burning sites onto the nearest chunk
+          const lp = s.decal.position;
+          let best = chunks[0], bd = Infinity;
+          for (const c of chunks) { const d = c.position.distanceToSquared(lp); if (d < bd) { bd = d; best = c; } }
+          best.attach(s.decal); best.attach(s.ember); s.o = best;
+        }
+        for (const c of chunks) { ship.attach(c); pieces.push(c); }
+        o.visible = false;
+      } else { ship.attach(o); pieces.push(o); }
+    }
+    const tmpC = new THREE.Vector3();
+    for (const o of pieces) {
+      new THREE.Box3().setFromObject(o).getCenter(tmpC);
+      ship.worldToLocal(tmpC);
+      const out = tmpC.lengthSq() > 1e-4 ? tmpC.clone().normalize() : new THREE.Vector3(rand() - 0.5, rand() - 0.5, rand() - 0.5).normalize();
+      flying.push({ o, v: out.multiplyScalar(0.45 + rand() * 1.0).add(new THREE.Vector3(rand() - 0.5, rand() - 0.5, rand() - 0.5).multiplyScalar(0.35)),
+        spin: new THREE.Vector3(rand() - 0.5, rand() - 0.5, rand() - 0.5).normalize(), spinRate: 0.3 + rand() * 1.5 });
+    }
+  }
+
+  let damage = 0, active = 0;
+  const shipInv = new THREE.Matrix4();
+  return {
+    explode() {
+      if (boomT >= 0) return;
+      boomT = 0;
+      this.setDamage(1);
+      loose.forEach((l) => { l.off = true; l.o.visible = true; });   // no more separate break-offs
+      flash.visible = true;
+      shock.start(new THREE.Vector3(), radius * 1.8);
+      for (const s of sites) { ship.updateMatrixWorld(true); s.decal.getWorldPosition(s.world); ship.worldToLocal(s.world); s.dir.copy(s.world).normalize(); burst(s, 36); }
+    },
+    get destroyed() { return boomT >= 0; },
+    setDamage(d) {
+      damage = d;
+      active = d <= 0 ? 0 : Math.ceil(d * sites.length);
+      sites.forEach((s, i) => {
+        const on = i < active;
+        s.decal.visible = on;
+        s.decal.scale.setScalar(s.decal.userData.size * (0.6 + 0.9 * d));
+        s.ember.visible = on && d > 0.45 && i % 2 === 0;
+      });
+      const wantOff = d >= 0.7 ? Math.round((d - 0.6) / 0.4 * loose.length) : 0;
+      loose.forEach((l, i) => {
+        if (i < wantOff && !l.off) {          // break off: keep its world pose, fly away
+          l.parent = l.o.parent; l.pos = l.o.position.clone(); l.quat = l.o.quaternion.clone(); l.scale = l.o.scale.clone();
+          ship.attach(l.o);
+          l.v = l.o.position.clone().sub(shipCenter).normalize().multiplyScalar(0.7)
+            .add(new THREE.Vector3(rand() - 0.5, rand() - 0.2, rand() - 0.5).multiplyScalar(0.5));
+          l.spin = new THREE.Vector3(rand() - 0.5, rand() - 0.5, rand() - 0.5).normalize();
+          l.spinRate = 1 + rand() * 3; l.age = 0; l.off = true;
+        } else if (i >= wantOff && l.off) {   // repaired: back where it was
+          l.parent.add(l.o); l.o.position.copy(l.pos); l.o.quaternion.copy(l.quat); l.o.scale.copy(l.scale);
+          l.o.visible = true; l.off = false;
+        }
+      });
+    },
+    get damage() { return damage; },
+    update(t, dt, particlesOn = true) {
+      if (boomT >= 0) {
+        const before = boomT;
+        boomT += dt;
+        if (before < 0.12 && boomT >= 0.12) breakApart();
+        flash.material.opacity = Math.max(0, 1 - boomT / 0.9);
+        flash.scale.setScalar(radius * (0.8 + 4 * Math.min(1, boomT / 0.35)));
+        flash.visible = boomT < 0.9;
+        for (const f of fireballs) {
+          const k = (boomT - f.delay) / 1.4;
+          f.s.visible = k > 0 && k < 1;
+          if (!f.s.visible) continue;
+          f.s.position.copy(f.off).multiplyScalar(1 + k * 1.5);
+          f.s.scale.setScalar(radius * (0.4 + 1.3 * Math.sqrt(k)));
+          f.s.material.opacity = (1 - k) * (0.8 + 0.2 * Math.sin(t * 30));
+        }
+        shock.update(dt);
+        const drag = Math.max(0, 1 - dt * 0.18);
+        for (const f of flying) {
+          f.o.position.addScaledVector(f.v, dt);
+          f.v.multiplyScalar(drag);
+          f.o.rotateOnAxis(f.spin, f.spinRate * dt);
+        }
+      }
+      shipInv.copy(ship.matrixWorld).invert();
+      for (let i = 0; i < active; i++) {                // site positions in ship space
+        const s = sites[i];
+        s.decal.getWorldPosition(s.world).applyMatrix4(shipInv);
+        s.dir.copy(s.n).transformDirection(s.o.matrixWorld).transformDirection(shipInv);
+        if (s.ember.visible) s.ember.scale.setScalar(0.35 + 0.25 * Math.sin(t * 17 + i * 3) * Math.sin(t * 7 + i));
+        if (damage > 0.25 && (s.sparkT -= dt) <= 0) {
+          s.sparkT = 0.12 + rand() * (1.8 - damage * 1.5);
+          if (particlesOn) burst(s, 10 + Math.floor(rand() * 18 * damage));
+        }
+      }
+      for (const l of loose) {
+        if (!l.off || !l.o.visible || !l.v) continue;
+        l.o.position.addScaledVector(l.v, dt);
+        l.o.rotateOnAxis(l.spin, l.spinRate * dt);
+        if ((l.age += dt) > 6) l.o.visible = false;
+      }
+      smoke.visible = particlesOn && active > 0;
+      sparks.visible = particlesOn && damage > 0.25;
+      if (smoke.visible) {
+        for (let i = 0; i < SMOKE; i++) {
+          sLife[i] += dt * sRate[i];
+          if (sLife[i] >= 1) {
+            const s = sites[i % SITES];
+            sLife[i] -= 1;
+            if (!s || i % SITES >= active) { sAlpha[i] = 0; continue; }
+            sPos[i * 3] = s.world.x + s.dir.x * 0.05; sPos[i * 3 + 1] = s.world.y + s.dir.y * 0.05; sPos[i * 3 + 2] = s.world.z + s.dir.z * 0.05;
+            const sp = 0.25 + rand() * 0.25;
+            sVel[i * 3] = s.dir.x * sp + (rand() - 0.5) * 0.12;
+            sVel[i * 3 + 1] = s.dir.y * sp + 0.12 + (rand() - 0.5) * 0.12;
+            sVel[i * 3 + 2] = s.dir.z * sp + (rand() - 0.5) * 0.12;
+            sAlpha[i] = 0.35 + 0.65 * damage;
+          }
+          sPos[i * 3] += sVel[i * 3] * dt; sPos[i * 3 + 1] += sVel[i * 3 + 1] * dt; sPos[i * 3 + 2] += sVel[i * 3 + 2] * dt;
+        }
+        sGeo.attributes.position.needsUpdate = true; sGeo.attributes.life.needsUpdate = true; sGeo.attributes.alpha.needsUpdate = true;
+      }
+      if (sparks.visible) {
+        const drag = Math.max(0, 1 - dt * 1.8);
+        for (let i = 0; i < SPARKS; i++) {
+          if (kLife[i] >= 1) continue;
+          kLife[i] = Math.min(1, kLife[i] + dt * kRate[i]);
+          kVel[i * 3] *= drag; kVel[i * 3 + 1] *= drag; kVel[i * 3 + 2] *= drag;
+          kPos[i * 3] += kVel[i * 3] * dt; kPos[i * 3 + 1] += kVel[i * 3 + 1] * dt; kPos[i * 3 + 2] += kVel[i * 3 + 2] * dt;
+        }
+        kGeo.attributes.position.needsUpdate = true; kGeo.attributes.life.needsUpdate = true;
+      }
+    },
+  };
+}
+
+// =====================================================================
+// SHIP BUILDING BLOCKS — parts and behaviours more than one ship uses.
+// A ship definition composes these instead of re-writing them (see
+// docs/ship.md "Adding a ship": anything a second ship would need goes
+// here, not into the ship).
+// =====================================================================
+
+// Solar-cell sheet (texture): a grid of blue cells with bus lines and a silver frame.
+function makeSolarCells({ size = 512, seed = 31, cols = 8, rows = 4 } = {}) {
+  const rand = rng(seed);
+  const W = size, H = size / 2, cw = W / cols, ch = H / rows;
+  const [c, ctx] = canvas(W, H);
+  ctx.fillStyle = "#c9ced8"; ctx.fillRect(0, 0, W, H);
+  for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) {
+    const x = i * cw + 3, y = j * ch + 3, w = cw - 6, h = ch - 6, k = rand() * 0.18;
+    const g = ctx.createLinearGradient(x, y, x + w, y + h);
+    g.addColorStop(0, `rgb(${Math.round(34 + k * 120)},${Math.round(56 + k * 140)},${Math.round(130 + k * 200)})`);
+    g.addColorStop(1, `rgb(8,16,${Math.round(58 + k * 90)})`);
+    ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
+    ctx.strokeStyle = "rgba(210,220,240,0.35)"; ctx.lineWidth = 1;
+    for (let b = 1; b < 4; b++) { ctx.beginPath(); ctx.moveTo(x + w * b / 4, y); ctx.lineTo(x + w * b / 4, y + h); ctx.stroke(); }
+    ctx.beginPath(); ctx.moveTo(x, y + h / 2); ctx.lineTo(x + w, y + h / 2); ctx.stroke();
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.anisotropy = 8; t.encoding = THREE.sRGBEncoding;
+  return t;
+}
+
+// A cylinder spanning from a to b: struts, spokes, booms, antenna feeds.
+function strut(a, b, radius, material, segments = 8) {
+  const dir = new THREE.Vector3().subVectors(b, a), len = dir.length();
+  const m = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, len, segments), material));
+  m.position.copy(a).addScaledVector(dir, 0.5);
+  m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
+  return m;
+}
+
+// A cache key for a ship's lettering: "" for the defaults (the shared set).
+const labelKey = (l) => (l && (l.name || l.sub) ? JSON.stringify([l.name || "", l.sub || ""]) : "");
+
+// Named parts: part("engines") is a Group named "engines" under root, made the
+// first time it's asked for. A ship puts each of its sections (hull, wings,
+// engines, lights…) in one, so a part can be found by name — in the lab, by
+// a tool, later by damage or upgrades. A part is a plain static group: the
+// game's merged build merges through it as before.
+// The shared effects' part (shots, the scan wave, damage smoke and sparks):
+// "effects" under the ship, unless the host gives them a root of their own.
+function effectsPart(ship) {
+  let g = ship.children.find((c) => c.userData.part && c.name === "effects");
+  if (!g) { g = new THREE.Group(); g.name = "effects"; g.userData.part = true; ship.add(g); }
+  return g;
+}
+function partsOf(root) {
+  const made = new Map();
+  return (name) => {
+    if (!made.has(name)) {
+      const g = new THREE.Group(); g.name = name; g.userData.part = true;
+      root.add(g); made.set(name, g);
+    }
+    return made.get(name);
+  };
+}
+
+// Segment-count and bevel helpers bound to a build's `detail`.
+function detailHelpers(detail) {
+  const seg = (n, min = 3) => Math.max(min, Math.round(n * detail));
+  const bevel = (t, sz) => ({ bevelEnabled: true, bevelThickness: t, bevelSize: sz, bevelSegments: seg(3, 1) });
+  return { seg, bevel };
+}
+
+// ---------------------------------------------------------------------
+// SHAPING — rounded edges and sealed joints, for any model (buildShipModel
+// options `round` and `seal`, 0..1; 0 = the model exactly as defined).
+//
+// Rounded edges: while a model builds with round > 0, THREE.BoxGeometry
+// and THREE.CylinderGeometry make rounded versions (withRounding): a box's
+// edges and corners, a cylinder's two rims. The radius follows the part —
+// round × 60 % of its smallest half-size — so a thin plate gets a soft
+// edge and a block a full one. Partial or open cylinders stay as they are.
+// The swap is scoped to the build (restored in `finally`); cones and every
+// other geometry are untouched.
+//
+// Sealed joints (sealJoints): where two solid parts cut into each other,
+// the line where they meet gets, in the bigger part's material, either
+//   "fillet" (default): a concave strip curving from one surface into the
+//            other — the joint's edge rounded, as if cast in one piece;
+//   "bead":   a round tube lying on the joint, like a line of sealant. The line is found from the parts' own shapes: each mesh's
+// edges are tested against the other's solid (box, cylinder, cone, sphere
+// and dome, torus, lathe, extrude — from the geometry's parameters, in its
+// local frame); an edge with one end inside and one outside gives a point
+// on the meeting line; the points are chained into curves, and a tube
+// follows each one. Moving parts are sealed only to parts that move with
+// them (the same userData.dynamic unit).
+// ---------------------------------------------------------------------
+const _Box = THREE.BoxGeometry, _Cyl = THREE.CylinderGeometry;
+function roundedBoxGeometry(w, h, d, r, k) {
+  const hx = w / 2, hy = h / 2, hz = d / 2;
+  r = Math.min(r, hx, hy, hz);
+  // k segments over each rounded band, one across the flat middle
+  const n = 2 * k + 1;
+  const g = new _Box(w, h, d, n, n, n);
+  const p = g.attributes.position, nr = g.attributes.normal;
+  const remap = (x, half) => {
+    const i = Math.round((x / half + 1) / 2 * n);               // which grid line
+    if (i <= k) return -half + r * (1 - Math.cos(i / k * Math.PI / 2)) * (k ? 1 : 0);
+    if (i >= n - k) return half - r * (1 - Math.cos((n - i) / k * Math.PI / 2));
+    return 0;
+  };
+  const q = new THREE.Vector3(), v = new THREE.Vector3(), o = new THREE.Vector3();
+  const uv = g.attributes.uv, size = [w, h, d], half = [hx, hy, hz];
+  // a face's texture axes, as BoxGeometry lays them: [u axis, v axis] by the face's normal axis
+  const AX = [[2, 1], [0, 2], [0, 1]];
+  for (let i = 0; i < p.count; i++) {
+    const old = [p.getX(i), p.getY(i), p.getZ(i)];
+    v.set(remap(old[0], hx), remap(old[1], hy), remap(old[2], hz));
+    // the texture follows the moved vertices (else it bunches up in bands near the edges):
+    // the same mapping BoxGeometry used, on the new flat position
+    const nAxis = Math.abs(nr.getX(i)) > 0.5 ? 0 : Math.abs(nr.getY(i)) > 0.5 ? 1 : 2, [ua, va] = AX[nAxis], flat = [v.x, v.y, v.z];
+    const su = Math.abs((old[ua] + half[ua]) / size[ua] - uv.getX(i)) < 1e-4 ? 1 : -1;
+    const sv = Math.abs(1 - (old[va] + half[va]) / size[va] - uv.getY(i)) < 1e-4 ? 1 : -1;
+    uv.setXY(i, (flat[ua] * su + half[ua]) / size[ua], 1 - (flat[va] * sv + half[va]) / size[va]);
+    q.set(Math.max(-hx + r, Math.min(hx - r, v.x)), Math.max(-hy + r, Math.min(hy - r, v.y)), Math.max(-hz + r, Math.min(hz - r, v.z)));
+    o.subVectors(v, q);
+    if (o.lengthSq() > 1e-12) { o.normalize(); v.copy(q).addScaledVector(o, r); nr.setXYZ(i, o.x, o.y, o.z); }
+    p.setXYZ(i, v.x, v.y, v.z);
+  }
+  g.userData.shape = { kind: "box", w, h, d };
+  return g;
+}
+function roundedCylinderGeometry(rt, rb, h, radial, r, k) {
+  const hy = h / 2, pts = [];
+  // the profile, axis to axis: bottom disc, its rounded rim, the side, the top rim, the top disc
+  pts.push(new THREE.Vector2(0, -hy));
+  for (let i = 0; i <= k; i++) { const a = -Math.PI / 2 + i / k * Math.PI / 2; pts.push(new THREE.Vector2(rb - r + Math.cos(a) * r, -hy + r + Math.sin(a) * r)); }
+  for (let i = 0; i <= k; i++) { const a = i / k * Math.PI / 2; pts.push(new THREE.Vector2(rt - r + Math.cos(a) * r, hy - r + Math.sin(a) * r)); }
+  pts.push(new THREE.Vector2(0, hy));
+  const g = new THREE.LatheGeometry(pts, radial);
+  g.computeVertexNormals();
+  // the texture as on a CylinderGeometry's side: v by height (a lathe spreads it
+  // over the whole profile, caps included — painted bands squeezed and merged)
+  const pa = g.attributes.position, uv = g.attributes.uv;
+  for (let i = 0; i < pa.count; i++) uv.setY(i, (pa.getY(i) + hy) / h);
+  g.userData.shape = { kind: "cylinder", rt, rb, h };
+  return g;
+}
+// Build `fn` with rounded boxes and cylinders (round 0..1, k: arc segments).
+function withRounding(round, k, fn) {
+  if (!(round > 0)) return fn();
+  THREE.BoxGeometry = function (w = 1, h = 1, d = 1, ...rest) {
+    const r = round * 0.6 * Math.min(w, h, d) / 2;
+    return r > 1e-4 ? roundedBoxGeometry(w, h, d, r, k) : new _Box(w, h, d, ...rest);
+  };
+  THREE.CylinderGeometry = function (rt = 1, rb = 1, h = 1, radial = 8, hs = 1, open = false, t0 = 0, tl = Math.PI * 2) {
+    const r = round * 0.6 * Math.min(rt, rb, h / 2);
+    if (open || tl < Math.PI * 2 - 1e-6 || Math.min(rt, rb) < h * 0.01 || r < 1e-4) return new _Cyl(rt, rb, h, radial, hs, open, t0, tl);
+    return roundedCylinderGeometry(rt, rb, h, radial, r, k);
+  };
+  try { return fn(); } finally { THREE.BoxGeometry = _Box; THREE.CylinderGeometry = _Cyl; }
+}
+
+// An ExtrudeGeometry as a solid, bevel included. Three.js bevels by growing
+// the outline: by bevelSize all along the depth, easing back to the plain
+// outline at the caps (a quarter ellipse, bevelThickness deep). Ignoring
+// that put a fin's root 4 cm inside the fin seen on screen (its joint only
+// showed past ~70 %).
+function extrudeSolid(P) {
+  const sh = Array.isArray(P.shapes) ? P.shapes : [P.shapes], o = P.options || {};
+  const depth = o.depth !== undefined ? o.depth : o.amount !== undefined ? o.amount : 1;
+  const bev = o.bevelEnabled !== false;
+  const bt = bev ? (o.bevelThickness !== undefined ? o.bevelThickness : 0.2) : 0;
+  const bs = bev ? (o.bevelSize !== undefined ? o.bevelSize : bt - 0.1) : 0, bo = bev ? (o.bevelOffset || 0) : 0;
+  const polys = sh.map((x) => { const e = x.extractPoints(12); return { outer: e.shape, holes: e.holes }; });
+  const loops = []; for (const q of polys) loops.push(q.outer, ...q.holes);
+  const inPoly = (pt, poly) => { let c = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const a = poly[i], b = poly[j]; if ((a.y > pt.y) !== (b.y > pt.y) && pt.x < (b.x - a.x) * (pt.y - a.y) / (b.y - a.y) + a.x) c = !c; } return c; };
+  const out2 = { d: 0, ux: 0, uy: 0 };
+  // signed distance to the plain outline (− inside) and the outward direction there
+  const outline = (p) => {
+    let bd = Infinity, qx = 0, qy = 0, ex = 1, ey = 0;
+    for (const L of loops) for (let i = 0, j = L.length - 1; i < L.length; j = i++) {
+      const a = L[j], b = L[i], vx = b.x - a.x, vy = b.y - a.y, l2 = vx * vx + vy * vy || 1e-12;
+      const k = Math.max(0, Math.min(1, ((p.x - a.x) * vx + (p.y - a.y) * vy) / l2));
+      const cx = a.x + vx * k - p.x, cy = a.y + vy * k - p.y, d = cx * cx + cy * cy;
+      if (d < bd) { bd = d; qx = cx; qy = cy; ex = vx; ey = vy; }
+    }
+    const inside = polys.some((q) => inPoly(p, q.outer) && !q.holes.some((h) => inPoly(p, h)));
+    let ux = inside ? qx : -qx, uy = inside ? qy : -qy, l = Math.hypot(ux, uy);
+    if (l < 1e-9) { const m = Math.hypot(ex, ey) || 1; ux = ey / m; uy = -ex / m; l = 1;   // on the line: its perpendicular, pointing out
+      if (polys.some((q) => inPoly({ x: p.x + ux * 1e-4, y: p.y + uy * 1e-4 }, q.outer))) { ux = -ux; uy = -uy; } }
+    out2.d = (inside ? -1 : 1) * Math.sqrt(bd); out2.ux = ux / l; out2.uy = uy / l;
+    return out2;
+  };
+  const beyond = (z) => (z < 0 ? -z : z > depth ? z - depth : 0);   // how far into a cap's bevel
+  const grow = (ez) => (bt > 0 ? bs * Math.sqrt(Math.max(0, 1 - (ez / bt) * (ez / bt))) : 0) + bo;
+  return {
+    inside: (p) => { const ez = beyond(p.z); if (ez >= bt && bt > 0 || (bt === 0 && ez > 0)) return false; return outline(p).d < grow(ez); },
+    normal: (p, out) => {
+      const o2 = outline(p), ez = beyond(p.z), zs = p.z > depth / 2 ? 1 : -1;
+      if (ez > 0 && bt > 0) {
+        // on the bevel: the ellipse's normal; within the plain outline: the cap
+        if (o2.d <= bo) return out.set(0, 0, zs);
+        const d = o2.d - bo;
+        return out.set(o2.ux * d / (bs * bs || 1e-9), o2.uy * d / (bs * bs || 1e-9), zs * ez / (bt * bt)).normalize();
+      }
+      const dSide = Math.abs(bs + bo - o2.d), dCap = bt + Math.min(Math.abs(p.z), Math.abs(depth - p.z));
+      if (dCap < dSide) return out.set(0, 0, zs);
+      return out.set(o2.ux, o2.uy, 0);
+    },
+  };
+}
+
+// Is a point (in the mesh's local frame) inside the mesh's solid? null: not
+// a solid we can tell. The test carries .thick: the part's smallest
+// half-size (a torus' tube, a box's thinnest side…), which sizes the bead.
+function solidTest(geo) {
+  const f = solidTestOf(geo);
+  if (f) { f.thick = thicknessOf(geo); f.normal = solidNormalOf(geo); }
+  return f;
+}
+// The outward normal of a solid's surface nearest a local point, from the
+// shape itself (a mesh's vertex normals are ambiguous where faces meet).
+function solidNormalOf(geo) {
+  const s = geo.userData && geo.userData.shape, P = geo.parameters || {}, t = geo.type;
+  const box = (w, h, d) => (p, out) => {
+    const dx = w / 2 - Math.abs(p.x), dy = h / 2 - Math.abs(p.y), dz = d / 2 - Math.abs(p.z);
+    if (dx <= dy && dx <= dz) return out.set(Math.sign(p.x) || 1, 0, 0);
+    if (dy <= dz) return out.set(0, Math.sign(p.y) || 1, 0);
+    return out.set(0, 0, Math.sign(p.z) || 1);
+  };
+  const cyl = (rt, rb, h) => (p, out) => {
+    const r = Math.hypot(p.x, p.z), rr = rb + (rt - rb) * (p.y + h / 2) / h;
+    const dSide = Math.abs(rr - r), dTop = Math.abs(h / 2 - p.y), dBot = Math.abs(p.y + h / 2);
+    if (dTop < dSide && dTop <= dBot) return out.set(0, 1, 0);
+    if (dBot < dSide) return out.set(0, -1, 0);
+    return r > 1e-9 ? out.set(p.x / r, (rb - rt) / h, p.z / r).normalize() : out.set(1, 0, 0);
+  };
+  if (s && s.kind === "box") return box(s.w, s.h, s.d);
+  if (s && s.kind === "cylinder") return cyl(s.rt, s.rb, s.h);
+  if (t === "BoxGeometry") return box(P.width, P.height, P.depth);
+  if (t === "CylinderGeometry") return cyl(P.radiusTop, P.radiusBottom, P.height);
+  if (t === "ConeGeometry") return cyl(0, P.radius, P.height);
+  if (t === "SphereGeometry") return (p, out) => out.copy(p).normalize();
+  if (t === "TorusGeometry") return (p, out) => { const l = Math.hypot(p.x, p.y) || 1; return out.set(p.x - p.x / l * P.radius, p.y - p.y / l * P.radius, p.z).normalize(); };
+  if (t === "LatheGeometry") {
+    const pts = P.points;
+    return (p, out) => {
+      const r = Math.hypot(p.x, p.z) || 1e-9;
+      let best = -1, slope = 0;
+      for (let i = 0; i < pts.length - 1; i++) {
+        const a = pts[i], b = pts[i + 1];
+        if ((p.y - a.y) * (p.y - b.y) > 0 || a.y === b.y) continue;
+        const x = a.x + (b.x - a.x) * (p.y - a.y) / (b.y - a.y);
+        if (x > best) { best = x; slope = (b.x - a.x) / (b.y - a.y); }
+      }
+      return out.set(p.x / r, -slope, p.z / r).normalize();      // the gradient of r − f(y)
+    };
+  }
+  if (t === "ExtrudeGeometry" && P.shapes) { const E = extrudeSolid(P); return E.normal; }
+  return null;
+}
+function thicknessOf(geo) {
+  const s = geo.userData && geo.userData.shape, P = geo.parameters || {}, t = geo.type;
+  if (s && s.kind === "box") return Math.min(s.w, s.h, s.d) / 2;
+  if (s && s.kind === "cylinder") return Math.min(Math.max(s.rt, s.rb), s.h / 2);
+  if (t === "BoxGeometry") return Math.min(P.width, P.height, P.depth) / 2;
+  if (t === "CylinderGeometry") return Math.min(Math.max(P.radiusTop, P.radiusBottom), P.height / 2);
+  if (t === "ConeGeometry") return Math.min(P.radius, P.height / 2);
+  if (t === "SphereGeometry") return P.radius;
+  if (t === "TorusGeometry") return P.tube;
+  if (t === "LatheGeometry" && P.points) {
+    const ys = P.points.map((q) => q.y);
+    return Math.min(Math.max(...P.points.map((q) => q.x)), (Math.max(...ys) - Math.min(...ys)) / 2);
+  }
+  geo.computeBoundingBox();
+  const sz = geo.boundingBox.getSize(new THREE.Vector3());
+  return Math.min(sz.x, sz.y, sz.z) / 2;
+}
+function solidTestOf(geo) {
+  const s = geo.userData && geo.userData.shape, P = geo.parameters || {}, t = geo.type;
+  const full = (a) => a === undefined || a >= Math.PI * 2 - 1e-6;
+  const cyl = (rt, rb, h) => (p) => { const hy = h / 2; if (p.y < -hy || p.y > hy) return false; const r = rb + (rt - rb) * (p.y + hy) / h; return p.x * p.x + p.z * p.z < r * r; };
+  if (s && s.kind === "box") return (p) => Math.abs(p.x) < s.w / 2 && Math.abs(p.y) < s.h / 2 && Math.abs(p.z) < s.d / 2;
+  if (s && s.kind === "cylinder") return cyl(s.rt, s.rb, s.h);
+  if (t === "BoxGeometry") return (p) => Math.abs(p.x) < P.width / 2 && Math.abs(p.y) < P.height / 2 && Math.abs(p.z) < P.depth / 2;
+  if (t === "CylinderGeometry" && !P.openEnded && full(P.thetaLength)) return cyl(P.radiusTop, P.radiusBottom, P.height);
+  if (t === "ConeGeometry" && !P.openEnded && full(P.thetaLength)) return cyl(0, P.radius, P.height);
+  if (t === "SphereGeometry") {
+    const r2 = P.radius * P.radius, t0 = P.thetaStart || 0, t1 = t0 + (P.thetaLength === undefined ? Math.PI : P.thetaLength);
+    const p0 = P.phiStart || 0, pl = P.phiLength === undefined ? Math.PI * 2 : P.phiLength;
+    return (p) => {
+      const l2 = p.lengthSq(); if (l2 >= r2) return false;
+      const th = Math.acos(Math.max(-1, Math.min(1, p.y / Math.sqrt(l2 || 1e-12))));
+      if (th < t0 || th > t1) return false;
+      if (pl >= Math.PI * 2 - 1e-6) return true;
+      const ph = ((Math.atan2(p.z, -p.x) - p0) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+      return ph <= pl;
+    };
+  }
+  if (t === "TorusGeometry" && full(P.arc)) return (p) => { const q = Math.hypot(p.x, p.y) - P.radius; return q * q + p.z * p.z < P.tube * P.tube; };
+  // a lathe is a solid only if it closes on its axis at one end at least (a
+  // hull with a nose); an open bell or tube is a thin shell, not a solid
+  const latheSolid = t === "LatheGeometry" && full(P.phiLength) && P.points && P.points.length > 1 &&
+    Math.min(P.points[0].x, P.points[P.points.length - 1].x) < 0.05 * Math.max(...P.points.map((q) => q.x));
+  if (latheSolid) {
+    const pts = P.points;
+    return (p) => {
+      const rr = Math.hypot(p.x, p.z);
+      let best = -1;
+      for (let i = 0; i < pts.length - 1; i++) {
+        const a = pts[i], b = pts[i + 1];
+        if ((p.y - a.y) * (p.y - b.y) > 0 || a.y === b.y) continue;
+        best = Math.max(best, a.x + (b.x - a.x) * (p.y - a.y) / (b.y - a.y));
+      }
+      return rr < best;
+    };
+  }
+  if (t === "ExtrudeGeometry" && P.shapes) return extrudeSolid(P).inside;
+  return null;
+}
+
+function sealJoints(root, seal, detail, style = "fillet") {
+  root.updateMatrixWorld(true);
+  const unitOf = (o) => { let u = o; while (u && u !== root && !u.userData.dynamic) u = u.parent; return u || root; };
+  const parts = [];
+  root.traverse((o) => {
+    if (!o.isMesh || o.isInstancedMesh || !o.geometry || !o.geometry.attributes.position) return;
+    const m = Array.isArray(o.material) ? o.material[0] : o.material;
+    if (!m || m.blending === THREE.AdditiveBlending || m.transparent || !o.visible) return;
+    const inside = solidTest(o.geometry);
+    if (!inside) return;
+    const box = new THREE.Box3().setFromObject(o);
+    const pos = o.geometry.attributes.position, idx = o.geometry.index;
+    // the mesh's edges (each once), in world space
+    const world = new Float32Array(pos.count * 3), v = new THREE.Vector3();
+    for (let i = 0; i < pos.count; i++) { v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld); world[i * 3] = v.x; world[i * 3 + 1] = v.y; world[i * 3 + 2] = v.z; }
+    const edges = [], seen = new Set(), tri = idx ? idx.array : null, nTri = (idx ? idx.count : pos.count) / 3;
+    for (let f = 0; f < nTri; f++) for (let e = 0; e < 3; e++) {
+      const a = tri ? tri[f * 3 + e] : f * 3 + e, b = tri ? tri[f * 3 + (e + 1) % 3] : f * 3 + (e + 1) % 3;
+      const key = a < b ? a * 1e7 + b : b * 1e7 + a;
+      if (seen.has(key)) continue; seen.add(key); edges.push(a, b);
+    }
+    parts.push({ o, mat: m, inside, box, world, edges, unit: unitOf(o), radius: box.getSize(v).length() / 2,
+      nMat: new THREE.Matrix3().getNormalMatrix(o.matrixWorld),
+      thick: inside.thick * o.matrixWorld.getMaxScaleOnAxis(),
+      inv: new THREE.Matrix4().copy(o.matrixWorld).invert() });
+  });
+  const modelR = new THREE.Box3().setFromObject(root).getSize(new THREE.Vector3()).length() / 2;
+  const a = new THREE.Vector3(), b = new THREE.Vector3(), m = new THREE.Vector3(), l = new THREE.Vector3();
+  const e0 = new THREE.Vector3(), e1 = new THREE.Vector3(), seg3 = new THREE.Line3(), cp = new THREE.Vector3();
+  const step = modelR / 60;                                   // the longest piece of an edge tested at once
+  // does the edge pass through the overlap box (not just have an end in it)?
+  const ovLine = (box, p0, p1) => box.containsPoint(p0) || box.containsPoint(p1) ||
+    box.containsPoint(seg3.set(p0, p1).closestPointToPoint(box.getCenter(cp), true, cp)) || box.distanceToPoint(cp) < 1e-6;
+  const isIn = (P, w) => P.inside(l.copy(w).applyMatrix4(P.inv));
+  // a part's outward surface normal at a world point (the shape's own, see solidNormalOf)
+  const surfaceNormal = (P, w, out) => P.inside.normal(l.copy(w).applyMatrix4(P.inv), out).applyMatrix3(P.nMat).normalize();
+  // the strips are seen from both sides (a twist at a corner must not vanish):
+  // one double-sided copy per material, shared, so merging still groups them
+  const twoSided = new Map();
+  const sideOf = (mat) => { if (!twoSided.has(mat)) { const c = mat.clone(); c.side = THREE.DoubleSide; twoSided.set(mat, c); } return twoSided.get(mat); };
+  let beads = 0;
+  for (let i = 0; i < parts.length; i++) for (let j = i + 1; j < parts.length; j++) {
+    const A = parts[i], B = parts[j];
+    if (A.unit !== B.unit || !A.box.intersectsBox(B.box)) continue;
+    // the meeting line: A's edges through B's solid, and B's through A's
+    const pts = [];
+    for (const [S, T] of [[A, B], [B, A]]) {
+      const ov = S.box.clone().intersect(T.box).expandByScalar(1e-3);
+      for (let e = 0; e < S.edges.length; e += 2) {
+        e0.fromArray(S.world, S.edges[e] * 3); e1.fromArray(S.world, S.edges[e + 1] * 3);
+        if (!ovLine(ov, e0, e1)) continue;
+        // a long edge can cross the other surface in its middle with both ends
+        // on the same side (a fin's root along a hull): test it in short pieces
+        const pieces = Math.max(1, Math.min(64, Math.ceil(e0.distanceTo(e1) / step)));
+        let ia = isIn(T, e0);
+        for (let q = 0; q < pieces; q++) {
+        a.lerpVectors(e0, e1, q / pieces); b.lerpVectors(e0, e1, (q + 1) / pieces);
+        const ib = isIn(T, b);
+        if (ia === ib) continue;
+        const iaWas = ia; ia = ib;
+        let lo = 0, hi = 1;                                   // the crossing, by halving
+        for (let s = 0; s < 10; s++) { const mid = (lo + hi) / 2; m.lerpVectors(a, b, mid); if (isIn(T, m) === iaWas) lo = mid; else hi = mid; }
+        const hit = new THREE.Vector3().lerpVectors(a, b, (lo + hi) / 2);
+        // only where the two surfaces meet at an angle: parts that run on
+        // into each other (a ring's overlapping segments) need no sealing
+        // both surfaces' directions here, from the shapes (the fillet curves from one to the other)
+        const na = surfaceNormal(A, hit, new THREE.Vector3()), nb = surfaceNormal(B, hit, new THREE.Vector3());
+        if (Math.abs(na.dot(nb)) > 0.82) continue;
+        pts.push({ p: hit, na, nb });
+        }
+      }
+    }
+    if (pts.length < 3) continue;
+    const big = A.radius >= B.radius ? A : B;
+    // the bead: a third of the thinner part's thickness (a fine trim gets a
+    // fine bead), never more than ~1 % of the model; finer than ~0.03 % of it: none
+    const rad = Math.min(seal * 0.35 * Math.min(A.thick, B.thick), seal * 0.012 * modelR);
+    if (rad < modelR * 0.0003) continue;
+    // merge points closer than a bead's width, chain the rest into curves
+    const merged = [];
+    for (const p of pts) if (!merged.some((q) => q.p.distanceToSquared(p.p) < rad * rad * 0.25)) merged.push(p);
+    if (merged.length < 3) continue;
+    const near = merged.map((p) => { let d = Infinity; for (const q of merged) if (q !== p) d = Math.min(d, p.p.distanceTo(q.p)); return d; }).sort((x, y) => x - y);
+    const gap = Math.max(near[Math.floor(near.length / 2)] * 3.5, rad * 3);
+    const left = merged.slice();
+    while (left.length >= 3) {
+      const chain = [left.pop()];
+      for (const back of [false, true]) for (;;) {             // grow from both ends
+        const end = back ? chain[0].p : chain[chain.length - 1].p;
+        let bi = -1, bd = gap;
+        const ec = back ? chain[0] : chain[chain.length - 1];
+        for (let k = 0; k < left.length; k++) {
+          if (left[k].na.dot(ec.na) < 0.5 || left[k].nb.dot(ec.nb) < 0.5) continue;
+          const d = left[k].p.distanceTo(end); if (d < bd) { bd = d; bi = k; }
+        }
+        if (bi < 0) break;
+        const p = left.splice(bi, 1)[0];
+        if (back) chain.unshift(p); else chain.push(p);
+      }
+      if (chain.length < 3) continue;
+      const closed = chain[0].p.distanceTo(chain[chain.length - 1].p) < gap;
+      const inv = new THREE.Matrix4().copy(A.unit.matrixWorld).invert();
+      const sc = A.unit.matrixWorld.getMaxScaleOnAxis() || 1;
+      let geo;
+      if (style === "bead") {
+        const curve = new THREE.CatmullRomCurve3(chain.map((c) => c.p.clone().applyMatrix4(inv)), closed, "centripetal");
+        geo = new THREE.TubeGeometry(curve, Math.min(400, Math.max(8, chain.length * 3)), rad / sc, Math.max(4, Math.round(6 * detail)), closed);
+      } else {
+        geo = filletGeometry(chain, closed, Math.min(rad * 2.2, 0.5 * Math.min(A.thick, B.thick)), Math.max(2, Math.round(4 * detail)), inv);
+        if (!geo) continue;
+      }
+      const bead = shadowed(new THREE.Mesh(geo, style === "bead" ? big.mat : sideOf(big.mat)));
+      bead.userData.seal = true;
+      A.unit.add(bead);
+      beads++;
+    }
+  }
+  return beads;
+}
+
+// A fillet along a chain of meeting points { p, na, nb } (world space; na,
+// nb: the two surfaces' outward normals there): at each point a curve from
+// w along surface A to w along surface B, bending through the corner (a
+// quadratic Bézier with its control point in the corner) — concave, and
+// tangent to both surfaces at its edges, so they flow into each other.
+// Built in the frame `inv` takes world points to. null if it degenerates.
+function filletGeometry(chain, closed, w, steps, inv) {
+  const n = chain.length;
+  // smooth the line and the normals a little (the points come from mesh edges)
+  const sm = chain.map((c, i) => {
+    const a = chain[closed ? (i - 1 + n) % n : Math.max(0, i - 1)], b = chain[closed ? (i + 1) % n : Math.min(n - 1, i + 1)];
+    return { p: c.p.clone().multiplyScalar(2).add(a.p).add(b.p).multiplyScalar(0.25),
+      na: c.na.clone().multiplyScalar(2).add(a.na).add(b.na).normalize(), nb: c.nb.clone().multiplyScalar(2).add(a.nb).add(b.nb).normalize() };
+  });
+  const rows = steps + 1, pos = [], nor = [], uv = [], idx = [];
+  const dA = new THREE.Vector3(), dB = new THREE.Vector3(), q = new THREE.Vector3(), nn = new THREE.Vector3(), lift = new THREE.Vector3();
+  const nm = new THREE.Matrix3().getNormalMatrix(inv);
+  let ok = 0;
+  for (let i = 0; i < n; i++) {
+    const { p, na, nb } = sm[i];
+    // along A, away from B (B's outward normal, flattened onto A) — and the other way round
+    dA.copy(nb).addScaledVector(na, -nb.dot(na)); dB.copy(na).addScaledVector(nb, -na.dot(nb));
+    if (dA.lengthSq() < 1e-8 || dB.lengthSq() < 1e-8) { dA.set(0, 0, 0); dB.set(0, 0, 0); } else { dA.normalize(); dB.normalize(); ok++; }
+    lift.copy(na).add(nb).normalize().multiplyScalar(w * 0.015);   // a hair off the surfaces: no z-fighting at its edges
+    for (let j = 0; j < rows; j++) {
+      const s = j / steps, k0 = (1 - s) * (1 - s), k2 = s * s;
+      q.copy(p).addScaledVector(dA, w * k0).addScaledVector(dB, w * k2).add(lift).applyMatrix4(inv);
+      nn.copy(na).multiplyScalar(1 - s).addScaledVector(nb, s).normalize().applyMatrix3(nm).normalize();
+      pos.push(q.x, q.y, q.z); nor.push(nn.x, nn.y, nn.z); uv.push(i / (n - 1), s);
+    }
+  }
+  if (ok < 3) return null;
+  const segs = closed ? n : n - 1;
+  for (let i = 0; i < segs; i++) {
+    const a0 = i * rows, b0 = ((i + 1) % n) * rows;
+    for (let j = 0; j < steps; j++) idx.push(a0 + j, b0 + j, a0 + j + 1, b0 + j, b0 + j + 1, a0 + j + 1);
+  }
+  // face the strip the way its normals point: a vote of all its triangles
+  // (one could be degenerate)
+  const v0 = new THREE.Vector3(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3(), fn = new THREE.Vector3(), vn = new THREE.Vector3();
+  let vote = 0;
+  for (let t = 0; t < idx.length; t += 3) {
+    v0.fromArray(pos, idx[t] * 3); v1.fromArray(pos, idx[t + 1] * 3).sub(v0); v2.fromArray(pos, idx[t + 2] * 3).sub(v0);
+    vote += fn.crossVectors(v1, v2).dot(vn.fromArray(nor, idx[t] * 3));
+  }
+  if (vote < 0) for (let t = 0; t < idx.length; t += 3) { const x = idx[t + 1]; idx[t + 1] = idx[t + 2]; idx[t + 2] = x; }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3));
+  g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx);
+  return g;
+}
+
+// Engines: a nacelle with a gold intake ring, a nose cone, a lathed bell,
+// a glowing throat, an optional heat ring, a shader plume and a glow
+// sprite. Built along local +Y and turned so the intake faces +X and the
+// exhaust -X. One set per ship: add() builds an engine, update() drives
+// every plume/glow from the throttle. `plumeMat` shares one plume material
+// between engines (else each gets its own, e.g. per color).
+function makeEngineSet(M, U, seg) {
+  const G = glowTextures(), engines = [];
+  return {
+    add(parent, pos, { radius, length, color, plumeMat = null, heatMat = null, taper = 1.08, intake = 0.12,
+                       cone = [0.55, 1.2], bell = [0.42, 1.2], plume = 7, glow = 4.2, res = 1 }) {
+      const r = radius, sg = (n, min) => seg(n * res, min);
+      const g = new THREE.Group();
+      g.add(shadowed(new THREE.Mesh(new THREE.CylinderGeometry(r, r * taper, length, sg(40, 8), 1), M.engine)));
+      const ring = shadowed(new THREE.Mesh(new THREE.TorusGeometry(r * 0.98, r * intake, sg(16, 4), sg(48, 8)), M.gold));
+      ring.rotation.x = Math.PI / 2; ring.position.y = length / 2; g.add(ring);
+      const nose = shadowed(new THREE.Mesh(new THREE.ConeGeometry(r * cone[0], r * cone[1], sg(32, 6)), M.dark));
+      nose.position.y = length / 2 + r * 0.3; g.add(nose);
+      const pts = [], steps = sg(16, 3);
+      for (let i = 0; i <= steps; i++) { const t = i / steps; pts.push(new THREE.Vector2(r * (0.72 + bell[0] * t * t), -t * r * bell[1])); }
+      const bellMesh = shadowed(new THREE.Mesh(new THREE.LatheGeometry(pts, sg(48, 8)), M.bell));
+      bellMesh.position.y = -length / 2; g.add(bellMesh);
+      const throat = new THREE.Mesh(new THREE.CircleGeometry(r * 0.72, sg(40, 8)), M.throat);
+      throat.rotation.x = Math.PI / 2; throat.position.y = -length / 2 - 0.02; g.add(throat);
+      if (heatMat) {
+        const heat = new THREE.Mesh(new THREE.TorusGeometry(r * 1.05, r * 0.05, sg(8), sg(48, 8)), heatMat);
+        heat.rotation.x = Math.PI / 2; heat.position.y = -length / 2 - r * 0.3; g.add(heat);
+      }
+      const plumeLen = r * plume;
+      const plumeGeo = new THREE.CylinderGeometry(r * 0.95, r * 0.08, plumeLen, sg(32, 8), sg(24, 4), true); // wide at the nozzle
+      plumeGeo.translate(0, -plumeLen / 2, 0);
+      const plumeMesh = new THREE.Mesh(plumeGeo, plumeMat || makePlumeMaterial(color, U));
+      plumeMesh.position.y = -length / 2 - r * 0.2;
+      plumeMesh.userData.dynamic = true; // toggled on/off: never merged (see mergeStatic)
+      g.add(plumeMesh);
+      const sprite = additiveSprite(G.engine, color);
+      sprite.scale.setScalar(r * glow); sprite.position.y = -length / 2 - r * 0.4; g.add(sprite);
+      engines.push({ sprite, plume: plumeMesh, base: r * glow });
+      g.rotation.z = -Math.PI / 2; // local +y (intake) -> +x (forward), exhaust toward -x
+      g.position.copy(pos);
+      parent.add(g);
+      return g;
+    },
+    update(t, power) {
+      for (const e of engines) {
+        e.sprite.scale.setScalar(e.base * (0.4 + 0.6 * power) * (0.95 + 0.05 * Math.sin(t * 40)));
+        e.plume.visible = power > 0.02;
+      }
+    },
+  };
+}
+
+// Exhaust particles: recycled Points streaming back (-X) from each emitter
+// { pos: [x, y, z], spread, length }, spread growing with age; `rate` is
+// [base, random] lifetimes per second, `grow` how much the cone widens.
+// update(dt, power, on, offsetY) — offsetY follows a bobbing body.
+function makeExhaust(parent, U, { count, seed, emitters, rate = [0.9, 0.6], grow = 1.4 }) {
+  const geo = new THREE.BufferGeometry();
+  const pos = new Float32Array(count * 3), life = new Float32Array(count), pseed = new Float32Array(count);
+  const rand = rng(seed);
+  for (let i = 0; i < count; i++) { life[i] = rand(); pseed[i] = rand(); }
+  geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute("life", new THREE.BufferAttribute(life, 1));
+  const points = new THREE.Points(geo, makeParticleMaterial(U));
+  points.frustumCulled = false;
+  parent.add(points);
+  return {
+    update(dt, power, on, offsetY = 0) {
+      points.visible = on && power > 0.05;
+      if (!points.visible) return;
+      for (let i = 0; i < count; i++) {
+        life[i] += dt * (rate[0] + pseed[i] * rate[1]);
+        if (life[i] >= 1) life[i] -= 1;
+        const e = emitters[i % emitters.length], l = life[i], spread = e.spread * (0.3 + l * grow), a = pseed[i] * 50 + i;
+        pos[i * 3] = e.pos[0] - l * e.length * (0.3 + 0.7 * power);
+        pos[i * 3 + 1] = e.pos[1] + Math.cos(a) * spread * pseed[i] + offsetY;
+        pos[i * 3 + 2] = e.pos[2] + Math.sin(a) * spread * pseed[i];
+      }
+      geo.attributes.position.needsUpdate = true;
+      geo.attributes.life.needsUpdate = true;
+    },
+  };
+}
+
+// Navigation lights: glow sprites, "steady" (gentle pulse) or "strobe"
+// (short flash; `phase` offsets it). defs: [{ color, pos: [x, y, z], size, kind, phase }]
+// Each light is a small lens in its colour (always there) and a glow
+// sprite; switched off (setVisible(false), offline, damage flicker) the
+// glow fades out in ~0.15 s and the lens goes dark — the fitting stays.
+function makeNavLights(parent, defs) {
+  const G = glowTextures();
+  // lenses that blink alike share a material (and so merge into one mesh in the game's build)
+  const lensMats = new Map();
+  const lensMat = (d) => {
+    const key = d.color + "/" + (d.kind || "steady") + "/" + (d.kind === "strobe" ? d.phase || 0 : 0);
+    if (!lensMats.has(key)) {
+      const c = new THREE.Color(d.color);
+      lensMats.set(key, { mat: new THREE.MeshStandardMaterial({ color: c.clone().multiplyScalar(0.18), emissive: c, emissiveIntensity: 0, roughness: 0.18, metalness: 0.2 }),
+        kind: d.kind || "steady", phase: d.phase || 0 });
+    }
+    return lensMats.get(key);
+  };
+  const lights = defs.map((d) => {
+    const s = additiveSprite(G.nav, d.color);
+    s.position.set(d.pos[0], d.pos[1], d.pos[2]); s.scale.setScalar(d.size || 0.6);
+    parent.add(s);
+    // the lens: dark tinted glass when off, lit from inside when on
+    const lens = new THREE.Mesh(new THREE.SphereGeometry((d.size || 0.6) * 0.11, 12, 8), lensMat(d).mat);
+    lens.position.copy(s.position);
+    lens.userData.navLens = true;
+    parent.add(lens);
+    return { s, kind: d.kind || "steady", phase: d.phase || 0 };
+  });
+  let on = true, level = 1, last = null;
+  return {
+    update(t) {
+      const dt = last === null ? 0 : Math.max(0, Math.min(0.1, t - last)); last = t;
+      level += ((on ? 1 : 0) - level) * Math.min(1, dt * 14);
+      const blink = (n) => n.kind === "strobe" ? (((t * 0.8 + n.phase) % 1) < 0.06 ? 1 : 0.05) : 0.75 + 0.25 * Math.sin(t * 3);
+      for (const n of lights) { n.s.material.opacity = blink(n) * level; n.s.visible = level > 0.01; }
+      for (const m of lensMats.values()) m.mat.emissiveIntensity = blink(m) * level * 2.2;
+    },
+    setVisible(v) { on = !!v; },
+  };
+}
+
+// Timed shots for act("fire"): schedule([{ delay, ...data }]) queues them
+// relative to the current time; run(t, fn) calls fn(shot) for every one due.
+function makeShotQueue() {
+  const q = [];
+  let now = 0;
+  return {
+    schedule(shots) { for (const sh of shots) q.push({ ...sh, at: now + sh.delay }); },
+    run(t, fn) { now = t; while (q.length && q[0].at <= t) fn(q.shift()); },
+  };
+}
+
+// Offline state for a ship's own parts: set(on) from act("offline"),
+// update(dt) eases a 0..1 "online" level (1 = running) that the ship
+// multiplies its glows, spins and emissive strengths by.
+function makeOnlineFader(rate = 2) {
+  let off = false, level = 1;
+  return {
+    set(on) { off = !!on; },
+    get offline() { return off; },
+    update(dt) { level += ((off ? 0 : 1) - level) * Math.min(1, dt * rate); return level; },
+  };
+}
+
+// =====================================================================
+// SHIP DEFINITIONS
+// One entry per ship type:
+//   id        stable key used by buildShipModel(id)
+//   name      display name
+//   camera    suggested viewer camera position (viewer only)
+//   assets()  creates + caches this type's textures/materials (once)
+//   build(detail) -> { group, update(t, dt, opts), setLights(on) } (+ optional
+//             actions/act, and setDamage(d) for damage stages of its own)
+// `detail` (0.2 .. 2) scales every segment count through seg(), so the
+// same definition serves both a close-up hero model and cheap swarm LODs.
+// The definitions live in js/shipkit/ships/<id>.js, one file per ship,
+// loaded after this one; each pushes its entry here (ShipKit.SHIP_DEFS)
+// and takes what it needs from ShipKit._ (the building blocks and helpers
+// below). To add a ship: a new file of the same shape, added after the
+// others on every page that loads ShipKit (docs/ship.md, "Adding a ship").
+// =====================================================================
+const SHIP_DEFS = [];
+
+// =====================================================================
+// PUBLIC API
+// =====================================================================
+
+const FIGURE_NAMES = {
+  LatheGeometry: "Lathe (revolved)", BoxGeometry: "Box", SphereGeometry: "Sphere / segment",
+  TorusGeometry: "Torus", ExtrudeGeometry: "Extruded shape", TubeGeometry: "Tube along curve",
+  CylinderGeometry: "Cylinder", ConeGeometry: "Cone", CircleGeometry: "Circle",
+  IcosahedronGeometry: "Icosahedron", OctahedronGeometry: "Octahedron", DodecahedronGeometry: "Dodecahedron",
+  TorusKnotGeometry: "Torus knot", EdgesGeometry: "Edges (wire cage)", PlaneGeometry: "Plane",
+};
+
+// The action buttons every ship shows, in this order. A ship enables the
+// ones it implements by listing them in its build() result's `actions`
+// (it may relabel them, e.g. "FIRE CANNONS"); the rest show up disabled,
+// so a ship with no extra animation for something simply doesn't list it.
+// Ship-specific extra actions (any other id) are appended after these.
+// "offline" and "destroy" are implemented here for every ship; a
+// definition can switch the shared features off with
+// features: { offline: false, damage: false, destroy: false }
+// (destroy needs damage: it reuses its smoke and sparks).
+const STANDARD_ACTIONS = [
+  { id: "fire", label: "FIRE", kind: "trigger" },
+  { id: "scan", label: "SCAN", kind: "trigger" },
+  { id: "print", label: "PRINT", kind: "trigger" },
+  { id: "offline", label: "OFFLINE", kind: "toggle" },
+  { id: "destroy", label: "DESTROY", kind: "trigger" },
+];
+
+// Merge the static meshes of a built ship to cut draw calls: meshes
+// sharing a material are baked into one geometry, per "unit" — the root
+// plus every object marked userData.dynamic (anything the ship animates
+// by transform or toggles on/off), each merged in its own local space so
+// its animation still works. A mesh with children, an instanced mesh, or
+// a material used only once is left alone.
+function mergeStatic(root) {
+  root.updateMatrixWorld(true);
+  const units = [root];
+  root.traverse((o) => { if (o !== root && o.userData.dynamic) units.push(o); });
+  for (const unit of units) {
+    const inv = new THREE.Matrix4().copy(unit.matrixWorld).invert();
+    const byMat = new Map();
+    (function walk(o) {
+      for (const c of o.children) {
+        if (c.userData.dynamic) continue;                 // its own unit
+        if (c.isMesh && !c.isInstancedMesh && !c.children.length && !Array.isArray(c.material)
+            && c.geometry && c.geometry.attributes.position) {
+          if (!byMat.has(c.material)) byMat.set(c.material, []);
+          byMat.get(c.material).push(c);
+        }
+        walk(c);
+      }
+    })(unit);
+    for (const [mat, meshes] of byMat) {
+      if (meshes.length < 2) continue;
+      const parts = meshes.map((m) => {
+        const g = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone();
+        g.applyMatrix4(new THREE.Matrix4().multiplyMatrices(inv, m.matrixWorld));
+        return g;
+      });
+      const names = ["position", "normal", "uv"].filter((n) => parts.some((g) => g.attributes[n]));
+      const total = parts.reduce((a, g) => a + g.attributes.position.count, 0);
+      const merged = new THREE.BufferGeometry();
+      for (const n of names) {
+        const size = n === "uv" ? 2 : 3, out = new Float32Array(total * size);
+        let off = 0;
+        for (const g of parts) {
+          const a = g.attributes[n];
+          if (a) out.set(a.array.subarray(0, a.count * size), off);  // missing uv stays 0
+          off += g.attributes.position.count * size;
+        }
+        merged.setAttribute(n, new THREE.BufferAttribute(out, size));
+      }
+      parts.forEach((g) => g.dispose());
+      const mesh = new THREE.Mesh(merged, mat);
+      mesh.castShadow = mesh.receiveShadow = true;
+      unit.add(mesh);
+      for (const m of meshes) { m.parent.remove(m); m.geometry.dispose(); }
+    }
+  }
+}
+
+// Build one ship model. Returns a model handle:
+//   { id, detail, group, update(t, dt, opts), setLights(on), size, radius }
+// group: THREE.Group, origin at the ship's center, nose along +X, up +Y.
+// Options:
+//   detail   0.2 .. 2, scales every segment count
+//   merge    true: merge static meshes (far fewer draw calls — use in the game)
+//   fxRoot   an Object3D (e.g. the scene) for effects that leave the ship
+//   envMap   environment map for the ship's reflective materials
+// round, seal (0..1): rounded edges and sealed joints (see SHAPING; sealStyle
+// "fillet" — the joint rounded — or "bead" — a line of sealant); 0 = the
+// model exactly as its definition builds it (the game's default).
+// labels { name, sub }: the lettering on a hull that has any (the codewing,
+// the station); omitted = the ship's own.
+function buildShipModel(id, { detail = 1, merge = false, fxRoot = null, envMap = null, round = 0, seal = 0, sealStyle = "fillet", labels = null } = {}) {
+  const def = SHIP_DEFS.find((d) => d.id === id);
+  if (!def) throw new Error("ShipKit: unknown ship id " + id);
+  const env = { fxRoot, owned: [], labels };
+  // arc segments: more for a stronger rounding and a higher detail (each box costs (2k+1)² quads a face)
+  const k = Math.max(1, Math.min(3, Math.round(round * 3 * detail)));
+  const built = withRounding(round, k, () => def.build(detail, env));
+  if (seal > 0) sealJoints(built.group, seal, detail, sealStyle);
+  built.group.userData.shipkit = true; // a host's color management can skip ShipKit models
+  if (merge) mergeStatic(built.group);
+  if (envMap) built.group.traverse((o) => {
+    for (const m of Array.isArray(o.material) ? o.material : o.material ? [o.material] : []) {
+      if (m.isMeshStandardMaterial && m.envMap !== envMap) { m.envMap = envMap; m.needsUpdate = true; }
+    }
+  });
+  // Size of the solid hull only: engine plumes, glow sprites and particles
+  // are effects and would inflate the box.
+  built.group.updateMatrixWorld(true);
+  const box = new THREE.Box3();
+  built.group.traverse((o) => {
+    if (!o.isMesh || (o.material && o.material.blending === THREE.AdditiveBlending)) return;
+    box.union(new THREE.Box3().setFromObject(o));
+  });
+  const size = box.getSize(new THREE.Vector3()), radius = size.length() / 2;
+
+  // Everything below is shared by every ship type: offline mode, damage
+  // effects and flickering lights, on top of the ship's own actions.
+  const features = { offline: true, damage: true, destroy: true, ...(def.features || {}) };
+  if (!features.damage) features.destroy = false;
+  const fx = features.damage ? createDamageFx(built.group, radius)
+    : { damage: 0, setDamage() {}, update() {} };
+  const own = built.actions || [];
+  const actions = STANDARD_ACTIONS.map((a) => {
+    const mine = own.find((x) => x.id === a.id);
+    const shared = a.id === "offline" || a.id === "destroy";
+    return { ...a, ...(mine || {}), enabled: shared ? features[a.id] : !!mine };
+  }).concat(own.filter((x) => !STANDARD_ACTIONS.some((a) => a.id === x.id)).map((x) => ({ kind: "trigger", ...x, enabled: true })));
+  const st = { offline: false, lights: true, shown: true, flickerT: 0 };
+  const showLights = (on) => { if (on !== st.shown) { st.shown = on; built.setLights(on); } };
+  const model = {
+    id, detail, group: built.group, size, radius, _owned: env.owned,
+    // [{ id, label, kind: "trigger" | "toggle", enabled }] — see STANDARD_ACTIONS
+    actions,
+    damageEnabled: features.damage,
+    get offline() { return st.offline; },
+    get destroyed() { return !!fx.destroyed; },
+    get damage() { return fx.damage; },
+    update(t, dt, opts = {}) {
+      const dead = st.offline || !!fx.destroyed;
+      const power = dead ? 0 : (opts.power === undefined ? 1 : opts.power);
+      built.update(t, dt, { ...opts, power });
+      // lights: off when offline; flicker when badly damaged
+      if (!st.lights || dead) showLights(false);
+      else if (fx.damage > 0.4) {
+        if ((st.flickerT -= dt) <= 0) {
+          st.flickerT = 0.04 + Math.random() * 0.3;
+          showLights(Math.random() > fx.damage * 0.5);
+        }
+      } else showLights(true);
+      fx.update(t, dt, opts.particles !== false);
+    },
+    setLights(on) { st.lights = on; },
+    // Trigger an action, or set a toggle (on = true/false). "offline" is
+    // handled here and passed on so the ship can dim its own parts.
+    act(actionId, on) {
+      const a = actions.find((x) => x.id === actionId);
+      if (!a || !a.enabled || fx.destroyed) return;  // not available / nothing left to act
+      if (actionId === "destroy") {                   // the ship powers down as it blows apart
+        if (built.act) built.act("offline", true);
+        if (built.setDamage) built.setDamage(1);
+        fx.explode();
+        return;
+      }
+      if (actionId === "offline") st.offline = on === undefined ? !st.offline : !!on;
+      if (built.act) built.act(actionId, actionId === "offline" ? st.offline : on);
+    },
+    // 0 = pristine, 1 = wrecked; a ship with damage stages of its own
+    // (built.setDamage, e.g. the station's breach) gets it too
+    setDamage(d) {
+      if (fx.destroyed) return;
+      fx.setDamage(clamp(d, 0, 1));
+      if (built.setDamage) built.setDamage(clamp(d, 0, 1));
+    },
+  };
+  return model;
+}
+
+// Free a model's GPU resources: all geometries + per-model materials.
+// Shared (cached) materials and all textures are kept for reuse.
+function disposeShipModel(model) {
+  if (model.group.parent) model.group.parent.remove(model.group);
+  for (const o of model._owned || []) {          // effects placed outside the ship (fxRoot)
+    if (o.parent) o.parent.remove(o);
+    o.traverse((c) => { if (c.geometry) c.geometry.dispose(); if (c.material && !sharedMaterials.has(c.material)) c.material.dispose(); });
+  }
+  model.group.traverse((o) => {
+    if (o.geometry) o.geometry.dispose();
+    const mats = Array.isArray(o.material) ? o.material : o.material ? [o.material] : [];
+    for (const m of mats) if (!sharedMaterials.has(m)) m.dispose();
+  });
+}
+
+// Technical statistics of a built model (object / figure / triangle counts,
+// materials, shaders, textures + GPU memory estimate).
+function modelStats(root) {
+  const st = { objects: 0, meshes: 0, instanced: 0, copies: 0, sprites: 0, lines: 0, points: 0, particles: 0,
+               triangles: 0, vertices: 0, figures: {}, materials: new Set(), shaders: 0, textures: new Set() };
+  root.traverse((o) => {
+    if (o === root || o.type === "Group") return;
+    st.objects++;
+    const k = o.isInstancedMesh ? o.count : 1;
+    if (o.isInstancedMesh) { st.instanced++; st.copies += o.count; }
+    else if (o.isMesh) st.meshes++;
+    else if (o.isSprite) st.sprites++;
+    else if (o.isLineSegments || o.isLine) st.lines++;
+    else if (o.isPoints) { st.points++; st.particles += o.geometry.attributes.position.count; }
+    if (o.geometry && !o.isSprite && !o.isPoints) {
+      const g = o.geometry, name = FIGURE_NAMES[g.type] || g.type;
+      st.figures[name] = (st.figures[name] || 0) + k;
+      st.vertices += g.attributes.position.count * k;
+      if (o.isMesh) st.triangles += (g.index ? g.index.count / 3 : g.attributes.position.count / 3) * k;
+    }
+    for (const m of Array.isArray(o.material) ? o.material : o.material ? [o.material] : []) {
+      st.materials.add(m);
+      for (const key of ["map", "roughnessMap", "bumpMap", "emissiveMap", "metalnessMap", "normalMap"]) if (m[key]) st.textures.add(m[key]);
+    }
+  });
+  st.shaders = [...st.materials].filter((m) => m.isShaderMaterial).length;
+  const images = new Set([...st.textures].map((t) => t.image));
+  st.texCount = images.size;
+  st.texMB = [...images].reduce((a, im) => a + (im ? im.width * im.height * 4 * 4 / 3 : 0), 0) / 1048576; // RGBA8 + mips
+  return st;
+}
+
+// The labs' reflection sky: an equirectangular nebula with stars, a warm
+// sun (gives metal a strong highlight) and a cool rim source. The ship and
+// body labs use it as their sky and environment; the game uses it as the
+// environment map so its ships and planets are lit like in the labs.
+function makeSpaceSky(w = 2048, h = 1024) {
+  const rand = rng(11);
+  const [c, ctx] = canvas(w, h);
+  const n1 = fbm(rand, 6, 3, 6), n2 = fbm(rand, 3, 2, 5);
+  paintPixels(ctx, w, h, (u, v) => {
+    const a = n1(u, v), b = n2(u, v);
+    const neb = Math.pow(clamp((a - 0.42) * 2.4, 0, 1), 2.2);
+    const neb2 = Math.pow(clamp((b - 0.48) * 2.6, 0, 1), 2);
+    const lat = 1 - Math.abs(v - 0.5) * 1.6;
+    return [
+      clamp(4 + neb * 70 * lat + neb2 * 90, 0, 255),
+      clamp(6 + neb * 40 * lat + neb2 * 30, 0, 255),
+      clamp(16 + neb * 150 * lat + neb2 * 110, 0, 255),
+    ];
+  });
+  for (let i = 0; i < 2600; i++) {
+    const x = rand() * w, y = rand() * h, r = rand() < 0.97 ? rand() * 0.9 + 0.3 : rand() * 1.8 + 1;
+    const t = rand();
+    ctx.fillStyle = t < 0.2 ? "#ffd9a8" : t < 0.4 ? "#b8c8ff" : "#ffffff";
+    ctx.globalAlpha = 0.4 + rand() * 0.6; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  const sun = (x, y, r, col) => {
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, "#ffffff"); g.addColorStop(0.08, col); g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g; ctx.fillRect(x - r, y - r, r * 2, r * 2);
+  };
+  sun(w * 0.18, h * 0.36, 260, "rgba(255,190,110,0.85)");
+  sun(w * 0.68, h * 0.55, 200, "rgba(110,140,255,0.6)");
+  const t = new THREE.CanvasTexture(c);
+  t.encoding = THREE.sRGBEncoding;
+  t.mapping = THREE.EquirectangularReflectionMapping;
+  return t;
+}
+
+// A prefiltered environment map from makeSpaceSky(), for scene.environment
+// (or buildShipModel's envMap option).
+// The game builds each model at Setup's geometry detail × this (the ship
+// lab's GAME BUILD too, so the lab shows what the game shows). Other
+// players' units go lower still (the game's own code).
+const GAME_DETAIL = { swarmer: 0.5, haven: 0.7, scribe: 1 };
+
+function makeEnvironment(renderer) {
+  const sky = makeSpaceSky(1024, 512);
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const env = pmrem.fromEquirectangular(sky).texture;
+  sky.dispose(); pmrem.dispose();
+  return env;
+}
+
+// Game wrapper: turns the model to the game's convention (forward = +Z)
+// and scales it to `length` units. Move/rotate `holder`, not model.group.
+function makeGameHolder(model, length) {
+  const holder = new THREE.Group(), inner = new THREE.Group();
+  inner.rotation.y = -Math.PI / 2;                 // +X nose -> +Z forward
+  inner.scale.setScalar(length / model.size.x);
+  inner.add(model.group);
+  holder.add(inner);
+  return holder;
+}
+
+// Generate a ship type's textures and materials ahead of time (the first
+// build costs ~1 s of CPU) — e.g. while a start screen is showing.
+function prewarm(ids) {
+  glowTextures(); fxTextures();
+  for (const id of ids) { const d = SHIP_DEFS.find((x) => x.id === id); if (d) d.assets(); }
+}
+
+return {
+  // the internals the ship files build with (js/shipkit/ships/*.js) — not a public API
+  _: { GOLD, BLUE, additiveSprite, buildShipModel, canvas, clamp, detailHelpers, fxHost, fxTextures, glowTextures, labelKey, makeBoltPool, makeBrushed, makeCoreMaterial, makeEngineSet, makeExhaust, makeGameHolder, makeNavLights, makeOnlineFader, makePlating, makePlumeMaterial, makeScanWave, makeShotQueue, makeSolarCells, mergeStatic, partsOf, rng, shadowed, sharedMaterials, strut, textTexture, trackTextures },
+  SHIP_DEFS, GAME_DETAIL, buildShipModel, disposeShipModel, modelStats, makeGameHolder, prewarm, mergeStatic,
+  makeSpaceSky, makeEnvironment,
+  makeBoltPool, makeScanWave, textTexture, fxTextures, // action/effect helpers for ship defs
+  // building blocks for ship definitions (see "SHIP BUILDING BLOCKS")
+  detailHelpers, partsOf, withRounding, sealJoints, roundedBoxGeometry, roundedCylinderGeometry, makeEngineSet, makeExhaust, makeNavLights, makeShotQueue, makeOnlineFader, makeSolarCells, strut,
+  STANDARD_ACTIONS,
+  allTextures,                      // Set of every generated texture
+  isSharedMaterial: (m) => sharedMaterials.has(m),
+  // lower-level generators, reusable for other game objects:
+  makePlating, makeBrushed, makeGlow,
+  util: { rng, valueNoise, fbm, canvas, paintPixels, clamp },
+};
+})();
