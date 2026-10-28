@@ -138,7 +138,8 @@ export function createHud(root) {
       if (S.threat > 0) warn.textContent = t('hud.torpWarn', { d: Math.round(S.threat) });
       hint.textContent = t('hud.hint', { repair: keys.repair });
       hint.hidden = S.time > 30;                     // controls reminder only at the start of a run
-      if (keys.gun) gunInfo.textContent = t(keys.locked ? (p.sub ? 'hud.scopeOn' : keys.zoom >= 1.5 ? 'hud.binoOn' : 'hud.gunOn') : 'hud.gunClick', { z: keys.zoom.toFixed(1) });
+      if (keys.deck) gunInfo.textContent = t(keys.locked ? (keys.zoom > 1 ? 'hud.deckBino' : 'hud.deckOn') : 'hud.deckClick', { z: keys.zoom.toFixed(1) });
+      else if (keys.gun) gunInfo.textContent = t(keys.locked ? (p.sub ? 'hud.scopeOn' : keys.zoom >= 1.5 ? 'hud.binoOn' : 'hud.gunOn') : 'hud.gunClick', { z: keys.zoom.toFixed(1) });
     },
 
     // Per-frame: banners, feed fade, crosshair, labels, popups, minimap.
