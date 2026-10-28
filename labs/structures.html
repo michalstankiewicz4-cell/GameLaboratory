@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Waterside Structures Lab — jack-up rig, quays, breakwaters | Steel Salvo Labs</title>
+<meta name="description" content="Steel Salvo waterside structures lab: quays (gravity, sheet-pile, piled deck), breakwaters (rock, tetrapods, caissons) and a jack-up drilling rig of the Super 300 class built from code at real scale — triangular hull, three 157 m truss legs with rack-and-pinion jack houses and spud cans, cantilevered drill floor and 49 m derrick, cranes, quarters, helideck, lifeboats — jacked up and down in any water depth.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/Battle/labs/structures.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Waterside Structures Lab — jack-up drilling rig">
+<meta property="og:description" content="A 1:1 jack-up drilling rig built from code: jack it up, skid the cantilever, work the cranes.">
+<meta property="og:url" content="https://michalstankiewicz4-cell.github.io/Battle/labs/structures.html">
+<meta property="og:image" content="https://michalstankiewicz4-cell.github.io/Battle/assets/labs/structures.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="../assets/favicon-32.png">
+<link rel="stylesheet" href="../css/lab-sea.css">
+</head>
+<body class="lab">
+<div id="view"></div>
+<div class="bar">
+  <b>Waterside Structures Lab</b>
+  <select id="structure"></select>
+  <span class="dimtxt" id="status">building…</span>
+  <span class="sp"></span>
+  <a href="warship.html">Ship Lab</a>
+  <a href="water.html">Water lab</a>
+  <a href="../import/battle/labs.html">Labs</a>
+  <a href="../import/battle/index.html">Play the game</a>
+</div>
+<aside class="panel left" id="leftPanel">
+  <h2 id="sName"></h2>
+  <div class="sub" id="sSub"></div>
+  <table class="specs" id="specs"></table>
+  <h3>Reconstruction</h3>
+  <p class="note" id="sNote"></p>
+  <h3>Sources</h3>
+  <ol class="src" id="sources"></ol>
+  <h3>Parts</h3>
+  <div id="parts"></div>
+</aside>
+<aside class="panel right" id="rightPanel">
+  <h3>Site</h3>
+  <div class="row"><span>Water depth</span><input type="range" id="depth" min="4" max="114" step="1"><output id="depthV"></output></div>
+  <div id="paramPanel" hidden>
+  <h3>Structure</h3>
+  <div id="params"></div>
+  <label class="chk" id="moorRow"><input type="checkbox" id="moor"> ORP Błyskawica moored alongside</label>
+  </div>
+  <div id="rigPanel">
+  <h3>Jacking</h3>
+  <div class="btns"><button type="button" id="afloat">Afloat (under tow)</button><button type="button" id="jackup">Jack up</button></div>
+  <div class="status" id="jackStatus"></div>
+  <div class="row"><span>Air gap</span><input type="range" id="air" min="6" max="30" step="0.5"><output id="airV"></output></div>
+  <div class="row"><span>Jacking speed</span><input type="range" id="jspeed" min="1" max="2000" step="1"><output id="jspeedV"></output></div>
+  <h3>Drilling</h3>
+  <div class="row"><span>Cantilever out</span><input type="range" id="canti" min="0" max="18.3" step="0.1"><output id="cantiV"></output></div>
+  <label class="chk"><input type="checkbox" id="cranesWork"> Cranes working (slew and luff)</label>
+  </div>
+  <h3>Camera</h3>
+  <div class="btns" id="cams"></div>
+  <h3>Sea and light</h3>
+  <div class="row"><span>Weather</span><select id="weather"></select><output></output></div>
+  <div class="btns" id="times"></div>
+  <h3>Performance</h3>
+  <div class="stats" id="stats"></div>
+  <p class="note">Drag to orbit, right-drag to pan, wheel to zoom, H hides the panels. Below the surface the view turns into the underwater one.</p>
+</aside>
+<div class="foot">
+  <span id="fps"></span>
+  <span class="sp"></span>
+  <span>Steel Salvo Labs</span>
+</div>
+<script type="module" src="../js/labs/structures.js"></script>
+</body>
+</html>
