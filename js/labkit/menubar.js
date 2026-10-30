@@ -9,7 +9,7 @@
    the top, MENU_H high) and moves each page's top panels down by that much
    (the selectors in OFFSETS — a new lab with a panel at the top adds its
    own there). The labs live in labs/, the tools in tools/; the start
-   screen is labs.html in the root. Not part of the game.
+   screen is index.html in the root.
    ======================================================================= */
 (function () {
 "use strict";
@@ -41,9 +41,17 @@ const LABS = [
   { file: "labs/marine.html", name: "Sea lab", doc: "docs/marine.md", keys: [["W / S, A / D", "drive, steer"], ["Drag / wheel", "camera"]] },
   { file: "labs/creator.html", name: "Creature editor", doc: "docs/life.md", keys: [["Drag a gold point", "shape the spine"], ["Drag a teal point", "slide a pair of legs along it"], ["Wheel on a point", "thicker / thinner"], ["EDIT / PLAY", "handles, or watch it walk"]] },
   { file: "labs/life.html", name: "Life lab", doc: "docs/life.md", keys: [["Drag / wheel", "turn and zoom the camera"], ["STAND / WALK / RUN / T-POSE", "the gaits"], ["🎲 by Face", "another face"], ["FACE", "expressions, LIVELY, TALK, CLOSE-UP"], ["LAYERS", "sneak, sad, angry, nod, shake, wave, look — on top of any gait"]] },
+  { file: "labs/warship.html", name: "Warship lab", doc: "docs/ships-sea/blyskawica.md", keys: [["Drag / wheel", "turn and zoom the camera"]] },
+  { file: "labs/structures.html", name: "Structures lab", doc: "docs/structures.md", keys: [["Drag / wheel", "turn and zoom the camera"]] },
+  { file: "labs/water.html", name: "Water lab", doc: "docs/water.md", keys: [["Drag / wheel", "turn and zoom the camera"]] },
+  { file: "labs/land.html", name: "Land lab", doc: "docs/land.md", keys: [["Drag / wheel", "turn and zoom the camera"]] },
+  { file: "labs/plants.html", name: "Plants lab", doc: "docs/plants.md", keys: [["Drag / wheel", "turn and zoom the camera"]] },
+  { file: "labs/look.html", name: "Look lab", doc: "docs/look.md", keys: [["Drag / wheel", "turn and zoom the camera"]] },
 ];
 const TOOLS = [
   { file: "tools/doctor.html", name: "Model doctor", doc: "docs/doctor.md", keys: [["Click a model, then a finding", "its parts light up red"], ["Drag / wheel", "turn and zoom the view"]] },
+  { file: "tools/doctor-sea.html", name: "Model doctor (sea)", doc: "docs/doctor-sea.md", keys: [["Drag / wheel", "turn and zoom the view"]] },
+  { file: "labs/transform.html", name: "Transformer", doc: "docs/transform.md", keys: [["Drag / wheel", "turn and zoom the camera"]] },
   { file: "tools/kitcheck.html", name: "Kit check", doc: "CLAUDE.md", keys: [] },
   { file: "tools/grainTexture.html", name: "Grain texture", doc: "README.md", keys: [] },
 ];
@@ -181,7 +189,7 @@ function help() {
     link("All the docs", REPO + "README.md", { blank: true }),
     link("What's new in the labs", REPO + "labs/CHANGELOG.md", { blank: true }),
     el("div", "lmSep"),
-    action("About the labs", () => dialog("Swarm Protocol labs", [["What", "the workshops the game's models, worlds and effects are made in"],
+    action("About the labs", () => dialog("GameLaboratory", [["What", "laboratories of models and worlds: space, land and water"],
       ["Labs", "v" + LABS_VERSION], ["Code", "MIT, github.com/michalstankiewicz4-cell/GameLaboratory"]],
       "The labs and the game share the same kits: what you see here is what the game shows.")),
   ];
@@ -189,7 +197,7 @@ function help() {
 
 const bar = el("div"); bar.id = "labMenu";
 const home = el("a", "lmHome"); home.href = ROOT + "index.html"; home.title = "Start screen";
-home.append(el("span", "lmMark"), document.createTextNode("Swarm Labs"));
+home.append(el("span", "lmMark"), document.createTextNode("GameLaboratory"));
 bar.appendChild(home);
 const menus = [["Files", files], ["Options", options], ["Tools", tools], ["Help", help]];
 menus.forEach(([name, make]) => {

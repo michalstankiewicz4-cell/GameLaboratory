@@ -3,22 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Swarm Protocol // Labs</title>
-<meta name="description" content="The labs of Swarm Protocol, a free browser space MMO: the workshops where its ships, planets, star systems, bases and vehicles are made from code, with sliders, in your browser.">
-<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/Space/labs.html">
+<title>GameLaboratory</title>
+<meta name="description" content="Laboratories of models and worlds — space, land and water — built from code in the browser.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Swarm Protocol">
-<meta property="og:title" content="Swarm Protocol Labs: procedural ships, planets and star systems">
-<meta property="og:description" content="The labs of Swarm Protocol, a free browser space MMO: the workshops where its ships, planets, star systems, bases and vehicles are made from code, with sliders, in your browser.">
-<meta property="og:url" content="https://michalstankiewicz4-cell.github.io/Space/labs.html">
-<meta property="og:image" content="https://michalstankiewicz4-cell.github.io/Space/og-image.jpg">
+<meta property="og:site_name" content="GameLaboratory">
+<meta property="og:title" content="GameLaboratory">
+<meta property="og:description" content="Laboratories of models and worlds — space, land and water — built from code in the browser.">
+<meta property="og:url" content="https://michalstankiewicz4-cell.github.io/GameLaboratory/">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<!-- The labs' start screen (labs.html, in the root; the labs themselves
+<!-- The labs' start screen (index.html, in the root; the labs themselves
      live in labs/, the tools in tools/): a tile for every lab and tool, with the menu
      bar every lab and tool page carries (js/labkit/menubar.js — the lists
-     live there, the tiles' pictures and words here). Not the game's style
-     on purpose: a workshop, not a cockpit. Not part of the game. -->
+     live there, the tiles' pictures and words here). A workshop, not a cockpit. -->
 <style>
 @font-face{ font-family:"Space Grotesk"; font-weight:300 700; src:url(fonts/space-grotesk-var-latin-ext.woff2) format("woff2"); unicode-range:U+0100-024F; }
 @font-face{ font-family:"Space Grotesk"; font-weight:300 700; src:url(fonts/space-grotesk-var-latin.woff2) format("woff2"); }
@@ -85,6 +83,9 @@ h2::after{ order:1; }
 .name{ display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:18px; font-weight:600; color:var(--head); }
 .file{ font:12px "IBM Plex Mono", ui-monospace, monospace; color:var(--dim); }
 .desc{ font-size:14px; color:#a7adbb; flex:1; }
+.art img{ width:100%; height:100%; object-fit:cover; display:block; }
+.phrases{ display:flex; gap:4px; flex-wrap:wrap; margin-top:6px; }
+.phrase{ font-size:11px; padding:1px 7px; border-radius:4px; background:rgba(255,255,255,.05); color:#8f96a5; }
 .tags{ display:flex; gap:6px; flex-wrap:wrap; margin-top:4px; }
 .tag{ font-size:11.5px; padding:2px 8px; border-radius:999px; border:1px solid var(--line); color:#a7adbb; }
 .tag.game{ color:var(--game); border-color:rgba(54,214,181,.4); background:rgba(54,214,181,.08); }
@@ -100,15 +101,14 @@ footer a{ color:#9aa1b0; }
 <main>
   <header>
     <div>
-      <h1>Swarm Protocol <span>Labs</span></h1>
-      <p class="lead">The workshops where the game's ships, worlds, bases and machines are made. The labs and the game share the same kits, so what you tune here is what the game shows.</p>
+      <h1>Game<span>Laboratory</span></h1>
+      <p class="lead">Laboratories of models and worlds: space, land and water. Each lab builds, shapes and tests models with the kits it shares with the other labs.</p>
     </div>
     <div class="stats">
       <div class="stat"><b id="nLabs">–</b><span>labs</span></div>
       <div class="stat"><b id="nGame">–</b><span>in the game</span></div>
       <div class="stat"><b id="nTools">–</b><span>tools</span></div>
       <div class="stat"><b id="labsVer">–</b><span>labs</span></div>
-      <div class="stat"><b id="ver">–</b><span>game</span></div>
     </div>
   </header>
   <h2>Quick access</h2>
@@ -117,13 +117,21 @@ footer a{ color:#9aa1b0; }
   <div class="grid" id="labs"></div>
   <h2>Tools</h2>
   <div class="grid" id="tools"></div>
-  <footer><span>Swarm Protocol · MIT · the labs aren't part of the game</span></footer>
+  <footer><span>GameLaboratory · MIT</span></footer>
 </main>
 <script>
 (() => {
 "use strict";
 // gradient + line art per tile (viewBox 0 0 200 100)
 const ART = {
+  "labs/warship.html": { img: "assets/labs/ship.jpg" },
+  "labs/structures.html": { img: "assets/labs/structures.jpg" },
+  "labs/water.html": { img: "assets/labs/water.jpg" },
+  "labs/land.html": { img: "assets/labs/land.jpg" },
+  "labs/plants.html": { img: "assets/labs/plants.jpg" },
+  "labs/look.html": { img: "assets/labs/look.jpg" },
+  "labs/transform.html": { img: "assets/labs/transform.jpg" },
+  "tools/doctor-sea.html": { img: "assets/labs/doctor.jpg" },
   "labs/ship.html": { bg: ["#1b2a5e", "#0f1630"], svg: `<path d="M38 58 L118 45 L166 54 L118 66 Z" fill="url(#g)" opacity=".95"/><path d="M92 49 L70 28 L84 28 L110 47 Z M92 62 L70 80 L84 80 L110 63 Z" fill="#9fb4ff" opacity=".55"/><circle cx="38" cy="58" r="9" fill="#5be0ff" opacity=".35"/><circle cx="38" cy="58" r="4" fill="#d8f6ff"/><path d="M14 58 H32" stroke="#5be0ff" stroke-width="3" stroke-linecap="round" opacity=".6"/>` },
   "labs/bodies.html": { bg: ["#3b1d4f", "#140d24"], svg: `<circle cx="100" cy="52" r="28" fill="url(#g)"/><path d="M100 24 A28 28 0 0 1 100 80 A16 28 0 0 0 100 24" fill="#0b0716" opacity=".55"/><ellipse cx="100" cy="54" rx="56" ry="12" fill="none" stroke="#f6c9ff" stroke-width="2.5" opacity=".7" transform="rotate(-12 100 54)"/><circle cx="160" cy="24" r="3" fill="#fff" opacity=".7"/><circle cx="34" cy="78" r="2" fill="#fff" opacity=".5"/>` },
   "labs/systems.html": { bg: ["#2c2312", "#120f08"], svg: `<circle cx="100" cy="50" r="9" fill="#ffd27a"/><circle cx="100" cy="50" r="16" fill="#ffd27a" opacity=".18"/><g fill="none" stroke="#f2b84b" stroke-width="1.4" opacity=".55"><ellipse cx="100" cy="50" rx="34" ry="13"/><ellipse cx="100" cy="50" rx="58" ry="23"/><ellipse cx="100" cy="50" rx="84" ry="34"/></g><circle cx="134" cy="50" r="4" fill="#8be0ff"/><circle cx="58" cy="66" r="5" fill="#ff9a6b"/><circle cx="168" cy="30" r="6" fill="#c7b2ff"/>` },
@@ -156,6 +164,40 @@ const INFO = {
   "tools/doctor.html": ["Every model examined for the repeating mistakes: inside-out shapes, flicker, floating parts.", "tool", "ModelDoctor"],
   "tools/kitcheck.html": ["The safety net: every model's fingerprint against the golden file, every lab for errors.", "tool", "kitcheck"],
   "tools/grainTexture.html": ["Regenerates the film grain the interface panels use.", "tool", "texture"],
+  "labs/warship.html": ["Real warships rebuilt from code at true scale: ORP Błyskawica and the submarine ORP Orzeł. Orbit, measure, toggle parts, train the mounts, dive.", "game", "ShipKit (sea)"],
+  "labs/structures.html": ["Waterside structures at real scale: a jack-up drilling rig, a quay, a breakwater.", "lab", "StructKit"],
+  "labs/water.html": ["Sea states from calm to gale, reflections, foam, bow wave, wake, spray, ship motion — with the cost of every effect.", "game", "WaterKit"],
+  "labs/land.html": ["Procedural land and sea from 0 to 100 % land: islands, coasts, fjords, erosion, beaches, surf.", "game", "LandKit"],
+  "labs/plants.html": ["Trees, palms, shrubs and grass grown from code, moving in the wind.", "lab", "PlantKit"],
+  "labs/look.html": ["Sky, seven weathers, time of day, procedural ageing of surfaces, graphics filters.", "game", "SkyKit"],
+  "labs/transform.html": ["A lab ship made game-ready: levels of detail, hitboxes, shader damage, fleet performance test.", "tool", "transform"],
+  "tools/doctor-sea.html": ["Every sea model examined: inside-out shapes, holes, flicker, floating pieces, guns firing into their own ship.", "tool", "ModelDoctor (sea)"],
+};
+// Phrases that describe each lab — for a future filter of the labs.
+const PHRASES = {
+  "labs/ship.html": ["kosmos", "statki", "stacja", "dron", "światła"],
+  "labs/bodies.html": ["kosmos", "planety", "słońca", "czarne dziury", "komety"],
+  "labs/systems.html": ["kosmos", "układy", "orbity", "gwiazdy"],
+  "labs/scale.html": ["kosmos", "skala", "proporcje"],
+  "labs/skins.html": ["interfejs", "wygląd"],
+  "labs/surface.html": ["ląd", "planeta", "lądowanie", "baza", "pogoda"],
+  "labs/buildings.html": ["ląd", "baza", "budynki", "moduły"],
+  "labs/vehicles.html": ["ląd", "pojazdy", "łaziki", "koła", "gąsienice"],
+  "labs/sound.html": ["dźwięk", "muzyka"],
+  "labs/marine.html": ["woda", "morze", "pod wodą", "pojazdy"],
+  "labs/creator.html": ["życie", "stwory", "chód", "nogi"],
+  "labs/life.html": ["życie", "człowiek", "chód", "twarz"],
+  "labs/warship.html": ["woda", "okręty", "okręt podwodny", "historyczne"],
+  "labs/structures.html": ["woda", "ląd", "budowle", "platforma", "nabrzeże"],
+  "labs/water.html": ["woda", "morze", "fale", "piana", "kilwater"],
+  "labs/land.html": ["ląd", "teren", "wyspy", "wybrzeże", "erozja"],
+  "labs/plants.html": ["ląd", "rośliny", "drzewa", "trawa", "wiatr"],
+  "labs/look.html": ["niebo", "pogoda", "pora dnia", "starzenie", "filtry"],
+  "labs/transform.html": ["narzędzie", "LOD", "hitboxy", "wydajność"],
+  "tools/doctor.html": ["narzędzie", "modele", "błędy"],
+  "tools/doctor-sea.html": ["narzędzie", "modele", "błędy", "woda"],
+  "tools/kitcheck.html": ["narzędzie", "testy"],
+  "tools/grainTexture.html": ["narzędzie", "tekstura"],
 };
 const STATUS = { game: "In the game", lab: "Lab only", tool: "Tool" };
 const { LABS, TOOLS } = window.LabMenu.ITEMS;
@@ -163,15 +205,20 @@ function tile(item) {
   const a = document.createElement("a"), art = ART[item.file], info = INFO[item.file] || ["", "lab", ""];
   a.className = "tile"; a.href = window.LabMenu.ROOT + item.file;
   const id = "g" + item.file.replace(/\W/g, "");
-  a.innerHTML = `<div class="art" style="background:linear-gradient(135deg, ${art.bg[0]}, ${art.bg[1]})">
+  const pic = art.img ? `<div class="art"><img src="${window.LabMenu.ROOT + art.img}" alt="" loading="lazy"></div>`
+    : `<div class="art" style="background:linear-gradient(135deg, ${art.bg[0]}, ${art.bg[1]})">
       <svg viewBox="0 0 200 100" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#9fb4ff"/></linearGradient></defs>${art.svg.replace(/url\(#g\)/g, "url(#" + id + ")")}</svg></div>
+      <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#9fb4ff"/></linearGradient></defs>${art.svg.replace(/url\(#g\)/g, "url(#" + id + ")")}</svg></div>`;
+  a.innerHTML = `${pic}
     <div class="body"><div class="name"><span></span><span class="file"></span></div><div class="desc"></div>
-      <div class="tags"><span class="tag ${info[1]}">${STATUS[info[1]]}</span><span class="tag"></span></div></div>`;
+      <div class="tags"><span class="tag ${info[1]}">${STATUS[info[1]]}</span><span class="tag"></span></div>
+      <div class="phrases"></div></div>`;
   a.querySelector(".name span").textContent = item.name;
   a.querySelector(".file").textContent = item.file.replace(/^(tools|labs)\//, "");
   a.querySelector(".desc").textContent = info[0];
   a.querySelector(".tags .tag:last-child").textContent = info[2];
+  const ph = a.querySelector(".phrases");
+  for (const w of PHRASES[item.file] || []) { const e = document.createElement("span"); e.className = "phrase"; e.textContent = w; ph.appendChild(e); }
   return a;
 }
 // ---------- the order: yours, dragged by the six-dot grip, kept in this browser ----------
@@ -336,8 +383,6 @@ document.getElementById("nLabs").textContent = LABS.length;
 document.getElementById("nGame").textContent = LABS.filter((l) => (INFO[l.file] || [])[1] === "game").length;
 document.getElementById("nTools").textContent = TOOLS.length;
 document.getElementById("labsVer").textContent = "v" + window.LabMenu.LABS_VERSION;
-const ver = () => { if (window.LabMenu.version) document.getElementById("ver").textContent = window.LabMenu.version; else setTimeout(ver, 200); };
-ver();
 })();
 </script>
 </body>
