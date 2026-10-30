@@ -18,6 +18,12 @@
 - `js/render/`, `js/audio/`, `js/labkit/` — wspólne warstwy.
 - `tools/` — narzędzia (doktor modeli, kitcheck); `docs/` — dokumentacja.
 
+## Fizyka
+
+- Fizyka jest częścią środowiska — nie ma osobnego laboratorium fizyki.
+- Trzy środowiska, każde ze swoimi prawami: próżnia (ciąg, orbity), woda (wyporność, fale, opór), ląd (grawitacja, tarcie, kontakt z podłożem, szyny).
+- Zachowanie testuje się w laboratorium środowiska, do którego należy (np. koło na szynie — ląd). Zachowania przechodzące między ośrodkami — przez przełącznik środowiska w laboratorium danej rodziny modeli.
+
 ## Naprawy modeli
 
 - Modeli nie naprawiamy ręcznie.
