@@ -65,6 +65,7 @@ class WebGLRenderTarget extends T.WebGLRenderTarget {
   constructor(w, h, o = {}) {
     super(w, h, o);
     this.isXRRenderTarget = true;
+    if (this.texture.colorSpace === T.NoColorSpace) this.texture.colorSpace = T.LinearSRGBColorSpace;   // r128's default (LinearEncoding)
     if ((o.type == null || o.type === T.UnsignedByteType) && (o.format == null || o.format === T.RGBAFormat)) this.texture.internalFormat = "RGBA8";
   }
 }
