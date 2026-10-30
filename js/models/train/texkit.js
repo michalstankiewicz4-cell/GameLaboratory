@@ -25,7 +25,7 @@
     }
     const cl = x => x < 0 ? 0 : x > 255 ? 255 : x;
     const sst = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
-    const tex = (c, srgb) => { const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8; if (srgb) t.encoding = THREE.sRGBEncoding; return t; };
+    const tex = (c, srgb) => { const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8; if (srgb) t.colorSpace = THREE.SRGBColorSpace; return t; };
     function three(w, h) { const [cC, c] = cv(w, h), [cR, r] = cv(w, h), [cB, b] = cv(w, h); b.fillStyle = '#808080'; b.fillRect(0, 0, w, h); return { cC, c, cR, r, cB, b, w, h }; }
     const out = k => ({ map: tex(k.cC, true), roughnessMap: tex(k.cR), bumpMap: tex(k.cB) });
     // zacieki rdzy spod nitów i krawędzi, brud od góry, pył od dołu
@@ -214,7 +214,7 @@
       for (const l of lines) { const s = l.size || 30; c.font = `${l.weight || weight} ${s}px ${font}`; c.fillText(l.t, align === 'center' ? w / 2 : 8, y); y += s * 1.12; }
       const rand = rng(lines.length * 7 + w); c.globalCompositeOperation = 'destination-out';
       for (let i = 0; i < 260; i++) { c.fillStyle = `rgba(0,0,0,${rand() * 0.7})`; c.fillRect(rand() * w, rand() * h, 1 + rand() * 3, 1 + rand() * 2); }   // przetarcia
-      const t = new THREE.CanvasTexture(cC); t.encoding = THREE.sRGBEncoding; t.anisotropy = 8; return t;
+      const t = new THREE.CanvasTexture(cC); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
     }
     // niebo do odbić (mapa otoczenia): gradient, słońce, ziemia
     function skyEquirect() {
@@ -227,7 +227,7 @@
       });
       const g = c.createRadialGradient(w * 0.3, h * 0.22, 0, w * 0.3, h * 0.22, 60); g.addColorStop(0, '#ffffff'); g.addColorStop(0.1, 'rgba(255,240,210,0.9)'); g.addColorStop(1, 'rgba(255,230,190,0)');
       c.fillStyle = g; c.fillRect(0, 0, w, h);
-      const t = new THREE.CanvasTexture(cC); t.encoding = THREE.sRGBEncoding; t.mapping = THREE.EquirectangularReflectionMapping; return t;
+      const t = new THREE.CanvasTexture(cC); t.colorSpace = THREE.SRGBColorSpace; t.mapping = THREE.EquirectangularReflectionMapping; return t;
     }
     return { steel, planks, tread, hazard, roofing, louvre, cast, brushed, sleeperWood, gravel, grass, decal, skyEquirect, rng };
   })();

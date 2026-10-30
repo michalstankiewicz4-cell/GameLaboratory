@@ -204,14 +204,14 @@ const PRESETS = {
 function plainTarget(depth){
   const t = new THREE.WebGLRenderTarget(1, 1, { format: THREE.RGBAFormat, depthBuffer: !!depth, stencilBuffer: false,
     minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter });
-  t.texture.encoding = THREE.sRGBEncoding;
+  t.texture.colorSpace = THREE.SRGBColorSpace;
   t.texture.generateMipmaps = false;
   return t;
 }
 
 function quad(mat){
   const scene = new THREE.Scene();
-  const mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2), mat);
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat);
   mesh.frustumCulled = false;
   scene.add(mesh);
   return scene;
@@ -267,9 +267,9 @@ function create(renderer){
     if(target && samples === n) return target;
     if(target) target.dispose();
     const o = { format: THREE.RGBAFormat, depthBuffer: true, stencilBuffer: false };
-    if(n > 0 && renderer.capabilities.isWebGL2){ target = new THREE.WebGLMultisampleRenderTarget(1, 1, o); target.samples = n; }
+    if(n > 0 && renderer.capabilities.isWebGL2){ target = new THREE.WebGLRenderTarget(1, 1, Object.assign({ samples: n }, o)); }
     else target = new THREE.WebGLRenderTarget(1, 1, o);
-    target.texture.encoding = THREE.sRGBEncoding;
+    target.texture.colorSpace = THREE.SRGBColorSpace;
     samples = n; w = h = 0;
     return target;
   }

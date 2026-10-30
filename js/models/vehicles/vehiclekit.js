@@ -57,7 +57,7 @@ function tireTexture() {
     const x = i * W / 24;
     ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + 6, H / 2); ctx.lineTo(x, H); ctx.lineTo(x + 5, H); ctx.lineTo(x + 11, H / 2); ctx.lineTo(x + 5, 0); ctx.fill();
   }
-  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.encoding = THREE.sRGBEncoding; return t;
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; return t;
 }
 function treadTexture() {
   const W = 64, H = 256, [c, ctx] = SK.util.canvas(W, H);
@@ -67,7 +67,7 @@ function treadTexture() {
     ctx.fillStyle = "#3a3c42"; ctx.fillRect(2, y + 1, W - 4, H / 16 - 3);
     ctx.fillStyle = "#55585f"; ctx.fillRect(2, y + 5, W - 4, 3);
   }
-  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.encoding = THREE.sRGBEncoding; return t;
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; return t;
 }
 function mats() {
   if (M) return M;

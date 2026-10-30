@@ -341,7 +341,7 @@ function canvas(w, h) { const c = document.createElement("canvas"); c.width = w;
 function tex(c, repeat, srgb) {
   const t = new THREE.CanvasTexture(c);
   t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repeat[0], repeat[1]); t.anisotropy = 4;
-  if (srgb) t.encoding = THREE.sRGBEncoding;
+  if (srgb) t.colorSpace = THREE.SRGBColorSpace;
   return t;
 }
 // a fine mottled grey (skin pores, fabric weave): bump and roughness
@@ -438,13 +438,13 @@ function materials(opts) {
     skinVC(tone, morph, faceted) {
       skinMap = skinMap || T(tex(skinCanvas(3), [3, 3], true)); skinBump = skinBump || T(tex(grain(4, 256, 5000, 0.35), [14, 14]));
       return get("skinvc" + tone + (morph ? "/m" : "") + (faceted ? "/f" : ""), false, () => new THREE.MeshStandardMaterial({ color: color(tone), vertexColors: true, map: skinMap, bumpMap: faceted ? null : skinBump, bumpScale: 0.0004, roughness: 0.55, metalness: 0, envMapIntensity: 0.55,
-        morphTargets: !!morph, morphNormals: !!morph && !faceted }));   // faceted: the mesh brings its own (per-facet) normals
+        }));   // faceted: the mesh brings its own (per-facet) normals
     },
     // a plain colour (teeth, the inside of a mouth); o: { side, morph }
     flat(hex, rough, o) {
       o = o || {};
       return get("flat" + hex + rough + (o.side || "") + (o.morph ? "/m" : ""), false, () => new THREE.MeshStandardMaterial({ color: color(hex), roughness: rough, metalness: 0, envMapIntensity: 0.5,
-        side: o.side || THREE.FrontSide, morphTargets: !!o.morph }));
+        side: o.side || THREE.FrontSide }));
     },
     // a creature's own material: make(T) builds it, T(texture) registers a
     // texture for disposal; cached by key (skinned and rigid copies apart)

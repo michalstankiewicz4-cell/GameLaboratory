@@ -40,7 +40,7 @@ function makeCodeBand({ seed = 41 } = {}) {
   }
   ctx.globalAlpha = 1;
   const t = new THREE.CanvasTexture(c);
-  t.wrapS = THREE.RepeatWrapping; t.encoding = THREE.sRGBEncoding;
+  t.wrapS = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace;
   return t;
 }
 

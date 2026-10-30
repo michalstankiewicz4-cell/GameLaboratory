@@ -227,7 +227,7 @@ function makePlating({ size = 1024, seed = 1, base = [150, 156, 170], minPanel =
     const t = new THREE.CanvasTexture(c);
     t.wrapS = t.wrapT = THREE.RepeatWrapping;
     t.anisotropy = 8;
-    if (srgb) t.encoding = THREE.sRGBEncoding;
+    if (srgb) t.colorSpace = THREE.SRGBColorSpace;
     return t;
   };
   return { map: tex(cCol, true), roughnessMap: tex(cRough), bumpMap: tex(cBump), emissiveMap: tex(cEmi, true) };
@@ -249,7 +249,7 @@ function makeBrushed({ size = 512, seed = 3, tint = [175, 180, 192], rings = 6 }
     ctx.fillStyle = "rgba(255,255,255,0.25)"; ctx.fillRect(0, y + 3, size, 1);
   }
   const t = new THREE.CanvasTexture(c);
-  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8; t.encoding = THREE.sRGBEncoding;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8; t.colorSpace = THREE.SRGBColorSpace;
   return t;
 }
 
@@ -908,7 +908,7 @@ function makeSolarCells({ size = 512, seed = 31, cols = 8, rows = 4 } = {}) {
     ctx.beginPath(); ctx.moveTo(x, y + h / 2); ctx.lineTo(x + w, y + h / 2); ctx.stroke();
   }
   const t = new THREE.CanvasTexture(c);
-  t.anisotropy = 8; t.encoding = THREE.sRGBEncoding;
+  t.anisotropy = 8; t.colorSpace = THREE.SRGBColorSpace;
   return t;
 }
 
@@ -1808,7 +1808,7 @@ function makeSpaceSky(w = 2048, h = 1024) {
   sun(w * 0.18, h * 0.36, 260, "rgba(255,190,110,0.85)");
   sun(w * 0.68, h * 0.55, 200, "rgba(110,140,255,0.6)");
   const t = new THREE.CanvasTexture(c);
-  t.encoding = THREE.sRGBEncoding;
+  t.colorSpace = THREE.SRGBColorSpace;
   t.mapping = THREE.EquirectangularReflectionMapping;
   return t;
 }

@@ -6,7 +6,7 @@ const $ = (id) => document.getElementById(id);
 const SK = window.SurfaceKit, BK = window.BodyKit;
 const view = $("view");
 const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
-renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1;
 renderer.localClippingEnabled = true;
 const PR = [0.6, 0.85, 1, Math.min(window.devicePixelRatio || 1, 2)], QN = ["LOW", "MEDIUM", "HIGH", "ULTRA"];

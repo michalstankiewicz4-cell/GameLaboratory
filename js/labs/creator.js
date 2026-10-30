@@ -7,7 +7,7 @@ const LK = window.LifeKit, DK = LK.design;
 const view = $("view");
 const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1;
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const scene = new THREE.Scene();
@@ -27,7 +27,7 @@ const floorTex = (() => {
   const S = 512, c = document.createElement("canvas"); c.width = c.height = S; const x = c.getContext("2d");
   x.fillStyle = "#2a2f3a"; x.fillRect(0, 0, S, S);
   for (let k = 0; k <= 5; k++) { x.strokeStyle = k === 0 || k === 5 ? "rgba(143,164,255,0.55)" : "rgba(143,164,255,0.22)"; x.lineWidth = k === 0 || k === 5 ? 3 : 1.5; const p = k * S / 5; x.beginPath(); x.moveTo(p, 0); x.lineTo(p, S); x.moveTo(0, p); x.lineTo(S, p); x.stroke(); }
-  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.encoding = THREE.sRGBEncoding; t.anisotropy = 8; t.repeat.set(40, 40); return t;
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; t.repeat.set(40, 40); return t;
 })();
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ map: floorTex, roughness: 0.85 }));
 floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);

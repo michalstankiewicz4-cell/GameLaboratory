@@ -8,7 +8,7 @@ const SK = window.SystemKit;
 // ---------- renderer, camera ----------
 const view = $("view");
 const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
-renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.1;
 const scene = new THREE.Scene();

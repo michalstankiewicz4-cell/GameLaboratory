@@ -94,7 +94,7 @@ function softSprite() {
     g.fillStyle = grd; g.fillRect(0, 0, 128, 128);
   }
   const t = new THREE.CanvasTexture(c);
-  t.encoding = THREE.sRGBEncoding;
+  t.colorSpace = THREE.SRGBColorSpace;
   return t;
 }
 function makeEntryFx() {

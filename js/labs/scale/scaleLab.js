@@ -83,7 +83,7 @@ function fmt(v){ return (Math.round(v * 100) / 100).toString(); }
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.outputEncoding = THREE.sRGBEncoding;           // the game's pipeline (scene/setup.js)
+renderer.outputColorSpace = THREE.SRGBColorSpace;           // the game's pipeline (scene/setup.js)
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.1;
 renderer.setClearColor(0x03040a, 1);

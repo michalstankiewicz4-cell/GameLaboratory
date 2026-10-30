@@ -18,7 +18,7 @@ const view = document.getElementById("view");
 const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight, false);
-renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.1;                 // the game's (scene/setup.js)
 renderer.shadowMap.enabled = true;

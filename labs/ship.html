@@ -155,21 +155,15 @@ body.focus #hud.labIdle *, body.focus #opt.labIdle *{ pointer-events:auto !impor
 </div>
 <div id="loading">GENERATING HULL…</div>
 
-<script src="../import/space/vendor/three-r128.min.js"></script>
-<script src="../import/space/vendor/three-r128-examples/OrbitControls.js"></script>
+<script type="module" src="../js/core/three-global.js"></script>
 <!-- Three.js r128 add-ons (vendor/, MIT) + PostKit: the IMAGE EFFECTS panel's post-processing, the game's own -->
-<script src="../import/space/vendor/three-r128-examples/Pass.js"></script>
-<script src="../import/space/vendor/three-r128-examples/CopyShader.js"></script>
-<script src="../import/space/vendor/three-r128-examples/LuminosityHighPassShader.js"></script>
-<script src="../import/space/vendor/three-r128-examples/UnrealBloomPass.js"></script>
-<script src="../import/space/vendor/three-r128-examples/FXAAShader.js"></script>
-<script src="../js/render/postkit/postkit.js"></script>
-<script src="../js/labkit/labkit.js"></script>
-<script id="shipkit" src="../js/models/ships-space/shipkit.js"></script>
-<script src="../js/models/ships-space/ships/codewing.js"></script>
-<script src="../js/models/ships-space/ships/scribe.js"></script>
-<script src="../js/models/ships-space/ships/swarmer.js"></script>
-<script src="../js/models/ships-space/ships/haven.js"></script>
-<script id="viewer" src="../js/labs/ship.js"></script>
+<script type="module" src="../js/render/postkit/postkit.js"></script>
+<script type="module" src="../js/labkit/labkit.js"></script>
+<script type="module" id="shipkit" src="../js/models/ships-space/shipkit.js"></script>
+<script type="module" src="../js/models/ships-space/ships/codewing.js"></script>
+<script type="module" src="../js/models/ships-space/ships/scribe.js"></script>
+<script type="module" src="../js/models/ships-space/ships/swarmer.js"></script>
+<script type="module" src="../js/models/ships-space/ships/haven.js"></script>
+<script type="module" id="viewer" src="../js/labs/ship.js"></script>
 </body>
 </html>

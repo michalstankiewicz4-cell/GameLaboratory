@@ -70,7 +70,7 @@ function padTexture() {
   ctx.fillRect(S * 0.38, S * 0.36, S * 0.05, S * 0.28); ctx.fillRect(S * 0.57, S * 0.36, S * 0.05, S * 0.28); ctx.fillRect(S * 0.38, S * 0.475, S * 0.24, S * 0.05);
   ctx.strokeStyle = "#e6ebff"; ctx.lineWidth = 6; ctx.setLineDash([26, 18]);
   ctx.beginPath(); for (let k = 0; k <= 6; k++) { const a = k / 6 * Math.PI * 2 + Math.PI / 6; ctx[k ? "lineTo" : "moveTo"](S / 2 + Math.cos(a) * S * 0.46, S / 2 + Math.sin(a) * S * 0.46); } ctx.stroke();
-  const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.anisotropy = 8;
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
   return t;
 }
 

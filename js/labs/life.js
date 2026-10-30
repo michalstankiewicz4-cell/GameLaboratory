@@ -7,7 +7,7 @@ const LK = window.LifeKit;
 const view = $("view");
 const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1;
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const scene = new THREE.Scene();
@@ -36,7 +36,7 @@ const floorTex = (() => {
     x.strokeStyle = k === 0 || k === 5 ? "rgba(143,164,255,0.55)" : "rgba(143,164,255,0.22)"; x.lineWidth = k === 0 || k === 5 ? 3 : 1.5;
     const p = k * S / 5; x.beginPath(); x.moveTo(p, 0); x.lineTo(p, S); x.moveTo(0, p); x.lineTo(S, p); x.stroke();
   }
-  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.encoding = THREE.sRGBEncoding; t.anisotropy = 8;
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
   t.repeat.set(40, 40); return t;   // 200 m / 40 = one tile every 5 m: lines every metre
 })();
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ map: floorTex, roughness: 0.85, metalness: 0 }));
@@ -48,13 +48,13 @@ const scaleBar = (() => {
   x.fillStyle = "#e9edf7"; x.fillRect(0, 0, 64, 1024);
   for (let i = 0; i < 20; i++) { x.fillStyle = i % 2 ? "#e9edf7" : "#f2b84b"; x.fillRect(0, 1024 - (i + 1) * 51.2, 64, 51.2); }
   for (let i = 0; i <= 20; i++) { x.fillStyle = "#11141c"; x.fillRect(0, 1024 - i * 51.2 - 1, i % 5 ? 30 : 64, 2); }
-  const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding;
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
   const bar = new THREE.Mesh(new THREE.BoxGeometry(0.03, 2, 0.03), new THREE.MeshStandardMaterial({ map: t, roughness: 0.6 }));
   bar.position.y = 1; bar.castShadow = true; g.add(bar);
   [0.5, 1, 1.5, 2].forEach((h) => {
     const lc = document.createElement("canvas"); lc.width = 128; lc.height = 48; const lx = lc.getContext("2d");
     lx.fillStyle = "#e9edf7"; lx.font = "600 30px sans-serif"; lx.fillText(h.toFixed(1) + " m", 6, 34);
-    const lt = new THREE.CanvasTexture(lc); lt.encoding = THREE.sRGBEncoding;
+    const lt = new THREE.CanvasTexture(lc); lt.colorSpace = THREE.SRGBColorSpace;
     const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: lt, depthWrite: false })); sp.scale.set(0.2, 0.075, 1); sp.position.set(0.14, h, 0); g.add(sp);
   });
   g.position.set(-0.75, 0, 0); scene.add(g); return g;

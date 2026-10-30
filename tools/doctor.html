@@ -46,18 +46,17 @@ p{ color:var(--info); margin:0 0 12px; }
   </div>
   <div id="view"><div id="cap"></div></div>
 </div>
-<script src="../import/space/vendor/three-r128.min.js"></script>
-<script src="../import/space/vendor/three-r128-examples/OrbitControls.js"></script>
-<script src="../js/models/ships-space/shipkit.js"></script>
-<script src="../js/models/ships-space/ships/codewing.js"></script>
-<script src="../js/models/ships-space/ships/scribe.js"></script>
-<script src="../js/models/ships-space/ships/swarmer.js"></script>
-<script src="../js/models/ships-space/ships/haven.js"></script>
-<script src="../js/models/base/basekit.js"></script>
-<script src="../js/models/vehicles/vehiclekit.js"></script>
-<script src="../js/envs/water/marinekit/marinekit.js"></script>
-<script src="modeldoctor.js"></script>
-<script>
+<script type="module" src="../js/core/three-global.js"></script>
+<script type="module" src="../js/models/ships-space/shipkit.js"></script>
+<script type="module" src="../js/models/ships-space/ships/codewing.js"></script>
+<script type="module" src="../js/models/ships-space/ships/scribe.js"></script>
+<script type="module" src="../js/models/ships-space/ships/swarmer.js"></script>
+<script type="module" src="../js/models/ships-space/ships/haven.js"></script>
+<script type="module" src="../js/models/base/basekit.js"></script>
+<script type="module" src="../js/models/vehicles/vehiclekit.js"></script>
+<script type="module" src="../js/envs/water/marinekit/marinekit.js"></script>
+<script type="module" src="modeldoctor.js"></script>
+<script type="module">
 (() => {
 "use strict";
 const $ = (id) => document.getElementById(id);
@@ -71,7 +70,7 @@ MarineKit.VESSELS.forEach((d) => MODELS.push({ id: "vessel/" + d.id, build: () =
 // ---------- the viewer ----------
 const view = $("view");
 const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1;
+renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1;
 view.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x060918);

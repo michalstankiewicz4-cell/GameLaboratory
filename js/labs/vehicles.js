@@ -7,7 +7,7 @@ const VK = window.VehicleKit;
 const view = $("view");
 const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1;
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const scene = new THREE.Scene();
@@ -49,7 +49,7 @@ const groundTex = (() => {
   for (let i = 0; i < 9000; i++) { ctx.fillStyle = `rgba(${r() < 0.5 ? "255,236,214" : "20,10,0"},${0.04 + r() * 0.07})`; ctx.fillRect(r() * S, r() * S, 1 + r() * 4, 1 + r() * 4); }
   ctx.strokeStyle = "rgba(79,227,198,0.10)"; ctx.lineWidth = 2;
   for (let k = 0; k <= 4; k++) { ctx.beginPath(); ctx.moveTo(k * S / 4, 0); ctx.lineTo(k * S / 4, S); ctx.moveTo(0, k * S / 4); ctx.lineTo(S, k * S / 4); ctx.stroke(); }
-  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(40, 40); t.encoding = THREE.sRGBEncoding; t.anisotropy = 8; return t;
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(40, 40); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
 })();
 const groundGeo = new THREE.PlaneGeometry(400, 400, 320, 320);
 groundGeo.rotateX(-Math.PI / 2);
