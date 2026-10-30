@@ -7,7 +7,7 @@ request: "one monochrome version tied to programming (a green CRT
 display, the logo only changes colour), a second colourful one with a
 programming theme".
 
-Referenced from [`CLAUDE.md`](../import/space/CLAUDE.md) and
+Referenced from [`CLAUDE.md`](https://github.com/michalstankiewicz4-cell/Space/blob/main/CLAUDE.md) and
 [`docs/ui.md`](ui.md) ("Skin lab").
 
 Contents:

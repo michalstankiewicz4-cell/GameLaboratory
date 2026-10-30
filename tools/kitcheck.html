@@ -130,7 +130,7 @@ let current = null;
 async function run() {
   $("sum").textContent = "running…"; $("out").textContent = "";
   let golden = {};
-  try { golden = await (await fetch("../import/space/tools/kitcheck.golden.json", { cache: "no-store" })).json(); } catch (e) { golden = null; }
+  try { golden = await (await fetch("kitcheck.golden.json", { cache: "no-store" })).json(); } catch (e) { golden = null; }
   const got = collect();
   current = got;
   const rows = [], fails = [];

@@ -3,8 +3,8 @@
    TOOLS, HELP), always visible at the top of every lab and tool page
    =======================================================================
    A classic script with no dependencies, the first thing in <body>:
-     <script src="../../import/space/js/labkit/js/labkit/menubar.js"></script>        (a lab)
-     <script src="../../import/space/js/js/labkit/menubar.js"></script>     (tools/)
+     <script src="../js/labkit/menubar.js"></script>        (a lab)
+     <script src="../js/labkit/menubar.js"></script>     (tools/)
    It finds the site's root from its own address, adds the bar (fixed, at
    the top, MENU_H high) and moves each page's top panels down by that much
    (the selectors in OFFSETS — a new lab with a panel at the top adds its
@@ -23,8 +23,8 @@ const MENU_H = 32;
 const ROOT = (document.currentScript && document.currentScript.src || "").replace(/js\/labkit\/menubar\.js.*$/, "");
 const PARTS = location.pathname.split("/"), HERE = PARTS.pop() || "index.html", DIR = PARTS.pop() || "";
 const PAGE = (DIR === "labs" || DIR === "tools" ? DIR + "/" : "") + HERE;   // e.g. "labs/ship.html"
-const START = PAGE === "labs.html";
-const REPO = "https://github.com/michalstankiewicz4-cell/Space/blob/main/";
+const START = PAGE === "index.html";
+const REPO = "https://github.com/michalstankiewicz4-cell/GameLaboratory/blob/main/";
 
 // The labs and tools, shared with the start screen (window.LabMenu.ITEMS).
 const LABS = [
@@ -150,7 +150,7 @@ function dialog(title, rows, note) {
 
 // ---------- the menus ----------
 function files() {
-  return [link("Start screen", ROOT + "labs.html", { on: START }), el("div", "lmSep"), link("Back to the game", ROOT + "index.html")];
+  return [link("Start screen", ROOT + "index.html", { on: START })];
 }
 function options() {
   const keys = SAVED[PAGE] || [];
@@ -182,13 +182,13 @@ function help() {
     link("What's new in the labs", REPO + "labs/CHANGELOG.md", { blank: true }),
     el("div", "lmSep"),
     action("About the labs", () => dialog("Swarm Protocol labs", [["What", "the workshops the game's models, worlds and effects are made in"],
-      ["Labs", "v" + LABS_VERSION], ["Game", (window.LabMenu && window.LabMenu.version) || "—"], ["Code", "MIT, github.com/michalstankiewicz4-cell/Space"]],
+      ["Labs", "v" + LABS_VERSION], ["Code", "MIT, github.com/michalstankiewicz4-cell/GameLaboratory"]],
       "The labs and the game share the same kits: what you see here is what the game shows.")),
   ];
 }
 
 const bar = el("div"); bar.id = "labMenu";
-const home = el("a", "lmHome"); home.href = ROOT + "labs.html"; home.title = "Start screen";
+const home = el("a", "lmHome"); home.href = ROOT + "index.html"; home.title = "Start screen";
 home.append(el("span", "lmMark"), document.createTextNode("Swarm Labs"));
 bar.appendChild(home);
 const menus = [["Files", files], ["Options", options], ["Tools", tools], ["Help", help]];
@@ -239,5 +239,4 @@ document.body.appendChild(dlg);
 
 // the game's version, for "About"
 window.LabMenu = { ITEMS: { LABS, TOOLS }, ROOT, MENU_H, LABS_VERSION, version: null };
-fetch(ROOT + "js/version.js").then((r) => r.text()).then((s) => { const m = s.match(/VERSION\s*=\s*"([^"]+)"/); if (m) window.LabMenu.version = "v" + m[1]; }).catch(() => {});
 })();

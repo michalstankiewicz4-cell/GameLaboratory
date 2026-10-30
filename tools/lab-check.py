@@ -33,12 +33,12 @@ def main():
             pg.on('pageerror', lambda e: errs.append('pageerror ' + str(e) + ' @ ' + pg.url + ' ' + (e.stack or '')[:400]))
             pg.on('console', lambda m: errs.append(m.type + ' ' + m.text) if m.type == 'error' else None)
             pg.goto(f'http://localhost:{PORT}/labs.html')
-            assert pg.locator('a.tile[href="../import/battle/tools/labs/ship.html"]').count() == 1, 'ship tile missing'
-            assert pg.locator('a.tile[href="../import/battle/tools/labs/ship.html?ship=orzel"]').count() == 1, 'orzel tile missing'
-            assert pg.locator('a.tile[href="../import/battle/tools/labs/look.html"]').count() >= 1, 'look tile missing'
-            assert pg.locator('a.tile[href="../import/battle/tools/labs/land.html"]').count() == 1, 'land tile missing'
-            assert pg.locator('a.tile[href="../import/battle/tools/labs/structures.html"]').count() == 1, 'structures tile missing'
-            assert pg.locator('a.tile[href="../import/battle/tools/labs/plants.html"]').count() == 1, 'plants tile missing'
+            assert pg.locator('a.tile[href="labs/ship.html"]').count() == 1, 'ship tile missing'
+            assert pg.locator('a.tile[href="labs/ship.html?ship=orzel"]').count() == 1, 'orzel tile missing'
+            assert pg.locator('a.tile[href="labs/look.html"]').count() >= 1, 'look tile missing'
+            assert pg.locator('a.tile[href="labs/land.html"]').count() == 1, 'land tile missing'
+            assert pg.locator('a.tile[href="labs/structures.html"]').count() == 1, 'structures tile missing'
+            assert pg.locator('a.tile[href="labs/plants.html"]').count() == 1, 'plants tile missing'
             pg.goto(f'http://localhost:{PORT}/labs/ship.html')
             pg.wait_for_function('window.__lab && window.__lab.model', timeout=180000)
             print('stats', ' '.join(pg.inner_text('#stats').split()))

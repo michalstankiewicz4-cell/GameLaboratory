@@ -1,11 +1,11 @@
 # UI notes: screens, HUD, windows
 
-Split out of [`architecture.md`](../import/space/docs/architecture.md) (2026-10-02). The why and
+Split out of [`architecture.md`](https://github.com/michalstankiewicz4-cell/Space/blob/main/docs/architecture.md) (2026-10-02). The why and
 the history behind the interface: the UI kit, the HUD and its windows,
 interface modes, the research trees and how the page loads. Read the
 relevant section before touching that part of the UI.
 
-The game's notes are in three files: [`architecture.md`](../import/space/docs/architecture.md)
+The game's notes are in three files: [`architecture.md`](https://github.com/michalstankiewicz4-cell/Space/blob/main/docs/architecture.md)
 (world, network, programs, units), [`ui.md`](ui.md) (screens, HUD,
 windows, load order) and [`rendering.md`](rendering.md) (models,
 image quality, post-processing, sky).

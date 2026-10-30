@@ -1,12 +1,12 @@
 # Rendering notes: models, image quality, sky
 
-Split out of [`architecture.md`](../import/space/docs/architecture.md) (2026-10-02). The why and
+Split out of [`architecture.md`](https://github.com/michalstankiewicz4-cell/Space/blob/main/docs/architecture.md) (2026-10-02). The why and
 the history behind how the game draws: colour management, the ShipKit /
 BodyKit models in the game, Setup → Graphics and PostKit, the sky, the
 ship cam. The kits' own APIs are in [`ship.md`](ship.md) and
 [`bodies.md`](bodies.md).
 
-The game's notes are in three files: [`architecture.md`](../import/space/docs/architecture.md)
+The game's notes are in three files: [`architecture.md`](https://github.com/michalstankiewicz4-cell/Space/blob/main/docs/architecture.md)
 (world, network, programs, units), [`ui.md`](ui.md) (screens, HUD,
 windows, load order) and [`rendering.md`](rendering.md) (models,
 image quality, post-processing, sky).

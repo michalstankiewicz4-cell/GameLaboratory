@@ -115,8 +115,8 @@ const asked = new URLSearchParams(location.search).get('ship');            // ?s
 let model = null, shipId = SHIP_IDS.includes(asked) ? asked : SHIP_IDS[0], buildMs = 0, signal = null;
 const partChecks = {};
 for (const id of SHIP_IDS) $('ship').append(el('option', { value: id, textContent: shipInfo(id).name + ' (' + shipInfo(id).year + ')' }));
-$('ship').value = shipId; document.querySelector('a[href^="doctor.html"]').href = '../../import/battle/js/labs/doctor.html?model=lab/' + shipId;
-$('ship').onchange = () => { shipId = $('ship').value; document.querySelector('a[href^="doctor.html"]').href = '../../import/battle/js/labs/doctor.html?model=lab/' + shipId; dive.keel = dive.want = null; rebuild(); fillInfo(); setCams(); buildDimLines(); const c = shipView(shipId).cams; if (c) orbit.want = { target: new THREE.Vector3(...c[0][1]), dist: c[0][2], yaw: c[0][3], pitch: c[0][4] }; };
+$('ship').value = shipId; document.querySelector('a[href^="../tools/doctor-sea.html"]').href = '../tools/doctor-sea.html?model=lab/' + shipId;
+$('ship').onchange = () => { shipId = $('ship').value; document.querySelector('a[href^="../tools/doctor-sea.html"]').href = '../tools/doctor-sea.html?model=lab/' + shipId; dive.keel = dive.want = null; rebuild(); fillInfo(); setCams(); buildDimLines(); const c = shipView(shipId).cams; if (c) orbit.want = { target: new THREE.Vector3(...c[0][1]), dist: c[0][2], yaw: c[0][3], pitch: c[0][4] }; };
 
 function fillInfo() {
   const inf = shipInfo(shipId);

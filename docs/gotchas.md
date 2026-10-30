@@ -1,6 +1,6 @@
 # Known gotchas — full stories
 
-Referenced from [`CLAUDE.md`](../import/space/CLAUDE.md), which keeps only the short
+Referenced from [`CLAUDE.md`](https://github.com/michalstankiewicz4-cell/Space/blob/main/CLAUDE.md), which keeps only the short
 gotchas inline. The ones below are long enough to warrant the full
 investigation narrative, kept here instead.
 
