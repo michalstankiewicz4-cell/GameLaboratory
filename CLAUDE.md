@@ -24,6 +24,12 @@
 - Trzy środowiska, każde ze swoimi prawami: próżnia (ciąg, orbity), woda (wyporność, fale, opór), ląd (grawitacja, tarcie, kontakt z podłożem, szyny).
 - Zachowanie testuje się w laboratorium środowiska, do którego należy (np. koło na szynie — ląd). Zachowania przechodzące między ośrodkami — przez przełącznik środowiska w laboratorium danej rodziny modeli.
 
+## Podział materiału (decyzje)
+
+- Środowisko ląd = laboratorium lądu z Battle; woda = laboratorium wody z Battle. Ze Space (surface, marine) można uzupełnić tylko to, czego Battle nie ma.
+- Części modelu (sprężyny, podwozie, wózki, zestawy kołowe, sprzęgi) należą do modelu (`js/models/`), bo będą podłączane.
+- Tory kolejowe to modele budowli lądowych (`js/models/structures/`).
+
 ## Naprawy modeli
 
 - Modeli nie naprawiamy ręcznie.
