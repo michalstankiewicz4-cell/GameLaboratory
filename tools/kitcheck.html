@@ -110,7 +110,7 @@ const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 function checkLab(url) {
   return new Promise((resolve) => {
     const f = document.createElement("iframe"), errs = [];
-    f.src = "../css/fonts.cs/" + url;
+    f.src = "../" + url;
     // listen from the start (a same-origin frame keeps its first window
     // through the first load), so errors while the page's own scripts run count
     f.addEventListener("load", () => setTimeout(() => {
