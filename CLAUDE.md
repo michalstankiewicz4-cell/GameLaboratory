@@ -35,12 +35,15 @@
 ## Przełącznik środowiska
 
 - W laboratorium każdej rodziny modeli przełącznik ma zawsze 3 pozycje: kosmos, woda, ląd. Pozycje, w których rodzina nie ma zachowania, są wyszarzone.
+- Wspólny komponent: `js/labkit/envswitch.js` + `css/envswitch.css` (znacznik `<div class="envSwitch" data-current=… data-space=… data-water=… data-land=…>`; pusty adres = wyszarzone).
+- Statki: jedno laboratorium (`labs/ship.html` — kosmos, `labs/warship.html` — woda, ląd wyszarzony). Pojazdy: `labs/vehicles.html` — ląd, `labs/marine.html` — woda, kosmos wyszarzony.
 
 ## Naprawy modeli
 
 - Modeli nie naprawiamy ręcznie.
 - Naprawa odbywa się przez ulepszanie doktora modeli. Doktor ma być uniwersalny — nigdy dostosowany do jednego modelu.
 - Jeśli naprawa przez doktora nie jest możliwa, zostaje po stronie gry.
+- Jeden doktor dla wszystkich modeli: `tools/doctor.html`, logika `tools/doctor/modeldoctor.js`, źródła modeli `tools/doctor/sources/` (opis: `docs/doctor/README.md`). Wzorzec: `tools/doctor.golden.json` (`python3 tools/doctor.py`, `--update`).
 
 ## Wersjonowanie
 
