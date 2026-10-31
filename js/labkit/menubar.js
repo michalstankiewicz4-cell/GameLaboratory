@@ -26,6 +26,23 @@ const PAGE = (DIR === "labs" || DIR === "tools" ? DIR + "/" : "") + HERE;   // e
 const START = PAGE === "index.html";
 const REPO = "https://github.com/michalstankiewicz4-cell/GameLaboratory/blob/main/";
 
+// LANGUAGE — English or Polish. Chosen in OPTIONS → Language (kept in this browser, gamelab.lang:
+// "auto" | "en" | "pl"); ?lang=pl / ?lang=en in the address wins (links for search engines);
+// "auto" = the browser's languages, and English when none of them is supported.
+const LANGS = { en: "English", pl: "Polski" };
+const LANG_KEY = "gamelab.lang";
+function storedLang() { try { return localStorage.getItem(LANG_KEY) || "auto"; } catch (e) { return "auto"; } }
+function browserLang() {
+  for (const l of navigator.languages || [navigator.language || ""]) { const c = String(l).slice(0, 2).toLowerCase(); if (LANGS[c]) return c; }
+  return "en";
+}
+const URL_LANG = (new URLSearchParams(location.search).get("lang") || "").toLowerCase();
+const LANG_CHOICE = storedLang();
+const LANG = LANGS[URL_LANG] ? URL_LANG : LANGS[LANG_CHOICE] ? LANG_CHOICE : browserLang();
+document.documentElement.lang = LANG;
+const PL = LANG === "pl";
+const t = (en, pl) => (PL ? pl : en);   // the bar's own words
+
 // The labs and tools, shared with the start screen (window.LabMenu.ITEMS).
 const LABS = [
   { file: "labs/ship.html", name: "Ship lab", doc: "docs/ship.md", keys: [["C", "change view: only the ticked blocks"], ["Double-click the name", "rename the ship"], ["Drag / wheel", "turn and zoom the camera"]] },
@@ -69,6 +86,35 @@ const OFFSETS = `
   body.lmTool { padding-top: ${MENU_H + 16}px !important; }
   body.lmTool #app { height: calc(100% - ${MENU_H}px) !important; margin-top: ${MENU_H}px; }
 `;
+// Polish names and keys (the English ones above stay the source)
+const PL_ITEMS = {
+  "labs/ship.html": ["Laboratorium statków", [["C", "zmień widok: tylko zaznaczone bloki"], ["Dwuklik na nazwie", "zmień nazwę statku"], ["Przeciągnij / kółko", "obrót i przybliżenie kamery"]]],
+  "labs/bodies.html": ["Laboratorium ciał niebieskich", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"]]],
+  "labs/systems.html": ["Laboratorium układów", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"], ["Złoty romb na linijce", "przeciągnij: odległość orbity"],
+    ["Turkusowy punkt (Z GÓRY)", "na zewnątrz / do środka: rozciągnij wzdłuż / w poprzek; dookoła: obróć oś"], ["Fioletowy punkt (Z BOKU)", "w górę / w dół: nachylenie"], ["Numer orbity", "wybierz ją: jej suwaki"]]],
+  "labs/scale.html": ["Laboratorium skali", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"]]],
+  "labs/skins.html": ["Laboratorium skórek", []],
+  "labs/surface.html": ["Laboratorium powierzchni", [["W / S, A / D", "jazda, skręt"], ["Shift", "przyspieszenie"], ["Prawy przycisk / kółko", "kamera"], ["B", "zbuduj pierwszy moduł"], ["R / Esc / Delete", "obróć / anuluj / usuń moduł"]]],
+  "labs/buildings.html": ["Laboratorium budynków", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"]]],
+  "labs/vehicles.html": ["Laboratorium pojazdów", [["W / S, A / D", "jazda, skręt"], ["Przeciągnij / kółko", "kamera"]]],
+  "labs/sound.html": ["Laboratorium dźwięku", [["Spacja", "graj / stop"], ["MOODS", "cały nastrój naraz"], ["SEED", "to samo ziarno gra ten sam utwór"]]],
+  "labs/marine.html": ["Laboratorium morza", [["W / S, A / D", "jazda, skręt"], ["Przeciągnij / kółko", "kamera"]]],
+  "labs/creator.html": ["Edytor stworów", [["Przeciągnij złoty punkt", "kształt kręgosłupa"], ["Przeciągnij turkusowy punkt", "przesuń parę nóg"], ["Kółko na punkcie", "grubszy / cieńszy"], ["EDIT / PLAY", "uchwyty albo patrz, jak chodzi"]]],
+  "labs/life.html": ["Laboratorium życia", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"], ["STAND / WALK / RUN / T-POSE", "chody"], ["🎲 przy twarzy", "inna twarz"], ["FACE", "miny, LIVELY, TALK, CLOSE-UP"], ["LAYERS", "skradanie, smutek, złość, kiwanie, kręcenie głową, machanie, spojrzenie — na każdym chodzie"]]],
+  "labs/structures.html": ["Laboratorium budowli", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"]]],
+  "labs/water.html": ["Laboratorium wody", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"]]],
+  "labs/land.html": ["Laboratorium lądu", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"]]],
+  "labs/plants.html": ["Laboratorium roślin", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"]]],
+  "labs/look.html": ["Laboratorium wyglądu", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"]]],
+  "labs/filters.html": ["Laboratorium filtrów", [["Przeciągnij / prawy / kółko", "obrót, przesuw, przybliżenie"]]],
+  "labs/pixel.html": ["Pixel Studio", [["Ctrl+Z / Ctrl+Shift+Z", "cofnij / ponów (Draw)"], ["Prawy przycisk", "gumka (Draw)"]]],
+  "labs/zombies.html": ["Generator zombie", []],
+  "tools/doctor.html": ["Doktor modeli", [["Kliknij model, potem znalezisko", "jego części świecą na czerwono"], ["Przeciągnij / kółko", "obrót i przybliżenie widoku"]]],
+  "labs/transform.html": ["Transformator", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"]]],
+  "tools/kitcheck.html": ["Kontrola kitów", []],
+  "tools/grainTexture.html": ["Tekstura ziarna", []],
+};
+if (PL) for (const it of LABS.concat(TOOLS)) { const p = PL_ITEMS[it.file]; if (p) { it.nameEn = it.name; it.name = p[0]; it.keys = p[1]; } }
 const all = LABS.concat(TOOLS);
 const isTool = DIR === "tools";
 const me = all.find((x) => x.file === PAGE) || null;
@@ -152,24 +198,31 @@ function dialog(title, rows, note) {
     box.appendChild(t);
   }
   if (note) box.appendChild(el("p", null, note));
-  const ok = el("button", null, "Close"); ok.addEventListener("click", () => dlg.classList.remove("open"));
+  const ok = el("button", null, t("Close", "Zamknij")); ok.addEventListener("click", () => dlg.classList.remove("open"));
   box.appendChild(ok);
   dlg.classList.add("open");
 }
 
 // ---------- the menus ----------
 function files() {
-  return [link("Start screen", ROOT + "index.html", { on: START })];
+  return [link(t("Start screen", "Strona startowa"), ROOT + "index.html", { on: START })];
 }
 function options() {
   const keys = SAVED[PAGE] || [];
   return [
-    action("Full screen", () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(() => {}); },
+    action(t("Full screen", "Pełny ekran"), () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(() => {}); },
       { key: "F11", on: !!document.fullscreenElement }),
-    action("Reload this page", () => location.reload(), { key: "F5" }),
+    action(t("Reload this page", "Odśwież stronę"), () => location.reload(), { key: "F5" }),
     el("div", "lmSep"),
-    action("Reset saved settings…", () => {
-      if (!confirm("Forget what this lab keeps in this browser (" + keys.join(", ") + ") and reload?")) return;
+    el("div", "lmLabel", t("Language", "Język")),
+    ...[["auto", t("Automatic (browser)", "Automatycznie (przeglądarka)")], ["en", "English"], ["pl", "Polski"]].map(([k, label]) =>
+      action(label, () => {
+        try { if (k === "auto") localStorage.removeItem(LANG_KEY); else localStorage.setItem(LANG_KEY, k); } catch (e) { /* storage blocked */ }
+        const u = new URL(location.href); u.searchParams.delete("lang"); location.href = u.href;
+      }, { on: LANG_CHOICE === k && !LANGS[URL_LANG] })),
+    el("div", "lmSep"),
+    action(t("Reset saved settings…", "Wyczyść zapisane ustawienia…"), () => {
+      if (!confirm(t("Forget what this lab keeps in this browser (", "Zapomnieć, co to laboratorium trzyma w tej przeglądarce (") + keys.join(", ") + t(") and reload?", ") i odświeżyć?"))) return;
       try { Object.keys(localStorage).forEach((k) => { if (keys.some((p) => k.startsWith(p))) localStorage.removeItem(k); }); } catch (e) { /* storage blocked */ }
       location.reload();
     }, { disabled: !keys.length }),
@@ -177,30 +230,30 @@ function options() {
 }
 // the labs and the tools, all here (FILES keeps only the start screen and the game)
 function tools() {
-  const d = [el("div", "lmLabel", "Labs")];
+  const d = [el("div", "lmLabel", t("Labs", "Laboratoria"))];
   LABS.forEach((l) => d.push(link(l.name, ROOT + l.file, { on: me === l })));
-  d.push(el("div", "lmSep"), el("div", "lmLabel", "Tools"));
+  d.push(el("div", "lmSep"), el("div", "lmLabel", t("Tools", "Narzędzia")));
   TOOLS.forEach((t) => d.push(link(t.name, ROOT + t.file, { on: me === t })));
   return d;
 }
 function help() {
   return [
-    action("Keyboard and mouse", () => dialog((me ? me.name : "Labs") + ": keys and mouse", me && me.keys.length ? me.keys : [["—", "nothing special here"]])),
-    link("This page's notes", REPO + (me ? me.doc : "README.md"), { blank: true }),
-    link("All the docs", REPO + "README.md", { blank: true }),
-    link("What's new", REPO + "CHANGELOG.md", { blank: true }),
+    action(t("Keyboard and mouse", "Klawiatura i mysz"), () => dialog((me ? me.name : t("Labs", "Laboratoria")) + t(": keys and mouse", ": klawisze i mysz"), me && me.keys.length ? me.keys : [["—", t("nothing special here", "nic szczególnego")]])),
+    link(t("This page's notes", "Notatki tej strony"), REPO + (me ? me.doc : "README.md"), { blank: true }),
+    link(t("All the docs", "Cała dokumentacja"), REPO + "README.md", { blank: true }),
+    link(t("What's new", "Co nowego"), REPO + "CHANGELOG.md", { blank: true }),
     el("div", "lmSep"),
-    action("About the labs", () => dialog("GameLaboratory", [["What", "laboratories of models and worlds: space, land and water"],
-      ["Program", "v" + APP_VERSION], ...(me && V.labs[me.file] ? [["This " + (isTool ? "tool" : "lab"), "v" + V.labs[me.file]]] : []), ["Code", "MIT, github.com/michalstankiewicz4-cell/GameLaboratory"]],
-      "Every lab has its own version; the program has one too.")),
+    action(t("About the labs", "O laboratoriach"), () => dialog("GameLaboratory", [[t("What", "Co to"), t("an engine for AI in the browser: laboratories of models and worlds — space, land and water", "silnik dla AI w przeglądarce: laboratoria modeli i światów — kosmos, ląd i woda")],
+      [t("Program", "Program"), "v" + APP_VERSION], ...(me && V.labs[me.file] ? [[isTool ? t("This tool", "To narzędzie") : t("This lab", "To laboratorium"), "v" + V.labs[me.file]]] : []), [t("Code", "Kod"), "MIT, github.com/michalstankiewicz4-cell/GameLaboratory"]],
+      t("Every lab has its own version; the program has one too.", "Każde laboratorium ma własną wersję; program też ma swoją."))),
   ];
 }
 
 const bar = el("div"); bar.id = "labMenu";
-const home = el("a", "lmHome"); home.href = ROOT + "index.html"; home.title = "Start screen";
+const home = el("a", "lmHome"); home.href = ROOT + "index.html"; home.title = t("Start screen", "Strona startowa");
 home.append(el("span", "lmMark"), document.createTextNode("GameLaboratory"));
 bar.appendChild(home);
-const menus = [["Files", files], ["Options", options], ["Tools", tools], ["Help", help]];
+const menus = [[t("Files", "Pliki"), files], [t("Options", "Opcje"), options], [t("Tools", "Narzędzia"), tools], [t("Help", "Pomoc"), help]];
 menus.forEach(([name, make]) => {
   const top = el("div", "lmTop"), btn = el("button", null, name); btn.type = "button";
   const drop = el("div", "lmDrop");
@@ -219,11 +272,11 @@ menus.forEach(([name, make]) => {
   bar.appendChild(top);
 });
 const where = el("div", "lmWhere");
-where.append(document.createTextNode(isTool ? "Tool · " : "Lab · "), el("b", null, me ? me.name : "Start screen"));
+where.append(document.createTextNode(isTool ? t("Tool · ", "Narzędzie · ") : t("Lab · ", "Laboratorium · ")), el("b", null, me ? me.name : t("Start screen", "Strona startowa")));
 if (me) bar.appendChild(where);
 // the labs' version, linked to what changed
-const ver = el("a", "lmVer", "v" + APP_VERSION + (me && V.labs[me.file] ? " · " + (isTool ? "tool" : "lab") + " v" + V.labs[me.file] : "")); ver.href = REPO + "CHANGELOG.md"; ver.target = "_blank"; ver.rel = "noopener";
-ver.title = "Program version · this page's version — what's new";
+const ver = el("a", "lmVer", "v" + APP_VERSION + (me && V.labs[me.file] ? " · " + (isTool ? t("tool", "narzędzie") : t("lab", "lab.")) + " v" + V.labs[me.file] : "")); ver.href = REPO + "CHANGELOG.md"; ver.target = "_blank"; ver.rel = "noopener";
+ver.title = t("Program version · this page's version — what's new", "Wersja programu · wersja tej strony — co nowego");
 bar.appendChild(ver);
 function closeAll() { bar.querySelectorAll(".lmTop.open").forEach((t) => t.classList.remove("open")); }
 document.addEventListener("pointerdown", (e) => { if (!bar.contains(e.target)) closeAll(); });
@@ -247,5 +300,5 @@ if (me) {
 document.body.appendChild(dlg);
 
 // the game's version, for "About"
-window.LabMenu = { ITEMS: { LABS, TOOLS }, ROOT, MENU_H, APP_VERSION, VERSIONS: V, version: null };
+window.LabMenu = { ITEMS: { LABS, TOOLS }, ROOT, MENU_H, APP_VERSION, VERSIONS: V, version: null, LANG, t };
 })();

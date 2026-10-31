@@ -3,15 +3,51 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GameLaboratory</title>
-<meta name="description" content="Laboratories of models and worlds — space, land and water — built from code in the browser.">
+<title>GameLaboratory — an engine for AI to build 3D models, worlds and games in the browser</title>
+<meta name="description" content="GameLaboratory — an engine for AI in the browser: laboratories where AI builds, shapes and tests 3D models, worlds and games in JavaScript and Three.js. Ships, planets, vehicles, a train with real wheel–rail physics, water, land, life, pixel art and a model doctor.">
+<meta name="keywords" content="AI game engine, engine for AI, AI 3D models, browser game engine, Three.js, WebGL, procedural generation, game development, 3D model laboratory, silnik dla AI, silnik gier dla AI, modele 3D, gry w przeglądarce, generowanie proceduralne">
+<meta name="author" content="Michał Stankiewicz">
+<meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/">
+<link rel="alternate" hreflang="en" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/?lang=en">
+<link rel="alternate" hreflang="pl" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/?lang=pl">
+<link rel="alternate" hreflang="x-default" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="GameLaboratory">
-<meta property="og:title" content="GameLaboratory">
-<meta property="og:description" content="Laboratories of models and worlds — space, land and water — built from code in the browser.">
+<meta property="og:title" content="GameLaboratory — an engine for AI to build 3D models, worlds and games">
+<meta property="og:description" content="GameLaboratory — an engine for AI in the browser: laboratories where AI builds, shapes and tests 3D models, worlds and games in JavaScript and Three.js. Ships, planets, vehicles, a train with real wheel–rail physics, water, land, life, pixel art and a model doctor.">
 <meta property="og:url" content="https://michalstankiewicz4-cell.github.io/GameLaboratory/">
+<meta property="og:image" content="https://michalstankiewicz4-cell.github.io/GameLaboratory/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="GameLaboratory start screen: tiles of the labs — ships, planets, vehicles, water, land, life, pixel art">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="pl_PL">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="GameLaboratory — an engine for AI to build 3D models, worlds and games">
+<meta name="twitter:description" content="GameLaboratory — an engine for AI in the browser: laboratories where AI builds, shapes and tests 3D models, worlds and games in JavaScript and Three.js. Ships, planets, vehicles, a train with real wheel–rail physics, water, land, life, pixel art and a model doctor.">
+<meta name="twitter:image" content="https://michalstankiewicz4-cell.github.io/GameLaboratory/assets/og-image.jpg">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "GameLaboratory",
+  "alternateName": "GameLaboratory — silnik dla AI",
+  "url": "https://michalstankiewicz4-cell.github.io/GameLaboratory/",
+  "image": "https://michalstankiewicz4-cell.github.io/GameLaboratory/assets/og-image.jpg",
+  "applicationCategory": "DeveloperApplication",
+  "applicationSubCategory": "Game engine for AI",
+  "operatingSystem": "Any (web browser with WebGL)",
+  "inLanguage": ["en", "pl"],
+  "isAccessibleForFree": true,
+  "license": "https://opensource.org/licenses/MIT",
+  "author": { "@type": "Person", "name": "Michał Stankiewicz" },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "GameLaboratory — an engine for AI in the browser: laboratories where AI builds, shapes and tests 3D models, worlds and games in JavaScript and Three.js. Ships, planets, vehicles, a train with real wheel–rail physics, water, land, life, pixel art and a model doctor.",
+  "abstract": "GameLaboratory — silnik dla AI w przeglądarce: laboratoria, w których AI buduje, kształtuje i testuje modele 3D, światy i gry w JavaScripcie i Three.js. Statki, planety, pojazdy, pociąg z prawdziwą fizyką koło–szyna, woda, ląd, życie, pixel art i doktor modeli.",
+  "keywords": "engine for AI, AI game engine, 3D models, Three.js, WebGL, procedural generation, silnik dla AI, modele 3D, gry w przeglądarce"
+}
+</script>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <!-- The labs' start screen (index.html, in the root; the labs themselves
      live in labs/, the tools in tools/): a tile for every lab and tool, with the menu
@@ -84,6 +120,19 @@ h2::after{ order:1; }
 .file{ font:12px "IBM Plex Mono", ui-monospace, monospace; color:var(--dim); }
 .desc{ font-size:14px; color:#a7adbb; flex:1; }
 .art img{ width:100%; height:100%; object-fit:cover; display:block; }
+/* the filter: a search box and the phrases of every lab (any tile matching all the chosen ones stays) */
+.filter{ display:flex; flex-direction:column; gap:10px; margin:6px 0 4px; }
+.filter input{ width:min(420px, 100%); height:36px; padding:0 14px; border-radius:10px; border:1px solid var(--line); background:rgba(21,24,32,.8);
+  color:var(--head); font:inherit; font-size:14px; outline:none; }
+.filter input:focus{ border-color:#3a4256; }
+.chips{ display:flex; gap:6px; flex-wrap:wrap; }
+.chip{ font:inherit; font-size:12.5px; padding:3px 10px; border-radius:999px; border:1px solid var(--line); background:rgba(255,255,255,.03); color:#a7adbb; cursor:pointer; }
+.chip:hover{ color:var(--head); border-color:#3a4256; }
+.chip.on{ color:#0d0f13; background:#36d6b5; border-color:#36d6b5; }
+.chip.more, .chip.clear{ background:none; color:#7d8494; }
+.chip b{ font-weight:500; opacity:.6; margin-left:4px; }
+.tile.out{ display:none; }
+.noMatch{ color:var(--dim); font-size:14px; padding:8px 2px; }
 .phrases{ display:flex; gap:4px; flex-wrap:wrap; margin-top:6px; }
 .phrase{ font-size:11px; padding:1px 7px; border-radius:4px; background:rgba(255,255,255,.05); color:#8f96a5; }
 .tags{ display:flex; gap:6px; flex-wrap:wrap; margin-top:4px; }
@@ -103,26 +152,40 @@ footer a{ color:#9aa1b0; }
   <header>
     <div>
       <h1>Game<span>Laboratory</span></h1>
-      <p class="lead">Laboratories of models and worlds: space, land and water. Each lab builds, shapes and tests models with the kits it shares with the other labs.</p>
+      <p class="lead" data-pl="Silnik dla AI w przeglądarce: laboratoria modeli i światów — kosmos, ląd i woda. Każde laboratorium buduje, kształtuje i testuje modele zestawami, które dzieli z pozostałymi.">An engine for AI in the browser: laboratories of models and worlds — space, land and water. Each lab builds, shapes and tests models with the kits it shares with the other labs.</p>
     </div>
     <div class="stats">
-      <div class="stat"><b id="nLabs">–</b><span>labs</span></div>
-      <div class="stat"><b id="nGame">–</b><span>in the game</span></div>
-      <div class="stat"><b id="nTools">–</b><span>tools</span></div>
-      <div class="stat"><b id="labsVer">–</b><span>program</span></div>
+      <div class="stat"><b id="nLabs">–</b><span data-pl="laboratoria">labs</span></div>
+      <div class="stat"><b id="nTools">–</b><span data-pl="narzędzia">tools</span></div>
+      <div class="stat"><b id="labsVer">–</b><span data-pl="program">program</span></div>
     </div>
   </header>
-  <h2>Quick access</h2>
+  <h2 data-pl="Szybki dostęp">Quick access</h2>
   <div class="grid quick" id="quick"></div>
-  <h2>Laboratories</h2>
+  <h2 data-pl="Laboratoria">Laboratories</h2>
+  <div class="filter" id="filter"><input id="fSearch" type="search" autocomplete="off"><div class="chips" id="fChips"></div></div>
+  <div class="noMatch" id="noMatch" hidden></div>
   <div class="grid" id="labs"></div>
-  <h2>Tools</h2>
+  <h2 data-pl="Narzędzia">Tools</h2>
   <div class="grid" id="tools"></div>
   <footer><span>GameLaboratory · MIT</span></footer>
 </main>
 <script>
 (() => {
 "use strict";
+// language: chosen by the menu bar (OPTIONS → Language; js/labkit/menubar.js) — English or Polish
+const PL = window.LabMenu.LANG === "pl", tr = window.LabMenu.t;
+// a language chosen by the address (?lang=pl / ?lang=en) is its own page for search engines
+{ const q = new URLSearchParams(location.search).get("lang"); const c = document.querySelector('link[rel="canonical"]');
+  if (c && (q === "pl" || q === "en")) c.href = c.href.split("?")[0] + "?lang=" + q; }
+if (PL) {
+  document.querySelectorAll("[data-pl]").forEach((e) => { e.textContent = e.dataset.pl; });
+  document.title = "GameLaboratory — silnik dla AI do modeli 3D, światów i gier w przeglądarce";
+  const meta = (sel, v) => { const m = document.querySelector(sel); if (m) m.setAttribute("content", v); };
+  const D = "GameLaboratory — silnik dla AI w przeglądarce: laboratoria, w których AI buduje, kształtuje i testuje modele 3D, światy i gry w JavaScripcie i Three.js. Statki, planety, pojazdy, pociąg z prawdziwą fizyką koło–szyna, woda, ląd, życie, pixel art i doktor modeli.", T = "GameLaboratory — silnik dla AI do modeli 3D, światów i gier";
+  meta('meta[name="description"]', D); meta('meta[property="og:description"]', D); meta('meta[name="twitter:description"]', D);
+  meta('meta[property="og:title"]', T); meta('meta[name="twitter:title"]', T); meta('meta[property="og:locale"]', "pl_PL");
+}
 // gradient + line art per tile (viewBox 0 0 200 100)
 const ART = {
   "labs/filters.html": { bg: ["#1c2436", "#0b0e16"], svg: `<defs><linearGradient id="fl" x1="0" x2="1"><stop offset="0" stop-color="#5b8cff"/><stop offset=".5" stop-color="#36d6b5"/><stop offset="1" stop-color="#f2b84b"/></linearGradient></defs><circle cx="78" cy="50" r="30" fill="none" stroke="url(#g)" stroke-width="3" opacity=".8"/><circle cx="122" cy="50" r="30" fill="url(#fl)" opacity=".35"/><circle cx="100" cy="50" r="12" fill="#fff" opacity=".85"/><path d="M30 86 H170" stroke="#9fb4ff" stroke-width="2" opacity=".5"/>` },
@@ -161,7 +224,7 @@ const INFO = {
   "labs/skins.html": ["Other looks for the game's interface, tried on a mock-up.", "lab", "UI"],
   "labs/surface.html": ["Land on a planet: terrain from its own look, sky, weather, day and night, a base.", "game", "SurfaceKit"],
   "labs/buildings.html": ["The base's modules one by one: built, as a hologram, under construction.", "game", "BaseKit"],
-  "labs/vehicles.html": ["Robot rovers: suspension, wheels and tracks, dust, lamps. A train on a track: a shunting diesel and two wagons.", "lab", "VehicleKit · TrainKit"],
+  "labs/vehicles.html": ["Robot rovers: suspension, wheels and tracks, dust, lamps. A train that drives: a shunting diesel and two wagons on an oval with turnouts, with real wheel–rail physics.", "lab", "VehicleKit · TrainKit"],
   "labs/creator.html": ["Build a creature: drag its spine into shape, give it pairs of legs anywhere — it walks, on any number of legs.", "lab", "LifeKit"],
   "labs/life.html": ["Life forms from blocks: a skeleton, bodies that bend at the joints. The first one, a human, stands, walks and runs.", "lab", "LifeKit"],
   "labs/sound.html": ["The game's music, made live from layers and a seed: drones, pads, chimes, whispers, a robot's voice.", "lab", "MusicKit"],
@@ -176,12 +239,39 @@ const INFO = {
   "labs/look.html": ["Sky, seven weathers, time of day, procedural ageing of surfaces, graphics filters.", "game", "SkyKit"],
   "labs/transform.html": ["A lab ship made game-ready: levels of detail, hitboxes, shader damage, fleet performance test.", "tool", "transform"],
 };
-// Phrases that describe each lab — for a future filter of the labs.
+// the same in Polish
+const INFO_PL = {
+  "labs/filters.html": "Wygląd kamery z laboratoriów wodnych na wybranych scenach — ekspozycja, mapowanie tonów, kolor, poświata, winieta, ziarno, efekty obiektywu, wyostrzenie; w porównaniu z czystym obrazem, z kosztem każdego efektu.",
+  "labs/pixel.html": "Pixel art z przezroczystym tłem: modele 3D renderowane do pikseli, generowane sprite'y i kafelki, edytor pikseli; palety, dithering, obrys; PNG, arkusze sprite'ów, GIF. Z własnym Pixel Doctorem.",
+  "labs/zombies.html": "Oryginalne zombie z ziarna, animowane w 8 kierunkach, eksportowane jako arkusze sprite'ów dla Unity (JSON, skrypt cięcia, ZIP).",
+  "labs/ship.html": "Statki w kosmosie i na morzu — przełącz środowisko. Kosmos: statki, dron i stacja: buduj, kształtuj, nazywaj, oświetlaj, animuj. Woda: prawdziwe okręty w prawdziwej skali, ORP Błyskawica i okręt podwodny ORP Orzeł.",
+  "labs/bodies.html": "Planety, słońca, olbrzymy, skały, komety i czarne dziury — każdy suwak ich shaderów.",
+  "labs/systems.html": "Całe układy gwiezdne z ciał niebieskich: gotowe zestawy i generator z ziarna.",
+  "labs/scale.html": "Rozmiary obok siebie: statki, ciała niebieskie i odległości, żeby świat trzymał proporcje.",
+  "labs/skins.html": "Inne wyglądy interfejsu gry, przymierzane na makiecie.",
+  "labs/surface.html": "Ląd na planecie: teren z jej własnego wyglądu, niebo, pogoda, dzień i noc, baza.",
+  "labs/buildings.html": "Moduły bazy jeden po drugim: zbudowane, jako hologram, w budowie.",
+  "labs/vehicles.html": "Łaziki-roboty: zawieszenie, koła i gąsienice, kurz, lampy. Pociąg, który jeździ: lokomotywa manewrowa i dwa wagony na owalu z rozjazdami, z prawdziwą fizyką koło–szyna.",
+  "labs/creator.html": "Zbuduj stwora: wygnij jego kręgosłup, daj mu pary nóg gdziekolwiek — chodzi, na dowolnej liczbie nóg.",
+  "labs/life.html": "Formy życia z bloków: szkielet, ciała zginające się w stawach. Pierwsza z nich, człowiek, stoi, chodzi i biega.",
+  "labs/sound.html": "Muzyka gry tworzona na żywo z warstw i ziarna: burdony, plamy, dzwonki, szepty, głos robota.",
+  "labs/marine.html": "Morze i to, co pod nim: fale, dno, wyspa, pojazdy-roboty.",
+  "tools/doctor.html": "Każdy model każdego laboratorium — kosmos, morze, ląd, kolej — badany pod kątem powtarzających się błędów: odwrócone bryły, dziury, migotanie, wiszące części, działa strzelające we własny okręt, okucia przez kadłub.",
+  "tools/kitcheck.html": "Siatka bezpieczeństwa: odcisk każdego modelu porównany ze wzorcem, każde laboratorium sprawdzone pod kątem błędów.",
+  "tools/grainTexture.html": "Generuje od nowa ziarno filmowe, którego używają panele interfejsu.",
+  "labs/structures.html": "Budowle nad wodą w prawdziwej skali: platforma wiertnicza typu jack-up, nabrzeże, falochron.",
+  "labs/water.html": "Stany morza od ciszy do sztormu, odbicia, piana, fala dziobowa, kilwater, bryzgi, kołysanie okrętu — z kosztem każdego efektu.",
+  "labs/land.html": "Proceduralny ląd i morze od 0 do 100 % lądu: wyspy, wybrzeża, fiordy, erozja, plaże, przybój.",
+  "labs/plants.html": "Drzewa, palmy, krzewy i trawa wyhodowane z kodu, poruszane wiatrem.",
+  "labs/look.html": "Niebo, siedem pogód, pora dnia, proceduralne starzenie powierzchni, filtry grafiki.",
+  "labs/transform.html": "Statek z laboratorium przygotowany do gry: poziomy szczegółów, hitboxy, uszkodzenia w shaderze, test wydajności floty.",
+};
+// Phrases that describe each lab — the filter above the labs uses them.
 const PHRASES = {
   "labs/filters.html": ["filtry", "grafika", "kamera", "obraz", "efekty", "tone mapping"],
   "labs/pixel.html": ["pixel art", "sprite", "2D", "animacja", "paleta", "GIF"],
   "labs/zombies.html": ["zombie", "postać", "sprite", "animacja", "Unity"],
-  "labs/ship.html": ["kosmos", "woda", "statki", "okręty", "okręt podwodny", "stacja", "dron", "światła"],
+  "labs/ship.html": ["kosmos", "woda", "statki", "okręty", "okręt podwodny", "Orzeł", "stacja", "dron", "światła"],
   "labs/bodies.html": ["kosmos", "planety", "słońca", "czarne dziury", "komety"],
   "labs/systems.html": ["kosmos", "układy", "orbity", "gwiazdy"],
   "labs/scale.html": ["kosmos", "skala", "proporcje"],
@@ -203,7 +293,11 @@ const PHRASES = {
   "tools/kitcheck.html": ["narzędzie", "testy"],
   "tools/grainTexture.html": ["narzędzie", "tekstura"],
 };
-const STATUS = { game: "In the game", lab: "Lab only", tool: "Tool" };
+// status tag: only tools carry one (the games are not in this repository)
+// the phrases in English (shown when the page is in English)
+const PHRASE_EN = {"2D": "2D", "GIF": "GIF", "LOD": "LOD", "Orzeł": "Orzeł", "Unity": "Unity", "animacja": "animation", "baza": "base", "budowle": "structures", "budynki": "buildings", "błędy": "errors", "chód": "gait", "czarne dziury": "black holes", "człowiek": "human", "dron": "drone", "drzewa": "trees", "dźwięk": "sound", "efekty": "effects", "erozja": "erosion", "fale": "waves", "filtry": "filters", "grafika": "graphics", "gwiazdy": "stars", "gąsienice": "tracks", "hitboxy": "hitboxes", "interfejs": "interface", "kamera": "camera", "kilwater": "wake", "komety": "comets", "kosmos": "space", "koła": "wheels", "ląd": "land", "lądowanie": "landing", "modele": "models", "moduły": "modules", "morze": "sea", "muzyka": "music", "nabrzeże": "quay", "narzędzie": "tool", "niebo": "sky", "nogi": "legs", "obraz": "image", "okręt podwodny": "submarine", "okręty": "warships", "orbity": "orbits", "paleta": "palette", "piana": "foam", "pixel art": "pixel art", "planeta": "planet", "planety": "planets", "platforma": "platform", "pociąg": "train", "pod wodą": "underwater", "pogoda": "weather", "pojazdy": "vehicles", "pora dnia": "time of day", "postać": "character", "proporcje": "proportions", "rośliny": "plants", "skala": "scale", "sprite": "sprite", "stacja": "station", "starzenie": "ageing", "statki": "ships", "stwory": "creatures", "słońca": "suns", "tekstura": "texture", "teren": "terrain", "testy": "tests", "tone mapping": "tone mapping", "tor": "track", "trawa": "grass", "twarz": "face", "układy": "systems", "wiatr": "wind", "woda": "water", "wybrzeże": "coast", "wydajność": "performance", "wygląd": "look", "wyspy": "islands", "zombie": "zombie", "łaziki": "rovers", "światła": "lights", "życie": "life"};
+const phrase = (w) => (PL ? w : PHRASE_EN[w] || w);
+const STATUS = { tool: tr("Tool", "Narzędzie") };
 const { LABS, TOOLS } = window.LabMenu.ITEMS;
 function tile(item) {
   const a = document.createElement("a"), art = ART[item.file], info = INFO[item.file] || ["", "lab", ""];
@@ -215,15 +309,15 @@ function tile(item) {
       <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#9fb4ff"/></linearGradient></defs>${art.svg.replace(/url\(#g\)/g, "url(#" + id + ")")}</svg></div>`;
   a.innerHTML = `${pic}
     <div class="body"><div class="name"><span></span><span class="file"></span></div><div class="desc"></div>
-      <div class="tags"><span class="tag ${info[1]}">${STATUS[info[1]]}</span><span class="tag"></span></div>
+      <div class="tags">${STATUS[info[1]] ? `<span class="tag ${info[1]}">${STATUS[info[1]]}</span>` : ""}<span class="tag"></span></div>
       <div class="phrases"></div></div>`;
   a.querySelector(".name span").textContent = item.name;
   a.querySelector(".file").textContent = item.file.replace(/^(tools|labs)\//, "");
   const v = window.LabMenu.VERSIONS.labs[item.file]; if (v) a.querySelector(".file").textContent += " · v" + v;
-  a.querySelector(".desc").textContent = info[0];
+  a.querySelector(".desc").textContent = (PL && INFO_PL[item.file]) || info[0];
   a.querySelector(".tags .tag:last-child").textContent = info[2];
   const ph = a.querySelector(".phrases");
-  for (const w of PHRASES[item.file] || []) { const e = document.createElement("span"); e.className = "phrase"; e.textContent = w; ph.appendChild(e); }
+  for (const w of PHRASES[item.file] || []) { const e = document.createElement("span"); e.className = "phrase"; e.textContent = phrase(w); ph.appendChild(e); }
   return a;
 }
 // ---------- the order: yours, dragged by the six-dot grip, kept in this browser ----------
@@ -245,7 +339,7 @@ const PIN = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.2 1.6 14.4
 function pinButton(file) {
   const p = document.createElement("span");
   p.className = "pin" + (store(PIN_KEY, null) === file ? " on" : ""); p.innerHTML = PIN; p.setAttribute("role", "button"); p.tabIndex = 0;
-  p.title = store(PIN_KEY, null) === file ? "Unpin" : "Pin to QUICK ACCESS";
+  p.title = store(PIN_KEY, null) === file ? tr("Unpin", "Odepnij") : tr("Pin to QUICK ACCESS", "Przypnij do SZYBKIEGO DOSTĘPU");
   const toggle = (e) => {
     e.preventDefault(); e.stopPropagation();
     const now = store(PIN_KEY, null) === file ? null : file;
@@ -261,13 +355,13 @@ function quick() {
   const pinned = store(PIN_KEY, null), recent = store("labsHub.recent", []), visits = store("labsHub.visits", {});
   const known = (f) => ALL.some((x) => x.file === f), used = new Set();
   const slots = [];
-  slots.push(["pin", "Pinned", known(pinned) ? pinned : null, "Pin a lab", "The pin on any tile puts it here."]);
+  slots.push(["pin", tr("Pinned", "Przypięte"), known(pinned) ? pinned : null, tr("Pin a lab", "Przypnij laboratorium"), tr("The pin on any tile puts it here.", "Pinezka na dowolnym kafelku przypina je tutaj.")]);
   if (slots[0][2]) used.add(slots[0][2]);
   const last = recent.find((f) => known(f) && !used.has(f)) || null;
-  slots.push(["last", "Last opened", last, "Last opened", "The lab you were in last will wait here."]);
+  slots.push(["last", tr("Last opened", "Ostatnio otwarte"), last, tr("Last opened", "Ostatnio otwarte"), tr("The lab you were in last will wait here.", "Tu poczeka laboratorium, w którym byłeś ostatnio.")]);
   if (last) used.add(last);
   const most = Object.keys(visits).filter((f) => known(f) && !used.has(f)).sort((a, b) => visits[b] - visits[a]);
-  [0, 1].forEach((k) => slots.push(["most", "Most opened" + (most[k] ? " · " + visits[most[k]] + "×" : ""), most[k] || null, "Most opened", "The labs you open most will show up here."]));
+  [0, 1].forEach((k) => slots.push(["most", tr("Most opened", "Najczęściej otwierane") + (most[k] ? " · " + visits[most[k]] + "×" : ""), most[k] || null, tr("Most opened", "Najczęściej otwierane"), tr("The labs you open most will show up here.", "Tu pojawią się laboratoria, które otwierasz najczęściej.")]));
   slots.forEach(([kind, badge, file, emptyTitle, emptyText]) => {
     if (!file) {
       const e = document.createElement("div"); e.className = "empty";
@@ -290,8 +384,8 @@ function fill(gridId, items, key) {
     const t = tile(it);
     t.dataset.file = it.file;
     const g = document.createElement("span");
-    g.className = "grip"; g.innerHTML = GRIP; g.title = "Drag to reorder"; g.setAttribute("role", "button"); g.tabIndex = 0;
-    g.setAttribute("aria-label", "Drag to reorder " + it.name + " (or Alt+arrow keys)");
+    g.className = "grip"; g.innerHTML = GRIP; g.title = tr("Drag to reorder", "Przeciągnij, by zmienić kolejność"); g.setAttribute("role", "button"); g.tabIndex = 0;
+    g.setAttribute("aria-label", tr("Drag to reorder ", "Przeciągnij, by przestawić: ") + it.name + tr(" (or Alt+arrow keys)", " (albo Alt+strzałki)"));
     t.appendChild(g);
     t.appendChild(pinButton(it.file));
     grid.appendChild(t);
@@ -306,7 +400,7 @@ function resetButton(grid) {
   const custom = !!loadOrder()[grid.dataset.key];
   if (!custom) { if (b) b.remove(); return; }
   if (b) return;
-  b = document.createElement("button"); b.className = "reset"; b.type = "button"; b.textContent = "Reset order";
+  b = document.createElement("button"); b.className = "reset"; b.type = "button"; b.textContent = tr("Reset order", "Przywróć kolejność");
   b.addEventListener("click", () => { const o = loadOrder(); delete o[grid.dataset.key]; saveOrder(o); render(); });
   h.appendChild(b);
 }
@@ -316,7 +410,56 @@ function remember(grid) {
   saveOrder(o);
   resetButton(grid);
 }
-function render() { quick(); fill("labs", LABS, "labs"); fill("tools", TOOLS, "tools"); }
+function render() { quick(); fill("labs", LABS, "labs"); fill("tools", TOOLS, "tools"); applyFilter(); }
+
+// ---------- the filter: phrases (all the chosen ones) and words typed (name, description, phrases) ----------
+const chosen = new Set();
+let showAll = false;
+const fSearch = document.getElementById("fSearch"), fChips = document.getElementById("fChips"), noMatch = document.getElementById("noMatch");
+fSearch.placeholder = tr("Search the labs…", "Szukaj laboratoriów…");
+const fold = (x) => x.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ł/g, "l");
+function counts() {
+  const c = new Map();
+  for (const it of LABS.concat(TOOLS)) for (const w of PHRASES[it.file] || []) c.set(w, (c.get(w) || 0) + 1);
+  return [...c.entries()].sort((a, b) => b[1] - a[1] || phrase(a[0]).localeCompare(phrase(b[0])));
+}
+function chips() {
+  fChips.textContent = "";
+  const all = counts(), list = showAll ? all : all.filter(([w], i) => i < 16 || chosen.has(w));
+  for (const [w, n] of list) {
+    const b = document.createElement("button"); b.type = "button"; b.className = "chip" + (chosen.has(w) ? " on" : "");
+    b.append(phrase(w)); const k = document.createElement("b"); k.textContent = n; b.appendChild(k);
+    b.addEventListener("click", () => { if (chosen.has(w)) chosen.delete(w); else chosen.add(w); chips(); applyFilter(); });
+    fChips.appendChild(b);
+  }
+  if (all.length > 16) {
+    const m = document.createElement("button"); m.type = "button"; m.className = "chip more";
+    m.textContent = showAll ? tr("fewer", "mniej") : tr("all phrases", "wszystkie frazy") + " (" + all.length + ")";
+    m.addEventListener("click", () => { showAll = !showAll; chips(); }); fChips.appendChild(m);
+  }
+  if (chosen.size || fSearch.value) {
+    const c = document.createElement("button"); c.type = "button"; c.className = "chip clear"; c.textContent = tr("clear ✕", "wyczyść ✕");
+    c.addEventListener("click", () => { chosen.clear(); fSearch.value = ""; chips(); applyFilter(); }); fChips.appendChild(c);
+  }
+}
+function applyFilter() {
+  const q = fold(fSearch.value.trim()), words = q ? q.split(/\s+/) : [];
+  let shown = 0;
+  for (const id of ["labs", "tools"]) document.getElementById(id).querySelectorAll(".tile").forEach((t) => {
+    const f = t.dataset.file, ph = PHRASES[f] || [], it = ALL.find((x) => x.file === f);
+    const text = fold([it ? it.name : "", it && it.nameEn || "", f, (INFO[f] || [""])[0], INFO_PL[f] || "", ...ph, ...ph.map((w) => PHRASE_EN[w] || "")].join(" "));
+    const ok = [...chosen].every((w) => ph.includes(w)) && words.every((w) => text.includes(w));
+    t.classList.toggle("out", !ok); if (ok) shown++;
+  });
+  const active = chosen.size || words.length;
+  noMatch.hidden = !active || shown > 0;
+  noMatch.textContent = tr("No lab matches — clear the filter.", "Żadne laboratorium nie pasuje — wyczyść filtr.");
+  // with a filter on, the tools' heading goes when none of them is left
+  const tools = document.getElementById("tools"), anyTool = !!tools.querySelector(".tile:not(.out)");
+  tools.style.display = anyTool ? "" : "none"; tools.previousElementSibling.style.display = anyTool ? "" : "none";
+}
+fSearch.addEventListener("input", () => { chips(); applyFilter(); });
+chips();
 render();
 
 // FLIP: the other tiles glide to their new places
@@ -385,7 +528,6 @@ document.addEventListener("keydown", (e) => {
   g.focus();
 });
 document.getElementById("nLabs").textContent = LABS.length;
-document.getElementById("nGame").textContent = LABS.filter((l) => (INFO[l.file] || [])[1] === "game").length;
 document.getElementById("nTools").textContent = TOOLS.length;
 document.getElementById("labsVer").textContent = "v" + window.LabMenu.APP_VERSION;
 })();

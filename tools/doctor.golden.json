@@ -474,8 +474,7 @@
  },
  "train/steelVan": {
   "counts": {
-   "sliver": 7,
-   "zfight": 1
+   "sliver": 7
   },
   "fingerprint": {
    "drawCalls": 202,
@@ -490,8 +489,7 @@
  },
  "train/woodVan": {
   "counts": {
-   "sliver": 5,
-   "zfight": 1
+   "sliver": 5
   },
   "fingerprint": {
    "drawCalls": 213,

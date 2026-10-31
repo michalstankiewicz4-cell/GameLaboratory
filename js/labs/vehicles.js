@@ -67,7 +67,8 @@ const drv = { x: 0, z: 0, yaw: 0, speed: 0 };
 let veh = null;
 const dust = VK.makeDust(0xc9a27c); scene.add(dust.points);
 // other model families (e.g. the train, js/labs/vehicles/train.js) show here instead
-// of a VehicleKit vehicle: { name, role, build(scene) → group, rows(), target, camera }
+// of a VehicleKit vehicle: { name, role, build(scene) → group, rows(), target, camera,
+// panel (their own controls, in place of DRIVE / GROUND), update(dt, t) (their behaviour, each frame) }
 let mode = null;
 const modes = [];
 function setMode(m) {
@@ -75,8 +76,10 @@ function setMode(m) {
   mode = m;
   const on = !!m;
   ground.visible = !on; dust.points.visible = !on; if (veh) veh.group.visible = !on;
+  $("vkPanel").classList.toggle("hidden", on);
+  for (const x of modes) if (x.panel) x.panel.classList.toggle("hidden", x !== m);
   if (!m) return;
-  if (!m.group) { m.group = m.build(scene); scene.add(m.group); }
+  if (!m.group) { m.group = m.build(scene); scene.add(m.group); if (m.panel) $("modePanel").appendChild(m.panel); }
   m.group.visible = true;
   $("hudTitle").textContent = m.name; $("role").textContent = m.role;
   [...$("vehTabs").children].forEach((b) => b.classList.toggle("on", b === m.tab));
@@ -149,7 +152,8 @@ const clock = new THREE.Clock(), prev = new THREE.Vector3(), delta = new THREE.V
 let wander = 0;
 function frame() {
   const t0 = performance.now(), dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
-  if (mode) {   // another family: a still model for now (no behaviour yet)
+  if (mode) {   // another family: its own behaviour, if it has one
+    if (mode.update) mode.update(dt, t);
     controls.update();
     renderer.info.reset(); LabKit.render(renderer, scene, camera);
     perf.update(performance.now(), performance.now() - t0);
@@ -194,6 +198,6 @@ function frame() {
 rebuildGround(); resize(); load();
 controls.target.set(0, heightAt(0, 0) + 1.5, 0);
 frame();
-window.vehicleLab = { state, drv, G, heightAt, load, get veh() { return veh; }, camera, controls, applyLight, scene, addMode, setMode, modes, row };
+window.vehicleLab = { state, drv, G, heightAt, load, get veh() { return veh; }, camera, controls, applyLight, scene, sun, addMode, setMode, modes, row };
 window.dispatchEvent(new Event("vehiclelab:ready"));
 })();

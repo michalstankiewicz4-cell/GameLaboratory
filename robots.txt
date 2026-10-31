@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://michalstankiewicz4-cell.github.io/GameLaboratory/sitemap.xml

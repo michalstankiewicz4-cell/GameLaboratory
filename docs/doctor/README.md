@@ -62,6 +62,12 @@ Wyjątki dla zamierzonych przypadków: `userData.doctorOk = 'floating'` (albo ta
 
 ## Zmiany
 
+- **2026-10-31 (v1.0.1)** — części lustrzane (ujemna skala, np. drugie koło zestawu kołowego): three.js rysuje je
+  z odwróconą kolejnością wierzchołków, więc doktor czyta teraz ich trójkąty tak samo (`triVerts`: zamiana dwóch
+  wierzchołków, gdy wyznacznik macierzy świata < 0). Dotyczy testów opartych na kierunku ściany (`zfight`,
+  `facing`). Wcześniej tarcza koła po lustrzanej stronie wyglądała na zwróconą w tę samą stronę co spód znacznika
+  na niej, więc wychodziło migotanie, którego na ekranie nie ma (wagony: 1 → 0). `seethrough` bez zmian —
+  promień three.js przelicza normalną przez lustro sam.
 - **2026-10-31** — `zfight` liczy tylko widoczne nakładanie: środek wspólnej części dwóch ścian (przycięcie
   trójkątów w 2D) nie może leżeć wewnątrz trzeciej zamkniętej bryły. Wcześniej końce szprych kół krzyżujące się
   w piaście dawały dziesiątki ostrzeżeń (łaziki, amfibia), choć leżą 7–9 mm w środku piasty. Nazwy części bez

@@ -5,7 +5,7 @@
 (function () {
   "use strict";
   const V = {
-  app: "0.4.0",
+  app: "0.5.0",
   labs: {
     "labs/ship.html": "1.2.0",
     "labs/bodies.html": "1.1.0",
@@ -14,7 +14,7 @@
     "labs/skins.html": "1.0.0",
     "labs/surface.html": "1.1.0",
     "labs/buildings.html": "1.1.0",
-    "labs/vehicles.html": "1.1.0",
+    "labs/vehicles.html": "1.2.0",
     "labs/sound.html": "1.0.0",
     "labs/marine.html": "1.1.0",
     "labs/creator.html": "1.1.0",
@@ -26,7 +26,7 @@
     "labs/look.html": "1.0.0",
     "labs/pixel.html": "1.0.0",
     "labs/zombies.html": "1.0.0",
-    "tools/doctor.html": "1.0.0",
+    "tools/doctor.html": "1.0.1",
     "labs/transform.html": "1.0.0",
     "tools/kitcheck.html": "1.0.0",
     "tools/grainTexture.html": "1.0.0",

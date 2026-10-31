@@ -1,6 +1,9 @@
 # Fizyka
 
-Cała fizyka to własny silnik w JavaScripcie (obiekt `PHYS` w `index.html`), liczony na CPU. Nic nie jest prowadzone po szynach „na sztywno” — pojazdy utrzymują się na torze wyłącznie dzięki kontaktowi kół z szynami.
+Cała fizyka to własny silnik w JavaScripcie z aTrain — tu zachowanie „koło na szynie” (środowisko ląd):
+`js/behaviors/rail/physics.js` (obliczenia bez zmian; liczby taboru w `js/models/train/data.js`) i `rail.js`
+(podpięcie do modelu składu). Sieć torowa: `js/models/structures/railway/network.js`. Laboratorium: pojazdy,
+zakładka Train. Liczona na CPU. Nic nie jest prowadzone po szynach „na sztywno” — pojazdy utrzymują się na torze wyłącznie dzięki kontaktowi kół z szynami.
 
 ## Całkowanie
 
@@ -58,7 +61,7 @@ Cała fizyka to własny silnik w JavaScripcie (obiekt `PHYS` w `index.html`), li
 ## Teren
 
 - Podkłady to fizyczne prostopadłościany — po wykolejeniu koła uderzają w nie.
-- Podsypka jako pole wysokości, poza nią ląd z mapy wysokości (`LAND`, ta sama co w grafice): miękki grunt z oporem toczenia, zbocza góry, skarpa, dno morza. Wykolejone koła i narożniki pudeł opierają się o rzeczywistą wysokość gruntu w danym miejscu.
+- Podsypka jako pole wysokości, poza nią grunt z `sim.groundH` (w aTrain: mapa wysokości z górą, skarpą i dnem morza; w laboratorium pojazdów płaski, bo tego terenu nie przeniesiono): miękki grunt z oporem toczenia. Wykolejone koła i narożniki pudeł opierają się o rzeczywistą wysokość gruntu w danym miejscu.
 
 ## Bezpieczniki
 

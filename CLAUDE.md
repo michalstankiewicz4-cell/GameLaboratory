@@ -30,7 +30,7 @@
 - Środowisko ląd = laboratorium lądu z Battle; woda = laboratorium wody z Battle. Ze Space (surface, marine) można uzupełnić tylko to, czego Battle nie ma.
 - Części modelu (sprężyny, podwozie, wózki, zestawy kołowe, sprzęgi) należą do modelu (`js/models/`), bo będą podłączane.
 - Tory kolejowe to modele budowli lądowych (`js/models/structures/railway/`).
-- Pociąg (TrainKit, `js/models/train/`): dane w `data.js` (wymiary, profil koła, zderzaki, sprzęgi) są wspólne dla modelu i przyszłego zachowania „koło na szynie” (środowisko ląd). Oglądany w laboratorium pojazdów. Fizyka i rozjazdy z aTrain są w jego repozytorium i w historii — do przeniesienia jako zachowanie.
+- Pociąg (TrainKit, `js/models/train/`): dane w `data.js` (wymiary, profil koła, zderzaki, sprzęgi) są wspólne dla modelu i przyszłego zachowania „koło na szynie” (środowisko ląd). Oglądany w laboratorium pojazdów. Fizyka i rozjazdy z aTrain są przeniesione jako zachowanie „koło na szynie” (`js/behaviors/rail/`: `physics.js` — obliczenia bez zmian, `rail.js` — podpięcie do modelu); sieć torowa z rozjazdami: `js/models/structures/railway/network.js`. Fizyka musi pozostać prawdziwa: żadnego przyklejania do toru ani warunków logicznych zamiast sił.
 
 ## Przełącznik środowiska
 
@@ -61,5 +61,7 @@
 
 ## Strona startowa
 
-- Każde laboratorium ma kilka fraz, które je opisują (np. woda, kosmos, planeta, układy) — pod przyszły filtr laboratoriów.
+- Każde laboratorium ma kilka fraz, które je opisują (np. woda, kosmos, planeta, układy) — używa ich filtr laboratoriów na stronie startowej (`PHRASES`, po angielsku `PHRASE_EN`; nowa fraza potrzebuje obu).
 - Strona startowa pochodzi z gry kosmicznej (Space).
+- Języki: angielski i polski. Wybór w Opcjach (Automatycznie / English / Polski); automatycznie z przeglądarki, a gdy się nie da — angielski. Teksty: `js/labkit/menubar.js` (`t(en, pl)`, `PL_ITEMS`, `window.LabMenu.LANG`) i `index.html` (`data-pl`, `INFO_PL`).
+- SEO (angielski i polski): GameLaboratory jako silnik dla AI; miniatura `assets/og-image.jpg` (zrzut strony startowej), `robots.txt`, `sitemap.xml`.

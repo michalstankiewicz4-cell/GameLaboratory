@@ -121,11 +121,14 @@ function collect(o, i, toRoot) {
     if (!isFinite(v0.x) || !isFinite(v0.y) || !isFinite(v0.z)) { nan = true; continue; }
     W[k * 3] = v0.x; W[k * 3 + 1] = v0.y; W[k * 3 + 2] = v0.z; box.expandByPoint(v0);
   }
-  return { o, g, W, idx, tris: Math.floor(count / 3), box, nan, name: partName(o, i), src: o.userData.src || g.userData?.src || '' };
+  // mirrored (negative scale): three.js draws it with the winding reversed, so its triangles' facing is read reversed too
+  const mirrored = mw.determinant() < 0;
+  return { o, g, W, idx, tris: Math.floor(count / 3), box, nan, mirrored, name: partName(o, i), src: o.userData.src || g.userData?.src || '' };
 }
 function triVerts(m, t, a, b, c) {
   const i0 = m.idx ? m.idx[t * 3] : t * 3, i1 = m.idx ? m.idx[t * 3 + 1] : t * 3 + 1, i2 = m.idx ? m.idx[t * 3 + 2] : t * 3 + 2;
-  a.fromArray(m.W, i0 * 3); b.fromArray(m.W, i1 * 3); c.fromArray(m.W, i2 * 3);
+  a.fromArray(m.W, i0 * 3);
+  if (m.mirrored) { c.fromArray(m.W, i1 * 3); b.fromArray(m.W, i2 * 3); } else { b.fromArray(m.W, i1 * 3); c.fromArray(m.W, i2 * 3); }
 }
 // signed volume in the geometry's own space (three.js corrects mirrored objects itself, not mirrored geometry)
 function signedVolume(g) {
@@ -253,7 +256,7 @@ export function examine(root, opts = {}) {
       if (!h || !h.face) continue;
       const mats = matsOf(h.object), mat = Array.isArray(h.object.material) ? h.object.material[h.face.materialIndex || 0] : h.object.material;
       if (!mats.length || sides.get(mat) !== THREE.FrontSide) continue;
-      nw.copy(h.face.normal).transformDirection(h.object.matrixWorld);
+      nw.copy(h.face.normal).transformDirection(h.object.matrixWorld);   // (already the drawn side for a mirrored piece: the face normal goes through the mirror too)
       const map = nw.dot(dir) > 0.05 ? back : front;
       map.set(h.object, (map.get(h.object) || 0) + 1);
       }
