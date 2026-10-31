@@ -46,6 +46,10 @@
 - Jeden doktor dla wszystkich modeli: `tools/doctor.html`, logika `tools/doctor/modeldoctor.js`, źródła modeli `tools/doctor/sources/` (opis: `docs/doctor/README.md`). Wzorzec: `tools/doctor.golden.json` (`python3 tools/doctor.py`, `--update`).
 - Pixel Doctor (`js/render/pixel/doctor.js`, w Pixel Studio) jest osobny i dotyczy tylko pixel artu (obrazków 2D): kolory, półprzezroczystość, samotne piksele, pillow shading, banding, kontrast.
 
+## Grafika
+
+- Preferowana grafika: ta z laboratoriów wodnych (Battle: potok kamery `js/render/sea/look.js`, niebo, woda), nie ze Space.
+
 ## Wersjonowanie
 
 - Każde laboratorium będzie miało własne wersjonowanie (do wprowadzenia).
