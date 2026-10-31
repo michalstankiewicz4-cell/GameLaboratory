@@ -24,9 +24,6 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 - [ ] Mgławica w tle laboratorium ciał niebieskich ciemniejsza po przejściu na grafikę Battle.
 - [ ] Poświaty silników statków słabsze niż wcześniej.
 
-## Repozytoria źródłowe
-- [ ] Space: wypchnąć gotowy commit v2.38.2 (usunięte laboratoria, przycisk LABS → GameLaboratory) — czeka na dostęp aplikacji Claude na GitHubie do repozytorium `space`.
-
 ## Testy
 - [ ] Pełny kitcheck po wersji 0.5.0 (przerwany; doktor przeszedł).
 
