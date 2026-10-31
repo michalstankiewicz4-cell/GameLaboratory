@@ -1,42 +1,42 @@
 {
  "ship/codewing": {
-  "tris": 75736,
+  "tris": 75616,
   "verts": 47035,
   "meshes": 90,
   "materials": 66,
   "textures": 12,
   "size": [
    12.064,
-   5.809,
+   5.864,
    9.854
   ]
  },
  "ship/codewing/merged": {
-  "tris": 75736,
-  "verts": 115916,
+  "tris": 75616,
+  "verts": 115556,
   "meshes": 44,
   "materials": 66,
   "textures": 12,
   "size": [
    12.064,
-   5.809,
-   10.593
+   5.864,
+   10.958
   ]
  },
  "ship/scribe": {
-  "tris": 28912,
+  "tris": 28816,
   "verts": 19418,
   "meshes": 77,
   "materials": 64,
   "textures": 12,
   "size": [
-   3.985,
+   4.229,
    3.77,
    4.468
   ]
  },
  "ship/scribe/merged": {
-  "tris": 28912,
+  "tris": 28816,
   "verts": 39752,
   "meshes": 61,
   "materials": 64,
@@ -48,31 +48,31 @@
   ]
  },
  "ship/swarmer": {
-  "tris": 13407,
+  "tris": 13338,
   "verts": 8472,
   "meshes": 50,
   "materials": 51,
   "textures": 7,
   "size": [
    6.062,
-   2.653,
-   5.76
+   2.621,
+   5.262
   ]
  },
  "ship/swarmer/merged": {
-  "tris": 13407,
-  "verts": 23839,
+  "tris": 13338,
+  "verts": 23632,
   "meshes": 32,
   "materials": 51,
   "textures": 7,
   "size": [
    6.062,
-   2.435,
+   2.553,
    3.663
   ]
  },
  "ship/haven": {
-  "tris": 31766,
+  "tris": 31526,
   "verts": 27320,
   "meshes": 86,
   "materials": 44,
@@ -84,15 +84,15 @@
   ]
  },
  "ship/haven/merged": {
-  "tris": 31766,
-  "verts": 50920,
+  "tris": 31526,
+  "verts": 50800,
   "meshes": 39,
   "materials": 44,
   "textures": 10,
   "size": [
    15.057,
    7.554,
-   8.68
+   8.69
   ]
  },
  "body/lava/cinder": {
@@ -444,7 +444,7 @@
   ]
  },
  "base/depot": {
-  "tris": 512,
+  "tris": 492,
   "verts": 843,
   "meshes": 18,
   "materials": 4,
@@ -480,7 +480,7 @@
   ]
  },
  "vehicle/crawler": {
-  "tris": 1104,
+  "tris": 1092,
   "verts": 1730,
   "meshes": 29,
   "materials": 8,
@@ -576,7 +576,7 @@
   ]
  },
  "life/strider": {
-  "tris": 14456,
+  "tris": 14392,
   "verts": 8321,
   "meshes": 33,
   "materials": 6,
