@@ -114,6 +114,13 @@ function perfCounters(renderer) {
 // renderer.render; `extra(options)` adds per-lab steps (a sun's flare, a
 // black hole's lensing). renderer.info is reset by the caller once a frame
 // (several passes are counted together).
+// Render sceny: w trybie grafiki Battle przez potok kamery z laboratoriów wodnych (ustawienie „Game clean”, jeden na
+// renderer), inaczej zwykłe renderer.render — dla laboratoriów bez panelu obrazu.
+function render(renderer, scene, camera) {
+  if (window.GameLabGraphics !== "battle" || !window.LabLook) { renderer.render(scene, camera); return; }
+  (renderer.__labLook || (renderer.__labLook = window.LabLook.cleanPipeline(renderer))).render(scene, camera);
+}
+
 function imageEffects({ renderer, scene, camera, panel, effects, setQuality }) {
   // strona w trybie grafiki Battle: potok kamery z laboratoriów wodnych zamiast PostKit (to samo API)
   if (window.GameLabGraphics === "battle" && window.LabLook) return window.LabLook.battleImageEffects({ renderer, scene, camera, panel });
@@ -165,5 +172,5 @@ function autoHideHud(panels, seconds = 5) {
   }, 250);
 }
 
-return { applyGrain, paintSlider, toggle, makeGlow, fitHud, perfCounters, imageEffects, autoHideHud };
+return { applyGrain, paintSlider, toggle, makeGlow, fitHud, perfCounters, imageEffects, autoHideHud, render };
 })();

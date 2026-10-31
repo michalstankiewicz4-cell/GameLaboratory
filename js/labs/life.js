@@ -20,11 +20,11 @@ const controls = new THREE.OrbitControls(camera, view);
 controls.enableDamping = true; controls.maxPolarAngle = 1.62; controls.minDistance = 0.4; controls.maxDistance = 30;
 controls.target.set(0, 1, 0);
 // a studio: a warm key with shadows, a cool rim from behind, a soft fill
-const key = new THREE.DirectionalLight(0xfff0dc, 2.3);
+const key = new THREE.DirectionalLight(0xfff0dc, 2.3 * THREE.LIGHT_SCALE);
 key.castShadow = true; key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -0.0004; key.shadow.normalBias = 0.02;
 Object.assign(key.shadow.camera, { left: -2, right: 2, top: 2.4, bottom: -0.4, near: 0.5, far: 20 });
-const rim = new THREE.DirectionalLight(0x9fb8ff, 1.3);
-const fill = new THREE.HemisphereLight(0xc9d4ff, 0x3a3128, 0.55);
+const rim = new THREE.DirectionalLight(0x9fb8ff, 1.3 * THREE.LIGHT_SCALE);
+const fill = new THREE.HemisphereLight(0xc9d4ff, 0x3a3128, 0.55 * THREE.LIGHT_SCALE);
 scene.add(key, key.target, rim, rim.target, fill);
 
 // ---------- the floor: a grid of metres (every fifth line stronger) ----------
@@ -254,7 +254,7 @@ function frame() {
   rim.position.set(c.x - 2, 3, c.z - 4); rim.target.position.set(c.x, 1, c.z);
   controls.update();
   renderer.info.reset();
-  renderer.render(scene, camera);
+  LabKit.render(renderer, scene, camera);
   perf.update(performance.now(), performance.now() - t0);
   requestAnimationFrame(frame);
 }

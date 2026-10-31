@@ -307,7 +307,7 @@ function buildVehicle(id, { detail = 1 } = {}) {
       // lamps and the beacon
       const lights = opts.lights || 0;
       parts.lamps.forEach((l) => { l.material.emissiveIntensity = 0.2 + lights * 3; });
-      spot.intensity = lights * 4;
+      spot.intensity = lights * 4 * THREE.LIGHT_SCALE;
       parts.beacon.material.emissiveIntensity = (Math.sin(t * 5) > 0.3 ? 3 : 0.2) * (Math.abs(speed) > 0.3 || (opts.work || 0) > 0.05 ? 1 : 0.4);
       // the work, eased
       state.work += ((opts.work || 0) - state.work) * Math.min(1, dt * 1.5);

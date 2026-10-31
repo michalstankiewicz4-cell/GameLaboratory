@@ -17,10 +17,10 @@ const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 2000);
 camera.position.set(22, 14, 26);
 const controls = new THREE.OrbitControls(camera, view);
 controls.enableDamping = true; controls.target.set(0, 3, 0); controls.autoRotate = true; controls.autoRotateSpeed = 0.5;
-const sun = new THREE.DirectionalLight(0xfff1dc, 2.2);
+const sun = new THREE.DirectionalLight(0xfff1dc, 2.2 * THREE.LIGHT_SCALE);
 sun.position.set(30, 40, 20); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
 Object.assign(sun.shadow.camera, { left: -25, right: 25, top: 25, bottom: -25, near: 1, far: 120 });
-scene.add(sun, new THREE.HemisphereLight(0x8aa0ff, 0x2a1d14, 0.35));
+scene.add(sun, new THREE.HemisphereLight(0x8aa0ff, 0x2a1d14, 0.35 * THREE.LIGHT_SCALE));
 // a patch of ground: dusty, with a faint grid
 const groundTex = (() => {
   const S = 512, [c, ctx] = ShipKit.util.canvas(S, S), r = ShipKit.util.rng(3);
@@ -90,7 +90,7 @@ function frame() {
   mod.update(t, dt);
   controls.update();
   renderer.info.reset();
-  renderer.render(scene, camera);
+  LabKit.render(renderer, scene, camera);
   perf.update(performance.now(), performance.now() - t0);
   requestAnimationFrame(frame);
 }

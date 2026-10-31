@@ -107,9 +107,9 @@ function build(P, opts) {
     const { c, cb } = hornCanvases(P.seed);
     return new THREE.MeshStandardMaterial({ map: T(U.tex(c, [1, 1], true)), bumpMap: T(U.tex(cb, [1, 1], false)), bumpScale: 0.002 * s, roughness: 0.45, metalness: 0, envMapIntensity: 0.7 });
   });
-  const keratin = mats.own("hoof", false, () => new THREE.MeshStandardMaterial({ color: new THREE.Color("#2a231d").convertSRGBToLinear(), roughness: 0.5, metalness: 0, envMapIntensity: 0.6 }));
-  const eyeMat = mats.own("eye", false, () => new THREE.MeshStandardMaterial({ color: new THREE.Color("#140d08").convertSRGBToLinear(), roughness: 0.08, metalness: 0, envMapIntensity: 1.2 }));
-  const innerEar = mats.own("innerEar", false, () => new THREE.MeshStandardMaterial({ color: new THREE.Color(hex).multiplyScalar(0.75).convertSRGBToLinear(), roughness: 0.9, side: THREE.DoubleSide }));
+  const keratin = mats.own("hoof", false, () => new THREE.MeshStandardMaterial({ color: THREE.srgbColor("#2a231d"), roughness: 0.5, metalness: 0, envMapIntensity: 0.6 }));
+  const eyeMat = mats.own("eye", false, () => new THREE.MeshStandardMaterial({ color: THREE.srgbColor("#140d08"), roughness: 0.08, metalness: 0, envMapIntensity: 1.2 }));
+  const innerEar = mats.own("innerEar", false, () => new THREE.MeshStandardMaterial({ color: THREE.srgbColor(new THREE.Color(hex).multiplyScalar(0.75)), roughness: 0.9, side: THREE.DoubleSide }));
 
   const parts = [];
   const sk = (secs, o) => U.sweep(secs, Object.assign({ seg, steps, bones: skel.index }, o));

@@ -489,7 +489,7 @@ function buildVessel(id, { detail = 1 } = {}) {
       if (parts.wheels) parts.wheels.forEach((w) => { w.spin.rotation.x += speed / w.r * dt * (st.onLand > 0.5 ? 1 : 0.3); w.pivot.rotation.y = w.steer * steer * 0.4; });
       const lights = opts.lights || 0;
       parts.lamps.forEach((l) => { l.material.emissiveIntensity = 0.2 + lights * 3; });
-      spot.intensity = lights * (def.maxDepth ? 6 : 4);
+      spot.intensity = lights * (def.maxDepth ? 6 : 4) * THREE.LIGHT_SCALE;
       parts.beacon.material.emissiveIntensity = Math.sin(t * 5) > 0.3 ? 3 : 0.2;
       // the work, eased
       st.work += ((opts.work || 0) - st.work) * Math.min(1, dt * 1.2);

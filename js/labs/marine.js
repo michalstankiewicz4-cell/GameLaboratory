@@ -20,10 +20,10 @@ const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1500);
 const controls = new THREE.OrbitControls(camera, view);
 controls.enableDamping = true; controls.minDistance = 4; controls.maxDistance = 120;
 const SUN_DIR = new THREE.Vector3(0.55, 0.62, 0.35).normalize();
-const sun = new THREE.DirectionalLight(0xfff1dc, 2.2);
+const sun = new THREE.DirectionalLight(0xfff1dc, 2.2 * THREE.LIGHT_SCALE);
 sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
 Object.assign(sun.shadow.camera, { left: -25, right: 25, top: 25, bottom: -25, near: 1, far: 200 });
-const hemi = new THREE.HemisphereLight(0xbfd8ff, 0x1d3a40, 0.6);
+const hemi = new THREE.HemisphereLight(0xbfd8ff, 0x1d3a40, 0.6 * THREE.LIGHT_SCALE);
 scene.add(sun, sun.target, hemi);
 
 const sea = MK.makeSea();
@@ -145,8 +145,8 @@ function frame() {
   const night = state.night;
   sunCol.setRGB(1, 0.96, 0.9).multiplyScalar(night ? 0.04 : 1);
   skyCol.copy(night ? SKY_NIGHT : SKY_DAY);
-  sun.intensity = (night ? 0.08 : 2.2) * (under ? Math.exp(-camDepth * 0.05) : 1);
-  hemi.intensity = (night ? 0.05 : 0.6) * (under ? Math.exp(-camDepth * 0.04) : 1);
+  sun.intensity = (night ? 0.08 : 2.2) * THREE.LIGHT_SCALE * (under ? Math.exp(-camDepth * 0.05) : 1);
+  hemi.intensity = (night ? 0.05 : 0.6) * THREE.LIGHT_SCALE * (under ? Math.exp(-camDepth * 0.04) : 1);
   const uf = sea.uniforms.uUnderFog.value.copy(night ? UNDER_NIGHT : UNDER).multiplyScalar(Math.exp(-camDepth * 0.025));
   if (under) { scene.background.copy(uf); scene.fog.color.copy(uf); scene.fog.density = 0.035; }
   else { scene.background.copy(skyCol); scene.fog.color.copy(skyCol); scene.fog.density = 0.0025; }
@@ -158,7 +158,7 @@ function frame() {
   $("nowDepth").textContent = def.maxDepth ? ves.depth.toFixed(1) + " m" : amph ? (ves.onLand ? "on land" : "afloat") : "afloat";
   $("nowCam").textContent = under ? "under water (" + camDepth.toFixed(1) + " m)" : "above water";
   renderer.info.reset();
-  renderer.render(scene, camera);
+  LabKit.render(renderer, scene, camera);
   perf.update(performance.now(), performance.now() - t0);
   requestAnimationFrame(frame);
 }

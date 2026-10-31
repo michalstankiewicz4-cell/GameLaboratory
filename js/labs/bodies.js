@@ -49,7 +49,7 @@ scene.add(sun);
 
 // SHIP LIGHT toggle: a teal point light circling the body (BodyKit's
 // opts.lights), with a glow dot to show where it is.
-const shipLight = { position: new THREE.Vector3(), color: new THREE.Color(0x4fe3c6).convertSRGBToLinear(), intensity: 1.5, distance: 4 };
+const shipLight = { position: new THREE.Vector3(), color: THREE.srgbColor(0x4fe3c6), intensity: 1.5, distance: 4 };
 const shipLights = [shipLight];
 const shipLightDot = new THREE.Sprite(new THREE.SpriteMaterial({
   map: makeGlow("rgba(220,255,248,1)", "rgba(79,227,198,0.6)"), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));

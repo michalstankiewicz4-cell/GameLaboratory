@@ -61,4 +61,11 @@ export function battleImageEffects({ renderer, scene, camera, panel, sunDir, pre
   };
 }
 
-window.LabLook = { battleImageEffects };
+// potok bez panelu (ustawienie „Game clean”) — dla laboratoriów, które renderują prosto na ekran (LabKit.render)
+export function cleanPipeline(renderer) {
+  const THREE = window.THREE, look = new LookPipeline(renderer), size = new THREE.Vector2();
+  look.set({ ...LOOK_DEFAULTS, ...pick(LOOK_PRESETS.clean) });
+  return { pipeline: look, render(scene, camera) { renderer.getSize(size); if (look.w !== size.x || look.h !== size.y) look.resize(size.x, size.y); look.render(scene, camera); } };
+}
+
+window.LabLook = { battleImageEffects, cleanPipeline };

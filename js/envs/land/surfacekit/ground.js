@@ -445,17 +445,17 @@ function createGround(renderer, opts = {}) {
     U.uAmbient.value.copy(L.ambient); U.uFogColor.value.copy(L.fogColor); U.uFog.value = L.fog;
     U.uWet.value = wx.wet; U.uSnow.value = wx.snow;
     // the modules: the same suns as three.js lights
-    sunLight.color.copy(L.sunCol0); sunLight.intensity = 2.4;
+    sunLight.color.copy(L.sunCol0); sunLight.intensity = 2.4 * THREE.LIGHT_SCALE;
     sunLight.position.copy(craft.position).addScaledVector(L.sunDir0, 200); sunLight.target.position.copy(craft.position);
-    sunLight2.color.copy(L.sunCol1); sunLight2.intensity = 2.4;
+    sunLight2.color.copy(L.sunCol1); sunLight2.intensity = 2.4 * THREE.LIGHT_SCALE;
     sunLight2.position.copy(craft.position).addScaledVector(L.sunDir1, 200); sunLight2.target.position.copy(craft.position);
-    hemi.color.copy(L.ambient).multiplyScalar(2.2); hemi.groundColor.copy(L.ambient).multiplyScalar(0.7); hemi.intensity = 1;
+    hemi.color.copy(L.ambient).multiplyScalar(2.2); hemi.groundColor.copy(L.ambient).multiplyScalar(0.7); hemi.intensity = THREE.LIGHT_SCALE;
     // the lamp: on when it gets dark
     const dark = lum(L.sunCol0) + lum(L.sunCol1) + lum(L.ambient) * 2 < 0.35;
     lampOn += ((dark ? 1 : 0) - lampOn) * Math.min(1, dt * 3);
     lamp.position.copy(craft.position).addScaledVector(P.dir, 2.5).addScaledVector(P.fwd, 2);
     lamp.target.position.copy(craft.position).addScaledVector(P.fwd, 40).addScaledVector(P.dir, -8);
-    lamp.intensity = lampOn * 3;
+    lamp.intensity = lampOn * 3 * THREE.LIGHT_SCALE;
     U.uLamp.value = lampOn * 2.2; U.uLampPos.value.copy(lamp.position);
     U.uLampDir.value.subVectors(lamp.target.position, lamp.position).normalize();
   }

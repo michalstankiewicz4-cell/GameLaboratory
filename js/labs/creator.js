@@ -17,12 +17,12 @@ scene.background = BG; scene.fog = new THREE.Fog(BG, 16, 70);
 const camera = new THREE.PerspectiveCamera(32, 1, 0.02, 400);
 const controls = new THREE.OrbitControls(camera, view);
 controls.enableDamping = true; controls.maxPolarAngle = 1.62; controls.minDistance = 0.4; controls.maxDistance = 30;
-const key = new THREE.DirectionalLight(0xfff0dc, 2.3);
+const key = new THREE.DirectionalLight(0xfff0dc, 2.3 * THREE.LIGHT_SCALE);
 key.castShadow = true; key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -0.0004; key.shadow.normalBias = 0.02;
 Object.assign(key.shadow.camera, { left: -3, right: 3, top: 3, bottom: -1, near: 0.5, far: 20 });
 key.position.set(3, 5, 3);
-const rim = new THREE.DirectionalLight(0x9fb8ff, 1.2); rim.position.set(-2, 3, -4);
-scene.add(key, key.target, rim, new THREE.HemisphereLight(0xc9d4ff, 0x3a3128, 0.55));
+const rim = new THREE.DirectionalLight(0x9fb8ff, 1.2 * THREE.LIGHT_SCALE); rim.position.set(-2, 3, -4);
+scene.add(key, key.target, rim, new THREE.HemisphereLight(0xc9d4ff, 0x3a3128, 0.55 * THREE.LIGHT_SCALE));
 const floorTex = (() => {
   const S = 512, c = document.createElement("canvas"); c.width = c.height = S; const x = c.getContext("2d");
   x.fillStyle = "#2a2f3a"; x.fillRect(0, 0, S, S);
@@ -222,7 +222,7 @@ function frame() {
     if (state.gait !== "idle") floorTex.offset.y -= (cre.ls ? cre.ls.spd : state.speed) * dt / 5;
   }
   controls.update();
-  renderer.info.reset(); renderer.render(scene, camera);
+  renderer.info.reset(); LabKit.render(renderer, scene, camera);
   perf.update(performance.now(), performance.now() - t0);
   requestAnimationFrame(frame);
 }

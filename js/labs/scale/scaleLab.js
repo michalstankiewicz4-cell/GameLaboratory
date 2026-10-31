@@ -91,8 +91,8 @@ document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 scene.environment = ShipKit.makeEnvironment(renderer);
-scene.add(new THREE.AmbientLight(0x8892b0, 0.55));
-const sunLight = new THREE.DirectionalLight(0xbfe9ff, 1.3);
+scene.add(new THREE.AmbientLight(0x8892b0, 0.55 * THREE.LIGHT_SCALE));
+const sunLight = new THREE.DirectionalLight(0xbfe9ff, 1.3 * THREE.LIGHT_SCALE);
 sunLight.position.copy(SUN_DIR).multiplyScalar(100);
 scene.add(sunLight);
 
@@ -346,7 +346,7 @@ function frame(){
   t += dt;
   live.forEach(function(l){ l.update(t, dt); });
   stepFlight(dt);
-  renderer.render(scene, camera);
+  LabKit.render(renderer, scene, camera);
   if(labelsDirty){ labelsDirty = false; placeLabels(); }
   frames++; fpsT += dt;
   if(fpsT >= 0.5){

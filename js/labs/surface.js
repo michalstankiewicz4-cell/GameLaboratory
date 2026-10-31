@@ -293,10 +293,10 @@ function frame() {
     orbitSun.copy(state.sky.suns[0].dir).applyMatrix4(Mframe).transformDirection(globe.surfaceRoot.matrixWorld);
     globe.update(t, dt, { sunDir: orbitSun, center: orbit.camera.position, renderer });
     backdrop.update(t, dt, { center: orbit.camera.position, renderer });
-    renderer.render(orbit.scene, orbit.camera);
+    LabKit.render(renderer, orbit.scene, orbit.camera);
   } else {
     stepGround(dt, t);
-    if (state.mode === "ground") renderer.render(ground.scene, ground.camera);
+    if (state.mode === "ground") LabKit.render(renderer, ground.scene, ground.camera);
   }
   perf.update(performance.now(), performance.now() - t0);
   requestAnimationFrame(frame);

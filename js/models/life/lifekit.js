@@ -403,7 +403,7 @@ function materials(opts) {
   // flat: faceted shading for the low-poly style (each triangle one shade)
   const keep = (m) => { if (flat) { m.flatShading = true; m.bumpMap = null; } made.push(m); return m; };
   const T = (t) => { textures.push(t); return t; };
-  const color = (hex) => new THREE.Color(hex).convertSRGBToLinear();
+  const color = (hex) => THREE.srgbColor(hex);
   const cache = {};
   function get(key, skinned, make) {
     const k = key + (skinned ? "/s" : "");

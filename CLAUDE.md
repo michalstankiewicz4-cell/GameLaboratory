@@ -49,6 +49,7 @@
 ## Grafika
 
 - Preferowana grafika: ta z laboratoriów wodnych (Battle: potok kamery `js/render/sea/look.js`, niebo, woda), nie ze Space.
+- Laboratoria Space w grafice Battle: znacznik `<meta name="gamelab-graphics" content="battle">` (wszystkie 3D poza kitcheck i doktorem). Moce świateł pisane pod r128 mnożyć przez `THREE.LIGHT_SCALE`, kolory sRGB z kodu przez `THREE.srgbColor()`, renderować przez `LabKit.imageEffects` / `LabKit.render`. Własny shader, który już oddaje kolor liniowy: `material.userData.linearOutput = true`.
 
 ## Wersjonowanie
 

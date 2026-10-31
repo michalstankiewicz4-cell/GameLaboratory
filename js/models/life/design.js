@@ -115,8 +115,8 @@ function build(design, opts) {
     const { c: cv, cb } = U.hide({ seed: D.skin.seed, pattern: D.skin.pattern }, hex);
     return new THREE.MeshStandardMaterial({ map: T(U.tex(cv, [1, 0.6], true)), bumpMap: T(U.tex(cb, [1, 0.6], false)), bumpScale: 0.0015, roughness: 0.8, metalness: 0, envMapIntensity: 0.5 });
   });
-  const keratin = mats.own("keratin", false, () => new THREE.MeshStandardMaterial({ color: new THREE.Color("#2a231d").convertSRGBToLinear(), roughness: 0.5, envMapIntensity: 0.6 }));
-  const eyeMat = mats.own("eye", false, () => new THREE.MeshStandardMaterial({ color: new THREE.Color("#120c08").convertSRGBToLinear(), roughness: 0.06, envMapIntensity: 1.3 }));
+  const keratin = mats.own("keratin", false, () => new THREE.MeshStandardMaterial({ color: THREE.srgbColor("#2a231d"), roughness: 0.5, envMapIntensity: 0.6 }));
+  const eyeMat = mats.own("eye", false, () => new THREE.MeshStandardMaterial({ color: THREE.srgbColor("#120c08"), roughness: 0.06, envMapIntensity: 1.3 }));
   const seg = Math.max(10, Math.round(20 * det));
   const sec = (p, rx, f, b, w, nn) => ({ p: Array.isArray(p) ? p : p.toArray(), rx, f, b, w, n: nn || 2.15 });
   const parts = [];

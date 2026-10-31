@@ -77,8 +77,28 @@ class WebGLRenderTarget extends T.WebGLRenderTarget {
   }
 }
 
-const THREE = Object.assign({}, T, BATTLE ? {} : { PointLight, SpotLight, WebGLRenderer, WebGLRenderTarget }, {
+// tryb Battle: własne shadery kitów Space (BodyKit, poświaty ShipKit, niebo) oddają kolor gotowy do wyświetlenia
+// (pisane pod r128); potok Battle oczekuje koloru liniowego — na końcu shadera przeliczamy go z sRGB na liniowy.
+// Shader, który już oddaje kolor liniowy: userData.linearOutput = true.
+class ShaderMaterial extends T.ShaderMaterial {
+  constructor(p) {
+    super(p);
+    this.onBeforeCompile = (sh) => {
+      if (this.userData.linearOutput) return;
+      const i = sh.fragmentShader.lastIndexOf('}');
+      if (i > 0) sh.fragmentShader = sh.fragmentShader.slice(0, i) + '  gl_FragColor.rgb = pow(max(gl_FragColor.rgb, vec3(0.0)), vec3(2.2));\n' + sh.fragmentShader.slice(i);
+    };
+  }
+}
+
+const THREE = Object.assign({}, T, BATTLE ? { ShaderMaterial } : { PointLight, SpotLight, WebGLRenderer, WebGLRenderTarget }, {
   OrbitControls, Pass, FullScreenQuad, UnrealBloomPass, CopyShader, LuminosityHighPassShader, FXAAShader,
 });
 THREE.Pass.FullScreenQuad = FullScreenQuad;
+// Pomocnicze dla kitów i laboratoriów Space (moce i kolory pisane pod r128):
+// LIGHT_SCALE — mnożnik mocy świateł: w trybie Battle π (fizyczne światła świecą π razy słabiej niż legacy), inaczej 1;
+// srgbColor(hex) — kolor podany w sRGB jako liniowy: w trybie Battle przelicza go już Three.js (ColorManagement),
+// w trybie r128 przeliczamy ręcznie (jak dawne .convertSRGBToLinear()).
+THREE.LIGHT_SCALE = BATTLE ? Math.PI : 1;
+THREE.srgbColor = (c) => (BATTLE ? new T.Color(c) : new T.Color(c).convertSRGBToLinear());
 window.THREE = THREE;

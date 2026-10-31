@@ -74,7 +74,7 @@ const BATTLE = window.GameLabGraphics === "battle";
 // grafika Battle (js/core/three-global.js): kolory już przeliczane z sRGB, a światła fizyczne — te same światła
 // świecą ×π słabiej niż w trybie legacy r128, więc ich moc ×π
 gameLights.forEach((l) => { if (!BATTLE) l.color.convertSRGBToLinear(); l.visible = false; scene.add(l); });
-if (BATTLE) [key, rim, hemi, ...gameLights].forEach((l) => { l.intensity *= Math.PI; });
+[key, rim, hemi, ...gameLights].forEach((l) => { l.intensity *= THREE.LIGHT_SCALE; });   // moce pod r128: ×π w trybie Battle
 const studioLights = [key, rim, hemi];
 
 // =====================================================================

@@ -20,10 +20,10 @@ const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 1200);
 camera.position.set(9, 4.5, -10);
 const controls = new THREE.OrbitControls(camera, view);
 controls.enableDamping = true; controls.maxPolarAngle = 1.45; controls.minDistance = 5; controls.maxDistance = 80;
-const sun = new THREE.DirectionalLight(0xfff1dc, 2.2);
+const sun = new THREE.DirectionalLight(0xfff1dc, 2.2 * THREE.LIGHT_SCALE);
 sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
 Object.assign(sun.shadow.camera, { left: -20, right: 20, top: 20, bottom: -20, near: 1, far: 160 });
-const hemi = new THREE.HemisphereLight(0xcfa98a, 0x2a1d14, 0.55);
+const hemi = new THREE.HemisphereLight(0xcfa98a, 0x2a1d14, 0.55 * THREE.LIGHT_SCALE);
 scene.add(sun, sun.target, hemi);
 
 // ---------- the ground: hills + bumps, the same function for the mesh and the wheels ----------
@@ -130,7 +130,7 @@ window.addEventListener("keyup", (e) => { state.keys[e.code] = false; });
 function applyLight() {
   const n = state.night;
   scene.background.copy(n ? NIGHT_BG : DAY_BG); scene.fog.color.copy(scene.background);
-  sun.intensity = n ? 0.05 : 2.2; hemi.intensity = n ? 0.06 : 0.55;
+  sun.intensity = (n ? 0.05 : 2.2) * THREE.LIGHT_SCALE; hemi.intensity = (n ? 0.06 : 0.55) * THREE.LIGHT_SCALE;
   dust.material.uniforms.uLight.value = n ? 0.15 : 1;
 }
 
@@ -151,7 +151,7 @@ function frame() {
   const t0 = performance.now(), dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
   if (mode) {   // another family: a still model for now (no behaviour yet)
     controls.update();
-    renderer.info.reset(); renderer.render(scene, camera);
+    renderer.info.reset(); LabKit.render(renderer, scene, camera);
     perf.update(performance.now(), performance.now() - t0);
     requestAnimationFrame(frame); return;
   }
@@ -187,7 +187,7 @@ function frame() {
   $("nowSpeed").textContent = Math.round(Math.abs(drv.speed) * 3.6) + " km/h";
   $("nowTilt").textContent = Math.round(-veh.body.rotation.x * 57.3) + "° / " + Math.round(veh.body.rotation.z * 57.3) + "°";
   renderer.info.reset();
-  renderer.render(scene, camera);
+  LabKit.render(renderer, scene, camera);
   perf.update(performance.now(), performance.now() - t0);
   requestAnimationFrame(frame);
 }
