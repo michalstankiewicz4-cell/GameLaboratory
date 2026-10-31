@@ -72,7 +72,17 @@ export function partName(o, i = 0) {
   const path = [];
   for (let p = o.parent; p; p = p.parent) if (p.userData && p.userData.part && p.name) path.unshift(p.name);
   let own = o.name;
-  if (!own) { const m = matsOf(o)[0]; own = (o.geometry && o.geometry.type || 'mesh').replace('Geometry', '').toLowerCase() + ' #' + i + (m && m.color ? ' #' + m.color.getHexString() : ''); }
+  if (!own) {
+    // no name: what it is, its size and colour — copies of one part get one name, so their findings group as ×n
+    const m = matsOf(o)[0], g = o.geometry, kind = (!g || g.type === 'BufferGeometry' ? 'mesh' : g.type.replace('Geometry', '').toLowerCase());
+    let size = '';
+    if (g && g.attributes && g.attributes.position) {
+      if (!g.boundingBox) g.computeBoundingBox();
+      const s = g.boundingBox.getSize(new THREE.Vector3()).multiply(o.scale);
+      size = ' ' + [s.x, s.y, s.z].map((v) => +Math.abs(v).toFixed(2)).join('×');
+    }
+    own = kind + size + (m && m.color ? ' #' + m.color.getHexString() : '');
+  }
   return [...path, own].join(' › ');
 }
 function allowed(o, check) {
@@ -142,6 +152,25 @@ function overlap2D(A, B) {
     if (aMax <= bMin || bMax <= aMin) return false;
   }
   return true;
+}
+// the overlap of two 2D triangles (B clipped by convex A): its centroid, or null
+function overlapCentroid(A, B) {
+  let poly = [[B[0], B[1]], [B[2], B[3]], [B[4], B[5]]];
+  const area = (T) => (T[2] - T[0]) * (T[5] - T[1]) - (T[4] - T[0]) * (T[3] - T[1]), sgn = area(A) >= 0 ? 1 : -1;
+  for (let i = 0; i < 3 && poly.length; i++) {
+    const x1 = A[i * 2], y1 = A[i * 2 + 1], x2 = A[((i + 1) % 3) * 2], y2 = A[((i + 1) % 3) * 2 + 1];
+    const side = (p) => sgn * ((x2 - x1) * (p[1] - y1) - (y2 - y1) * (p[0] - x1));
+    const out = [];
+    for (let k = 0; k < poly.length; k++) {
+      const P = poly[k], Q = poly[(k + 1) % poly.length], sp = side(P), sq = side(Q);
+      if (sp >= 0) out.push(P);
+      if ((sp >= 0) !== (sq >= 0)) { const t = sp / (sp - sq); out.push([P[0] + (Q[0] - P[0]) * t, P[1] + (Q[1] - P[1]) * t]); }
+    }
+    poly = out;
+  }
+  if (poly.length < 3) return null;
+  let cx = 0, cy = 0; for (const p of poly) { cx += p[0]; cy += p[1]; }
+  return [cx / poly.length, cy / poly.length];
 }
 const inTree = (o, root) => { for (; o; o = o.parent) if (o === root) return true; return false; };
 
@@ -296,6 +325,22 @@ export function examine(root, opts = {}) {
       }
     });
     const pairs = new Map(), planes = new Map(), A = [0, 0, 0, 0, 0, 0], B = [0, 0, 0, 0, 0, 0], ax = new THREE.Vector3(), ay = new THREE.Vector3(), nn = new THREE.Vector3();
+    // an overlap inside a third closed piece cannot be seen (spoke ends inside a hub): it does not flicker
+    const closedZ = meshes.filter((m) => closedShape(m.g) && !m.nan), zray = new THREE.Raycaster(), zdir = new THREE.Vector3(0.3113, 0.8271, 0.4679).normalize();
+    const zp = new THREE.Vector3(), zw = new THREE.Vector3();
+    const buried = (pt, a, b) => {
+      for (const other of closedZ) {
+        if (other === a || other === b || !other.box.containsPoint(pt)) continue;
+        const mats = matsOf(other.o), sides = mats.map((x) => x.side);
+        mats.forEach((x) => { x.side = THREE.DoubleSide; });
+        zray.set(zw.copy(pt).applyMatrix4(root.matrixWorld), zdir);
+        let hits = 0, last = -1;
+        for (const h of zray.intersectObject(other.o, false)) { if (h.distance - last > 1e-5) hits++; last = h.distance; }
+        mats.forEach((x, i) => { x.side = sides[i]; });
+        if (hits % 2 === 1) return true;
+      }
+      return false;
+    };
     const flat = (m, k, out) => { triVerts(m, k, v0, v1, v2); [v0, v1, v2].forEach((p, i) => { out[i * 2] = p.dot(ax); out[i * 2 + 1] = p.dot(ay); }); };
     buckets.forEach((b) => {
       if (b.length < 2) return;
@@ -310,7 +355,16 @@ export function examine(root, opts = {}) {
         ax.set(1, 0, 0); if (Math.abs(nn.x) > 0.9) ax.set(0, 1, 0);
         ax.sub(e1.copy(nn).multiplyScalar(ax.dot(nn))).normalize(); ay.crossVectors(nn, ax);
         flat(meshes[p.mi], p.t, A); flat(meshes[qq.mi], qq.t, B);
-        if (overlap2D(A, B)) { pairs.set(key, (pairs.get(key) || 0) + 1); if (!planes.has(key)) planes.set(key, [p.nx, p.ny, p.nz, meshes[p.mi].W, p, meshes[p.mi]]); }
+        if (overlap2D(A, B)) {
+          const c = overlapCentroid(A, B);
+          if (c) {   // back to 3D: on the plane through A's first vertex
+            triVerts(meshes[p.mi], p.t, v0, v1, v2);
+            const d = v0.dot(nn);
+            zp.copy(nn).multiplyScalar(d).addScaledVector(ax, c[0]).addScaledVector(ay, c[1]);
+            if (buried(zp, meshes[p.mi], meshes[qq.mi])) continue;
+          }
+          pairs.set(key, (pairs.get(key) || 0) + 1); if (!planes.has(key)) planes.set(key, [p.nx, p.ny, p.nz, meshes[p.mi].W, p, meshes[p.mi]]);
+        }
       }
     });
     pairs.forEach((count, key) => {
@@ -420,7 +474,7 @@ export function examine(root, opts = {}) {
   // the same mistake repeated (one finding per copy of a part): one finding with "×n"
   const groups = new Map();
   for (const f of findings) {
-    const key = f.check + '|' + f.parts.join(';') + '|' + f.src.join(';') + '|' + (f.check === 'zfight' || f.check === 'sliver' || f.check === 'speck' ? '' : f.detail);
+    const key = f.check + '|' + f.parts.join(';') + '|' + f.src.join(';') + '|' + (['zfight', 'sliver', 'speck', 'facing', 'seethrough'].includes(f.check) ? '' : f.detail);
     const g = groups.get(key);
     if (g) { g.n++; g.meshes.push(...f.meshes); } else groups.set(key, Object.assign(f, { n: 1 }));
   }

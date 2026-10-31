@@ -39,7 +39,7 @@ wskazywał jedną część.
 | `facing` | błąd | otwarta powierzchnia ze ścianami do środka (z zewnątrz prześwituje) |
 | `seethrough` | błąd | dziura: patrząc z zewnątrz widać tył jednostronnej ściany |
 | `arc` | ostrzeżenie | linia ognia działa trafia we własny model w zakresie obrotu (`opts.mounts`) |
-| `zfight` | ostrzeżenie | ściany dwóch części w jednej płaszczyźnie — migoczą |
+| `zfight` | ostrzeżenie | ściany dwóch części w jednej płaszczyźnie — migoczą; tylko tam, gdzie widać (nie wewnątrz trzeciej zamkniętej bryły) |
 | `floating` | ostrzeżenie | część niczego nie dotyka |
 | `waterline` | ostrzeżenie | część nad kadłubem sięga pod linię wody (`opts.waterline`) |
 | `poke` | ostrzeżenie | element wystaje przez burtę (`opts.hullSide`) |
@@ -47,6 +47,9 @@ wskazywał jedną część.
 | `hidden` | info | część w całości wewnątrz innej |
 | `speck` | info | część za mała, by ją zobaczyć |
 | `sliver` | info | trójkąty-igły, które źle się cieniują |
+
+Części bez nazwy opisuje rodzaj bryły, wymiary i kolor (np. `box 0.45×0.07×0.65 #ffffff`), bez numeru — kopie jednej
+części mają jedną nazwę, więc ich wyniki łączą się w jeden „×n” (dotyczy też lustrzanych kopii w `facing` i `seethrough`).
 
 Wyjątki dla zamierzonych przypadków: `userData.doctorOk = 'floating'` (albo tablica testów) na części lub jej przodku.
 
@@ -56,3 +59,14 @@ Wyjątki dla zamierzonych przypadków: `userData.doctorOk = 'floating'` (albo ta
 - Bez okna: `python3 tools/doctor.py` (porównanie z wzorcem), `--update` (nowy wzorzec), `--shots` (zrzuty).
 - Strona ładuje kity Space przez `js/core/three-global.js`, więc w podglądzie także modele morskie świecą
   jak w r128 (kolory bez konwersji, oświetlenie legacy). Na wyniki doktora nie ma to wpływu.
+
+## Zmiany
+
+- **2026-10-31** — `zfight` liczy tylko widoczne nakładanie: środek wspólnej części dwóch ścian (przycięcie
+  trójkątów w 2D) nie może leżeć wewnątrz trzeciej zamkniętej bryły. Wcześniej końce szprych kół krzyżujące się
+  w piaście dawały dziesiątki ostrzeżeń (łaziki, amfibia), choć leżą 7–9 mm w środku piasty. Nazwy części bez
+  nazwy bez numeru porządkowego (grupowanie kopii). Modele morskie i stanowisko testowe — wyniki bez zmian.
+  Przykład: hauler 87 → 3 ostrzeżenia (zostały: zlicowane ściany skrzyni, skrzynia na podłodze, koła tandemu
+  nachodzące na siebie).
+- Igły (`sliver`) na fazach zaokrąglonych prostopadłościanów (tabor) — zostają: każde ogólne kryterium, które je
+  pomija, pomija też igły ze stanowiska testowego.
