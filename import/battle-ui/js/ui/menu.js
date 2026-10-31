@@ -41,9 +41,10 @@ export function createMenu(root, { actions, settings, progress }) {
       btn('menu.options', () => menu.go('options'), 'sub')),
     best,
     h('p', { class: 'labs' }, tx('menu.labs', 'span'), ' ',
-      h('a', { href: 'labs/ship.html' }, tx('menu.shipLab', 'span')), ' · ',
-      h('a', { href: 'labs/water.html' }, tx('menu.waterLab', 'span')), ' · ',
-      h('a', { href: 'labs.html' }, tx('menu.allLabs', 'span'))),
+      // the labs moved to GameLaboratory (its own repository and site)
+      h('a', { href: 'https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/warship.html' }, tx('menu.shipLab', 'span')), ' · ',
+      h('a', { href: 'https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/water.html' }, tx('menu.waterLab', 'span')), ' · ',
+      h('a', { href: 'https://michalstankiewicz4-cell.github.io/GameLaboratory/' }, tx('menu.allLabs', 'span'))),
     h('p', { class: 'foot' }, 'v' + VERSION, ' · ', tx('menu.credit')));
   screen('multi', tx('multi.title', 'h2'), tx('multi.note', 'p'), h('div', { class: 'stack' }, back()));
   screen('pause', tx('pause.title', 'h2'), tx('pause.keys', 'p'),
