@@ -3,7 +3,7 @@
 // occlusion. Only the field runs on the GPU (one small shader: no ray-march loops), so Direct3D compiles it in
 // seconds the first time and the browser's shader cache makes it instant afterwards; the mesh, colours and drawing
 // are shared with the CPU path.
-import * as THREE from '../../vendor/three.module.js';
+import * as THREE from '../../../../vendor/three/three.module.js';
 import { NJ, OUTFITS } from './zombie.js';
 
 const FIELD = /* glsl */`

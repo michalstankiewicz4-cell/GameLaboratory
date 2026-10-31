@@ -2,11 +2,10 @@
 // frames from any of eight directions, exported as sprite sheets for Unity (512×512 frames in a 6×2 grid, pivot at
 // the feet, 100 pixels per unit) with a JSON description and an editor script that slices them — realistic, or as
 // pixel art through the Pixel Studio pipeline (palette, majority downsampling, selective outline, clean-up).
-import { OUTFITS, ANIMS, DIRS, randomZombie, renderZombieAsync } from './zombie.js';
-import { PixelImage, autoPalette, quantize, outline, removeOrphans, modeDownsample, toCanvas, sheet } from './core.js';
-import { encodeGIF } from './gif.js';
-import { zip } from './zip.js';
-import { VERSION } from '../version.js';
+import { OUTFITS, ANIMS, DIRS, randomZombie, renderZombieAsync } from '../../models/life/zombie/zombie.js';
+import { PixelImage, autoPalette, quantize, outline, removeOrphans, modeDownsample, toCanvas, sheet } from '../../render/pixel/core.js';
+import { encodeGIF } from '../../render/pixel/gif.js';
+import { zip } from '../../render/pixel/zip.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
@@ -220,7 +219,6 @@ $('prev').onclick = () => { shown = (shown + frames.length - 1) % frames.length;
 $('next').onclick = () => { shown = (shown + 1) % frames.length; draw(); };
 $('png').onclick = exportSheet; $('json').onclick = exportJSON; $('gifB').onclick = exportGIF; $('all').onclick = exportAll;
 $('cs').onclick = () => download(SLICER, 'ZombieSheetSlicer.cs', 'text/plain');
-$('ver').textContent = 'v' + VERSION; document.title = document.title.replace(/^Zombie Generator/, `Zombie Generator v${VERSION}`);
 $('stage').width = $('stage').height = S.frame;   // the frame's size from the start, so the loader covers it
 zombieUI(); styleUI(); changed();
 window.__zombies = { S, get Z() { return Z; }, set Z(v) { Z = v; zombieUI(); changed(); }, get frames() { return frames; }, make, meta, run, zip, SLICER };

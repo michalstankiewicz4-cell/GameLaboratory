@@ -1,7 +1,7 @@
 # Zombie Generator — `pixel/zombies.html`
 
 Part of Pixel Studio (not part of the game). Original zombies made from a seed, animated, exported as sprite sheets
-that drop straight into a Unity project. Live: <https://michalstankiewicz4-cell.github.io/Battle/pixel/zombies.html>.
+that drop straight into a Unity project. Live: <https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/zombies.html>.
 Made as a gift for the author of a zombie game whose sprites use this sheet layout; nothing of that game is in here —
 every zombie is generated from code.
 

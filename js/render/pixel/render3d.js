@@ -5,10 +5,10 @@
 // draws inner lines where the depth jumps, the outer outline, and cleans up.
 // Subjects: simple props built here (crate, barrel, chest, sword, mushroom, house, rock, adventurer with a walk
 // cycle) and the project's own models (PlantKit trees in the wind, ShipKit ships rolling on a swell).
-import * as THREE from '../../vendor/three.module.js';
+import * as THREE from '../../../vendor/three/three.module.js';
 import { PixelImage, shade } from './core.js';
-import { SPECIES, SPECIES_IDS, growPlant, leafTexture, barkTexture } from '../env/plantkit.js';
-import { SHIP_IDS, buildShip, shipInfo } from '../shipkit/index.js';
+import { SPECIES, SPECIES_IDS, growPlant, leafTexture, barkTexture } from '../../models/plants/plantkit.js';
+import { SHIP_IDS, buildShip, shipInfo } from '../../models/ships-sea/index.js';
 
 const std = (c, o = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.8, ...o });
 const mesh = (g, m, p = [0, 0, 0], r = [0, 0, 0]) => { const x = new THREE.Mesh(g, m); x.position.set(...p); x.rotation.set(...r); return x; };

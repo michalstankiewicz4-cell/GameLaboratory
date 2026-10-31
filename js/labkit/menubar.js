@@ -46,6 +46,8 @@ const LABS = [
   { file: "labs/land.html", name: "Land lab", doc: "docs/land.md", keys: [["Drag / wheel", "turn and zoom the camera"]] },
   { file: "labs/plants.html", name: "Plants lab", doc: "docs/plants.md", keys: [["Drag / wheel", "turn and zoom the camera"]] },
   { file: "labs/look.html", name: "Look lab", doc: "docs/look.md", keys: [["Drag / wheel", "turn and zoom the camera"]] },
+  { file: "labs/pixel.html", name: "Pixel Studio", doc: "docs/pixel/README.md", keys: [["Ctrl+Z / Ctrl+Shift+Z", "undo / redo (Draw)"], ["Right button", "erase (Draw)"]] },
+  { file: "labs/zombies.html", name: "Zombie Generator", doc: "docs/pixel/zombies.md", keys: [] },
 ];
 const TOOLS = [
   { file: "tools/doctor.html", name: "Model doctor", doc: "docs/doctor/README.md", keys: [["Click a model, then a finding", "its parts light up red"], ["Drag / wheel", "turn and zoom the view"]] },

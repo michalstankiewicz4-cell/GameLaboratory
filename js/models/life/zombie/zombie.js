@@ -6,7 +6,7 @@
 // ray-marched the field in one shader; Direct3D on Windows took minutes to compile it.)
 // The skeleton is posed with forward kinematics per frame (shamble, lurch, lunge, idle, crawl); every frame of an
 // animation uses the same camera, so the sprite does not jump; the feet stay on the pivot line.
-import * as THREE from '../../vendor/three.module.js';
+import * as THREE from '../../../../vendor/three/three.module.js';
 import { prepareGPU, gpuReady, setGPUPose, sampleGPU } from './zombie-gpu.js';
 
 /* ---------------- options ---------------- */

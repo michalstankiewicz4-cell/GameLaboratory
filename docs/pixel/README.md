@@ -2,7 +2,7 @@
 
 A separate project inside this repository: a studio for **pixel art**. It is **not part of the game** and not linked
 from it (the game stays realistic only); it is published with the site at
-<https://michalstankiewicz4-cell.github.io/Battle/pixel/>.
+<https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/pixel.html>.
 
 Every result has a **transparent background**, any size from 4 to 256 pixels each way (presets 16–128), and exports as a
 **PNG** (one frame or a sprite sheet, 1–16× nearest-neighbour) or an animated **GIF** (looping, transparent).

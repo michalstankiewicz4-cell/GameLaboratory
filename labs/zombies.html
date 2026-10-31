@@ -6,9 +6,9 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <title>Zombie Generator — sprite sheets for Unity, realistic or pixel art</title>
 <meta name="description" content="Zombie Generator: original zombies from a seed — body, face, decay, outfit, blood and dirt — animated in 12 frames from eight directions and exported as Unity sprite sheets (512×512 frames, pivot at the feet) with JSON and an editor script, realistic or as pixel art.">
-<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/Battle/pixel/zombies.html">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/zombies.html">
 <link rel="icon" type="image/png" href="../assets/favicon-32.png">
-<link rel="stylesheet" href="../css/lab.css">
+<link rel="stylesheet" href="../css/lab-sea.css">
 <link rel="stylesheet" href="../css/pixel.css">
 </head>
 <body class="lab pix zomb">
@@ -20,8 +20,9 @@
     <button type="button" id="resetAll" title="Every setting and the zombie back to the defaults">Reset to default</button></div>
   <span class="sp"></span>
   <span class="status" id="status"></span>
-  <a href="index.html">Pixel Studio</a>
-  <a href="https://github.com/michalstankiewicz4-cell/Battle/blob/main/docs/zombies.md">How it works</a>
+  <a href="pixel.html">Pixel Studio</a>
+  <a href="https://github.com/michalstankiewicz4-cell/GameLaboratory/blob/main/docs/pixel/zombies.md">How it works</a>
+  <a href="../index.html">Labs</a>
 </div>
 <aside class="panel left">
   <h3>Zombie</h3>
@@ -63,6 +64,6 @@
   <label class="chk"><input type="checkbox" id="allAnims"> ZIP: every animation, not only this one</label>
   <p class="note">Default sheet: 12 frames of 512 × 512 in 6 columns × 2 rows, frame 0 top-left, transparent background with a hard edge, pivot in the centre 9 px above the bottom, 100 pixels per unit. The ZIP holds the sheets, their JSON, the slicer script and a README.</p>
 </aside>
-<script type="module" src="../js/pixel/zombieapp.js"></script>
+<script type="module" src="../js/labs/pixel/zombies.js"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-"""Headless check of Pixel Studio (pixel/index.html), Playwright + SwiftShader.
+"""Headless check of Pixel Studio (labs/pixel.html), Playwright + SwiftShader.
 
 Every 3D subject, every generator and every sample sprite is made at a few sizes; each result must have opaque
 pixels, no half-transparent ones, a sane colour count and a Pixel Doctor report. GIF and PNG exports are encoded and
@@ -31,7 +31,7 @@ def main():
             pg = br.new_page(viewport={'width': 1400, 'height': 860})
             pg.on('pageerror', lambda e: errs.append('pageerror ' + str(e) + ' ' + (e.stack or '')[:400]))
             pg.on('console', lambda m: errs.append(m.type + ' ' + m.text) if m.type == 'error' else None)
-            pg.goto(f'http://localhost:{PORT}/pixel/')
+            pg.goto(f'http://localhost:{PORT}/labs/pixel.html')
             pg.evaluate("()=>localStorage.clear()"); pg.reload()
             pg.wait_for_function('() => window.__pixel', timeout=120000); settle(pg)
             def check(label, st, min_op=12):
@@ -69,7 +69,7 @@ def main():
             gif = pg.evaluate("()=>{const u=__pixel.encodeGIF(__pixel.frames,{delay:100,scale:2});return [String.fromCharCode(...u.slice(0,6)),u.length,u[u.length-1]]}")
             print('gif', gif)
             if gif[0] != 'GIF89a' or gif[2] != 0x3B: fails.append('gif bytes')
-            png = pg.evaluate("""async()=>{const {toCanvas}=await import('../js/pixel/core.js');const c=toCanvas(__pixel.frames[0],4);
+            png = pg.evaluate("""async()=>{const {toCanvas}=await import('../js/render/pixel/core.js');const c=toCanvas(__pixel.frames[0],4);
               const b=await new Promise(r=>c.toBlob(r,'image/png'));const u=new Uint8Array(await b.arrayBuffer());return [Array.from(u.slice(1,4)).map(x=>String.fromCharCode(x)).join(''),c.width]}""")
             print('png', png)
             if png[0] != 'PNG': fails.append('png bytes')
@@ -113,7 +113,7 @@ def main():
             # the ZIP is a zip and the slicer script is there
             # small first render (same origin as the studio page): the default 12 × 512² render blocks SwiftShader for minutes
             pg.evaluate("()=>localStorage.setItem('steelSalvo.zombieGen.v1', JSON.stringify({S:{frame:256,frames:2,cols:2,engine:'cpu'}}))")
-            pg.goto(f'http://localhost:{PORT}/pixel/zombies.html', timeout=600000)
+            pg.goto(f'http://localhost:{PORT}/labs/zombies.html', timeout=600000)
             # nothing renders by itself: the page waits with Start render
             pg.wait_for_function("() => window.__zombies && document.getElementById('loader').classList.contains('idle')", timeout=120000)
             assert pg.evaluate('__zombies.frames.length') == 0, 'rendered by itself'
