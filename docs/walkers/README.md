@@ -1,3 +1,8 @@
+> **W GameLaboratory** (przeniesione z repozytorium NeuroLabPA, z historią): SDF Walkers to `labs/walkers.html`
+> (skrypty `js/labs/walkers/`, model — shadery, cechy, render — `js/models/life/zombie/walkers/`, dane `data/walkers/`),
+> laboratorium języka to `labs/lang.html` (`js/labs/lang/`, teksty `data/lang/`, narzędzia `tools/lang/`).
+> Pierwotne SDF Morgue: `docs/morgue/sdf-morgue-original.html`. Ścieżki niżej są z dawnego repozytorium.
+
 # SDF Walkers
 
 *Repozytorium NeuroLabPA*

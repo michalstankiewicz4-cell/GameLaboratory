@@ -78,7 +78,7 @@ let ftInfo = null;
 const isBPE = () => !!unitInfo && unitInfo.unit === 'bpe';
 const pc = v => v == null ? null : v / CPT();
 const showTok = t => t.replace(/ /g, '·').replace(/\n/g, '↵');
-const worker = new Worker('js/worker.js');
+const worker = new Worker('../js/labs/lang/worker.js');
 
 function loadText(text, label) {
   corpus = cleanText(text);
@@ -126,7 +126,7 @@ function stripFooter(t) { const i = t.search(/\r?\n-----\r?\n[^]*$/); return (i 
 const plural = (n, one, few, many) => n + ' ' + (n === 1 ? one : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14)) ? few : many);
 let sets = [];
 async function loadManifest() {
-  try { sets = ((await (await fetch('data/manifest.json', { cache: 'no-cache' })).json()).sets || []).filter(s => s.files && s.files.length); } catch (e) { sets = []; }
+  try { sets = ((await (await fetch('../data/lang/manifest.json', { cache: 'no-cache' })).json()).sets || []).filter(s => s.files && s.files.length); } catch (e) { sets = []; }
   const sel = $('sampleSet'); sel.innerHTML = '';
   sets.forEach(s => sel.add(new Option(s.name, s.id)));
   sel.add(new Option('Krótki tekst Claude\'a (do pokazania uczenia na pamięć)', 'builtin'));
@@ -137,12 +137,12 @@ async function loadExample() {
   $('useSample').disabled = $('sampleSet').disabled = true;
   try {
     $('dataNote').textContent = 'Wczytuję teksty…';
-    const texts = await Promise.all(set.files.map(async f => { const r = await fetch('data/' + set.dir + f.file, { cache: 'force-cache' }); if (!r.ok) throw 0; const t = await r.text(); return set.strip === 'wolnelektury' ? stripFooter(t) : t; }));
+    const texts = await Promise.all(set.files.map(async f => { const r = await fetch('../data/lang/' + set.dir + f.file, { cache: 'force-cache' }); if (!r.ok) throw 0; const t = await r.text(); return set.strip === 'wolnelektury' ? stripFooter(t) : t; }));
     const n = set.files.length, unit = set.strip === 'wolnelektury' ? ['utwór', 'utwory', 'utworów'] : ['artykuł', 'artykuły', 'artykułów'];
     loadText(texts.join('\n\n'), `${set.label}, ${plural(n, ...unit)}`);
     const note = document.createElement('span');
     note.append(`Przykład: ${plural(n, ...unit)} (${set.files.slice(0, 4).map(f => '„' + f.title + '”').join(', ')}${n > 4 ? '…' : ''}). ${set.note} `);
-    const a = document.createElement('a'); a.href = 'data/' + set.license; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'Źródło i licencja.';
+    const a = document.createElement('a'); a.href = '../data/lang/' + set.license; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'Źródło i licencja.';
     note.append(a, ' ' + $('dataNote').textContent);
     $('dataNote').replaceChildren(note);
   } catch (e) {
@@ -255,7 +255,7 @@ async function startFinetune() {
   const hp = hpValues('chat');
   $('sample').textContent = 'Dostrajam: sieć zaczyna od tego, co umie po nauce na tekście bazowym…';
   try {
-    if (!dialogText) dialogText = await (await fetch('data/rozmowy/rozmowy.txt')).text();
+    if (!dialogText) dialogText = await (await fetch('../data/lang/rozmowy/rozmowy.txt')).text();
     worker.postMessage({ cmd: 'finetune', base: hp.base, hp, dialog: dialogText });
   } catch (e) { showErr('Nie udało się wczytać rozmów (data/rozmowy/rozmowy.txt). Strona musi być otwarta przez serwer.'); training = false; $('train').disabled = false; $('stop').disabled = true; }
 }

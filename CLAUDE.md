@@ -6,7 +6,7 @@
 ## Co jest w repozytorium
 
 - Tylko laboratoria i ich strona startowa (`index.html`), z modelami, środowiskami i narzędziami, których używają. Gier nie przenosimy.
-- Źródła (z historią): Space, Battle, aTrain (z aTrain tylko modele taboru).
+- Źródła (z historią): Space, Battle, aTrain (tabor i fizyka), NeuroLabPA (SDF Walkers, laboratorium języka); SDF Morgue z artefaktu claude.ai.
 - Jedna wersja Three.js: r186, moduły ES (`vendor/three/`, dodatki w `vendor/three/addons/`).
 - Laboratoria z Battle importują r186 bezpośrednio. Kity i laboratoria ze Space ładują go przez `js/core/three-global.js` (globalne `THREE`, potem skrypty jako `type="module"`), który zachowuje ich dawny wygląd z r128: kolory bez konwersji, oświetlenie legacy, bufory pośrednie jak w r128.
 

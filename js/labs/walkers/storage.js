@@ -29,7 +29,7 @@ const initStore=async()=>{
     try{localStorage.removeItem('sdf-walkers-ratings');ratings=JSON.parse(localStorage.getItem(LS)||'[]');}catch(e){ratings=[];}
     // A copy of the site (GitHub Pages, local server) ships Claude's ratings in data/; they join training read-only.
     try{
-      const res=await fetch('data/claude-ratings.json',{cache:'no-cache'});
+      const res=await fetch('../data/walkers/claude-ratings.json',{cache:'no-cache'});
       if(res.ok){
         const d=await res.json(),have=new Set(ratings.map(r=>r.id));
         (d.ratings||[]).filter(r=>r.v===2&&!have.has(r.id)).forEach(r=>ratings.push({...r,bundled:true}));

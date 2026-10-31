@@ -62,7 +62,7 @@ document.getElementById('impModel').addEventListener('change',e=>{
 });
 document.getElementById('repoModel').addEventListener('click',async()=>{
   try{
-    const res=await fetch('data/model.json',{cache:'no-cache'});
+    const res=await fetch('../data/walkers/model.json',{cache:'no-cache'});
     if(!res.ok)throw new Error(res.status);
     loadModelData(await res.json(),'the repo model');
   }catch(e){ioNote.textContent='The repo model is only available on the GitHub Pages copy of this page (or a local copy of the repo).';}

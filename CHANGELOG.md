@@ -3,6 +3,24 @@
 Wersja programu i każdego laboratorium: `js/labkit/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `labs/CHANGELOG.md`; Battle i aTrain — w historii git.
 
+## Program 0.9.0 — 2026-10-31
+
+### Dodane
+- **Import NeuroLabPA z historią** (16 commitów): dwa nowe laboratoria.
+  - **SDF Walkers** (`labs/walkers.html`, v0.23.0 — wersja z NeuroLabPA): całe zombie z funkcji odległości,
+    5 animacji × 4 kierunki × 8 klatek, sprite sheet z JSON, edytor cech, oceny i sieć neuronowa ucząca się gustu.
+    Model: `js/models/life/zombie/walkers/`; skrypty `js/labs/walkers/`; dane `data/walkers/`; dokumentacja,
+    historia zmian i plan: `docs/walkers/`.
+  - **Laboratorium języka** (`labs/lang.html`, v0.23.0): sieć uczy się polskiego od zera (bigram → okno → RNN/GRU →
+    transformer; CPU, WebAssembly SIMD, WebGPU; tokeny BPE; rozmowa). Skrypty `js/labs/lang/`, teksty `data/lang/`.
+  - Oryginał SDF Morgue z NeuroLabPA: `docs/morgue/sdf-morgue-original.html`.
+  - Obie strony: wspólny pasek menu, ścieżki dostosowane, czcionki bez Google Fonts (zastępcze). Na razie we
+    własnym stylu (przewijane strony) — przejście na okna i styl Battle w `TODO.md`.
+- Kafelki, frazy (nowe: sieć neuronowa, język, tekst, transformer, WebGPU), mapa strony.
+
+### Poprawione
+- Pasek menu odporny na ogólne style przycisków strony (cień, przesunięcie, litery).
+
 ## Program 0.8.0 — 2026-10-31
 
 ### Dodane

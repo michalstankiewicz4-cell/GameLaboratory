@@ -25,7 +25,8 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 - [ ] Poświaty silników statków słabsze niż wcześniej.
 
 ## Do przeniesienia
-- [ ] NeuroLabPA (https://michalstankiewicz4-cell.github.io/NeuroLabPA/, repo `michalstankiewicz4-cell/NeuroLabPA`, 17 commitów): dwa laboratoria — **SDF Walkers** (zombie w pixel arcie z funkcji odległości w shaderze, 22 cechy, sprite sheety 5 animacji × 4 kierunki × 8 klatek, sieć neuronowa uczy się gustu z ocen) i **laboratorium języka** (`lang/`: sieć uczy się polskiego od zera — bigram → okno → RNN/GRU → transformer, CPU/WebGPU/WASM SIMD, tokeny BPE, dostrajanie do rozmowy).
+- [ ] SDF Walkers i laboratorium języka (z NeuroLabPA): przenieść na okna z opcjami i styl Battle — dziś to przewijane strony we własnym stylu.
+- [ ] Repozytorium NeuroLabPA: co z nim zrobić po przeniesieniu (usunąć przeniesione / zarchiwizować / zostawić).
 
 ## Testy
 - [ ] Pełny kitcheck po wersji 0.5.0 (przerwany; doktor przeszedł).

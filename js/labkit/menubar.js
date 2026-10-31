@@ -67,6 +67,8 @@ const LABS = [
   { file: "labs/pixel.html", name: "Pixel Studio", doc: "docs/pixel/README.md", keys: [["Ctrl+Z / Ctrl+Shift+Z", "undo / redo (Draw)"], ["Right button", "erase (Draw)"]] },
   { file: "labs/zombies.html", name: "Zombie Generator", doc: "docs/pixel/zombies.md", keys: [] },
   { file: "labs/morgue.html", name: "SDF Morgue", doc: "docs/morgue.md", keys: [] },
+  { file: "labs/walkers.html", name: "SDF Walkers", doc: "docs/walkers/README.md", keys: [] },
+  { file: "labs/lang.html", name: "Language lab", doc: "docs/walkers/README.md", keys: [] },
 ];
 const TOOLS = [
   { file: "tools/doctor.html", name: "Model doctor", doc: "docs/doctor/README.md", keys: [["Click a model, then a finding", "its parts light up red"], ["Drag / wheel", "turn and zoom the view"]] },
@@ -112,6 +114,8 @@ const PL_ITEMS = {
   "labs/pixel.html": ["Pixel Studio", [["Ctrl+Z / Ctrl+Shift+Z", "cofnij / ponów (Draw)"], ["Prawy przycisk", "gumka (Draw)"]]],
   "labs/zombies.html": ["Generator zombie", []],
   "labs/morgue.html": ["Kostnica SDF", []],
+  "labs/walkers.html": ["SDF Walkers", []],
+  "labs/lang.html": ["Laboratorium języka", []],
   "tools/doctor.html": ["Doktor modeli", [["Kliknij model, potem znalezisko", "jego części świecą na czerwono"], ["Przeciągnij / kółko", "obrót i przybliżenie widoku"]]],
   "labs/transform.html": ["Transformator", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"]]],
   "tools/kitcheck.html": ["Kontrola kitów", []],
@@ -131,7 +135,10 @@ const CSS = `
 #labMenu .lmHome:hover { background: #22262f; }
 #labMenu .lmMark { width: 16px; height: 16px; border-radius: 4px; background: conic-gradient(from 210deg, #5b8cff, #36d6b5, #f2b84b, #5b8cff); }
 #labMenu .lmTop { position: relative; }
-#labMenu .lmTop > button { height: 24px; padding: 0 10px; border: 0; border-radius: 6px; background: none; color: inherit; font: inherit; cursor: pointer; }
+#labMenu .lmTop > button { height: 24px; padding: 0 10px; border: 0; border-radius: 6px; background: none; color: inherit; font: inherit; cursor: pointer;
+  box-shadow: none; transform: none; letter-spacing: normal; text-transform: none; outline-offset: 0; }
+#labMenu button, #labMenu a { box-shadow: none; text-shadow: none; letter-spacing: normal; text-transform: none; }
+#labMenu button:active { transform: none; }
 #labMenu .lmTop > button:hover, #labMenu .lmTop.open > button { background: #262a33; color: #fff; }
 #labMenu .lmDrop { position: absolute; left: 0; top: 28px; min-width: 240px; padding: 6px; border-radius: 10px; background: #1a1d24;
   border: 1px solid #2c313c; box-shadow: 0 12px 32px rgba(0, 0, 0, .45); display: none; }
