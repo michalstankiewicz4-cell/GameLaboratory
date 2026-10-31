@@ -11,6 +11,7 @@
      ShipKit's generators): each module built, as a placement hologram
      (fits / doesn't fit) and under construction. docs/surface.md. -->
 <link rel="stylesheet" href="../css/lab.css">
+<link rel="stylesheet" href="../css/windows.css">
 <style>
 .hidden{ display:none !important; }
 #modTabs{ display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:6px; }
@@ -24,7 +25,7 @@
 <script src="../js/labkit/versions.js"></script>
 <script src="../js/labkit/menubar.js"></script>
 <canvas id="view"></canvas>
-<div id="hud">
+<div id="hud" data-window="left" data-side="left">
   <div id="hudTop">
     <div class="mat blue" id="hudBracket"></div>
     <svg id="hudLogo" viewBox="0 0 52 48" aria-hidden="true">
@@ -58,7 +59,7 @@
     <div id="hint">Left-drag: rotate · Right-drag: pan · Scroll: zoom</div>
   </div>
 </div>
-<div id="opt">
+<div id="opt" data-window="right" data-side="right">
   <div class="hudPanel">
     <div class="mat lilac side"></div>
     <div class="secHd first">MODULE</div>
@@ -74,6 +75,7 @@
     <canvas id="fpsGraph" width="270" height="40"></canvas>
   </div>
 </div>
+<script src="../js/labkit/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
 <script type="module" src="../js/labkit/labkit.js"></script>
 <script type="module" src="../js/models/ships-space/shipkit.js"></script>

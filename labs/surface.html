@@ -17,6 +17,7 @@
      and weather.js. The base lives in
      this browser (localStorage "roj-bases"); the game shows its marker. -->
 <link rel="stylesheet" href="../css/lab.css">
+<link rel="stylesheet" href="../css/windows.css">
 <style>
 .hidden{ display:none !important; }
 #hud{ width:340px; }
@@ -52,7 +53,7 @@ select.lab{ width:100%; height:28px; border:1.5px solid #3c55d8; border-radius:6
 <div id="compass" class="hidden"><svg viewBox="0 0 30 30"><g id="cArrow"><path d="M15 3 L21 22 L15 18 L9 22 Z" fill="#f8bb56"/></g></svg><span>BASE</span><span class="d" id="cDist">–</span></div>
 <div id="readout" class="hidden"><span>Speed <b id="rSpeed">0</b> m/s</span><span>Altitude <b id="rAlt">0</b> m</span><span id="rWhere"></span></div>
 
-<div id="hud">
+<div id="hud" data-window="left" data-side="left">
   <div id="hudTop">
     <div class="mat blue" id="hudBracket"></div>
     <svg id="hudLogo" viewBox="0 0 52 48" aria-hidden="true">
@@ -96,7 +97,7 @@ select.lab{ width:100%; height:28px; border:1.5px solid #3c55d8; border-radius:6
     <div id="hint">Orbit: drag to turn the globe · Ground: W/S speed, A/D turn, Shift boost, right-drag camera (down to look at the sky), scroll zoom</div>
   </div>
 </div>
-<div id="opt">
+<div id="opt" data-window="right" data-side="right">
   <div class="hudPanel">
     <div class="mat lilac side"></div>
     <div class="secHd first">SKY</div>
@@ -124,6 +125,7 @@ select.lab{ width:100%; height:28px; border:1.5px solid #3c55d8; border-radius:6
   </div>
 </div>
 
+<script src="../js/labkit/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
 <script type="module" src="../js/labkit/labkit.js"></script>
 <script type="module" src="../js/models/ships-space/shipkit.js"></script>

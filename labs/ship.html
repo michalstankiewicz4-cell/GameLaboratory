@@ -23,6 +23,7 @@
           camera, HUD, quality/detail sliders, performance counters)
      Opens straight from disk, no server needed. -->
 <link rel="stylesheet" href="../css/lab.css">
+<link rel="stylesheet" href="../css/windows.css">
 <link rel="stylesheet" href="../css/envswitch.css">
 <style>
 #actBtns{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px 0 4px; }
@@ -73,7 +74,7 @@ body.focus #hud.labIdle *, body.focus #opt.labIdle *{ pointer-events:auto !impor
 
 <div id="partTip" class="hidden"></div>
 <button class="tBtn" id="btnView" title="The full UI ↔ only the ticked blocks (key C)">CHANGE VIEW</button>
-<div id="hud">
+<div id="hud" data-window="left" data-side="left">
   <div id="hudTop">
     <div class="mat blue" id="hudBracket"></div>
     <svg id="hudLogo" viewBox="0 0 52 48" aria-hidden="true">
@@ -133,7 +134,7 @@ body.focus #hud.labIdle *, body.focus #opt.labIdle *{ pointer-events:auto !impor
   </div>
 </div>
 
-<div id="opt">
+<div id="opt" data-window="right" data-side="right">
   <div class="hudPanel block" id="blkOpt" data-block="optimization">
     <div class="mat gold side"></div>
     <div class="blockHd"><span>OPTIMIZATION</span><label class="pick" title="Keep this block when C hides the rest"><input type="checkbox" data-pick="optimization">KEEP</label></div>
@@ -160,6 +161,7 @@ body.focus #hud.labIdle *, body.focus #opt.labIdle *{ pointer-events:auto !impor
 </div>
 <div id="loading">GENERATING HULL…</div>
 
+<script src="../js/labkit/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
 <!-- Three.js r128 add-ons (vendor/, MIT) + PostKit: the IMAGE EFFECTS panel's post-processing, the game's own -->
 <script type="module" src="../js/render/postkit/postkit.js"></script>

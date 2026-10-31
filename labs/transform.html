@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <title>Transformer — levels of detail and hitboxes for ORP Błyskawica | GameLaboratory</title>
 <meta name="description" content="GameLaboratory transformer: the 1:1 lab model of ORP Błyskawica turned into a game-ready ship — three levels of detail, hundreds of hitboxes for procedural destruction, damage in the shader, fleet performance test.">
 <link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/transform.html">
@@ -15,8 +15,11 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="../assets/favicon-32.png">
 <link rel="stylesheet" href="../css/lab-sea.css">
+<link rel="stylesheet" href="../css/windows.css">
 </head>
 <body class="lab">
+<script src="../js/labkit/versions.js"></script>
+<script src="../js/labkit/menubar.js"></script>
 <div id="view"></div>
 <div class="bar">
   <b>Transformer</b> <span class="ver mono" data-lab-version="labs/transform.html"></span>
@@ -27,7 +30,7 @@
   <a href="../tools/doctor.html">Model doctor</a>
   <a href="../index.html">Labs</a>
 </div>
-<aside class="panel left" id="leftPanel">
+<aside class="panel left" id="leftPanel" data-window="left" data-side="left">
   <h3>Levels of detail</h3>
   <table class="specs" id="levels"></table>
   <div class="btns" id="show"></div>
@@ -40,7 +43,7 @@
   <div class="stats" id="perf"></div>
   <p class="note">The fleet is spread from 100 m to 2 km so every level is in use. Compare fps and draw calls with the box on and off.</p>
 </aside>
-<aside class="panel right" id="rightPanel">
+<aside class="panel right" id="rightPanel" data-window="right" data-side="right">
   <h3>Camera</h3>
   <div class="btns" id="cams"></div>
   <h3>Hitboxes</h3>
@@ -60,7 +63,7 @@
   <span class="sp"></span>
   <span>GameLaboratory</span>
 </div>
+<script src="../js/labkit/windows.js"></script>
 <script type="module" src="../js/labs/transform.js"></script>
-<script src="../js/labkit/versions.js"></script>
 </body>
 </html>

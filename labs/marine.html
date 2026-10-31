@@ -13,6 +13,7 @@
      vessels — riding the waves, rising on foils, diving, driving out onto
      the shore. docs/marine.md. -->
 <link rel="stylesheet" href="../css/lab.css">
+<link rel="stylesheet" href="../css/windows.css">
 <link rel="stylesheet" href="../css/envswitch.css">
 <style>
 .hidden{ display:none !important; }
@@ -31,7 +32,7 @@ input[type=range]:disabled{ opacity:.35; }
 <div class="envSwitch float" data-current="water" data-space="" data-water="marine.html" data-land="vehicles.html"></div>
 <script src="../js/labkit/envswitch.js"></script>
 <canvas id="view"></canvas>
-<div id="hud">
+<div id="hud" data-window="left" data-side="left">
   <div id="hudTop">
     <div class="mat blue" id="hudBracket"></div>
     <svg id="hudLogo" viewBox="0 0 52 48" aria-hidden="true">
@@ -73,7 +74,7 @@ input[type=range]:disabled{ opacity:.35; }
     <div id="hint">WASD: steer · Q / E: dive / rise · Left-drag: orbit the camera (take it under water) · Scroll: zoom</div>
   </div>
 </div>
-<div id="opt">
+<div id="opt" data-window="right" data-side="right">
   <div class="hudPanel">
     <div class="mat lilac side"></div>
     <div class="secHd first">VESSEL</div>
@@ -91,6 +92,7 @@ input[type=range]:disabled{ opacity:.35; }
     <canvas id="fpsGraph" width="270" height="40"></canvas>
   </div>
 </div>
+<script src="../js/labkit/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
 <script type="module" src="../js/labkit/labkit.js"></script>
 <script type="module" src="../js/models/ships-space/shipkit.js"></script>

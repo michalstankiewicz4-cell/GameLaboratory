@@ -3,16 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <title>Filters Lab | GameLaboratory</title>
 <meta name="description" content="GameLaboratory filters lab: the camera look from the water labs — exposure, tone mapping, colour, glow, vignette, grain, lens effects and sharpening — on a choice of scenes, compared with the clean image, with the cost of every effect.">
 <link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/filters.html">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../css/lab-sea.css">
+<link rel="stylesheet" href="../css/windows.css">
 </head>
 <!-- Laboratorium filtrów (js/labs/filters/): potok kamery z Battle (js/render/sea/look.js) na wybranej scenie.
      Sceny: js/labs/filters/scenes/, scena bazowa (niebo, światło, morze, grunt): js/labs/filters/stage.js. -->
 <body class="lab">
+<script src="../js/labkit/versions.js"></script>
+<script src="../js/labkit/menubar.js"></script>
 <div id="view"></div>
 <div id="split" class="splitline" hidden><span>clean</span><span>look</span></div>
 <div class="bar">
@@ -23,7 +26,7 @@
   <a href="look.html">Look lab (weather, ageing)</a>
   <a href="../index.html">Labs</a>
 </div>
-<aside class="panel left">
+<aside class="panel left" data-window="left" data-side="left">
   <h3>Camera look</h3>
   <div class="btns" id="presets"></div>
   <label class="chk"><input type="checkbox" id="splitOn"> Compare: clean on the left</label>
@@ -34,7 +37,7 @@
   <div class="btns"><button type="button" id="copy">Copy settings (JSON)</button></div>
   <p class="note" id="copied"></p>
 </aside>
-<aside class="panel right">
+<aside class="panel right" data-window="right" data-side="right">
   <h3>Camera</h3>
   <div class="row"><span>Field of view</span><input type="range" id="fov" min="20" max="95" value="40"><output id="fovV"></output></div>
   <h3>Performance</h3>
@@ -53,7 +56,7 @@
   <span class="sp"></span>
   <span>GameLaboratory</span>
 </div>
+<script src="../js/labkit/windows.js"></script>
 <script type="module" src="../js/labs/filters/page.js"></script>
-<script src="../js/labkit/versions.js"></script>
 </body>
 </html>

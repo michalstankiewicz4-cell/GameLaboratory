@@ -53,7 +53,7 @@
 
 ## Okna z opcjami
 
-- Opcje laboratorium (dawne panele po lewej i prawej) są w pływających oknach otwieranych z OPCJE → Okna: `js/labkit/windows.js` + `css/windows.css` (styl laboratoriów Battle). Panel dostaje `data-window`, `data-title`, `data-title-pl`. Na razie tylko laboratorium roślin (próba) — reszta po akceptacji.
+- Opcje laboratorium (dawne panele po lewej i prawej) są w pływających oknach otwieranych z OPCJE → Okna: `js/labkit/windows.js` + `css/windows.css` (styl laboratoriów Battle). Panel dostaje `data-window`, `data-title`, `data-title-pl`. Wszystkie laboratoria z panelami (poza skalą i skórkami) i doktor. Bez `data-title` tytułem jest pierwsza sekcja panelu (`h3` / `.secHd`). Panele Space w oknie dostają styl Battle z `css/windows.css`.
 - Strony ze ścisłym CSP: pasek menu wstawia style przez CSSOM; w CSP potrzebne `font-src 'self'`.
 
 ## Wersjonowanie

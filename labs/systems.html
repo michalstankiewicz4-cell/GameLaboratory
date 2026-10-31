@@ -14,6 +14,7 @@
      shared HUD helpers), BodyKit (the bodies), SystemKit (the systems:
      data, presets, generator, building — js/systemkit/systemkit.js). -->
 <link rel="stylesheet" href="../css/lab.css">
+<link rel="stylesheet" href="../css/windows.css">
 <style>
 .hidden{ display:none !important; }
 #hud{ width:360px; }
@@ -73,7 +74,7 @@ body.dragging, body.dragging *{ cursor:grabbing !important; }
 <div id="labels"></div>
 <div id="handles"></div>
 
-<div id="hud">
+<div id="hud" data-window="left" data-side="left">
   <div id="hudTop">
     <div class="mat blue" id="hudBracket"></div>
     <svg id="hudLogo" viewBox="0 0 52 48" aria-hidden="true">
@@ -131,7 +132,7 @@ body.dragging, body.dragging *{ cursor:grabbing !important; }
   </div>
 </div>
 
-<div id="opt">
+<div id="opt" data-window="right" data-side="right">
   <div class="hudPanel">
     <div class="mat lilac side"></div>
     <div class="secHd first">VIEW</div>
@@ -175,6 +176,7 @@ body.dragging, body.dragging *{ cursor:grabbing !important; }
 </div>
 <div id="loading">BUILDING THE SYSTEM…</div>
 
+<script src="../js/labkit/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
 <script type="module" src="../js/render/postkit/postkit.js"></script>
 <script type="module" src="../js/labkit/labkit.js"></script>

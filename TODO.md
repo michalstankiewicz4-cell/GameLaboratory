@@ -24,6 +24,10 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 - [ ] Mgławica w tle laboratorium ciał niebieskich ciemniejsza po przejściu na grafikę Battle.
 - [ ] Poświaty silników statków słabsze niż wcześniej.
 
+## Do przeniesienia
+- [ ] NeuroLabPA (https://michalstankiewicz4-cell.github.io/NeuroLabPA/, repo `michalstankiewicz4-cell/NeuroLabPA`, 17 commitów): dwa laboratoria — **SDF Walkers** (zombie w pixel arcie z funkcji odległości w shaderze, 22 cechy, sprite sheety 5 animacji × 4 kierunki × 8 klatek, sieć neuronowa uczy się gustu z ocen) i **laboratorium języka** (`lang/`: sieć uczy się polskiego od zera — bigram → okno → RNN/GRU → transformer, CPU/WebGPU/WASM SIMD, tokeny BPE, dostrajanie do rozmowy).
+- [ ] Artefakt https://claude.ai/artifact/7JugJX6pGPW8KuZmq4Kug6 — kolejne laboratorium; ta sesja nie może go otworzyć (potrzebny plik HTML albo opis).
+
 ## Testy
 - [ ] Pełny kitcheck po wersji 0.5.0 (przerwany; doktor przeszedł).
 

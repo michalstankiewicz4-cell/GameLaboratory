@@ -5,7 +5,8 @@
    A classic script, after the lab's panels in the page:
      <script src="../js/labkit/windows.js"></script>   + css/windows.css
    Every element with data-window="id" becomes a window: a title bar
-   (data-title, Polish data-title-pl; dragged to move it), ✕ to close,
+   (data-title, Polish data-title-pl; without them the panel's first section
+   heading, read as the lab fills it; dragged to move it), ✕ to close,
    the element itself as the body. A click brings a window to the front.
    Which windows are open and where they stand is kept in this browser
    (gamelab.windows:<page>); the first visit opens them where the panels
@@ -45,7 +46,8 @@ function make(body) {
   body.classList.add("labWinBody");
   body.parentNode.insertBefore(el, body);
   el.append(head, body);
-  const w = { id, el, body, open: true, title: () => (lang() === "pl" && body.dataset.titlePl) || body.dataset.title || id };
+  const heading = () => { const h = body.querySelector("h3, .secHd"); return h && h.textContent.trim(); };
+  const w = { id, el, body, open: true, title: () => (lang() === "pl" && body.dataset.titlePl) || body.dataset.title || heading() || id };
   title.textContent = w.title();
   close.title = lang() === "pl" ? "Zamknij (OPCJE → Okna otwiera je znowu)" : "Close (OPTIONS → Windows opens it again)";
   close.addEventListener("click", () => show(w, false));
@@ -75,6 +77,8 @@ function make(body) {
 
 function init() {
   document.querySelectorAll("[data-window]").forEach(make);
+  // titles from a heading: the labs fill their panels after loading
+  setInterval(() => wins.forEach((w) => { const t = w.title(), e = w.el.querySelector(".labWinTitle"); if (e.textContent !== t) e.textContent = t; }), 1500);
   addEventListener("resize", () => wins.forEach((w) => { if (w.open) clamp(w); }));
 }
 window.LabWindows = {

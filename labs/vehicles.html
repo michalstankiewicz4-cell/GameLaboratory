@@ -13,6 +13,7 @@
      pitching and rolling, tracks running, dust, lamps at night, and its
      work (tipping the bed, drilling, the crane). docs/vehicles.md. -->
 <link rel="stylesheet" href="../css/lab.css">
+<link rel="stylesheet" href="../css/windows.css">
 <link rel="stylesheet" href="../css/envswitch.css">
 <style>
 .hidden{ display:none !important; }
@@ -28,9 +29,10 @@
 <script src="../js/labkit/versions.js"></script>
 <script src="../js/labkit/menubar.js"></script>
 <div class="envSwitch float" data-current="land" data-space="" data-water="marine.html" data-land="vehicles.html"></div>
+<script src="../js/labkit/windows.js"></script>
 <script src="../js/labkit/envswitch.js"></script>
 <canvas id="view"></canvas>
-<div id="hud">
+<div id="hud" data-window="left" data-side="left">
   <div id="hudTop">
     <div class="mat blue" id="hudBracket"></div>
     <svg id="hudLogo" viewBox="0 0 52 48" aria-hidden="true">
@@ -73,7 +75,7 @@
     <div id="hint">WASD: drive · Left-drag: orbit the camera · Scroll: zoom</div>
   </div>
 </div>
-<div id="opt">
+<div id="opt" data-window="right" data-side="right">
   <div class="hudPanel">
     <div class="mat lilac side"></div>
     <div class="secHd first">VEHICLE</div>

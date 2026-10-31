@@ -3,15 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <title>Zombie Generator — sprite sheets for Unity, realistic or pixel art</title>
 <meta name="description" content="Zombie Generator: original zombies from a seed — body, face, decay, outfit, blood and dirt — animated in 12 frames from eight directions and exported as Unity sprite sheets (512×512 frames, pivot at the feet) with JSON and an editor script, realistic or as pixel art.">
 <link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/zombies.html">
 <link rel="icon" type="image/png" href="../assets/favicon-32.png">
 <link rel="stylesheet" href="../css/lab-sea.css">
+<link rel="stylesheet" href="../css/windows.css">
 <link rel="stylesheet" href="../css/pixel.css">
 </head>
 <body class="lab pix zomb">
+<script src="../js/labkit/versions.js"></script>
+<script src="../js/labkit/menubar.js"></script>
 <div class="bar">
   <b>Zombie Generator</b> <span class="ver mono" id="ver" data-lab-version="labs/zombies.html"></span>
   <span class="dimtxt">Pixel Studio</span>
@@ -24,7 +27,7 @@
   <a href="https://github.com/michalstankiewicz4-cell/GameLaboratory/blob/main/docs/pixel/zombies.md">How it works</a>
   <a href="../index.html">Labs</a>
 </div>
-<aside class="panel left">
+<aside class="panel left" data-window="left" data-side="left">
   <h3>Zombie</h3>
   <div class="row"><span>Seed</span><input type="number" id="seed" min="1" max="99999" step="1"><output></output></div>
   <div class="btns"><button type="button" id="another">Another zombie</button></div>
@@ -37,7 +40,7 @@
   <div class="frames btns"><button type="button" id="prev">◀</button><span id="frameNo" class="mono"></span><button type="button" id="next">▶</button><button type="button" id="play">Pause</button></div>
   <div class="checker sheetbox"><canvas id="sheetView"></canvas></div>
 </main>
-<aside class="panel right">
+<aside class="panel right" data-window="right" data-side="right">
   <h3>Animation</h3>
   <div class="row"><span>Animation</span><select id="anim"></select><output></output></div>
   <div class="row"><span>Direction</span><select id="dir"></select><output></output></div>
@@ -64,7 +67,7 @@
   <label class="chk"><input type="checkbox" id="allAnims"> ZIP: every animation, not only this one</label>
   <p class="note">Default sheet: 12 frames of 512 × 512 in 6 columns × 2 rows, frame 0 top-left, transparent background with a hard edge, pivot in the centre 9 px above the bottom, 100 pixels per unit. The ZIP holds the sheets, their JSON, the slicer script and a README.</p>
 </aside>
+<script src="../js/labkit/windows.js"></script>
 <script type="module" src="../js/labs/pixel/zombies.js"></script>
-<script src="../js/labkit/versions.js"></script>
 </body>
 </html>

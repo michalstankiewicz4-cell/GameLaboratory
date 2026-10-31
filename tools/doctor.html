@@ -3,14 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="robots" content="noindex, nofollow">
 <title>Model doctor | GameLaboratory</title>
 <meta name="description" content="GameLaboratory model doctor: every procedural model of every lab — space, sea, land, rail — examined for the repeating mistakes: inside-out shapes, holes, flicker, floating pieces, guns firing into their own ship, fittings through the hull.">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../css/lab-sea.css">
+<link rel="stylesheet" href="../css/windows.css">
 </head>
 <body class="lab">
+<script src="../js/labkit/versions.js"></script>
+<script src="../js/labkit/menubar.js"></script>
 <div id="view"></div>
 <div class="bar">
   <b>Model Doctor</b> <span class="ver mono" data-lab-version="tools/doctor.html"></span>
@@ -18,7 +21,7 @@
   <span class="sp"></span>
   <a href="../index.html">Labs</a>
 </div>
-<aside class="panel left" id="leftPanel">
+<aside class="panel left" id="leftPanel" data-window="left" data-side="left">
   <h3>Models</h3>
   <div id="models" class="mlist"></div>
   <h3>Checks</h3>
@@ -35,7 +38,7 @@
   <div class="row"><span>Draw calls</span><input type="range" id="bCalls" min="10" max="200" step="5" value="40"><output id="bCallsV"></output></div>
   <p class="note">Models are built unmerged (one mesh per piece) so every finding names a piece and the source line that added it. Allow-list what is meant with <span class="mono">userData.doctorOk = 'floating'</span> (or an array of checks) on the piece or its part.</p>
 </aside>
-<aside class="panel right" id="rightPanel">
+<aside class="panel right" id="rightPanel" data-window="right" data-side="right">
   <h3 id="mTitle">Findings</h3>
   <div class="stats" id="mStats"></div>
   <div id="findings" class="flist"></div>
@@ -46,6 +49,7 @@
   <span>GameLaboratory</span>
 </div>
 <!-- Space kits (classic scripts on window, r186 through three-global), then the doctor -->
+<script src="../js/labkit/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
 <script type="module" src="../js/models/ships-space/shipkit.js"></script>
 <script type="module" src="../js/models/ships-space/ships/codewing.js"></script>
@@ -56,6 +60,5 @@
 <script type="module" src="../js/models/vehicles/vehiclekit.js"></script>
 <script type="module" src="../js/envs/water/marinekit/marinekit.js"></script>
 <script type="module" src="doctor/page.js"></script>
-<script src="../js/labkit/versions.js"></script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <title>Land Lab — procedural coasts, terrain and mixed waters | GameLaboratory</title>
 <meta name="description" content="GameLaboratory land lab: procedural land and sea from 0 to 100 % land — islands, archipelagos, coasts, fjords, highlands with erosion, beaches and surf — on a wrap-around map (sail out one side, in at the other) or a map bounded by buoys or mountains, with ORP Błyskawica to sail through it; rivers, lakes, fjords, harbours and ice mixed by region with seamless transitions.">
 <link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/land.html">
@@ -15,8 +15,11 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="../assets/favicon-32.png">
 <link rel="stylesheet" href="../css/lab-sea.css">
+<link rel="stylesheet" href="../css/windows.css">
 </head>
 <body class="lab">
+<script src="../js/labkit/versions.js"></script>
+<script src="../js/labkit/menubar.js"></script>
 <div id="view"></div>
 <div class="bar">
   <b>Land Lab</b> <span class="ver mono" data-lab-version="labs/land.html"></span>
@@ -27,7 +30,7 @@
   <a href="look.html">Look Lab</a>
   <a href="../index.html">Labs</a>
 </div>
-<aside class="panel left" id="leftPanel">
+<aside class="panel left" id="leftPanel" data-window="left" data-side="left">
   <h3>Map</h3>
   <div class="row"><span>Seed</span><input type="number" id="seed" min="0" max="999999" step="1"><output></output></div>
   <div class="btns"><button type="button" id="random">New random map</button><button type="button" id="gen">Generate</button></div>
@@ -60,7 +63,7 @@
   <div class="btns"><button type="button" id="copy">Copy settings (JSON)</button></div>
   <p class="note" id="copied">Same seed and settings always give the same map.</p>
 </aside>
-<aside class="panel right" id="rightPanel">
+<aside class="panel right" id="rightPanel" data-window="right" data-side="right">
   <h3>Chart</h3>
   <canvas id="mini" class="minimap" width="256" height="256"></canvas>
   <label class="chk"><input type="checkbox" id="labels" checked> Names of the waters on the chart</label>
@@ -83,7 +86,7 @@
   <span class="sp"></span>
   <span>GameLaboratory</span>
 </div>
+<script src="../js/labkit/windows.js"></script>
 <script type="module" src="../js/labs/land.js"></script>
-<script src="../js/labkit/versions.js"></script>
 </body>
 </html>

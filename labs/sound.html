@@ -10,6 +10,7 @@
      generated live from layers, parameters and a seed, like ShipKit builds
      ships. Play it, shape it, record it. docs/sound.md. -->
 <link rel="stylesheet" href="../css/lab.css">
+<link rel="stylesheet" href="../css/windows.css">
 <style>
 .hidden{ display:none !important; }
 #viz{ position:fixed; inset:0; width:100%; height:100%; display:block; background:#01020a; }
@@ -53,7 +54,7 @@ textarea.lab{ height:96px; width:100%; padding:6px; resize:vertical; line-height
 <canvas id="viz"></canvas>
 <div id="tapHint"><b>PRESS PLAY</b>the music is made live, here, from code</div>
 
-<div id="hud">
+<div id="hud" data-window="left" data-side="left">
   <div id="hudTop">
     <div class="mat blue" id="hudBracket"></div>
     <svg id="hudLogo" viewBox="0 0 52 48" aria-hidden="true">
@@ -99,7 +100,7 @@ textarea.lab{ height:96px; width:100%; padding:6px; resize:vertical; line-height
   </div>
 </div>
 
-<div id="opt">
+<div id="opt" data-window="right" data-side="right">
   <div class="hudPanel">
     <div class="mat lilac side"></div>
     <div class="secHd first">INSTRUMENTS</div>
@@ -124,8 +125,9 @@ textarea.lab{ height:96px; width:100%; padding:6px; resize:vertical; line-height
   </div>
 </div>
 
-<script src="../js/labkit/labkit.js"></script>
-<script src="../js/audio/musickit/musickit.js"></script>
-<script src="../js/labs/sound.js"></script>
+<script src="../js/labkit/windows.js"></script>
+<script type="module" src="../js/labkit/labkit.js"></script>
+<script type="module" src="../js/audio/musickit/musickit.js"></script>
+<script type="module" src="../js/labs/sound.js"></script>
 </body>
 </html>

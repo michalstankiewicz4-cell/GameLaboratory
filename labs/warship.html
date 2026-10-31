@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <title>Ship Lab — ORP Błyskawica and ORP Orzeł 1:1 3D models | GameLaboratory</title>
 <meta name="description" content="GameLaboratory ship lab: detailed 3D models of the Polish destroyer ORP Błyskawica (1937) and the submarine ORP Orzeł (1939), reconstructed to real dimensions with their guns, torpedo tubes, bridge, conning tower and periscopes. Orbit, toggle parts, train the guns, dive the submarine, measure.">
 <link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/warship.html">
@@ -15,9 +15,12 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="../assets/favicon-32.png">
 <link rel="stylesheet" href="../css/lab-sea.css">
+<link rel="stylesheet" href="../css/windows.css">
 <link rel="stylesheet" href="../css/envswitch.css">
 </head>
 <body class="lab">
+<script src="../js/labkit/versions.js"></script>
+<script src="../js/labkit/menubar.js"></script>
 <div id="view"></div>
 <div id="dims"></div>
 <div class="bar">
@@ -29,7 +32,7 @@
   <a href="../tools/doctor.html?model=sea/lab/blyskawica">Model doctor</a>
   <a href="../index.html">Labs</a>
 </div>
-<aside class="panel left" id="infoPanel">
+<aside class="panel left" id="infoPanel" data-window="left" data-side="left">
   <h2 id="shipName"></h2>
   <div class="sub" id="shipSub"></div>
   <h3>Specifications</h3>
@@ -39,7 +42,7 @@
   <h3>Sources</h3>
   <ol class="src" id="sources"></ol>
 </aside>
-<aside class="panel right" id="ctlPanel">
+<aside class="panel right" id="ctlPanel" data-window="right" data-side="right">
   <h3>Camera</h3>
   <div class="btns" id="cams"></div>
   <h3>View</h3>
@@ -82,8 +85,8 @@
   <span class="sp"></span>
   <span>GameLaboratory</span>
 </div>
+<script src="../js/labkit/windows.js"></script>
 <script type="module" src="../js/labs/warship.js"></script>
 <script src="../js/labkit/envswitch.js"></script>
-<script src="../js/labkit/versions.js"></script>
 </body>
 </html>
