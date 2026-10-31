@@ -1,5 +1,5 @@
 {
- "game/bb": {
+ "sea/game/bb": {
   "counts": {},
   "fingerprint": {
    "drawCalls": 63,
@@ -12,7 +12,7 @@
    "triangles": 5326
   }
  },
- "game/ca": {
+ "sea/game/ca": {
   "counts": {},
   "fingerprint": {
    "drawCalls": 40,
@@ -25,7 +25,7 @@
    "triangles": 3594
   }
  },
- "game/dd": {
+ "sea/game/dd": {
   "counts": {},
   "fingerprint": {
    "drawCalls": 27,
@@ -38,7 +38,7 @@
    "triangles": 2362
   }
  },
- "game/ss": {
+ "sea/game/ss": {
   "counts": {},
   "fingerprint": {
    "drawCalls": 22,
@@ -51,7 +51,7 @@
    "triangles": 908
   }
  },
- "lab/blyskawica": {
+ "sea/lab/blyskawica": {
   "counts": {
    "budget": 1
   },
@@ -66,7 +66,7 @@
    "triangles": 33575
   }
  },
- "lab/orzel": {
+ "sea/lab/orzel": {
   "counts": {
    "arc": 1,
    "budget": 1,
@@ -83,7 +83,7 @@
    "triangles": 17083
   }
  },
- "lod/blyskawica/0": {
+ "sea/lod/blyskawica/0": {
   "counts": {},
   "fingerprint": {
    "drawCalls": 65,
@@ -96,7 +96,7 @@
    "triangles": 33551
   }
  },
- "lod/blyskawica/1": {
+ "sea/lod/blyskawica/1": {
   "counts": {},
   "fingerprint": {
    "drawCalls": 31,
@@ -109,7 +109,7 @@
    "triangles": 12238
   }
  },
- "lod/blyskawica/2": {
+ "sea/lod/blyskawica/2": {
   "counts": {},
   "fingerprint": {
    "drawCalls": 7,
@@ -122,7 +122,7 @@
    "triangles": 2695
   }
  },
- "lod/orzel/0": {
+ "sea/lod/orzel/0": {
   "counts": {},
   "fingerprint": {
    "drawCalls": 27,
@@ -135,7 +135,7 @@
    "triangles": 17057
   }
  },
- "lod/orzel/1": {
+ "sea/lod/orzel/1": {
   "counts": {},
   "fingerprint": {
    "drawCalls": 15,
@@ -148,7 +148,7 @@
    "triangles": 6559
   }
  },
- "lod/orzel/2": {
+ "sea/lod/orzel/2": {
   "counts": {},
   "fingerprint": {
    "drawCalls": 4,

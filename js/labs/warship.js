@@ -115,15 +115,15 @@ const asked = new URLSearchParams(location.search).get('ship');            // ?s
 let model = null, shipId = SHIP_IDS.includes(asked) ? asked : SHIP_IDS[0], buildMs = 0, signal = null;
 const partChecks = {};
 for (const id of SHIP_IDS) $('ship').append(el('option', { value: id, textContent: shipInfo(id).name + ' (' + shipInfo(id).year + ')' }));
-$('ship').value = shipId; document.querySelector('a[href^="../tools/doctor-sea.html"]').href = '../tools/doctor-sea.html?model=lab/' + shipId;
-$('ship').onchange = () => { shipId = $('ship').value; document.querySelector('a[href^="../tools/doctor-sea.html"]').href = '../tools/doctor-sea.html?model=lab/' + shipId; dive.keel = dive.want = null; rebuild(); fillInfo(); setCams(); buildDimLines(); const c = shipView(shipId).cams; if (c) orbit.want = { target: new THREE.Vector3(...c[0][1]), dist: c[0][2], yaw: c[0][3], pitch: c[0][4] }; };
+$('ship').value = shipId; document.querySelector('a[href^="../tools/doctor.html"]').href = '../tools/doctor.html?model=sea/lab/' + shipId;
+$('ship').onchange = () => { shipId = $('ship').value; document.querySelector('a[href^="../tools/doctor.html"]').href = '../tools/doctor.html?model=sea/lab/' + shipId; dive.keel = dive.want = null; rebuild(); fillInfo(); setCams(); buildDimLines(); const c = shipView(shipId).cams; if (c) orbit.want = { target: new THREE.Vector3(...c[0][1]), dist: c[0][2], yaw: c[0][3], pitch: c[0][4] }; };
 
 function fillInfo() {
   const inf = shipInfo(shipId);
   $('shipName').textContent = inf.name; $('shipSub').textContent = `${inf.type} · ${inf.year} · ${inf.builder}`;
   $('specs').replaceChildren(...inf.specs.map(([k, v]) => el('tr', {}, el('td', { textContent: k }), el('td', { textContent: v }))));
   $('sources').replaceChildren(...inf.sources.map(([t, u]) => el('li', {}, el('a', { href: u, textContent: t, target: '_blank', rel: 'noopener' }))));
-  document.title = `Ship Lab — ${inf.name} 1:1 3D model | Steel Salvo Labs`;
+  document.title = `Ship Lab — ${inf.name} 1:1 3D model | GameLaboratory`;
 }
 
 function rebuild() {

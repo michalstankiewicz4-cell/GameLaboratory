@@ -4,17 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
-<title>Ship Lab — ORP Błyskawica and ORP Orzeł 1:1 3D models | Steel Salvo Labs</title>
-<meta name="description" content="Steel Salvo ship lab: detailed 3D models of the Polish destroyer ORP Błyskawica (1937) and the submarine ORP Orzeł (1939), reconstructed to real dimensions with their guns, torpedo tubes, bridge, conning tower and periscopes. Orbit, toggle parts, train the guns, dive the submarine, measure.">
-<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/Battle/labs/ship.html">
+<title>Ship Lab — ORP Błyskawica and ORP Orzeł 1:1 3D models | GameLaboratory</title>
+<meta name="description" content="GameLaboratory ship lab: detailed 3D models of the Polish destroyer ORP Błyskawica (1937) and the submarine ORP Orzeł (1939), reconstructed to real dimensions with their guns, torpedo tubes, bridge, conning tower and periscopes. Orbit, toggle parts, train the guns, dive the submarine, measure.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/warship.html">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Ship Lab — ORP Błyskawica (1937) and ORP Orzeł (1939) in 3D">
 <meta property="og:description" content="1:1 procedural 3D reconstructions of the Polish destroyer ORP Błyskawica and submarine ORP Orzeł, built from code in the browser.">
-<meta property="og:url" content="https://michalstankiewicz4-cell.github.io/Battle/labs/ship.html">
-<meta property="og:image" content="https://michalstankiewicz4-cell.github.io/Battle/assets/labs/ship.jpg">
+<meta property="og:url" content="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/warship.html">
+<meta property="og:image" content="https://michalstankiewicz4-cell.github.io/GameLaboratory/assets/labs/ship.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="../assets/favicon-32.png">
 <link rel="stylesheet" href="../css/lab-sea.css">
+<link rel="stylesheet" href="../css/envswitch.css">
 </head>
 <body class="lab">
 <div id="view"></div>
@@ -22,9 +23,10 @@
 <div class="bar">
   <b>Ship Lab</b>
   <select id="ship" aria-label="Ship"></select>
+  <div class="envSwitch" data-current="water" data-space="ship.html" data-water="warship.html" data-land=""></div>
   <span class="sp"></span>
   <a href="water.html">Water lab</a>
-  <a href="../tools/doctor-sea.html?model=lab/blyskawica">Model doctor</a>
+  <a href="../tools/doctor.html?model=sea/lab/blyskawica">Model doctor</a>
   <a href="../index.html">Labs</a>
 </div>
 <aside class="panel left" id="infoPanel">
@@ -78,8 +80,9 @@
   <span class="scale"><i id="scaleBar"></i><span id="scaleTxt"></span></span>
   <span id="fps"></span>
   <span class="sp"></span>
-  <span>Steel Salvo Labs</span>
+  <span>GameLaboratory</span>
 </div>
 <script type="module" src="../js/labs/warship.js"></script>
+<script src="../js/labkit/envswitch.js"></script>
 </body>
 </html>

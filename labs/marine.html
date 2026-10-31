@@ -12,6 +12,7 @@
      vessels — riding the waves, rising on foils, diving, driving out onto
      the shore. docs/marine.md. -->
 <link rel="stylesheet" href="../css/lab.css">
+<link rel="stylesheet" href="../css/envswitch.css">
 <style>
 .hidden{ display:none !important; }
 #vesTabs{ display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:6px; }
@@ -25,6 +26,8 @@ input[type=range]:disabled{ opacity:.35; }
 </head>
 <body>
 <script src="../js/labkit/menubar.js"></script>
+<div class="envSwitch float" data-current="water" data-space="" data-water="marine.html" data-land="vehicles.html"></div>
+<script src="../js/labkit/envswitch.js"></script>
 <canvas id="view"></canvas>
 <div id="hud">
   <div id="hudTop">

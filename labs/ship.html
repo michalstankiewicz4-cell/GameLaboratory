@@ -22,6 +22,7 @@
           camera, HUD, quality/detail sliders, performance counters)
      Opens straight from disk, no server needed. -->
 <link rel="stylesheet" href="../css/lab.css">
+<link rel="stylesheet" href="../css/envswitch.css">
 <style>
 #actBtns{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px 0 4px; }
 .tBtn.trig:active, .tBtn.pulse{ border-color:#4fe3c6; box-shadow:0 0 10px rgb(79 227 198 / .6); color:#c8fff2; }
@@ -64,6 +65,8 @@ body.focus #hud.labIdle *, body.focus #opt.labIdle *{ pointer-events:auto !impor
 </head>
 <body>
 <script src="../js/labkit/menubar.js"></script>
+<div class="envSwitch float" data-current="space" data-space="ship.html" data-water="warship.html" data-land=""></div>
+<script src="../js/labkit/envswitch.js"></script>
 <canvas id="view"></canvas>
 
 <div id="partTip" class="hidden"></div>

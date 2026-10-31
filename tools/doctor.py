@@ -1,4 +1,4 @@
-"""Model doctor, headless (Playwright + SwiftShader): opens labs/doctor.html, waits for every model to be examined
+"""Model doctor, headless (Playwright + SwiftShader): opens tools/doctor.html, waits for every model to be examined
 and prints the findings. It fails (exit 1) when
   - the test bench does not trigger every check (a check stopped working),
   - a model's fingerprint (triangles, draw calls, materials, size) or finding counts differ from
@@ -28,7 +28,7 @@ def main():
             pg = b.new_page(viewport={'width': 1280, 'height': 720}, bypass_csp=True)
             pg.on('pageerror', lambda e: errs.append('pageerror ' + str(e)))
             pg.on('console', lambda m: errs.append(m.type + ' ' + m.text) if m.type == 'error' else None)
-            pg.goto(f'http://localhost:{PORT}/labs/doctor.html')
+            pg.goto(f'http://localhost:{PORT}/tools/doctor.html')
             pg.wait_for_function('window.doctorReport && window.doctorReport.done', timeout=900000)
             rep = pg.evaluate('window.doctorReport')
             if '--shots' in sys.argv:

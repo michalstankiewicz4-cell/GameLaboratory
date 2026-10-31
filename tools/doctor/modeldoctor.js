@@ -1,5 +1,6 @@
-// MODEL DOCTOR — finds the repeating mistakes in procedural models (ported from the owner's Space repo,
-// tools/modeldoctor.js, and extended for a naval game: gun arcs, waterline, hull side, game budget).
+// MODEL DOCTOR — finds the repeating mistakes in procedural models. One doctor for every model of the laboratory
+// (docs/doctor/README.md): the Space doctor (tools/modeldoctor.js) as extended in Battle — gun arcs, waterline, hull
+// side, game budget. Universal: the model-specific checks run only when a model's source passes their opts.
 // Examine a model built UNMERGED (ShipKit: KIT.unmerged = true) so a finding names one piece and its source line.
 //
 // Only solid meshes count: visible, opaque standard / physical / lambert / phong / basic materials. Glows,
@@ -35,7 +36,7 @@
 //   opts.waterline   true: run "waterline"; opts.below(name) → true for pieces allowed under water (hull, screws…)
 //   opts.hullSide    (z, y) → half-breadth of the hull for "poke"; opts.outboard(name) → true when allowed
 //   opts.budget      { triangles, drawCalls, measured: { triangles, drawCalls } } for "budget"
-import * as THREE from '../vendor/three/three.module.js';
+import * as THREE from '../../vendor/three/three.module.js';
 
 export const CHECKS = ['nan', 'inverted', 'facing', 'seethrough', 'arc', 'zfight', 'floating', 'waterline', 'poke', 'budget', 'hidden', 'speck', 'sliver'];
 export const SEVERITY = { nan: 'error', inverted: 'error', facing: 'error', seethrough: 'error', arc: 'warning', zfight: 'warning', floating: 'warning', waterline: 'warning', poke: 'warning', budget: 'warning', hidden: 'info', speck: 'info', sliver: 'info' };

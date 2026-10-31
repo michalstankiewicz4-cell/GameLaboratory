@@ -12,6 +12,7 @@
      pitching and rolling, tracks running, dust, lamps at night, and its
      work (tipping the bed, drilling, the crane). docs/vehicles.md. -->
 <link rel="stylesheet" href="../css/lab.css">
+<link rel="stylesheet" href="../css/envswitch.css">
 <style>
 .hidden{ display:none !important; }
 #vehTabs{ display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:6px; }
@@ -24,6 +25,8 @@
 </head>
 <body>
 <script src="../js/labkit/menubar.js"></script>
+<div class="envSwitch float" data-current="land" data-space="" data-water="marine.html" data-land="vehicles.html"></div>
+<script src="../js/labkit/envswitch.js"></script>
 <canvas id="view"></canvas>
 <div id="hud">
   <div id="hudTop">
