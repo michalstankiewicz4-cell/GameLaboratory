@@ -52,7 +52,11 @@
 
 ## Wersjonowanie
 
-- Każde laboratorium będzie miało własne wersjonowanie (do wprowadzenia).
+- Program (GameLaboratory) ma swoją wersję, a każde laboratorium i narzędzie — osobną. Jedno miejsce: `js/labkit/versions.js` (`app` i `labs`).
+- `x.y.z`: **y** — nowa funkcja (nowe laboratorium podnosi program), **z** — poprawka lub mała zmiana, **x** — duży zwrot.
+- Zmiana w laboratorium podnosi wersję tego laboratorium; zmiana strony startowej lub wspólnych warstw (`js/core`, `js/labkit`, `js/render`, wspólne kity) — wersję programu (a wspólnego kitu także laboratoriów, w których zmienia to, co widać).
+- Każda zmiana wersji ma wpis w `CHANGELOG.md` (katalog główny). `labs/CHANGELOG.md` to historia laboratoriów Space sprzed przeniesienia.
+- Wersje widać: pasek menu (program · laboratorium), strona startowa (program i każdy kafelek), paski laboratoriów z Battle i Pixel Studio (znacznik `data-lab-version`).
 
 ## Strona startowa
 

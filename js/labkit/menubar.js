@@ -13,12 +13,12 @@
    ======================================================================= */
 (function () {
 "use strict";
-// THE LABS' VERSION — their own, apart from the game's (js/version.js).
-// Every change to a lab, a tool, LabKit or this bar bumps it, with an entry
-// in labs/CHANGELOG.md (CLAUDE.md, "Versioning"): x.y.z — y a new lab, tool
-// or feature, z a fix or a small change. Shown on the bar, the start screen
-// and in HELP → About.
-const LABS_VERSION = "1.17.0";
+// VERSIONS — the program's and every lab's own: js/labkit/versions.js (one place).
+// A change to a lab bumps that lab's version; a change to the start page or the
+// shared layers bumps the program's; each with an entry in CHANGELOG.md
+// (CLAUDE.md, "Wersjonowanie"). Shown on the bar, the start page, HELP → About.
+const V = window.GameLabVersions || { app: "?", labs: {} };   // js/labkit/versions.js (loaded before this script)
+const APP_VERSION = V.app;
 const MENU_H = 32;
 const ROOT = (document.currentScript && document.currentScript.src || "").replace(/js\/labkit\/menubar\.js.*$/, "");
 const PARTS = location.pathname.split("/"), HERE = PARTS.pop() || "index.html", DIR = PARTS.pop() || "";
@@ -46,6 +46,7 @@ const LABS = [
   { file: "labs/land.html", name: "Land lab", doc: "docs/land.md", keys: [["Drag / wheel", "turn and zoom the camera"]] },
   { file: "labs/plants.html", name: "Plants lab", doc: "docs/plants.md", keys: [["Drag / wheel", "turn and zoom the camera"]] },
   { file: "labs/look.html", name: "Look lab", doc: "docs/look.md", keys: [["Drag / wheel", "turn and zoom the camera"]] },
+  { file: "labs/filters.html", name: "Filters lab", doc: "docs/filters.md", keys: [["Drag / right-drag / wheel", "orbit, pan, zoom"]] },
   { file: "labs/pixel.html", name: "Pixel Studio", doc: "docs/pixel/README.md", keys: [["Ctrl+Z / Ctrl+Shift+Z", "undo / redo (Draw)"], ["Right button", "erase (Draw)"]] },
   { file: "labs/zombies.html", name: "Zombie Generator", doc: "docs/pixel/zombies.md", keys: [] },
 ];
@@ -187,11 +188,11 @@ function help() {
     action("Keyboard and mouse", () => dialog((me ? me.name : "Labs") + ": keys and mouse", me && me.keys.length ? me.keys : [["—", "nothing special here"]])),
     link("This page's notes", REPO + (me ? me.doc : "README.md"), { blank: true }),
     link("All the docs", REPO + "README.md", { blank: true }),
-    link("What's new in the labs", REPO + "labs/CHANGELOG.md", { blank: true }),
+    link("What's new", REPO + "CHANGELOG.md", { blank: true }),
     el("div", "lmSep"),
     action("About the labs", () => dialog("GameLaboratory", [["What", "laboratories of models and worlds: space, land and water"],
-      ["Labs", "v" + LABS_VERSION], ["Code", "MIT, github.com/michalstankiewicz4-cell/GameLaboratory"]],
-      "The labs and the game share the same kits: what you see here is what the game shows.")),
+      ["Program", "v" + APP_VERSION], ...(me && V.labs[me.file] ? [["This " + (isTool ? "tool" : "lab"), "v" + V.labs[me.file]]] : []), ["Code", "MIT, github.com/michalstankiewicz4-cell/GameLaboratory"]],
+      "Every lab has its own version; the program has one too.")),
   ];
 }
 
@@ -221,8 +222,8 @@ const where = el("div", "lmWhere");
 where.append(document.createTextNode(isTool ? "Tool · " : "Lab · "), el("b", null, me ? me.name : "Start screen"));
 if (me) bar.appendChild(where);
 // the labs' version, linked to what changed
-const ver = el("a", "lmVer", "Labs v" + LABS_VERSION); ver.href = REPO + "labs/CHANGELOG.md"; ver.target = "_blank"; ver.rel = "noopener";
-ver.title = "What's new in the labs";
+const ver = el("a", "lmVer", "v" + APP_VERSION + (me && V.labs[me.file] ? " · " + (isTool ? "tool" : "lab") + " v" + V.labs[me.file] : "")); ver.href = REPO + "CHANGELOG.md"; ver.target = "_blank"; ver.rel = "noopener";
+ver.title = "Program version · this page's version — what's new";
 bar.appendChild(ver);
 function closeAll() { bar.querySelectorAll(".lmTop.open").forEach((t) => t.classList.remove("open")); }
 document.addEventListener("pointerdown", (e) => { if (!bar.contains(e.target)) closeAll(); });
@@ -246,5 +247,5 @@ if (me) {
 document.body.appendChild(dlg);
 
 // the game's version, for "About"
-window.LabMenu = { ITEMS: { LABS, TOOLS }, ROOT, MENU_H, LABS_VERSION, version: null };
+window.LabMenu = { ITEMS: { LABS, TOOLS }, ROOT, MENU_H, APP_VERSION, VERSIONS: V, version: null };
 })();

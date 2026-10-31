@@ -13,7 +13,7 @@
 </head>
 <body class="lab pix zomb">
 <div class="bar">
-  <b>Zombie Generator</b> <span class="ver mono" id="ver"></span>
+  <b>Zombie Generator</b> <span class="ver mono" id="ver" data-lab-version="labs/zombies.html"></span>
   <span class="dimtxt">Pixel Studio</span>
   <div class="btns menu"><span class="dimtxt">Renderer</span><span class="seg" id="engine"><button type="button" data-e="gpu" title="The distance field on the graphics card: fast; the first time it compiles (about 20 s on Windows)">GPU</button><button type="button" data-e="cpu" title="Everything in JavaScript: slower, works everywhere">CPU</button></span>
     <button type="button" id="start" class="go">Start render</button>
@@ -65,5 +65,6 @@
   <p class="note">Default sheet: 12 frames of 512 × 512 in 6 columns × 2 rows, frame 0 top-left, transparent background with a hard edge, pivot in the centre 9 px above the bottom, 100 pixels per unit. The ZIP holds the sheets, their JSON, the slicer script and a README.</p>
 </aside>
 <script type="module" src="../js/labs/pixel/zombies.js"></script>
+<script src="../js/labkit/versions.js"></script>
 </body>
 </html>

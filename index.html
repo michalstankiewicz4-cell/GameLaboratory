@@ -97,6 +97,7 @@ footer a{ color:#9aa1b0; }
 </style>
 </head>
 <body>
+<script src="js/labkit/versions.js"></script>
 <script src="js/labkit/menubar.js"></script>
 <main>
   <header>
@@ -108,7 +109,7 @@ footer a{ color:#9aa1b0; }
       <div class="stat"><b id="nLabs">–</b><span>labs</span></div>
       <div class="stat"><b id="nGame">–</b><span>in the game</span></div>
       <div class="stat"><b id="nTools">–</b><span>tools</span></div>
-      <div class="stat"><b id="labsVer">–</b><span>labs</span></div>
+      <div class="stat"><b id="labsVer">–</b><span>program</span></div>
     </div>
   </header>
   <h2>Quick access</h2>
@@ -124,6 +125,7 @@ footer a{ color:#9aa1b0; }
 "use strict";
 // gradient + line art per tile (viewBox 0 0 200 100)
 const ART = {
+  "labs/filters.html": { bg: ["#1c2436", "#0b0e16"], svg: `<defs><linearGradient id="fl" x1="0" x2="1"><stop offset="0" stop-color="#5b8cff"/><stop offset=".5" stop-color="#36d6b5"/><stop offset="1" stop-color="#f2b84b"/></linearGradient></defs><circle cx="78" cy="50" r="30" fill="none" stroke="url(#g)" stroke-width="3" opacity=".8"/><circle cx="122" cy="50" r="30" fill="url(#fl)" opacity=".35"/><circle cx="100" cy="50" r="12" fill="#fff" opacity=".85"/><path d="M30 86 H170" stroke="#9fb4ff" stroke-width="2" opacity=".5"/>` },
   "labs/pixel.html": { bg: ["#1d2b22", "#0b120d"], svg: `<rect x="80" y="14" width="10" height="10" fill="#8be07a"/><rect x="90" y="14" width="10" height="10" fill="#8be07a"/><rect x="80" y="24" width="10" height="10" fill="#8be07a"/><rect x="90" y="24" width="10" height="10" fill="#8be07a"/><rect x="70" y="34" width="10" height="10" fill="#8be07a"/><rect x="80" y="34" width="10" height="10" fill="#8be07a"/><rect x="90" y="34" width="10" height="10" fill="#8be07a"/><rect x="100" y="34" width="10" height="10" fill="#8be07a"/><rect x="60" y="44" width="10" height="10" fill="#8be07a"/><rect x="70" y="44" width="10" height="10" fill="#13261a"/><rect x="80" y="44" width="10" height="10" fill="#8be07a"/><rect x="90" y="44" width="10" height="10" fill="#8be07a"/><rect x="100" y="44" width="10" height="10" fill="#13261a"/><rect x="110" y="44" width="10" height="10" fill="#8be07a"/><rect x="60" y="54" width="10" height="10" fill="#8be07a"/><rect x="70" y="54" width="10" height="10" fill="#8be07a"/><rect x="80" y="54" width="10" height="10" fill="#8be07a"/><rect x="90" y="54" width="10" height="10" fill="#8be07a"/><rect x="100" y="54" width="10" height="10" fill="#8be07a"/><rect x="110" y="54" width="10" height="10" fill="#8be07a"/><rect x="70" y="64" width="10" height="10" fill="#8be07a"/><rect x="100" y="64" width="10" height="10" fill="#8be07a"/><rect x="60" y="74" width="10" height="10" fill="#8be07a"/><rect x="110" y="74" width="10" height="10" fill="#8be07a"/>` },
   "labs/zombies.html": { bg: ["#2a2020", "#120b0b"], svg: `<rect x="86" y="12" width="8" height="8" fill="#9db07c"/><rect x="94" y="12" width="8" height="8" fill="#9db07c"/><rect x="102" y="12" width="8" height="8" fill="#9db07c"/><rect x="78" y="20" width="8" height="8" fill="#9db07c"/><rect x="86" y="20" width="8" height="8" fill="#e8e04a"/><rect x="94" y="20" width="8" height="8" fill="#9db07c"/><rect x="102" y="20" width="8" height="8" fill="#9db07c"/><rect x="110" y="20" width="8" height="8" fill="#e8e04a"/><rect x="86" y="28" width="8" height="8" fill="#9db07c"/><rect x="94" y="28" width="8" height="8" fill="#5a1b1b"/><rect x="102" y="28" width="8" height="8" fill="#9db07c"/><rect x="94" y="36" width="8" height="8" fill="#4b5a6e"/><rect x="86" y="44" width="8" height="8" fill="#4b5a6e"/><rect x="94" y="44" width="8" height="8" fill="#4b5a6e"/><rect x="102" y="44" width="8" height="8" fill="#4b5a6e"/><rect x="78" y="52" width="8" height="8" fill="#4b5a6e"/><rect x="94" y="52" width="8" height="8" fill="#4b5a6e"/><rect x="110" y="52" width="8" height="8" fill="#4b5a6e"/><rect x="86" y="60" width="8" height="8" fill="#4b5a6e"/><rect x="102" y="60" width="8" height="8" fill="#4b5a6e"/><rect x="86" y="68" width="8" height="8" fill="#3a3a44"/><rect x="102" y="68" width="8" height="8" fill="#3a3a44"/><rect x="86" y="76" width="8" height="8" fill="#3a3a44"/><rect x="102" y="76" width="8" height="8" fill="#3a3a44"/>` },
   "labs/structures.html": { img: "assets/labs/structures.jpg" },
@@ -149,6 +151,7 @@ const ART = {
   "tools/grainTexture.html": { bg: ["#24242a", "#101014"], svg: `<g fill="#d8dbe4">${Array.from({ length: 140 }, (_, i) => { const x = (i * 73) % 200, y = (i * 37 + (i * i) % 23) % 100; return `<circle cx="${x}" cy="${y}" r="${0.6 + (i % 5) * 0.35}" opacity="${0.15 + (i % 7) / 12}"/>`; }).join("")}</g>` },
 };
 const INFO = {
+  "labs/filters.html": ["The camera look from the water labs on a choice of scenes — exposure, tone mapping, colour, glow, vignette, grain, lens effects, sharpening; compared with the clean image, with the cost of every effect.", "lab", "LookPipeline"],
   "labs/pixel.html": ["Pixel art with a transparent background: 3D models rendered to pixels, generated sprites and tiles, a pixel editor; palettes, dither, outline; PNG, sprite sheets, GIF. With its own Pixel Doctor.", "lab", "Pixel Studio"],
   "labs/zombies.html": ["Original zombies from a seed, animated in 8 directions, exported as Unity sprite sheets (JSON, slicer script, ZIP).", "lab", "Pixel Studio"],
   "labs/ship.html": ["Ships in space and at sea — switch the environment. Space: ships, the drone and the station: build, shape, rename, light, animate. Water: real warships at true scale, ORP Błyskawica and the submarine ORP Orzeł.", "game", "ShipKit · ShipKit (sea)"],
@@ -175,6 +178,7 @@ const INFO = {
 };
 // Phrases that describe each lab — for a future filter of the labs.
 const PHRASES = {
+  "labs/filters.html": ["filtry", "grafika", "kamera", "obraz", "efekty", "tone mapping"],
   "labs/pixel.html": ["pixel art", "sprite", "2D", "animacja", "paleta", "GIF"],
   "labs/zombies.html": ["zombie", "postać", "sprite", "animacja", "Unity"],
   "labs/ship.html": ["kosmos", "woda", "statki", "okręty", "okręt podwodny", "stacja", "dron", "światła"],
@@ -215,6 +219,7 @@ function tile(item) {
       <div class="phrases"></div></div>`;
   a.querySelector(".name span").textContent = item.name;
   a.querySelector(".file").textContent = item.file.replace(/^(tools|labs)\//, "");
+  const v = window.LabMenu.VERSIONS.labs[item.file]; if (v) a.querySelector(".file").textContent += " · v" + v;
   a.querySelector(".desc").textContent = info[0];
   a.querySelector(".tags .tag:last-child").textContent = info[2];
   const ph = a.querySelector(".phrases");
@@ -382,7 +387,7 @@ document.addEventListener("keydown", (e) => {
 document.getElementById("nLabs").textContent = LABS.length;
 document.getElementById("nGame").textContent = LABS.filter((l) => (INFO[l.file] || [])[1] === "game").length;
 document.getElementById("nTools").textContent = TOOLS.length;
-document.getElementById("labsVer").textContent = "v" + window.LabMenu.LABS_VERSION;
+document.getElementById("labsVer").textContent = "v" + window.LabMenu.APP_VERSION;
 })();
 </script>
 </body>
