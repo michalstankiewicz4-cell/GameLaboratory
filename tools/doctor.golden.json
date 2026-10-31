@@ -162,9 +162,7 @@
   }
  },
  "space/base/depot": {
-  "counts": {
-   "zfight": 4
-  },
+  "counts": {},
   "fingerprint": {
    "drawCalls": 37,
    "materials": 6,
@@ -191,8 +189,7 @@
  },
  "space/base/hab": {
   "counts": {
-   "hidden": 1,
-   "zfight": 1
+   "hidden": 1
   },
   "fingerprint": {
    "drawCalls": 31,
@@ -247,7 +244,7 @@
  "space/ship/codewing": {
   "counts": {
    "hidden": 1,
-   "sliver": 2
+   "sliver": 1
   },
   "fingerprint": {
    "drawCalls": 92,
@@ -281,7 +278,7 @@
   "counts": {
    "floating": 1,
    "hidden": 2,
-   "sliver": 2
+   "sliver": 1
   },
   "fingerprint": {
    "drawCalls": 79,
@@ -311,8 +308,7 @@
  },
  "space/vehicle/constructor": {
   "counts": {
-   "floating": 1,
-   "zfight": 40
+   "floating": 1
   },
   "fingerprint": {
    "drawCalls": 68,
@@ -327,7 +323,7 @@
  },
  "space/vehicle/crawler": {
   "counts": {
-   "zfight": 4
+   "zfight": 1
   },
   "fingerprint": {
    "drawCalls": 29,
@@ -342,7 +338,7 @@
  },
  "space/vehicle/hauler": {
   "counts": {
-   "zfight": 87
+   "zfight": 3
   },
   "fingerprint": {
    "drawCalls": 105,
@@ -358,8 +354,7 @@
  "space/vehicle/scout": {
   "counts": {
    "floating": 1,
-   "seethrough": 1,
-   "zfight": 60
+   "seethrough": 1
   },
   "fingerprint": {
    "drawCalls": 83,
@@ -375,8 +370,7 @@
  "space/vessel/amphibian": {
   "counts": {
    "floating": 1,
-   "seethrough": 2,
-   "zfight": 60
+   "seethrough": 2
   },
   "fingerprint": {
    "drawCalls": 82,
@@ -391,7 +385,7 @@
  },
  "space/vessel/barge": {
   "counts": {
-   "hidden": 2,
+   "hidden": 1,
    "seethrough": 2
   },
   "fingerprint": {
@@ -407,7 +401,7 @@
  },
  "space/vessel/diver": {
   "counts": {
-   "hidden": 4
+   "hidden": 1
   },
   "fingerprint": {
    "drawCalls": 44,
@@ -423,7 +417,7 @@
  "space/vessel/skimmer": {
   "counts": {
    "floating": 1,
-   "seethrough": 4
+   "seethrough": 2
   },
   "fingerprint": {
    "drawCalls": 30,
@@ -465,7 +459,7 @@
  },
  "train/loco": {
   "counts": {
-   "sliver": 16
+   "sliver": 8
   },
   "fingerprint": {
    "drawCalls": 227,
@@ -480,8 +474,8 @@
  },
  "train/steelVan": {
   "counts": {
-   "sliver": 43,
-   "zfight": 6
+   "sliver": 7,
+   "zfight": 1
   },
   "fingerprint": {
    "drawCalls": 202,
@@ -496,8 +490,8 @@
  },
  "train/woodVan": {
   "counts": {
-   "sliver": 11,
-   "zfight": 7
+   "sliver": 5,
+   "zfight": 1
   },
   "fingerprint": {
    "drawCalls": 213,
