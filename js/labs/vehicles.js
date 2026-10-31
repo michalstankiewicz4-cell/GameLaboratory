@@ -66,7 +66,30 @@ const state = { index: 0, auto: true, autoSpeed: 0.5, night: false, dust: true, 
 const drv = { x: 0, z: 0, yaw: 0, speed: 0 };
 let veh = null;
 const dust = VK.makeDust(0xc9a27c); scene.add(dust.points);
+// other model families (e.g. the train, js/labs/vehicles/train.js) show here instead
+// of a VehicleKit vehicle: { name, role, build(scene) → group, rows(), target, camera }
+let mode = null;
+const modes = [];
+function setMode(m) {
+  if (mode && mode.group) mode.group.visible = false;
+  mode = m;
+  const on = !!m;
+  ground.visible = !on; dust.points.visible = !on; if (veh) veh.group.visible = !on;
+  if (!m) return;
+  if (!m.group) { m.group = m.build(scene); scene.add(m.group); }
+  m.group.visible = true;
+  $("hudTitle").textContent = m.name; $("role").textContent = m.role;
+  [...$("vehTabs").children].forEach((b) => b.classList.toggle("on", b === m.tab));
+  $("vehRows").textContent = ""; m.rows().forEach(([k, v]) => $("vehRows").appendChild(row(k, v)));
+  controls.target.fromArray(m.target); camera.position.fromArray(m.camera); controls.update();
+}
+function addMode(m) {
+  const b = document.createElement("button"); b.className = "tBtn"; b.textContent = m.tabName || m.name;
+  b.addEventListener("click", () => setMode(m));
+  m.tab = b; modes.push(m); $("vehTabs").appendChild(b);
+}
 function load() {
+  setMode(null);
   if (veh) VK.disposeVehicle(veh);
   const def = VK.VEHICLES[state.index];
   veh = VK.buildVehicle(def.id, { detail: 1 });
@@ -126,6 +149,12 @@ const clock = new THREE.Clock(), prev = new THREE.Vector3(), delta = new THREE.V
 let wander = 0;
 function frame() {
   const t0 = performance.now(), dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
+  if (mode) {   // another family: a still model for now (no behaviour yet)
+    controls.update();
+    renderer.info.reset(); renderer.render(scene, camera);
+    perf.update(performance.now(), performance.now() - t0);
+    requestAnimationFrame(frame); return;
+  }
   const def = veh.def;
   // the input: the keys, or a wandering drive that turns back toward the middle
   let input;
@@ -165,5 +194,6 @@ function frame() {
 rebuildGround(); resize(); load();
 controls.target.set(0, heightAt(0, 0) + 1.5, 0);
 frame();
-window.vehicleLab = { state, drv, G, heightAt, load, get veh() { return veh; }, camera, controls, applyLight };
+window.vehicleLab = { state, drv, G, heightAt, load, get veh() { return veh; }, camera, controls, applyLight, scene, addMode, setMode, modes, row };
+window.dispatchEvent(new Event("vehiclelab:ready"));
 })();

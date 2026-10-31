@@ -36,7 +36,7 @@ patch("lights_pars_begin",
   "if ( cutoffDistance > 0.0 && decayExponent > 0.0 ) {\n\t\treturn pow( saturate( - lightDistance / cutoffDistance + 1.0 ), decayExponent );\n\t}\n\treturn 1.0;");
 patch("lights_pars_begin", "light.color = directionalLight.color;", "light.color = directionalLight.color * PI;");
 patch("lights_pars_begin", "light.color = pointLight.color;", "light.color = pointLight.color * PI;");
-patch("lights_pars_begin", "light.color = spotLight.color;", "light.color = spotLight.color * PI;");
+patch("lights_pars_begin", "light.color = spotLight.color * spotAttenuation;", "light.color = spotLight.color * PI * spotAttenuation;");
 patch("lights_pars_begin", "vec3 irradiance = ambientLightColor;", "vec3 irradiance = ambientLightColor * PI;");
 patch("lights_pars_begin", "vec3 irradiance = mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );",
   "vec3 irradiance = mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight ) * PI;");

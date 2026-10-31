@@ -29,7 +29,12 @@
 
 - Środowisko ląd = laboratorium lądu z Battle; woda = laboratorium wody z Battle. Ze Space (surface, marine) można uzupełnić tylko to, czego Battle nie ma.
 - Części modelu (sprężyny, podwozie, wózki, zestawy kołowe, sprzęgi) należą do modelu (`js/models/`), bo będą podłączane.
-- Tory kolejowe to modele budowli lądowych (`js/models/structures/`).
+- Tory kolejowe to modele budowli lądowych (`js/models/structures/railway/`).
+- Pociąg (TrainKit, `js/models/train/`): dane w `data.js` (wymiary, profil koła, zderzaki, sprzęgi) są wspólne dla modelu i przyszłego zachowania „koło na szynie” (środowisko ląd). Oglądany w laboratorium pojazdów. Fizyka i rozjazdy z aTrain są w jego repozytorium i w historii — do przeniesienia jako zachowanie.
+
+## Przełącznik środowiska
+
+- W laboratorium każdej rodziny modeli przełącznik ma zawsze 3 pozycje: kosmos, woda, ląd. Pozycje, w których rodzina nie ma zachowania, są wyszarzone.
 
 ## Naprawy modeli
 

@@ -1,4 +1,5 @@
   // ===================== Tekstury proceduralne =====================
+const THREE = window.THREE;
   // Technika z ShipKit (laboratorium Space): jeden układ rysowany naraz na kilku płótnach —
   // kolor, szorstkość i wypukłość — więc ciemna spoina jest też wgłębiona i bardziej matowa.
   const TK = (function () {
@@ -261,3 +262,5 @@
     }
     return g;
   }
+
+export { TK, fitUV, roundedBox };
