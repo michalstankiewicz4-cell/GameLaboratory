@@ -1,0 +1,20 @@
+/* LabKit windows (js/labkit/windows.js): a lab's options as floating windows — the look of the labs from Battle
+   (css/lab-sea.css: dark glass, thin line, gold headings). Opened and closed from OPTIONS → Windows. */
+.labWin{position:fixed;z-index:20;display:flex;flex-direction:column;width:330px;max-width:calc(100vw - 16px);max-height:calc(100vh - 88px);
+  background:rgba(13,17,23,.9);border:1px solid #26303d;border-radius:12px;backdrop-filter:blur(6px);box-shadow:0 12px 32px rgba(0,0,0,.4);
+  color:#c8d0da;font:13.5px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;transition:opacity .4s}
+.labWin.right{width:300px}
+.labWin[hidden]{display:none}
+.labWin.dragging{transition:none;box-shadow:0 18px 44px rgba(0,0,0,.55);opacity:.96}
+.labWinHead{flex:none;display:flex;align-items:center;gap:8px;height:32px;padding:0 6px 0 14px;border-bottom:1px solid #26303d;cursor:move;user-select:none;touch-action:none}
+.labWinTitle{flex:1;font-size:11px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:#f2b84b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.labWinClose{width:24px;height:24px;border:0;border-radius:6px;background:none;color:#7f8a98;font:inherit;font-size:13px;cursor:pointer}
+.labWinClose:hover{background:#18202b;color:#eef2f6}
+/* the lab's panel inside: no longer placed on its own */
+.labWin > .labWinBody{position:static;inset:auto;width:auto;max-height:none;flex:1;min-height:0;overflow:auto;margin:0;padding:12px 14px;
+  background:none;border:0;border-radius:0;backdrop-filter:none;box-shadow:none}
+/* the labs' own "hide the panels" (H) and idle dimming apply to the whole window */
+.labWin:has(> .hidden-panel){display:none}
+.labWin:has(> .idle){opacity:.18}
+.labWin > .labWinBody.idle{opacity:1}
+@media (max-width:640px){.labWin,.labWin.right{width:calc(100vw - 16px)}}

@@ -51,6 +51,11 @@
 - Preferowana grafika: ta z laboratoriów wodnych (Battle: potok kamery `js/render/sea/look.js`, niebo, woda), nie ze Space.
 - Laboratoria Space w grafice Battle: znacznik `<meta name="gamelab-graphics" content="battle">` (wszystkie 3D poza kitcheck i doktorem). Moce świateł pisane pod r128 mnożyć przez `THREE.LIGHT_SCALE`, kolory sRGB z kodu przez `THREE.srgbColor()`, renderować przez `LabKit.imageEffects` / `LabKit.render`. Własny shader, który już oddaje kolor liniowy: `material.userData.linearOutput = true`.
 
+## Okna z opcjami
+
+- Opcje laboratorium (dawne panele po lewej i prawej) są w pływających oknach otwieranych z OPCJE → Okna: `js/labkit/windows.js` + `css/windows.css` (styl laboratoriów Battle). Panel dostaje `data-window`, `data-title`, `data-title-pl`. Na razie tylko laboratorium roślin (próba) — reszta po akceptacji.
+- Strony ze ścisłym CSP: pasek menu wstawia style przez CSSOM; w CSP potrzebne `font-src 'self'`.
+
 ## Wersjonowanie
 
 - Program (GameLaboratory) ma swoją wersję, a każde laboratorium i narzędzie — osobną. Jedno miejsce: `js/labkit/versions.js` (`app` i `labs`).

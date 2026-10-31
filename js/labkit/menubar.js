@@ -83,6 +83,7 @@ const OFFSETS = `
   #compass { top: ${16 + MENU_H}px !important; }
   #toast { top: ${70 + MENU_H}px !important; }
   body > #bar { top: ${MENU_H}px !important; }
+  body.lab > .bar { top: ${MENU_H}px !important; }
   body.lmTool { padding-top: ${MENU_H + 16}px !important; }
   body.lmTool #app { height: calc(100% - ${MENU_H}px) !important; margin-top: ${MENU_H}px; }
 `;
@@ -163,9 +164,13 @@ const CSS = `
 const FONT = `@font-face{ font-family:"Space Grotesk"; font-weight:300 700; src:url(${ROOT}fonts/space-grotesk-var-latin-ext.woff2) format("woff2"); unicode-range:U+0100-024F; }
 @font-face{ font-family:"Space Grotesk"; font-weight:300 700; src:url(${ROOT}fonts/space-grotesk-var-latin.woff2) format("woff2"); }`;
 
-const style = document.createElement("style");
-style.textContent = FONT + CSS + (START ? "" : OFFSETS);
-document.head.appendChild(style);
+// styles through the CSSOM (a constructed sheet): pages with a strict CSP (style-src 'self', the labs from
+// Battle) refuse a <style> element but allow this; older browsers get the <style> element
+const SHEET = FONT + CSS + (START ? "" : OFFSETS);
+try {
+  const sh = new CSSStyleSheet(); sh.replaceSync(SHEET);
+  document.adoptedStyleSheets = [...document.adoptedStyleSheets, sh];
+} catch (e) { const style = document.createElement("style"); style.textContent = SHEET; document.head.appendChild(style); }
 if (isTool) document.body.classList.add("lmTool");
 
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
@@ -213,6 +218,8 @@ function options() {
     action(t("Full screen", "Pełny ekran"), () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(() => {}); },
       { key: "F11", on: !!document.fullscreenElement }),
     action(t("Reload this page", "Odśwież stronę"), () => location.reload(), { key: "F5" }),
+    // this page's windows (js/labkit/windows.js): its options, each in a window you open and close here
+    ...windowItems(),
     el("div", "lmSep"),
     el("div", "lmLabel", t("Language", "Język")),
     ...[["auto", t("Automatic (browser)", "Automatycznie (przeglądarka)")], ["en", "English"], ["pl", "Polski"]].map(([k, label]) =>
@@ -227,6 +234,11 @@ function options() {
       location.reload();
     }, { disabled: !keys.length }),
   ];
+}
+function windowItems() {
+  const W = window.LabWindows; if (!W || !W.list().length) return [];
+  return [el("div", "lmSep"), el("div", "lmLabel", t("Windows", "Okna")),
+    ...W.list().map((w) => action(w.title(), () => W.toggle(w.id), { on: w.open }))];
 }
 // the labs and the tools, all here (FILES keeps only the start screen and the game)
 function tools() {

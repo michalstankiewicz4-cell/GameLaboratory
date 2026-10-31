@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <title>Plants Lab — procedural trees, palms, shrubs and grass | GameLaboratory</title>
 <meta name="description" content="GameLaboratory plants lab: procedural trees, palms and shrubs at real scale — Norway spruce, Scots pine, silver birch, pedunculate oak, date palm, umbrella thorn acacia, juniper, saltbush — moving in the wind, with impostors far away and blades of grass, placed by biome over a landscape.">
 <link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/plants.html">
@@ -15,8 +15,11 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="../assets/favicon-32.png">
 <link rel="stylesheet" href="../css/lab-sea.css">
+<link rel="stylesheet" href="../css/windows.css">
 </head>
 <body class="lab">
+<script src="../js/labkit/versions.js"></script>
+<script src="../js/labkit/menubar.js"></script>
 <div id="view"></div>
 <div class="bar">
   <b>Plants Lab</b> <span class="ver mono" data-lab-version="labs/plants.html"></span>
@@ -26,7 +29,7 @@
   <a href="warship.html">Ship Lab</a>
   <a href="../index.html">Labs</a>
 </div>
-<aside class="panel left" id="leftPanel">
+<aside class="panel left" id="leftPanel" data-window="model" data-title="Model" data-title-pl="Model">
   <div id="specPanel">
     <h3>Specimen</h3>
     <div class="row"><span>Species</span><select id="species"></select><output></output></div>
@@ -54,7 +57,7 @@
     <p class="note">Plants stand by biome, height, slope and water: spruce and pine forests with birch at their edges and juniper on the heath; copses and lone oaks on the plains; palm oases by the water, acacias and saltbush in the desert. Rocks come in their own lab.</p>
   </div>
 </aside>
-<aside class="panel right" id="rightPanel">
+<aside class="panel right" id="rightPanel" data-window="scene" data-title="Scene" data-title-pl="Scena">
   <h3>Camera</h3>
   <div class="btns" id="cams"></div>
   <h3>Wind</h3>
@@ -73,7 +76,7 @@
   <span class="sp"></span>
   <span>GameLaboratory</span>
 </div>
+<script src="../js/labkit/windows.js"></script>
 <script type="module" src="../js/labs/plants.js"></script>
-<script src="../js/labkit/versions.js"></script>
 </body>
 </html>
