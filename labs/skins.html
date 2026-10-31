@@ -34,6 +34,12 @@ body{ background:#000; }
 button{ font:inherit; color:inherit; background:none; border:0; padding:0; cursor:pointer; }
 #skinSwitch{ left:968px; top:88px; z-index:50; display:flex; gap:6px; font-family:"Oswald",sans-serif; }
 #skinSwitch button{ padding:6px 14px; border-radius:6px; font-size:14px; letter-spacing:.5px; }
+/* GameLaboratory: the lab's own control (not the mock-up) in the look of the labs from Battle */
+#skinSwitch{ font-family:system-ui,-apple-system,"Segoe UI",sans-serif; }
+#skinSwitch button{ background:#18202b !important; color:#c8d0da !important; border:1px solid #26303d !important; border-radius:7px !important;
+  font:12.5px system-ui,-apple-system,"Segoe UI",sans-serif !important; letter-spacing:0 !important; padding:4px 10px !important; text-shadow:none !important; box-shadow:none !important; }
+#skinSwitch button:hover{ border-color:#f2b84b !important; color:#eef2f6 !important; }
+#skinSwitch button.on{ border-color:#f2b84b !important; color:#f2b84b !important; }
 canvas#view{ display:block; }
 
 /* layout (design px) — mirrors the game's HUD */

@@ -50,3 +50,8 @@
 .labWin #fpsGraph{border:1px solid #26303d;border-radius:6px;background:#0c0f13}
 /* the first section heading, when it is the window's title */
 .labWin .labWinDup{display:none}
+
+/* ---- the top bar of the labs from Battle: the lab's name, version and links to other labs are on the menu bar
+   (js/labkit/menubar.js: "Lab · name", the version, TOOLS) — the bar keeps only the lab's own controls; empty, it goes ---- */
+body.lab > .bar > b, body.lab > .bar > .ver, body.lab > .bar > a{display:none}
+body.lab > .bar:not(:has(> :not(b, .ver, a, .sp))){display:none}

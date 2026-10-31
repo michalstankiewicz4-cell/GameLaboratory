@@ -26,7 +26,6 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 
 ## Do przeniesienia
 - [ ] SDF Walkers i laboratorium języka (z NeuroLabPA): przenieść na okna z opcjami i styl Battle — dziś to przewijane strony we własnym stylu.
-- [ ] Repozytorium NeuroLabPA: co z nim zrobić po przeniesieniu (usunąć przeniesione / zarchiwizować / zostawić).
 
 ## Testy
 - [ ] Pełny kitcheck po wersji 0.5.0 (przerwany; doktor przeszedł).

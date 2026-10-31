@@ -40,6 +40,14 @@
   #scaleBar{ position:fixed; right:18px; bottom:14px; z-index:5; text-align:center; font-family:"IBM Plex Mono",monospace; font-size:12px; color:#d8ddff; }
   #scaleBar div{ height:6px; border:2px solid #d8ddff; border-top:0; margin-top:3px; }
   .tick{ position:absolute; transform:translate(-50%,4px); font-family:"IBM Plex Mono",monospace; font-size:11px; color:#8fa2ff; text-shadow:0 0 3px #000; }
+  /* GameLaboratory: one look for every lab — the top bar like the labs from Battle (css/lab-sea.css); the lab's name is on the menu bar */
+  #bar{ background:rgba(10,13,17,.82); border-bottom:1px solid #26303d; backdrop-filter:blur(6px); font-family:system-ui,-apple-system,"Segoe UI",sans-serif; }
+  #bar h1{ display:none; }
+  #bar button{ font-family:system-ui,-apple-system,"Segoe UI",sans-serif; font-size:12.5px; color:#c8d0da; background:#18202b; border:1px solid #26303d; border-radius:7px; padding:4px 9px; }
+  #bar button:hover{ filter:none; border-color:#f2b84b; color:#eef2f6; }
+  #bar button.on{ border-color:#f2b84b; color:#f2b84b; box-shadow:none; }
+  #legend{ color:#7f8a98; font-family:system-ui,-apple-system,"Segoe UI",sans-serif; font-size:12.5px; }
+  #fps, #hint{ color:#7f8a98; font-family:ui-monospace,Consolas,monospace; font-size:12px; }
 </style>
 </head>
 <body>

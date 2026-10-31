@@ -130,3 +130,35 @@ h2{font-family:var(--display);font-size:16px;letter-spacing:.08em;text-transform
 
 header .xlink{font-size:14px}
 header .xlink a{color:var(--rot);font-family:var(--display);letter-spacing:.04em}
+
+/* ---- GameLaboratory: one look for every lab — the labs from Battle (css/lab-sea.css, css/windows.css): dark glass,
+   thin lines, gold headings, plain buttons, system fonts. The same tokens as there; the layout above stays. ---- */
+:root{
+  --bg:#0c0f13; --panel:rgba(13,17,23,.9); --line:#26303d; --fg:#c8d0da; --muted:#7f8a98;
+  --rot:#f2b84b; --asphalt:#141922;
+  --display:system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,Consolas,monospace;
+}
+body{font-size:14px}
+header h1{color:#eef2f6;font-weight:700;letter-spacing:-.3px}
+.view, .card, .modelbox, .rate, .out > div, section{border-radius:12px}
+.view{border-radius:12px}
+h2, .card h2, .rate h2, .out h2{font-size:11px !important;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:var(--rot)}
+.dirs, .meta{font-family:var(--mono);font-size:12px;letter-spacing:.04em}
+button, .btn{font-family:var(--body);font-size:13px;letter-spacing:0;padding:6px 12px;background:#18202b;color:var(--fg);border:1px solid var(--line);border-radius:7px;box-shadow:none}
+button:hover, .btn:hover{border-color:var(--rot);color:#eef2f6}
+button:active, .btn:active{transform:none;box-shadow:none}
+#roll, #batch, .btn.go{border-color:var(--rot);color:var(--rot)}
+.tabs button, .ghost{font-size:13px;border-radius:7px;background:#18202b}
+.tabs button[aria-pressed="true"]{background:#18202b;color:var(--rot);border-color:var(--rot)}
+select, input[type=text], input[type=number]{background:#18202b;border:1px solid var(--line);border-radius:6px;font-size:13px}
+input[type=range]{accent-color:var(--rot)}
+input[type=checkbox]{accent-color:var(--rot)}
+.ltitle{font-family:var(--body);font-size:13px;letter-spacing:1.4px;color:var(--rot)}
+.lbar{border-color:var(--rot);border-width:1px;border-radius:6px}
+.lbar i{background:var(--rot);border-radius:3px}
+.hud{background:rgba(13,17,23,.92);border:1px solid var(--line);border-radius:12px}
+.hud-head{color:var(--rot);font-size:11px;letter-spacing:1.4px;text-transform:uppercase}
+.hud-head button{font-size:12px;border-radius:6px}
+pre, code, .mono{font-family:var(--mono)}

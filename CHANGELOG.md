@@ -3,6 +3,17 @@
 Wersja programu i każdego laboratorium: `js/labkit/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `labs/CHANGELOG.md`; Battle i aTrain — w historii git.
 
+## Program 0.10.0 — 2026-10-31
+
+### Zmienione
+- **Jeden wygląd wszędzie (styl Battle)**:
+  - górne paski laboratoriów Battle bez nazwy, wersji i linków (są na pasku menu: „Laboratorium · nazwa”, wersja,
+    NARZĘDZIA) — zostaje tylko sterowanie laboratorium; pusty pasek znika (`css/windows.css`);
+  - SDF Walkers i laboratorium języka: kolory, czcionki, przyciski i nagłówki Battle (układ stron bez zmian);
+  - skala: górny pasek jak w laboratoriach Battle; skórki: przełącznik skórek (sama makieta interfejsu gry bez zmian);
+  - kitcheck i tekstura ziarna w kolorach Battle.
+- NeuroLabPA usunięte z listy do zrobienia (repozytorium kasuje właściciel).
+
 ## Program 0.9.0 — 2026-10-31
 
 ### Dodane
