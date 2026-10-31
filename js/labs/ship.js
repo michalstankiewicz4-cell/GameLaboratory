@@ -70,7 +70,11 @@ scene.add(hemi);
 const gameSun = new THREE.DirectionalLight(0xbfe9ff, 1.3), gameRim = new THREE.DirectionalLight(0xff7a45, 0.5);
 gameSun.position.set(40, 60, 30); gameRim.position.set(-60, -30, -40);
 const gameLights = [new THREE.AmbientLight(0x8892b0, 0.55), gameSun, gameRim];
-gameLights.forEach((l) => { l.color.convertSRGBToLinear(); l.visible = false; scene.add(l); });
+const BATTLE = window.GameLabGraphics === "battle";
+// grafika Battle (js/core/three-global.js): kolory już przeliczane z sRGB, a światła fizyczne — te same światła
+// świecą ×π słabiej niż w trybie legacy r128, więc ich moc ×π
+gameLights.forEach((l) => { if (!BATTLE) l.color.convertSRGBToLinear(); l.visible = false; scene.add(l); });
+if (BATTLE) [key, rim, hemi, ...gameLights].forEach((l) => { l.intensity *= Math.PI; });
 const studioLights = [key, rim, hemi];
 
 // =====================================================================

@@ -22,12 +22,19 @@ import { CopyShader } from "../../vendor/three/addons/shaders/CopyShader.js";
 import { LuminosityHighPassShader } from "../../vendor/three/addons/shaders/LuminosityHighPassShader.js";
 import { FXAAShader } from "../../vendor/three/addons/shaders/FXAAShader.js";
 
+// Strona w trybie grafiki Battle (<meta name="gamelab-graphics" content="battle">): czyste r186 — zarządzanie
+// kolorem, fizyczne światła, zwykłe bufory, jak w laboratoriach wodnych (CLAUDE.md: preferowana grafika).
+// Bez tego znacznika: dawny wygląd r128 (poniżej).
+const BATTLE = !!document.querySelector('meta[name="gamelab-graphics"][content="battle"]');
+window.GameLabGraphics = BATTLE ? "battle" : "legacy";
+
 // ---- colours as written (r128 had no colour management)
-T.ColorManagement.enabled = false;
+if (!BATTLE) T.ColorManagement.enabled = false;
 
 // ---- legacy lighting
 const C = T.ShaderChunk;
 function patch(chunk, from, to) {
+  if (BATTLE) return;
   if (!C[chunk].includes(from)) { console.warn("three-global: chunk changed, not patched:", chunk, from); return; }
   C[chunk] = C[chunk].split(from).join(to);
 }
@@ -70,8 +77,7 @@ class WebGLRenderTarget extends T.WebGLRenderTarget {
   }
 }
 
-const THREE = Object.assign({}, T, {
-  PointLight, SpotLight, WebGLRenderer, WebGLRenderTarget,
+const THREE = Object.assign({}, T, BATTLE ? {} : { PointLight, SpotLight, WebGLRenderer, WebGLRenderTarget }, {
   OrbitControls, Pass, FullScreenQuad, UnrealBloomPass, CopyShader, LuminosityHighPassShader, FXAAShader,
 });
 THREE.Pass.FullScreenQuad = FullScreenQuad;

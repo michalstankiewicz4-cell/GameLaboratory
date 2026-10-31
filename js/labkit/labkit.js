@@ -6,6 +6,7 @@
    BodyKit and PostKit, so the labs still open straight from disk. Labs
    only — the game doesn't load it. Styles: css/lab.css.
    ======================================================================= */
+import "./look-panel.js";   // grafika Battle: panel kamery z laboratoriów wodnych (window.LabLook)
 window.LabKit = (function () {
 "use strict";
 const $ = (id) => document.getElementById(id);
@@ -114,6 +115,8 @@ function perfCounters(renderer) {
 // black hole's lensing). renderer.info is reset by the caller once a frame
 // (several passes are counted together).
 function imageEffects({ renderer, scene, camera, panel, effects, setQuality }) {
+  // strona w trybie grafiki Battle: potok kamery z laboratoriów wodnych zamiast PostKit (to samo API)
+  if (window.GameLabGraphics === "battle" && window.LabLook) return window.LabLook.battleImageEffects({ renderer, scene, camera, panel });
   const pipe = PostKit.create(renderer);
   renderer.info.autoReset = false;
   const fx = PostKit.labPanel(panel, { effects, setQuality });
