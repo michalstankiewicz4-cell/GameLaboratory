@@ -66,6 +66,7 @@ const LABS = [
   { file: "labs/filters.html", name: "Filters lab", doc: "docs/filters.md", keys: [["Drag / right-drag / wheel", "orbit, pan, zoom"]] },
   { file: "labs/pixel.html", name: "Pixel Studio", doc: "docs/pixel/README.md", keys: [["Ctrl+Z / Ctrl+Shift+Z", "undo / redo (Draw)"], ["Right button", "erase (Draw)"]] },
   { file: "labs/zombies.html", name: "Zombie Generator", doc: "docs/pixel/zombies.md", keys: [] },
+  { file: "labs/morgue.html", name: "SDF Morgue", doc: "docs/morgue.md", keys: [] },
 ];
 const TOOLS = [
   { file: "tools/doctor.html", name: "Model doctor", doc: "docs/doctor/README.md", keys: [["Click a model, then a finding", "its parts light up red"], ["Drag / wheel", "turn and zoom the view"]] },
@@ -110,6 +111,7 @@ const PL_ITEMS = {
   "labs/filters.html": ["Laboratorium filtrów", [["Przeciągnij / prawy / kółko", "obrót, przesuw, przybliżenie"]]],
   "labs/pixel.html": ["Pixel Studio", [["Ctrl+Z / Ctrl+Shift+Z", "cofnij / ponów (Draw)"], ["Prawy przycisk", "gumka (Draw)"]]],
   "labs/zombies.html": ["Generator zombie", []],
+  "labs/morgue.html": ["Kostnica SDF", []],
   "tools/doctor.html": ["Doktor modeli", [["Kliknij model, potem znalezisko", "jego części świecą na czerwono"], ["Przeciągnij / kółko", "obrót i przybliżenie widoku"]]],
   "labs/transform.html": ["Transformator", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"]]],
   "tools/kitcheck.html": ["Kontrola kitów", []],

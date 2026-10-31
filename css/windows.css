@@ -48,3 +48,5 @@
 .labWin > .labIdle{opacity:1}
 .labWin > .labIdle, .labWin > .labIdle *{pointer-events:auto !important}
 .labWin #fpsGraph{border:1px solid #26303d;border-radius:6px;background:#0c0f13}
+/* the first section heading, when it is the window's title */
+.labWin .labWinDup{display:none}

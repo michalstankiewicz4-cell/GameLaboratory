@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>SDF Morgue — a pixel-art zombie head computed in a shader | GameLaboratory</title>
+<meta name="description" content="GameLaboratory SDF Morgue: a zombie head computed in a shader — distance functions, raymarching, lighting quantized to four tones and outlines derived from geometry, as pixel art. Every roll is a new specimen from a seed.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/morgue.html">
+<link rel="icon" type="image/png" href="../assets/favicon-32.png">
+<link rel="stylesheet" href="../css/lab-sea.css">
+<link rel="stylesheet" href="../css/windows.css">
+<link rel="stylesheet" href="../css/morgue.css">
+</head>
+<!-- SDF Morgue (from a claude.ai artifact): the head is the model js/models/life/zombie/sdf-head.js
+     (shaders, the specimen from a seed, its palette, the renderer); this page is the lab around it. -->
+<body class="lab">
+<script src="../js/labkit/versions.js"></script>
+<script src="../js/labkit/menubar.js"></script>
+<div class="bar">
+  <b>SDF Morgue</b> <span class="ver mono" data-lab-version="labs/morgue.html"></span>
+  <span class="sp"></span>
+  <a href="zombies.html">Zombie Generator</a>
+  <a href="../index.html">Labs</a>
+</div>
+<aside class="panel left" data-window="left" data-side="left">
+  <h3>Specimen</h3>
+  <div class="btns"><button type="button" id="roll">Roll a zombie</button></div>
+  <div class="row"><span>Camera angle</span><input id="ang" type="range" min="-180" max="180" step="1" value="14"><output id="angV"></output></div>
+  <label class="chk"><input id="spin" type="checkbox" checked> Head sway</label>
+  <label class="chk"><input id="outline" type="checkbox" checked> Outline</label>
+  <div class="row"><span>Resolution</span><select id="res">
+    <option value="32">32 × 32</option><option value="48">48 × 48</option><option value="64" selected>64 × 64</option>
+    <option value="96">96 × 96</option><option value="256">256 × 256 (no pixel art)</option></select><output></output></div>
+  <p class="note">A zombie head computed in a shader: distance functions, raymarching, lighting quantized to four tones and outlines derived from geometry. Every click rolls a new specimen.</p>
+</aside>
+<main class="morgue">
+  <div class="view">
+    <canvas id="cv" width="64" height="64" aria-label="Pixel-art zombie head"></canvas>
+    <div class="meta"><span id="seedLabel">SPECIMEN #0</span><span id="resLabel">64×64 PX</span></div>
+  </div>
+</main>
+<aside class="panel right" data-window="right" data-side="right">
+  <h3>Specimen card</h3>
+  <dl class="sheet" id="sheet"></dl>
+  <div class="swatches" id="sw"></div>
+  <p class="note">The engine is about 120 lines of GLSL. The first pass computes each pixel's material, light tone and depth; the second maps them to palette colors and draws an outline wherever the material changes or the depth jumps.</p>
+  <p class="note err" id="err" hidden></p>
+</aside>
+<script src="../js/labkit/windows.js"></script>
+<script type="module" src="../js/labs/morgue.js"></script>
+</body>
+</html>

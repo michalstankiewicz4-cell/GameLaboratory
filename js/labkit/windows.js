@@ -78,7 +78,15 @@ function make(body) {
 function init() {
   document.querySelectorAll("[data-window]").forEach(make);
   // titles from a heading: the labs fill their panels after loading
-  setInterval(() => wins.forEach((w) => { const t = w.title(), e = w.el.querySelector(".labWinTitle"); if (e.textContent !== t) e.textContent = t; }), 1500);
+  // the heading that became the title is not repeated right under it
+  const sync = () => wins.forEach((w) => {
+    const t = w.title(), e = w.el.querySelector(".labWinTitle"); if (e.textContent !== t) e.textContent = t;
+    if (w.body.dataset.title) return;
+    const h = w.body.querySelector("h3, .secHd");
+    w.body.querySelectorAll(".labWinDup").forEach((x) => { if (x !== h) x.classList.remove("labWinDup"); });
+    if (h) h.classList.add("labWinDup");
+  });
+  sync(); setInterval(sync, 1500);
   addEventListener("resize", () => wins.forEach((w) => { if (w.open) clamp(w); }));
 }
 window.LabWindows = {

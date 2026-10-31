@@ -5,7 +5,7 @@
 (function () {
   "use strict";
   const V = {
-  app: "0.7.0",
+  app: "0.8.0",
   labs: {
     "labs/ship.html": "1.3.0",
     "labs/bodies.html": "1.2.0",
@@ -32,6 +32,7 @@
     "tools/grainTexture.html": "1.0.0",
     "labs/filters.html": "0.2.0",
     "labs/warship.html": "1.1.0",
+    "labs/morgue.html": "1.0.0",
   },
   };
   window.GameLabVersions = V;
