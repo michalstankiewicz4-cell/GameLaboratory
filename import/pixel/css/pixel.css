@@ -1,0 +1,54 @@
+/* Pixel Studio (pixel/index.html): on top of lab.css. Not part of the game. */
+.pix .panel{top:52px;bottom:12px}
+.stagewrap{position:fixed;top:52px;bottom:12px;left:356px;right:326px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:10px;overflow:auto;padding:12px}
+/* centred while it fits, scrolls from the top when it does not (justify-content:center would cut the top off) */
+.stagewrap>*{flex:none}.stagewrap>:first-child{margin-top:auto}.stagewrap>:last-child{margin-bottom:auto}
+.checker{background-color:#2a2f37;background-image:linear-gradient(45deg,#3a404a 25%,transparent 25%,transparent 75%,#3a404a 75%),linear-gradient(45deg,#3a404a 25%,transparent 25%,transparent 75%,#3a404a 75%);background-size:16px 16px;background-position:0 0,8px 8px;border:1px solid var(--line);border-radius:4px}
+.stagewrap>.checker{display:inline-block;line-height:0;max-width:100%;max-height:100%;overflow:auto}
+#stage{display:block;image-rendering:pixelated;max-width:100%;height:auto}
+#stage.drawing{cursor:crosshair;touch-action:none}
+.frames{align-items:center}
+.frames span{min-width:60px;text-align:center;color:var(--dim)}
+.truesize{display:flex;align-items:center;gap:8px;color:var(--dim);font-size:12px}
+.truesize canvas{image-rendering:pixelated;background-size:8px 8px;background-position:0 0,4px 4px}
+.swatches{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}
+.swatches .sw{width:22px;height:22px;border-radius:4px;border:1px solid var(--line);cursor:pointer;padding:0}
+.swatches .sw.on{outline:2px solid var(--lab);outline-offset:1px}
+.pix textarea{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:6px;color:inherit;font-size:11px;resize:vertical}
+.doc{display:flex;align-items:center;gap:10px;margin:4px 0 6px}
+.score{font:600 26px ui-monospace,Consolas,monospace;min-width:52px}
+.score.good{color:var(--ok)}.score.mid{color:var(--lab)}.score.bad{color:#ff6b70}
+.pix .find{cursor:default;display:flex;flex-direction:column;gap:4px}
+.pix .find.sev2{border-left-color:#e04b50}.pix .find.sev1{border-left-color:#f2b84b}.pix .find.ok{border-left-color:var(--ok);color:var(--ok)}
+.pix .find .btns{margin:0}
+/* narrow windows: one scrolling column — the preview first, then the mode's controls, then output; nothing hidden */
+@media (max-width:1100px){
+  .pix{overflow:auto;display:flex;flex-direction:column}
+  .pix .bar{position:sticky;flex-wrap:wrap;row-gap:6px}
+  .pix .stagewrap{position:static;order:1;padding:12px 12px 4px;overflow:visible}
+  .pix .stagewrap>.checker{max-height:none}
+  .pix .panel,.pix .panel.left,.pix .panel.right{display:block;position:static;order:2;width:auto;max-height:none;overflow:visible;margin:8px 12px}
+  .pix .panel.right{order:3}
+}
+@media (max-width:640px){.pix .bar b{flex-basis:100%}.pix .bar .sp{display:none}.pix .row{grid-template-columns:96px 1fr 44px}}
+/* Zombie Generator */
+.zomb #stage{max-width:min(100%,512px);height:auto}
+.zomb #stage.px{image-rendering:pixelated}
+.zomb .sheetbox{display:block;line-height:0;max-width:100%}
+.zomb #sheetView{display:block;max-width:100%;height:auto}
+.zomb .stagebox{position:relative;display:inline-block;line-height:0}
+.zomb .stagebox>.checker{display:inline-block}
+.loader{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:rgba(10,13,17,.62);border-radius:4px;line-height:1.4;color:var(--head);font-size:13px;text-align:center;padding:12px}
+.loader i{width:38px;height:38px;border-radius:50%;border:3px solid rgba(242,184,75,.22);border-top-color:var(--lab);animation:spin .8s linear infinite}
+.loader b{display:block;width:min(240px,80%);height:6px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden}
+.loader em{display:block;height:100%;width:0;background:var(--lab);transition:width .15s}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.loader i{animation-duration:2.4s}}
+.bar .ver{color:var(--dim);font-size:12px;font-weight:400;margin-left:-6px}
+.zomb .menu{margin:0;align-items:center;gap:8px}
+.zomb .seg{display:inline-flex}.zomb .seg button{border-radius:0}.zomb .seg button:first-child{border-radius:7px 0 0 7px}.zomb .seg button:last-child{border-radius:0 7px 7px 0;margin-left:-1px}
+.zomb button.go{background:#2a2312;border-color:var(--lab);color:var(--lab);font-weight:600}
+.zomb button.go.due{background:var(--lab);color:#14100a}
+.loader .go{display:none}
+.loader.idle i,.loader.idle b{display:none}.loader.idle .go{display:inline-block;padding:6px 14px}
+.loader .go{border:1px solid var(--lab);border-radius:7px;cursor:pointer;font:inherit}

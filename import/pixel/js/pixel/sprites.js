@@ -1,0 +1,57 @@
+// Hand-drawn sprites, pixel by pixel, as text: one character per pixel, '.' is empty, the palette maps the rest.
+// The same format is what the Draw mode imports and exports (so sprites can be written, read and corrected as text).
+export const SPRITES = {
+  heart: {
+    label: 'Heart 16×16 (hand-drawn)', w: 16, h: 16,
+    palette: { o: '#2a0e14', r: '#c8283a', d: '#86182a', h: '#f8d0d4', l: '#ec5a64' },
+    frames: [[
+      '................',
+      '..ooo.....ooo...',
+      '.orrro...orrro..',
+      'orhlrro.orrrddo.',
+      'orhlrrrorrrrddo.',
+      'orlrrrrrrrrrddo.',
+      '.orrrrrrrrrrdo..',
+      '..orrrrrrrddo...',
+      '...orrrrrddo....',
+      '....orrrddo.....',
+      '.....orrdo......',
+      '......odo.......',
+      '.......o........',
+      '................',
+      '................',
+      '................',
+    ]],
+  },
+  potion: {
+    label: 'Potion 16×16 (hand-drawn)', w: 16, h: 16,
+    palette: { o: '#1a1420', g: '#a8c8d8', w: '#f4fbff', c: '#9a6a42', C: '#6a4426', r: '#c0302a', R: '#ef6a4a', D: '#7a1a1e' },
+    frames: [[
+      '......oooo......',
+      '.....occcCo.....',
+      '.....oCCCCo.....',
+      '......owgo......',
+      '......owgo......',
+      '...oowgggggoo...',
+      '..owgggggggggo..',
+      '.owRRrrrrrrrDDo.',
+      '.owRrrrrrrrrDDo.',
+      '.orrrrrrrrrrDDo.',
+      '.orrrrrrrrrDDDo.',
+      '..orrrrrrrDDDo..',
+      '...orrrrrDDDo...',
+      '....oooooooo....',
+      '................',
+      '................',
+    ]],
+  },
+  torch: {
+    label: 'Torch 8×16, 3 frames (hand-drawn)', w: 8, h: 16,
+    palette: { o: '#1a0e0a', y: '#fbe7a1', a: '#f7b84a', e: '#ef7a2a', r: '#c0441c', b: '#6a4426', B: '#4a2c18', m: '#8a8a92' },
+    frames: [
+      ['...o....', '..oyo...', '..oyao..', '.oyaeo..', '.oaeero.', '.oeerro.', '..orro..', '.ommmo..', '.ommmo..', '..obbo..', '..obBo..', '..obBo..', '..obBo..', '..obBo..', '..oBBo..', '...oo...'],
+      ['....o...', '...oyo..', '..oayo..', '.oeayo..', '.orreao.', '.orreeo.', '..orro..', '.ommmo..', '.ommmo..', '..obbo..', '..obBo..', '..obBo..', '..obBo..', '..obBo..', '..oBBo..', '...oo...'],
+      ['........', '...oo...', '..oyyo..', '.oyaao..', '.oaeeao.', '.oerreo.', '..orro..', '.ommmo..', '.ommmo..', '..obbo..', '..obBo..', '..obBo..', '..obBo..', '..obBo..', '..oBBo..', '...oo...'],
+    ],
+  },
+};
