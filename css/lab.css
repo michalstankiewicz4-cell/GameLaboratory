@@ -35,17 +35,11 @@ canvas#view{ position:fixed; inset:0; width:100%; height:100%; display:block; }
   scrollbar-width:thin; scrollbar-color:#3c55d8 transparent; }
 #hud > *{ pointer-events:auto; }
 #hudTop{ position:relative; height:58px; }
-#hudBracket{ position:absolute; left:0; top:0; width:30px; height:58px;
-  clip-path:path("M30 0 H26 C10 0 0 13 0 29 C0 45 9 58 24 58 H30 Z"); }
-#hudLogo{ position:absolute; left:40px; top:9px; width:40px; height:37px; filter:drop-shadow(0 0 4px rgb(255 190 90 / .35)); }
 #hudTitle{ position:absolute; left:88px; top:2px; font-family:var(--fontHead); font-weight:600; font-size:30px; line-height:44px;
   background:linear-gradient(180deg,#ffd88f,#f8bb56 50%,#dd9540); -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent; white-space:nowrap; }
-#hudSub{ position:absolute; left:89px; top:38px; font-family:var(--fontLabel); font-size:13px; letter-spacing:1.2px; color:#96a8ff; }
-#hudBar{ position:relative; height:9px; margin:6px 0 10px 34px; border-radius:0 5px 5px 0; }
 .hudPanel{ position:relative; padding:10px 14px 14px 34px; border:1.5px solid #1c3bb4; border-radius:12px;
   background:rgb(0 3 16 / .74); box-shadow:0 0 8px rgb(40 80 255 / .45), inset 0 0 8px rgb(40 80 255 / .18); backdrop-filter:blur(3px); }
-.hudPanel .side{ position:absolute; left:8px; top:10px; bottom:10px; width:14px; border-radius:8px 0 0 8px; }
 .secHd{ margin:10px 0 4px; padding-bottom:3px; border-bottom:1.5px solid #2c4bd8; font-family:var(--fontLabel);
   font-size:15px; letter-spacing:.6px; color:#96a8ff; }
 .secHd.first{ margin-top:0; }

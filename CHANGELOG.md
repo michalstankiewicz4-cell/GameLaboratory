@@ -3,6 +3,27 @@
 Wersja programu i każdego laboratorium: `js/labkit/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `labs/CHANGELOG.md`; Battle i aTrain — w historii git.
 
+## Program 0.12.0 — 2026-11-01 (remanent, partia 1: śmieci, błędy, martwy kod)
+
+### Usunięte
+- `css/game-ui/` (27 plików interfejsu gry — nic ich nie ładowało), `tools/out/` (27 zrzutów z testów, 3,8 MB —
+  teraz w `.gitignore`), `tools/walkers/` (prototypy w Pythonie i składacz artefaktu claude.ai z NeuroLabPA),
+  `docs/walkers/gitignore.txt`, nieużywane miniatury `assets/labs/ship.jpg` i `orzel.jpg` (`lab-check.py --thumb`
+  zapisuje je teraz do `tools/out/`).
+- **Tryb grafiki „legacy r128”** z `js/core/three-global.js` (łatki świateł, bufory jak w r128) — używały go już
+  tylko doktor i kitcheck; teraz wszędzie grafika Battle, bez znacznika `<meta name="gamelab-graphics">` (znaczniki
+  usunięte ze stron). Odciski kitchecka i doktora liczą geometrię — bez zmian.
+- Martwy markup HUD w stronach Space (logo, ramka, podtytuł, złoty pasek, boczne paski) — od okien był schowany.
+
+### Poprawione
+- `tools/lab-check.py` działa znowu: strona startowa `index.html` i `labs/warship.html` zamiast adresów z Battle.
+- Pasek menu zna `labs/warship.html` (druga strona laboratorium statków, „woda”): nazwa i wersja na pasku; bez osobnej
+  pozycji w liście i bez kafelka — wejście przełącznikiem środowiska.
+- Tytuły 13 stron Space i kitchecka bez „Swarm Protocol” („Nazwa | GameLaboratory”); domyślny podpis statku
+  „GAMELABORATORY // SHIP LAB”; metadane MIDI z MusicKit.
+- SDF Walkers: jedna wersja (z `versions.js`), bez osobnego numeru w `js/labs/walkers/version.js`.
+- Wersje (z+1): laboratoria Space, okręty, SDF Walkers, doktor, kitcheck.
+
 ## Program 0.11.1 — 2026-11-01
 
 ### Zmienione (pasek menu)

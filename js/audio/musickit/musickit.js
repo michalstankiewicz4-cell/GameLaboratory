@@ -370,7 +370,7 @@ function songMidi(paramsIn) {
   }
   const usPerBeat = Math.round(60000000 / p.tempo);
   const tracks = [chunk([
-    [0, text(0x03, def.name + " (Swarm Protocol, MusicKit)"), -1],
+    [0, text(0x03, def.name + " (GameLaboratory, MusicKit)"), -1],
     [0, [0xff, 0x51, 3, (usPerBeat >> 16) & 255, (usPerBeat >> 8) & 255, usPerBeat & 255], -1],
     [0, [0xff, 0x58, 4, 4, 2, 24, 8], -1],
   ])];

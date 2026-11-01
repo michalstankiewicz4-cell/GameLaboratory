@@ -351,7 +351,7 @@ const store = {
 };
 // Rename: double-click the ship's name or the caption; Enter keeps it, Esc
 // cancels, empty brings the original back. Kept per ship, in the lab only.
-const DEFAULT_SUB = "SWARM PROTOCOL // SHIP LAB";
+const DEFAULT_SUB = "GAMELABORATORY // SHIP LAB";
 function shipLabels(id) { return store.get("names", {})[id] || {}; }
 function showLabels() {
   const def = ShipKit.SHIP_DEFS[state.shipIndex], L = shipLabels(def.id);

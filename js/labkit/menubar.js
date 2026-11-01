@@ -47,6 +47,8 @@ const t = (en, pl) => (PL ? pl : en);   // the bar's own words
 // The labs and tools, shared with the start screen (window.LabMenu.ITEMS).
 const LABS = [
   { file: "labs/ship.html", name: "Ship lab", doc: "docs/ship.md" },
+  // the ship lab's second page (water) — reached by its environment switch: no entry of its own in the lists
+  { file: "labs/warship.html", name: "Ship lab · water", doc: "docs/ships-sea/blyskawica.md", page: true },
   { file: "labs/bodies.html", name: "Body lab", doc: "docs/bodies.md" },
   { file: "labs/systems.html", name: "System lab", doc: "docs/systems.md" },
   { file: "labs/scale.html", name: "Scale lab", doc: "docs/scale.md" },
@@ -103,6 +105,7 @@ const OFFSETS = `
 // Polish names (the English ones above stay the source)
 const PL_ITEMS = {
   "labs/ship.html": ["Laboratorium statków"],
+  "labs/warship.html": ["Laboratorium statków · woda"],
   "labs/bodies.html": ["Laboratorium ciał niebieskich"],
   "labs/systems.html": ["Laboratorium układów"],
   "labs/scale.html": ["Laboratorium skali"],
@@ -258,7 +261,7 @@ function windowItems() {
 // the labs and the tools, all here (the start screen: the GameLaboratory mark on the left)
 function tools() {
   const d = [el("div", "lmLabel", t("Labs", "Laboratoria"))];
-  LABS.forEach((l) => d.push(link(l.name, ROOT + l.file, { on: me === l })));
+  LABS.filter((l) => !l.page).forEach((l) => d.push(link(l.name, ROOT + l.file, { on: me === l || (l.file === "labs/ship.html" && me && me.page) })));
   d.push(el("div", "lmSep"), el("div", "lmLabel", t("Tools", "Narzędzia")));
   TOOLS.forEach((t) => d.push(link(t.name, ROOT + t.file, { on: me === t })));
   return d;

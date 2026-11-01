@@ -1,5 +1,5 @@
 /* =======================================================================
-   BODYKIT — procedural celestial bodies for Swarm Protocol
+   BODYKIT — procedural celestial bodies (from the game Swarm Protocol)
    =======================================================================
    One file, shared by the body lab (bodies.html) and the game
    (index.html), the same way js/shipkit/shipkit.js is: a classic script

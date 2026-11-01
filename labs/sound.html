@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Swarm Protocol // Sound lab</title>
+<title>Sound lab | GameLaboratory</title>
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../css/fonts.css">
 <!-- The sound lab: MusicKit (js/musickit/musickit.js) — the game's music,
@@ -56,21 +56,9 @@ textarea.lab{ height:96px; width:100%; padding:6px; resize:vertical; line-height
 
 <div id="hud" data-window="left" data-side="left">
   <div id="hudTop">
-    <div class="mat blue" id="hudBracket"></div>
-    <svg id="hudLogo" viewBox="0 0 52 48" aria-hidden="true">
-      <defs>
-        <linearGradient id="gLogoGold" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0" stop-color="#ffe0a0"/><stop offset=".5" stop-color="#f8bb56"/><stop offset="1" stop-color="#cf8a35"/></linearGradient>
-        <linearGradient id="gLogoBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b8c5ff"/><stop offset="1" stop-color="#6d82f5"/></linearGradient>
-      </defs>
-      <path d="M16 8 L3 24 L16 40 M36 8 L49 24 L36 40" fill="none" stroke="url(#gLogoGold)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="26" cy="15" r="3.6" fill="url(#gLogoBlue)"/><circle cx="20" cy="30" r="3.6" fill="url(#gLogoBlue)"/><circle cx="32" cy="30" r="3.6" fill="url(#gLogoBlue)"/>
-    </svg>
     <div id="hudTitle">SOUND</div>
-    <div id="hudSub">SWARM PROTOCOL // SOUND LAB</div>
   </div>
-  <div class="mat gold" id="hudBar"></div>
   <div class="hudPanel">
-    <div class="mat blue side"></div>
     <div class="secHd first">PLAYER</div>
     <button class="tBtn" id="btnPlay">▶ PLAY</button>
     <div id="nowPlaying"></div>
@@ -102,7 +90,6 @@ textarea.lab{ height:96px; width:100%; padding:6px; resize:vertical; line-height
 
 <div id="opt" data-window="right" data-side="right">
   <div class="hudPanel">
-    <div class="mat lilac side"></div>
     <div class="secHd first">INSTRUMENTS</div>
     <div id="instruments"></div>
     <div class="secHd">LAYERS</div>

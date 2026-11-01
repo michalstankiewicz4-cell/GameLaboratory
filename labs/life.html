@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="gamelab-graphics" content="battle">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Swarm Protocol // Life lab</title>
+<title>Life lab | GameLaboratory</title>
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../css/fonts.css">
 <!-- Life forms (LifeKit, js/lifekit/): creatures built from blocks — a
@@ -37,21 +36,9 @@ select.lab, input.lab{ height:28px; border:1.5px solid #3c55d8; border-radius:6p
 <canvas id="view"></canvas>
 <div id="hud" data-window="left" data-side="left">
   <div id="hudTop">
-    <div class="mat blue" id="hudBracket"></div>
-    <svg id="hudLogo" viewBox="0 0 52 48" aria-hidden="true">
-      <defs>
-        <linearGradient id="gLogoGold" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0" stop-color="#ffe0a0"/><stop offset=".5" stop-color="#f8bb56"/><stop offset="1" stop-color="#cf8a35"/></linearGradient>
-        <linearGradient id="gLogoBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b8c5ff"/><stop offset="1" stop-color="#6d82f5"/></linearGradient>
-      </defs>
-      <path d="M16 8 L3 24 L16 40 M36 8 L49 24 L36 40" fill="none" stroke="url(#gLogoGold)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="26" cy="15" r="3.6" fill="url(#gLogoBlue)"/><circle cx="20" cy="30" r="3.6" fill="url(#gLogoBlue)"/><circle cx="32" cy="30" r="3.6" fill="url(#gLogoBlue)"/>
-    </svg>
     <div id="hudTitle"></div>
-    <div id="hudSub">SWARM PROTOCOL // LIFE LAB</div>
   </div>
-  <div class="mat gold" id="hudBar"></div>
   <div class="hudPanel">
-    <div class="mat blue side"></div>
     <div class="secHd first">LIFE FORMS</div>
     <div id="creTabs"></div>
     <div id="blurb"></div>
@@ -83,7 +70,6 @@ select.lab, input.lab{ height:28px; border:1.5px solid #3c55d8; border-radius:6p
 </div>
 <div id="opt" data-window="right" data-side="right">
   <div class="hudPanel">
-    <div class="mat lilac side"></div>
     <div class="secHd first">BODY</div>
     <div id="params"></div>
     <div class="secHd" id="faceHd">FACE</div>

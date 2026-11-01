@@ -1,12 +1,12 @@
 """Headless check of the model labs (Playwright + SwiftShader).
 
-Loads labs.html and labs/ship.html, waits for the ship to build, toggles parts, trains the mounts,
+Loads the start page (index.html) and labs/warship.html (the ship lab's water page), waits for the ship to build, toggles parts, trains the mounts,
 rebuilds at another detail level and screenshots a few camera presets to tools/out/lab-*.png;
 then the water lab, the transformer, the look lab (weathers, look presets, split compare, cameras) and the land
 lab (seamless wrap, exact land share, 100 % land, mountain barrier).
 Exit code 1 on page errors or a missing model. Slow without a GPU (first build ~15 s).
   py tools/lab-check.py            # check + screenshots
-  py tools/lab-check.py --thumb    # also rewrite assets/labs/ship.jpg (clean Bow 3/4 view)
+  py tools/lab-check.py --thumb    # also write clean Bow 3/4 views of both ships to tools/out/lab-thumb*.jpg
 """
 import os, sys, time, subprocess
 from playwright.sync_api import sync_playwright
@@ -32,14 +32,10 @@ def main():
             pg.set_default_navigation_timeout(300000)        # leaving a busy lab page can take a while headless
             pg.on('pageerror', lambda e: errs.append('pageerror ' + str(e) + ' @ ' + pg.url + ' ' + (e.stack or '')[:400]))
             pg.on('console', lambda m: errs.append(m.type + ' ' + m.text) if m.type == 'error' else None)
-            pg.goto(f'http://localhost:{PORT}/labs.html')
-            assert pg.locator('a.tile[href="labs/ship.html"]').count() == 1, 'ship tile missing'
-            assert pg.locator('a.tile[href="labs/ship.html?ship=orzel"]').count() == 1, 'orzel tile missing'
-            assert pg.locator('a.tile[href="labs/look.html"]').count() >= 1, 'look tile missing'
-            assert pg.locator('a.tile[href="labs/land.html"]').count() == 1, 'land tile missing'
-            assert pg.locator('a.tile[href="labs/structures.html"]').count() == 1, 'structures tile missing'
-            assert pg.locator('a.tile[href="labs/plants.html"]').count() == 1, 'plants tile missing'
-            pg.goto(f'http://localhost:{PORT}/labs/ship.html')
+            pg.goto(f'http://localhost:{PORT}/index.html')
+            for t in ['ship', 'look', 'land', 'structures', 'plants', 'water', 'transform']:
+                assert pg.locator(f'#labs a.tile[href$="labs/{t}.html"]').count() == 1, t + ' tile missing'
+            pg.goto(f'http://localhost:{PORT}/labs/warship.html')
             pg.wait_for_function('window.__lab && window.__lab.model', timeout=180000)
             print('stats', ' '.join(pg.inner_text('#stats').split()))
             assert pg.locator('#specs tr').count() > 5 and pg.locator('#sources li').count() > 2, 'info panel empty'
@@ -63,10 +59,10 @@ def main():
                 pg.keyboard.press('h'); pg.evaluate("()=>{const c=document.getElementById('dimsChk');if(c.checked)c.click()}")
                 tmp = os.path.join(OUT, 'lab-thumb.png'); snap(pg, 'Bow ¾', tmp)
                 from PIL import Image
-                Image.open(tmp).convert('RGB').crop((60, 90, 1100, 675)).resize((1200, 675), Image.LANCZOS).save(os.path.join(ROOT, 'assets', 'labs', 'ship.jpg'), quality=85)
+                Image.open(tmp).convert('RGB').crop((60, 90, 1100, 675)).resize((1200, 675), Image.LANCZOS).save(os.path.join(OUT, 'lab-thumb.jpg'), quality=85)
                 print('thumbnail written')
             # ORP Orzeł: builds with its own cameras, dives to periscope depth (40 mm into its well, periscopes up, ensign struck)
-            pg.goto(f'http://localhost:{PORT}/labs/ship.html?ship=orzel')
+            pg.goto(f'http://localhost:{PORT}/labs/warship.html?ship=orzel')
             pg.wait_for_function("window.__lab && window.__lab.model && window.__lab.model.info.id === 'orzel'", timeout=180000)
             print('orzel', ' '.join(pg.inner_text('#stats').split()))
             assert pg.locator('#cams button').count() >= 8 and not pg.locator('#subPanel').is_hidden() and pg.locator('#signalPanel').is_hidden(), 'orzel panels'
@@ -87,7 +83,7 @@ def main():
                 pg.keyboard.press('h'); pg.evaluate("()=>{const c=document.getElementById('dimsChk');if(c.checked)c.click()}")
                 tmp = os.path.join(OUT, 'lab-thumb-orzel.png'); snap(pg, 'Bow ¾', tmp)
                 from PIL import Image
-                Image.open(tmp).convert('RGB').crop((60, 90, 1100, 675)).resize((1200, 675), Image.LANCZOS).save(os.path.join(ROOT, 'assets', 'labs', 'orzel.jpg'), quality=85)
+                Image.open(tmp).convert('RGB').crop((60, 90, 1100, 675)).resize((1200, 675), Image.LANCZOS).save(os.path.join(OUT, 'lab-thumb-orzel.jpg'), quality=85)
                 print('orzel thumbnail written')
             # water lab: loads, variants, presets, split screen, every effect toggled
             pg.goto(f'http://localhost:{PORT}/labs/water.html')

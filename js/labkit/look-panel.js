@@ -1,7 +1,7 @@
 // Panel obrazu w grafice Battle dla laboratoriów Space: zamiast PostKit potok kamery z laboratoriów wodnych
 // (js/render/sea/look.js — LookPipeline). To samo API co LabKit.imageEffects ({ markCustom, render }), więc
 // laboratorium nie musi się zmieniać; LabKit.imageEffects wybiera to, gdy strona jest w trybie grafiki Battle
-// (<meta name="gamelab-graphics" content="battle">, js/core/three-global.js). Wygląd panelu: klasy z css/lab.css.
+// (zawsze — js/core/three-global.js ma tylko grafikę Battle).
 import { LookPipeline, LOOK_PRESETS, LOOK_DEFAULTS } from '../render/sea/look.js';
 
 const SLIDERS = [['exposure', 'Exposure', 0.3, 2.5, 0.05], ['contrast', 'Contrast', 0.7, 1.5, 0.01], ['saturation', 'Saturation', 0, 1.6, 0.01],

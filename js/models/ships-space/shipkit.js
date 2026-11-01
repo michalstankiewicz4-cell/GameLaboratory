@@ -1,5 +1,5 @@
 /* =======================================================================
-   SHIPKIT — procedural spaceship models for Swarm Protocol
+   SHIPKIT — procedural spaceship models (from the game Swarm Protocol)
    =======================================================================
    One classic script (window.ShipKit), shared by the ship lab (ship.html)
    and the game (index.html loads it after Three.js) — not copied between
