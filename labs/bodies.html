@@ -6,24 +6,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Body lab | GameLaboratory</title>
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
-<!-- Procedural celestial-body preview (companion of ship.html).
-     Script blocks, in order:
-       1. vendor/three-r128.min.js + OrbitControls – the same copy the game
-          uses (was inlined here until the 2026-10 review: 600 KB twice)
-       2. js/labkit/labkit.js                     – what both labs share around
-          the model (grain, sliders, toggles, HUD scale, performance
-          counters, the IMAGE EFFECTS render); styles in ui/space.css
-       3. js/models/bodies/bodykit.js                   – THE BODIES, the same file
-          the game loads (a classic script, window.BodyKit): groups,
-          parameter schemas, shaders; see its header for the API
-       4. vendor/three-r128-examples + js/render/postkit/postkit.js – the IMAGE
-          EFFECTS panel: the game's post-processing (bloom, FXAA, MSAA,
-          filter, depth of field, sharpening, sun flare and light rays,
-          black-hole lensing), apart
-          from the body's own controls
-       5. <script id="viewer">                     – preview page (sky, camera,
-          HUD, sliders built from the schemas, statistics, counters)
-     Opens straight from disk, no server needed. -->
+<!-- Body lab: procedural celestial bodies (BodyKit, from the game Space). Scripts, in order (modules):
+       1. js/core/three-global.js        – Three.js r186 as the global THREE (graphics of the labs from Battle)
+       2. js/labkit/labkit.js            – what the Space labs share around the model
+       3. js/models/bodies/…             – THE BODIES (window.BodyKit): groups, parameter schemas, shaders;
+                                           see bodykit.js's header for the API
+       4. js/render/postkit/postkit.js   – the IMAGE EFFECTS: post-processing (bloom, FXAA, MSAA, filter, depth of
+                                           field, sharpening, sun flare and light rays, black-hole lensing)
+       5. js/labs/bodies.js              – the lab (sky, camera, the windows, sliders, counters)
+     Styles: ui/ui.css, ui/space.css, ui/pages/bodies.css. Needs a local server (ES modules). -->
 <link rel="stylesheet" href="../ui/ui.css">
 <link rel="stylesheet" href="../ui/space.css">
 <link rel="stylesheet" href="../ui/pages/bodies.css">
@@ -107,7 +98,7 @@
 
 <script src="../ui/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
-<!-- Three.js r128 add-ons (vendor/, MIT) + PostKit: the IMAGE EFFECTS panel's post-processing, the game's own -->
+<!-- PostKit: the IMAGE EFFECTS panel's post-processing -->
 <script type="module" src="../js/render/postkit/postkit.js"></script>
 <script type="module" src="../js/labkit/labkit.js"></script>
 <script type="module" id="bodykit" src="../js/models/bodies/bodykit.js"></script>

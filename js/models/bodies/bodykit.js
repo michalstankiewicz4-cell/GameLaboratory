@@ -1,13 +1,10 @@
 /* =======================================================================
    BODYKIT — procedural celestial bodies (from the game Swarm Protocol)
    =======================================================================
-   One file, shared by the body lab (bodies.html) and the game
-   (index.html), the same way js/models/ships-sea/shipkit.js is: a classic script
-   (not a module) exposing window.BodyKit, so the lab still opens
-   straight from disk. Tune a body in the lab and the game shows exactly
-   that body — there is no copy to keep in sync.
+   One file (window.BodyKit), like js/models/ships-space/shipkit.js: the body,
+   system, scale and surface labs build from it; in the game Space it is the same file.
 
-   Dependencies: the global THREE (r128). No textures: every surface is
+   Dependencies: the global THREE (js/core/three-global.js; written for r128). No textures: every surface is
    computed per pixel on the GPU (3D simplex noise in the shaders), so
    every parameter is a shader uniform and a slider change is instant,
    with no regeneration.
@@ -87,15 +84,13 @@
    (scene/setup.js), so that's hardly visible.
 
    -----------------------------------------------------------------------
-   In the game (see docs/bodies.md, "BodyKit in the game")
+   In the game Space (where this file came from)
    -----------------------------------------------------------------------
-   world/bodyVisual.js builds the planet for each fixed orbit slot listed
-   in GAME_BODIES (sized to the slot's radius, spun by the game, detail
-   and octaves from Setup -> Graphics) and drives setDamage() from the
-   body's health. Adding a body here for a slot, or retuning one in the
-   lab, changes the game with no game code involved. Repo conventions
-   (CLAUDE.md): English comments; a change here is a game change, so
-   bump js/version.js + CHANGELOG.md + the ?v= params.
+   The game builds the body for each fixed orbit slot listed in GAME_BODIES
+   (sized to the slot's radius, detail and octaves from its graphics
+   settings) and drives setDamage() from the body's health. Here: a change
+   to this file bumps the program's version (ui/versions.js, CHANGELOG.md;
+   CLAUDE.md, "Wersjonowanie"). English comments.
    ======================================================================= */
 window.BodyKit = (function () {
 "use strict";

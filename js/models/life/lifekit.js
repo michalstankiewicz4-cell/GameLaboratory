@@ -1,8 +1,8 @@
 /* =======================================================================
    LIFEKIT — life forms, built from blocks like ShipKit builds ships
    =======================================================================
-   A classic script (window.LifeKit), for the life lab (labs/life.html);
-   not in the game yet (docs/life.md). Needs THREE (r128).
+   window.LifeKit, for the life and human labs (labs/life.html, labs/human.html;
+   docs/life.md). Needs the global THREE (js/core/three-global.js).
 
    The core holds what every creature shares; the rest comes in files:
      js/models/life/lifekit.js          this core: the registry, skeletons,

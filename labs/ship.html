@@ -6,21 +6,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ship lab | GameLaboratory</title>
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
-<!-- Procedural spaceship preview. Script blocks, in order:
-       1. vendor/three-r128.min.js + OrbitControls – the same copy the game
-          uses (was inlined here until the 2026-10 review: 600 KB twice)
-       2. js/labkit/labkit.js                     – what both labs share around
-          the model (grain, sliders, toggles, HUD scale, performance
-          counters, the IMAGE EFFECTS render); styles in ui/space.css
-       3. js/models/ships-sea/shipkit.js                   – THE SHIP MODELS, the same
-          file the game loads (a classic script, window.ShipKit); see its
-          header for the API
-       4. vendor/three-r128-examples + js/render/postkit/postkit.js – the IMAGE
-          EFFECTS panel: the game's post-processing (bloom, FXAA, MSAA,
-          filter, depth of field, sharpening), apart from the model's own controls
-       5. <script id="viewer">                     – preview page (sky, lights,
-          camera, HUD, quality/detail sliders, performance counters)
-     Opens straight from disk, no server needed. -->
+<!-- Ship lab: procedural spaceships (ShipKit, from the game Space). Scripts, in order (modules):
+       1. js/core/three-global.js        – Three.js r186 as the global THREE (graphics of the labs from Battle)
+       2. js/render/postkit/postkit.js   – the IMAGE EFFECTS: post-processing (bloom, FXAA, MSAA, filter, depth
+                                           of field, sharpening), apart from the model's own controls
+       3. js/labkit/labkit.js            – what the Space labs share around the model (sliders, toggles,
+                                           performance counters, the IMAGE EFFECTS render, the camera look)
+       4. js/models/ships-space/…        – THE SHIP MODELS (window.ShipKit); see shipkit.js's header for the API
+       5. js/labs/ship.js                – the lab (sky, lights, camera, the windows, sliders, counters)
+     Styles: ui/ui.css, ui/space.css, ui/pages/ship.css. Needs a local server (ES modules). -->
 <link rel="stylesheet" href="../ui/ui.css">
 <link rel="stylesheet" href="../ui/space.css">
 <link rel="stylesheet" href="../ui/pages/ship.css">
@@ -105,7 +99,7 @@
 
 <script src="../ui/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
-<!-- Three.js r128 add-ons (vendor/, MIT) + PostKit: the IMAGE EFFECTS panel's post-processing, the game's own -->
+<!-- PostKit: the IMAGE EFFECTS panel's post-processing -->
 <script type="module" src="../js/render/postkit/postkit.js"></script>
 <script type="module" src="../js/labkit/labkit.js"></script>
 <script type="module" id="shipkit" src="../js/models/ships-space/shipkit.js"></script>

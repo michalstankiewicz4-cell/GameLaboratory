@@ -36,7 +36,7 @@ meant to go through Jekyll processing in the first place (no
 
 ## SVG gradients on straight lines
 
-Found 2026-09-28 in the Research window's tree (`ui/windows/techTree.js`):
+Found 2026-09-28 in the game's Research window (its tech tree):
 the copper traces were stroked with a `linearGradient` in the default
 `gradientUnits="objectBoundingBox"`. A perfectly vertical or horizontal
 path has a bounding box of zero width or height, and the browser then
@@ -46,8 +46,8 @@ flat colour, or `gradientUnits="userSpaceOnUse"` with coordinates.
 
 ## Post-processing and shading lessons (v2.23–v2.25)
 
-Found while building the image effects (`js/render/postkit/postkit.js`,
-`js/scene/eclipse.js`):
+Found while building the image effects (`js/render/postkit/postkit.js`, and the game's
+eclipse lighting):
 
 - **Bloom works on the tone-mapped LDR picture.** The Sun and a sunlit
   ice planet both reach ~0.95–1.0 there, so a low threshold turns bright

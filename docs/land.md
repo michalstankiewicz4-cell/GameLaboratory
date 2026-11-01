@@ -3,7 +3,7 @@
 `labs/land.html` (`js/labs/land.js`), kit `js/envs/land/landkit.js`. Land and sea from one seed, from 0 % to 100 % land, on a
 map that wraps around (a torus) or is bounded by a barrier, under the SkyKit sky, with the WaterKit sea (shallows,
 surf, waves dying on the shore) and the transformer's ORP Błyskawica to sail through it. Settings are kept in the
-browser (`steelSalvo.landLab.v1`) and copied as JSON; the same seed and settings always give the same map.
+browser (`gameLab.land.v1`) and copied as JSON; the same seed and settings always give the same map.
 
 ## Generator (`generateTerrain`)
 

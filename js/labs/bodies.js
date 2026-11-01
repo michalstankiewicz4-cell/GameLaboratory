@@ -1,7 +1,7 @@
 // The bodies lab's own script (bodies.html): its scene and panels, wired to the kits'
 // public APIs. Moved out of the page (2026-10-03) so the page is markup and styles.
 /* =======================================================================
-   VIEWER — preview page only (not part of the game extraction).
+   THE LAB — the page's own script.
    Uses BodyKit's public API exclusively.
    ======================================================================= */
 (() => {

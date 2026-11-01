@@ -1,4 +1,4 @@
-# Pixel Studio — `pixel/index.html`
+# Pixel Studio — `labs/pixel.html`
 
 A separate project inside this repository: a studio for **pixel art**. It is **not part of the game** and not linked
 from it (the game stays realistic only); it is published with the site at
@@ -58,7 +58,7 @@ text* writes it, *Text → drawing* reads it — sprites can be written, read an
 
 ## Files
 
-- `pixel/index.html`, `ui/pages/pixel.css` — the page (strict CSP like the labs; checkerboard behind the transparent pixels).
+- `labs/pixel.html`, `ui/pages/pixel.css` — the page (strict CSP like the labs; checkerboard behind the transparent pixels).
 - `js/render/pixel/core.js` — `PixelImage`, OKLab, palettes, median cut, quantize + Bayer, outline/selout, orphans,
   pixel-perfect, majority downsampling, canvas helpers, sprite sheet.
 - `js/render/pixel/gif.js` — GIF89a encoder (LZW, global table with index 0 transparent, disposal 2, NETSCAPE loop).

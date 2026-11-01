@@ -3,6 +3,21 @@
 Wersja programu i każdego laboratorium: `ui/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.13.3 — 2026-11-01 (dokumentacja i komentarze)
+
+### Zmienione
+- **Dokumentacja bez opisów samej gry:** z `docs/ship.md` i `docs/bodies.md` wycięte „…in the game” (jak gra ładuje
+  kity, jej wersjonowanie), z `docs/rendering.md` ustawienia grafiki gry, kamera statku i porównanie gry z
+  laboratoriami, z `docs/surface.md` lądowanie w grze, z `docs/scale.md` zależności w grze (baza danych, kamery,
+  lista kontrolna). Tabele „File layout” opisują obecne ładowanie (Three.js r186, `three-global.js`, moduły).
+- `docs/walkers/README.md`: struktura plików obu laboratoriów po przeniesieniu (wcześniej ścieżki z NeuroLabPA).
+- Przewodnik i mapa laboratoriów z Battle (`guide-sea.md`, `labs-sea.md`): adresy GameLaboratory.
+- Klucze ustawień w dokumentacji i `tools/pixel-check.py`: `gameLab.*`.
+- **Komentarze:** nagłówki stron statków, ciał, skali i tekstury ziarna, LabKit, PostKit, ShipKit, BodyKit, LifeKit
+  i laboratorium skali — pochodzenie („z gry Space”) zamiast opisu działania gry; poprawione ścieżki do ShipKit w
+  plikach statków i BodyKit; bez nieaktualnych wzmianek o r128 i otwieraniu z dysku.
+- `tools/paths.py`: 0 martwych ścieżek (pomija wygenerowane `tools/out/`).
+
 ## Program 0.13.2 — 2026-11-01
 
 ### Zmienione

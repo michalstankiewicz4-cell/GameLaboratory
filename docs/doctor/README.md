@@ -57,8 +57,8 @@ Wyjątki dla zamierzonych przypadków: `userData.doctorOk = 'floating'` (albo ta
 
 - Strona: `tools/doctor.html`; `?model=sea/lab/blyskawica` otwiera jeden model. `window.doctorReport` — wyniki jako dane.
 - Bez okna: `python3 tools/doctor.py` (porównanie z wzorcem), `--update` (nowy wzorzec), `--shots` (zrzuty).
-- Strona ładuje kity Space przez `js/core/three-global.js`, więc w podglądzie także modele morskie świecą
-  jak w r128 (kolory bez konwersji, oświetlenie legacy). Na wyniki doktora nie ma to wpływu.
+- Strona ładuje kity Space przez `js/core/three-global.js` — w grafice Battle, jak laboratoria (od 0.12.0;
+  wcześniej w trybie legacy r128). Na wyniki doktora nie ma to wpływu.
 
 ## Zmiany
 

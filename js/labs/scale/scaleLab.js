@@ -1,8 +1,7 @@
-// Scale lab (scale.html): every object of the game in one row at its
+// Scale lab (scale.html): every object of the game Space in one row at its
 // in-game size, over a ruler in world units (docs/scale.md). Every number
-// comes from the game's own modules — none are copied here — so the row
-// always shows the game as it is. Standalone dev tool, not part of the
-// game bundle (no version bump, not in js/versionCheck.js).
+// comes from the game's data carried over with the models (js/envs/space/) —
+// none are copied here.
 import { SOLAR_BODY_BY_SLOT } from "../../envs/space/solarSystem.js";
 import { SHIP_MODEL_LENGTH, DRONE_MODEL_LENGTH, STATION_MODEL_LENGTH, STATION_PICK_RADIUS, STATION_FIELD_RADIUS,
   STATION_START_DAMAGE, EAT_ORBIT_GAP, DRONE_DOCK_GAP, BLACKHOLE_GRAVITY_RADIUS_MULT, BLACKHOLE_KILL_RADIUS_MULT } from "../../envs/space/config.js";

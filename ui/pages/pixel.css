@@ -1,4 +1,4 @@
-/* Pixel Studio (pixel/index.html): on top of lab.css. Not part of the game. */
+/* Pixel Studio (labs/pixel.html): on top of ui/ui.css and ui/sea.css. */
 .pix .panel{top:84px;bottom:44px}
 .stagewrap{position:fixed;top:84px;bottom:44px;left:356px;right:326px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:10px;overflow:auto;padding:12px}
 /* centred while it fits, scrolls from the top when it does not (justify-content:center would cut the top off) */

@@ -1,15 +1,13 @@
 # Ship lab (`ship.html`)
 
 A standalone preview page for procedurally built 3D spaceships. The
-ships themselves live in **`js/models/ships-space/shipkit.js`**, one file shared by
-this lab and the game (see [ShipKit in the game](#shipkit-in-the-game)):
-edit a ship there and both see it. A change to `ship.html` alone (the
-viewer) needs no version bump; a change to `shipkit.js` changes the game,
-so it does.
+ships themselves live in **`js/models/ships-space/shipkit.js`** (ShipKit, from the
+game Space); the lab, the scale, surface, building, vehicle and sea labs, the model
+doctor and the kit check all build from it. A change to a lab bumps that lab's
+version; a change to ShipKit bumps the program's (`ui/versions.js`, `CHANGELOG.md`).
 
-Open `ship.html` straight from disk (double-click). No server, no build
-step and no network are needed: the fonts come from the repo's own
-`ui/fonts.css` / `fonts/` (they load from disk too, checked in Chromium).
+The page needs a local server (ES modules): `python3 -m http.server` in the
+repository, then `http://localhost:8000/labs/ship.html`.
 
 > **The ship lab is the reference lab** (the user's words, 2026-10-03:
 > the first lab and the most polished; the others take their patterns from
@@ -20,21 +18,20 @@ step and no network are needed: the fonts come from the repo's own
 
 ## File layout
 
-`ship.html` loads these scripts, in this order (all classic scripts, so
-the lab still opens straight from disk):
+`labs/ship.html` loads, in this order (all as `<script type="module">`, after the menu bar):
 
-| Script | What it is | In the game? |
-|---|---|---|
-| 1. `vendor/three-r128.min.js`, `vendor/three-r128-examples/OrbitControls.js` | Three.js r128 (the game's own copy) and the preview's mouse camera. Until the 2026-10 review both were pasted into the page (~630 KB, twice with bodies.html). | Three.js yes, OrbitControls no |
-| 2. `vendor/three-r128-examples/*` + `js/render/postkit/postkit.js` | The IMAGE EFFECTS panel: the game's post-processing | **Yes — the same files** |
-| 3. `js/labkit/labkit.js` | What the labs (ship, body, system) share around the model (`window.LabKit`): the panels' grain, slider fills, toggles, the HUD's scale, performance counters, the IMAGE EFFECTS render, and the panels fading out after 5 idle seconds (`autoHideHud`; not while the pointer rests on a panel or a field there has the focus). Styles: `ui/space.css` (shared) + a few rules inline. | No |
-| 4. `js/models/ships-space/shipkit.js` (`<script id="shipkit">`) | **ShipKit's core**: texture generators, materials, shaders, shared effects, the building blocks, SHAPING, the model build, public API (`window.ShipKit`), and `ShipKit._`: the internals the ship files build with (not a public API). | **Yes — the same file** |
-| 4b. `js/models/ships-space/ships/codewing.js`, `scribe.js`, `swarmer.js`, `haven.js` | **One file per ship** (split out 2026-10-03, ~150–475 lines each). Each pushes its definition into `ShipKit.SHIP_DEFS` and takes what it uses from `ShipKit._`. They load after the core, in this order, which is the lab's order. | **Yes — the same files** |
-| 5. `js/labs/ship.js` (`<script id="viewer">`; in the page until 2026-10-03) | Preview page: sky, lights, renderer, camera, HUD wiring, sliders. Uses only the kits' public APIs. | No |
+| Script | What it is |
+|---|---|
+| 1. `js/core/three-global.js` | Three.js r186 (`vendor/three/`) as the global `THREE`, with OrbitControls and the post-processing passes, in the graphics of the labs from Battle (CLAUDE.md, "Grafika") |
+| 2. `js/render/postkit/postkit.js` | The IMAGE EFFECTS: post-processing |
+| 3. `js/labkit/labkit.js` | What the Space labs share around the model (`window.LabKit`): slider fills, toggles, performance counters, the IMAGE EFFECTS render, the camera look panel and the windows fading out after 5 idle seconds (`autoHideHud`). Styles: `ui/space.css` + `ui/pages/ship.css` |
+| 4. `js/models/ships-space/shipkit.js` | **ShipKit's core**: texture generators, materials, shaders, shared effects, the building blocks, SHAPING, the model build, public API (`window.ShipKit`), and `ShipKit._`: the internals the ship files build with (not a public API) |
+| 4b. `js/models/ships-space/ships/codewing.js`, `scribe.js`, `swarmer.js`, `haven.js` | **One file per ship**. Each pushes its definition into `ShipKit.SHIP_DEFS` and takes what it uses from `ShipKit._`; they load after the core, in the lab's order |
+| 5. `js/labs/ship.js` | The lab: sky, lights, renderer, camera, the windows' wiring, sliders. Uses only the kits' public APIs |
 
 ## ShipKit (`window.ShipKit`)
 
-Self-contained: it needs only the global `THREE` (r128) and a DOM
+Self-contained: it needs only the global `THREE` (`js/core/three-global.js`; written for r128) and a DOM
 (`<canvas>` for texture generation). No renderer, scene, camera or HUD.
 
 ### API
@@ -53,8 +50,7 @@ ShipKit.disposeShipModel(model);
 | `buildShipModel(id, { detail, merge, fxRoot, envMap })` | Builds one ship and returns a model handle (below). `detail` is 0.2–2 and scales every segment count. `merge: true` merges static meshes (the game's build; the lab's GAME BUILD button). `fxRoot`: where effects that leave the ship go (the game passes the scene). `envMap`: a reflection map for its materials (not needed when `scene.environment` is set). |
   GAME BUILD also builds at the game's detail for the model (`ShipKit.GAME_DETAIL`:
   swarmer 0.5, haven 0.7, scribe 1). GAME LIGHTING (v2.34.1) swaps the studio
-  lights for the game's (ambient + two scene lights, no shadows) — see
-  docs/rendering.md, "Labs and the game: the same picture".
+  lights for the game's (ambient + two scene lights, no shadows).
 | `makeGameHolder(model, length)` | Wraps a model for the game: turned to +Z forward and scaled to `length` units. Move/turn the holder. |
 | `prewarm(ids)` | Generates a type's textures/materials ahead of time (the first build costs ~1 s). |
 | `mergeStatic(group)` | What `merge: true` does (see below). |
@@ -127,10 +123,8 @@ broken hanging panel from 0.2, a torn ring segment with debris from 0.3.
 
 ### "scribe" (DR-01 SCRIBE, the drone), measured
 
-The first ship meant for the game: a replacement for the drone's plain
-gold octahedron (`js/drone/drone.js#makeDroneMesh`), keeping its identity
-as a gold, faceted octahedral hull. In the game since v2.8.0 (the drone's
-model, and other players' drones).
+The first ship made for the game Space: a replacement for the drone's plain
+gold octahedron, keeping its identity as a gold, faceted octahedral hull.
 
 | | |
 |---|---|
@@ -267,14 +261,13 @@ What each ship does:
 | scan | a sensor ping from the dish | a teal wave from the crown, the eye turns teal, the sweep ring speeds up |
 | print | — (disabled) | the belly laser writes "HELLO" into a gas cloud at the beam's end, then it fades |
 
-In the lab, bolts and waves live in the ship's own space. In the game
-they'd need to be world-space objects (so a turning ship doesn't drag its
-shots along).
+Bolts and waves live in the ship's own space. A scene where the ship moves would
+need them as world-space objects (so a turning ship doesn't drag its shots along).
 
 ## Viewer (preview page)
 
 - **IMAGE EFFECTS** (right panel, v2.25.1): PostKit's lab panel
-  (`js/render/postkit/postkit.js#labPanel`) — the game's post-processing
+  (`js/render/postkit/postkit.js#labPanel`) — the post-processing
   (bloom, FXAA, sharpening, robot-eyes filter, depth of field, MSAA ×0–8) with
   presets AUTO / MIN / NORMAL / MAX (a preset also sets the render
   quality; AUTO steps by frame rate, not in the first 6 s). The camera's
@@ -561,19 +554,18 @@ Before turning either on in the game, decide the values and measure
     | haven | spine, dome, dock, radiators, ring, solar, dish, lights |
 
     All of them also have `effects`. Nothing hangs loose off a ship's root.
-14. **A change to ShipKit is a change to the game**: version bump, a
-    CHANGELOG entry and a WHAT'S NEW line, even when the game looks the
-    same (say so in the line).
+14. **A change to ShipKit is a change to every lab that builds from it**:
+    the program's version (and the labs where it shows), with a `CHANGELOG.md`
+    entry (CLAUDE.md, "Wersjonowanie").
 
 ## Adding a ship
 
 A new file `js/models/ships-space/ships/<id>.js`, shaped like the others: one IIFE
 that takes the helpers it needs from `ShipKit._` and pushes its entry into
 `ShipKit.SHIP_DEFS`, built from the blocks above. Then load it after the
-others on **every page that loads ShipKit** — `index.html` (with `defer`),
-the labs (`ship.html`, `scale.html`, `surface.html`, `buildings.html`,
-`vehicles.html`, `marine.html`) and `tools/kitcheck.html` — and add it to
-`js/versionCheck.js#MODULE_FILES`. A helper the core doesn't export yet:
+others on **every page that loads ShipKit** — the labs (`ship.html`, `scale.html`,
+`surface.html`, `buildings.html`, `vehicles.html`, `marine.html`), `tools/kitcheck.html`
+and the model doctor's sources (`tools/doctor/sources/`). A helper the core doesn't export yet:
 add it to the `_` list at the end of `shipkit.js`. Finally run
 `tools/kitcheck.html`, and add the new ship's fingerprint to the golden
 file:
@@ -620,48 +612,6 @@ The prev/next arrows, statistics, detail slider, wireframe, light
 toggles, action buttons, damage and GAME BUILD work for it with no extra
 code.
 
-## ShipKit in the game
-
-Since v2.8.0 the game loads `js/models/ships-space/shipkit.js` itself (a `defer`
-script right after Three.js in `index.html`), and the drone is ShipKit's
-DR-01 SCRIBE. How it's wired (`js/drone/drone.js#buildDroneModel`, full
-story in `docs/rendering.md`'s "Rendering and ShipKit models"):
-
-1. **Renderer like the labs**: the game renders with sRGB output, ACES
-   tone mapping and `scene.environment = ShipKit.makeEnvironment(renderer)`
-   — the labs' look. The game's own colors are converted to match
-   (`scene/colorManagement.js`); ShipKit models are marked
-   `userData.shipkit` and left as authored.
-2. **Build**: `buildShipModel(id, { detail, merge: true, fxRoot: scene })`
-   then `makeGameHolder(model, length)` (+Z forward, `length` units long);
-   the holder sits in a plain group the game moves as before, next to the
-   game's own pick sphere and selection ring.
-3. **Merging**: `merge: true` bakes meshes sharing a material into one,
-   per "unit" — the root and every object marked `userData.dynamic`
-   (anything the ship animates by transform or toggles on/off, each
-   merged in its own space). Codewing goes from 77 to 31 draw calls, the
-   drone from 68 to 52 (its four gimballed pods stay separate). **When
-   you add an animated or toggled part to a ship, mark it
-   `userData.dynamic = true`**, or merging bakes it in place.
-4. **Effects in world space**: with `fxRoot`, bolts, scan waves and print
-   clouds are placed in the scene (converted from ship space; sizes follow
-   the ship's world scale), so a turning ship doesn't drag its shots.
-   They're tracked and freed by `disposeShipModel`.
-5. **Driving it**: every frame `model.update(t, dt, { power, particles })`;
-   actions from game events — `act("fire", { target })` (a world point),
-   `act("offline", on)`, `act("destroy")`; `act("print", { text })` exists
-   but the game keeps its own print() effect.
-6. **Graphics settings** (Setup → Graphics, `scene/graphics.js`): the
-   same two sliders as this lab — render quality (pixel ratio, particles)
-   and geometry detail (rebuilds the models).
-7. **Multiplayer**: models aren't sent, only a few numbers per drone in
-   the regular `ships` broadcast (engine power, offline, shot count and
-   last target); other players' drones are the same model, not tinted,
-   with the owner's diamond marker (like their ships; only stations show
-   the owner's name).
-8. **Repo conventions**: `shipkit.js` is part of the game — changing it
-   needs the version bump (`js/version.js`, `CHANGELOG.md`, `?v=`).
-
 ## Gotchas
 
 - **Hull text orientation**: the lathe's UV `u` runs around the hull, so
@@ -677,14 +627,13 @@ story in `docs/rendering.md`'s "Rendering and ShipKit models"):
 - **Bounding box**: `Box3.setFromObject` on the whole group includes
   the ~5-unit engine plumes (16.4 instead of 12.06 units long).
   `buildShipModel` measures only non-additive meshes.
-- **Three.js r128 `BufferAttribute` has no `getComponent()`** (added in a
-  later release): `fractureMesh()` reads `attribute.array` directly
-  (`array[i * itemSize + k]`). The first version called
-  `getComponent()` and threw the moment DESTROY was pressed.
+- **`fractureMesh()` reads `attribute.array` directly**
+  (`array[i * itemSize + k]`): written under Three.js r128, whose
+  `BufferAttribute` had no `getComponent()`; the first version called it and
+  threw the moment DESTROY was pressed.
 - **Headless testing**: Playwright's Chromium renders WebGL through
   SwiftShader (`--use-gl=angle --use-angle=swiftshader
   --enable-unsafe-swiftshader`). It works, but at 1–8 FPS. Those FPS
   numbers are meaningless; on a real GPU the page runs normally.
-- **Libraries**: Three.js and OrbitControls come from `vendor/` (see
-  `vendor/README.md`); a library update there covers the game and both
-  labs at once.
+- **Libraries**: Three.js r186 and its addons come from `vendor/three/`; one
+  copy for every lab.

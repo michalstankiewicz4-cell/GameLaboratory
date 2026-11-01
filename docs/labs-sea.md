@@ -1,11 +1,11 @@
 # Labs — map
 
-The labs are the workshop behind the game (`labs.html`). They are grouped in five areas; each area has its labs (pages
-under `labs/`) and its kit (code under `js/` that the game will use once a lab's result is chosen).
+The labs from Battle were the workshop behind its game; here they are reached from the start page (`index.html`). They are grouped in five areas; each area has its labs (pages
+under `labs/`) and its kit (code under `js/`).
 
 | Area | Lab | Status | Kit (code) | Docs |
 |---|---|---|---|---|
-| **Models** | Ship Lab — ORP Błyskawica 1937, ORP Orzeł 1939 (`labs/ship.html`) | in progress | `js/models/ships-sea/` | `docs/ships-sea/blyskawica.md`, `docs/ships-sea/orzel.md` |
+| **Models** | Ship Lab — ORP Błyskawica 1937, ORP Orzeł 1939 (`labs/warship.html`) | in progress | `js/models/ships-sea/` | `docs/ships-sea/blyskawica.md`, `docs/ships-sea/orzel.md` |
 | | Light cruiser, submarine, aircraft and shore | soon | `js/models/ships-sea/ships/` | |
 | | Paint Lab: paint schemes and camouflage as data, fitted to one ship or assigned to another (owner's idea, later) | later | ShipKit materials | |
 | | Waterside Structures Lab (`labs/structures.html`): jack-up drilling rig (Super 300 class), quay walls (gravity, sheet-pile, piled deck), breakwaters (rock, tetrapods, caissons); next piers, harbours, lighthouses | in progress | `js/models/structures/` | `docs/structures.md`, `docs/structures/super300.md` |

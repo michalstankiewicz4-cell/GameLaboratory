@@ -30,7 +30,7 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 - [ ] Pełny kitcheck po wersji 0.5.0 (przerwany; doktor przeszedł).
 
 ## Z remanentu (do decyzji — `docs/AUDIT.md`, „Stan wykonania”)
-- [ ] D6: wspólne pomocnicze `$()` / `el()` (`js/labkit/dom.js`).
+- [ ] D6: wspólne pomocnicze `$()` / `el()` (np. nowy plik w `js/labkit/`).
 - [ ] F3: dane głowy człowieka jako plik `.bin` (wczytywany asynchronicznie).
 - [ ] F4: kity Space jako importy ES zamiast globali `window.*`.
 - [ ] Narzędzie „Tekstura ziarna”: robiło `grain.png` dla paneli `.mat` gry; laboratoria już go nie używają — zostawić albo usunąć.

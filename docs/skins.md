@@ -7,8 +7,8 @@ request: "one monochrome version tied to programming (a green CRT
 display, the logo only changes colour), a second colourful one with a
 programming theme".
 
-Referenced from [`CLAUDE.md`](https://github.com/michalstankiewicz4-cell/Space/blob/main/CLAUDE.md) and
-[`docs/ui.md`](https://github.com/michalstankiewicz4-cell/Space/blob/main/docs/ui.md) in Space ("Skin lab").
+From the game Space; the game's interface it would restyle is described there
+([its UI notes](https://github.com/michalstankiewicz4-cell/Space/blob/main/docs/ui.md), "Skin lab").
 
 Contents:
 - [Using it](#using-it)
@@ -26,7 +26,7 @@ Contents:
 - **1** / **2** (or the buttons in the viewport's top-right corner)
   switch TERMINAL / SYNTAX; **C** (or the CRT button, TERMINAL only)
   toggles the CRT effects. The choice is remembered per browser
-  (`localStorage["roj-skinlab"]`).
+  (`localStorage["gameLab.skins"]`).
 - Everything is sample data (points tick up so it feels alive); nothing
   is clickable beyond the switches and hover states.
 - The sample text is English (the repo's rule; until the 2026-10 review it
@@ -35,7 +35,7 @@ Contents:
 ## How it's built
 
 - **The game's HUD layout**: a 1536×1024 design surface scaled to the
-  window with `--uiScale` (like `css/ui/kit.css#.uiStage`), the same
+  window with `--uiScale` (like the game's UI kit stage), the same
   panels in the same places — logo, stats, clock, nav, fleet list,
   selected unit, viewport with the camera toggle and the command bar,
   object info, event log, minimap. Pixel positions are in the `#logo …
@@ -106,8 +106,8 @@ Not done yet — a separate, bigger step:
 4. **Text that changes shape** (menu vs. file names, `let x =` rows)
    stays skin-specific markup or i18n variants — decide per item; the
    first version can keep the game's texts and change only the look.
-5. Version bump + CHANGELOG, new CSS files into
-   `js/versionCheck.js#MODULE_FILES`.
+5. Version bump + CHANGELOG in the game, new CSS files into its list of
+   versioned files.
 
 ## Skins: chosen by the player or by race?
 

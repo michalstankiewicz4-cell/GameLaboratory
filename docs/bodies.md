@@ -2,27 +2,23 @@
 
 A standalone preview page for procedurally generated celestial bodies,
 the companion of [`ship.html`](ship.md) and built on the same scheme.
-The bodies themselves live in **`js/models/bodies/bodykit.js` (BodyKit)**, one
-file shared by the lab and the game (since v2.10.0), exactly like
-ShipKit: a body tuned in the lab is the body the game shows. There is no
-copy to keep in sync.
+The bodies themselves live in **`js/models/bodies/bodykit.js` (BodyKit, from the
+game Space)**; the body, system, scale and surface labs and the kit check build
+from it. A change to the lab bumps its version; a change to BodyKit bumps the
+program's (`ui/versions.js`, `CHANGELOG.md`).
 
-Open `bodies.html` straight from disk (double-click). No server, no build
-step and no network are needed: the fonts come from the repo's own
-`ui/fonts.css` / `fonts/` (they load from disk too, checked in Chromium). The page
-itself (the viewer) is a dev tool and needs no version bump, but
-**`js/models/bodies/bodykit.js` is part of the game**: changing it needs the
-bump (`js/version.js`, `CHANGELOG.md`, the `?v=` params).
+The page needs a local server (ES modules): `python3 -m http.server`, then
+`http://localhost:8000/labs/bodies.html`.
 
 ## File layout
 
-| Part | What it is | Needed by the game? |
-|---|---|---|
-| 1. `vendor/three-r128.min.js`, `vendor/three-r128-examples/OrbitControls.js` | Three.js r128 (the game's own copy; pasted into the page until the 2026-10 review) and the preview's mouse camera | Three.js yes |
-| 2. `js/labkit/labkit.js` + `ui/space.css` | Shared with the ship lab: grain, sliders, toggles, HUD scale, performance counters, the IMAGE EFFECTS render (see docs/ship.md) | No |
-| 3. `js/models/bodies/bodykit.js` (`<script id="bodykit" src=…>`) | **BodyKit's core**: the shared GLSL (noise, the body uniforms), the shared blocks, the groups and their parameter schemas, the public API (`window.BodyKit`; its header repeats it), and `BodyKit._`: the internals the kind files build with (not a public API). | **Yes**, `index.html` loads it (`defer`, after Three.js and ShipKit) |
-| 3b. `js/models/bodies/kinds/planets.js`, `giants.js`, `pulsars.js`, `suns.js`, `rocks.js`, `holes.js`, `sky.js` | **One file per kind of body** (split out 2026-10-03; the core went from ~2330 to ~725 lines).<br>Each holds its shaders and builder(s) and registers them in `KINDS`. A group's `build` names its kind: `"planet"`, `"giant"`, `"rings"`, `"pulsar"`, `"sun"`, `"rock"`, `"comet"`, `"hole"` or `"sky"`.<br>Their public parts (`planetTerrain`, `GLSL_PLANET`, `GLSL_PLANET_SURFACE`, `GLSL_SUN`, `GLSL_ROCK`, `GLSL_HOLE`, `GLSL_SKY`) are added to `window.BodyKit` by these files.<br>Load order matters: `planets.js` before `giants.js`, because the giants use the planets' atmosphere. | **Yes**, after `bodykit.js` everywhere |
-| 4. `js/labs/bodies.js` (`<script id="viewer">`; in the page until 2026-10-03) | Preview page: sky, camera, HUD, sliders generated from the schemas, statistics, counters | No |
+| Part | What it is |
+|---|---|
+| 1. `js/core/three-global.js` | Three.js r186 (`vendor/three/`) as the global `THREE`, in the graphics of the labs from Battle |
+| 2. `js/labkit/labkit.js` + `ui/space.css` | Shared with the ship lab: sliders, toggles, performance counters, the IMAGE EFFECTS render (see docs/ship.md) |
+| 3. `js/models/bodies/bodykit.js` | **BodyKit's core**: the shared GLSL (noise, the body uniforms), the shared blocks, the groups and their parameter schemas, the public API (`window.BodyKit`; its header repeats it), and `BodyKit._`: the internals the kind files build with (not a public API) |
+| 3b. `js/models/bodies/kinds/planets.js`, `giants.js`, `pulsars.js`, `suns.js`, `rocks.js`, `holes.js`, `sky.js` | **One file per kind of body**. Each holds its shaders and builder(s) and registers them in `KINDS`. A group's `build` names its kind: `"planet"`, `"giant"`, `"rings"`, `"pulsar"`, `"sun"`, `"rock"`, `"comet"`, `"hole"` or `"sky"`.<br>Their public parts (`planetTerrain`, `GLSL_PLANET`, `GLSL_PLANET_SURFACE`, `GLSL_SUN`, `GLSL_ROCK`, `GLSL_HOLE`, `GLSL_SKY`) are added to `window.BodyKit` by these files.<br>Load order matters: `planets.js` before `giants.js`, because the giants use the planets' atmosphere |
+| 4. `js/labs/bodies.js` | The lab: sky, camera, the windows, sliders generated from the schemas, statistics, counters |
 
 ## Groups
 
@@ -409,74 +405,9 @@ Rules, for every new body and every change:
   `kmPerSize` / `view` / `layers`, `build: "<kind>"` and at least one body.
 
   Load the new file after `bodykit.js` on every page that loads BodyKit:
-  `index.html` (`defer`), `bodies.html`, `systems.html`, `scale.html`,
-  `surface.html` and `tools/kitcheck.html`. Add it to
-  `js/versionCheck.js#MODULE_FILES`, then run `tools/kitcheck.html`. The viewer generates
-  the sliders and statistics from these, so no viewer code is needed.
-  Give the body a `slot` or a `kind` and the game draws it
-  (`world/bodyVisual.js#bodyLookRef`).
-
-## BodyKit in the game
-
-Since v2.10.0 the game's planets, since v2.11.0 **every** body (the
-Sun, the meteoroid, comets, the black hole) and since v2.12.0 the sky
-(`scene/skybox.js`) are BodyKit's
-(`world/bodyVisual.js`; full story in `docs/rendering.md`'s
-"Rendering and ShipKit models"):
-
-1. **Loading**: `index.html` loads `js/models/bodies/bodykit.js` as a `defer`
-   classic script after Three.js and ShipKit.
-2. **Build**: `materializePlanet()` calls
-   `makeBodyLook(bodyLookRef(slot, kind), radius)` — the slot's body
-   (`GAME_BODIES`) or else the kind's (`GAME_KINDS`, comets). The body is
-   sized to the game radius (`setRadius`) at `detail = gfxDetail × 0.5`
-   (≈15k triangles for a planet at the default), with
-   `QUALITY_OCTAVES[gfxQuality]` octaves. The black hole
-   (`world/blackholes.js#materializeBlackHole`, not in `ctx.planets`)
-   uses the same `makeBodyLook`, with its own invisible pick sphere
-   (2.5 × radius, so the disk is clickable).
-3. **The game's `p.mesh`** stays, as an **invisible sphere**
-   (`MeshBasicMaterial({ visible: false })`): it's what picking raycasts
-   (an invisible material still hits), what moves along the orbit and
-   what carries the body's color for bite particles and debris. The
-   BodyKit group is its child.
-4. **Light**: the Sun is at (0,0,0), BodyKit's default light position,
-   so `updateBodyLooks(dt)` (main loop) just calls `body.update(t, dt)`.
-5. **Spin**: the body spins itself at its lab rate (`values.spin`), the
-   same for every player; `p.spin` only reports it (rad/s) to the info
-   panel. The old random orbital ring is gone.
-   **Comets**: `look.opts.velocity` is the comet's live velocity (the
-   dust tail bends back along it) and `updateBodies()` sets
-   `look.opts.activity = cometActivity(distance from the Sun)`
-   (`COMET_ACTIVITY_DISTANCE` / distance, 0.3–1.5): the coma and tails
-   grow near the Sun. **The Sun** keeps the game's PointLight (for
-   standard-material objects: ships, the station).
-6. **Damage**: `applyHealthVisual()` calls `look.setDamage(1 − health /
-   maxHealth)` — glowing cracks in the shader (the old crack overlay,
-   halo sprite, sun rays, flat comet tail and their canvas textures are
-   removed). Scorch marks keep their canvas overlay, attached to
-   `surfaceRoot` (`look.attach()`) so they turn with the ground;
-   `paintScorch()` maps the hit point in the scorch mesh's own frame.
-7. **Graphics settings**: a geometry detail change rebuilds the bodies
-   (attached scorch marks move to the new body); a quality change only
-   sets the octaves.
-8. **Fog**: the shaders don't use THREE's fog; the game's `FogExp2`
-   (0.0007) is thin enough that this barely shows.
-9. **Cost**: at the default settings, the six planets add ≈90k
-   triangles, the other bodies little; the pixel cost only matters when
-   a body fills the screen (the ship cam, the PLANET INFO miniature, the
-   Sun's corona up close). Dev Tools → Performance stats shows FPS,
-   frame time, draw calls and triangles live.
-10. **Ship glow lights** (v2.11.1, Setup → Graphics, off by default):
-    `updateBodyLooks()` gathers the visible ship lights (`ships/swarm.js`:
-    behind the engines, intensity following the engine power; bodies get
-    `SHIP_BODY_LIGHT_INTENSITY` / `SHIP_BODY_LIGHT_RANGE`, stronger than the
-    scene light's own) once per frame and gives
-    every body the nearest ones that reach it (at most 4) as
-    `opts.lights`. The lab's **SHIP LIGHT** toggle circles the same kind
-    of light around the body.
-11. **Multiplayer**: nothing is sent — the look is fixed per slot and the
-    health that drives damage is already synced.
+  `bodies.html`, `systems.html`, `scale.html`, `surface.html` and
+  `tools/kitcheck.html`, then run `tools/kitcheck.html`. The lab generates
+  the sliders and statistics from these, so no lab code is needed.
 
 ## Viewer (preview page)
 

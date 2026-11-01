@@ -1,11 +1,11 @@
 /* =======================================================================
    SHIPKIT — procedural spaceship models (from the game Swarm Protocol)
    =======================================================================
-   One classic script (window.ShipKit), shared by the ship lab (ship.html)
-   and the game (index.html loads it after Three.js) — not copied between
-   them. The lab's viewer is its own <script> in ship.html.
+   One script (window.ShipKit): the ship lab and the other Space labs build
+   from it; in the game Space it is the same file. The ship lab's own script
+   is js/labs/ship.js.
 
-   Dependencies: the global THREE (r128, same as the game) and a DOM
+   Dependencies: the global THREE (js/core/three-global.js; written for r128) and a DOM
    (<canvas> for texture generation). No OrbitControls, no other libs.
 
    -----------------------------------------------------------------------
@@ -51,7 +51,7 @@
    so many instances can animate/throttle independently.
 
    -----------------------------------------------------------------------
-   IN THE GAME (see docs/ship.md "ShipKit in the game")
+   IN THE GAME SPACE (where this file came from)
    -----------------------------------------------------------------------
    buildShipModel(id, { detail, merge: true, fxRoot: scene }) + makeGameHolder
    (model, length) — +Z forward, scaled; effects placed in the scene. The
@@ -60,9 +60,9 @@
    game renders like the labs (sRGB output, ACES, scene.environment from
    makeEnvironment()) and skips userData.shipkit objects in its color
    conversion. Mark animated/toggled parts userData.dynamic (mergeStatic).
-   Changing this file changes the game: bump js/version.js, CHANGELOG.md
-   and the ?v= params in index.html. English comments, no trademarked
-   franchise names (CLAUDE.md).
+   Here: a change to this file bumps the program's version (ui/versions.js,
+   CHANGELOG.md; CLAUDE.md, "Wersjonowanie"). English comments, no
+   trademarked franchise names.
    ======================================================================= */
 window.ShipKit = (function () {
 "use strict";

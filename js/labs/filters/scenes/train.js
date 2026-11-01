@@ -1,5 +1,5 @@
 // Scena: skład z TrainKit na torze, na płaskim gruncie. TrainKit używa window.THREE — strona importuje najpierw
-// js/core/three-window.js (r186 bez łatek wyglądu r128).
+// js/core/three-window.js (sam r186).
 import * as THREE from '../../../../vendor/three/three.module.js';
 import { buildTrain, DEFAULT_TRAIN } from '../../../models/train/trainkit.js';
 import { buildTrack } from '../../../models/structures/railway/track.js';

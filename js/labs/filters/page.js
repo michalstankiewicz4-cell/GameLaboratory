@@ -1,6 +1,6 @@
 // Laboratorium filtrów: potok kamery z Battle (js/render/sea/look.js — LookPipeline) na wybranej scenie. Każdy
 // filtr ma suwak, gotowe ustawienia, porównanie z czystym obrazem po lewej i pomiar kosztu każdego efektu.
-// Grafika z laboratoriów wodnych (CLAUDE.md: preferowana) — bez łatek wyglądu r128.
+// Grafika z laboratoriów wodnych (CLAUDE.md: preferowana).
 import '../../core/three-window.js';                      // pierwszy: TrainKit czyta window.THREE przy załadowaniu
 import * as THREE from '../../../vendor/three/three.module.js';
 import { LookPipeline, AutoResolution, LOOK_PRESETS, LOOK_DEFAULTS } from '../../render/sea/look.js';

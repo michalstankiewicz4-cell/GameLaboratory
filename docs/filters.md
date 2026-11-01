@@ -1,7 +1,7 @@
 # Laboratorium filtrów (`labs/filters.html`)
 
 Potok kamery z laboratoriów wodnych (Battle, `js/render/sea/look.js` — `LookPipeline`) na wybranej scenie.
-Grafika z Battle (preferowana, CLAUDE.md) — bez łatek wyglądu r128.
+Grafika z Battle (preferowana, CLAUDE.md).
 
 - **Filtry:** ekspozycja (ręczna lub automatyczna), tone mapping (ACES, AgX, Hable), kontrast, nasycenie,
   vibrance, temperatura, odcień, poświata, winieta, ziarno, aberracja chromatyczna, zniekształcenie obiektywu,

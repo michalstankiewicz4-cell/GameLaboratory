@@ -1,7 +1,7 @@
 > **W GameLaboratory** (przeniesione z repozytorium NeuroLabPA, z historią): SDF Walkers to `labs/walkers.html`
 > (skrypty `js/labs/walkers/`, model — shadery, cechy, render — `js/models/human/zombie/walkers/`, dane `data/walkers/`),
 > laboratorium języka to `labs/lang.html` (`js/labs/lang/`, teksty `data/lang/`, narzędzia `tools/lang/`).
-> Pierwotne SDF Morgue: `docs/morgue/sdf-morgue-original.html`. Ścieżki niżej są z dawnego repozytorium.
+> Pierwotne SDF Morgue: `docs/morgue/sdf-morgue-original.html`. Ścieżki niżej są obecne (po przeniesieniu).
 
 # SDF Walkers
 
@@ -42,20 +42,20 @@ Sieć neuronowa nie jest nigdzie zapisywana: przy każdym otwarciu uczy się od 
 
 ## Laboratorium języka
 
-Osobna strona `lang/` (link w nagłówku): sieć uczy się polskiego od zera, na Twoich plikach .txt, na własnym silniku napisanym w JS (bez bibliotek). Konstrukcje idą w kolejności historycznej, każda naprawia słabość poprzedniej: bigram → sieć z oknem i embeddingami → sieć rekurencyjna (zwykła RNN i GRU) → transformer. Transformer może liczyć na procesorze albo na karcie graficznej (WebGPU). Tekst może być dzielony na litery albo na tokeny BPE, a krok 5 dostraja wytrenowaną sieć do rozmowy i pozwala z nią porozmawiać. Wszystkie mierzone tą samą miarą (błąd na tekście sprawdzającym, bity na znak), więc różnice widać w tabeli porównania.
+Osobna strona `labs/lang.html` (link w nagłówku SDF Walkers): sieć uczy się polskiego od zera, na Twoich plikach .txt, na własnym silniku napisanym w JS (bez bibliotek). Konstrukcje idą w kolejności historycznej, każda naprawia słabość poprzedniej: bigram → sieć z oknem i embeddingami → sieć rekurencyjna (zwykła RNN i GRU) → transformer. Transformer może liczyć na procesorze albo na karcie graficznej (WebGPU). Tekst może być dzielony na litery albo na tokeny BPE, a krok 5 dostraja wytrenowaną sieć do rozmowy i pozwala z nią porozmawiać. Wszystkie mierzone tą samą miarą (błąd na tekście sprawdzającym, bity na znak), więc różnice widać w tabeli porównania.
 
 ```
-lang/index.html       strona laboratorium
-lang/lang.css         układ (kolory i czcionki z css/style.css)
-lang/js/engine.js     silnik CPU: tensory, autograd, komórki RNN i GRU, klocki transformera, Adam z obcinaniem gradientu, PCA
-lang/js/wasm.js       mnożenie macierzy w WebAssembly SIMD (wygenerowane z lang/tools/matmul.wat)
-lang/js/gpu.js        silnik GPU (WebGPU, shadery WGSL) dla transformera: nagrany raz cały krok nauki
-lang/js/data.js       przykładowy tekst, słownik liter
-lang/js/bpe.js        tokenizer BPE: nauka sklejeń, kodowanie i dekodowanie
-lang/js/worker.js     trening w tle (Web Worker): bigram, sieć z oknem, RNN/GRU, najlepsza wersja, zapis/wczytanie modelu
-lang/js/lang.js       strona: dane, wykres, wizualizacje, porównanie
-lang/tools/           matmul.wat (źródło WASM) i build_wasm.js (kompilacja: npm install wabt@1.0.36, potem node lang/tools/build_wasm.js)
-lang/data/            zestawy przykładowe: grabinski/, wikipedia/ (manifest.json, opis i licencje w README)
+labs/lang.html              strona laboratorium
+ui/pages/lang.css           układ (kolory i czcionki z ui/pages/walkers.css)
+js/labs/lang/engine.js      silnik CPU: tensory, autograd, komórki RNN i GRU, klocki transformera, Adam z obcinaniem gradientu, PCA
+js/labs/lang/wasm.js        mnożenie macierzy w WebAssembly SIMD (wygenerowane z tools/lang/matmul.wat)
+js/labs/lang/gpu.js         silnik GPU (WebGPU, shadery WGSL) dla transformera: nagrany raz cały krok nauki
+js/labs/lang/data.js        przykładowy tekst, słownik liter
+js/labs/lang/bpe.js         tokenizer BPE: nauka sklejeń, kodowanie i dekodowanie
+js/labs/lang/worker.js      trening w tle (Web Worker): bigram, sieć z oknem, RNN/GRU, najlepsza wersja, zapis/wczytanie modelu
+js/labs/lang/lang.js        strona: dane, wykres, wizualizacje, porównanie
+tools/lang/                 matmul.wat (źródło WASM) i build_wasm.js (kompilacja: npm install wabt@1.0.36, potem node tools/lang/build_wasm.js)
+data/lang/                  zestawy przykładowe: grabinski/, wikipedia/, rozmowy/ (manifest.json, opis i licencje w README)
 ```
 
 Uwaga: Web Worker nie działa z pliku otwartego bezpośrednio (`file://`), laboratorium trzeba uruchomić przez serwer lub GitHub Pages.
@@ -63,30 +63,30 @@ Uwaga: Web Worker nie działa z pliku otwartego bezpośrednio (`file://`), labor
 ## Struktura
 
 ```
-index.html            strona
-css/style.css         wygląd
-js/version.js         numer wersji (jedyne źródło)
-js/shaders.js         GLSL: przebieg 1 (raymarching SDF), przebieg 2 (paleta, kontur, dithering)
-js/traits.js          palety, słowniki cech, animacje, generator okazów z ziarnem
-js/editor.js          edytor cech
-js/render.js          WebGL, renderowanie klatek, sprite sheet i jego JSON
-js/preview.js         animowany podgląd 4 kierunków
-js/storage.js         zapis ocen (baza artefaktu albo localStorage)
-js/network.js         sieć: cechy wejściowe, MLP z 7 wyjściami, trening, walidacja, wnioski
-js/io.js              eksport / import ocen i modelu
-js/grid.js            siatka oceniania
-js/roll.js            losowanie (zwykłe i sterowane siecią)
-js/hud.js             panel Network view
-js/main.js            start i podpięcie zdarzeń
-tools/build_artifact.py  składa projekt w jeden plik HTML dla claude.ai (dist/)
-legacy/sdf-morgue.html  pierwsza wersja: sama głowa zombie
-tools/prototype/      prototyp w Pythonie (numpy), od którego wszystko się zaczęło
-docs/img/             zrzuty z kolejnych etapów
-data/claude-ratings.json  oceny Claude'a (dołączane automatycznie poza claude.ai)
-data/model.json       sieć wytrenowana na ocenach Claude'a (przycisk Load repo model)
+labs/walkers.html                        strona
+ui/pages/walkers.css                     wygląd
+ui/versions.js                           numer wersji (labs/walkers.html; js/labs/walkers/version.js go czyta)
+js/render/sdf-glsl.js                    funkcje odległości GLSL wspólne z Kostnicą SDF
+js/models/human/zombie/walkers/shaders.js  GLSL: przebieg 1 (raymarching SDF), przebieg 2 (paleta, kontur, dithering)
+js/models/human/zombie/walkers/traits.js   palety, słowniki cech, animacje, generator okazów z ziarnem
+js/models/human/zombie/walkers/render.js   WebGL, renderowanie klatek, sprite sheet i jego JSON
+js/labs/walkers/editor.js                edytor cech
+js/labs/walkers/preview.js               animowany podgląd 4 kierunków
+js/labs/walkers/storage.js               zapis ocen (localStorage)
+js/labs/walkers/network.js               sieć: cechy wejściowe, MLP z 7 wyjściami, trening, walidacja, wnioski
+js/labs/walkers/io.js                    eksport / import ocen i modelu
+js/labs/walkers/grid.js                  siatka oceniania
+js/labs/walkers/roll.js                  losowanie (zwykłe i sterowane siecią)
+js/labs/walkers/hud.js                   panel Network view
+js/labs/walkers/main.js                  start i podpięcie zdarzeń
+docs/morgue/sdf-morgue-original.html     pierwsza wersja: sama głowa zombie
+docs/walkers/img/                        zrzuty z kolejnych etapów
+data/walkers/                            oceny Claude'a i sieć wytrenowana na nich (przycisk Load repo model)
 ```
 
-Skrypty są zwykłymi `<script>` (bez modułów ES) i dzielą zmienne globalne, dlatego **kolejność wczytywania w `index.html` ma znaczenie**.
+Prototyp w Pythonie i składacz artefaktu claude.ai z NeuroLabPA nie zostały przeniesione (są w historii git).
+
+Skrypty są zwykłymi `<script>` (bez modułów ES) i dzielą zmienne globalne, dlatego **kolejność wczytywania w `labs/walkers.html` ma znaczenie**.
 
 ## Sieć w skrócie
 

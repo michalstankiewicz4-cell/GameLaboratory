@@ -1,7 +1,7 @@
 // The ship lab's own script (ship.html): its scene and panels, wired to the kits'
 // public APIs. Moved out of the page (2026-10-03) so the page is markup and styles.
 /* =======================================================================
-   VIEWER — preview page only (not part of the game extraction).
+   THE LAB — the page's own script.
    Uses ShipKit's public API exclusively.
    ======================================================================= */
 (() => {

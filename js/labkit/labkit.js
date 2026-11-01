@@ -1,10 +1,9 @@
 /* =======================================================================
-   LabKit — what the ship lab (ship.html) and the body lab (bodies.html)
-   share around their models: slider fills, toggle
-   buttons, the performance counters and the IMAGE
-   EFFECTS render (PostKit). A classic script (window.LabKit) like ShipKit,
-   BodyKit and PostKit, so the labs still open straight from disk. Labs
-   only — the game doesn't load it. Styles: ui/space.css.
+   LabKit — what the labs from Space share around their models: slider
+   fills, toggle buttons, the performance counters, the IMAGE EFFECTS
+   render (PostKit), the windows fading out when idle and the camera look
+   panel (look-panel.js). window.LabKit, loaded as a module after
+   js/core/three-global.js. Styles: ui/space.css.
    ======================================================================= */
 import "./look-panel.js";   // grafika Battle: panel kamery z laboratoriów wodnych (window.LabLook)
 window.LabKit = (function () {

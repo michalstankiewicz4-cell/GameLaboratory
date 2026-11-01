@@ -1,7 +1,7 @@
 # Surface lab (surface.html), building lab (buildings.html), SurfaceKit, BaseKit
 
-Landing on a planet and building a base there, tried out in two labs before
-anything goes into the game. Started 2026-10-03. The user's goal: land on a
+Landing on a planet and building a base there, tried out in two labs (made for the
+game Space). Started 2026-10-03. The user's goal: land on a
 planet, put down a base from ready-made modules (first a ghost plan, then
 materials are delivered and processed), all simple and automated for now.
 For now everything is stored in **this browser only** (localStorage), and each
@@ -30,10 +30,9 @@ player sees only their own base. Later this may move to the server.
 | `js/models/base/basekit.js` | **BaseKit** (`window.BaseKit`): the base modules (`MODULES`: landing pad, habitat, solar array, mine, refinery, depot), built from ShipKit's generators. Each one can be shown built, as a placement hologram (fits or doesn't fit), and under construction (clipping planes). |
 | `surface.html` | The surface lab: a BodyKit globe in orbit (click it to pick a landing site), then the ground with a craft, a sky, the compass to the base, and building. |
 | `buildings.html` | The building lab: one module at a time on a flat patch of ground, with BUILT / GHOST / BLOCKED views, a construction slider and BUILD IT. |
-| `js/models/bodies/bodykit.js` | `planetTerrain()` (the sampler) and the shared GLSL (`GLSL_PLANET_SURFACE`, exported with `blackbody`). **This is game-shared**: changing it means a version bump. |
+| `js/models/bodies/bodykit.js` | `planetTerrain()` (the sampler) and the shared GLSL (`GLSL_PLANET_SURFACE`, exported with `blackbody`). Shared with the body, system and scale labs: a change bumps the program's version. |
 
-SurfaceKit and BaseKit are in the game since v2.34.0 (the ground under a
-landing ship, "In the game" below). The labs are in Dev Tools → LABS.
+SurfaceKit and BaseKit are also used by the game Space (the ground under a landing ship).
 
 ## The ground: terrain from the planet's own look
 
@@ -286,80 +285,9 @@ globe.
 - A beacon (a tall additive cylinder) marks the base's centre on the ground.
   The globe shows a gold diamond (`makeMarker`).
 
-## In the game
-
-### Landing: the ground view (v2.34.0)
-
-`js/surface/groundView.js` runs SurfaceKit's ground (`createGround`) in the
-game's main view.
-
-- **When**: the camera follows one of your ships (VIEW, `unitInView()`;
-  not the cockpit cam) and it has the LAND order (`ships/orders.js`). A
-  moment into its descent from space (`land.t` 0.2) the view fades and goes
-  down with it: the full descent. VIEW on a ship that is already down puts
-  you straight on the ground.
-- **The world**: the landing body's BodyKit look (`bodyLookRef`), its
-  default values. The sky is the game's own solar system as it stands
-  (`skyFromGame`: the Sun and every fixed body where it is now, scaled so
-  the Sun looks as the lab's does from the Earth). The hour is where the
-  Sun really is over the landing spot (the body's `surfaceRoot` frame is
-  the ground's). The day: the planet's own turn, but at least 10 minutes
-  (the game's planets turn in about a minute). Weather: what the world can
-  have, clear 55 % of the time.
-- **The panel** (inside `#viewport`, `css/ui/hud/groundView.css`): TAKE OFF,
-  HOP TO THE BASE, VIEW FROM SPACE, the six modules (B: the first), a hint;
-  the compass to the base at the top, the readout at the bottom. The space
-  view's toggles, brackets and tooltips step aside (`body.onGround`). The
-  canvas input goes to the ground; `scene/controls.js` stands aside. Esc
-  cancels a hologram first.
-- **The ship**: driving moves it (its landing spot follows the craft).
-  TAKE OFF climbs, then the ship is back in orbit (the "orbit" order) with
-  the camera on it. VIEW FROM SPACE leaves it down and points the camera at
-  the planet. The view also goes back up if the ship gets another order or
-  a program, is lost, or the camera goes elsewhere.
-- **Building** as in the lab (free for now). While a hologram follows the
-  pointer, a label next to it says whether it fits or why not (v2.34.2;
-  the lab has it too). The placement hologram blends normally, so cyan and
-  red read true on any ground (additive, red on green came out orange);
-  the construction hologram still glows. The event log says what
-  happened and why a module doesn't fit; the base markers follow at once
-  (`refreshBaseMarkers`).
-- Rendering: through the same post-processing as the space view
-  (`post.js#renderPostScene`: bloom, edge smoothing, sharpening, filter;
-  no lensing, flare or depth of field), else
-  `scene/viewRect.js#renderSceneInView`. Setup's geometry detail, particles
-  and noise octaves reach the ground (`G.setGraphics`: the craft at the
-  detail as is, modules 0.8×, the far globe's octaves). `localClippingEnabled`
-  is switched on for BaseKit's construction cut on the first landing.
-
-### The base marker (v2.32.13)
-
-`js/world/baseMarkers.js` reads the same `roj-bases`.
-
-- **The marker.** A planet whose look is a body with a base (its BodyKit
-  ref: `bodyLookRef(slot)`, e.g. the game's slot 3 is `earthlike/terra`)
-  gets a marker at the base's lat/lon.
-  - It is placed through the look's `attach` (BodyKit's `surfaceRoot`, unit
-    radius), so it turns with the planet and survives a rebuilt look.
-  - Since v2.34.0 a small pulsing gold dot: two rings spread out of it and
-    fade, every 2.4 s (the user's call: discreet). It was a gold diamond,
-    0.22 of the radius, and swallowed a landed ship's miniature.
-  - Constant size on screen (the dot 1.8 % of the view's height; the
-    surface is scaled by the planet's radius, so the sprites are divided by
-    it). Depth-tested, so it hides behind the planet.
-- **PLANET INFO** shows a gold "Surface base" line under the value: the
-  modules, and how many are built.
-  - It is a line of its own (`#infoBase`), because a fourth row didn't fit
-    the panel.
-  - It is not called "Your base": that's the station's name in the game.
-- Only you see your base; nothing goes to the server.
-- Another tab changing the bases moves the markers (the `storage` event).
-- Only bodies the game shows can carry one: the game's planets are CINDER,
-  MAGMA, TERRA, PELAGIA, RIME and GLACIES.
-
 ## Saved bases
 
-Saved in localStorage under `roj-bases`, one base per planet:
+Saved in localStorage under `gameLab.bases` (until 0.13.0 `roj-bases`), one base per planet:
 
 ```js
 { "desert/mars": { name, lat, lon, created,
@@ -380,5 +308,4 @@ Saved in localStorage under `roj-bases`, one base per planet:
   (the user's call: separate from the ground vehicles).
 - The system moving (orbits, so moons rise at different times through a
   month), eclipses, weather that changes on its own.
-- Materials, delivery and processing; collisions with modules; bases on
-  the server, seen by other players.
+- Materials, delivery and processing; collisions with modules.

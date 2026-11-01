@@ -112,7 +112,7 @@ def main():
             # Zombie Generator: a zombie renders (realistic and pixel art), the sheet metadata matches the Unity layout,
             # the ZIP is a zip and the slicer script is there
             # small first render (same origin as the studio page): the default 12 × 512² render blocks SwiftShader for minutes
-            pg.evaluate("()=>localStorage.setItem('steelSalvo.zombieGen.v1', JSON.stringify({S:{frame:256,frames:2,cols:2,engine:'cpu'}}))")
+            pg.evaluate("()=>localStorage.setItem('gameLab.zombies.v1', JSON.stringify({S:{frame:256,frames:2,cols:2,engine:'cpu'}}))")
             pg.goto(f'http://localhost:{PORT}/labs/zombies.html', timeout=600000)
             # nothing renders by itself: the page waits with Start render
             pg.wait_for_function("() => window.__zombies && document.getElementById('loader').classList.contains('idle')", timeout=120000)

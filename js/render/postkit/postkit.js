@@ -2,14 +2,12 @@
    PostKit — post-processing of a rendered view: MSAA level, bloom,
    gravitational lensing, FXAA, depth of field, a sun's lens flare and a
    "robot eyes" filter (aberration, vignette, grain). One classic script
-   (window.PostKit), like ShipKit and BodyKit, shared by the game
-   (js/scene/post.js — Setup -> Graphics) and the labs (ship.html,
-   bodies.html — their IMAGE EFFECTS panel). Changing it changes the game.
+   (window.PostKit), like ShipKit and BodyKit, from the game Space (its
+   Setup -> Graphics); here the IMAGE EFFECTS panel of the Space labs.
 
-   Needs Three.js r128 (global THREE) and, for bloom and FXAA, the r128
-   add-ons in vendor/three-r128-examples (Pass, CopyShader,
-   LuminosityHighPassShader, UnrealBloomPass, FXAAShader); without them
-   those two steps are skipped.
+   Needs the global THREE from js/core/three-global.js (Three.js r186 with
+   the add-ons Pass, CopyShader, LuminosityHighPassShader, UnrealBloomPass,
+   FXAAShader); without the add-ons bloom and FXAA are skipped.
 
    API
      const pipe = PostKit.create(renderer);

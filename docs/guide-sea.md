@@ -1,15 +1,15 @@
-> Przeniesione z repozytorium Battle (`docs/GUIDE.md`). Adresy stron z Battle odpowiadają tu: `labs/ship.html` → `labs/warship.html`, `tools/doctor.html` → `tools/doctor.html`, `pixel/` → `labs/pixel.html`, `pixel/zombies.html` → `labs/zombies.html`; laboratoria wody, lądu, budowli, wyglądu, roślin i transformator — te same nazwy w `labs/`.
+> Przeniesione z repozytorium Battle (docs/GUIDE.md), z adresami stron GameLaboratory (w Battle: labs/ship.html, labs/doctor.html, pixel/, pixel/zombies.html).
 
 # Labs guide — how to use them
 
-The labs are the workshop behind *Steel Salvo*: each one tries out one part of the game (a ship, the sea, the look,
-the land) with every option switchable, so a choice can be made before it goes into the game. This guide says what
+These labs were the workshop behind the game *Steel Salvo* (repository Battle): each one tries out one part (a ship, the
+sea, the look, the land) with every option switchable, so a choice can be made. This guide says what
 each lab is for, how to drive it and what to try. Technical details are in the per-lab documents (`docs/*.md`).
 
 ## Opening the labs
 
-- **Online:** <https://michalstankiewicz4-cell.github.io/Battle/labs.html> (also from the game's main menu).
-- **Locally:** in the repository folder run `py -m http.server 8000` and open `http://localhost:8000/labs.html`
+- **Online:** <https://michalstankiewicz4-cell.github.io/GameLaboratory/> (the start page lists every lab).
+- **Locally:** in the repository folder run `py -m http.server 8000` and open `http://localhost:8000/`
   (pages are ES modules: opening the file directly from disk does not work).
 - A desktop browser with a real graphics card is assumed; the labs show fps and draw calls, and most have
   "Measure the cost of each effect".
@@ -26,7 +26,7 @@ each lab is for, how to drive it and what to try. Technical details are in the p
 | Keep a result | **Copy settings (JSON)** — paste it into the chat; it is what moves into the game |
 | Settings survive a reload | yes (stored in the browser); "Reset" buttons where they exist |
 
-## Ship Lab — `labs/ship.html`
+## Ship Lab — `labs/warship.html`
 
 ORP Błyskawica (1937) and ORP Orzeł (1939) at real scale, built from code; pick the ship in the top bar.
 
@@ -174,7 +174,7 @@ Checks every lab and game ship for the mistakes that keep coming back.
 - **Options** and **Budget**: what is checked and the game's limits per ship.
 - From the command line: `py tools/doctor.py` (compares with the golden file).
 
-## Pixel Studio — `pixel/` (separate project, not a lab)
+## Pixel Studio — `labs/pixel.html`
 Open <https://michalstankiewicz4-cell.github.io/Battle/pixel/>. Pick a mode at the top: **3D model**, **Generate** or **Draw**.
 - Set the size on the right (width, height or a preset). The background is always transparent (shown as a checkerboard).
 - 3D model: subject, camera preset (Front, ¾, Side, Isometric, Top-down ¾, Top), light side and height, light steps,
@@ -189,7 +189,7 @@ Open <https://michalstankiewicz4-cell.github.io/Battle/pixel/>. Pick a mode at t
 - On a narrow window or a phone everything is one column: preview, then the mode's controls, then output.
 Details: `docs/pixel/README.md`.
 
-**Zombie Generator** (`pixel/zombies.html`, link in Pixel Studio's top bar): choose *GPU* or *CPU* in the top bar,
+**Zombie Generator** (`labs/zombies.html`): choose *GPU* or *CPU* in the top bar,
 then *Another zombie* or a seed and any trait on
 the left; animation, direction, camera, light, style (realistic or pixel art) and the sheet on the right; *PNG sheet*,
 *JSON*, *GIF preview*, *All 8 directions (ZIP)* and *Unity slicer (.cs)*. Nothing renders until you press *Start render*. Details: `docs/pixel/zombies.md`.

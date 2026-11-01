@@ -9,7 +9,7 @@
 2. Mentions — a path in `backticks` or a markdown link in docs/*.md, CLAUDE.md, README files and code comments,
    starting with a folder of this repository (js/, labs/, tools/, docs/, ui/, vendor/, assets/, fonts/): a warning
    when it is missing (the text points nowhere). History (CHANGELOG.md, docs/history/) is skipped: it describes
-   the past on purpose.
+   the past on purpose. Generated output (tools/out/) is not checked.
 """
 import os, re, sys
 
@@ -61,7 +61,7 @@ def main():
         txt = open(f, encoding="utf-8", errors="ignore").read()
         for m in MENTION.finditer(txt):
             u = m.group(1).rstrip(".,:;")
-            if "<" in u or "…" in u or "*" in u:
+            if "<" in u or "…" in u or "*" in u or "|" in u or u.startswith("tools/out/"):
                 continue
             base = os.path.dirname(f)
             if not exists(base, u):

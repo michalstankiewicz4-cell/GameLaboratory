@@ -1,7 +1,9 @@
 # Scale: sizes, distances and what depends on them
 
-How big things are in Swarm Protocol, why, what was changed so far and
-what to watch for when changing it again. It's a topic we keep coming
+How big things are in the game Space (the models of the space labs come from it), why,
+and what was changed so far — the background of the scale lab (`labs/scale.html`). What
+depends on the sizes inside the game itself (gravity, the database, the cameras) stayed in
+Space's documentation. It's a topic we keep coming
 back to: many systems depend on sizes and distances, often in ways that
 aren't obvious from the constant itself.
 
@@ -19,10 +21,7 @@ Contents:
 - [Current numbers](#current-numbers)
 - [What has been done](#what-has-been-done)
 - [Problems found along the way](#problems-found-along-the-way)
-- [What depends on what](#what-depends-on-what)
 - [Scale lab (scale.html)](#scale-lab-scalehtml)
-- [Checklist for the next change](#checklist-for-the-next-change)
-- [Possible next steps](#possible-next-steps)
 
 ## The key idea: gameplay size vs drawn size
 
@@ -174,41 +173,6 @@ Worth remembering — each would come back with the next rescale.
    `renderer.render` twice captured the first override as "original";
    keep the real one in `window.__orig`. (Test-only, but it cost time.)
 
-## What depends on what
-
-**If you change a unit's size** (ship, drone, station): the rings, pick
-spheres, markers, labels, spawn distances, field radius, ship cam, unit
-miniature and base camera listed above; `SHIP_LIGHT_RANGE`; check the ship
-cam isn't inside the hull; check picking still works (ships are picked
-before planets).
-
-**If you change a body's drawn size** (`BODY_VISUAL_SCALE`): nothing in
-gameplay, by design — but check the look up close (the eating orbit is
-automatic), the scorch blots, the selection frame, the camera focus
-distance, and that the Sun doesn't swallow orbit 1 (90) or the comet's
-perihelion (60).
-
-**If you change a body's gameplay `size`**: gravity (SOI, pull), its
-point value, its health — **and the database**, whose `solar_bodies`
-max_health was seeded from `size × healthMult` (a new seed or an UPDATE
-through the Management API; there's no client UPDATE policy on purpose,
-see `docs/security.md`).
-
-**If you change distances** (orbits, the system's extent) — the expensive
-one:
-- `GM_SUN` is tied to the orbit sizes (gravity falls off with r²);
-- orbital speeds (`SOLAR_BODIES[].speed`) are tuned so ships (base speed
-  6.5 × upgrade) can catch a body; they scale with the orbit;
-- comet entry/exit radius and perihelion derive from the orbits, and the
-  **database CHECK constraints** `bodies_pos_check` (±1200) and
-  `bodies_vel_check` (±15) must allow the new positions and speeds —
-  forgetting this once silently rejected every comet spawn for several
-  commits (`docs/security.md`);
-- travel times between orbits, the station ring (290) and station
-  placement, the minimap's ring table, the system camera (950, zoom up to
-  2500), the far plane (12000) and sky radius (9000), the fog density;
-- float precision is fine up to far larger systems (it isn't the limit).
-
 ## Scale lab (scale.html)
 
 The user's idea (2026-09-27): every object of the game side by side in
@@ -220,9 +184,8 @@ should shrink. `scale.html` + `js/labs/scale/scaleLab.js`.
   `config.js` (unit lengths, `EAT_ORBIT_GAP`, `DRONE_DOCK_GAP`, station
   pick/field radius, `BLACKHOLE_*_RADIUS_MULT` — moved there from
   `world/blackholes.js` for this, same values) and `bodies/comet.js`
-  (comet radius range). Change a constant and the lab shows it. Being an
-  ES module it needs the local server like the game (`/scale.html`); it
-  can't be opened from disk like the other labs.
+  (comet radius range). Change a constant and the lab shows it. Like every
+  lab it needs a local server (ES modules).
 - **Row**: Sun, planets by size, black hole, meteoroid, comet (largest;
   the smallest as a dashed ring), station, drone, ship — each spaced by
   its widest ring. **Orthographic camera** (no perspective: sizes compare
@@ -244,35 +207,3 @@ should shrink. `scale.html` + `js/labs/scale/scaleLab.js`.
   than any planet; the station (5) is about the meteoroid's diameter
   (3.3) and ~11× a ship.
 
-## Checklist for the next change
-
-1. Read this file and the relevant `docs/architecture.md` sections;
-   look at the row in the scale lab (`scale.html`) before and after.
-2. Change constants in one place (`config.js`, `world/solarSystem.js`),
-   derive the rest from them — no new magic numbers sized in world units.
-3. Anything "near a body": `radius + gap`. Anything tied to a unit:
-   a multiple of its length constant.
-4. Test in the game (Playwright): base view, system view, focus on a
-   planet, a ship eating (it must reach the orbit and the health must
-   drop), the ship cam, the unit and planet miniatures, the station with
-   ship lights on and off, a second session for other players' units,
-   Dev Tools → Performance stats.
-5. Bump the version, add a CHANGELOG entry and update the tables here.
-
-## Possible next steps
-
-Not decided yet — ideas for later steps:
-
-- **Black hole:** bigger visually (the disk) while keeping its pull and
-  kill radius (they come from `size`).
-- **Comet:** a bigger nucleus and a longer tail through a visual scale
-  only — its radius is in the database (`bodies_radius_check` ≤ 1.2).
-- **Camera:** zoom ranges and default distances of the base/system views
-  tuned to the new proportions.
-- **Station:** its size relative to ships as more station parts arrive
-  (repairs, building).
-- **Distances:** only if really needed — see "If you change distances".
-
-(2026-10 review: the bar's legend is built from `scaleLab.js`'s `LEGEND`, the
-same colours the rings use; the HTML labels are only re-placed when the view
-changes.)
