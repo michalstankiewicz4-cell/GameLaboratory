@@ -67,12 +67,12 @@ pre{ background:#141922; border:1px solid #26303d; border-radius:8px; }
 <script type="module" src="../js/envs/water/marinekit/marinekit.js"></script>
 <script type="module" src="../js/envs/space/systemkit/systemkit.js"></script>
 <script type="module" src="../js/models/life/lifekit.js"></script>
-<script type="module" src="../js/models/life/move/walk.js"></script>
+<script type="module" src="../js/models/human/walk.js"></script>
 <script type="module" src="../js/models/life/move/quad.js"></script>
-<script type="module" src="../js/models/life/parts/face.js"></script>
-<script type="module" src="../js/models/life/data/bust-head.js"></script>
-<script type="module" src="../js/models/life/data/human-head.js"></script>
-<script type="module" src="../js/models/life/creatures/human.js"></script>
+<script type="module" src="../js/models/human/face.js"></script>
+<script type="module" src="../js/models/human/data/bust-head.js"></script>
+<script type="module" src="../js/models/human/data/human-head.js"></script>
+<script type="module" src="../js/models/human/human.js"></script>
 <script type="module" src="../js/models/life/creatures/strider.js"></script>
 <script type="module">
 (() => {
@@ -80,7 +80,7 @@ pre{ background:#141922; border:1px solid #26303d; border-radius:8px; }
 const $ = (id) => document.getElementById(id);
 // ?labs=a.html,b.html checks only those (e.g. to try the checker itself)
 const LABS = new URLSearchParams(location.search).get("labs") ? new URLSearchParams(location.search).get("labs").split(",") :
-  ["labs/ship.html", "labs/bodies.html", "labs/systems.html", "labs/scale.html", "labs/skins.html", "labs/surface.html", "labs/buildings.html", "labs/vehicles.html", "labs/marine.html", "labs/sound.html", "labs/life.html", "labs/creator.html"];
+  ["labs/ship.html", "labs/bodies.html", "labs/systems.html", "labs/scale.html", "labs/skins.html", "labs/surface.html", "labs/buildings.html", "labs/vehicles.html", "labs/marine.html", "labs/sound.html", "labs/life.html", "labs/human.html", "labs/creator.html"];
 const r3 = (v) => Math.round(v * 1000) / 1000;
 
 // a model's fingerprint: what a refactor must not change

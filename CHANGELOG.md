@@ -3,6 +3,19 @@
 Wersja programu i każdego laboratorium: `js/labkit/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `labs/CHANGELOG.md`; Battle i aTrain — w historii git.
 
+## Program 0.11.0 — 2026-11-01
+
+### Dodane
+- **Laboratorium człowieka** (`labs/human.html`, v1.0.0) — wydzielone z laboratorium życia (decyzja właściciela:
+  ludzie i ich animacja dostają własne laboratorium). Ludzie (Human I, Human II), twarz z minami, chody i warstwy.
+  Modele ludzi w osobnym folderze `js/models/human/` (`human.js`, `face.js`, `walk.js`, `data/` — przeniesione
+  z `js/models/life/`, z historią); skrypt `js/labs/human.js`; dokumentacja `docs/human.md`.
+
+### Zmienione
+- **Laboratorium życia v1.3.0**: pozostałe formy życia (zwierzęta — strider); sekcja twarzy chowa się, gdy stworzenie
+  nie ma twarzy; nowy kafelek, opis i frazy (życie, zwierzęta, chód, nogi). `docs/life.md` bez części o ludziach.
+- Kitcheck ładuje ludzi z nowego miejsca i sprawdza też laboratorium człowieka.
+
 ## Program 0.10.0 — 2026-10-31
 
 ### Zmienione

@@ -95,7 +95,7 @@ const FACE_NAMES = { eyeBlinkLeft: "Blink, left", eyeBlinkRight: "Blink, right",
 function buildFace() {
   const box = $("faceSliders"); box.textContent = "";
   const f = cre.face;
-  $("facePresets").parentElement && [$("facePresets"), box, $("btnLively").parentElement].forEach((el) => { el.style.display = f ? "" : "none"; });
+  $("facePresets").parentElement && [$("faceHd"), $("facePresets"), box, $("btnLively").parentElement].forEach((el) => { el.style.display = f ? "" : "none"; });
   if (!f) return;
   f.names.forEach((k) => {
     const l = document.createElement("label"); l.className = "sl"; l.innerHTML = "<span></span><b></b>"; l.firstChild.textContent = FACE_NAMES[k] || k;

@@ -10,7 +10,7 @@
 <!-- Life forms (LifeKit, js/lifekit/): creatures built from blocks — a
      skeleton, swept bodies that bend at the joints, rigid heads, hands and
      feet — and moving in their medium (land now: walk, run, stand).
-     The first one: a human. docs/life.md. -->
+     Humans have their own lab (labs/human.html). docs/life.md. -->
 <link rel="stylesheet" href="../css/lab.css">
 <link rel="stylesheet" href="../css/windows.css">
 <style>
@@ -86,7 +86,7 @@ select.lab, input.lab{ height:28px; border:1.5px solid #3c55d8; border-radius:6p
     <div class="mat lilac side"></div>
     <div class="secHd first">BODY</div>
     <div id="params"></div>
-    <div class="secHd">FACE</div>
+    <div class="secHd" id="faceHd">FACE</div>
     <div class="threeBtns">
       <button class="tBtn on" id="btnLively" title="Blinks, glances, breathing">LIVELY</button>
       <button class="tBtn" id="btnTalk" title="The jaw and the lips as if speaking">TALK</button>
@@ -110,12 +110,7 @@ select.lab, input.lab{ height:28px; border:1.5px solid #3c55d8; border-radius:6p
 <script type="module" src="../js/labkit/labkit.js"></script>
 <script type="module" src="../js/models/ships-space/shipkit.js"></script>
 <script type="module" src="../js/models/life/lifekit.js"></script>
-<script type="module" src="../js/models/life/move/walk.js"></script>
 <script type="module" src="../js/models/life/move/quad.js"></script>
-<script type="module" src="../js/models/life/parts/face.js"></script>
-<script type="module" src="../js/models/life/data/bust-head.js"></script>
-<script type="module" src="../js/models/life/data/human-head.js"></script>
-<script type="module" src="../js/models/life/creatures/human.js"></script>
 <script type="module" src="../js/models/life/creatures/strider.js"></script>
 <script type="module" src="../js/labs/life.js"></script>
 </body>

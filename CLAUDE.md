@@ -14,6 +14,7 @@
 
 - `labs/` — strony laboratoriów; `js/labs/` — ich skrypty.
 - `js/models/` — modele (geometria, materiały, światła, części); nie wiedzą, w jakim środowisku są.
+- Ludzie mają osobne laboratorium (`labs/human.html`) i osobny folder modeli (`js/models/human/`) — oddzielone od laboratorium życia (zwierzęta i inne formy życia, `js/models/life/`). Oba stoją na LifeKit (`js/models/life/lifekit.js`).
 - `js/envs/space|land|water/` — środowiska i ich prawa (kosmos bez grawitacji, ląd z grawitacją, woda z wypornością).
 - `js/behaviors/` — zachowania (napęd i ruch) podpinane do modeli; każde deklaruje, w których środowiskach działa.
 - `js/render/`, `js/audio/`, `js/labkit/` — wspólne warstwy.
