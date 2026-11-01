@@ -16,7 +16,7 @@
    ======================================================================= */
 (function () {
 "use strict";
-const MENU_H = 32, TOP = MENU_H + 44, KEY = "gamelab.windows:" + location.pathname.replace(/^.*\/(labs|tools)\//, "$1/");
+const MENU_H = 32, TOP = MENU_H + 52, KEY = "gamelab.windows:" + location.pathname.replace(/^.*\/(labs|tools)\//, "$1/");
 const lang = () => (window.LabMenu && window.LabMenu.LANG) || "en";
 const load = () => { try { return JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { return {}; } };
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* storage blocked: lasts this visit */ } };

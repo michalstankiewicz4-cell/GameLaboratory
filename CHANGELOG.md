@@ -12,7 +12,7 @@ Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` 
   tam, gdzie laboratorium samo ich nie pokazuje. Paski laboratoriów z Battle nie znikają już, gdy są puste.
 - **Przełącznik środowiska** wszędzie w górnym pasku, jak w statkach na wodzie (dotąd w statkach w kosmosie, pojazdach
   i morzu pływał na dole ekranu).
-- Okna kończą się nad dolnym paskiem; kompas i odczyty powierzchni, podpowiedź i skala w laboratorium skali, scena
+- Okna zaczynają się pod górnym paskiem i kończą nad dolnym; kompas i odczyty powierzchni, podpowiedź i skala w laboratorium skali, scena
   Pixel Studio i Kostnicy przesunięte, żeby paski ich nie zasłaniały.
 - Wersje: program i laboratoria z paskami z+1.
 
