@@ -8,15 +8,16 @@
 <meta name="description" content="GameLaboratory SDF Morgue: a zombie head computed in a shader — distance functions, raymarching, lighting quantized to four tones and outlines derived from geometry, as pixel art. Every roll is a new specimen from a seed.">
 <link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/morgue.html">
 <link rel="icon" type="image/png" href="../assets/favicon-32.png">
-<link rel="stylesheet" href="../css/lab-sea.css">
-<link rel="stylesheet" href="../css/windows.css">
-<link rel="stylesheet" href="../css/morgue.css">
+<link rel="stylesheet" href="../ui/sea.css">
+<link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="../ui/pages/morgue.css">
 </head>
-<!-- SDF Morgue (from a claude.ai artifact): the head is the model js/models/life/zombie/sdf-head.js
+<!-- SDF Morgue (from a claude.ai artifact): the head is the model js/models/human/zombie/sdf-head.js
      (shaders, the specimen from a seed, its palette, the renderer); this page is the lab around it. -->
 <body class="lab">
-<script src="../js/labkit/versions.js"></script>
-<script src="../js/labkit/menubar.js"></script>
+<script src="../ui/versions.js"></script>
+<script src="../ui/catalog.js"></script>
+<script src="../ui/menubar.js"></script>
 <div class="bar">
   <b>SDF Morgue</b> <span class="ver mono" data-lab-version="labs/morgue.html"></span>
   <span class="sp"></span>
@@ -47,7 +48,8 @@
   <p class="note">The engine is about 120 lines of GLSL. The first pass computes each pixel's material, light tone and depth; the second maps them to palette colors and draws an outline wherever the material changes or the depth jumps.</p>
   <p class="note err" id="err" hidden></p>
 </aside>
-<script src="../js/labkit/windows.js"></script>
+<script src="../ui/windows.js"></script>
+<script src="../js/render/sdf-glsl.js"></script>
 <script type="module" src="../js/labs/morgue.js"></script>
 </body>
 </html>

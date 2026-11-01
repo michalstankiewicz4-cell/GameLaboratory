@@ -2,7 +2,7 @@
    BODYKIT — procedural celestial bodies (from the game Swarm Protocol)
    =======================================================================
    One file, shared by the body lab (bodies.html) and the game
-   (index.html), the same way js/shipkit/shipkit.js is: a classic script
+   (index.html), the same way js/models/ships-sea/shipkit.js is: a classic script
    (not a module) exposing window.BodyKit, so the lab still opens
    straight from disk. Tune a body in the lab and the game shows exactly
    that body — there is no copy to keep in sync.
@@ -416,7 +416,7 @@ function planetParams(list) {
     return { ...base, ...over };
   });
 }
-// Each group's `build` names its kind; the kind files (js/bodykit/kinds/*.js,
+// Each group's `build` names its kind; the kind files (js/models/bodies/kinds/*.js,
 // loaded after this one) register the builders here.
 const KINDS = {};
 // scale: a lab size of 1 in km for these kinds (the groups' kmPerSize)
@@ -716,7 +716,7 @@ function modelStats(root) {
 }
 
 // GLSL_PLANET, GLSL_PLANET_SURFACE, planetTerrain, GLSL_SUN, GLSL_ROCK,
-// GLSL_HOLE and GLSL_SKY are added by their kind files (js/bodykit/kinds/).
+// GLSL_HOLE and GLSL_SKY are added by their kind files (js/models/bodies/kinds/).
 return { GROUPS, COMMON_PARAMS, PLANET_PARAMS, PLANET_DEFAULTS, QUALITY_OCTAVES, GAME_DETAIL_SCALE, MAX_POINT_LIGHTS, GAME_BODIES, GAME_KINDS, SPIN_RAD_PER_UNIT,
          buildBody, disposeBody, modelStats, defaultValues,
          GLSL_NOISE, GLSL_BODY, blackbody,

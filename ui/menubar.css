@@ -1,0 +1,54 @@
+/* The menu bar (ui/menubar.js): GameLaboratory · Labs · Options · Tools · Help, the lab's name and the versions.
+   Loaded by ui/menubar.js itself (a <link>, allowed by the strict CSP of the labs from Battle: style-src 'self'). */
+@import url("tokens.css");
+@import url("fonts.css");
+#labMenu { position: fixed; left: 0; right: 0; top: 0; height: 32px; z-index: 1000; display: flex; align-items: center; gap: 2px;
+  padding: 0 10px; box-sizing: border-box; background: rgba(13,17,23,.94); backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line); font: 500 13px/1 var(--font); color: var(--text); user-select: none; }
+#labMenu .lmHome { display: flex; align-items: center; gap: 8px; margin-right: 10px; padding: 0 8px 0 2px; height: 24px; border-radius: 6px;
+  color: var(--head); text-decoration: none; font-weight: 600; letter-spacing: .2px; }
+#labMenu .lmHome:hover { background: var(--field); }
+#labMenu .lmMark { width: 16px; height: 16px; border-radius: 4px; background: conic-gradient(from 210deg, #5b8cff, var(--accent), #f2b84b, #5b8cff); }
+#labMenu .lmTop { position: relative; }
+#labMenu .lmTop > button { height: 24px; padding: 0 10px; border: 0; border-radius: 6px; background: none; color: inherit; font: inherit; cursor: pointer;
+  box-shadow: none; transform: none; letter-spacing: normal; text-transform: none; outline-offset: 0; }
+#labMenu button, #labMenu a { box-shadow: none; text-shadow: none; letter-spacing: normal; text-transform: none; }
+#labMenu button:active { transform: none; }
+#labMenu .lmTop > button:hover, #labMenu .lmTop.open > button { background: var(--line); color: #fff; }
+#labMenu .lmDrop { position: absolute; left: 0; top: 28px; min-width: 240px; padding: 6px; border-radius: 10px; background: var(--card);
+  border: 1px solid var(--line); box-shadow: 0 12px 32px rgba(0, 0, 0, .45); display: none; }
+#labMenu .lmTop.open .lmDrop { display: block; }
+#labMenu .lmItem { display: flex; align-items: center; gap: 10px; width: 100%; height: 28px; padding: 0 10px; box-sizing: border-box; border: 0;
+  border-radius: 6px; background: none; color: var(--text); font: inherit; font-weight: 400; text-align: left; text-decoration: none; cursor: pointer; }
+#labMenu .lmItem:hover { background: var(--field); color: var(--head); }
+#labMenu .lmItem .lmChk { width: 12px; color: var(--accent); }
+#labMenu .lmItem[aria-disabled="true"] { color: #4a5363; cursor: default; background: none; }
+#labMenu .lmSep { height: 1px; margin: 5px 6px; background: var(--line); }
+#labMenu .lmLabel { padding: 6px 10px 3px; color: var(--dim); font-size: 11px; letter-spacing: .8px; text-transform: uppercase; }
+#labMenu .lmWhere { margin-left: auto; color: var(--dim); font-weight: 400; }
+#labMenu .lmWhere b { color: var(--head); font-weight: 600; }
+#labMenu .lmVer { margin-left: 14px; padding: 2px 8px; border: 1px solid var(--line); border-radius: 999px; color: var(--dim); font-size: 11.5px;
+  text-decoration: none; font-weight: 500; }
+#labMenu .lmVer:hover { color: var(--head); border-color: var(--line2); }
+#labMenu .lmWhere + .lmVer { margin-left: 12px; }
+#labMenu .lmTop:last-of-type + .lmVer { margin-left: auto; }
+#lmDialog { position: fixed; inset: 0; z-index: 1001; display: none; align-items: center; justify-content: center; background: rgba(5, 6, 9, .55); }
+#lmDialog.open { display: flex; }
+#lmDialog .lmBox { width: min(460px, calc(100vw - 32px)); padding: 20px 22px; border-radius: 14px; background: var(--card); border: 1px solid var(--line);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .5); font: 14px/1.5 var(--font); color: var(--text); }
+#lmDialog h3 { margin: 0 0 12px; font-size: 17px; color: var(--head); }
+#lmDialog table { width: 100%; border-collapse: collapse; }
+#lmDialog td { padding: 5px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+#lmDialog td:first-child { width: 45%; color: var(--head); font-family: var(--mono); font-size: 12.5px; }
+#lmDialog button { margin-top: 14px; height: 30px; padding: 0 16px; border: 1px solid var(--line2); border-radius: 8px; background: var(--field); color: var(--head);
+  font: inherit; cursor: pointer; }
+#lmDialog button:hover { border-color: var(--accent); }
+
+/* the pages' own top panels, moved down under the bar (not on the start page) */
+body.lmLab #hud, body.lmLab #opt { top: 48px !important; max-height: calc(100vh - 64px) !important; }
+body.lmLab #compass { top: 48px !important; }
+body.lmLab #toast { top: 102px !important; }
+body.lmLab > #bar { top: 32px !important; }
+body.lmLab.lab > .bar { top: 32px !important; }
+body.lmLab.lmTool { padding-top: 48px !important; }
+body.lmLab.lmTool #app { height: calc(100% - 32px) !important; margin-top: 32px; }

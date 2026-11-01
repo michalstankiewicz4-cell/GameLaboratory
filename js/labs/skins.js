@@ -4,7 +4,7 @@
   // ---------- stage scale, like the game (1536x1024 design surface) ----------
   const stageEl = document.getElementById("stage");
   function fitStage(){
-    // under the labs' menu bar (js/labkit/menubar.js), if there is one
+    // under the labs' menu bar (ui/menubar.js), if there is one
     const top = window.LabMenu ? window.LabMenu.MENU_H : 0;
     const s = Math.min(window.innerWidth / 1536, (window.innerHeight - top) / 1024);
     stageEl.style.top = top + "px";
@@ -19,7 +19,7 @@
     syn:  { logoA: ["#ffb45c", "#ff6ac1"], logoB: ["#5ee7ff", "#b58cff"], filter: "" }
   };
   let skin = "term";
-  try{ skin = localStorage.getItem("roj-skinlab") || "term"; }catch(e){}
+  try{ skin = localStorage.getItem("gameLab.skins") || "term"; }catch(e){}
   function setSkin(s){
     skin = SKINS[s] ? s : "term";
     document.body.dataset.skin = skin;
@@ -31,7 +31,7 @@
     paintSwitch(document.getElementById("crtBtn"), document.body.dataset.crt === "on");
     document.getElementById("crtBtn").style.display = skin === "term" ? "" : "none";
     renderText();
-    try{ localStorage.setItem("roj-skinlab", skin); }catch(e){}
+    try{ localStorage.setItem("gameLab.skins", skin); }catch(e){}
   }
   function paintSwitch(b, on){
     const term = skin === "term";

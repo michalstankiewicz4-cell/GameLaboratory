@@ -1,0 +1,21 @@
+/* The surface lab (labs/surface.html): its own rules, on top of ui/ui.css and ui/space.css. */
+#hud{ width:340px; }
+select.lab.mini{ width:130px; height:24px; font-size:12.5px; }
+select.lab{ width:100%; height:28px; border:1px solid var(--line); border-radius:6px; background:var(--field); color:var(--text); font-family:var(--font); font-size:13.5px; }
+.btnCol{ display:flex; flex-direction:column; gap:6px; margin-top:8px; }
+.btnCol .tBtn{ width:100%; }
+#modBtns{ display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+#modBtns .tBtn{ height:28px; font-size:12.5px; }
+#fade{ position:fixed; inset:0; pointer-events:none; opacity:0; background:#000; transition:opacity .45s; z-index:5; }
+#compass{ position:fixed; left:50%; top:16px; transform:translateX(-50%); display:flex; align-items:center; gap:12px; padding:6px 16px;
+  border:1px solid var(--line); border-radius:18px; background:var(--glass); font-family:var(--font); color:var(--text); letter-spacing:.6px; z-index:4; }
+#compass svg{ width:30px; height:30px; }
+#compass .d{ font-size:18px; color:var(--accent); }
+#readout{ position:fixed; left:50%; bottom:18px; transform:translateX(-50%); display:flex; gap:18px; padding:6px 16px; border:1px solid var(--line);
+  border-radius:18px; background:var(--glass); font-family:var(--font); font-size:14px; color:var(--text); z-index:4; }
+#readout b{ color:var(--head); font-weight:500; }
+#toast{ position:fixed; left:50%; top:70px; transform:translateX(-50%); padding:8px 18px; border-radius:8px; background:var(--glass);
+  border:1px solid var(--accent); color:var(--accent); font-family:var(--font); letter-spacing:.5px; opacity:0; transition:opacity .3s; z-index:6; }
+#buildTip{ position:fixed; z-index:6; pointer-events:none; padding:4px 10px; border-radius:6px; white-space:nowrap; background:var(--glass);
+  border:1px solid var(--ok); color:var(--ok); font-family:var(--font); font-size:13.5px; letter-spacing:.3px; }
+#buildTip.bad{ border-color:var(--err); color:var(--err); }

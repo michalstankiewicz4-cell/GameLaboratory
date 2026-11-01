@@ -1,6 +1,6 @@
 # ORP Błyskawica (1937, as built) — research sheet
 
-Model: `js/shipkit/ships/blyskawica.js` · viewer: `labs/ship.html` · kit: `js/shipkit/`.
+Model: `js/models/ships-sea/ships/blyskawica.js` · viewer: `labs/ship.html` · kit: `js/models/ships-sea/`.
 Configuration: the ship as completed by J. Samuel White & Co., Cowes, in 1937 (before the 1940–41 refits and the 1942 British 4-inch rearmament).
 
 ## Published figures used

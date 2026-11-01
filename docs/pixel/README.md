@@ -11,10 +11,10 @@ Every result has a **transparent background**, any size from 4 to 256 pixels eac
 
 | Mode | What it does | Code |
 |---|---|---|
-| **3D model** | A model built from code is rendered small with an orthographic camera and lit in hard steps (toon light computed per pixel from albedo and normals; shadows shift cooler, lights warmer), at the target size × *supersample*. It is reduced to the palette, then every pixel takes the colour **most of its sub-pixels** have (majority, not average — no blur, no new colours). Jumps in depth become **inner lines**; then outline and clean-up. Subjects: crate, barrel, chest (opens), sword, mushroom, house, rock, adventurer (walk cycle, idle), a **PlantKit tree** (any species, in the wind) and a **ShipKit ship** (rolling on a swell). Animations render every frame from the same fitted camera, so the sprite does not jump. | `js/pixel/render3d.js` |
-| **Generate** | Sprites drawn directly in pixels by rules — a rotating planet with clouds and a rim, a gem with a glint, a potion with bubbles, a spinning coin, a swaying tree, a rock, rising fire, a bouncing slime (squash and stretch) — and **seamless tiles** (grass, sand, cobblestone, animated water and lava). Light from the top-left, shades from a hue-shifted ramp, dithering only along the edge between two shades. | `js/pixel/generators.js` |
-| **Draw** | A pixel editor: pencil, eraser (or right button), fill, line (Bresenham, pixel-perfect), rectangle, picker, mirror left–right, frames (new, duplicate, delete), onion skin, undo/redo (Ctrl+Z / Ctrl+Shift+Z), samples drawn by hand, and **sprites as text** in and out. The drawing is kept in the browser. | `js/pixel/app.js`, `js/pixel/sprites.js` |
-| **Hybrid** | *Edit in Draw* takes the current 3D or generated result (all frames, its colours added to the swatches) into the editor for retouching by hand. | `js/pixel/app.js` |
+| **3D model** | A model built from code is rendered small with an orthographic camera and lit in hard steps (toon light computed per pixel from albedo and normals; shadows shift cooler, lights warmer), at the target size × *supersample*. It is reduced to the palette, then every pixel takes the colour **most of its sub-pixels** have (majority, not average — no blur, no new colours). Jumps in depth become **inner lines**; then outline and clean-up. Subjects: crate, barrel, chest (opens), sword, mushroom, house, rock, adventurer (walk cycle, idle), a **PlantKit tree** (any species, in the wind) and a **ShipKit ship** (rolling on a swell). Animations render every frame from the same fitted camera, so the sprite does not jump. | `js/render/pixel/render3d.js` |
+| **Generate** | Sprites drawn directly in pixels by rules — a rotating planet with clouds and a rim, a gem with a glint, a potion with bubbles, a spinning coin, a swaying tree, a rock, rising fire, a bouncing slime (squash and stretch) — and **seamless tiles** (grass, sand, cobblestone, animated water and lava). Light from the top-left, shades from a hue-shifted ramp, dithering only along the edge between two shades. | `js/render/pixel/generators.js` |
+| **Draw** | A pixel editor: pencil, eraser (or right button), fill, line (Bresenham, pixel-perfect), rectangle, picker, mirror left–right, frames (new, duplicate, delete), onion skin, undo/redo (Ctrl+Z / Ctrl+Shift+Z), samples drawn by hand, and **sprites as text** in and out. The drawing is kept in the browser. | `js/labs/pixel/app.js`, `js/render/pixel/sprites.js` |
+| **Hybrid** | *Edit in Draw* takes the current 3D or generated result (all frames, its colours added to the swatches) into the editor for retouching by hand. | `js/labs/pixel/app.js` |
 
 ## The shared pipeline (right panel)
 
@@ -35,7 +35,7 @@ The drawing itself is not part of it — share that with *Drawing → text*.
 ## Pixel Doctor
 
 The rules of pixel art as checks on the frame shown, with a score (100 minus 18 per severe and 8 per minor finding),
-**Show** (marks the pixels) and **Fix** where it can be fixed automatically (`js/pixel/doctor.js`):
+**Show** (marks the pixels) and **Fix** where it can be fixed automatically (`js/render/pixel/doctor.js`):
 
 - too many colours for the size (12 / 20 / 32) — fix: auto palette;
 - half-transparent pixels — fix: opaque or empty;
@@ -58,18 +58,18 @@ text* writes it, *Text → drawing* reads it — sprites can be written, read an
 
 ## Files
 
-- `pixel/index.html`, `css/pixel.css` — the page (strict CSP like the labs; checkerboard behind the transparent pixels).
-- `js/pixel/core.js` — `PixelImage`, OKLab, palettes, median cut, quantize + Bayer, outline/selout, orphans,
+- `pixel/index.html`, `ui/pages/pixel.css` — the page (strict CSP like the labs; checkerboard behind the transparent pixels).
+- `js/render/pixel/core.js` — `PixelImage`, OKLab, palettes, median cut, quantize + Bayer, outline/selout, orphans,
   pixel-perfect, majority downsampling, canvas helpers, sprite sheet.
-- `js/pixel/gif.js` — GIF89a encoder (LZW, global table with index 0 transparent, disposal 2, NETSCAPE loop).
-- `js/pixel/render3d.js`, `generators.js`, `doctor.js`, `sprites.js`, `app.js` — as above.
+- `js/render/pixel/gif.js` — GIF89a encoder (LZW, global table with index 0 transparent, disposal 2, NETSCAPE loop).
+- `js/render/pixel/render3d.js`, `generators.js`, `doctor.js`, `sprites.js`, `app.js` — as above.
 - `tools/pixel-check.py` — headless check: every subject, generator, palette and sample at several sizes (opaque
   pixels, no half-transparent ones, colour count, a Doctor report), GIF/PNG signatures and downloads, a pencil stroke,
   undo, the text round trip, Doctor fixes; screenshots `tools/out/pixel-*.png`.
 
 ## Zombie Generator
 
-`pixel/zombies.html` — original zombies as Unity sprite sheets, realistic or pixel art: see `docs/zombies.md`.
+`pixel/zombies.html` — original zombies as Unity sprite sheets, realistic or pixel art: see `docs/pixel/zombies.md`.
 
 ## Known limits / next
 

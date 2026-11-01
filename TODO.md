@@ -29,6 +29,13 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 ## Testy
 - [ ] Pełny kitcheck po wersji 0.5.0 (przerwany; doktor przeszedł).
 
+## Z remanentu (do decyzji — `docs/AUDIT.md`, „Stan wykonania”)
+- [ ] D6: wspólne pomocnicze `$()` / `el()` (`js/labkit/dom.js`).
+- [ ] F3: dane głowy człowieka jako plik `.bin` (wczytywany asynchronicznie).
+- [ ] F4: kity Space jako importy ES zamiast globali `window.*`.
+- [ ] Narzędzie „Tekstura ziarna”: robiło `grain.png` dla paneli `.mat` gry; laboratoria już go nie używają — zostawić albo usunąć.
+- [ ] Laboratorium skórek bez CSP (atrybuty `style=` w makiecie i w `js/labs/skins.js`).
+
 ## Pomysły na laboratoria przeniesione z TODO.md w Battle
 - [ ] Pixel Studio: edytor i import palet, warstwy, zaznaczanie i przesuwanie, czas klatki, podgląd kafelka 3×3, normalne koron drzew, więcej obiektów 3D.
 - [ ] Laboratorium lądu: rzeki i jeziora, klify i skaliste brzegi, porty i miasta, roślinność (drzewa jako impostory), pojazdy naziemne / swobodny spacer przy 100 % lądu, LOD terenu za dalekim gridem.

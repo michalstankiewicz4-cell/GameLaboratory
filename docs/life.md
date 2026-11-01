@@ -13,10 +13,10 @@ the game yet. The plan and its reasons: IDEAS.md, "Life forms".
 
 | File | What it is |
 |---|---|
-| `js/lifekit/lifekit.js` | The core (`window.LifeKit`): the registry (`CREATURES`, `register`, `MOVES`, `registerMove`), `build(id, params, opts)`, and `util` — `skeleton`, `sweep`, `merge`, `materials`, `skinned`, `rigid`, `rng`. |
-| `js/lifekit/move/quad.js` | Four legs on land: walk and trot, feet planted by IK; graze, alert, look. |
-| `js/lifekit/creatures/strider.js` | The plains strider, an invented grazer — the first land animal. |
-| `js/lifekit/design.js` + `js/lifekit/move/legs.js` | The creature editor's builder (a creature from a design, JSON) and its walker (any number of legs). |
+| `js/models/life/lifekit.js` | The core (`window.LifeKit`): the registry (`CREATURES`, `register`, `MOVES`, `registerMove`), `build(id, params, opts)`, and `util` — `skeleton`, `sweep`, `merge`, `materials`, `skinned`, `rigid`, `rng`. |
+| `js/models/life/move/quad.js` | Four legs on land: walk and trot, feet planted by IK; graze, alert, look. |
+| `js/models/life/creatures/strider.js` | The plains strider, an invented grazer — the first land animal. |
+| `js/models/life/design.js` + `js/models/life/move/legs.js` | The creature editor's builder (a creature from a design, JSON) and its walker (any number of legs). |
 | `labs/creator.html` + `js/labs/creator.js` | The creature editor. |
 | `labs/life.html` + `js/labs/life.js` | The lab: the creatures, MOVEMENT (gait, speed, in place / around), VIEW (skeleton, wireframe, scale bar), BODY (the creature's own parameters, generated from `params`), MODEL and PERFORMANCE. |
 

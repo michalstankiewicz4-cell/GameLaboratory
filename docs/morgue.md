@@ -2,7 +2,7 @@
 
 Przeniesione z artefaktu claude.ai „SDF Morgue”. Głowa zombie liczona w shaderze WebGL2 jako pixel art.
 
-- **Model:** `js/models/life/zombie/sdf-head.js` — shadery (funkcje odległości: elipsoidy, kapsuły, prostopadłościany,
+- **Model:** `js/models/human/zombie/sdf-head.js` — shadery (funkcje odległości: elipsoidy, kapsuły, prostopadłościany,
   gładkie sumy i różnice; raymarching 110 kroków, miękki cień, okluzja, światło brzegowe; światło w 4 tonach),
   okaz z ziarna (`makeZombie`: skóra, oczy, szczęka, odsłonięta czaszka, zęby, rana, ubranie, przechylenie),
   paleta (`paletteArray`), renderer dwuprzebiegowy (`createRenderer`). Materiały: 0 skóra, 1 oczy, 2 usta, 3 zęby,

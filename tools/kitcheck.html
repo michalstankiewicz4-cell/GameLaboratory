@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'self' blob:; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-src 'self'">
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kit check | GameLaboratory</title>
@@ -16,33 +17,13 @@
      changes them on purpose: check the diff, then UPDATE THE GOLDEN FILE
      (the button copies the new JSON) and commit it with the change.
      ?labs=labs/a.html,labs/b.html checks only those labs. -->
-<style>
-:root{ color-scheme:dark; --ok:#4fe3c6; --bad:#e04b50; --dim:#7f92e8; }
-body{ margin:0; padding:24px 28px; background:#060918; color:#e6ebff; font:14px/1.45 "IBM Plex Mono", ui-monospace, monospace; }
-h1{ font:600 22px system-ui, sans-serif; color:#f8bb56; margin:0 0 4px; }
-p{ color:var(--dim); margin:0 0 16px; max-width:900px; }
-button{ background:#02061a; color:#e6ebff; border:1.5px solid #3c55d8; border-radius:6px; padding:6px 14px; cursor:pointer; font:inherit; }
-button:hover{ border-color:#90a3ff; }
-#sum{ font:600 18px system-ui, sans-serif; margin:10px 0 16px; }
-.ok{ color:var(--ok); } .bad{ color:var(--bad); } .dim{ color:var(--dim); }
-table{ border-collapse:collapse; margin-bottom:22px; }
-td, th{ padding:3px 12px 3px 0; text-align:left; vertical-align:top; }
-th{ color:#c7d0ff; border-bottom:1px solid #2c4bd8; }
-pre{ white-space:pre-wrap; background:#02061a; border:1px solid #2c4bd8; padding:10px; max-height:260px; overflow:auto; }
-iframe{ position:fixed; left:-2000px; top:0; width:1280px; height:720px; border:0; }
-/* GameLaboratory: one look for every page — the labs from Battle (css/lab-sea.css) */
-:root{ --ok:#5fd0a0; --bad:#e04b50; --dim:#7f8a98; }
-body{ background:#0c0f13; color:#c8d0da; }
-h1{ color:#eef2f6; }
-button{ background:#18202b; color:#c8d0da; border:1px solid #26303d; border-radius:7px; font:12.5px system-ui,-apple-system,"Segoe UI",sans-serif; }
-button:hover{ border-color:#f2b84b; color:#eef2f6; }
-th{ color:#f2b84b; border-bottom:1px solid #26303d; font:600 11px system-ui,sans-serif; letter-spacing:1.4px; text-transform:uppercase; }
-pre{ background:#141922; border:1px solid #26303d; border-radius:8px; }
-</style>
+<link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="../ui/pages/kitcheck.css">
 </head>
 <body>
-<script src="../js/labkit/versions.js"></script>
-<script src="../js/labkit/menubar.js"></script>
+<script src="../ui/versions.js"></script>
+<script src="../ui/catalog.js"></script>
+<script src="../ui/menubar.js"></script>
 <h1>Kit check</h1>
 <p>Every default model of every kit against the golden fingerprints, then every lab for errors. Building takes a while; the labs open one by one.</p>
 <div><button id="run">RUN AGAIN</button> <button id="copy">COPY NEW GOLDEN JSON</button> <span id="copied" class="dim"></span></div>

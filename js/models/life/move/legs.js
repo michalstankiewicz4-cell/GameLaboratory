@@ -1,4 +1,4 @@
-/* LifeKit — any number of legs (js/lifekit/move/legs.js): the creature
+/* LifeKit — any number of legs (js/models/life/move/legs.js): the creature
    editor's walker (designs from design.js). Loaded after lifekit.js.
 
    Legs come in mirrored pairs, front to back. The steps run as a wave from

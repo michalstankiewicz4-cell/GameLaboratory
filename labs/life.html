@@ -2,37 +2,22 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'self' blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Life lab | GameLaboratory</title>
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="../css/fonts.css">
-<!-- Life forms (LifeKit, js/lifekit/): creatures built from blocks — a
+<!-- Life forms (LifeKit, js/models/life/): creatures built from blocks — a
      skeleton, swept bodies that bend at the joints, rigid heads, hands and
      feet — and moving in their medium (land now: walk, run, stand).
      Humans have their own lab (labs/human.html). docs/life.md. -->
-<link rel="stylesheet" href="../css/lab.css">
-<link rel="stylesheet" href="../css/windows.css">
-<style>
-.hidden{ display:none !important; }
-#view{ position:fixed; inset:0; width:100%; height:100%; display:block; }
-#creTabs{ display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:6px; }
-#creTabs .tBtn{ height:28px; }
-#creTabs .creGroup{ grid-column:1 / -1; font-size:11px; letter-spacing:1.4px; color:#7f8fd6; text-transform:uppercase; margin-top:4px; }
-#blurb{ font-size:13px; color:#9fb1ff; margin:4px 0 6px; line-height:1.35; }
-.fourBtns{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:6px; }
-.twoBtns{ display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:8px; }
-.threeBtns{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:8px; }
-.fourBtns .tBtn, .twoBtns .tBtn, .threeBtns .tBtn{ height:28px; font-size:12.5px; }
-#faceSliders .sl span{ font-size:12.5px; }
-.prow{ display:grid; grid-template-columns:96px 1fr; gap:8px; align-items:center; margin-top:5px; font-size:13.5px; color:#c7d0ff; }
-.seedRow{ display:grid; grid-template-columns:96px 1fr 34px; gap:8px; align-items:center; margin-top:5px; font-size:13.5px; color:#c7d0ff; }
-select.lab, input.lab{ height:28px; border:1.5px solid #3c55d8; border-radius:6px; background:#02061a; color:#e6ebff; font-family:var(--fontBody); font-size:13.5px; padding:0 6px; min-width:0; }
-#fpsGraph{ height:40px; }
-</style>
+<link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="../ui/space.css">
+<link rel="stylesheet" href="../ui/pages/life.css">
 </head>
 <body>
-<script src="../js/labkit/versions.js"></script>
-<script src="../js/labkit/menubar.js"></script>
+<script src="../ui/versions.js"></script>
+<script src="../ui/catalog.js"></script>
+<script src="../ui/menubar.js"></script>
 <canvas id="view"></canvas>
 <div id="hud" data-window="left" data-side="left">
   <div id="hudTop">
@@ -91,13 +76,14 @@ select.lab, input.lab{ height:28px; border:1.5px solid #3c55d8; border-radius:6p
     <canvas id="fpsGraph" width="270" height="40"></canvas>
   </div>
 </div>
-<script src="../js/labkit/windows.js"></script>
+<script src="../ui/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
 <script type="module" src="../js/labkit/labkit.js"></script>
 <script type="module" src="../js/models/ships-space/shipkit.js"></script>
 <script type="module" src="../js/models/life/lifekit.js"></script>
 <script type="module" src="../js/models/life/move/quad.js"></script>
 <script type="module" src="../js/models/life/creatures/strider.js"></script>
+<script type="module" src="../js/labs/shared/studio.js"></script>
 <script type="module" src="../js/labs/life.js"></script>
 </body>
 </html>

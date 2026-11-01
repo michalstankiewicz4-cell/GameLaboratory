@@ -65,7 +65,7 @@ const DEFAULTS = {
   B: { body: 'ocean', width: 700, wall: 650, steep: 0.85, depth: 180, meander: 0.12, current: 0, oil: 0, iceCover: 0, floe: 18, freeboard: 0.35, sea: 'rough', ...pick(SEAS.rough), dir: 30, look: 'baltic', ...pick(LOOKS.baltic), reflect: 1, planar: true, clear: false, kn: 18, motion: true, bowWave: true, wake: true, hullFoam: true, wet: true, spray: true, foamMap: true },
 };
 function pick(o) { const r = { ...o }; delete r.label; return r; }
-const KEY = 'steelSalvo.waterLab.v1';
+const KEY = 'gameLab.water.v1';
 let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { saved = null; }
 const V = { A: { ...DEFAULTS.A, ...(saved && saved.A) }, B: { ...DEFAULTS.B, ...(saved && saved.B) } };
 // no shore: a one-texel map 1 km deep, so the sea's shallows code sees open water everywhere

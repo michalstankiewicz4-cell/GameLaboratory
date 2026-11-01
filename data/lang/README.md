@@ -1,7 +1,7 @@
 # Teksty przykładowe
 
 Lista **Przykład** na stronie laboratorium pokazuje zestawy z `manifest.json`. Przycisk **Wczytaj przykład** skleja pliki zestawu w jeden tekst do nauki.
-Gdy zestawów brak (albo strona jest otwarta z dysku), używa krótkiego tekstu z `js/data.js`.
+Gdy zestawów brak (albo strona jest otwarta z dysku), używa krótkiego tekstu z `js/labs/lang/data.js`.
 
 | Folder | Zawartość | Licencja |
 |---|---|---|

@@ -1,6 +1,6 @@
 # Land Lab — procedural land and sea
 
-`labs/land.html` (`js/labs/land.js`), kit `js/env/landkit.js`. Land and sea from one seed, from 0 % to 100 % land, on a
+`labs/land.html` (`js/labs/land.js`), kit `js/envs/land/landkit.js`. Land and sea from one seed, from 0 % to 100 % land, on a
 map that wraps around (a torus) or is bounded by a barrier, under the SkyKit sky, with the WaterKit sea (shallows,
 surf, waves dying on the shore) and the transformer's ORP Błyskawica to sail through it. Settings are kept in the
 browser (`steelSalvo.landLab.v1`) and copied as JSON; the same seed and settings always give the same map.
@@ -23,7 +23,7 @@ browser (`steelSalvo.landLab.v1`) and copied as JSON; the same seed and settings
 
 Map size 4–32 km, heightmap 256²–1024² (512² over 8 km: 15.6 m texels, about 0.9 s to generate).
 
-## Water bodies by region (`js/env/regionkit.js`)
+## Water bodies by region (`js/envs/land/regionkit.js`)
 
 One world, several kinds of water. A **region map** (two RGBA8 textures over the map) holds, for every texel, the weight
 of each water body — ocean, fjord, lake, river, harbour water, ice — and the flow (x, z, up to 2.5 m/s). The sea shader

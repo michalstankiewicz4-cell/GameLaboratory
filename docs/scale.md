@@ -213,7 +213,7 @@ one:
 
 The user's idea (2026-09-27): every object of the game side by side in
 one row, at its in-game size, to see precisely what should grow and what
-should shrink. `scale.html` + `js/scalelab/scaleLab.js`.
+should shrink. `scale.html` + `js/labs/scale/scaleLab.js`.
 
 - **Numbers from the game, never copied**: it imports
   `world/solarSystem.js` (drawn `radius` and gameplay `size` per slot),

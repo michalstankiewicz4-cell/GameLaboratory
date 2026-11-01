@@ -207,10 +207,9 @@ function frameCamera() {
 }
 
 // ---------- the loop ----------
-LabKit.applyGrain();
 LabKit.autoHideHud([$("hud"), $("opt")], 10);
 const perf = LabKit.perfCounters(renderer); renderer.info.autoReset = false;
-function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); LabKit.fitHud([$("hud"), $("opt")], 0.4, 1.3); }
+function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); }
 window.addEventListener("resize", resize);
 const clock = new THREE.Clock();
 let t = 0;

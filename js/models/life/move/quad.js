@@ -1,4 +1,4 @@
-/* LifeKit — four legs on land (js/lifekit/move/quad.js): a quadruped's
+/* LifeKit — four legs on land (js/models/life/move/quad.js): a quadruped's
    gaits. Loaded after lifekit.js. docs/life.md, "Four legs".
 
    A creature using it gives a rig:

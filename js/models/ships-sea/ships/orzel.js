@@ -3,7 +3,7 @@
 // Bofors deck gun in a shielded mount forward of the tower, twin 40 mm/56 Bofors that retracts into a watertight well
 // in the after part of the tower, 12 × 550 mm torpedo tubes (4 bow, 4 stern inside the pressure hull, two trainable
 // twin mounts between the hulls fore and aft of the tower), net cutter and jumping wires, "85A" on the tower.
-// Real dimensions in metres (1 unit = 1 m). Sources and the reconstruction notes: docs/ships/orzel.md.
+// Real dimensions in metres (1 unit = 1 m). Sources and the reconstruction notes: docs/ships-sea/orzel.md.
 // pose({ periscopes, search, mast, aa, planes }) (0…1 each) raises the periscopes and the radio mast, the 40 mm
 // mount out of its well, and rigs out the bow hydroplanes.
 import * as THREE from '../../../../vendor/three/three.module.js';

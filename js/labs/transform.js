@@ -1,4 +1,4 @@
-// Transformer lab: shows what js/shipkit/transform.js makes of a lab ship — the three levels of detail with their
+// Transformer lab: shows what js/models/ships-sea/transform.js makes of a lab ship — the three levels of detail with their
 // cost, the hitboxes for procedural destruction (click to damage, damage drawn by the shader), the mounts driven on
 // every level at once, and a fleet test that spreads up to 24 ships over 2 km to compare against the lab models.
 import * as THREE from '../../vendor/three/three.module.js';

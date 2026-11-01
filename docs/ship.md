@@ -1,7 +1,7 @@
 # Ship lab (`ship.html`)
 
 A standalone preview page for procedurally built 3D spaceships. The
-ships themselves live in **`js/shipkit/shipkit.js`**, one file shared by
+ships themselves live in **`js/models/ships-space/shipkit.js`**, one file shared by
 this lab and the game (see [ShipKit in the game](#shipkit-in-the-game)):
 edit a ship there and both see it. A change to `ship.html` alone (the
 viewer) needs no version bump; a change to `shipkit.js` changes the game,
@@ -9,7 +9,7 @@ so it does.
 
 Open `ship.html` straight from disk (double-click). No server, no build
 step and no network are needed: the fonts come from the repo's own
-`css/fonts.css` / `fonts/` (they load from disk too, checked in Chromium).
+`ui/fonts.css` / `fonts/` (they load from disk too, checked in Chromium).
 
 > **The ship lab is the reference lab** (the user's words, 2026-10-03:
 > the first lab and the most polished; the others take their patterns from
@@ -26,10 +26,10 @@ the lab still opens straight from disk):
 | Script | What it is | In the game? |
 |---|---|---|
 | 1. `vendor/three-r128.min.js`, `vendor/three-r128-examples/OrbitControls.js` | Three.js r128 (the game's own copy) and the preview's mouse camera. Until the 2026-10 review both were pasted into the page (~630 KB, twice with bodies.html). | Three.js yes, OrbitControls no |
-| 2. `vendor/three-r128-examples/*` + `js/postkit/postkit.js` | The IMAGE EFFECTS panel: the game's post-processing | **Yes — the same files** |
-| 3. `js/labkit/labkit.js` | What the labs (ship, body, system) share around the model (`window.LabKit`): the panels' grain, slider fills, toggles, the HUD's scale, performance counters, the IMAGE EFFECTS render, and the panels fading out after 5 idle seconds (`autoHideHud`; not while the pointer rests on a panel or a field there has the focus). Styles: `css/lab.css` (shared) + a few rules inline. | No |
-| 4. `js/shipkit/shipkit.js` (`<script id="shipkit">`) | **ShipKit's core**: texture generators, materials, shaders, shared effects, the building blocks, SHAPING, the model build, public API (`window.ShipKit`), and `ShipKit._`: the internals the ship files build with (not a public API). | **Yes — the same file** |
-| 4b. `js/shipkit/ships/codewing.js`, `scribe.js`, `swarmer.js`, `haven.js` | **One file per ship** (split out 2026-10-03, ~150–475 lines each). Each pushes its definition into `ShipKit.SHIP_DEFS` and takes what it uses from `ShipKit._`. They load after the core, in this order, which is the lab's order. | **Yes — the same files** |
+| 2. `vendor/three-r128-examples/*` + `js/render/postkit/postkit.js` | The IMAGE EFFECTS panel: the game's post-processing | **Yes — the same files** |
+| 3. `js/labkit/labkit.js` | What the labs (ship, body, system) share around the model (`window.LabKit`): the panels' grain, slider fills, toggles, the HUD's scale, performance counters, the IMAGE EFFECTS render, and the panels fading out after 5 idle seconds (`autoHideHud`; not while the pointer rests on a panel or a field there has the focus). Styles: `ui/space.css` (shared) + a few rules inline. | No |
+| 4. `js/models/ships-space/shipkit.js` (`<script id="shipkit">`) | **ShipKit's core**: texture generators, materials, shaders, shared effects, the building blocks, SHAPING, the model build, public API (`window.ShipKit`), and `ShipKit._`: the internals the ship files build with (not a public API). | **Yes — the same file** |
+| 4b. `js/models/ships-space/ships/codewing.js`, `scribe.js`, `swarmer.js`, `haven.js` | **One file per ship** (split out 2026-10-03, ~150–475 lines each). Each pushes its definition into `ShipKit.SHIP_DEFS` and takes what it uses from `ShipKit._`. They load after the core, in this order, which is the lab's order. | **Yes — the same files** |
 | 5. `js/labs/ship.js` (`<script id="viewer">`; in the page until 2026-10-03) | Preview page: sky, lights, renderer, camera, HUD wiring, sliders. Uses only the kits' public APIs. | No |
 
 ## ShipKit (`window.ShipKit`)
@@ -274,7 +274,7 @@ shots along).
 ## Viewer (preview page)
 
 - **IMAGE EFFECTS** (right panel, v2.25.1): PostKit's lab panel
-  (`js/postkit/postkit.js#labPanel`) — the game's post-processing
+  (`js/render/postkit/postkit.js#labPanel`) — the game's post-processing
   (bloom, FXAA, sharpening, robot-eyes filter, depth of field, MSAA ×0–8) with
   presets AUTO / MIN / NORMAL / MAX (a preset also sets the render
   quality; AUTO steps by frame rate, not in the first 6 s). The camera's
@@ -371,7 +371,7 @@ shots along).
 
 ## Building blocks (reuse, don't re-write)
 
-`js/shipkit/shipkit.js` has a **SHIP BUILDING BLOCKS** section: parts
+`js/models/ships-space/shipkit.js` has a **SHIP BUILDING BLOCKS** section: parts
 and behaviours shared by ships. A ship definition composes them; it
 only writes what is unique to it (its hull, its signature parts, its own
 animations).
@@ -567,7 +567,7 @@ Before turning either on in the game, decide the values and measure
 
 ## Adding a ship
 
-A new file `js/shipkit/ships/<id>.js`, shaped like the others: one IIFE
+A new file `js/models/ships-space/ships/<id>.js`, shaped like the others: one IIFE
 that takes the helpers it needs from `ShipKit._` and pushes its entry into
 `ShipKit.SHIP_DEFS`, built from the blocks above. Then load it after the
 others on **every page that loads ShipKit** — `index.html` (with `defer`),
@@ -622,7 +622,7 @@ code.
 
 ## ShipKit in the game
 
-Since v2.8.0 the game loads `js/shipkit/shipkit.js` itself (a `defer`
+Since v2.8.0 the game loads `js/models/ships-space/shipkit.js` itself (a `defer`
 script right after Three.js in `index.html`), and the drone is ShipKit's
 DR-01 SCRIBE. How it's wired (`js/drone/drone.js#buildDroneModel`, full
 story in `docs/rendering.md`'s "Rendering and ShipKit models"):

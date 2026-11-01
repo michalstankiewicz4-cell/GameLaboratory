@@ -1,4 +1,4 @@
-# Water lab (`labs/water.html`, `js/labs/water.js`, `js/env/waterkit.js`)
+# Water lab (`labs/water.html`, `js/labs/water.js`, `js/envs/water/waterkit.js`)
 
 A test bench for the look of the sea and its interaction with a ship, before any of it goes into the game. The ship is
 ORP Błyskawica from ShipKit at 1:1; units are metres and seconds. The ship stays at the origin heading +z and the sea
@@ -41,7 +41,7 @@ Settings are remembered in the browser (localStorage) and "Copy settings (JSON)"
 - **Spray**: CPU particles from the stem, continuous at speed and in bursts when the bow slams into a crest; air
   streams aft past the ship.
 
-## Foam with memory (`js/env/foamkit.js`)
+## Foam with memory (`js/envs/water/foamkit.js`)
 
 A **foam map** keeps the foam of a 1.5 km square of sea (1024² float texels, 1.5 m each) in the water's own frame, so
 foam stays where it was made and drifts with the water while the ship sails on. The window follows the ship in whole

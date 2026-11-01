@@ -14,7 +14,7 @@ import { SPRITES } from '../../render/pixel/sprites.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
-const KEY = 'steelSalvo.pixelStudio.v1';
+const KEY = 'gameLab.pixel.v1';
 let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { saved = null; }
 const S = {
   mode: '3d', w: 48, h: 48, palette: 'auto', autoN: 14, dither: 'none', ditherK: 0.5, outline: 'selout', corners: false, orphans: true, perfect: true, zoom: 8, fps: 8,

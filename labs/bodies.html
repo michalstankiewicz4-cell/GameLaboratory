@@ -2,21 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'self' blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Body lab | GameLaboratory</title>
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="../css/fonts.css">
 <!-- Procedural celestial-body preview (companion of ship.html).
      Script blocks, in order:
        1. vendor/three-r128.min.js + OrbitControls – the same copy the game
           uses (was inlined here until the 2026-10 review: 600 KB twice)
        2. js/labkit/labkit.js                     – what both labs share around
           the model (grain, sliders, toggles, HUD scale, performance
-          counters, the IMAGE EFFECTS render); styles in css/lab.css
-       3. js/bodykit/bodykit.js                   – THE BODIES, the same file
+          counters, the IMAGE EFFECTS render); styles in ui/space.css
+       3. js/models/bodies/bodykit.js                   – THE BODIES, the same file
           the game loads (a classic script, window.BodyKit): groups,
           parameter schemas, shaders; see its header for the API
-       4. vendor/three-r128-examples + js/postkit/postkit.js – the IMAGE
+       4. vendor/three-r128-examples + js/render/postkit/postkit.js – the IMAGE
           EFFECTS panel: the game's post-processing (bloom, FXAA, MSAA,
           filter, depth of field, sharpening, sun flare and light rays,
           black-hole lensing), apart
@@ -24,29 +24,14 @@
        5. <script id="viewer">                     – preview page (sky, camera,
           HUD, sliders built from the schemas, statistics, counters)
      Opens straight from disk, no server needed. -->
-<link rel="stylesheet" href="../css/lab.css">
-<link rel="stylesheet" href="../css/windows.css">
-<style>
-.hidden{ display:none !important; }
-.blueT{ --c:#5c6ff1; --hi:#8b9bff; --lo:#4155d6; }
-#groupTabs{ display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px; }
-.groupTab{ height:28px; border:0; cursor:pointer; font-family:var(--fontLabel); font-weight:500; font-size:14.5px;
-  letter-spacing:.5px; color:#0c1440; border-radius:8px 8px 3px 8px; transition:filter .15s; }
-.groupTab.gold{ border-radius:3px 16px 3px 3px; }
-.groupTab:hover{ filter:brightness(1.12); }
-#bodyIndex{ font-family:var(--fontLabel); font-size:16px; letter-spacing:1px; color:#f8bb56; }
-.note{ margin:10px 0 4px; font-size:13.5px; line-height:19px; color:#9fb1ff; }
-.param{ margin-bottom:2px; }
-.param .sl{ margin-top:4px; }
-.param input[type=range]{ height:18px; margin-top:1px; }
-.twoBtns{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
-.wideBtn{ width:100%; margin-top:8px; }
-#fpsGraph{ height:40px; }
-</style>
+<link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="../ui/space.css">
+<link rel="stylesheet" href="../ui/pages/bodies.css">
 </head>
 <body>
-<script src="../js/labkit/versions.js"></script>
-<script src="../js/labkit/menubar.js"></script>
+<script src="../ui/versions.js"></script>
+<script src="../ui/catalog.js"></script>
+<script src="../ui/menubar.js"></script>
 <canvas id="view"></canvas>
 
 <div id="hud" data-window="left" data-side="left">
@@ -56,9 +41,9 @@
   <div class="hudPanel">
     <div id="groupTabs"></div>
     <div id="shipNav">
-      <button class="mat blue navArrow" id="prevBody" aria-label="Previous body"><svg viewBox="0 0 12 16"><path d="M9 2 L3 8 L9 14"/></svg></button>
+      <button class="navArrow" id="prevBody" aria-label="Previous body"><svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></button>
       <span id="bodyIndex">1 / 1</span>
-      <button class="mat blue navArrow" id="nextBody" aria-label="Next body"><svg viewBox="0 0 12 16"><path d="M3 2 L9 8 L3 14"/></svg></button>
+      <button class="navArrow" id="nextBody" aria-label="Next body"><svg viewBox="0 0 16 16"><path d="m6 3 5 5-5 5"/></svg></button>
     </div>
     <div id="emptyNote" class="note hidden">No bodies in this group yet — its shape, parameters and example bodies are still to be designed.</div>
     <div id="bodyStats">
@@ -91,10 +76,10 @@
         <button class="tBtn" id="btnSeed">NEW SEED</button>
         <button class="tBtn" id="btnReset">RESET</button>
       </div>
-      <button class="tBtn wideBtn" id="btnCopy" title="Copies this body's entry for js/bodykit/bodykit.js (values that differ from the defaults)">COPY VALUES</button>
+      <button class="tBtn wideBtn" id="btnCopy" title="Copies this body's entry for js/models/bodies/bodykit.js (values that differ from the defaults)">COPY VALUES</button>
     </div>
   </div>
-  <div class="hudPanel" style="margin-top:12px">
+  <div class="hudPanel">
     <div class="secHd first">OPTIMIZATION</div>
     <label class="sl"><span>Render quality</span><b id="qVal">ULTRA</b></label>
     <input type="range" id="qSlider" min="0" max="4" step="1" value="3">
@@ -113,9 +98,9 @@
     <canvas id="fpsGraph" width="270" height="40"></canvas>
   </div>
 </div>
-<div id="loading">GENERATING SKY…</div>
+<div id="loading" class="labLoad"><div class="labLoadCard"><i class="labSpin"></i><b>Generating the sky…</b><span class="labLoadStep"></span><span class="labLoadBar"><i></i></span></div></div>
 
-<script src="../js/labkit/windows.js"></script>
+<script src="../ui/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
 <!-- Three.js r128 add-ons (vendor/, MIT) + PostKit: the IMAGE EFFECTS panel's post-processing, the game's own -->
 <script type="module" src="../js/render/postkit/postkit.js"></script>

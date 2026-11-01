@@ -1,0 +1,30 @@
+/* Floating windows (ui/windows.js): a lab's options, opened and closed from OPTIONS → Windows.
+   Dark glass, a thin line, a gold title; what is inside: ui/controls.css. */
+.labWin{position:fixed;z-index:20;display:flex;flex-direction:column;width:330px;max-width:calc(100vw - 16px);max-height:calc(100vh - 88px);
+  background:var(--glass);border:1px solid var(--line);border-radius:var(--r);backdrop-filter:blur(6px);box-shadow:0 12px 32px rgba(0,0,0,.4);
+  transition:opacity .4s}
+.labWin.right{width:300px}
+.labWin[hidden]{display:none}
+.labWin.dragging{transition:none;box-shadow:0 18px 44px rgba(0,0,0,.55);opacity:.96}
+.labWinHead{flex:none;display:flex;align-items:center;gap:8px;height:34px;padding:0 6px 0 14px;border-bottom:1px solid var(--line);cursor:move;
+  user-select:none;touch-action:none}
+.labWinTitle{flex:1;font:600 11px var(--font);letter-spacing:1.4px;text-transform:uppercase;color:var(--accent);white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis}
+.labWinClose{width:26px;height:26px;border:0;border-radius:6px;background:none;color:var(--dim);font:13px var(--font);cursor:pointer}
+.labWinClose:hover{background:var(--field);color:var(--head)}
+/* the lab's panel inside: no longer placed on its own */
+.labWin > .labWinBody{position:static !important;inset:auto !important;width:auto !important;max-height:none !important;flex:1;min-height:0;overflow:auto;
+  margin:0;padding:12px 14px 16px;background:none;border:0;border-radius:0;backdrop-filter:none;box-shadow:none;transform:none;pointer-events:auto}
+/* the first section heading, when it is the window's title */
+.labWin .labWinDup{display:none}
+/* the labs' own "hide the panels" (H) and idle dimming apply to the whole window */
+.labWin:has(> .hidden-panel){display:none}
+.labWin:has(> :is(.idle, .labIdle)){opacity:.18}
+.labWin > :is(.idle, .labIdle){opacity:1}
+.labWin > .labIdle, .labWin > .labIdle *{pointer-events:auto !important}
+@media (max-width:640px){.labWin,.labWin.right{width:calc(100vw - 16px)}}
+
+/* the top bar of the labs from Battle: the lab's name, version and links to other labs are on the menu bar
+   (ui/menubar.js) — the bar keeps only the lab's own controls; empty, it goes */
+body.lab > .bar > b, body.lab > .bar > .ver, body.lab > .bar > a{display:none}
+body.lab > .bar:not(:has(> :not(b, .ver, a, .sp))){display:none}

@@ -1,5 +1,5 @@
 // MODEL DOCTOR — finds the repeating mistakes in procedural models. One doctor for every model of the laboratory
-// (docs/doctor/README.md): the Space doctor (tools/modeldoctor.js) as extended in Battle — gun arcs, waterline, hull
+// (docs/doctor/README.md): the Space doctor (tools/doctor/modeldoctor.js) as extended in Battle — gun arcs, waterline, hull
 // side, game budget. Universal: the model-specific checks run only when a model's source passes their opts.
 // Examine a model built UNMERGED (ShipKit: KIT.unmerged = true) so a finding names one piece and its source line.
 //

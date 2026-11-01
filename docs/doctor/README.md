@@ -2,7 +2,7 @@
 
 Jeden doktor dla wszystkich modeli laboratorium: kosmos (Space), morze (Battle), ląd i tabor (TrainKit).
 Szuka powtarzających się błędów modeli budowanych kodem. Scalony z dwóch wersji: doktora ze Space
-(`history-space.md`) i jego rozszerzonej wersji z Battle (`history-sea.md`). Logika to wersja z Battle —
+(`../history/doctor-space.md`) i jego rozszerzonej wersji z Battle (`../history/doctor-sea.md`). Logika to wersja z Battle —
 ma wszystkie testy wersji ze Space i więcej.
 
 ## Zasady

@@ -1,0 +1,17 @@
+/* GameLaboratory UI — the loading card: a spinning ring, a plain sentence, an optional step and a bar.
+   <div id="loading" class="labLoad"><div class="labLoadCard"><i class="labSpin"></i><b>Generating the hull…</b>
+     <span class="labLoadStep"></span><span class="labLoadBar"><i></i></span></div></div>
+   The bar without a width runs back and forth; with style.width on its <i> it shows progress. */
+.labLoad{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:var(--bg);transition:opacity .6s}
+.labLoadCard{display:grid;justify-items:center;gap:12px;min-width:280px;padding:22px 26px;background:var(--glass);
+  border:1px solid var(--line);border-radius:var(--r);box-shadow:0 12px 32px rgba(0,0,0,.4);font:14px/1.4 var(--font);color:var(--text)}
+.labSpin{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--accent);animation:labSpin 1s linear infinite}
+.labLoadCard > b{font-size:15px;font-weight:600;color:var(--head)}
+.labLoadStep{margin-top:-6px;font-size:12.5px;color:var(--dim)}
+.labLoadStep:empty{display:none}
+.labLoadBar{position:relative;width:220px;height:4px;border-radius:2px;background:var(--line);overflow:hidden}
+.labLoadBar > i{position:absolute;left:0;top:0;bottom:0;width:35%;background:var(--accent);animation:labBar 1.4s ease-in-out infinite}
+.labLoadBar > i[style*="width"]{animation:none;transition:width .3s}
+@keyframes labSpin{to{transform:rotate(1turn)}}
+@keyframes labBar{0%{left:-35%}100%{left:100%}}
+@media (prefers-reduced-motion:reduce){.labSpin,.labLoadBar > i{animation-duration:3s}}

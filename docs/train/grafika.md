@@ -41,4 +41,4 @@ Statyczne części łączone w siatki według materiału (mniej wywołań rysowa
 
 ## Kontrola modeli
 
-Modele sprawdzane narzędziem Model Doctor z repozytorium Space (`tools/modeldoctor.js`): NaN, odwrócone ściany, nachodzące powierzchnie (z-fighting), elementy w powietrzu, ukryte, za małe i za cienkie.
+Modele sprawdzane narzędziem Model Doctor z repozytorium Space (`tools/doctor/modeldoctor.js`): NaN, odwrócone ściany, nachodzące powierzchnie (z-fighting), elementy w powietrzu, ukryte, za małe i za cienkie.

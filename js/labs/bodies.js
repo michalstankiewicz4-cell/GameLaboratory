@@ -115,7 +115,6 @@ function refreshModelStats() {
   row(box, "Custom shaders", st.shaderCount);
   row(box, "Noise octaves per pixel", QUALITY[state.quality].octaves);
   row(box, "Textures", "0 (fully procedural)");
-  fitHud();
 }
 let measureTimer = 0;
 function queueMeasure() { clearTimeout(measureTimer); measureTimer = setTimeout(measure, 120); }
@@ -130,7 +129,6 @@ function measure() {
   }
   for (const [k, text] of current.describe(renderer)) row(box, k, text);   // the group's own statistics
   if (g.kmPerSize) row(box, "Axial tilt", Math.round(v.tilt) + "°");
-  fitHud();
 }
 setInterval(() => { if (current && state.values.cloudDrift > 0) measure(); }, 2000); // clouds drift
 
@@ -158,7 +156,7 @@ function buildParamSliders() {
   const has = !!state.values;
   $("paramsBody").classList.toggle("hidden", !has);
   $("paramsEmpty").classList.toggle("hidden", has);
-  if (!has) { fitHud(); return; }
+  if (!has) return;
   const showCommon = g.common !== false;                 // the sky has no spin/tilt/damage sliders
   $("commonHd").classList.toggle("hidden", !showCommon); common.classList.toggle("hidden", !showCommon);
   const set = (key) => (x) => { state.values[key] = x; current.setValues({ [key]: x }); if (key !== "spin" && key !== "damage") queueMeasure(); };
@@ -168,7 +166,6 @@ function buildParamSliders() {
     own.appendChild(n);
   }
   for (const p of g.params) slider(own, p, state.values[p.key], set(p.key));
-  fitHud();
 }
 
 // =====================================================================
@@ -236,7 +233,7 @@ $("btnSeed").addEventListener("click", () => {
 $("btnReset").addEventListener("click", () => loadBody(false));
 
 // The current body as a ready-to-paste entry for the group's `bodies` list
-// in js/bodykit/bodykit.js — the sliders only change this preview, the
+// in js/models/bodies/bodykit.js — the sliders only change this preview, the
 // game shows what's in that file. Only values that differ from the
 // group's defaults are written (plus the seed); damage is a preview, not
 // part of a body.
@@ -302,7 +299,6 @@ dSlider.addEventListener("input", () => {
   }
 });
 
-LabKit.applyGrain();   // the panels' grain (css/lab.css --grain)
 LabKit.autoHideHud([$("hud"), $("opt")], 5);   // the panels fade out when idle
 
 // =====================================================================
@@ -312,8 +308,6 @@ LabKit.autoHideHud([$("hud"), $("opt")], 5);   // the panels fade out when idle
 // (CSS max-height on #hud/#opt), so switching tabs (other sliders) never
 // changes the UI size.
 // =====================================================================
-const hudEl = $("hud"), optEl = $("opt");
-function fitHud() { LabKit.fitHud([hudEl, optEl], 0.4, 1.3); }
 
 const perf = LabKit.perfCounters(renderer);   // FPS, frame/CPU time, triangles, draw calls + graph
 
@@ -348,14 +342,11 @@ window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   applyQuality(state.quality);
-  fitHud();
 });
-if (document.fonts) document.fonts.ready.then(fitHud);
 
 paintSlider(qSlider); paintSlider(dSlider);
 loadBody(false);
 applyQuality(state.quality);
-fitHud();
 frame();
 const loading = $("loading");
 loading.style.opacity = "0";

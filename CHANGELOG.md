@@ -1,7 +1,60 @@
 # GameLaboratory — zmiany
 
-Wersja programu i każdego laboratorium: `js/labkit/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
-Historia laboratoriów Space sprzed przeniesienia: `labs/CHANGELOG.md`; Battle i aTrain — w historii git.
+Wersja programu i każdego laboratorium: `ui/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
+Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
+
+## Program 0.13.0 — 2026-11-01 (remanent, dokończenie: całe UI w `ui/`, nowy wygląd, katalog, foldery, dokumentacja)
+
+### Nowe
+- **Folder `ui/`** — całe UI w jednym miejscu (opis: `ui/README.md`): `tokens.css` (kolory, czcionki, promienie),
+  `fonts.css`, `base.css` (paski przewijania), `controls.css` (przyciski, strzałki, suwaki, pola wyboru, listy,
+  pola), `windows.css/js`, `envswitch.css/js`, `loader.css`, `menubar.css/js`, `versions.js`, `space.css`
+  (dawne `css/lab.css`), `sea.css` (dawne `css/lab-sea.css`) i `pages/<lab>.css` — style każdej strony.
+  Strona linkuje jedno `ui/ui.css`. Folder `css/` zniknął; `js/labkit/` ma już tylko LabKit.
+- **Nowy wygląd** (zaakceptowany projekt): czcionka Space Grotesk, liczby w IBM Plex Mono; cienkie paski przewijania
+  bez strzałek; złote suwaki (wypełnione do wartości także w laboratoriach z Battle), pola wyboru i przyciski
+  „wybrane”; strzałki poprzedni/następny jako kwadratowe przyciski. Niebieski wygląd Space zastąpiony tokenami.
+- **Ładowanie** jako karta z kółkiem, zwykłym zdaniem i paskiem („Generating the hull…”, „Generating the sky…”,
+  „Building the system…”) zamiast napisów wielkimi literami.
+- Okna bez zapisanego położenia układają się jedno pod drugim po swojej stronie (gdy brak miejsca — kaskadą).
+
+### Zmienione
+- Laboratorium statków: opcje w oknach jak w innych laboratoriach — Statek, Sterowanie, Statystyki (lewa),
+  Optymalizacja, Wydajność (prawa); bez trybu „CHANGE VIEW / KEEP” i bez skalowania HUD.
+- Pasek menu: style z JS przeniesione do `ui/menubar.css` (wczytywany przez `<link>`; pasek pokazuje się po
+  wczytaniu arkusza); przesunięcia paneli pod pasek w tym samym pliku.
+- Strony Space, narzędzia (kitcheck, tekstura ziarna) i strona startowa bez bloków `<style>` — style w
+  `ui/pages/`; strony Space bez atrybutów `style=` (poza laboratorium skórek, które pokazuje własne motywy).
+- Wspólne reguły laboratoriów Space (rzędy przycisków, pola `.lab`, `.hidden`, wykres FPS) w `ui/space.css`
+  zamiast kopii w każdej stronie. `ui/sea.css` bez martwej sekcji starego ekranu startowego.
+- **CSP** (`style-src 'self'` i reszta jak w Battle) także na stronach Space, kitchecku i teksturze ziarna (skrypt
+  strony do `tools/grainTexture.js`); bez CSP zostaje tylko laboratorium skórek (atrybuty `style=` w makiecie).
+- **Katalog laboratoriów** `ui/catalog.js` — jedno miejsce na nazwy EN/PL, dokument, opisy, kit, frazy filtra, klucze
+  ustawień i obrazki kafelków; czytają go pasek menu i strona startowa (dane wyjęte z `menubar.js` i `index.html`).
+  `sitemap.xml` generuje `tools/sitemap.py` (bez stron `noindex` — wypadł doktor modeli).
+- **Klucze ustawień** po starych grach (`steelSalvo.*`, `roj-*`) przemianowane na `gameLab.*`; pasek menu raz
+  przenosi zapisane ustawienia pod nowe nazwy.
+- Język: pasek dostaje wybrany język (`lang`), strona laboratorium zostaje przy swoim (panele po angielsku);
+  całą stronę przełącza tylko strona startowa.
+- Foldery: postacie SDF i pixel art `js/models/life/zombie/` → `js/models/human/zombie/`; niebo i deszcz
+  `js/envs/land/` → `js/envs/sky/`; `structures/structures/` → `structures/coastal/` (nabrzeże, falochron) i
+  `structures/offshore/` (platforma); `ships-sea/world/` → `ships-sea/game-classes/`.
+- Laboratoria życia i człowieka: wspólne studio `js/labs/shared/studio.js` (oba skrypty były identyczne).
+- Wspólne funkcje odległości GLSL dla SDF Morgue i SDF Walkers: `js/render/sdf-glsl.js`.
+- Dokumentacja: mapa `docs/README.md`; historia sprzed przeniesienia w `docs/history/` (`labs/CHANGELOG.md`,
+  historia doktora, CHANGELOG SDF Walkers); ok. 110 martwych ścieżek podmienionych na obecne; usunięty `docs/ui.md`
+  (interfejs gry Space) i części `docs/gotchas.md` o grze (Supabase, odświeżanie wersji). `docs/AUDIT.md`: A4 i A5
+  oznaczone jako fałszywe trafienia.
+
+### Usunięte
+- Martwy kod po nowym wyglądzie: ziarno paneli (`LabKit.applyGrain`, `.mat`) i skalowanie HUD (`LabKit.fitHud`,
+  `--ui`); czcionki Antonio i Roboto Condensed (4 pliki) — zostaje Oswald (napisy ShipKit na kadłubach, skórki).
+
+### Sprawdzenia
+- `tools/paths.py` — pliki ładowane przez strony (błąd) i ścieżki wspomniane w dokumentacji i komentarzach
+  (ostrzeżenie); GitHub Actions `check.yml`: składnia JS, `paths.py --strict`, `sitemap.py --check`.
+
+- Wersje: program 0.13.0; laboratorium statków y+1, pozostałe laboratoria i narzędzia z+1.
 
 ## Program 0.12.0 — 2026-11-01 (remanent, partia 1: śmieci, błędy, martwy kod)
 

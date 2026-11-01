@@ -1,6 +1,6 @@
 # Waterside Structures Lab — and StructKit
 
-`labs/structures.html` (`js/labs/structures.js`), kit `js/structkit/`. Static structures in and on the water, built
+`labs/structures.html` (`js/labs/structures.js`), kit `js/models/structures/`. Static structures in and on the water, built
 from code at real scale like the ships: offshore platforms first, then everything built that touches the water —
 quays, piers and jetties, breakwaters, harbours, lighthouses (owner's decision, 2026-10-21).
 
@@ -8,13 +8,13 @@ quays, piers and jetties, breakwaters, harbours, lighthouses (owner's decision, 
 
 | File | What it does |
 |---|---|
-| `js/structkit/index.js` | `STRUCTURES` registry, `buildStructure(id, { detail })`, `structureInfo(id)` |
-| `js/structkit/materials.js` | PBR set for offshore steel and paint; the leg material colours itself by world height (marine growth below the splash zone, a rust band, then the paint) so it stays right while the legs move |
-| `js/structkit/parts.js` | Building blocks: square truss leg with rack plates, spud can, jack house with pinion units, tapered lattice tower (derrick), lattice boom, pedestal crane (slewing, luffing), enclosed lifeboat on davits, helideck markings (canvas texture), railings, stairs, window rows |
-| `js/structkit/coastal.js` | Coastal works: tetrapod and quarry-rock geometry, `layUnits` (armour units on any parametric surface, two layers, random turns), `instanced`, bollards, cylindrical fenders, ladders, lighting masts, `sweepZ` (cross-sections) |
-| `js/structkit/structures/quay.js` | Quay wall: gravity block wall, steel sheet-pile wall or open piled deck, with kerb, bollards, fenders, ladders, crane rails, masts, apron; `PARAMS` (construction, length, cope level), `heightAt` |
-| `js/structkit/structures/breakwater.js` | Breakwater: rubble mound with rock or tetrapod armour, or caissons with a tetrapod berm; round head with a harbour light; `PARAMS` (type, length, crest, armour unit mass), `heightAt`. Research sheet for both: `docs/structures/coastal.md` |
-| `js/structkit/structures/super300.js` | Jack-up drilling rig, Super 300 class: `info` (specifications, sources), `DIM`, `build()` → group, parts, legs, cranes, cantilever, `pose({ depth, air, legsDown })`. Research sheet: `docs/structures/super300.md` |
+| `js/models/structures/index.js` | `STRUCTURES` registry, `buildStructure(id, { detail })`, `structureInfo(id)` |
+| `js/models/structures/materials.js` | PBR set for offshore steel and paint; the leg material colours itself by world height (marine growth below the splash zone, a rust band, then the paint) so it stays right while the legs move |
+| `js/models/structures/parts.js` | Building blocks: square truss leg with rack plates, spud can, jack house with pinion units, tapered lattice tower (derrick), lattice boom, pedestal crane (slewing, luffing), enclosed lifeboat on davits, helideck markings (canvas texture), railings, stairs, window rows |
+| `js/models/structures/coastal.js` | Coastal works: tetrapod and quarry-rock geometry, `layUnits` (armour units on any parametric surface, two layers, random turns), `instanced`, bollards, cylindrical fenders, ladders, lighting masts, `sweepZ` (cross-sections) |
+| `js/models/structures/coastal/quay.js` | Quay wall: gravity block wall, steel sheet-pile wall or open piled deck, with kerb, bollards, fenders, ladders, crane rails, masts, apron; `PARAMS` (construction, length, cope level), `heightAt` |
+| `js/models/structures/coastal/breakwater.js` | Breakwater: rubble mound with rock or tetrapod armour, or caissons with a tetrapod berm; round head with a harbour light; `PARAMS` (type, length, crest, armour unit mass), `heightAt`. Research sheet for both: `docs/structures/coastal.md` |
+| `js/models/structures/offshore/super300.js` | Jack-up drilling rig, Super 300 class: `info` (specifications, sources), `DIM`, `build()` → group, parts, legs, cranes, cantilever, `pose({ depth, air, legsDown })`. Research sheet: `docs/structures/super300.md` |
 
 Geometry is merged per material with ShipKit's `Part` (the rig is ~156k triangles and ~170 draw calls at detail 1);
 armour units are instanced. A structure may export `PARAMS` (its own settings: the lab builds sliders and selects from

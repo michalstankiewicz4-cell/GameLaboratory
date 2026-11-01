@@ -1,6 +1,6 @@
 // SDF Morgue lab (labs/morgue.html): rolls a specimen, sways the head, shows its card. The head itself — shaders,
-// specimen, palette, renderer — is the model js/models/life/zombie/sdf-head.js. From the "SDF Morgue" artifact.
-import { makeZombie, paletteArray, shirtRamp, createRenderer } from "../models/life/zombie/sdf-head.js";
+// specimen, palette, renderer — is the model js/models/human/zombie/sdf-head.js. From the "SDF Morgue" artifact.
+import { makeZombie, paletteArray, shirtRamp, createRenderer } from "../models/human/zombie/sdf-head.js";
 
 const $ = (id) => document.getElementById(id);
 const cv = $("cv"), gl = cv.getContext("webgl2", { antialias: false });

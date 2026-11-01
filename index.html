@@ -51,103 +51,14 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <!-- The labs' start screen (index.html, in the root; the labs themselves
      live in labs/, the tools in tools/): a tile for every lab and tool, with the menu
-     bar every lab and tool page carries (js/labkit/menubar.js — the lists
+     bar every lab and tool page carries (ui/menubar.js — the lists
      live there, the tiles' pictures and words here). A workshop, not a cockpit. -->
-<style>
-@font-face{ font-family:"Space Grotesk"; font-weight:300 700; src:url(fonts/space-grotesk-var-latin-ext.woff2) format("woff2"); unicode-range:U+0100-024F; }
-@font-face{ font-family:"Space Grotesk"; font-weight:300 700; src:url(fonts/space-grotesk-var-latin.woff2) format("woff2"); }
-@font-face{ font-family:"IBM Plex Mono"; font-weight:400; src:url(fonts/ibm-plex-mono-400-latin.woff2) format("woff2"); }
-:root{ color-scheme:dark; --bg:#0d0f13; --card:#151820; --line:#252a34; --text:#c9ced8; --head:#eef1f6; --dim:#7d8494;
-  --game:#36d6b5; --lab:#f2b84b; --tool:#8b9cff; }
-*{ box-sizing:border-box; }
-html,body{ margin:0; min-height:100%; background:var(--bg); color:var(--text); font:15px/1.5 "Space Grotesk", system-ui, sans-serif; }
-body{ background:
-  radial-gradient(1200px 500px at 10% -10%, rgba(91,140,255,.14), transparent 60%),
-  radial-gradient(900px 500px at 100% 0%, rgba(54,214,181,.10), transparent 60%),
-  var(--bg); }
-main{ max-width:1240px; margin:0 auto; padding:76px 28px 70px; }
-header{ display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; margin-bottom:34px; }
-h1{ margin:0; font-size:40px; line-height:1.1; font-weight:700; letter-spacing:-.5px; color:var(--head); }
-h1 span{ background:linear-gradient(90deg, #5b8cff, #36d6b5 55%, #f2b84b); -webkit-background-clip:text; background-clip:text; color:transparent; }
-.lead{ margin:10px 0 0; max-width:640px; color:#9aa1b0; font-size:16px; }
-.stats{ display:flex; gap:10px; flex-wrap:wrap; }
-.stat{ padding:10px 14px; border:1px solid var(--line); border-radius:12px; background:rgba(21,24,32,.7); min-width:96px; }
-.stat b{ display:block; font-size:22px; color:var(--head); line-height:1.1; }
-.stat span{ font-size:12px; color:var(--dim); letter-spacing:.4px; text-transform:uppercase; }
-h2{ display:flex; align-items:center; gap:12px; margin:34px 0 14px; font-size:13px; letter-spacing:1.6px; text-transform:uppercase; color:var(--dim); font-weight:600; }
-h2::after{ content:""; flex:1; height:1px; background:var(--line); }
-.grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(268px, 1fr)); gap:16px; }
-.tile{ position:relative; display:flex; flex-direction:column; border:1px solid var(--line); border-radius:16px; background:var(--card);
-  color:inherit; text-decoration:none; overflow:hidden; transition:transform .18s, border-color .18s, box-shadow .18s; }
-.tile:hover{ transform:translateY(-3px); border-color:#3a4256; box-shadow:0 14px 34px rgba(0,0,0,.4), 0 0 0 1px rgba(139,156,255,.15); }
-/* reordering: the six-dot grip (top right, on hover), the tile being dragged, its gap */
-/* QUICK ACCESS: pinned, last opened, the two most opened; a badge says which */
-.quick .tile .badge{ position:absolute; left:10px; top:10px; z-index:2; padding:3px 9px; border-radius:999px; font-size:11px; letter-spacing:.8px;
-  text-transform:uppercase; background:rgba(13,15,19,.72); backdrop-filter:blur(4px); color:#eef1f6; border:1px solid rgba(255,255,255,.12); }
-.quick .tile .badge.b-pin{ color:#f2b84b; border-color:rgba(242,184,75,.45); }
-.quick .tile .badge.b-last{ color:#8b9cff; border-color:rgba(139,156,255,.45); }
-.quick .tile .badge.b-most{ color:#36d6b5; border-color:rgba(54,214,181,.45); }
-.quick .empty{ display:flex; flex-direction:column; justify-content:center; gap:6px; min-height:150px; padding:18px; border:1.5px dashed var(--line);
-  border-radius:16px; color:var(--dim); font-size:14px; }
-.quick .empty b{ color:#a7adbb; font-weight:600; font-size:12px; letter-spacing:1px; text-transform:uppercase; }
-/* the pin, beside the grip (top right, on hover; always on while pinned) */
-.pin{ position:absolute; right:46px; top:10px; z-index:2; width:30px; height:30px; display:grid; place-items:center; border-radius:8px;
-  background:rgba(13,15,19,.55); backdrop-filter:blur(4px); color:#c9ced8; cursor:pointer; opacity:0; transition:opacity .15s, background .15s; }
-.quick .pin{ right:10px; }
-.tile:hover .pin, .pin:focus-visible, .pin.on{ opacity:1; }
-.pin.on{ color:#f2b84b; }
-.pin:hover{ background:rgba(43,58,99,.85); color:#fff; }
-.pin svg{ width:15px; height:15px; }
-.grip{ position:absolute; right:10px; top:10px; z-index:2; width:30px; height:30px; display:grid; place-items:center; border-radius:8px;
-  background:rgba(13,15,19,.55); backdrop-filter:blur(4px); color:#c9ced8; cursor:grab; opacity:0; transition:opacity .15s, background .15s; touch-action:none; }
-.tile:hover .grip, .grip:focus-visible{ opacity:1; }
-.grip:hover{ background:rgba(43,58,99,.85); color:#fff; }
-.grip svg{ width:14px; height:14px; }
-.tile.dragging{ position:fixed; z-index:50; pointer-events:none; transform:rotate(1.5deg) scale(1.03); transition:none;
-  box-shadow:0 24px 50px rgba(0,0,0,.55), 0 0 0 1px rgba(139,156,255,.35); }
-.tile.dragging .grip{ opacity:1; cursor:grabbing; }
-.gap{ border:2px dashed #3a4256; border-radius:16px; background:rgba(139,156,255,.05); }
-body.reordering, body.reordering *{ cursor:grabbing !important; user-select:none; }
-h2 .reset{ order:2; margin-left:4px; font:inherit; font-size:11px; letter-spacing:1px; color:#7d8494; background:none; border:1px solid var(--line);
-  border-radius:999px; padding:2px 10px; cursor:pointer; text-transform:uppercase; }
-h2 .reset:hover{ color:#eef1f6; border-color:#3a4256; }
-h2::after{ order:1; }
-.art{ position:relative; aspect-ratio:16/8; overflow:hidden; }
-.art svg{ position:absolute; inset:0; width:100%; height:100%; }
-.art::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg, transparent 55%, rgba(21,24,32,.85)); }
-.body{ padding:12px 16px 16px; display:flex; flex-direction:column; gap:6px; flex:1; }
-.name{ display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:18px; font-weight:600; color:var(--head); }
-.file{ font:12px "IBM Plex Mono", ui-monospace, monospace; color:var(--dim); }
-.desc{ font-size:14px; color:#a7adbb; flex:1; }
-.art img{ width:100%; height:100%; object-fit:cover; display:block; }
-/* the filter: a search box and the phrases of every lab (any tile matching all the chosen ones stays) */
-.filter{ display:flex; flex-direction:column; gap:10px; margin:6px 0 4px; }
-.filter input{ width:min(420px, 100%); height:36px; padding:0 14px; border-radius:10px; border:1px solid var(--line); background:rgba(21,24,32,.8);
-  color:var(--head); font:inherit; font-size:14px; outline:none; }
-.filter input:focus{ border-color:#3a4256; }
-.chips{ display:flex; gap:6px; flex-wrap:wrap; }
-.chip{ font:inherit; font-size:12.5px; padding:3px 10px; border-radius:999px; border:1px solid var(--line); background:rgba(255,255,255,.03); color:#a7adbb; cursor:pointer; }
-.chip:hover{ color:var(--head); border-color:#3a4256; }
-.chip.on{ color:#0d0f13; background:#36d6b5; border-color:#36d6b5; }
-.chip.more, .chip.clear{ background:none; color:#7d8494; }
-.chip b{ font-weight:500; opacity:.6; margin-left:4px; }
-.tile.out{ display:none; }
-.noMatch{ color:var(--dim); font-size:14px; padding:8px 2px; }
-.phrases{ display:flex; gap:4px; flex-wrap:wrap; margin-top:6px; }
-.phrase{ font-size:11px; padding:1px 7px; border-radius:4px; background:rgba(255,255,255,.05); color:#8f96a5; }
-.tags{ display:flex; gap:6px; flex-wrap:wrap; margin-top:4px; }
-.tag{ font-size:11.5px; padding:2px 8px; border-radius:999px; border:1px solid var(--line); color:#a7adbb; }
-.tag.game{ color:var(--game); border-color:rgba(54,214,181,.4); background:rgba(54,214,181,.08); }
-.tag.lab{ color:var(--lab); border-color:rgba(242,184,75,.4); background:rgba(242,184,75,.08); }
-.tag.tool{ color:var(--tool); border-color:rgba(139,156,255,.4); background:rgba(139,156,255,.08); }
-footer{ margin-top:46px; color:var(--dim); font-size:13px; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; }
-footer a{ color:#9aa1b0; }
-@media (max-width:600px){ h1{ font-size:30px; } main{ padding:64px 16px 50px; } }
-</style>
+<link rel="stylesheet" href="ui/pages/start.css">
 </head>
 <body>
-<script src="js/labkit/versions.js"></script>
-<script src="js/labkit/menubar.js"></script>
+<script src="ui/versions.js"></script>
+<script src="ui/catalog.js"></script>
+<script src="ui/menubar.js"></script>
 <main>
   <header>
     <div>
@@ -173,7 +84,7 @@ footer a{ color:#9aa1b0; }
 <script>
 (() => {
 "use strict";
-// language: chosen by the menu bar (OPTIONS → Language; js/labkit/menubar.js) — English or Polish
+// language: chosen by the menu bar (OPTIONS → Language; ui/menubar.js) — English or Polish
 const PL = window.LabMenu.LANG === "pl", tr = window.LabMenu.t;
 // a language chosen by the address (?lang=pl / ?lang=en) is its own page for search engines
 { const q = new URLSearchParams(location.search).get("lang"); const c = document.querySelector('link[rel="canonical"]');
@@ -187,131 +98,11 @@ if (PL) {
   meta('meta[property="og:title"]', T); meta('meta[name="twitter:title"]', T); meta('meta[property="og:locale"]', "pl_PL");
 }
 // gradient + line art per tile (viewBox 0 0 200 100)
-const ART = {
-  "labs/filters.html": { bg: ["#1c2436", "#0b0e16"], svg: `<defs><linearGradient id="fl" x1="0" x2="1"><stop offset="0" stop-color="#5b8cff"/><stop offset=".5" stop-color="#36d6b5"/><stop offset="1" stop-color="#f2b84b"/></linearGradient></defs><circle cx="78" cy="50" r="30" fill="none" stroke="url(#g)" stroke-width="3" opacity=".8"/><circle cx="122" cy="50" r="30" fill="url(#fl)" opacity=".35"/><circle cx="100" cy="50" r="12" fill="#fff" opacity=".85"/><path d="M30 86 H170" stroke="#9fb4ff" stroke-width="2" opacity=".5"/>` },
-  "labs/pixel.html": { bg: ["#1d2b22", "#0b120d"], svg: `<rect x="80" y="14" width="10" height="10" fill="#8be07a"/><rect x="90" y="14" width="10" height="10" fill="#8be07a"/><rect x="80" y="24" width="10" height="10" fill="#8be07a"/><rect x="90" y="24" width="10" height="10" fill="#8be07a"/><rect x="70" y="34" width="10" height="10" fill="#8be07a"/><rect x="80" y="34" width="10" height="10" fill="#8be07a"/><rect x="90" y="34" width="10" height="10" fill="#8be07a"/><rect x="100" y="34" width="10" height="10" fill="#8be07a"/><rect x="60" y="44" width="10" height="10" fill="#8be07a"/><rect x="70" y="44" width="10" height="10" fill="#13261a"/><rect x="80" y="44" width="10" height="10" fill="#8be07a"/><rect x="90" y="44" width="10" height="10" fill="#8be07a"/><rect x="100" y="44" width="10" height="10" fill="#13261a"/><rect x="110" y="44" width="10" height="10" fill="#8be07a"/><rect x="60" y="54" width="10" height="10" fill="#8be07a"/><rect x="70" y="54" width="10" height="10" fill="#8be07a"/><rect x="80" y="54" width="10" height="10" fill="#8be07a"/><rect x="90" y="54" width="10" height="10" fill="#8be07a"/><rect x="100" y="54" width="10" height="10" fill="#8be07a"/><rect x="110" y="54" width="10" height="10" fill="#8be07a"/><rect x="70" y="64" width="10" height="10" fill="#8be07a"/><rect x="100" y="64" width="10" height="10" fill="#8be07a"/><rect x="60" y="74" width="10" height="10" fill="#8be07a"/><rect x="110" y="74" width="10" height="10" fill="#8be07a"/>` },
-  "labs/zombies.html": { bg: ["#2a2020", "#120b0b"], svg: `<rect x="86" y="12" width="8" height="8" fill="#9db07c"/><rect x="94" y="12" width="8" height="8" fill="#9db07c"/><rect x="102" y="12" width="8" height="8" fill="#9db07c"/><rect x="78" y="20" width="8" height="8" fill="#9db07c"/><rect x="86" y="20" width="8" height="8" fill="#e8e04a"/><rect x="94" y="20" width="8" height="8" fill="#9db07c"/><rect x="102" y="20" width="8" height="8" fill="#9db07c"/><rect x="110" y="20" width="8" height="8" fill="#e8e04a"/><rect x="86" y="28" width="8" height="8" fill="#9db07c"/><rect x="94" y="28" width="8" height="8" fill="#5a1b1b"/><rect x="102" y="28" width="8" height="8" fill="#9db07c"/><rect x="94" y="36" width="8" height="8" fill="#4b5a6e"/><rect x="86" y="44" width="8" height="8" fill="#4b5a6e"/><rect x="94" y="44" width="8" height="8" fill="#4b5a6e"/><rect x="102" y="44" width="8" height="8" fill="#4b5a6e"/><rect x="78" y="52" width="8" height="8" fill="#4b5a6e"/><rect x="94" y="52" width="8" height="8" fill="#4b5a6e"/><rect x="110" y="52" width="8" height="8" fill="#4b5a6e"/><rect x="86" y="60" width="8" height="8" fill="#4b5a6e"/><rect x="102" y="60" width="8" height="8" fill="#4b5a6e"/><rect x="86" y="68" width="8" height="8" fill="#3a3a44"/><rect x="102" y="68" width="8" height="8" fill="#3a3a44"/><rect x="86" y="76" width="8" height="8" fill="#3a3a44"/><rect x="102" y="76" width="8" height="8" fill="#3a3a44"/>` },
-  "labs/morgue.html": { bg: ["#1e1b2b", "#15131f"], svg: `<ellipse cx="100" cy="46" rx="26" ry="28" fill="#68805a"/><ellipse cx="100" cy="66" rx="18" ry="14" fill="#9cac70"/><circle cx="90" cy="42" r="6" fill="#26223a"/><circle cx="110" cy="40" r="5" fill="#26223a"/><circle cx="110" cy="40" r="2.4" fill="#faee96"/><rect x="92" y="66" width="16" height="6" fill="#1e0a16"/><rect x="94" y="66" width="3" height="3" fill="#d6c896"/><rect x="99" y="66" width="3" height="3" fill="#d6c896"/><rect x="104" y="66" width="3" height="3" fill="#d6c896"/><path d="M70 96 Q100 76 130 96" fill="#4b3d6b"/>` },
-  "labs/walkers.html": { bg: ["#1e1b2b", "#15131f"], svg: `${[40, 80, 120, 160].map((x, i) => `<g transform="translate(${x - 10} ${18 + (i % 2) * 2})"><rect x="6" y="0" width="10" height="10" fill="#9cac70"/><rect x="4" y="10" width="14" height="22" fill="${["#6b5b95", "#4f7aa8", "#5f9e7a", "#a8583a"][i]}"/><rect x="5" y="32" width="5" height="${14 + (i % 2) * 4}" fill="#3a3550"/><rect x="12" y="32" width="5" height="${18 - (i % 2) * 4}" fill="#3a3550"/></g>`).join("")}<circle cx="100" cy="86" r="3" fill="#f2b84b"/><circle cx="86" cy="86" r="3" fill="#9cac70"/><circle cx="114" cy="86" r="3" fill="#9cac70"/><path d="M86 86 H114" stroke="#9cac70" stroke-width="1"/>` },
-  "labs/lang.html": { bg: ["#1b2030", "#11141d"], svg: `<text x="100" y="44" text-anchor="middle" font-family="monospace" font-size="20" fill="#9cac70">ą ę ł ó ś ż</text>${[0, 1, 2, 3, 4].map((i) => `<rect x="${30 + i * 30}" y="${82 - [10, 22, 34, 46, 58][i] * .6}" width="20" height="${[10, 22, 34, 46, 58][i] * .6}" fill="#f2b84b" opacity="${0.4 + i * 0.12}"/>`).join("")}` },
-  "labs/structures.html": { img: "assets/labs/structures.jpg" },
-  "labs/water.html": { img: "assets/labs/water.jpg" },
-  "labs/land.html": { img: "assets/labs/land.jpg" },
-  "labs/plants.html": { img: "assets/labs/plants.jpg" },
-  "labs/look.html": { img: "assets/labs/look.jpg" },
-  "labs/transform.html": { img: "assets/labs/transform.jpg" },
-  "labs/ship.html": { bg: ["#1b2a5e", "#0f1630"], svg: `<path d="M38 58 L118 45 L166 54 L118 66 Z" fill="url(#g)" opacity=".95"/><path d="M92 49 L70 28 L84 28 L110 47 Z M92 62 L70 80 L84 80 L110 63 Z" fill="#9fb4ff" opacity=".55"/><circle cx="38" cy="58" r="9" fill="#5be0ff" opacity=".35"/><circle cx="38" cy="58" r="4" fill="#d8f6ff"/><path d="M14 58 H32" stroke="#5be0ff" stroke-width="3" stroke-linecap="round" opacity=".6"/>` },
-  "labs/bodies.html": { bg: ["#3b1d4f", "#140d24"], svg: `<circle cx="100" cy="52" r="28" fill="url(#g)"/><path d="M100 24 A28 28 0 0 1 100 80 A16 28 0 0 0 100 24" fill="#0b0716" opacity=".55"/><ellipse cx="100" cy="54" rx="56" ry="12" fill="none" stroke="#f6c9ff" stroke-width="2.5" opacity=".7" transform="rotate(-12 100 54)"/><circle cx="160" cy="24" r="3" fill="#fff" opacity=".7"/><circle cx="34" cy="78" r="2" fill="#fff" opacity=".5"/>` },
-  "labs/systems.html": { bg: ["#2c2312", "#120f08"], svg: `<circle cx="100" cy="50" r="9" fill="#ffd27a"/><circle cx="100" cy="50" r="16" fill="#ffd27a" opacity=".18"/><g fill="none" stroke="#f2b84b" stroke-width="1.4" opacity=".55"><ellipse cx="100" cy="50" rx="34" ry="13"/><ellipse cx="100" cy="50" rx="58" ry="23"/><ellipse cx="100" cy="50" rx="84" ry="34"/></g><circle cx="134" cy="50" r="4" fill="#8be0ff"/><circle cx="58" cy="66" r="5" fill="#ff9a6b"/><circle cx="168" cy="30" r="6" fill="#c7b2ff"/>` },
-  "labs/scale.html": { bg: ["#173236", "#0a1517"], svg: `<g fill="none" stroke="url(#g)" stroke-width="2.5"><circle cx="46" cy="58" r="8"/><circle cx="86" cy="54" r="14"/><circle cx="140" cy="46" r="26"/></g><path d="M24 84 H180" stroke="#9fe8de" stroke-width="2"/><g stroke="#9fe8de" stroke-width="2">${[0,1,2,3,4,5,6,7,8].map((i) => `<path d="M${24 + i * 19.5} 84 V${i % 2 ? 80 : 76}"/>`).join("")}</g>` },
-  "labs/skins.html": { bg: ["#3a1830", "#160a14"], svg: `<rect x="34" y="22" width="92" height="58" rx="8" fill="#1d1328" stroke="#ff8bd1" stroke-width="2"/><rect x="34" y="22" width="92" height="12" rx="6" fill="#ff8bd1" opacity=".5"/><rect x="74" y="38" width="92" height="52" rx="8" fill="#16182a" stroke="#8b9cff" stroke-width="2"/><rect x="74" y="38" width="92" height="12" rx="6" fill="#8b9cff" opacity=".5"/><g><circle cx="92" cy="68" r="7" fill="#36d6b5"/><circle cx="112" cy="68" r="7" fill="#f2b84b"/><circle cx="132" cy="68" r="7" fill="#ff6b8b"/><circle cx="152" cy="68" r="7" fill="#8b9cff"/></g>` },
-  "labs/surface.html": { bg: ["#16304a", "#0b1420"], svg: `<circle cx="150" cy="30" r="10" fill="#ffd9a0"/><path d="M0 74 Q40 54 78 66 T150 62 T200 70 V100 H0 Z" fill="#2c5a4a"/><path d="M0 84 Q50 70 100 80 T200 78 V100 H0 Z" fill="#1d3f35"/><path d="M84 66 a12 12 0 0 1 24 0 Z" fill="#9fe8de"/><rect x="95" y="20" width="2" height="46" fill="#f2b84b" opacity=".6"/>` },
-  "labs/buildings.html": { bg: ["#2a2a14", "#12120a"], svg: `<path d="M20 82 H180" stroke="#5c5a3a" stroke-width="2"/><path d="M40 82 a22 22 0 0 1 44 0 Z" fill="url(#g)"/><rect x="92" y="54" width="34" height="28" rx="3" fill="#cfc28a" opacity=".85"/><rect x="132" y="62" width="40" height="20" rx="3" fill="#8a8158"/><g stroke="#36d6b5" stroke-width="1.5" fill="none" stroke-dasharray="3 3"><rect x="136" y="34" width="34" height="22" rx="3"/></g>` },
-  "labs/vehicles.html": { bg: ["#3a2a12", "#160f06"], svg: `<rect x="50" y="44" width="100" height="22" rx="6" fill="url(#g)"/><rect x="70" y="30" width="36" height="16" rx="4" fill="#ffdca0" opacity=".8"/><path d="M128 44 V22" stroke="#ffdca0" stroke-width="2.5"/><circle cx="128" cy="20" r="4" fill="#ffdca0"/><g fill="#1a1208" stroke="#f2b84b" stroke-width="3"><circle cx="64" cy="72" r="10"/><circle cx="100" cy="72" r="10"/><circle cx="136" cy="72" r="10"/></g><path d="M14 84 H186" stroke="#5a4320" stroke-width="2"/>` },
-  "labs/sound.html": { bg: ["#1f1840", "#0b0818"], svg: `<g fill="none" stroke-linecap="round">${Array.from({ length: 36 }, (_, i) => { const x = 18 + i * 4.6, h = 6 + Math.abs(Math.sin(i * 0.55) * Math.cos(i * 0.21)) * 34; return `<path d="M${x} ${50 - h} V${50 + h}" stroke="${i % 3 ? "#9fb4ff" : "#36d6b5"}" stroke-width="2.2" opacity="${0.45 + (h / 40) * 0.5}"/>`; }).join("")}</g><path d="M14 50 Q40 20 66 50 T118 50 T170 50 T190 50" fill="none" stroke="#f2b84b" stroke-width="1.8" opacity=".8"/>` },
-  "labs/creator.html": { bg: ["#2a2416", "#110e08"], svg: `<path d="M40 60 Q70 30 110 42 T170 34" fill="none" stroke="#e8c79a" stroke-width="10" stroke-linecap="round"/><g stroke="#e8c79a" stroke-width="4" stroke-linecap="round"><path d="M75 44 L68 80 M95 42 L100 80 M125 40 L118 80 M145 38 L152 80"/></g><g fill="#f8bb56"><circle cx="40" cy="60" r="5"/><circle cx="80" cy="40" r="5"/><circle cx="120" cy="41" r="5"/><circle cx="170" cy="34" r="5"/></g><g fill="#36d6b5"><circle cx="75" cy="44" r="4"/><circle cx="145" cy="38" r="4"/></g>` },
-  "labs/life.html": { bg: ["#203a2e", "#0b1611"], svg: `<g fill="none" stroke="#e8d2b8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M64 56 Q100 44 136 56 M74 58 L66 92 M90 54 L94 92 M114 54 L108 92 M128 58 L136 92 M136 56 Q150 44 156 30"/></g><circle cx="158" cy="26" r="7" fill="#e8d2b8"/><path d="M0 92 H200" stroke="#5fd0a0" stroke-width="2" opacity=".5"/><g stroke="#5fd0a0" stroke-width="1.5" opacity=".45"><path d="M30 92 V86 M60 92 V86 M140 92 V86 M170 92 V86"/></g>` },
-  "labs/human.html": { bg: ["#2e2636", "#120e17"], svg: `<g fill="none" stroke="#e8d2b8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M100 40 V66 M100 66 L88 92 M100 66 L114 90 M100 46 L84 62 M100 46 L118 58"/></g><circle cx="100" cy="27" r="9" fill="#e8d2b8"/><path d="M0 92 H200" stroke="#5fd0a0" stroke-width="2" opacity=".5"/><g stroke="#5fd0a0" stroke-width="1.5" opacity=".45"><path d="M30 92 V86 M60 92 V86 M140 92 V86 M170 92 V86"/></g>` },
-  "labs/marine.html": { bg: ["#0f3550", "#081722"], svg: `<path d="M64 52 H140 L128 66 H76 Z" fill="url(#g)"/><rect x="92" y="38" width="22" height="14" rx="3" fill="#c9f1ff" opacity=".85"/><path d="M0 64 Q25 56 50 64 T100 64 T150 64 T200 64 V100 H0 Z" fill="#1f6d8f" opacity=".75"/><path d="M0 74 Q25 68 50 74 T100 74 T150 74 T200 74 V100 H0 Z" fill="#164f6a"/><g fill="#c9f1ff" opacity=".6"><circle cx="60" cy="86" r="2.5"/><circle cx="68" cy="80" r="1.6"/><circle cx="150" cy="88" r="2"/></g>` },
-  "tools/doctor.html": { img: "assets/labs/doctor.jpg" },
-  "tools/kitcheck.html": { bg: ["#123024", "#08140f"], svg: `${[0,1,2].map((i) => `<rect x="58" y="${24 + i * 20}" width="12" height="12" rx="3" fill="none" stroke="#36d6b5" stroke-width="2"/><path d="M61 ${30 + i * 20} l3 3 l6 -7" stroke="#36d6b5" stroke-width="2.4" fill="none" stroke-linecap="round"/><rect x="80" y="${27 + i * 20}" width="${70 - i * 14}" height="6" rx="3" fill="#9fe8de" opacity=".5"/>`).join("")}` },
-  "tools/grainTexture.html": { bg: ["#24242a", "#101014"], svg: `<g fill="#d8dbe4">${Array.from({ length: 140 }, (_, i) => { const x = (i * 73) % 200, y = (i * 37 + (i * i) % 23) % 100; return `<circle cx="${x}" cy="${y}" r="${0.6 + (i % 5) * 0.35}" opacity="${0.15 + (i % 7) / 12}"/>`; }).join("")}</g>` },
-};
-const INFO = {
-  "labs/filters.html": ["The camera look from the water labs on a choice of scenes — exposure, tone mapping, colour, glow, vignette, grain, lens effects, sharpening; compared with the clean image, with the cost of every effect.", "lab", "LookPipeline"],
-  "labs/pixel.html": ["Pixel art with a transparent background: 3D models rendered to pixels, generated sprites and tiles, a pixel editor; palettes, dither, outline; PNG, sprite sheets, GIF. With its own Pixel Doctor.", "lab", "Pixel Studio"],
-  "labs/zombies.html": ["Original zombies from a seed, animated in 8 directions, exported as Unity sprite sheets (JSON, slicer script, ZIP).", "lab", "Pixel Studio"],
-  "labs/walkers.html": ["Whole zombies built from distance functions, five animations in four directions, sprite sheets with JSON; rate batches and a small neural network learns your taste and steers the rolls.", "lab", "SDF Walkers"],
-  "labs/lang.html": ["A network learns Polish from zero, letter by letter, on your texts: bigram, a window with embeddings, RNN and GRU, a transformer — on the CPU, in WebAssembly or WebGPU; BPE tokens, tuning for a conversation.", "lab", "own JS engine"],
-  "labs/morgue.html": ["A zombie head computed in a shader: distance functions, raymarching, light in four tones and outlines from geometry, as pixel art. Every roll is a new specimen from a seed.", "lab", "SDF head"],
-  "labs/ship.html": ["Ships in space and at sea — switch the environment. Space: ships, the drone and the station: build, shape, rename, light, animate. Water: real warships at true scale, ORP Błyskawica and the submarine ORP Orzeł.", "game", "ShipKit · ShipKit (sea)"],
-  "labs/bodies.html": ["Planets, suns, giants, rocks, comets and black holes, every slider of their shaders.", "game", "BodyKit"],
-  "labs/systems.html": ["Whole star systems from the bodies: presets and a seeded generator.", "lab", "SystemKit"],
-  "labs/scale.html": ["Sizes side by side: ships, bodies and distances, to keep the world in proportion.", "lab", "scale"],
-  "labs/skins.html": ["Other looks for the game's interface, tried on a mock-up.", "lab", "UI"],
-  "labs/surface.html": ["Land on a planet: terrain from its own look, sky, weather, day and night, a base.", "game", "SurfaceKit"],
-  "labs/buildings.html": ["The base's modules one by one: built, as a hologram, under construction.", "game", "BaseKit"],
-  "labs/vehicles.html": ["Robot rovers: suspension, wheels and tracks, dust, lamps. A train that drives: a shunting diesel and two wagons on an oval with turnouts, with real wheel–rail physics.", "lab", "VehicleKit · TrainKit"],
-  "labs/creator.html": ["Build a creature: drag its spine into shape, give it pairs of legs anywhere — it walks, on any number of legs.", "lab", "LifeKit"],
-  "labs/life.html": ["Life forms from blocks: a skeleton, bodies that bend at the joints, moving in their medium — animals on four legs. Humans have their own lab.", "lab", "LifeKit"],
-  "labs/human.html": ["Humans from blocks: a skeleton, a body that bends at the joints, a face with expressions; standing, walking, running, with layers on top of any gait.", "lab", "LifeKit · human"],
-  "labs/sound.html": ["The game's music, made live from layers and a seed: drones, pads, chimes, whispers, a robot's voice.", "lab", "MusicKit"],
-  "labs/marine.html": ["The sea and under it: waves, a seabed, an island, robot vessels.", "lab", "MarineKit"],
-  "tools/doctor.html": ["Every model of every lab — space, sea, land, rail — examined for the repeating mistakes: inside-out shapes, holes, flicker, floating pieces, guns firing into their own ship, fittings through the hull.", "tool", "ModelDoctor"],
-  "tools/kitcheck.html": ["The safety net: every model's fingerprint against the golden file, every lab for errors.", "tool", "kitcheck"],
-  "tools/grainTexture.html": ["Regenerates the film grain the interface panels use.", "tool", "texture"],
-  "labs/structures.html": ["Waterside structures at real scale: a jack-up drilling rig, a quay, a breakwater.", "lab", "StructKit"],
-  "labs/water.html": ["Sea states from calm to gale, reflections, foam, bow wave, wake, spray, ship motion — with the cost of every effect.", "game", "WaterKit"],
-  "labs/land.html": ["Procedural land and sea from 0 to 100 % land: islands, coasts, fjords, erosion, beaches, surf.", "game", "LandKit"],
-  "labs/plants.html": ["Trees, palms, shrubs and grass grown from code, moving in the wind.", "lab", "PlantKit"],
-  "labs/look.html": ["Sky, seven weathers, time of day, procedural ageing of surfaces, graphics filters.", "game", "SkyKit"],
-  "labs/transform.html": ["A lab ship made game-ready: levels of detail, hitboxes, shader damage, fleet performance test.", "tool", "transform"],
-};
-// the same in Polish
-const INFO_PL = {
-  "labs/filters.html": "Wygląd kamery z laboratoriów wodnych na wybranych scenach — ekspozycja, mapowanie tonów, kolor, poświata, winieta, ziarno, efekty obiektywu, wyostrzenie; w porównaniu z czystym obrazem, z kosztem każdego efektu.",
-  "labs/pixel.html": "Pixel art z przezroczystym tłem: modele 3D renderowane do pikseli, generowane sprite'y i kafelki, edytor pikseli; palety, dithering, obrys; PNG, arkusze sprite'ów, GIF. Z własnym Pixel Doctorem.",
-  "labs/zombies.html": "Oryginalne zombie z ziarna, animowane w 8 kierunkach, eksportowane jako arkusze sprite'ów dla Unity (JSON, skrypt cięcia, ZIP).",
-  "labs/walkers.html": "Całe zombie z funkcji odległości, pięć animacji w czterech kierunkach, sprite sheety z JSON; oceniasz partie, a mała sieć neuronowa uczy się Twojego gustu i steruje losowaniem.",
-  "labs/lang.html": "Sieć uczy się polskiego od zera, litera po literze, na Twoich tekstach: bigram, okno z embeddingami, RNN i GRU, transformer — na procesorze, w WebAssembly albo WebGPU; tokeny BPE, dostrajanie do rozmowy.",
-  "labs/morgue.html": "Głowa zombie liczona w shaderze: funkcje odległości, raymarching, światło w czterech tonach i kontur z geometrii, jako pixel art. Każde losowanie to nowy okaz z ziarna.",
-  "labs/ship.html": "Statki w kosmosie i na morzu — przełącz środowisko. Kosmos: statki, dron i stacja: buduj, kształtuj, nazywaj, oświetlaj, animuj. Woda: prawdziwe okręty w prawdziwej skali, ORP Błyskawica i okręt podwodny ORP Orzeł.",
-  "labs/bodies.html": "Planety, słońca, olbrzymy, skały, komety i czarne dziury — każdy suwak ich shaderów.",
-  "labs/systems.html": "Całe układy gwiezdne z ciał niebieskich: gotowe zestawy i generator z ziarna.",
-  "labs/scale.html": "Rozmiary obok siebie: statki, ciała niebieskie i odległości, żeby świat trzymał proporcje.",
-  "labs/skins.html": "Inne wyglądy interfejsu gry, przymierzane na makiecie.",
-  "labs/surface.html": "Ląd na planecie: teren z jej własnego wyglądu, niebo, pogoda, dzień i noc, baza.",
-  "labs/buildings.html": "Moduły bazy jeden po drugim: zbudowane, jako hologram, w budowie.",
-  "labs/vehicles.html": "Łaziki-roboty: zawieszenie, koła i gąsienice, kurz, lampy. Pociąg, który jeździ: lokomotywa manewrowa i dwa wagony na owalu z rozjazdami, z prawdziwą fizyką koło–szyna.",
-  "labs/creator.html": "Zbuduj stwora: wygnij jego kręgosłup, daj mu pary nóg gdziekolwiek — chodzi, na dowolnej liczbie nóg.",
-  "labs/life.html": "Formy życia z bloków: szkielet, ciała zginające się w stawach, ruch w swoim ośrodku — zwierzęta na czterech nogach. Ludzie mają własne laboratorium.",
-  "labs/human.html": "Ludzie z bloków: szkielet, ciało zginające się w stawach, twarz z minami; stanie, chód, bieg, z warstwami na każdym chodzie.",
-  "labs/sound.html": "Muzyka gry tworzona na żywo z warstw i ziarna: burdony, plamy, dzwonki, szepty, głos robota.",
-  "labs/marine.html": "Morze i to, co pod nim: fale, dno, wyspa, pojazdy-roboty.",
-  "tools/doctor.html": "Każdy model każdego laboratorium — kosmos, morze, ląd, kolej — badany pod kątem powtarzających się błędów: odwrócone bryły, dziury, migotanie, wiszące części, działa strzelające we własny okręt, okucia przez kadłub.",
-  "tools/kitcheck.html": "Siatka bezpieczeństwa: odcisk każdego modelu porównany ze wzorcem, każde laboratorium sprawdzone pod kątem błędów.",
-  "tools/grainTexture.html": "Generuje od nowa ziarno filmowe, którego używają panele interfejsu.",
-  "labs/structures.html": "Budowle nad wodą w prawdziwej skali: platforma wiertnicza typu jack-up, nabrzeże, falochron.",
-  "labs/water.html": "Stany morza od ciszy do sztormu, odbicia, piana, fala dziobowa, kilwater, bryzgi, kołysanie okrętu — z kosztem każdego efektu.",
-  "labs/land.html": "Proceduralny ląd i morze od 0 do 100 % lądu: wyspy, wybrzeża, fiordy, erozja, plaże, przybój.",
-  "labs/plants.html": "Drzewa, palmy, krzewy i trawa wyhodowane z kodu, poruszane wiatrem.",
-  "labs/look.html": "Niebo, siedem pogód, pora dnia, proceduralne starzenie powierzchni, filtry grafiki.",
-  "labs/transform.html": "Statek z laboratorium przygotowany do gry: poziomy szczegółów, hitboxy, uszkodzenia w shaderze, test wydajności floty.",
-};
-// Phrases that describe each lab — the filter above the labs uses them.
-const PHRASES = {
-  "labs/filters.html": ["filtry", "grafika", "kamera", "obraz", "efekty", "tone mapping"],
-  "labs/pixel.html": ["pixel art", "sprite", "2D", "animacja", "paleta", "GIF"],
-  "labs/zombies.html": ["zombie", "postać", "sprite", "animacja", "Unity"],
-  "labs/morgue.html": ["zombie", "pixel art", "shader", "SDF", "postać"],
-  "labs/walkers.html": ["zombie", "pixel art", "sprite", "animacja", "SDF", "sieć neuronowa"],
-  "labs/lang.html": ["język", "tekst", "sieć neuronowa", "transformer", "WebGPU"],
-  "labs/ship.html": ["kosmos", "woda", "statki", "okręty", "okręt podwodny", "Orzeł", "stacja", "dron", "światła"],
-  "labs/bodies.html": ["kosmos", "planety", "słońca", "czarne dziury", "komety"],
-  "labs/systems.html": ["kosmos", "układy", "orbity", "gwiazdy"],
-  "labs/scale.html": ["kosmos", "skala", "proporcje"],
-  "labs/skins.html": ["interfejs", "wygląd"],
-  "labs/surface.html": ["ląd", "planeta", "lądowanie", "baza", "pogoda"],
-  "labs/buildings.html": ["ląd", "baza", "budynki", "moduły"],
-  "labs/vehicles.html": ["ląd", "pojazdy", "łaziki", "koła", "gąsienice", "pociąg", "tor"],
-  "labs/sound.html": ["dźwięk", "muzyka"],
-  "labs/marine.html": ["woda", "morze", "pod wodą", "pojazdy"],
-  "labs/creator.html": ["życie", "stwory", "chód", "nogi"],
-  "labs/life.html": ["życie", "zwierzęta", "chód", "nogi"],
-  "labs/human.html": ["człowiek", "postać", "chód", "twarz", "animacja"],
-  "labs/structures.html": ["woda", "ląd", "budowle", "platforma", "nabrzeże"],
-  "labs/water.html": ["woda", "morze", "fale", "piana", "kilwater"],
-  "labs/land.html": ["ląd", "teren", "wyspy", "wybrzeże", "erozja"],
-  "labs/plants.html": ["ląd", "rośliny", "drzewa", "trawa", "wiatr"],
-  "labs/look.html": ["niebo", "pogoda", "pora dnia", "starzenie", "filtry"],
-  "labs/transform.html": ["narzędzie", "LOD", "hitboxy", "wydajność"],
-  "tools/doctor.html": ["narzędzie", "modele", "błędy", "kosmos", "woda", "ląd"],
-  "tools/kitcheck.html": ["narzędzie", "testy"],
-  "tools/grainTexture.html": ["narzędzie", "tekstura"],
-};
-// status tag: only tools carry one (the games are not in this repository)
-// the phrases in English (shown when the page is in English)
-const PHRASE_EN = {"2D": "2D", "GIF": "GIF", "LOD": "LOD", "Orzeł": "Orzeł", "Unity": "Unity", "animacja": "animation", "baza": "base", "budowle": "structures", "budynki": "buildings", "błędy": "errors", "chód": "gait", "czarne dziury": "black holes", "człowiek": "human", "dron": "drone", "drzewa": "trees", "dźwięk": "sound", "efekty": "effects", "erozja": "erosion", "fale": "waves", "filtry": "filters", "grafika": "graphics", "gwiazdy": "stars", "gąsienice": "tracks", "hitboxy": "hitboxes", "interfejs": "interface", "kamera": "camera", "kilwater": "wake", "komety": "comets", "kosmos": "space", "koła": "wheels", "ląd": "land", "lądowanie": "landing", "modele": "models", "moduły": "modules", "morze": "sea", "muzyka": "music", "nabrzeże": "quay", "narzędzie": "tool", "niebo": "sky", "nogi": "legs", "obraz": "image", "okręt podwodny": "submarine", "okręty": "warships", "orbity": "orbits", "paleta": "palette", "piana": "foam", "pixel art": "pixel art", "planeta": "planet", "planety": "planets", "platforma": "platform", "pociąg": "train", "pod wodą": "underwater", "pogoda": "weather", "pojazdy": "vehicles", "pora dnia": "time of day", "postać": "character", "proporcje": "proportions", "rośliny": "plants", "skala": "scale", "sprite": "sprite", "stacja": "station", "starzenie": "ageing", "statki": "ships", "stwory": "creatures", "słońca": "suns", "tekstura": "texture", "teren": "terrain", "testy": "tests", "tone mapping": "tone mapping", "tor": "track", "trawa": "grass", "twarz": "face", "układy": "systems", "wiatr": "wind", "woda": "water", "wybrzeże": "coast", "wydajność": "performance", "wygląd": "look", "wyspy": "islands", "zombie": "zombie", "shader": "shader", "SDF": "SDF", "zwierzęta": "animals", "sieć neuronowa": "neural network", "język": "language", "tekst": "text", "transformer": "transformer", "WebGPU": "WebGPU", "łaziki": "rovers", "światła": "lights", "życie": "life"};
+// the tiles' data (picture, description, kit, phrases): ui/catalog.js
+const CAT = window.LabMenu.CATALOG, BY = {};
+for (const c of CAT.labs.concat(CAT.tools)) BY[c.file] = c;
+const ART = {}, INFO = {}, INFO_PL = {}, PHRASES = {}, PHRASE_EN = CAT.phraseEn || {};
+for (const f in BY) { const c = BY[f]; if (c.art) ART[f] = c.art; if (c.desc) { INFO[f] = [c.desc, c.kind, c.kit]; INFO_PL[f] = c.descPl; } if (c.phrases) PHRASES[f] = c.phrases; }
 const phrase = (w) => (PL ? w : PHRASE_EN[w] || w);
 const STATUS = { tool: tr("Tool", "Narzędzie") };
 const LABS = window.LabMenu.ITEMS.LABS.filter((l) => !l.page), TOOLS = window.LabMenu.ITEMS.TOOLS;
@@ -347,7 +138,7 @@ function ordered(items, ids) {
 }
 // ---------- QUICK ACCESS: the pinned one, the last opened, the two most opened ----------
 // The visits are counted by the menu bar on every lab and tool page
-// (js/labkit/menubar.js); the pin is chosen here. Nothing shows twice.
+// (ui/menubar.js); the pin is chosen here. Nothing shows twice.
 const PIN_KEY = "labsHub.pin";
 const ALL = LABS.concat(TOOLS);
 const store = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } };

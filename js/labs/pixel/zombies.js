@@ -2,14 +2,14 @@
 // frames from any of eight directions, exported as sprite sheets for Unity (512×512 frames in a 6×2 grid, pivot at
 // the feet, 100 pixels per unit) with a JSON description and an editor script that slices them — realistic, or as
 // pixel art through the Pixel Studio pipeline (palette, majority downsampling, selective outline, clean-up).
-import { OUTFITS, ANIMS, DIRS, randomZombie, renderZombieAsync } from '../../models/life/zombie/zombie.js';
+import { OUTFITS, ANIMS, DIRS, randomZombie, renderZombieAsync } from '../../models/human/zombie/zombie.js';
 import { PixelImage, autoPalette, quantize, outline, removeOrphans, modeDownsample, toCanvas, sheet } from '../../render/pixel/core.js';
 import { encodeGIF } from '../../render/pixel/gif.js';
 import { zip } from '../../render/pixel/zip.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
-const KEY = 'steelSalvo.zombieGen.v1';
+const KEY = 'gameLab.zombies.v1';
 let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { saved = null; }
 const S = { style: 'pixel', engine: 'gpu', frame: 512, frames: 12, cols: 6, anim: 'shamble', dir: 0, pitch: 6, lightAz: -35, lightEl: 40, foot: 9, ppu: 100, px: 96, colours: 24, outline: 'selout', zoom: 1, fps: 10, ...(saved && saved.S) };
 if (saved && saved.S && !saved.S.engine) { S.style = 'pixel'; S.engine = 'gpu'; }   // settings from before the renderer menu: the new defaults

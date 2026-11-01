@@ -24,13 +24,13 @@ player sees only their own base. Later this may move to the server.
 
 | File | What it is |
 |---|---|
-| `js/surfacekit/sky.js`, `weather.js` | SurfaceKit's sky (what the system puts in it, the world's turn, the light it gives) and weather (kinds per world, particles, wet ground, snow). Classic scripts after `surfacekit.js`, adding to `window.SurfaceKit`. |
-| `js/surfacekit/ground.js` | SurfaceKit's ground (`createGround`): the ground scene, the craft, the descent and its effects, driving, the hop, the base on the ground and building. No DOM: the surface lab and the game both run it and draw their own panels. |
-| `js/surfacekit/surfacekit.js` | **SurfaceKit** (`window.SurfaceKit`), a classic script: the ground as cube-sphere tiles loaded around the player, lat/lon helpers, saved bases (`bases`), the globe's diamond marker (`makeMarker`). Needs BodyKit. |
-| `js/basekit/basekit.js` | **BaseKit** (`window.BaseKit`): the base modules (`MODULES`: landing pad, habitat, solar array, mine, refinery, depot), built from ShipKit's generators. Each one can be shown built, as a placement hologram (fits or doesn't fit), and under construction (clipping planes). |
+| `js/envs/land/surfacekit/sky.js`, `weather.js` | SurfaceKit's sky (what the system puts in it, the world's turn, the light it gives) and weather (kinds per world, particles, wet ground, snow). Classic scripts after `surfacekit.js`, adding to `window.SurfaceKit`. |
+| `js/envs/land/surfacekit/ground.js` | SurfaceKit's ground (`createGround`): the ground scene, the craft, the descent and its effects, driving, the hop, the base on the ground and building. No DOM: the surface lab and the game both run it and draw their own panels. |
+| `js/envs/land/surfacekit/surfacekit.js` | **SurfaceKit** (`window.SurfaceKit`), a classic script: the ground as cube-sphere tiles loaded around the player, lat/lon helpers, saved bases (`bases`), the globe's diamond marker (`makeMarker`). Needs BodyKit. |
+| `js/models/base/basekit.js` | **BaseKit** (`window.BaseKit`): the base modules (`MODULES`: landing pad, habitat, solar array, mine, refinery, depot), built from ShipKit's generators. Each one can be shown built, as a placement hologram (fits or doesn't fit), and under construction (clipping planes). |
 | `surface.html` | The surface lab: a BodyKit globe in orbit (click it to pick a landing site), then the ground with a craft, a sky, the compass to the base, and building. |
 | `buildings.html` | The building lab: one module at a time on a flat patch of ground, with BUILT / GHOST / BLOCKED views, a construction slider and BUILD IT. |
-| `js/bodykit/bodykit.js` | `planetTerrain()` (the sampler) and the shared GLSL (`GLSL_PLANET_SURFACE`, exported with `blackbody`). **This is game-shared**: changing it means a version bump. |
+| `js/models/bodies/bodykit.js` | `planetTerrain()` (the sampler) and the shared GLSL (`GLSL_PLANET_SURFACE`, exported with `blackbody`). **This is game-shared**: changing it means a version bump. |
 
 SurfaceKit and BaseKit are in the game since v2.34.0 (the ground under a
 landing ship, "In the game" below). The labs are in Dev Tools → LABS.

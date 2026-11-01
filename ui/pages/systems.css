@@ -1,0 +1,50 @@
+/* The systems lab (labs/systems.html): its own rules, on top of ui/ui.css and ui/space.css. */
+#hud{ width:360px; }
+.btnGrid{ display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.btnGrid .tBtn{ height:28px; font-size:13px; }
+.seedRow{ display:grid; grid-template-columns:1fr 34px 1fr; gap:6px; margin-top:6px; }
+.seedRow input{ min-width:0; }
+input[type=number], select.lab, input.lab{ height:28px; border:1px solid var(--line); border-radius:6px; background:var(--field); color:var(--text);
+  font-family:var(--font); font-size:13.5px; padding:0 6px; }
+select.lab{ cursor:pointer; }
+.list{ display:flex; flex-direction:column; gap:5px; }
+.orow{ display:grid; grid-template-columns:20px 1fr 66px 44px 24px; gap:5px; align-items:center; }
+.crow{ display:grid; grid-template-columns:20px 1fr 24px; gap:5px; align-items:center; }
+.orow .n, .crow .n{ font-family:var(--font); font-size:12.5px; color:var(--accent); text-align:right; }
+.orow select, .crow select{ width:100%; min-width:0; }
+.orow input[type=number]{ width:100%; padding:0 2px 0 6px; }
+.xBtn{ height:24px; width:24px; border:1px solid #6a3443; border-radius:6px; background:#1a0610; color:#ff9aa8; cursor:pointer;
+  font-size:13px; line-height:1; padding:0; }
+.xBtn:hover{ border-color:#d05b69; }
+.colHd{ display:grid; grid-template-columns:20px 1fr 66px 44px 24px; gap:5px; font-size:11.5px; color:var(--dim); margin-bottom:2px; }
+.addBtn{ width:100%; margin-top:6px; height:26px; }
+#sysName{ font-family:var(--font); font-size:15px; letter-spacing:.8px; color:var(--accent); margin:4px 0 2px; }
+#labels{ position:fixed; inset:0; pointer-events:none; z-index:1; }
+#hud, #opt{ z-index:3; }
+#labels div.gap{ transform:translate(-50%, -50%); padding:1px 6px; border-radius:8px; background:var(--glass); color:var(--accent);
+  font-size:11px; letter-spacing:.4px; border:1px solid rgb(242 184 75 / .35); }
+/* the handles: drag them in the view (distance on the ruler; shape at the
+   orbit's nearest point, seen from above; tilt, seen from the side) */
+#handles{ position:fixed; inset:0; pointer-events:none; z-index:2; }
+.hdl{ position:absolute; width:14px; height:14px; margin:-7px 0 0 -7px; border-radius:50%; pointer-events:auto; cursor:grab;
+  border:2px solid var(--field); box-shadow:0 0 0 1.5px currentColor, 0 0 8px currentColor; background:currentColor; touch-action:none; }
+.hdl.dist{ color:var(--accent); border-radius:3px; transform:rotate(45deg); }
+.hdl.shape{ color:#36d6b5; }
+.hdl.incl{ color:#b9a2ff; }
+.hdl.sel{ width:18px; height:18px; margin:-9px 0 0 -9px; }
+.hdl:hover{ filter:brightness(1.3); }
+body.dragging, body.dragging *{ cursor:grabbing !important; }
+.viewRow{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:6px; }
+.viewRow .tBtn{ height:28px; font-size:12.5px; }
+.orow .n{ cursor:pointer; border-radius:4px; }
+.orow .n:hover{ color:var(--head); }
+.orow.sel .n{ color:var(--field); background:var(--accent); text-align:center; }
+#selBox .sl{ margin-top:8px; }
+#selBox .hintSel{ font-size:12.5px; color:var(--dim); margin-top:4px; }
+#selName{ color:var(--accent); margin-left:6px; }
+#labels div{ position:absolute; transform:translate(-50%, -100%); font-family:var(--font); font-size:12px; letter-spacing:.8px;
+  color:var(--text); text-shadow:0 0 3px #000, 0 0 6px #000; white-space:nowrap; padding-bottom:4px; }
+#labels div.center{ color:var(--accent); }
+#labels div.moon{ font-size:10.5px; color:var(--dim); }
+.lab.wide{ width:100%; margin-top:4px; }
+.wideBtn{ width:100%; margin-top:10px; }

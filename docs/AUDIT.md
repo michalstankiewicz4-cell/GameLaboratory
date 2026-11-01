@@ -1,10 +1,21 @@
 # Remanent GameLaboratory — audyt kodu, plików, folderów i dokumentacji (2026-11-01, program 0.11.1)
 
-Stan: 453 pliki w repozytorium, ok. 14 MB. Raport zawiera wyłącznie **propozycje** — nic z poniższego nie zostało
-jeszcze zrobione. Każdy punkt ma numer (do decyzji), pracochłonność (S/M/L) i ryzyko (niskie / średnie / wysokie).
+Stan: 453 pliki w repozytorium, ok. 14 MB. Raport był listą **propozycji**; wykonanie — niżej, „Stan wykonania”. Każdy punkt ma numer (do decyzji), pracochłonność (S/M/L) i ryzyko (niskie / średnie / wysokie).
 Metody: graf zależności od każdej strony (skrypty, importy, style, `fetch`, workery), skan ścieżek w kodzie,
 komentarzach i dokumentacji, wyszukiwanie powtórzonych bloków kodu (okna po 6 linii), skan selektorów CSS,
 spójność rejestrów laboratoriów, przegląd narzędzi testowych.
+
+## Stan wykonania (program 0.13.0)
+
+- **Zrobione:** A1–A3, A6; B1–B4 (B4: klucze `gameLab.*` z jednorazową migracją); C1 (ścieżki z historii przeniesień;
+  zostały wzmianki o plikach samej gry), C2 (`docs/ui.md` i części `gotchas.md` o grze), C3, C4, C5, C6; D1 (`ui/catalog.js`
+  + `tools/sitemap.py`), D2, D3 (`js/labs/shared/studio.js`), D4 (`js/render/sdf-glsl.js`); E1–E4, E6; F1, F2; G1 (poza
+  skórkami), G2, G3; H2–H4; J1–J4 (bez osobnych `panels.css` i `bar.css` — treść paneli jest w `space.css` / `sea.css`).
+- **Fałszywe trafienia:** A4, A5.
+- **Zostawione decyzją:** D5 (decyzja z 0.11.1); E5 (dzielić, gdy pliki urosną).
+- **Do decyzji / później:** D6 (wspólne `$()`/`el()` — każdy skrypt ma swoją jednolinijkową wersję, zysk mały), F3 (dane
+  głowy są już binarne: Int16 w base64; plik `.bin` oszczędziłby ok. 50 kB, ale wymaga asynchronicznego wczytania), F4, H1
+  (pełny kitcheck — długo trwa), I1–I3.
 
 ## Podsumowanie
 
@@ -26,8 +37,8 @@ spójność rejestrów laboratoriów, przegląd narzędzi testowych.
 | A1 | `css/game-ui/` — 27 plików (style interfejsu gry Space: HUD, okna, ekran startowy, tła) | żadna strona ich nie ładuje; to interfejs gry, a gier tu nie przenosimy (makieta w laboratorium skórek ma własne style) | S |
 | A2 | `tools/out/` — 27 PNG, 3,8 MB | wyniki uruchomień `pixel-check.py` (zrzuty), nie wzorce — nic ich nie czyta; dodać `tools/out/` do `.gitignore` (dziś brak `.gitignore` w ogóle) | S |
 | A3 | `docs/walkers/gitignore.txt` | dawny `.gitignore` z NeuroLabPA, przeniesiony przez import | S |
-| A4 | `console.log` w `js/labs/bodies.js`, `sound.js`, `systems.js` | pozostałości debugowania | S |
-| A5 | selektory `.sev1`, `.sev2` w `css/pixel.css` | nieużywane | S |
+| A4 | ~~`console.log` w `js/labs/bodies.js`, `sound.js`, `systems.js`~~ | **fałszywe trafienie** — to celowa funkcja zapasowa „SEE CONSOLE” (gdy schowek jest zablokowany); zostaje | — |
+| A5 | ~~selektory `.sev1`, `.sev2` w `css/pixel.css`~~ | **fałszywe trafienie** — klasy nadawane dynamicznie przez skrypt Pixel Studio; zostają | — |
 | A6 | `assets/labs/ship.jpg`, `assets/labs/orzel.jpg` | nieużywane (kafelek okrętów nie istnieje — patrz B2); albo użyć ich w B2, albo usunąć | S |
 | A7 | `tools/walkers/prototype/*.py` (6 plików) i `tools/walkers/build_artifact.py` | prototypy SDF z Pythona i składacz artefaktu claude.ai — po przeniesieniu do GameLaboratory bez zastosowania (zostają w historii) | S |
 

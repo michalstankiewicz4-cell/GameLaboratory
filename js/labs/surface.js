@@ -109,7 +109,7 @@ function setMouse(e) { mouse.set(e.clientX / window.innerWidth * 2 - 1, -(e.clie
 
 
 // =====================================================================
-// GROUND: SurfaceKit's ground (js/surfacekit/ground.js) — the same one the
+// GROUND: SurfaceKit's ground (js/envs/land/surfacekit/ground.js) — the same one the
 // game lands on. The lab adds its panels, the time slider and the weather.
 // =====================================================================
 const G = SK.createGround(renderer, { env, onEvent: (name) => { if (name === "landed") toast("Landed"); else if (name === "founded") toast("Base founded"); } });
@@ -253,7 +253,6 @@ window.addEventListener("keyup", (e) => { state.keys[e.code] = false; });
 // =====================================================================
 // the loop
 // =====================================================================
-LabKit.applyGrain();
 LabKit.autoHideHud([$("hud"), $("opt")], 5);
 const perf = LabKit.perfCounters(renderer);
 renderer.info.autoReset = false;
@@ -264,7 +263,6 @@ function resize() {
   $("qVal").textContent = QN[quality];
   orbit.camera.aspect = window.innerWidth / window.innerHeight; orbit.camera.updateProjectionMatrix();
   G.setAspect(window.innerWidth / window.innerHeight);
-  LabKit.fitHud([$("hud"), $("opt")], 0.4, 1.3);
 }
 window.addEventListener("resize", resize);
 const clock = new THREE.Clock();

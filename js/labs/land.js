@@ -4,7 +4,7 @@
 // Water bodies are mixed by region (RegionKit): one body everywhere, hand-shaped layouts (river mouth, lake and canal,
 // fjord over its sill, harbour bay, ice edge) or mixed from the seed; the sea blends their looks, waves and currents.
 import * as THREE from '../../vendor/three/three.module.js';
-import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment } from '../envs/land/skykit.js';
+import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment } from '../envs/sky/skykit.js';
 import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, LOOKS } from '../envs/water/waterkit.js';
 import { heightTexture, terrainMeshes, sampleHeight, barrierBuoys, SHAPES, TERRAIN_DEFAULTS, GLSL_LAND } from '../envs/land/landkit.js';
 import { generateWorld, regionTextures, regionUniforms, setRegions, regionAt, GLSL_REGIONS, LAYOUTS, WORLD_DEFAULTS, BODY_ORDER, CHART, BIOMES, BIOME_ORDER, BIOME_CHART, biomeTexture, biomeAt } from '../envs/land/regionkit.js';
@@ -14,7 +14,7 @@ import { LookPipeline, LOOK_PRESETS } from '../render/sea/look.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
-const KEY = 'steelSalvo.landLab.v1';
+const KEY = 'gameLab.land.v1';
 let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { saved = null; }
 const S = { map: { ...TERRAIN_DEFAULTS }, water: { ...WORLD_DEFAULTS }, sky: { weather: 'fair', sunEl: 24, sunAz: 210 }, sail: true, cam: 'Chase', ...(saved || {}) };
 S.map = { ...TERRAIN_DEFAULTS, ...S.map }; S.water = { ...WORLD_DEFAULTS, ...(S.water || {}) };

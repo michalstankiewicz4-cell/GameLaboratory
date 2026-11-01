@@ -4,15 +4,15 @@
 import * as THREE from '../../vendor/three/three.module.js';
 import { buildShip, SHIPS } from '../models/ships-sea/index.js';
 import { bakeWear, ageMaterials, ageUniforms } from '../models/ships-sea/ageing.js';
-import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment, sunAt } from '../envs/land/skykit.js';
-import { rainUniforms, rainMesh, lightning } from '../envs/land/rainkit.js';
+import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment, sunAt } from '../envs/sky/skykit.js';
+import { rainUniforms, rainMesh, lightning } from '../envs/sky/rainkit.js';
 import { navLights, gunFlashes, signalLamp } from '../models/ships-sea/lights.js';
 import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, hullTexture, LOOKS } from '../envs/water/waterkit.js';
 import { LookPipeline, AutoResolution, LOOK_PRESETS, LOOK_DEFAULTS } from '../render/sea/look.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
-const KEY = 'steelSalvo.lookLab.v1';
+const KEY = 'gameLab.look.v1';
 let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { saved = null; }
 const S = {
   sky: { weather: 'broken', ...pick(WEATHER.broken), sunEl: 12, sunAz: 235, windSea: true, squalls: true, rainLens: true, time: 15.2, moon: 0.8, lightning: 0, thunder: false, navLights: 'auto' },

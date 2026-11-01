@@ -7,13 +7,13 @@ import * as THREE from '../../vendor/three/three.module.js';
 import { STRUCTURE_IDS, buildStructure, structureInfo, structureParams } from '../models/structures/index.js';
 import { heightTexture, landUniforms, setLand, GLSL_LAND } from '../envs/land/landkit.js';
 import { transformShip } from '../models/ships-sea/transform.js';
-import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment } from '../envs/land/skykit.js';
+import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment } from '../envs/sky/skykit.js';
 import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, LOOKS } from '../envs/water/waterkit.js';
 import { LookPipeline, LOOK_PRESETS } from '../render/sea/look.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
-const KEY = 'steelSalvo.structuresLab.v1';
+const KEY = 'gameLab.structures.v1';
 let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { saved = null; }
 const S = { id: STRUCTURE_IDS[0], depth: 60, air: 18, jspeed: 400, canti: 0, cranes: false, weather: 'fair', time: 'Day', params: {}, moor: true, ...(saved || {}) };
 S.params = S.params || {};

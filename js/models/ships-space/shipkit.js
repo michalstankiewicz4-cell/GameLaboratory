@@ -1537,7 +1537,7 @@ function makeOnlineFader(rate = 2) {
 //             actions/act, and setDamage(d) for damage stages of its own)
 // `detail` (0.2 .. 2) scales every segment count through seg(), so the
 // same definition serves both a close-up hero model and cheap swarm LODs.
-// The definitions live in js/shipkit/ships/<id>.js, one file per ship,
+// The definitions live in js/models/ships-sea/ships/<id>.js, one file per ship,
 // loaded after this one; each pushes its entry here (ShipKit.SHIP_DEFS)
 // and takes what it needs from ShipKit._ (the building blocks and helpers
 // below). To add a ship: a new file of the same shape, added after the
@@ -1847,7 +1847,7 @@ function prewarm(ids) {
 }
 
 return {
-  // the internals the ship files build with (js/shipkit/ships/*.js) — not a public API
+  // the internals the ship files build with (js/models/ships-sea/ships/*.js) — not a public API
   _: { GOLD, BLUE, additiveSprite, buildShipModel, canvas, clamp, detailHelpers, fxHost, fxTextures, glowTextures, labelKey, makeBoltPool, makeBrushed, makeCoreMaterial, makeEngineSet, makeExhaust, makeGameHolder, makeNavLights, makeOnlineFader, makePlating, makePlumeMaterial, makeScanWave, makeShotQueue, makeSolarCells, mergeStatic, partsOf, rng, shadowed, sharedMaterials, strut, textTexture, trackTextures },
   SHIP_DEFS, GAME_DETAIL, buildShipModel, disposeShipModel, modelStats, makeGameHolder, prewarm, mergeStatic,
   makeSpaceSky, makeEnvironment,

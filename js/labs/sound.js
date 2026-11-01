@@ -32,7 +32,6 @@ function showTab(music) {
   $("tabMoods").classList.toggle("on", !music); $("tabMusic").classList.toggle("on", music);
   $("presets").classList.toggle("hidden", music); $("songs").classList.toggle("hidden", !music);
   try { localStorage.setItem("soundLab.tab", music ? "music" : "moods"); } catch (e) { /* blocked */ }
-  fitHud();
 }
 $("tabMoods").addEventListener("click", () => showTab(false));
 $("tabMusic").addEventListener("click", () => showTab(true));
@@ -191,12 +190,8 @@ function draw(t) {
   requestAnimationFrame(draw);
 }
 
-LabKit.applyGrain();
 LabKit.autoHideHud([$("hud"), $("opt")], 8);
-function fitHud() { LabKit.fitHud([$("hud"), $("opt")], 0.4, 1.3); }
-window.addEventListener("resize", fitHud);
-if (document.fonts) document.fonts.ready.then(fitHud);
-showAll(); markPreset("station"); fitHud();
+showAll(); markPreset("station");
 try { if (localStorage.getItem("soundLab.tab") === "music") showTab(true); } catch (e) { /* blocked */ }
 requestAnimationFrame(draw);
 window.soundLab = { player, toggle };

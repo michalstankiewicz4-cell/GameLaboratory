@@ -1,0 +1,10 @@
+/* The creator lab (labs/creator.html): its own rules, on top of ui/ui.css and ui/space.css. */
+.twoBtns{ display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px; }
+.threeBtns{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:6px; }
+.twoBtns .tBtn, .threeBtns .tBtn{ height:28px; font-size:12.5px; }
+#presets{ display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+#presets .tBtn{ height:28px; font-size:12px; }
+#pairs{ display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
+#pairs .tBtn{ height:26px; min-width:44px; font-size:12px; }
+textarea.lab{ height:110px; width:100%; padding:6px; font-family:monospace; font-size:11px; resize:vertical; }
+#sel{ font-size:13px; color:var(--dim); margin:4px 0; }

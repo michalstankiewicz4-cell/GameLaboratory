@@ -1,6 +1,6 @@
 # Plants Lab — trees, palms, shrubs and grass
 
-`labs/plants.html` (`js/labs/plants.js`), kits `js/env/plantkit.js` (single plants) and `js/env/forestkit.js` (many
+`labs/plants.html` (`js/labs/plants.js`), kits `js/models/plants/plantkit.js` (single plants) and `js/models/plants/forestkit.js` (many
 plants: impostors, forests, grass). Everything is grown from code — no image files: bark and foliage are drawn on
 canvases, the shapes follow each species' habit at real scale (metres). Settings are kept in the browser
 (`steelSalvo.plantsLab.v1`). Rocks as objects get their own lab; the terrain's ground colours (grass, heather, sand)

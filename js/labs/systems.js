@@ -510,10 +510,8 @@ function systemFx(o) {
     lens: o.lens && hole ? { object: hole.body.group, position: hole.body.group.getWorldPosition(new THREE.Vector3()), radius: hole.size } : null,
   };
 }
-LabKit.applyGrain();
 LabKit.autoHideHud([$("hud"), $("opt")], 5);   // the panels fade out when idle
 const perf = LabKit.perfCounters(renderer);
-function fitHud() { LabKit.fitHud([$("hud"), $("opt")], 0.4, 1.3); }
 
 // ---------- the loop ----------
 const clock = new THREE.Clock();
@@ -544,13 +542,11 @@ function frame() {
   perf.update(performance.now(), performance.now() - t0);
   requestAnimationFrame(frame);
 }
-window.addEventListener("resize", () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); applyQuality(state.quality); fitHud(); });
-if (document.fonts) document.fonts.ready.then(fitHud);
+window.addEventListener("resize", () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); applyQuality(state.quality); });
 
 [$("speed"), $("qSlider"), $("dSlider")].forEach(paint);
 applyQuality(state.quality);
 load(SK.PRESETS[1].make());
-fitHud();
 frame();
 const loading = $("loading");
 loading.style.opacity = "0";

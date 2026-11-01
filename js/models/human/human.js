@@ -1,4 +1,4 @@
-/* LifeKit — the human (js/lifekit/creatures/human.js). Loaded after
+/* LifeKit — the human (js/models/life/creatures/human.js). Loaded after
    lifekit.js and move/walk.js. docs/life.md.
 
    Lore: there are no living humans in the game's world — this model is

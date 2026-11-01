@@ -112,7 +112,6 @@ function loadShip(index, keepCamera) {
   renderActions();
   applyWire();
   renderModelStats({ ...ShipKit.modelStats(current.group), buildMs });
-  if (typeof fitHud === "function") fitHud(); // panel height depends on the stats list
   if (!keepCamera) camera.position.set(...def.camera);
   // HUD
   showLabels();
@@ -286,8 +285,7 @@ const step = (d) => { state.shipIndex = (state.shipIndex + d + ShipKit.SHIP_DEFS
 document.getElementById("prevShip").addEventListener("click", () => step(-1));
 document.getElementById("nextShip").addEventListener("click", () => step(1));
 
-LabKit.applyGrain();   // the panels' grain (css/lab.css --grain)
-LabKit.autoHideHud([document.getElementById("hud"), document.getElementById("opt")], 5);
+LabKit.autoHideHud([...document.querySelectorAll("[data-window]")], 5);   // every window of the page (ui/windows.js)
 // PART NAMES: the ship's named part under the pointer (ShipKit partsOf) lights
 // up and its name shows by the pointer, with how many pieces and triangles it
 // has. Not in GAME BUILD: the parts are merged there, so they have no names.
@@ -384,30 +382,6 @@ for (const [elId, key] of [["hudTitle", "name"], ["hudSub", "sub"]]) {
   });
   el.addEventListener("blur", () => finish(true));
 }
-// CHANGE VIEW / C: the full UI, or only the ticked blocks (kept per viewer)
-{
-  const picked = store.get("picked", {});
-  document.querySelectorAll("[data-pick]").forEach((box) => {
-    const block = box.closest(".block");
-    box.checked = !!picked[box.dataset.pick];
-    block.classList.toggle("picked", box.checked);
-    box.addEventListener("change", () => {
-      picked[box.dataset.pick] = box.checked; store.set("picked", picked);
-      block.classList.toggle("picked", box.checked);
-    });
-  });
-  let focus = false;
-  const setFocus = (on) => { focus = on; document.body.classList.toggle("focus", on); fitHud(); };
-  document.getElementById("btnView").addEventListener("click", () => setFocus(!focus));
-  window.addEventListener("keydown", (e) => {
-    // not while typing (a text field, a name being edited); a checkbox or a slider in focus is fine
-    const a = document.activeElement, typing = a.isContentEditable || a.tagName === "TEXTAREA" || a.tagName === "SELECT" ||
-      (a.tagName === "INPUT" && !/^(checkbox|range|button|radio)$/.test(a.type));
-    if (e.code !== "KeyC" || e.ctrlKey || e.metaKey || e.altKey || typing) return;
-    setFocus(!focus);
-  });
-}
-
 const perf = LabKit.perfCounters(renderer);   // FPS, frame/CPU time, triangles, draw calls + graph
 
 // =====================================================================
@@ -439,26 +413,15 @@ function frame() {
   requestAnimationFrame(frame);
 }
 
-// HUD scaling: both panels share one scale factor (--ui) so they follow
-// the window: grow a little on big screens, shrink on small ones and never
-// overlap each other horizontally. It depends on the WINDOW only, not on
-// the panels' content — a panel that doesn't fit vertically scrolls (CSS
-// max-height on #hud/#opt), so the UI doesn't change size when, e.g., GAME
-// BUILD rebuilds the model and its stats list gets shorter.
-const hudEl = document.getElementById("hud"), optEl = document.getElementById("opt");
-function fitHud() { LabKit.fitHud([hudEl, optEl], 0.45, 1.35); }
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   applyQuality(state.quality);
-  fitHud();
 });
-if (document.fonts) document.fonts.ready.then(fitHud); // text metrics change once web fonts load
 
 loadShip(0, false);
 paintSlider(qSlider); paintSlider(dSlider); paintSlider(dmgSlider);
 applyQuality(state.quality);
-fitHud();
 frame();
 const loading = document.getElementById("loading");
 loading.style.opacity = "0";

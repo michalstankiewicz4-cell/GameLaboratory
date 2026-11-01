@@ -1,0 +1,19 @@
+/* The ship lab (labs/ship.html): its own rules, on top of ui/ui.css and ui/space.css. */
+#actBtns{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px 0 4px; }
+.tBtn.trig:active, .tBtn.pulse{ border-color:var(--ok); box-shadow:none; color:var(--ok); }
+.tBtn:disabled{ opacity:.32; filter:saturate(0); cursor:not-allowed; box-shadow:none; border-color:var(--line); color:var(--text); }
+input[type=range]:disabled{ opacity:.35; cursor:not-allowed; }
+#hudTop, #shipNav{ flex:none; }
+#shipNav{ margin:0 0 10px; }
+#opt .block .secHd:first-of-type{ margin-top:4px; }
+#hudTitle, #hudSub{ cursor:text; outline:none; }
+#hudTitle[contenteditable="true"], #hudSub[contenteditable="true"]{ box-shadow:0 0 0 1px var(--accent); border-radius:4px; padding:0 4px;
+  background:var(--field); }
+/* PART NAMES: the part under the pointer, named next to it */
+#partTip.hidden{ display:none; }
+#partTip{ position:fixed; z-index:15; pointer-events:none; padding:5px 10px; border:1px solid var(--ok); border-radius:6px;
+  background:var(--glass); font-family:var(--font); color:var(--text); font-size:13px; white-space:nowrap; }
+#partTip b{ color:var(--ok); font-weight:500; }
+#partTip span{ display:block; font-family:var(--font); font-size:11.5px; letter-spacing:0; color:var(--dim); }
+.tBtn.off.on{ border-color:var(--err); box-shadow:none; color:var(--err); }
+.legend .lg1{ background:#f8bb56; } .legend .lg2{ background:#8ea6fd; } .legend .lg3{ background:#d05b69; }

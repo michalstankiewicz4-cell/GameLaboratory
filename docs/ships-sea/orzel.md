@@ -1,6 +1,6 @@
 # ORP Orzeł (1939, as delivered) — research sheet
 
-Model: `js/shipkit/ships/orzel.js` · viewer: `labs/ship.html` (pick *ORP Orzeł* in the top bar) · kit: `js/shipkit/`.
+Model: `js/models/ships-sea/ships/orzel.js` · viewer: `labs/ship.html` (pick *ORP Orzeł* in the top bar) · kit: `js/models/ships-sea/`.
 Configuration: the boat as handed over by De Schelde at Vlissingen on 2 February 1939 and as she sailed in September 1939
 (before the May 1940 work at Rosyth). She was lost with all hands on her seventh patrol in the North Sea, declared lost
 on 11 June 1940; the wreck has not been found.

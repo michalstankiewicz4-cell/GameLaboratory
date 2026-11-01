@@ -2,9 +2,9 @@
 // and lighthouses next (owner: everything built that touches the water). Metres, y up (y = 0 sea level).
 // build(id, { detail, depth, …PARAMS }) → { group, parts: {name: Object3D}, info, … structure-specific handles }
 // PARAMS (optional): the structure's own settings, shown by the lab as sliders and selects.
-import * as super300 from './structures/super300.js';
-import * as quay from './structures/quay.js';
-import * as breakwater from './structures/breakwater.js';
+import * as super300 from './offshore/super300.js';
+import * as quay from './coastal/quay.js';
+import * as breakwater from './coastal/breakwater.js';
 
 export const STRUCTURES = { super300, quay, breakwater };
 export const STRUCTURE_IDS = Object.keys(STRUCTURES);

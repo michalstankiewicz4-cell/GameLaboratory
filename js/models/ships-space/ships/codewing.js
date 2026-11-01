@@ -1,5 +1,5 @@
 /* =======================================================================
-   SHIPKIT · CODEWING — one ship definition (see js/shipkit/shipkit.js,
+   SHIPKIT · CODEWING — one ship definition (see js/models/ships-sea/shipkit.js,
    "SHIP DEFINITIONS", and docs/ship.md). A classic script loaded after
    shipkit.js: it pushes its entry into ShipKit.SHIP_DEFS and builds with
    ShipKit's blocks and helpers (ShipKit._).

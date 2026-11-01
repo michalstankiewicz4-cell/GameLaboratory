@@ -34,7 +34,7 @@
      offsetDir(dir, eastM, northM, R)   a direction eastM/northM metres away
      greatCircle(a, b, R)               metres between two directions
      bases: load(), save(all), get(ref), put(ref, base), remove(ref)
-       localStorage "roj-bases": { [ref]: { name, lat, lon, created,
+       localStorage "gameLab.bases": { [ref]: { name, lat, lon, created,
          modules: [{ type, e, n, rot, start, dur }] } } (e/n: metres from the
          base's centre, east/north; start/dur: ms — progress from the clock)
      makeMarker(color, size)            a constant-size diamond sprite (globe markers)
@@ -286,7 +286,7 @@ function groundMaterial(terrain, R) {
 }
 
 // ---------- bases (this browser only for now) ----------
-const KEY = "roj-bases";
+const KEY = "gameLab.bases";
 const bases = {
   load() { try { return JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { return {}; } },
   save(all) { try { localStorage.setItem(KEY, JSON.stringify(all)); } catch (e) { /* storage unavailable */ } },

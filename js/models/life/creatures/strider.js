@@ -1,4 +1,4 @@
-/* LifeKit — the plains strider (js/lifekit/creatures/strider.js). Loaded
+/* LifeKit — the plains strider (js/models/life/creatures/strider.js). Loaded
    after lifekit.js and move/quad.js. docs/life.md, "Four legs".
 
    An invented grazer of open plains, built to be believable rather than

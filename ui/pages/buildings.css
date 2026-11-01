@@ -1,0 +1,5 @@
+/* The buildings lab (labs/buildings.html): its own rules, on top of ui/ui.css and ui/space.css. */
+#modTabs{ display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:6px; }
+#modTabs .tBtn{ height:28px; }
+.twoBtns{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:8px; }
+#costList .row b{ color:var(--accent); }

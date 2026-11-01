@@ -1,5 +1,5 @@
 /* =======================================================================
-   BODYKIT · SKY — one kind of body (see js/bodykit/bodykit.js and
+   BODYKIT · SKY — one kind of body (see js/models/bodies/bodykit.js and
    docs/bodies.md). A classic script loaded after bodykit.js (and after the
    kinds it uses): it registers its builder(s) in BodyKit's KINDS, which
    the groups' table names, and builds with BodyKit's shared blocks.

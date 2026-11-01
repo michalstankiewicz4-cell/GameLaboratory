@@ -9,8 +9,8 @@ seed + editing on top", a full hand editor later if needed).
 
 | File | What it is |
 |---|---|
-| `js/systemkit/systemkit.js` | **SystemKit** (`window.SystemKit`), a classic script like ShipKit and BodyKit: the system data format, presets, the random generator, building a system from BodyKit bodies. Not loaded by the game yet; meant for it (other systems on the galaxy map). |
-| `systems.html` | The lab: Three.js, OrbitControls, PostKit (IMAGE EFFECTS), LabKit (the labs' HUD helpers, `css/lab.css`), BodyKit, SystemKit. |
+| `js/envs/space/systemkit/systemkit.js` | **SystemKit** (`window.SystemKit`), a classic script like ShipKit and BodyKit: the system data format, presets, the random generator, building a system from BodyKit bodies. Not loaded by the game yet; meant for it (other systems on the galaxy map). |
+| `systems.html` | The lab: Three.js, OrbitControls, PostKit (IMAGE EFFECTS), LabKit (the labs' HUD helpers, `ui/space.css`), BodyKit, SystemKit. |
 
 ## The data
 

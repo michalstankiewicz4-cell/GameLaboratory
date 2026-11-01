@@ -1,5 +1,5 @@
 > **W GameLaboratory** (przeniesione z repozytorium NeuroLabPA, z historią): SDF Walkers to `labs/walkers.html`
-> (skrypty `js/labs/walkers/`, model — shadery, cechy, render — `js/models/life/zombie/walkers/`, dane `data/walkers/`),
+> (skrypty `js/labs/walkers/`, model — shadery, cechy, render — `js/models/human/zombie/walkers/`, dane `data/walkers/`),
 > laboratorium języka to `labs/lang.html` (`js/labs/lang/`, teksty `data/lang/`, narzędzia `tools/lang/`).
 > Pierwotne SDF Morgue: `docs/morgue/sdf-morgue-original.html`. Ścieżki niżej są z dawnego repozytorium.
 
@@ -101,4 +101,4 @@ Zobacz `ROADMAP.md`.
 
 ## Wersjonowanie
 
-Wersja jest w `js/version.js` i w stopce strony. Każda zmiana trafia do `CHANGELOG.md`. Schemat: `0.MINOR.PATCH`. MINOR rośnie przy nowych funkcjach, a każda zmiana listy wejść sieci (nowa cecha) też podnosi MINOR, bo unieważnia wyeksportowane modele.
+Wersja jest w `ui/versions.js` (`labs/walkers.html`) i na pasku menu. Zmiany od przeniesienia: `CHANGELOG.md` w katalogu głównym; historia z NeuroLabPA: `docs/history/walkers.md`. Schemat: `0.MINOR.PATCH`. MINOR rośnie przy nowych funkcjach, a każda zmiana listy wejść sieci (nowa cecha) też podnosi MINOR, bo unieważnia wyeksportowane modele.

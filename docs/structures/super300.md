@@ -1,6 +1,6 @@
 # Jack-up drilling rig, Super 300 class — research sheet
 
-Model: `js/structkit/structures/super300.js` · lab: `labs/structures.html` · built at real scale (1 unit = 1 m).
+Model: `js/models/structures/offshore/super300.js` · lab: `labs/structures.html` · built at real scale (1 unit = 1 m).
 
 ## What it is
 

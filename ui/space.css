@@ -1,0 +1,57 @@
+/* The labs from Space (ship, bodies, systems, surface, buildings, vehicles, marine, sound, life, human, creator):
+   the page, the panels (#hud, #opt, .hudPanel) and what is in them, in the look of ui/ (ui/tokens.css).
+   Load after ui/ui.css. Each page adds its own rules in ui/pages/<lab>.css. */
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden}
+body{font:14px/1.45 var(--font);color:var(--text)}
+canvas#view{position:fixed;inset:0;width:100%;height:100%;display:block}
+
+/* panels (in a window from ui/windows.js, or on their own on the pages without windows) */
+#hud{position:fixed;left:16px;top:calc(16px + var(--menuH));width:330px}
+#opt{position:fixed;right:16px;top:calc(16px + var(--menuH));width:330px}
+#hud, #opt{max-height:calc(100vh - 32px - var(--menuH));overflow-y:auto;overflow-x:hidden;transition:opacity .45s}
+#hudTop{position:relative;margin:0 0 8px}
+#hudTitle{font:600 20px/1.2 var(--font);color:var(--head);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hudPanel{position:relative;padding:12px 14px;margin:0 0 6px;border:1px solid var(--line);border-radius:var(--r);background:var(--glass);backdrop-filter:blur(6px)}
+.labWin .hudPanel:not(.labWinBody){padding:0;border:0;border-radius:0;background:none;backdrop-filter:none}
+.secHd{margin:14px 0 6px;font:600 11px/1.3 var(--font);letter-spacing:1.4px;text-transform:uppercase;color:var(--accent)}
+.secHd.first{margin-top:0}
+.row{display:flex;justify-content:space-between;gap:10px;font-size:13px;line-height:20px;color:var(--dim)}
+.row b{font:12.5px var(--mono);font-weight:400;color:var(--head);white-space:nowrap}
+.sl{display:flex;justify-content:space-between;align-items:baseline;margin-top:8px;font-size:13px;color:var(--text)}
+.sl b{font:12px var(--mono);font-weight:400;color:var(--dim)}
+.ticks{display:flex;justify-content:space-between;margin-bottom:4px;font:11px var(--mono);color:var(--dim)}
+#hint{margin-top:10px;font-size:12px;line-height:1.45;color:var(--dim)}
+#fpsGraph{display:block;width:100%;margin-top:8px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.legend{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:5px;font-size:11.5px;color:var(--dim)}
+.legend i{display:inline-block;width:10px;height:10px;margin-left:4px;border-radius:2px}
+
+/* the model arrows: previous · 1 / 4 · next */
+#shipNav{display:flex;align-items:center;gap:8px}
+#shipIndex{flex:1;text-align:center;font:13px var(--mono);color:var(--dim)}
+#figList{list-style:none;margin:0;padding:0;columns:2;column-gap:14px}
+#figList li{display:flex;justify-content:space-between;font-size:13px;line-height:18px;color:var(--dim);break-inside:avoid}
+#figList li b{margin-left:6px;font:12px var(--mono);font-weight:400;color:var(--head)}
+#hudBtns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:12px}
+
+/* the panels' controls on the pages without windows (scale, skins) look the same as in a window */
+#hud, #opt, .hudPanel{font:13.5px/1.45 var(--font)}
+
+/* shared by several labs: rows of buttons, labelled fields, the lab's own drop-downs and fields */
+.hidden{display:none !important}
+#view{position:fixed;inset:0;width:100%;height:100%;display:block}
+#fpsGraph{height:40px}
+.twoBtns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.threeBtns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px}
+.prow{display:grid;grid-template-columns:96px 1fr;gap:8px;align-items:center;margin-top:5px;font-size:13.5px;color:var(--text)}
+:is(select, input, textarea).lab, #hud input[type=number], #opt input[type=number]{min-width:0;height:28px;padding:0 6px;border:1px solid var(--line);
+  border-radius:6px;background:var(--field);color:var(--text);font:13px var(--font)}
+
+/* hidden after a few idle seconds (LabKit.autoHideHud) */
+.labIdle{opacity:0}
+.labIdle, .labIdle *{pointer-events:none !important}
+#hudSub{margin-top:2px;font-size:12.5px;color:var(--dim)}
+/* the camera look panel (js/labkit/look-panel.js) */
+.pkNote{margin:2px 0 6px;font-size:11.5px;color:var(--dim)}
+.pkRow{display:flex;flex-wrap:wrap;gap:5px;margin:4px 0 6px}
+.pkRow .tBtn{flex:1 1 auto;padding:0 8px;font-size:12px}

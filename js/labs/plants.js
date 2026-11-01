@@ -3,7 +3,7 @@
 // forests, copses, oases and scrub placed by biome, height, slope and water, full models near the camera and
 // impostors beyond, grass blades around the camera, all moving in the same wind).
 import * as THREE from '../../vendor/three/three.module.js';
-import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment } from '../envs/land/skykit.js';
+import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment } from '../envs/sky/skykit.js';
 import { waveSet, waterUniforms, setWaves, polarGrid, waterMaterial, LOOKS } from '../envs/water/waterkit.js';
 import { heightTexture, terrainMeshes, sampleHeight, GLSL_LAND, fbm } from '../envs/land/landkit.js';
 import { generateWorld, biomeTexture, biomeAt, BIOMES } from '../envs/land/regionkit.js';
@@ -13,7 +13,7 @@ import { LookPipeline, LOOK_PRESETS } from '../render/sea/look.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
-const KEY = 'steelSalvo.plantsLab.v1';
+const KEY = 'gameLab.plants.v1';
 let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { saved = null; }
 const S = { mode: 'specimen', species: 'oak', seed: 1, size: 1, detail: 1, compare: true, season: 0, biome: 'temperate', mapSeed: 7, density: 1, grass: 0.8, grassR: 45, lod: 110, impostors: true,
   wind: 0.5, windDir: 225, weather: 'fair', sunEl: 32, sunAz: 200, ...(saved || {}) };

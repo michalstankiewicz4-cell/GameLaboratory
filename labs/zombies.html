@@ -8,13 +8,14 @@
 <meta name="description" content="Zombie Generator: original zombies from a seed — body, face, decay, outfit, blood and dirt — animated in 12 frames from eight directions and exported as Unity sprite sheets (512×512 frames, pivot at the feet) with JSON and an editor script, realistic or as pixel art.">
 <link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/zombies.html">
 <link rel="icon" type="image/png" href="../assets/favicon-32.png">
-<link rel="stylesheet" href="../css/lab-sea.css">
-<link rel="stylesheet" href="../css/windows.css">
-<link rel="stylesheet" href="../css/pixel.css">
+<link rel="stylesheet" href="../ui/sea.css">
+<link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="../ui/pages/pixel.css">
 </head>
 <body class="lab pix zomb">
-<script src="../js/labkit/versions.js"></script>
-<script src="../js/labkit/menubar.js"></script>
+<script src="../ui/versions.js"></script>
+<script src="../ui/catalog.js"></script>
+<script src="../ui/menubar.js"></script>
 <div class="bar">
   <b>Zombie Generator</b> <span class="ver mono" id="ver" data-lab-version="labs/zombies.html"></span>
   <span class="dimtxt">Pixel Studio</span>
@@ -67,7 +68,7 @@
   <label class="chk"><input type="checkbox" id="allAnims"> ZIP: every animation, not only this one</label>
   <p class="note">Default sheet: 12 frames of 512 × 512 in 6 columns × 2 rows, frame 0 top-left, transparent background with a hard edge, pivot in the centre 9 px above the bottom, 100 pixels per unit. The ZIP holds the sheets, their JSON, the slicer script and a README.</p>
 </aside>
-<script src="../js/labkit/windows.js"></script>
+<script src="../ui/windows.js"></script>
 <script type="module" src="../js/labs/pixel/zombies.js"></script>
 </body>
 </html>

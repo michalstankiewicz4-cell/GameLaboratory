@@ -1,4 +1,4 @@
-# Transformer (`js/shipkit/transform.js`, `labs/transform.html`)
+# Transformer (`js/models/ships-sea/transform.js`, `labs/transform.html`)
 
 Turns a ShipKit lab ship into a game-ready one: levels of detail that keep a fleet cheap, and many hitboxes for
 procedural destruction, with the damage drawn by the materials (no extra draw calls).

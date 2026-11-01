@@ -1,7 +1,7 @@
 # Quays and breakwaters — research sheet
 
-Models: `js/structkit/structures/quay.js`, `js/structkit/structures/breakwater.js`, building blocks in
-`js/structkit/coastal.js` · lab: `labs/structures.html`. These are **typical** structures, not particular ones: the
+Models: `js/models/structures/coastal/quay.js`, `js/models/structures/coastal/breakwater.js`, building blocks in
+`js/models/structures/coastal.js` · lab: `labs/structures.html`. These are **typical** structures, not particular ones: the
 construction types, cross-sections and furniture follow common port and coastal engineering practice, and the main
 sizes are parameters in the lab.
 

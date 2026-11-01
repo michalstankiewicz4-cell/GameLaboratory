@@ -7,8 +7,8 @@ import { KIT } from '../../../js/models/ships-sea/geom.js';
 import { SHIPS } from '../../../js/models/ships-sea/index.js';
 import { transformShip } from '../../../js/models/ships-sea/transform.js';
 import { sideAt } from '../../../js/models/ships-sea/hull.js';
-import { buildShip as buildGameShip } from '../../../js/models/ships-sea/world/models.js';
-import { CLASSES } from '../../../js/models/ships-sea/world/constants.js';
+import { buildShip as buildGameShip } from '../../../js/models/ships-sea/game-classes/models.js';
+import { CLASSES } from '../../../js/models/ships-sea/game-classes/constants.js';
 
 const GAME_NAMES = { dd: 'Destroyer', ca: 'Cruiser', bb: 'Battleship', ss: 'Submarine' };
 // per-level budgets the transformer aims at (LOD0 is only drawn close up)

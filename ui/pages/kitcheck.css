@@ -1,0 +1,14 @@
+/* Kit check (tools/kitcheck.html): a report page, on top of ui/ui.css. */
+:root{color-scheme:dark;--bad:var(--err)}
+body{margin:0;padding:24px 28px;background:var(--bg);color:var(--text);font:14px/1.45 var(--mono)}
+h1{margin:0 0 4px;font:600 22px var(--font);color:var(--head)}
+p{max-width:900px;margin:0 0 16px;color:var(--dim)}
+button{padding:6px 14px;border:1px solid var(--line);border-radius:var(--r2);background:var(--field);color:var(--text);font:500 13px var(--font);cursor:pointer}
+button:hover{border-color:var(--accent);color:var(--head)}
+#sum{margin:10px 0 16px;font:600 18px var(--font)}
+.ok{color:var(--ok)} .bad{color:var(--bad)} .dim{color:var(--dim)}
+table{border-collapse:collapse;margin-bottom:22px}
+td, th{padding:3px 12px 3px 0;text-align:left;vertical-align:top}
+th{border-bottom:1px solid var(--line);font:600 11px var(--font);letter-spacing:1.4px;text-transform:uppercase;color:var(--accent)}
+pre{max-height:260px;overflow:auto;padding:10px;white-space:pre-wrap;background:var(--card);border:1px solid var(--line);border-radius:8px}
+iframe{position:fixed;left:-2000px;top:0;width:1280px;height:720px;border:0}

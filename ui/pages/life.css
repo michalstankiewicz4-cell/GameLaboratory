@@ -1,0 +1,9 @@
+/* The life lab (labs/life.html): its own rules, on top of ui/ui.css and ui/space.css. */
+#creTabs{ display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:6px; }
+#creTabs .tBtn{ height:28px; }
+#creTabs .creGroup{ grid-column:1 / -1; font-size:11px; letter-spacing:1.4px; color:var(--dim); text-transform:uppercase; margin-top:4px; }
+#blurb{ font-size:13px; color:var(--dim); margin:4px 0 6px; line-height:1.35; }
+.fourBtns{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:6px; }
+.fourBtns .tBtn, .twoBtns .tBtn, .threeBtns .tBtn{ height:28px; font-size:12.5px; }
+#faceSliders .sl span{ font-size:12.5px; }
+.seedRow{ display:grid; grid-template-columns:96px 1fr 34px; gap:8px; align-items:center; margin-top:5px; font-size:13.5px; color:var(--text); }

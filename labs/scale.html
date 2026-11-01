@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'self' blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Scale lab | GameLaboratory</title>
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="../css/fonts.css">
 <!-- Scale lab: every object of the game side by side in one row, at the
      size it has in the game, over a ruler in world units — to decide what
      should grow and what should shrink (docs/scale.md). The sizes are READ
@@ -16,42 +16,13 @@
      bodies.html it can't be opened straight from disk.
      Models come from the same kits as the game (ShipKit, BodyKit); the
      outline mode draws the sizes that matter for gameplay instead. -->
-<style>
-  :root{ color-scheme:dark; }
-  html,body{ margin:0; height:100%; overflow:hidden; background:#03040a; color:#d8ddff;
-    font-family:"Roboto Condensed","Arial Narrow",sans-serif; }
-  #bar{ position:fixed; left:0; right:0; top:0; z-index:5; display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px;
-    padding:8px 14px; background:rgba(6,9,26,.92); border-bottom:1px solid #1c3bb4; }
-  #bar h1{ margin:0; font-family:"Antonio","Arial Narrow",sans-serif; font-size:20px; letter-spacing:.5px; color:#f8bb56; font-weight:700; }
-  #bar button{ font-family:"Oswald",sans-serif; font-size:14px; color:#d8ddff; background:#070b22; border:1px solid #3c55d8;
-    border-radius:6px; padding:4px 12px; cursor:pointer; }
-  #bar button.on{ border-color:#f8bb56; color:#ffe2a8; box-shadow:0 0 8px rgb(248 187 86 / .35); }
-  #bar button:hover{ filter:brightness(1.2); }
-  #legend{ display:flex; flex-wrap:wrap; gap:4px 12px; font-size:13px; color:#aab4e8; }
-  #legend i{ display:inline-block; width:18px; height:0; border-top:2px solid; vertical-align:middle; margin-right:5px; }
-  #legend i.dash{ border-top-style:dashed; }
-  #fps{ margin-left:auto; font-family:"IBM Plex Mono",monospace; font-size:13px; color:#7f8fd6; }
-  #hint{ position:fixed; left:14px; bottom:10px; z-index:5; font-size:13px; color:#7f8fd6; }
-  #labels{ position:fixed; inset:0; pointer-events:none; z-index:3; }
-  .lbl{ position:absolute; transform:translate(-50%,-100%); text-align:center; white-space:nowrap; text-shadow:0 0 4px #000, 0 0 2px #000; }
-  .lbl b{ display:block; font-family:"Oswald",sans-serif; font-weight:500; font-size:14px; color:#fff; }
-  .lbl span{ display:block; font-size:12.5px; color:#b7c4ff; line-height:1.35; }
-  #scaleBar{ position:fixed; right:18px; bottom:14px; z-index:5; text-align:center; font-family:"IBM Plex Mono",monospace; font-size:12px; color:#d8ddff; }
-  #scaleBar div{ height:6px; border:2px solid #d8ddff; border-top:0; margin-top:3px; }
-  .tick{ position:absolute; transform:translate(-50%,4px); font-family:"IBM Plex Mono",monospace; font-size:11px; color:#8fa2ff; text-shadow:0 0 3px #000; }
-  /* GameLaboratory: one look for every lab — the top bar like the labs from Battle (css/lab-sea.css); the lab's name is on the menu bar */
-  #bar{ background:rgba(10,13,17,.82); border-bottom:1px solid #26303d; backdrop-filter:blur(6px); font-family:system-ui,-apple-system,"Segoe UI",sans-serif; }
-  #bar h1{ display:none; }
-  #bar button{ font-family:system-ui,-apple-system,"Segoe UI",sans-serif; font-size:12.5px; color:#c8d0da; background:#18202b; border:1px solid #26303d; border-radius:7px; padding:4px 9px; }
-  #bar button:hover{ filter:none; border-color:#f2b84b; color:#eef2f6; }
-  #bar button.on{ border-color:#f2b84b; color:#f2b84b; box-shadow:none; }
-  #legend{ color:#7f8a98; font-family:system-ui,-apple-system,"Segoe UI",sans-serif; font-size:12.5px; }
-  #fps, #hint{ color:#7f8a98; font-family:ui-monospace,Consolas,monospace; font-size:12px; }
-</style>
+<link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="../ui/pages/scale.css">
 </head>
 <body>
-<script src="../js/labkit/versions.js"></script>
-<script src="../js/labkit/menubar.js"></script>
+<script src="../ui/versions.js"></script>
+<script src="../ui/catalog.js"></script>
+<script src="../ui/menubar.js"></script>
 <div id="bar">
   <h1>SCALE LAB</h1>
   <button type="button" id="btnModels" class="on" title="The game's own models (ShipKit, BodyKit)">Models</button>

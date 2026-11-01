@@ -7,7 +7,7 @@ ship cam. The kits' own APIs are in [`ship.md`](ship.md) and
 [`bodies.md`](bodies.md).
 
 The game's notes are in three files: [`architecture.md`](https://github.com/michalstankiewicz4-cell/Space/blob/main/docs/architecture.md)
-(world, network, programs, units), [`ui.md`](ui.md) (screens, HUD,
+(world, network, programs, units), [`ui.md`](https://github.com/michalstankiewicz4-cell/Space/blob/main/docs/ui.md) (screens, HUD,
 windows, load order) and [`rendering.md`](rendering.md) (models,
 image quality, post-processing, sky).
 
@@ -46,7 +46,7 @@ then read just that range.
   Custom `ShaderMaterial`s write their color untouched and need nothing.
   **A new material color set at runtime** (not at creation) would bypass
   the one-time conversion — convert it yourself.
-- **ShipKit is shared, not copied**: `js/shipkit/shipkit.js` is a classic
+- **ShipKit is shared, not copied**: `js/models/ships-space/shipkit.js` is a classic
   script (`window.ShipKit`, like the `THREE` global), loaded by
   `index.html` (`defer`, after Three.js) and by `ship.html` — one source
   of truth. See `docs/ship.md` for its API.
@@ -99,7 +99,7 @@ then read just that range.
   to address in the lighting pass. (Remote stations stopped being tinted
   in v2.13.0, see "Space station".)
 - **BodyKit planets** (v2.10.0, `world/bodyVisual.js`): the six planet
-  slots are the body lab's bodies — `js/bodykit/bodykit.js`, a classic
+  slots are the body lab's bodies — `js/models/bodies/bodykit.js`, a classic
   script (`window.BodyKit`) shared with `bodies.html` like ShipKit is with
   `ship.html`. `BodyKit.GAME_BODIES` maps orbit slot -> lab body (from the
   bodies' `slot` field). `materializePlanet()` keeps `p.mesh` as an
@@ -225,7 +225,7 @@ the values from before). The Setup tab is a scrolling list; controls with
   of the post-processing chain below (it was `viewRect.js#renderWithFxaa`).
 - **Post-processing** (v2.23.0, `scene/post.js`; the user asked for all
   of it, each switchable; since v2.25.1 the steps live in PostKit,
-  `js/postkit/postkit.js`, shared with the labs — `post.js` only maps
+  `js/render/postkit/postkit.js`, shared with the labs — `post.js` only maps
   settings and game objects to its options): `viewRect.js#renderMainView`
   hands over to `renderPost` whenever `postActive()`. Order: scene → offscreen target
   (MSAA = its sample count: `gfxMsaa` 0/2/4/8; the canvas's own ≈×4 is
@@ -311,7 +311,7 @@ the values from before). The Setup tab is a scrolling list; controls with
 
 ## Sky backdrop (nebulae, stars, pulsars)
 
-- **Since v2.12.0 the sky is BodyKit's** (`js/bodykit/bodykit.js`, the SKY
+- **Since v2.12.0 the sky is BodyKit's** (`js/models/bodies/bodykit.js`, the SKY
   group, kind `"sky"`; `js/scene/skybox.js` builds and updates it; the
   body lab's SKY tab edits it and the lab shows it behind every body). It
   replaces the old canvas nebula sphere, the `THREE.Points` starfield in

@@ -15,5 +15,5 @@ export const COMET = {
   // previous, much smaller world and would take a comet a very long time
   // to cross this one.
   speedMin: 8, speedRange: 4
-  // its look (nucleus, coma, tails) is BodyKit's COMET (js/bodykit/bodykit.js)
+  // its look (nucleus, coma, tails) is BodyKit's COMET (js/models/bodies/bodykit.js)
 };

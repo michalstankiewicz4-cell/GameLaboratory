@@ -1,4 +1,4 @@
-> Przeniesione z repozytorium Battle (`docs/GUIDE.md`). Adresy stron z Battle odpowiadają tu: `labs/ship.html` → `labs/warship.html`, `labs/doctor.html` → `tools/doctor.html`, `pixel/` → `labs/pixel.html`, `pixel/zombies.html` → `labs/zombies.html`; laboratoria wody, lądu, budowli, wyglądu, roślin i transformator — te same nazwy w `labs/`.
+> Przeniesione z repozytorium Battle (`docs/GUIDE.md`). Adresy stron z Battle odpowiadają tu: `labs/ship.html` → `labs/warship.html`, `tools/doctor.html` → `tools/doctor.html`, `pixel/` → `labs/pixel.html`, `pixel/zombies.html` → `labs/zombies.html`; laboratoria wody, lądu, budowli, wyglądu, roślin i transformator — te same nazwy w `labs/`.
 
 # Labs guide — how to use them
 
@@ -165,7 +165,7 @@ The lab ship made game-ready: levels of detail and hitboxes.
   hit power.
 - **Armament**: train and elevate on every level.
 
-## Model Doctor — `labs/doctor.html`
+## Model Doctor — `tools/doctor.html`
 
 Checks every lab and game ship for the mistakes that keep coming back.
 
@@ -187,12 +187,12 @@ Open <https://michalstankiewicz4-cell.github.io/Battle/pixel/>. Pick a mode at t
 - Export: scale, then *PNG frame*, *PNG sprite sheet* or *GIF animation*.
 - Settings: *Copy settings* to send the exact setup (e.g. to Claude), *Apply pasted settings* to load one, *Reset* for defaults.
 - On a narrow window or a phone everything is one column: preview, then the mode's controls, then output.
-Details: `docs/pixel.md`.
+Details: `docs/pixel/README.md`.
 
 **Zombie Generator** (`pixel/zombies.html`, link in Pixel Studio's top bar): choose *GPU* or *CPU* in the top bar,
 then *Another zombie* or a seed and any trait on
 the left; animation, direction, camera, light, style (realistic or pixel art) and the sheet on the right; *PNG sheet*,
-*JSON*, *GIF preview*, *All 8 directions (ZIP)* and *Unity slicer (.cs)*. Nothing renders until you press *Start render*. Details: `docs/zombies.md`.
+*JSON*, *GIF preview*, *All 8 directions (ZIP)* and *Unity slicer (.cs)*. Nothing renders until you press *Start render*. Details: `docs/pixel/zombies.md`.
 
 ## When something looks wrong
 

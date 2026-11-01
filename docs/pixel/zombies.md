@@ -20,9 +20,9 @@ Each sheet comes with a JSON file (size, grid, pivot, pixels per unit, filter, a
 bottom-left origin) and `ZombieSheetSlicer.cs`, an editor script: select the PNGs, *Tools > Slice Zombie Sheets*, and
 each becomes a Multiple sprite with the rects, pivot, pixels per unit and filter from its JSON.
 *All 8 directions (ZIP)* renders every direction (optionally every animation) and packs the sheets, JSON, the script
-and a README into one ZIP (`js/pixel/zip.js`, stored).
+and a README into one ZIP (`js/render/pixel/zip.js`, stored).
 
-## The zombie (`js/pixel/zombie.js`)
+## The zombie (`js/models/human/zombie/zombie.js`)
 
 - **Body**: a signed distance field — round cones and ellipsoids on a 20-joint skeleton, smoothly joined (deltoids,
   biceps, calves, belly by build, clawed fingers and thumbs, a skull with jaw, nose, ears, eye sockets and an open

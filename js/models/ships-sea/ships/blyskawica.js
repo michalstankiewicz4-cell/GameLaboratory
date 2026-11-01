@@ -1,7 +1,7 @@
 // ORP Błyskawica (Grom class destroyer, J. Samuel White, Cowes; commissioned 1937), as built in 1937:
 // 3×2 + 1×1 120 mm/50 Bofors wz.34/36, 2×2 40 mm/56 Bofors wz.36, 4×2 13.2 mm Hotchkiss, 2×3 torpedo tubes,
 // depth-charge racks, mine rails, one raked funnel with a cap, high bridge with searchlight tower.
-// Real dimensions in metres (1 unit = 1 m). Sources and the reconstruction notes: docs/ships/blyskawica.md.
+// Real dimensions in metres (1 unit = 1 m). Sources and the reconstruction notes: docs/ships-sea/blyskawica.md.
 import * as THREE from '../../../../vendor/three/three.module.js';
 import { Part, plan, roundRect } from '../geom.js';
 import { loftHull, deckSurface, sideAt } from '../hull.js';

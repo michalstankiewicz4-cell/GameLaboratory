@@ -138,14 +138,12 @@ function applyLight() {
 }
 
 // ---------- the loop ----------
-LabKit.applyGrain();
 LabKit.autoHideHud([$("hud"), $("opt")], 5);
 const perf = LabKit.perfCounters(renderer);
 renderer.info.autoReset = false;
 function resize() {
   renderer.setSize(window.innerWidth, window.innerHeight, false);
   camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
-  LabKit.fitHud([$("hud"), $("opt")], 0.4, 1.3);
 }
 window.addEventListener("resize", resize);
 const clock = new THREE.Clock(), prev = new THREE.Vector3(), delta = new THREE.Vector3();

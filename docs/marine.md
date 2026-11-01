@@ -8,7 +8,7 @@ because you'll be able to go under water.
 
 | File | What it is |
 |---|---|
-| `js/marinekit/marinekit.js` | **MarineKit** (`window.MarineKit`), a classic script like the other kits. It holds the sea (waves, the seabed and an island, the water's and the bed's shaders), the vessels, the wake and marine snow. It needs THREE, ShipKit and VehicleKit (the amphibian's wheels: `VehicleKit.parts`). Not in the game, nor in the surface lab, yet. |
+| `js/envs/water/marinekit/marinekit.js` | **MarineKit** (`window.MarineKit`), a classic script like the other kits. It holds the sea (waves, the seabed and an island, the water's and the bed's shaders), the vessels, the wake and marine snow. It needs THREE, ShipKit and VehicleKit (the amphibian's wheels: `VehicleKit.parts`). Not in the game, nor in the surface lab, yet. |
 | `marine.html` | The lab: AUTO (wandering, keeping off the island; the amphibian shuttles to the island and back) or WASD + Q/E to dive, waves and depth sliders, NIGHT, WAKE, WORK. |
 
 ## The sea

@@ -2,55 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'self' blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sound lab | GameLaboratory</title>
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="../css/fonts.css">
-<!-- The sound lab: MusicKit (js/musickit/musickit.js) — the game's music,
+<!-- The sound lab: MusicKit (js/audio/musickit/musickit.js) — the game's music,
      generated live from layers, parameters and a seed, like ShipKit builds
      ships. Play it, shape it, record it. docs/sound.md. -->
-<link rel="stylesheet" href="../css/lab.css">
-<link rel="stylesheet" href="../css/windows.css">
-<style>
-.hidden{ display:none !important; }
-#viz{ position:fixed; inset:0; width:100%; height:100%; display:block; background:#01020a; }
-#btnPlay{ width:100%; height:44px; font-size:17px; letter-spacing:2px; margin-top:4px; }
-#btnPlay.on{ --c:#f8bb56; color:#241404; background:linear-gradient(180deg,#ffd98f,#e7a23f); border-color:#f8bb56; }
-#nowPlaying{ margin-top:8px; font-family:var(--fontLabel); font-size:13.5px; letter-spacing:.6px; color:#9fb1ff; min-height:18px; }
-#nowPlaying b{ color:#ffe2a8; font-weight:500; }
-.btnGrid{ display:grid; grid-template-columns:1fr 1fr; gap:6px; }
-.btnGrid .tBtn{ height:28px; font-size:13px; }
-.seedRow, .keyRow{ display:grid; grid-template-columns:1fr 34px; gap:6px; margin-top:6px; }
-.keyRow{ grid-template-columns:70px 1fr; }
-input.lab, select.lab, textarea.lab{ height:28px; border:1.5px solid #3c55d8; border-radius:6px; background:#02061a; color:#e6ebff;
-  font-family:var(--fontBody); font-size:13.5px; padding:0 6px; min-width:0; }
-textarea.lab{ height:96px; width:100%; padding:6px; resize:vertical; line-height:18px; }
-.lrow{ display:grid; grid-template-columns:76px 1fr 38px; gap:8px; align-items:center; margin-top:4px; font-size:13.5px; color:#c7d0ff; }
-.lrow b{ font-weight:400; color:#fff; text-align:right; font-size:12.5px; }
-.lrow input{ margin:0; }
-/* MOODS | MUSIC: two tabs in the section's header */
-.secHd.tabHd{ display:flex; gap:14px; }
-.tabHd button{ all:unset; cursor:pointer; color:#6f7fcf; letter-spacing:inherit; font:inherit; padding-bottom:1px; border-bottom:2px solid transparent; }
-.tabHd button:hover{ color:#c7d0ff; }
-.tabHd button.on{ color:#ffe2a8; border-bottom-color:#f8bb56; }
-.songList{ display:grid; gap:6px; }
-.songList .tBtn{ height:auto; min-height:38px; padding:5px 10px; display:flex; justify-content:space-between; align-items:center; text-align:left; font-size:13.5px; }
-.songList .tBtn small{ font-size:11.5px; color:#8fa4ff; letter-spacing:.5px; text-transform:none; }
-.songList .tBtn.on small{ color:#f2b84b; opacity:.85; }
-.irow{ display:grid; grid-template-columns:76px 1fr; gap:8px; align-items:center; margin-top:4px; font-size:13.5px; color:#c7d0ff; }
-.twoBtns{ display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:8px; }
-.twoBtns .tBtn{ height:28px; font-size:12.5px; }
-#btnWarm{ width:100%; height:28px; font-size:12.5px; margin-top:8px; }
-#btnMidi{ width:100%; height:28px; font-size:12.5px; margin-top:6px; }
-#recState{ font-size:12.5px; color:#7f92e8; margin-top:6px; min-height:16px; }
-#tapHint{ position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); z-index:1; pointer-events:none; text-align:center;
-  font-family:var(--fontLabel); letter-spacing:3px; color:#8fa4ff; font-size:15px; opacity:.85; transition:opacity .6s; }
-#tapHint b{ display:block; font-size:34px; color:#ffe2a8; letter-spacing:4px; margin-bottom:6px; }
-</style>
+<link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="../ui/space.css">
+<link rel="stylesheet" href="../ui/pages/sound.css">
 </head>
 <body>
-<script src="../js/labkit/versions.js"></script>
-<script src="../js/labkit/menubar.js"></script>
+<script src="../ui/versions.js"></script>
+<script src="../ui/catalog.js"></script>
+<script src="../ui/menubar.js"></script>
 <canvas id="viz"></canvas>
 <div id="tapHint"><b>PRESS PLAY</b>the music is made live, here, from code</div>
 
@@ -112,7 +78,7 @@ textarea.lab{ height:96px; width:100%; padding:6px; resize:vertical; line-height
   </div>
 </div>
 
-<script src="../js/labkit/windows.js"></script>
+<script src="../ui/windows.js"></script>
 <script type="module" src="../js/labkit/labkit.js"></script>
 <script type="module" src="../js/audio/musickit/musickit.js"></script>
 <script type="module" src="../js/labs/sound.js"></script>

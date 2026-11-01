@@ -18,12 +18,11 @@ export function battleImageEffects({ renderer, scene, camera, panel, sunDir, pre
   const paint = (r) => (window.LabKit ? window.LabKit.paintSlider(r) : null);
 
   const box = el('div');
-  box.append(el('div', 'secHd', 'CAMERA LOOK'), Object.assign(el('div', 'pkNote', 'The camera from the water labs: exposure, tone mapping, colour, glow, lens.'), { style: 'font-size:11.5px;color:#7f92e8;margin:2px 0 6px' }));
-  const row = el('div'); row.style.cssText = 'display:flex;flex-wrap:wrap;gap:5px;margin:4px 0 6px';
+  box.append(el('div', 'secHd', 'CAMERA LOOK'), el('div', 'pkNote', 'The camera from the water labs: exposure, tone mapping, colour, glow, lens.'));
+  const row = el('div', 'pkRow');
   const presetBtns = {};
   for (const [k, p] of Object.entries(LOOK_PRESETS)) {
-    const b = el('button', 'tBtn', p.label.toUpperCase()); b.style.cssText = 'flex:1 1 auto;padding:0 8px;font-size:12px';
-    b.addEventListener('click', () => { S.preset = k; S.look = { ...LOOK_DEFAULTS, ...pick(p) }; fill(); apply(); });
+    const b = el('button', 'tBtn', p.label.toUpperCase()); b.addEventListener('click', () => { S.preset = k; S.look = { ...LOOK_DEFAULTS, ...pick(p) }; fill(); apply(); });
     presetBtns[k] = b; row.append(b);
   }
   box.append(row);

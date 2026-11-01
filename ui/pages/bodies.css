@@ -1,0 +1,13 @@
+/* The bodies lab (labs/bodies.html): its own rules, on top of ui/ui.css and ui/space.css. */
+#groupTabs{ display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px; }
+.groupTab{ height:28px; padding:0 8px; border:1px solid var(--line); border-radius:var(--r2); background:var(--field); color:var(--text);
+  font:500 12.5px var(--font); cursor:pointer; transition:border-color .15s, color .15s; }
+.groupTab:hover{ border-color:var(--line2); color:var(--head); }
+.groupTab.gold{ border-color:var(--accent); color:var(--accent); }   /* the chosen group */
+#bodyIndex{ flex:1; text-align:center; font:13px var(--mono); color:var(--dim); }
+.note{ margin:10px 0 4px; font-size:13.5px; line-height:19px; color:var(--dim); }
+.param{ margin-bottom:2px; }
+.param .sl{ margin-top:4px; }
+.param input[type=range]{ height:18px; margin-top:1px; }
+.twoBtns{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+.wideBtn{ width:100%; margin-top:8px; }

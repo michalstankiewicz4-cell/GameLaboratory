@@ -1,0 +1,31 @@
+/* The scale lab (labs/scale.html): its own rules, on top of ui/ui.css and ui/space.css. */
+  :root{ color-scheme:dark; }
+  html,body{ margin:0; height:100%; overflow:hidden; background:#03040a; color:#d8ddff;
+    font-family:var(--font); }
+  #bar{ position:fixed; left:0; right:0; top:0; z-index:5; display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px;
+    padding:8px 14px; background:rgba(10,13,17,.9); border-bottom:1px solid var(--line); }
+  #bar h1{ margin:0; font-family:var(--font); font-size:20px; letter-spacing:.5px; color:var(--accent); font-weight:700; }
+  #bar button{ font-family:var(--font); font-size:14px; color:#d8ddff; background:#070b22; border:1px solid var(--line);
+    border-radius:6px; padding:4px 12px; cursor:pointer; }
+  #bar button.on{ border-color:var(--accent); color:var(--accent); box-shadow:0 0 8px rgb(248 187 86 / .35); }
+  #bar button:hover{ filter:brightness(1.2); }
+  #legend{ display:flex; flex-wrap:wrap; gap:4px 12px; font-size:13px; color:#aab4e8; }
+  #legend i{ display:inline-block; width:18px; height:0; border-top:2px solid; vertical-align:middle; margin-right:5px; }
+  #legend i.dash{ border-top-style:dashed; }
+  #fps{ margin-left:auto; font-family:var(--mono); font-size:13px; color:var(--dim); }
+  #hint{ position:fixed; left:14px; bottom:10px; z-index:5; font-size:13px; color:var(--dim); }
+  #labels{ position:fixed; inset:0; pointer-events:none; z-index:3; }
+  .lbl{ position:absolute; transform:translate(-50%,-100%); text-align:center; white-space:nowrap; text-shadow:0 0 4px #000, 0 0 2px #000; }
+  .lbl b{ display:block; font-family:var(--font); font-weight:500; font-size:14px; color:var(--head); }
+  .lbl span{ display:block; font-size:12.5px; color:#b7c4ff; line-height:1.35; }
+  #scaleBar{ position:fixed; right:18px; bottom:14px; z-index:5; text-align:center; font-family:var(--mono); font-size:12px; color:#d8ddff; }
+  #scaleBar div{ height:6px; border:2px solid #d8ddff; border-top:0; margin-top:3px; }
+  .tick{ position:absolute; transform:translate(-50%,4px); font-family:var(--mono); font-size:11px; color:#8fa2ff; text-shadow:0 0 3px #000; }
+  /* GameLaboratory: one look for every lab — the top bar like the labs from Battle (ui/sea.css); the lab's name is on the menu bar */
+  #bar{ background:rgba(10,13,17,.82); border-bottom:1px solid #26303d; backdrop-filter:blur(6px); font-family:system-ui,-apple-system,"Segoe UI",sans-serif; }
+  #bar h1{ display:none; }
+  #bar button{ font-family:system-ui,-apple-system,"Segoe UI",sans-serif; font-size:12.5px; color:#c8d0da; background:#18202b; border:1px solid #26303d; border-radius:7px; padding:4px 9px; }
+  #bar button:hover{ filter:none; border-color:var(--accent); color:#eef2f6; }
+  #bar button.on{ border-color:var(--accent); color:var(--accent); box-shadow:none; }
+  #legend{ color:#7f8a98; font-family:system-ui,-apple-system,"Segoe UI",sans-serif; font-size:12.5px; }
+  #fps, #hint{ color:#7f8a98; font-family:ui-monospace,Consolas,monospace; font-size:12px; }

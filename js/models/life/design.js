@@ -1,4 +1,4 @@
-/* LifeKit — creatures from a design (js/lifekit/design.js): the creature
+/* LifeKit — creatures from a design (js/models/life/design.js): the creature
    editor's builder (labs/creator.html). Loaded after lifekit.js and
    move/legs.js. docs/life.md, "The creature editor".
 

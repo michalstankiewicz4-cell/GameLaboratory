@@ -2,36 +2,22 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'self' blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Creature editor | GameLaboratory</title>
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="../css/fonts.css">
 <!-- The creature editor (LifeKit design.js + move/legs.js): drag the spine
      into shape, give it pairs of legs anywhere, and it walks — any number
      of legs. A design is data (JSON): copy it, load it. docs/life.md,
      "The creature editor". -->
-<link rel="stylesheet" href="../css/lab.css">
-<link rel="stylesheet" href="../css/windows.css">
-<style>
-.hidden{ display:none !important; }
-#view{ position:fixed; inset:0; width:100%; height:100%; display:block; }
-.twoBtns{ display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px; }
-.threeBtns{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:6px; }
-.twoBtns .tBtn, .threeBtns .tBtn{ height:28px; font-size:12.5px; }
-#presets{ display:grid; grid-template-columns:1fr 1fr; gap:6px; }
-#presets .tBtn{ height:28px; font-size:12px; }
-#pairs{ display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
-#pairs .tBtn{ height:26px; min-width:44px; font-size:12px; }
-.prow{ display:grid; grid-template-columns:96px 1fr; gap:8px; align-items:center; margin-top:5px; font-size:13.5px; color:#c7d0ff; }
-select.lab, textarea.lab{ height:28px; border:1.5px solid #3c55d8; border-radius:6px; background:#02061a; color:#e6ebff; font-family:var(--fontBody); font-size:13.5px; padding:0 6px; min-width:0; }
-textarea.lab{ height:110px; width:100%; padding:6px; font-family:monospace; font-size:11px; resize:vertical; }
-#sel{ font-size:13px; color:#9fb1ff; margin:4px 0; }
-#fpsGraph{ height:40px; }
-</style>
+<link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="../ui/space.css">
+<link rel="stylesheet" href="../ui/pages/creator.css">
 </head>
 <body>
-<script src="../js/labkit/versions.js"></script>
-<script src="../js/labkit/menubar.js"></script>
+<script src="../ui/versions.js"></script>
+<script src="../ui/catalog.js"></script>
+<script src="../ui/menubar.js"></script>
 <canvas id="view"></canvas>
 <div id="hud" data-window="left" data-side="left">
   <div id="hudTop">
@@ -119,7 +105,7 @@ textarea.lab{ height:110px; width:100%; padding:6px; font-family:monospace; font
     <div class="row hidden"><span>Draw calls / frame</span><b id="statCalls">–</b></div>
   </div>
 </div>
-<script src="../js/labkit/windows.js"></script>
+<script src="../ui/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
 <script type="module" src="../js/labkit/labkit.js"></script>
 <script type="module" src="../js/models/ships-space/shipkit.js"></script>

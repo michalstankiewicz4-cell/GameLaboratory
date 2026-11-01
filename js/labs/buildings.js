@@ -69,14 +69,12 @@ $("vBad").addEventListener("click", () => { state.view = "bad"; applyView(); });
 $("pSlider").addEventListener("input", () => { state.progress = +$("pSlider").value; state.view = "built"; state.anim = false; $("btnAnim").classList.remove("on"); applyView(); });
 $("btnRotate").addEventListener("click", () => { controls.autoRotate = !controls.autoRotate; $("btnRotate").classList.toggle("on", controls.autoRotate); });
 $("btnAnim").addEventListener("click", () => { state.anim = true; state.view = "built"; state.progress = 0; $("btnAnim").classList.add("on"); });
-LabKit.applyGrain();
 LabKit.autoHideHud([$("hud"), $("opt")], 5);
 const perf = LabKit.perfCounters(renderer);
 renderer.info.autoReset = false;
 function resize() {
   renderer.setSize(window.innerWidth, window.innerHeight, false);
   camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
-  LabKit.fitHud([$("hud"), $("opt")], 0.4, 1.3);
 }
 window.addEventListener("resize", resize);
 const clock = new THREE.Clock();

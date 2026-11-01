@@ -5,11 +5,11 @@
    not in the game yet (docs/life.md). Needs THREE (r128).
 
    The core holds what every creature shares; the rest comes in files:
-     js/lifekit/lifekit.js          this core: the registry, skeletons,
+     js/models/life/lifekit.js          this core: the registry, skeletons,
                                     swept bodies, materials, merging
-     js/lifekit/move/<medium>.js    how a body moves in a medium — walk.js
+     js/models/life/move/<medium>.js    how a body moves in a medium — walk.js
                                     (land) now; swim / fly / space later
-     js/lifekit/creatures/<id>.js   one file per creature (LifeKit.register)
+     js/models/life/creatures/<id>.js   one file per creature (LifeKit.register)
 
    A body is SWEPT: a tube along a line of sections (each one an ellipse
    with its own width, front and back), smoothed between them, weighted to
