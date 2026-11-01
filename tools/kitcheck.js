@@ -1,0 +1,115 @@
+// Kit check (tools/kitcheck.html): builds every kit's models and compares their geometry with the last run.
+(() => {
+"use strict";
+const $ = (id) => document.getElementById(id);
+// ?labs=a.html,b.html checks only those (e.g. to try the checker itself)
+const LABS = new URLSearchParams(location.search).get("labs") ? new URLSearchParams(location.search).get("labs").split(",") :
+  ["labs/ship.html", "labs/bodies.html", "labs/systems.html", "labs/scale.html", "labs/skins.html", "labs/surface.html", "labs/buildings.html", "labs/vehicles.html", "labs/marine.html", "labs/sound.html", "labs/life.html", "labs/human.html", "labs/creator.html"];
+const r3 = (v) => Math.round(v * 1000) / 1000;
+
+// a model's fingerprint: what a refactor must not change
+function fingerprint(group) {
+  const st = ShipKit.modelStats(group);
+  group.updateMatrixWorld(true);
+  const box = new THREE.Box3();
+  group.traverse((o) => { if (o.isMesh && !(o.material && o.material.blending === THREE.AdditiveBlending)) box.union(new THREE.Box3().setFromObject(o)); });
+  const size = box.isEmpty() ? [0, 0, 0] : box.getSize(new THREE.Vector3()).toArray().map(r3);
+  return { tris: st.triangles, verts: st.vertices, meshes: st.meshes, materials: st.materials.size, textures: st.textures.size, size };
+}
+function safe(fn) { try { return fn(); } catch (e) { return { error: String(e && e.message || e) }; } }
+function collect() {
+  const out = {};
+  for (const d of ShipKit.SHIP_DEFS) {
+    out["ship/" + d.id] = safe(() => { const m = ShipKit.buildShipModel(d.id, { detail: 1 }); const f = fingerprint(m.group); ShipKit.disposeShipModel(m); return f; });
+    out["ship/" + d.id + "/merged"] = safe(() => { const m = ShipKit.buildShipModel(d.id, { detail: 1, merge: true }); const f = fingerprint(m.group); ShipKit.disposeShipModel(m); return f; });
+  }
+  for (const g of BodyKit.GROUPS) for (const b of g.bodies)
+    out["body/" + g.id + "/" + b.id] = safe(() => { const m = BodyKit.buildBody(g.id, b.id, { detail: 1 }); const f = fingerprint(m.group); BodyKit.disposeBody(m); return f; });
+  for (const d of BaseKit.MODULES)
+    out["base/" + d.id] = safe(() => { const m = BaseKit.buildModule(d.id, { detail: 1 }); const f = fingerprint(m.solid); BaseKit.disposeModule(m); return f; });
+  for (const d of VehicleKit.VEHICLES)
+    out["vehicle/" + d.id] = safe(() => { const m = VehicleKit.buildVehicle(d.id, { detail: 1 }); const f = fingerprint(m.group); VehicleKit.disposeVehicle(m); return f; });
+  for (const d of MarineKit.VESSELS)
+    out["vessel/" + d.id] = safe(() => { const m = MarineKit.buildVessel(d.id, { detail: 1 }); const f = fingerprint(m.group); MarineKit.disposeVessel(m); return f; });
+  for (const d of LifeKit.CREATURES)
+    out["life/" + d.id] = safe(() => { const c = LifeKit.build(d.id, {}, { detail: 1 }); const f = fingerprint(c.group); c.dispose(); return f; });
+  for (const p of SystemKit.PRESETS)
+    out["system/" + p.id] = safe(() => { const h = SystemKit.build(p.make(), { detail: 0.5 }); const f = { bodies: h.bodies.length, roles: h.bodies.map((x) => x.role[0]).join("") }; h.dispose(); return f; });
+  return out;
+}
+const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
+// each lab in a hidden frame, one at a time: its errors in the first seconds
+function checkLab(url) {
+  return new Promise((resolve) => {
+    const f = document.createElement("iframe"), errs = [];
+    f.src = "../" + url;
+    // listen from the start (a same-origin frame keeps its first window
+    // through the first load), so errors while the page's own scripts run count
+    f.addEventListener("load", () => setTimeout(() => {
+      resolve({ url, errors: [...new Set(errs)] });
+      f.remove();
+    }, 4500));
+    document.body.appendChild(f);
+    const w = f.contentWindow;
+    w.addEventListener("error", (e) => errs.push(e.message));
+    w.addEventListener("unhandledrejection", (e) => errs.push("promise: " + (e.reason && e.reason.message || e.reason)));
+    const ce = w.console.error.bind(w.console);
+    w.console.error = (...a) => { errs.push(a.map(String).join(" ").slice(0, 200)); ce(...a); };
+  });
+}
+
+let current = null;
+async function run() {
+  $("sum").textContent = "running…"; $("out").textContent = "";
+  let golden = {};
+  try { golden = await (await fetch("kitcheck.golden.json", { cache: "no-store" })).json(); } catch (e) { golden = null; }
+  const got = collect();
+  current = got;
+  const rows = [], fails = [];
+  for (const k of Object.keys(Object.assign({}, golden || {}, got))) {
+    const a = golden && golden[k], b = got[k];
+    const ok = golden && same(a, b);
+    if (!ok) fails.push(k);
+    rows.push([k, ok, a, b]);
+  }
+  const labs = [];
+  for (const url of LABS) labs.push(await checkLab(url));
+  const labFails = labs.filter((l) => l.errors.length);
+  const pass = golden && !fails.length && !labFails.length;
+  $("sum").innerHTML = "";
+  const s = document.createElement("span");
+  s.className = pass ? "ok" : "bad";
+  s.textContent = !golden ? "NO GOLDEN FILE — copy the new JSON into tools/kitcheck.golden.json" :
+    pass ? `PASS — ${rows.length} models match, ${labs.length} labs without errors` :
+    `FAIL — ${fails.length} model(s) differ, ${labFails.length} lab(s) with errors`;
+  $("sum").appendChild(s);
+  // the table: the differing ones first
+  const t = document.createElement("table");
+  t.innerHTML = "<tr><th>model</th><th></th><th>golden</th><th>now</th></tr>";
+  rows.sort((x, y) => (x[1] === y[1] ? 0 : x[1] ? 1 : -1));
+  for (const [k, ok, a, b] of rows) {
+    const tr = document.createElement("tr");
+    for (const [txt, cls] of [[k, ""], [ok ? "ok" : "DIFF", ok ? "ok" : "bad"], [ok ? "" : JSON.stringify(a), "dim"], [JSON.stringify(b), ok ? "dim" : ""]]) {
+      const td = document.createElement("td"); td.textContent = txt; if (cls) td.className = cls; tr.appendChild(td);
+    }
+    t.appendChild(tr);
+  }
+  const lt = document.createElement("table");
+  lt.innerHTML = "<tr><th>lab</th><th>errors</th></tr>";
+  for (const l of labs) {
+    const tr = document.createElement("tr"), a = document.createElement("td"), b = document.createElement("td");
+    a.textContent = l.url; b.textContent = l.errors.length ? l.errors.join(" | ") : "none"; b.className = l.errors.length ? "bad" : "ok";
+    tr.append(a, b); lt.appendChild(tr);
+  }
+  $("out").append(lt, t);
+  window.kitcheck = { done: true, pass: !!pass, fails, labs, got };
+}
+$("run").addEventListener("click", run);
+$("copy").addEventListener("click", async () => {
+  const text = JSON.stringify(current, null, 1);
+  try { await navigator.clipboard.writeText(text); $("copied").textContent = "copied — paste into tools/kitcheck.golden.json"; }
+  catch (e) { const pre = document.createElement("pre"); pre.textContent = text; $("out").prepend(pre); $("copied").textContent = "below — copy it by hand"; }
+});
+run();
+})();

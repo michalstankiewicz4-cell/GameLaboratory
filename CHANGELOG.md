@@ -28,7 +28,7 @@ Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` 
 - Wspólne reguły laboratoriów Space (rzędy przycisków, pola `.lab`, `.hidden`, wykres FPS) w `ui/space.css`
   zamiast kopii w każdej stronie. `ui/sea.css` bez martwej sekcji starego ekranu startowego.
 - **CSP** (`style-src 'self'` i reszta jak w Battle) także na stronach Space, kitchecku i teksturze ziarna (skrypt
-  strony do `tools/grainTexture.js`); bez CSP zostaje tylko laboratorium skórek (atrybuty `style=` w makiecie).
+  stron do `tools/grainTexture.js` i `tools/kitcheck.js`); bez CSP zostaje tylko laboratorium skórek (atrybuty `style=` w makiecie).
 - **Katalog laboratoriów** `ui/catalog.js` — jedno miejsce na nazwy EN/PL, dokument, opisy, kit, frazy filtra, klucze
   ustawień i obrazki kafelków; czytają go pasek menu i strona startowa (dane wyjęte z `menubar.js` i `index.html`).
   `sitemap.xml` generuje `tools/sitemap.py` (bez stron `noindex` — wypadł doktor modeli).
