@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.13.1 — 2026-11-01
+
+### Zmienione
+- Narzędzia (doktor modeli, kontrola kitów, tekstura ziarna) bez znacznika „nie indeksować” — jak każda strona
+  laboratoriów są w `sitemap.xml` i mogą pojawiać się w wyszukiwarkach. Wersje: program i trzy narzędzia z+1.
+
 ## Program 0.13.0 — 2026-11-01 (remanent, dokończenie: całe UI w `ui/`, nowy wygląd, katalog, foldery, dokumentacja)
 
 ### Nowe
@@ -31,7 +37,7 @@ Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` 
   stron do `tools/grainTexture.js` i `tools/kitcheck.js`); bez CSP zostaje tylko laboratorium skórek (atrybuty `style=` w makiecie).
 - **Katalog laboratoriów** `ui/catalog.js` — jedno miejsce na nazwy EN/PL, dokument, opisy, kit, frazy filtra, klucze
   ustawień i obrazki kafelków; czytają go pasek menu i strona startowa (dane wyjęte z `menubar.js` i `index.html`).
-  `sitemap.xml` generuje `tools/sitemap.py` (bez stron `noindex` — wypadł doktor modeli).
+  `sitemap.xml` generuje `tools/sitemap.py` (bez stron `noindex`).
 - **Klucze ustawień** po starych grach (`steelSalvo.*`, `roj-*`) przemianowane na `gameLab.*`; pasek menu raz
   przenosi zapisane ustawienia pod nowe nazwy.
 - Język: pasek dostaje wybrany język (`lang`), strona laboratorium zostaje przy swoim (panele po angielsku);
