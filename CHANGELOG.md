@@ -3,6 +3,17 @@
 Wersja programu i każdego laboratorium: `js/labkit/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `labs/CHANGELOG.md`; Battle i aTrain — w historii git.
 
+## Program 0.11.1 — 2026-11-01
+
+### Zmienione (pasek menu)
+- Bez menu PLIKI (była tam tylko strona startowa — prowadzi do niej znak GameLaboratory po lewej).
+- OPCJE → **Wyczyść zapisane ustawienia** działa na każdej stronie: ustawienia laboratorium zapisane w przeglądarce
+  i układ jego okien (na stronie startowej: kolejność, przypięcie, licznik odwiedzin). Oceny w SDF Walkers to dane —
+  zostają; język ustawia się osobno.
+- POMOC: bez „Klawiatura i mysz” i „Notatki tej strony”; **Dokumentacja** prowadzi do folderu `docs/` (wcześniej do
+  nieistniejącego README).
+- Bez skrótów klawiszowych w menu (F11, F5) i bez list klawiszy laboratoriów.
+
 ## Program 0.11.0 — 2026-11-01
 
 ### Dodane

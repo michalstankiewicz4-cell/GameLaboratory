@@ -12,7 +12,6 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 - [ ] Pogoda z aTrain.
 
 ## Dokumentacja
-- [ ] `README.md` w katalogu głównym — linki w menu Pomoc („Cała dokumentacja”, notatki narzędzi) prowadzą do pliku, którego nie ma.
 
 ## Modele — błędy znalezione przez doktora (po stronie gry, chyba że doktor nauczy się je naprawiać)
 - [ ] Dziury: talerz anteny (haven), kadłub (swarmer), kadłuby (skimmer, barka, amfibia), półkula (scout).

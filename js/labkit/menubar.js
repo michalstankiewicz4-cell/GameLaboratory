@@ -1,5 +1,5 @@
 /* =======================================================================
-   LABKIT · MENU BAR — the labs' and tools' common menu (FILES, OPTIONS,
+   LABKIT · MENU BAR — the labs' and tools' common menu (OPTIONS,
    TOOLS, HELP), always visible at the top of every lab and tool page
    =======================================================================
    A classic script with no dependencies, the first thing in <body>:
@@ -25,6 +25,7 @@ const PARTS = location.pathname.split("/"), HERE = PARTS.pop() || "index.html", 
 const PAGE = (DIR === "labs" || DIR === "tools" ? DIR + "/" : "") + HERE;   // e.g. "labs/ship.html"
 const START = PAGE === "index.html";
 const REPO = "https://github.com/michalstankiewicz4-cell/GameLaboratory/blob/main/";
+const DOCS = "https://github.com/michalstankiewicz4-cell/GameLaboratory/tree/main/docs";   // HELP → Documentation
 
 // LANGUAGE — English or Polish. Chosen in OPTIONS → Language (kept in this browser, gamelab.lang:
 // "auto" | "en" | "pl"); ?lang=pl / ?lang=en in the address wins (links for search engines);
@@ -45,41 +46,49 @@ const t = (en, pl) => (PL ? pl : en);   // the bar's own words
 
 // The labs and tools, shared with the start screen (window.LabMenu.ITEMS).
 const LABS = [
-  { file: "labs/ship.html", name: "Ship lab", doc: "docs/ship.md", keys: [["C", "change view: only the ticked blocks"], ["Double-click the name", "rename the ship"], ["Drag / wheel", "turn and zoom the camera"]] },
-  { file: "labs/bodies.html", name: "Body lab", doc: "docs/bodies.md", keys: [["Drag / wheel", "turn and zoom the camera"]] },
-  { file: "labs/systems.html", name: "System lab", doc: "docs/systems.md", keys: [["Drag / wheel", "turn and zoom the camera"], ["Gold diamond on the ruler", "drag: an orbit's distance"],
-    ["Teal point (FROM ABOVE)", "drag out / in: stretch along / across; around: turn the axis"], ["Violet point (FROM THE SIDE)", "drag up / down: the tilt"], ["An orbit's number", "select it: its sliders"]] },
-  { file: "labs/scale.html", name: "Scale lab", doc: "docs/scale.md", keys: [["Drag / wheel", "turn and zoom the camera"]] },
-  { file: "labs/skins.html", name: "Skin lab", doc: "docs/skins.md", keys: [] },
-  { file: "labs/surface.html", name: "Surface lab", doc: "docs/surface.md", keys: [["W / S, A / D", "drive, turn"], ["Shift", "boost"], ["Right-drag / wheel", "camera"], ["B", "build the first module"], ["R / Esc / Delete", "turn / cancel / remove a module"]] },
-  { file: "labs/buildings.html", name: "Building lab", doc: "docs/surface.md", keys: [["Drag / wheel", "turn and zoom the camera"]] },
-  { file: "labs/vehicles.html", name: "Vehicle lab", doc: "docs/vehicles.md", keys: [["W / S, A / D", "drive, steer"], ["Drag / wheel", "camera"]] },
-  { file: "labs/sound.html", name: "Sound lab", doc: "docs/sound.md", keys: [["Space", "play / stop"], ["MOODS", "a whole mood at once"], ["SEED", "the same seed plays the same piece"]] },
-  { file: "labs/marine.html", name: "Sea lab", doc: "docs/marine.md", keys: [["W / S, A / D", "drive, steer"], ["Drag / wheel", "camera"]] },
-  { file: "labs/creator.html", name: "Creature editor", doc: "docs/life.md", keys: [["Drag a gold point", "shape the spine"], ["Drag a teal point", "slide a pair of legs along it"], ["Wheel on a point", "thicker / thinner"], ["EDIT / PLAY", "handles, or watch it walk"]] },
-  { file: "labs/life.html", name: "Life lab", doc: "docs/life.md", keys: [["Drag / wheel", "turn and zoom the camera"], ["STAND / WALK / RUN", "the gaits"]] },
-  { file: "labs/human.html", name: "Human lab", doc: "docs/human.md", keys: [["Drag / wheel", "turn and zoom the camera"], ["STAND / WALK / RUN / T-POSE", "the gaits"], ["🎲 by Face", "another face"], ["FACE", "expressions, LIVELY, TALK, CLOSE-UP"], ["LAYERS", "sneak, sad, angry, nod, shake, wave, look — on top of any gait"]] },
-  { file: "labs/structures.html", name: "Structures lab", doc: "docs/structures.md", keys: [["Drag / wheel", "turn and zoom the camera"]] },
-  { file: "labs/water.html", name: "Water lab", doc: "docs/water.md", keys: [["Drag / wheel", "turn and zoom the camera"]] },
-  { file: "labs/land.html", name: "Land lab", doc: "docs/land.md", keys: [["Drag / wheel", "turn and zoom the camera"]] },
-  { file: "labs/plants.html", name: "Plants lab", doc: "docs/plants.md", keys: [["Drag / wheel", "turn and zoom the camera"]] },
-  { file: "labs/look.html", name: "Look lab", doc: "docs/look.md", keys: [["Drag / wheel", "turn and zoom the camera"]] },
-  { file: "labs/filters.html", name: "Filters lab", doc: "docs/filters.md", keys: [["Drag / right-drag / wheel", "orbit, pan, zoom"]] },
-  { file: "labs/pixel.html", name: "Pixel Studio", doc: "docs/pixel/README.md", keys: [["Ctrl+Z / Ctrl+Shift+Z", "undo / redo (Draw)"], ["Right button", "erase (Draw)"]] },
-  { file: "labs/zombies.html", name: "Zombie Generator", doc: "docs/pixel/zombies.md", keys: [] },
-  { file: "labs/morgue.html", name: "SDF Morgue", doc: "docs/morgue.md", keys: [] },
-  { file: "labs/walkers.html", name: "SDF Walkers", doc: "docs/walkers/README.md", keys: [] },
-  { file: "labs/lang.html", name: "Language lab", doc: "docs/walkers/README.md", keys: [] },
+  { file: "labs/ship.html", name: "Ship lab", doc: "docs/ship.md" },
+  { file: "labs/bodies.html", name: "Body lab", doc: "docs/bodies.md" },
+  { file: "labs/systems.html", name: "System lab", doc: "docs/systems.md" },
+  { file: "labs/scale.html", name: "Scale lab", doc: "docs/scale.md" },
+  { file: "labs/skins.html", name: "Skin lab", doc: "docs/skins.md" },
+  { file: "labs/surface.html", name: "Surface lab", doc: "docs/surface.md" },
+  { file: "labs/buildings.html", name: "Building lab", doc: "docs/surface.md" },
+  { file: "labs/vehicles.html", name: "Vehicle lab", doc: "docs/vehicles.md" },
+  { file: "labs/sound.html", name: "Sound lab", doc: "docs/sound.md" },
+  { file: "labs/marine.html", name: "Sea lab", doc: "docs/marine.md" },
+  { file: "labs/creator.html", name: "Creature editor", doc: "docs/life.md" },
+  { file: "labs/life.html", name: "Life lab", doc: "docs/life.md" },
+  { file: "labs/human.html", name: "Human lab", doc: "docs/human.md" },
+  { file: "labs/structures.html", name: "Structures lab", doc: "docs/structures.md" },
+  { file: "labs/water.html", name: "Water lab", doc: "docs/water.md" },
+  { file: "labs/land.html", name: "Land lab", doc: "docs/land.md" },
+  { file: "labs/plants.html", name: "Plants lab", doc: "docs/plants.md" },
+  { file: "labs/look.html", name: "Look lab", doc: "docs/look.md" },
+  { file: "labs/filters.html", name: "Filters lab", doc: "docs/filters.md" },
+  { file: "labs/pixel.html", name: "Pixel Studio", doc: "docs/pixel/README.md" },
+  { file: "labs/zombies.html", name: "Zombie Generator", doc: "docs/pixel/zombies.md" },
+  { file: "labs/morgue.html", name: "SDF Morgue", doc: "docs/morgue.md" },
+  { file: "labs/walkers.html", name: "SDF Walkers", doc: "docs/walkers/README.md" },
+  { file: "labs/lang.html", name: "Language lab", doc: "docs/walkers/README.md" },
 ];
 const TOOLS = [
-  { file: "tools/doctor.html", name: "Model doctor", doc: "docs/doctor/README.md", keys: [["Click a model, then a finding", "its parts light up red"], ["Drag / wheel", "turn and zoom the view"]] },
-  { file: "labs/transform.html", name: "Transformer", doc: "docs/transform.md", keys: [["Drag / wheel", "turn and zoom the camera"]] },
-  { file: "tools/kitcheck.html", name: "Kit check", doc: "CLAUDE.md", keys: [] },
-  { file: "tools/grainTexture.html", name: "Grain texture", doc: "README.md", keys: [] },
+  { file: "tools/doctor.html", name: "Model doctor", doc: "docs/doctor/README.md" },
+  { file: "labs/transform.html", name: "Transformer", doc: "docs/transform.md" },
+  { file: "tools/kitcheck.html", name: "Kit check", doc: "CLAUDE.md" },
+  { file: "tools/grainTexture.html", name: "Grain texture", doc: "README.md" },
 ];
 // what each lab keeps in this browser (OPTIONS → Reset saved settings)
 // (not the surface lab's roj-bases: the game shows those bases too)
-const SAVED = { "labs/ship.html": ["shipLab."], "labs/skins.html": ["roj-skinlab"] };
+// (every page also keeps where its windows stand: gamelab.windows:<page>, js/labkit/windows.js; the language is chosen
+// on its own, in OPTIONS → Language; the SDF Walkers ratings are data, not settings, and stay)
+const SAVED = {
+  "index.html": ["labsHub."],
+  "labs/ship.html": ["shipLab."], "labs/skins.html": ["roj-skinlab"], "labs/sound.html": ["soundLab."], "labs/creator.html": ["creatorLab."],
+  "labs/surface.html": ["roj-bases"], "labs/filters.html": ["gameLab.filters."], "labs/water.html": ["steelSalvo.waterLab."],
+  "labs/land.html": ["steelSalvo.landLab."], "labs/look.html": ["steelSalvo.lookLab."], "labs/plants.html": ["steelSalvo.plantsLab."],
+  "labs/structures.html": ["steelSalvo.structuresLab."], "labs/pixel.html": ["steelSalvo.pixelStudio."], "labs/zombies.html": ["steelSalvo.zombieGen."],
+  "labs/walkers.html": ["sdf-walkers-hud"],
+};
 // the pages' own top panels, moved down under the bar
 const OFFSETS = `
   #hud, #opt { top: ${16 + MENU_H}px !important; max-height: calc((100vh - ${32 + MENU_H}px) / var(--ui, 1)) !important; }
@@ -91,39 +100,38 @@ const OFFSETS = `
   body.lmTool { padding-top: ${MENU_H + 16}px !important; }
   body.lmTool #app { height: calc(100% - ${MENU_H}px) !important; margin-top: ${MENU_H}px; }
 `;
-// Polish names and keys (the English ones above stay the source)
+// Polish names (the English ones above stay the source)
 const PL_ITEMS = {
-  "labs/ship.html": ["Laboratorium statków", [["C", "zmień widok: tylko zaznaczone bloki"], ["Dwuklik na nazwie", "zmień nazwę statku"], ["Przeciągnij / kółko", "obrót i przybliżenie kamery"]]],
-  "labs/bodies.html": ["Laboratorium ciał niebieskich", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"]]],
-  "labs/systems.html": ["Laboratorium układów", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"], ["Złoty romb na linijce", "przeciągnij: odległość orbity"],
-    ["Turkusowy punkt (Z GÓRY)", "na zewnątrz / do środka: rozciągnij wzdłuż / w poprzek; dookoła: obróć oś"], ["Fioletowy punkt (Z BOKU)", "w górę / w dół: nachylenie"], ["Numer orbity", "wybierz ją: jej suwaki"]]],
-  "labs/scale.html": ["Laboratorium skali", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"]]],
-  "labs/skins.html": ["Laboratorium skórek", []],
-  "labs/surface.html": ["Laboratorium powierzchni", [["W / S, A / D", "jazda, skręt"], ["Shift", "przyspieszenie"], ["Prawy przycisk / kółko", "kamera"], ["B", "zbuduj pierwszy moduł"], ["R / Esc / Delete", "obróć / anuluj / usuń moduł"]]],
-  "labs/buildings.html": ["Laboratorium budynków", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"]]],
-  "labs/vehicles.html": ["Laboratorium pojazdów", [["W / S, A / D", "jazda, skręt"], ["Przeciągnij / kółko", "kamera"]]],
-  "labs/sound.html": ["Laboratorium dźwięku", [["Spacja", "graj / stop"], ["MOODS", "cały nastrój naraz"], ["SEED", "to samo ziarno gra ten sam utwór"]]],
-  "labs/marine.html": ["Laboratorium morza", [["W / S, A / D", "jazda, skręt"], ["Przeciągnij / kółko", "kamera"]]],
-  "labs/creator.html": ["Edytor stworów", [["Przeciągnij złoty punkt", "kształt kręgosłupa"], ["Przeciągnij turkusowy punkt", "przesuń parę nóg"], ["Kółko na punkcie", "grubszy / cieńszy"], ["EDIT / PLAY", "uchwyty albo patrz, jak chodzi"]]],
-  "labs/life.html": ["Laboratorium życia", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"], ["STAND / WALK / RUN", "chody"]]],
-  "labs/human.html": ["Laboratorium człowieka", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"], ["STAND / WALK / RUN / T-POSE", "chody"], ["🎲 przy twarzy", "inna twarz"], ["FACE", "miny, LIVELY, TALK, CLOSE-UP"], ["LAYERS", "skradanie, smutek, złość, kiwanie, kręcenie głową, machanie, spojrzenie — na każdym chodzie"]]],
-  "labs/structures.html": ["Laboratorium budowli", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"]]],
-  "labs/water.html": ["Laboratorium wody", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"]]],
-  "labs/land.html": ["Laboratorium lądu", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"]]],
-  "labs/plants.html": ["Laboratorium roślin", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"]]],
-  "labs/look.html": ["Laboratorium wyglądu", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"]]],
-  "labs/filters.html": ["Laboratorium filtrów", [["Przeciągnij / prawy / kółko", "obrót, przesuw, przybliżenie"]]],
-  "labs/pixel.html": ["Pixel Studio", [["Ctrl+Z / Ctrl+Shift+Z", "cofnij / ponów (Draw)"], ["Prawy przycisk", "gumka (Draw)"]]],
-  "labs/zombies.html": ["Generator zombie", []],
-  "labs/morgue.html": ["Kostnica SDF", []],
-  "labs/walkers.html": ["SDF Walkers", []],
-  "labs/lang.html": ["Laboratorium języka", []],
-  "tools/doctor.html": ["Doktor modeli", [["Kliknij model, potem znalezisko", "jego części świecą na czerwono"], ["Przeciągnij / kółko", "obrót i przybliżenie widoku"]]],
-  "labs/transform.html": ["Transformator", [["Przeciągnij / kółko", "obrót i przybliżenie kamery"]]],
-  "tools/kitcheck.html": ["Kontrola kitów", []],
-  "tools/grainTexture.html": ["Tekstura ziarna", []],
+  "labs/ship.html": ["Laboratorium statków"],
+  "labs/bodies.html": ["Laboratorium ciał niebieskich"],
+  "labs/systems.html": ["Laboratorium układów"],
+  "labs/scale.html": ["Laboratorium skali"],
+  "labs/skins.html": ["Laboratorium skórek"],
+  "labs/surface.html": ["Laboratorium powierzchni"],
+  "labs/buildings.html": ["Laboratorium budynków"],
+  "labs/vehicles.html": ["Laboratorium pojazdów"],
+  "labs/sound.html": ["Laboratorium dźwięku"],
+  "labs/marine.html": ["Laboratorium morza"],
+  "labs/creator.html": ["Edytor stworów"],
+  "labs/life.html": ["Laboratorium życia"],
+  "labs/human.html": ["Laboratorium człowieka"],
+  "labs/structures.html": ["Laboratorium budowli"],
+  "labs/water.html": ["Laboratorium wody"],
+  "labs/land.html": ["Laboratorium lądu"],
+  "labs/plants.html": ["Laboratorium roślin"],
+  "labs/look.html": ["Laboratorium wyglądu"],
+  "labs/filters.html": ["Laboratorium filtrów"],
+  "labs/pixel.html": ["Pixel Studio"],
+  "labs/zombies.html": ["Generator zombie"],
+  "labs/morgue.html": ["Kostnica SDF"],
+  "labs/walkers.html": ["SDF Walkers"],
+  "labs/lang.html": ["Laboratorium języka"],
+  "tools/doctor.html": ["Doktor modeli"],
+  "labs/transform.html": ["Transformator"],
+  "tools/kitcheck.html": ["Kontrola kitów"],
+  "tools/grainTexture.html": ["Tekstura ziarna"],
 };
-if (PL) for (const it of LABS.concat(TOOLS)) { const p = PL_ITEMS[it.file]; if (p) { it.nameEn = it.name; it.name = p[0]; it.keys = p[1]; } }
+if (PL) for (const it of LABS.concat(TOOLS)) { const p = PL_ITEMS[it.file]; if (p) { it.nameEn = it.name; it.name = p[0]; } }
 const all = LABS.concat(TOOLS);
 const isTool = DIR === "tools";
 const me = all.find((x) => x.file === PAGE) || null;
@@ -149,7 +157,6 @@ const CSS = `
   border-radius: 6px; background: none; color: #d7dbe4; font: inherit; font-weight: 400; text-align: left; text-decoration: none; cursor: pointer; }
 #labMenu .lmItem:hover { background: #2b3a63; color: #fff; }
 #labMenu .lmItem .lmChk { width: 12px; color: #36d6b5; }
-#labMenu .lmItem .lmKey { margin-left: auto; color: #7d8494; font-size: 12px; }
 #labMenu .lmItem[aria-disabled="true"] { color: #5d6370; cursor: default; background: none; }
 #labMenu .lmSep { height: 1px; margin: 5px 6px; background: #2a2f3a; }
 #labMenu .lmLabel { padding: 6px 10px 3px; color: #7d8494; font-size: 11px; letter-spacing: .8px; text-transform: uppercase; }
@@ -188,14 +195,12 @@ const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls)
 const link = (label, href, opts = {}) => {
   const a = el("a", "lmItem"); a.href = href;
   const c = el("span", "lmChk", opts.on ? "●" : ""); a.append(c, document.createTextNode(label));
-  if (opts.key) a.appendChild(el("span", "lmKey", opts.key));
   if (opts.blank) { a.target = "_blank"; a.rel = "noopener"; }
   return a;
 };
 const action = (label, fn, opts = {}) => {
   const b = el("button", "lmItem"); b.type = "button";
   b.append(el("span", "lmChk", opts.on ? "✓" : ""), document.createTextNode(label));
-  if (opts.key) b.appendChild(el("span", "lmKey", opts.key));
   if (opts.disabled) b.setAttribute("aria-disabled", "true");
   b.addEventListener("click", () => { if (!opts.disabled) { closeAll(); fn(b); } });
   return b;
@@ -220,15 +225,12 @@ function dialog(title, rows, note) {
 }
 
 // ---------- the menus ----------
-function files() {
-  return [link(t("Start screen", "Strona startowa"), ROOT + "index.html", { on: START })];
-}
 function options() {
-  const keys = SAVED[PAGE] || [];
+  const keys = (SAVED[PAGE] || []).concat(START ? [] : ["gamelab.windows:" + PAGE]);
   return [
     action(t("Full screen", "Pełny ekran"), () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(() => {}); },
-      { key: "F11", on: !!document.fullscreenElement }),
-    action(t("Reload this page", "Odśwież stronę"), () => location.reload(), { key: "F5" }),
+      { on: !!document.fullscreenElement }),
+    action(t("Reload this page", "Odśwież stronę"), () => location.reload()),
     // this page's windows (js/labkit/windows.js): its options, each in a window you open and close here
     ...windowItems(),
     el("div", "lmSep"),
@@ -240,10 +242,12 @@ function options() {
       }, { on: LANG_CHOICE === k && !LANGS[URL_LANG] })),
     el("div", "lmSep"),
     action(t("Reset saved settings…", "Wyczyść zapisane ustawienia…"), () => {
-      if (!confirm(t("Forget what this lab keeps in this browser (", "Zapomnieć, co to laboratorium trzyma w tej przeglądarce (") + keys.join(", ") + t(") and reload?", ") i odświeżyć?"))) return;
+      const what = START ? t("the start screen's order, pin and visit counts", "kolejność, przypięcie i licznik odwiedzin strony startowej")
+        : t("this page's settings and where its windows stand", "ustawienia tej strony i układ jej okien");
+      if (!confirm(t("Forget ", "Zapomnieć ") + what + t(" in this browser and reload?", " w tej przeglądarce i odświeżyć?"))) return;
       try { Object.keys(localStorage).forEach((k) => { if (keys.some((p) => k.startsWith(p))) localStorage.removeItem(k); }); } catch (e) { /* storage blocked */ }
       location.reload();
-    }, { disabled: !keys.length }),
+    }),
   ];
 }
 function windowItems() {
@@ -251,7 +255,7 @@ function windowItems() {
   return [el("div", "lmSep"), el("div", "lmLabel", t("Windows", "Okna")),
     ...W.list().map((w) => action(w.title(), () => W.toggle(w.id), { on: w.open }))];
 }
-// the labs and the tools, all here (FILES keeps only the start screen and the game)
+// the labs and the tools, all here (the start screen: the GameLaboratory mark on the left)
 function tools() {
   const d = [el("div", "lmLabel", t("Labs", "Laboratoria"))];
   LABS.forEach((l) => d.push(link(l.name, ROOT + l.file, { on: me === l })));
@@ -261,9 +265,7 @@ function tools() {
 }
 function help() {
   return [
-    action(t("Keyboard and mouse", "Klawiatura i mysz"), () => dialog((me ? me.name : t("Labs", "Laboratoria")) + t(": keys and mouse", ": klawisze i mysz"), me && me.keys.length ? me.keys : [["—", t("nothing special here", "nic szczególnego")]])),
-    link(t("This page's notes", "Notatki tej strony"), REPO + (me ? me.doc : "README.md"), { blank: true }),
-    link(t("All the docs", "Cała dokumentacja"), REPO + "README.md", { blank: true }),
+    link(t("Documentation", "Dokumentacja"), DOCS, { blank: true }),
     link(t("What's new", "Co nowego"), REPO + "CHANGELOG.md", { blank: true }),
     el("div", "lmSep"),
     action(t("About the labs", "O laboratoriach"), () => dialog("GameLaboratory", [[t("What", "Co to"), t("an engine for AI in the browser: laboratories of models and worlds — space, land and water", "silnik dla AI w przeglądarce: laboratoria modeli i światów — kosmos, ląd i woda")],
@@ -276,7 +278,7 @@ const bar = el("div"); bar.id = "labMenu";
 const home = el("a", "lmHome"); home.href = ROOT + "index.html"; home.title = t("Start screen", "Strona startowa");
 home.append(el("span", "lmMark"), document.createTextNode("GameLaboratory"));
 bar.appendChild(home);
-const menus = [[t("Files", "Pliki"), files], [t("Options", "Opcje"), options], [t("Tools", "Narzędzia"), tools], [t("Help", "Pomoc"), help]];
+const menus = [[t("Options", "Opcje"), options], [t("Tools", "Narzędzia"), tools], [t("Help", "Pomoc"), help]];
 menus.forEach(([name, make]) => {
   const top = el("div", "lmTop"), btn = el("button", null, name); btn.type = "button";
   const drop = el("div", "lmDrop");
