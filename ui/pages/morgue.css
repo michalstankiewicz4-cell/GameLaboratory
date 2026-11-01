@@ -1,5 +1,5 @@
 /* SDF Morgue lab (labs/morgue.html): the pixel-art head in the middle, between the option windows */
-.morgue{position:fixed;inset:76px 0 36px;display:grid;place-items:center;pointer-events:none}
+.morgue{position:fixed;inset:84px 0 44px;display:grid;place-items:center;pointer-events:none}
 .morgue .view{pointer-events:auto;display:grid;gap:8px;width:min(62vmin,560px)}
 .morgue canvas{display:block;width:100%;aspect-ratio:1;image-rendering:pixelated;background:#15131f;border:1px solid var(--line);border-radius:8px}
 .morgue .meta{display:flex;justify-content:space-between;font:12px ui-monospace,Consolas,monospace;color:var(--dim);letter-spacing:.06em}

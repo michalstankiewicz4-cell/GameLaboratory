@@ -46,9 +46,8 @@
 
 /* the pages' own top panels, moved down under the bar (not on the start page) */
 body.lmLab #hud, body.lmLab #opt { top: 48px !important; max-height: calc(100vh - 64px) !important; }
-body.lmLab #compass { top: 48px !important; }
-body.lmLab #toast { top: 102px !important; }
+body.lmLab #compass { top: 92px !important; }
+body.lmLab #toast { top: 140px !important; }
 body.lmLab > #bar { top: 32px !important; }
-body.lmLab.lab > .bar { top: 32px !important; }
 body.lmLab.lmTool { padding-top: 48px !important; }
 body.lmLab.lmTool #app { height: calc(100% - 32px) !important; margin-top: 32px; }

@@ -13,12 +13,12 @@
   #legend i{ display:inline-block; width:18px; height:0; border-top:2px solid; vertical-align:middle; margin-right:5px; }
   #legend i.dash{ border-top-style:dashed; }
   #fps{ margin-left:auto; font-family:var(--mono); font-size:13px; color:var(--dim); }
-  #hint{ position:fixed; left:14px; bottom:10px; z-index:5; font-size:13px; color:var(--dim); }
+  #hint{ position:fixed; left:14px; bottom:44px; z-index:5; font-size:13px; color:var(--dim); }
   #labels{ position:fixed; inset:0; pointer-events:none; z-index:3; }
   .lbl{ position:absolute; transform:translate(-50%,-100%); text-align:center; white-space:nowrap; text-shadow:0 0 4px #000, 0 0 2px #000; }
   .lbl b{ display:block; font-family:var(--font); font-weight:500; font-size:14px; color:var(--head); }
   .lbl span{ display:block; font-size:12.5px; color:#b7c4ff; line-height:1.35; }
-  #scaleBar{ position:fixed; right:18px; bottom:14px; z-index:5; text-align:center; font-family:var(--mono); font-size:12px; color:#d8ddff; }
+  #scaleBar{ position:fixed; right:18px; bottom:48px; z-index:5; text-align:center; font-family:var(--mono); font-size:12px; color:#d8ddff; }
   #scaleBar div{ height:6px; border:2px solid #d8ddff; border-top:0; margin-top:3px; }
   .tick{ position:absolute; transform:translate(-50%,4px); font-family:var(--mono); font-size:11px; color:#8fa2ff; text-shadow:0 0 3px #000; }
   /* GameLaboratory: one look for every lab — the top bar like the labs from Battle (ui/sea.css); the lab's name is on the menu bar */

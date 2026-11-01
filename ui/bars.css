@@ -1,0 +1,16 @@
+/* The lab's two bars, as in the labs from Battle (the water lab): one under the menu bar (the lab's own controls,
+   the environment switch, a status) and one at the bottom (scale, frames per second, GameLaboratory).
+   <div class="bar">…</div> … <div class="foot"><span id="fps" data-auto></span><span class="sp"></span><span>GameLaboratory</span></div>
+   (data-auto: ui/bars.js counts the frames for a lab that does not write #fps itself). The lab's name, version
+   and links to other labs are on the menu bar (ui/menubar.js), so the bar does not repeat them. */
+.bar{position:fixed;left:0;right:0;top:var(--menuH);z-index:5;display:flex;align-items:center;gap:14px;min-height:44px;padding:8px 14px;
+  background:rgba(10,13,17,.82);border-bottom:1px solid var(--line);backdrop-filter:blur(6px);font:14px/1.45 var(--font);color:var(--text)}
+.bar .sp{flex:1}
+.bar select{min-height:28px;padding:3px 6px;border:1px solid var(--line);border-radius:6px;background:var(--field);color:var(--text);font:13px var(--font)}
+.bar > b, .bar > .ver, .bar > a{display:none}
+.foot{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;align-items:center;gap:18px;min-height:34px;padding:8px 14px;
+  background:rgba(10,13,17,.82);border-top:1px solid var(--line);font:12px/1.4 var(--font);color:var(--dim)}
+.foot .sp{flex:1}
+.foot #fps{font-family:var(--mono)}
+.foot .scale{display:flex;align-items:center;gap:8px}
+.foot .scale i{display:block;height:6px;border:1px solid var(--text);border-top:0}

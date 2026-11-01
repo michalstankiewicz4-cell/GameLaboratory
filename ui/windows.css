@@ -1,6 +1,6 @@
 /* Floating windows (ui/windows.js): a lab's options, opened and closed from OPTIONS → Windows.
    Dark glass, a thin line, a gold title; what is inside: ui/controls.css. */
-.labWin{position:fixed;z-index:20;display:flex;flex-direction:column;width:330px;max-width:calc(100vw - 16px);max-height:calc(100vh - 88px);
+.labWin{position:fixed;z-index:20;display:flex;flex-direction:column;width:330px;max-width:calc(100vw - 16px);max-height:calc(100vh - 124px);
   background:var(--glass);border:1px solid var(--line);border-radius:var(--r);backdrop-filter:blur(6px);box-shadow:0 12px 32px rgba(0,0,0,.4);
   transition:opacity .4s}
 .labWin.right{width:300px}
@@ -23,8 +23,3 @@
 .labWin > :is(.idle, .labIdle){opacity:1}
 .labWin > .labIdle, .labWin > .labIdle *{pointer-events:auto !important}
 @media (max-width:640px){.labWin,.labWin.right{width:calc(100vw - 16px)}}
-
-/* the top bar of the labs from Battle: the lab's name, version and links to other labs are on the menu bar
-   (ui/menubar.js) — the bar keeps only the lab's own controls; empty, it goes */
-body.lab > .bar > b, body.lab > .bar > .ver, body.lab > .bar > a{display:none}
-body.lab > .bar:not(:has(> :not(b, .ver, a, .sp))){display:none}

@@ -83,7 +83,7 @@ function stack() {
     for (const w of wins) {
       if (w.fresh !== side || !w.open) continue;
       const h = w.el.getBoundingClientRect().height;
-      if (y > TOP && y + Math.min(h, 160) > innerHeight - 12) { k++; y = TOP + 28 * k; }
+      if (y > TOP && y + Math.min(h, 160) > innerHeight - 46) { k++; y = TOP + 28 * k; }
       w.el.style.top = y + "px";
       if (k) w.el.style[side] = 12 + 28 * k + "px";
       y += h + 10;

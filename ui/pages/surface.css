@@ -11,7 +11,7 @@ select.lab{ width:100%; height:28px; border:1px solid var(--line); border-radius
   border:1px solid var(--line); border-radius:18px; background:var(--glass); font-family:var(--font); color:var(--text); letter-spacing:.6px; z-index:4; }
 #compass svg{ width:30px; height:30px; }
 #compass .d{ font-size:18px; color:var(--accent); }
-#readout{ position:fixed; left:50%; bottom:18px; transform:translateX(-50%); display:flex; gap:18px; padding:6px 16px; border:1px solid var(--line);
+#readout{ position:fixed; left:50%; bottom:52px; transform:translateX(-50%); display:flex; gap:18px; padding:6px 16px; border:1px solid var(--line);
   border-radius:18px; background:var(--glass); font-family:var(--font); font-size:14px; color:var(--text); z-index:4; }
 #readout b{ color:var(--head); font-weight:500; }
 #toast{ position:fixed; left:50%; top:70px; transform:translateX(-50%); padding:8px 18px; border-radius:8px; background:var(--glass);

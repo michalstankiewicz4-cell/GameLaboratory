@@ -3,6 +3,19 @@
 Wersja programu i każdego laboratorium: `ui/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.13.2 — 2026-11-01
+
+### Zmienione
+- **Dwa paski jak w laboratorium wody we wszystkich laboratoriach ze sceną** (`ui/bars.css`): górny pod paskiem menu
+  (kontrolki laboratorium, przełącznik środowiska) i dolny (skala, klatki na sekundę, GameLaboratory). Nowe w 11
+  laboratoriach Space; dolny także w skali, Pixel Studio, generatorze zombie i Kostnicy SDF. Klatki liczy `ui/bars.js`
+  tam, gdzie laboratorium samo ich nie pokazuje. Paski laboratoriów z Battle nie znikają już, gdy są puste.
+- **Przełącznik środowiska** wszędzie w górnym pasku, jak w statkach na wodzie (dotąd w statkach w kosmosie, pojazdach
+  i morzu pływał na dole ekranu).
+- Okna kończą się nad dolnym paskiem; kompas i odczyty powierzchni, podpowiedź i skala w laboratorium skali, scena
+  Pixel Studio i Kostnicy przesunięte, żeby paski ich nie zasłaniały.
+- Wersje: program i laboratoria z paskami z+1.
+
 ## Program 0.13.1 — 2026-11-01
 
 ### Zmienione

@@ -36,7 +36,7 @@
 
 ## Przełącznik środowiska
 
-- W laboratorium każdej rodziny modeli przełącznik ma zawsze 3 pozycje: kosmos, woda, ląd. Pozycje, w których rodzina nie ma zachowania, są wyszarzone.
+- W laboratorium każdej rodziny modeli przełącznik ma zawsze 3 pozycje: kosmos, woda, ląd, i stoi w górnym pasku laboratorium (`.bar`). Pozycje, w których rodzina nie ma zachowania, są wyszarzone.
 - Wspólny komponent: `ui/envswitch.js` + `ui/envswitch.css` (znacznik `<div class="envSwitch" data-current=… data-space=… data-water=… data-land=…>`; pusty adres = wyszarzone).
 - Statki: jedno laboratorium (`labs/ship.html` — kosmos, `labs/warship.html` — woda, ląd wyszarzony). Pojazdy: `labs/vehicles.html` — ląd, `labs/marine.html` — woda, kosmos wyszarzony.
 
@@ -62,6 +62,7 @@
 - Jeden wygląd wszędzie: styl laboratoriów Battle (ciemne szkło, cienka linia, złote nagłówki i kontrolki). Czcionka Space Grotesk, liczby IBM Plex Mono, cienkie paski przewijania bez strzałek. Kolory tylko z tokenów (`ui/tokens.css`).
 - Strona linkuje `ui/ui.css`, potem `ui/space.css` lub `ui/sea.css`, potem `ui/pages/<lab>.css`. Bez bloków `<style>` i atrybutów `style=` w stronach (CSP `style-src 'self'`); skrypty ustawiają style przez CSSOM. W CSP potrzebne `font-src 'self'`.
 - Pasek menu ładuje własny arkusz `ui/menubar.css` (`<link>`).
+- Każde laboratorium ze sceną ma dwa paski jak laboratorium wody (`ui/bars.css`): `.bar` pod paskiem menu (własne kontrolki laboratorium, przełącznik środowiska) i `.foot` na dole (skala, klatki na sekundę, GameLaboratory; `#fps[data-auto]` liczy `ui/bars.js`).
 - Ładowanie: karta `.labLoad` z kółkiem, zwykłym zdaniem (nie wielkimi literami), krokiem i paskiem.
 
 ## Wersjonowanie
