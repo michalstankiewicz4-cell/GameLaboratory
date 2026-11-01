@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Cave Lab — procedural caves, rock and light | GameLaboratory</title>
+<meta name="description" content="GameLaboratory cave lab: caves generated from a seed — passages, chambers, stalactites, stalagmites, rubble and lakes — cut in limestone, granite, sandstone or basalt, dry or wet, lit by a flashlight and a lantern.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/caves.html">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="../ui/sea.css">
+</head>
+<body class="lab">
+<script src="../ui/versions.js"></script>
+<script src="../ui/catalog.js"></script>
+<script src="../ui/menubar.js"></script>
+<div id="view"></div>
+<div class="bar">
+  <div class="btns" id="views"></div>
+  <span class="dimtxt" id="status"></span>
+  <span class="sp"></span>
+</div>
+<aside class="panel left" data-window="cave" data-title="Cave" data-title-pl="Jaskinia" data-side="left">
+  <h3>Shape</h3>
+  <div class="row"><span>Seed</span><input type="number" id="seed" min="1" max="99999" step="1"><output></output></div>
+  <div class="btns"><button type="button" id="another">Another cave</button></div>
+  <div class="row"><span>Length</span><input type="range" id="length" min="20" max="160" step="5"><output id="lengthV"></output></div>
+  <div class="row"><span>Branches</span><input type="range" id="branches" min="0" max="6" step="1"><output id="branchesV"></output></div>
+  <div class="row"><span>Width</span><input type="range" id="width" min="2.5" max="12" step="0.5"><output id="widthV"></output></div>
+  <div class="row"><span>Winding</span><input type="range" id="winding" min="0" max="1" step="0.05"><output id="windingV"></output></div>
+  <div class="row"><span>Chambers</span><input type="range" id="chambers" min="0" max="8" step="1"><output id="chambersV"></output></div>
+  <div class="row"><span>Roughness</span><input type="range" id="rough" min="0" max="1" step="0.05"><output id="roughV"></output></div>
+  <div class="row"><span>Detail</span><input type="range" id="cell" min="0.25" max="1" step="0.05"><output id="cellV"></output></div>
+  <h3>Formations</h3>
+  <div class="row"><span>Drip stones</span><input type="range" id="drips" min="0" max="2" step="0.1"><output id="dripsV"></output></div>
+  <div class="row"><span>Rubble</span><input type="range" id="rubble" min="0" max="2" step="0.1"><output id="rubbleV"></output></div>
+  <div class="row"><span>Lakes</span><input type="range" id="lakes" min="0" max="1" step="0.05"><output id="lakesV"></output></div>
+  <div class="stats" id="caveStats"></div>
+  <p class="note">Lakes are plain water here; how water looks (its style) is chosen in the water lab.</p>
+</aside>
+<aside class="panel right" data-window="rock" data-title="Rock and light" data-title-pl="Skała i światło" data-side="right">
+  <h3>Rock</h3>
+  <div class="row"><span>Rock</span><select id="rock"></select><output></output></div>
+  <p class="note" id="rockNote"></p>
+  <div class="row"><span>Wet</span><input type="range" id="wet" min="0" max="1" step="0.05"><output id="wetV"></output></div>
+  <div class="row"><span>Relief</span><input type="range" id="relief" min="0" max="2.5" step="0.1"><output id="reliefV"></output></div>
+  <h3>Light</h3>
+  <label class="chk"><input type="checkbox" id="torch"> Flashlight (in the hand)</label>
+  <div class="row"><span>Power</span><input type="range" id="torchPow" min="0" max="3" step="0.05"><output id="torchPowV"></output></div>
+  <div class="row"><span>Beam</span><input type="range" id="torchAng" min="8" max="60" step="1"><output id="torchAngV"></output></div>
+  <label class="chk"><input type="checkbox" id="lamp"> Lantern (warm, all around)</label>
+  <div class="row"><span>Power</span><input type="range" id="lampPow" min="0" max="3" step="0.05"><output id="lampPowV"></output></div>
+  <div class="row"><span>Ambient</span><input type="range" id="ambient" min="0" max="1" step="0.02"><output id="ambientV"></output></div>
+  <div class="row"><span>Exposure</span><input type="range" id="exposure" min="0.3" max="3" step="0.05"><output id="exposureV"></output></div>
+  <h3>Performance</h3>
+  <div class="stats" id="stats"></div>
+  <p class="note">Inside: drag to look, wheel to go forward and back, right-drag to move sideways and up (or W/A/S/D, Q/E, Shift). Overview: drag to turn, wheel to zoom.</p>
+</aside>
+<div class="foot">
+  <span id="fps"></span>
+  <span class="sp"></span>
+  <span>GameLaboratory</span>
+</div>
+<div id="loading" class="labLoad"><div class="labLoadCard"><i class="labSpin"></i><b>Generating the cave…</b><span class="labLoadStep"></span><span class="labLoadBar"><i></i></span></div></div>
+<script src="../ui/windows.js"></script>
+<script type="module" src="../js/labs/caves.js"></script>
+</body>
+</html>

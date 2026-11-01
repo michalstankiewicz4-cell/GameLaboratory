@@ -158,9 +158,10 @@ export class LookPipeline {
     const vis = front && Math.abs(p.x) < 1.3 && Math.abs(p.y) < 1.3 && dir.y > -0.02 ? 1 - Math.max(0, Math.max(Math.abs(p.x), Math.abs(p.y)) - 1) / 0.3 : 0;
     for (const m of [this.mat, this.matB]) m.uniforms.sunScreen.value.set(p.x * 0.5 + 0.5, p.y * 0.5 + 0.5, Math.max(0, vis) * (this.sunVisible ?? 1));
   }
-  render(scene, camera) {
+  // target: where the finished picture goes (null: the screen) — e.g. a render target for a pass after this one
+  render(scene, camera, target = null) {
     const t = performance.now() / 1000; this.mat.uniforms.time.value = t; this.matB.uniforms.time.value = t;
-    this.r.setRenderTarget(this.rt); this.r.render(scene, camera); this.r.setRenderTarget(null);
+    this.r.setRenderTarget(this.rt); this.r.render(scene, camera); this.r.setRenderTarget(target);
     const sz = this.r.getSize(new THREE.Vector2()), W = sz.x, H = sz.y;            // CSS pixels, as setScissor expects
     if (this.split > 0) {
       const x = Math.round(W * this.split);
@@ -169,6 +170,7 @@ export class LookPipeline {
       this.quad.material = this.mat; this.r.setScissor(x, 0, W - x, H); this.r.render(this.scene, this.cam);
       this.r.setScissorTest(false);
     } else { this.quad.material = this.mat; this.r.render(this.scene, this.cam); }
+    if (target) this.r.setRenderTarget(null);
   }
 }
 

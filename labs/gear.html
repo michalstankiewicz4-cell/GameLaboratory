@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Hero's Gear Lab — flashlight, light sources, night vision, binoculars | GameLaboratory</title>
+<meta name="description" content="GameLaboratory hero's gear lab: the hero's items that give light — a flashlight, a lantern, a glow stick, a lighter, a phone screen — held in first person in a dark cave, and the ways of seeing: the bare eye, night vision, binoculars.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/gear.html">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="../ui/sea.css">
+</head>
+<body class="lab">
+<script src="../ui/versions.js"></script>
+<script src="../ui/catalog.js"></script>
+<script src="../ui/menubar.js"></script>
+<div id="view"></div>
+<div class="bar">
+  <div class="btns" id="modes"></div>
+  <span class="dimtxt" id="status"></span>
+  <span class="sp"></span>
+</div>
+<aside class="panel left" data-window="item" data-title="Item" data-title-pl="Przedmiot" data-side="left">
+  <h3>In the hand</h3>
+  <div class="btns" id="items"></div>
+  <p class="note" id="itemNote"></p>
+  <div class="row"><span>Power</span><input type="range" id="power" min="0" max="2" step="0.05"><output id="powerV"></output></div>
+  <div class="row" id="angleRow"><span>Beam</span><input type="range" id="angle" min="6" max="80" step="1"><output id="angleV"></output></div>
+  <div class="row" id="kelvinRow"><span>Colour</span><input type="range" id="kelvin" min="1500" max="9000" step="100"><output id="kelvinV"></output></div>
+  <div class="row"><span>Charge</span><input type="range" id="charge" min="0" max="1" step="0.01"><output id="chargeV"></output></div>
+  <label class="chk"><input type="checkbox" id="drain"> Runs down with time (fast: a minute is an hour)</label>
+  <label class="chk"><input type="checkbox" id="show"> Show the item in the hand</label>
+  <div class="stats" id="itemStats"></div>
+</aside>
+<aside class="panel right" data-window="vision" data-title="Vision" data-title-pl="Widzenie" data-side="right">
+  <h3>Night vision</h3>
+  <div class="row"><span>Gain</span><input type="range" id="gain" min="2" max="60" step="1"><output id="gainV"></output></div>
+  <div class="row"><span>Noise</span><input type="range" id="grain" min="0" max="1" step="0.05"><output id="grainV"></output></div>
+  <div class="row"><span>Phosphor</span><select id="phosphor"><option value="green">Green</option><option value="white">White</option></select><output></output></div>
+  <label class="chk"><input type="checkbox" id="ir"> Infrared illuminator (seen only through the device)</label>
+  <h3>Binoculars</h3>
+  <div class="row"><span>Zoom</span><input type="range" id="zoom" min="2" max="16" step="0.5"><output id="zoomV"></output></div>
+  <label class="chk"><input type="checkbox" id="reticle"> Range scale</label>
+  <h3>Place</h3>
+  <div class="row"><span>Cave</span><input type="number" id="seed" min="1" max="99999" step="1"><output></output></div>
+  <div class="btns"><button type="button" id="another">Another cave</button></div>
+  <div class="row"><span>Rock</span><select id="rock"></select><output></output></div>
+  <div class="row"><span>Ambient</span><input type="range" id="ambient" min="0" max="0.5" step="0.01"><output id="ambientV"></output></div>
+  <h3>Performance</h3>
+  <div class="stats" id="stats"></div>
+  <p class="note">Drag to look, wheel to go forward and back, right-drag to move sideways and up (or W/A/S/D, Q/E, Shift).</p>
+</aside>
+<div class="foot">
+  <span id="fps"></span>
+  <span class="sp"></span>
+  <span>GameLaboratory</span>
+</div>
+<div id="loading" class="labLoad"><div class="labLoadCard"><i class="labSpin"></i><b>Generating the cave…</b><span class="labLoadStep"></span><span class="labLoadBar"><i></i></span></div></div>
+<script src="../ui/windows.js"></script>
+<script type="module" src="../js/labs/gear.js"></script>
+</body>
+</html>
