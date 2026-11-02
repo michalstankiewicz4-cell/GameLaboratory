@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Laboratorium pojazdów — kosmos 1.6.2, woda 1.3.2, ląd 1.6.2 — 2026-11-02 (kolejność na pasku)
+
+### Zmienione
+- Przełącznik środowiska stoi zaraz po cofnij / ponów, przed listą pojazdów. Zasada w `CLAUDE.md`: cofnij / ponów,
+  przełącznik laboratoriów, potem listy rozwijane i inne (laboratoria kosmosu już tak miały).
+
 ## Program 0.20.8 — 2026-11-02 (cofnij / ponów, repozytorium w Pomocy)
 
 ### Dodane
