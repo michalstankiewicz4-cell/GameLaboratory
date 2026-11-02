@@ -3,7 +3,7 @@
 - Odpowiadaj po polsku.
 - Nigdy nie dodawaj własnych pomysłów — tylko je proponuj; implementuj to, o co poproszono.
 
-- Po każdym zadaniu: commit i push na `labs-import` i `main`. Gdy zadań jest kilka i taniej jest je połączyć, łączyć, a wysyłać po połączonej pracy.
+- Po każdym zadaniu: commit i push na `main` (jedyna gałąź). Gdy zadań jest kilka i taniej jest je połączyć, łączyć, a wysyłać po połączonej pracy.
 
 ## Co jest w repozytorium
 
