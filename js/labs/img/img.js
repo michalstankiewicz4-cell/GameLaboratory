@@ -1,20 +1,31 @@
 // Laboratorium obrazów · strona: dane, graf modelu, nauka, rysowanie, uwaga, porównanie.
 const $ = id => document.getElementById(id);
 const fmt = (v, d = 2) => v == null || !isFinite(v) ? '–' : v.toFixed(d).replace('.', ',');
-const LN2 = Math.log(2), S = 16, N = 256, LV = 16;
+// Dwa zbiory danych (lista na pasku narzędzi; wybór w adresie ?set= i w tej przeglądarce):
+// 16×16 × 16 odcieni szarości (Quick, Draw!) albo 64×40 × 256 kolorów wspólnej palety (CIFAR-10).
+const SETS = {
+  gray: { dir: 'img', w: 16, h: 16, levels: 16, label: '16×16 · 16 odcieni szarości (Quick, Draw!)' },
+  color: { dir: 'img-color', w: 64, h: 40, levels: 256, label: '64×40 · 256 kolorów (CIFAR-10)' },
+};
+const SET = (() => { const q = new URLSearchParams(location.search).get('set'); if (SETS[q]) return q; try { const v = localStorage.getItem('gameLab.img.set'); if (SETS[v]) return v; } catch (e) { /* zablokowane */ } return 'gray'; })();
+const COLOR = SET === 'color', DIR = SETS[SET].dir, W = SETS[SET].w, H = SETS[SET].h, N = W * H, LV = SETS[SET].levels;
+const LN2 = Math.log(2), BIG = COLOR ? 4 : 12;   // BIG: pikseli ekranu na piksel obrazka na dużych płótnach
 const shade = v => Math.round(242 - (242 - 24) * v / (LV - 1));   // odcień 0..15 → szarość (papier → kreska)
+let PALCSS = null;                                                  // kolory palety jako tekst CSS (tryb kolor)
+const DIN = COLOR ? N * 3 : N, S = 16;   // DIN: liczb na wejściu sieci ciągłych; S: zgadywanie i mapa uwagi (tylko 16×16)
+const UNIT = COLOR ? 'obrazek' : 'rysunek', LVNAME = COLOR ? 'kolorów' : 'odcieni', BITS0 = Math.log2(LV);
 const worker = new Worker('../js/labs/img/worker.js');
 
 // ---------- kroki ----------
 const STEPS = [
   { kind: 'stats', name: '1 · Statystyka pikseli', sub: 'każdy piksel osobno', ready: true,
-    what: 'Dla każdej kategorii i każdego z 256 miejsc liczymy, jak często pojawia się każdy z 16 odcieni. Rysując, losujemy każdy piksel osobno z jego tabeli.',
+    what: `Dla każdej kategorii i każdego z ${N} miejsc liczymy, jak często pojawia się każdy z ${LV} ${LVNAME}. Rysując, losujemy każdy piksel osobno z jego tabeli.`,
     why: 'Odpowiednik bigramu z tekstu: najprostszy model, który w ogóle coś „wie” o rysunkach. Średni obrazek każdej kategorii już przypomina kota czy słońce. Jest punktem odniesienia dla wszystkich kolejnych konstrukcji.',
     lim: 'Piksele nic o sobie nie wiedzą. Kreska nie może się ciągnąć, bo każdy piksel jest losowany niezależnie, więc wychodzi szum w kształcie kategorii. Nie umie też narysować dwóch różnych kotów: każdy jest tym samym rozmytym średnim kotem z szumem.' },
   { kind: 'ar', name: '2 · Piksel po pikselu', sub: 'transformer, jak ImageGPT', ready: true,
-    what: 'Obrazek czytamy jak tekst: wiersz po wierszu, 256 pikseli. Na początek wstawiamy numer kategorii. Transformer, ten sam co w laboratorium języka, na każdej pozycji patrzy na kategorię i wszystkie wcześniejsze piksele i zgaduje odcień następnego.',
+    what: `Obrazek czytamy jak tekst: wiersz po wierszu, ${N} pikseli. Na początek wstawiamy numer kategorii. Transformer, ten sam co w laboratorium języka, na każdej pozycji patrzy na kategorię i wszystkie wcześniejsze piksele i zgaduje ${COLOR ? 'kolor' : 'odcień'} następnego.`,
     why: 'Usuwa wadę statystyki: każdy piksel zależy od już narysowanych, więc kreska może się ciągnąć, a oczy pasują do głowy. Tak działał ImageGPT (OpenAI, 2020). Uwaga sama odkrywa dwa wymiary: piksel bezpośrednio nad nim jest 16 pozycji wcześniej, a sieć uczy się tam patrzeć.',
-    lim: 'Rysuje po kolei, więc wygenerowanie obrazka to 256 kroków. Przy większych obrazkach to bardzo wolne. Błąd na początku rysunku ciągnie się do końca, bo nie da się wrócić i poprawić. Dlatego dziś do obrazków używa się głównie dyfuzji.',
+    lim: `Rysuje po kolei, więc wygenerowanie obrazka to ${N} kroków. Przy większych obrazkach to bardzo wolne. Błąd na początku rysunku ciągnie się do końca, bo nie da się wrócić i poprawić. Dlatego dziś do obrazków używa się głównie dyfuzji.`,
     more: 'Ile uczyć: po 1000 krokach sieć umie głównie ciągnąć kreskę w poziomie, od ok. 3000 kroków pojawiają się kształty (drzewo, gwiazda), po 5000–6000 rozpoznawalne domy, ryby i księżyce. Na procesorze 3000 kroków to ok. 12–15 minut, na karcie graficznej zwykle kilka razy krócej. Pozycje to 256 wyuczonych wektorów, po jednym na piksel. Sieć nie dostaje podpowiedzi, że obrazek ma 16 kolumn: musi to odkryć sama. Kategoria to po prostu jeszcze jeden „wyraz” w słowniku wejścia (16 odcieni + 12 kategorii).' },
   { kind: 'vae', name: '3 · Autoenkoder (VAE)', sub: 'ściśnij i odtwórz, 2013', ready: true,
     what: 'Koder ściska rysunek (razem z kategorią) do kilku liczb z, czyli punktu w „przestrzeni ukrytej”. Dekoder z samego z i kategorii odtwarza rysunek. Uczymy obu naraz: odtworzenie ma być jak najwierniejsze.',
@@ -63,22 +74,32 @@ const HP = {
   ],
 };
 let cur = 'stats', man = null, catData = [], ready = false, training = false;
-const hpValues = (kind = cur) => { const o = { batch: kind === 'ar' ? 8 : 64 }; (HP[kind] || []).forEach(h => o[h.id] = h.val); return o; };
+const hpValues = (kind = cur) => { const o = { batch: kind === 'ar' ? (COLOR ? 2 : 8) : 64 }; (HP[kind] || []).forEach(h => o[h.id] = h.val); return o; };
+// 64×40 w kolorze: ciąg 2560 pikseli (uwaga 2560 × 2560 na głowę), więc mniejszy transformer i krótsza nauka na start
+if (COLOR) {
+  const set = (k, id, v, opts) => { const h = HP[k].find(x => x.id === id); h.val = v; if (opts) h.opts = opts; };
+  set('ar', 'heads', 2); set('ar', 'dim', 32); set('ar', 'layers', 2); set('ar', 'steps', 1000, [300, 1000, 3000, 6000]);
+  HP.ar.find(x => x.id === 'steps').hint = 'po 2 obrazki';
+  set('vae', 'hidden', 512); set('gan', 'hidden', 512); set('diff', 'hidden', 512);
+}
 
 // ---------- dane: pliki PNG z data/img, każdy kafelek 16×16 to jeden rysunek ----------
 async function loadData() {
   try {
-    man = await (await fetch('../data/img/manifest.json', { cache: 'no-cache' })).json();
+    man = await (await fetch(`../data/${DIR}/manifest.json`, { cache: 'no-cache' })).json();
+    const palIdx = new Map();
+    if (COLOR) { PALCSS = man.palette.map(([r, g, b]) => `rgb(${r},${g},${b})`); man.palette.forEach(([r, g, b], i) => { const k = (r << 16) | (g << 8) | b; if (!palIdx.has(k)) palIdx.set(k, i); }); }
     catData = await Promise.all(man.categories.map(async c => {
-      const im = new Image(); im.src = '../data/img/' + c.file; await im.decode();
+      const im = new Image(); im.src = `../data/${DIR}/` + c.file; await im.decode();
       const cv = document.createElement('canvas'); cv.width = im.width; cv.height = im.height;
       const cx = cv.getContext('2d'); cx.drawImage(im, 0, 0);
       const d = cx.getImageData(0, 0, im.width, im.height).data, pix = new Uint8Array(c.count * N);
       for (let k = 0; k < c.count; k++) {
-        const tx = (k % man.cols) * S, ty = Math.floor(k / man.cols) * S;
-        for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
-          const g = d[((ty + y) * im.width + tx + x) * 4];
-          pix[k * N + y * S + x] = Math.max(0, Math.min(LV - 1, Math.round((242 - g) / (242 - 24) * (LV - 1))));
+        const tx = (k % man.cols) * W, ty = Math.floor(k / man.cols) * H;
+        for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+          const o = ((ty + y) * im.width + tx + x) * 4, g = d[o];
+          pix[k * N + y * W + x] = COLOR ? (palIdx.get((d[o] << 16) | (d[o + 1] << 8) | d[o + 2]) || 0)   // PNG z paletą: kolor → numer
+            : Math.max(0, Math.min(LV - 1, Math.round((242 - g) / (242 - 24) * (LV - 1))));
         }
       }
       return { ...c, pix };
@@ -86,30 +107,35 @@ async function loadData() {
   } catch (e) { $('dataErr').textContent = 'Nie udało się wczytać rysunków z data/img/. Strona musi być otwarta przez serwer (np. GitHub Pages).'; $('dataErr').hidden = false; return; }
   const total = catData.reduce((s, c) => s + c.count, 0);
   $('dataStats').innerHTML = '';
-  [['Kategorie', catData.length], ['Rysunki', total.toLocaleString('pl')], ['Rozmiar', '16 × 16'], ['Odcienie', LV], ['Liczb na rysunek', N]].forEach(([k, v]) => {
+  [['Kategorie', catData.length], ['Rysunki', total.toLocaleString('pl')], ['Rozmiar', `${W} × ${H}`], [COLOR ? 'Kolory (paleta)' : 'Odcienie', LV], ['Pikseli na obrazek', N]].forEach(([k, v]) => {
     const d = document.createElement('div'); d.innerHTML = '<dt></dt><dd></dd>'; d.firstChild.textContent = k; d.lastChild.textContent = v; $('dataStats').appendChild(d);
   });
   $('gallery').innerHTML = '';
   catData.forEach(c => {
     const box = document.createElement('div'), b = document.createElement('b'), sm = document.createElement('small'), cv = document.createElement('canvas');
-    box.className = 'gcat'; b.textContent = c.name; sm.textContent = `${c.count} rysunków · ${c.quickdraw}`; b.appendChild(sm);
-    cv.width = 10 * (S + 1) - 1; cv.height = S; const cx = cv.getContext('2d');
-    for (let k = 0; k < 10; k++) drawImg(cx, c.pix.subarray(k * N, (k + 1) * N), k * (S + 1), 0, 1);
+    box.className = 'gcat'; b.textContent = c.name; sm.textContent = `${c.count} ${COLOR ? 'obrazków' : 'rysunków'} · ${c.quickdraw || c.cifar}`; b.appendChild(sm);
+    const nG = COLOR ? 8 : 10; cv.width = nG * (W + 1) - 1; cv.height = H; const cx = cv.getContext('2d');
+    for (let k = 0; k < nG; k++) drawImg(cx, c.pix.subarray(k * N, (k + 1) * N), k * (W + 1), 0, 1);
     box.append(b, cv); $('gallery').appendChild(box);
   });
   const ul = document.createElement('ul');
-  [['manifest.json', 'lista kategorii i parametry danych'], ['LICENCJA.txt', 'źródło i licencja (CC BY 4.0)'], ...catData.map(c => [c.file, `${c.name}: ${c.count} rysunków w siatce po ${man.cols} w wierszu`])].forEach(([f, d]) => {
-    const li = document.createElement('li'), a = document.createElement('a'); a.href = '../data/img/' + f; a.target = '_blank'; a.rel = 'noopener';
+  [['manifest.json', 'lista kategorii i parametry danych'], ['LICENCJA.txt', 'źródło i licencja (CC BY 4.0)'], ...catData.map(c => [c.file, `${c.name}: ${c.count} ${COLOR ? 'obrazków' : 'rysunków'} w siatce po ${man.cols} w wierszu`])].forEach(([f, d]) => {
+    const li = document.createElement('li'), a = document.createElement('a'); a.href = `../data/${DIR}/` + f; a.target = '_blank'; a.rel = 'noopener';
     const code = document.createElement('code'); code.textContent = f; a.appendChild(code); li.append(a, ' — ' + d); ul.appendChild(li);
   });
   const p = document.createElement('p'); p.className = 'note';
-  p.textContent = 'Każdy plik PNG to siatka rysunków 16×16, dokładnie to, z czego uczy się sieć. Robi je skrypt img/tools/build_quickdraw.py: pobiera pierwsze 2000 rysunków każdej kategorii z Quick, Draw!, pomniejsza je z 28×28 do 16×16 i sprowadza do 16 odcieni. Ostatnie 10% rysunków każdej kategorii służy tylko do sprawdzania.';
+  p.textContent = COLOR
+    ? 'Każdy plik PNG to siatka obrazków 64×40 z jedną wspólną paletą 256 kolorów, dokładnie to, z czego uczy się sieć. Robi je skrypt tools/img/build_cifar.py: bierze pierwsze 600 zdjęć każdej kategorii z CIFAR-10 (32×32), wycina środkowy pas 32×20, powiększa ×2 i przypisuje każdy piksel najbliższemu kolorowi palety. Statystyka i transformer zgadują numer koloru (1 z 256), VAE, GAN i dyfuzja rysują R, G, B, a my wybieramy najbliższy kolor palety. Ostatnie 10% obrazków każdej kategorii służy tylko do sprawdzania.'
+    : 'Każdy plik PNG to siatka rysunków 16×16, dokładnie to, z czego uczy się sieć. Robi je skrypt tools/img/build_quickdraw.py: pobiera pierwsze 2000 rysunków każdej kategorii z Quick, Draw!, pomniejsza je z 28×28 do 16×16 i sprowadza do 16 odcieni. Ostatnie 10% rysunków każdej kategorii służy tylko do sprawdzania.';
   $('files').replaceChildren(p, ul);
   $('genCat').innerHTML = ''; catData.forEach((c, i) => $('genCat').add(new Option(c.name, i)));
-  worker.postMessage({ cmd: 'data', cats: catData.map(c => ({ name: c.name, pix: c.pix })) });
+  worker.postMessage({ cmd: 'data', cats: catData.map(c => ({ name: c.name, pix: c.pix })), cfg: { w: W, h: H, levels: LV, palette: COLOR ? man.palette : null } });
 }
-function drawImg(cx, pix, ox, oy, sc) {
-  for (let i = 0; i < N; i++) { const g = shade(pix[i]); cx.fillStyle = `rgb(${g},${g},${g})`; cx.fillRect(ox + (i % S) * sc, oy + Math.floor(i / S) * sc, sc, sc); }
+function drawImg(cx, pix, ox, oy, sc, n = N) {
+  for (let i = 0; i < n; i++) {
+    if (COLOR) cx.fillStyle = PALCSS[pix[i] | 0] || '#000'; else { const g = shade(pix[i]); cx.fillStyle = `rgb(${g},${g},${g})`; }
+    cx.fillRect(ox + (i % W) * sc, oy + Math.floor(i / W) * sc, sc, sc);
+  }
 }
 
 // ---------- wybór kroku i ustawienia ----------
@@ -147,53 +173,53 @@ function graphSpec(kind, hp) {
   const C = catData.length || 12;
   if (kind === 'stats') return { nodes: [
     { id: 'in', name: 'Wejście: kategoria', out: '1 numer (0–' + (C - 1) + ')', io: true, desc: 'Numer kategorii, np. 0 = kot. Model nie dostaje żadnych pikseli: rysuje wyłącznie z tabeli tej kategorii.' },
-    { id: 'tab', name: 'Tabela odcieni', out: '256 × 16', w: [['tabela', `${C} × 256 × 16`, C * N * LV]], desc: `Dla każdej z ${C} kategorii i każdego z 256 pikseli 16 prawdopodobieństw odcieni. Policzone wprost z rysunków treningowych, bez uczenia gradientem: to zwykłe zliczanie, jak w bigramie.` },
-    { id: 'out', name: 'Losowanie każdego piksela', out: '16 × 16 odcieni', io: true, desc: 'Każdy z 256 pikseli losowany osobno ze swojego rozkładu. Brak zależności między pikselami: dlatego rysunek wychodzi jak szum w kształcie kategorii.' },
+    { id: 'tab', name: COLOR ? 'Tabela kolorów' : 'Tabela odcieni', out: `${N} × ${LV}`, w: [['tabela', `${C} × ${N} × ${LV}`, C * N * LV]], desc: `Dla każdej z ${C} kategorii i każdego z ${N} pikseli ${LV} prawdopodobieństw ${LVNAME}. Policzone wprost z rysunków treningowych, bez uczenia gradientem: to zwykłe zliczanie, jak w bigramie.` },
+    { id: 'out', name: 'Losowanie każdego piksela', out: `${W} × ${H} ${LVNAME}`, io: true, desc: `Każdy z ${N} pikseli losowany osobno ze swojego rozkładu. Brak zależności między pikselami: dlatego ${UNIT} wychodzi jak szum w kształcie kategorii.` },
   ] };
   const dl = (id, name, nIn, nOut, out, desc, act) => ({ id, name: name + (act ? ` · ${act}` : ''), out, w: [['W', `${nIn} × ${nOut}`, nIn * nOut], ['bias', `${nOut}`, nOut]], desc });
   if (kind === 'vae') { const Hh = hp.hidden, Z = hp.z; return { nodes: [
-    { id: 'in', name: 'Wejście: rysunek + kategoria', out: `${N} + ${C} liczb`, io: true, desc: `256 odcieni (0–1) i kategoria jako ${C} liczb, z których jedna to 1 (one-hot).` },
-    dl('e1', 'Koder: warstwa ukryta', N + C, Hh, `${Hh}`, 'Zbiera cechy rysunku.', 'tanh'),
+    { id: 'in', name: 'Wejście: rysunek + kategoria', out: `${DIN} + ${C} liczb`, io: true, desc: `${COLOR ? `${N} pikseli × R, G, B` : '256 odcieni'} (0–1) i kategoria jako ${C} liczb, z których jedna to 1 (one-hot).` },
+    dl('e1', 'Koder: warstwa ukryta', DIN + C, Hh, `${Hh}`, 'Zbiera cechy rysunku.', 'tanh'),
     { id: 'z', name: `Średnia mu i rozrzut z (2 × ${Z})`, out: `${Z} liczb z`, w: [['W mu', `${Hh} × ${Z}`, Hh * Z], ['bias mu', `${Z}`, Z], ['W log-wariancji', `${Hh} × ${Z}`, Hh * Z], ['bias', `${Z}`, Z]], desc: `Koder nie podaje jednego punktu, tylko rozkład: środek mu i rozrzut. z = mu + rozrzut × losowy szum (reparametryzacja). Te ${Z} liczb to cały „opis” rysunku.` },
     { id: 'kl', name: 'Błąd KL: z ma być jak N(0, 1)', out: '1 liczba', io: true, desc: 'Kara za to, że rozkład z odbiega od zwykłego rozkładu normalnego. Dzięki niej po nauce można losować z z N(0, 1) i rysować.' },
     dl('d1', 'Dekoder: z + kategoria → ukryta', Z + C, Hh, `${Hh}`, 'Z kilku liczb i kategorii zaczyna odtwarzać rysunek.', 'tanh'),
-    dl('d2', 'Dekoder: wyjście', Hh, N, `${N}`, 'Dla każdego piksela jedna liczba, po sigmoidzie odcień 0–1. Błąd odtworzenia: binarna entropia krzyżowa z prawdziwym rysunkiem.', 'sigmoid'),
-    { id: 'out', name: 'Rysunek', out: '16 × 16', io: true, desc: 'Wszystkie piksele naraz, w jednym przejściu. Rysując nowe, losujemy z z N(0, 1) i używamy tylko dekodera.' },
+    dl('d2', 'Dekoder: wyjście', Hh, DIN, `${DIN}`, (COLOR ? 'Dla każdego piksela trzy liczby (R, G, B), po sigmoidzie 0–1; potem najbliższy kolor palety.' : 'Dla każdego piksela jedna liczba, po sigmoidzie odcień 0–1.') + ' Błąd odtworzenia: binarna entropia krzyżowa z prawdziwym rysunkiem.', 'sigmoid'),
+    { id: 'out', name: 'Rysunek', out: `${W} × ${H}`, io: true, desc: 'Wszystkie piksele naraz, w jednym przejściu. Rysując nowe, losujemy z z N(0, 1) i używamy tylko dekodera.' },
   ] }; }
   if (kind === 'gan') { const Hh = hp.hidden, Z = hp.noise; return { nodes: [
     { id: 'in', name: 'Generator: szum + kategoria', out: `${Z} + ${C} liczb`, io: true, desc: `Losowe ${Z} liczb i kategoria. Inny szum = inny rysunek tej samej kategorii.` },
     dl('g1', 'Generator: warstwa 1', Z + C, Hh, `${Hh}`, 'Rozwija szum w cechy rysunku.', 'GELU'),
     dl('g2', 'Generator: warstwa 2', Hh, Hh, `${Hh}`, '', 'GELU'),
-    dl('g3', 'Generator: wyjście', Hh, N, `${N}`, 'Odcień każdego piksela (sigmoid). To jest podróbka.', 'sigmoid'),
-    dl('k1', 'Krytyk: rysunek + kategoria', N + C, Hh, `${Hh}`, 'Krytyk dostaje raz prawdziwy rysunek, raz podróbkę generatora.', 'GELU'),
+    dl('g3', 'Generator: wyjście', Hh, DIN, `${DIN}`, (COLOR ? 'R, G, B każdego piksela (sigmoid), potem najbliższy kolor palety.' : 'Odcień każdego piksela (sigmoid).') + ' To jest podróbka.', 'sigmoid'),
+    dl('k1', 'Krytyk: rysunek + kategoria', DIN + C, Hh, `${Hh}`, 'Krytyk dostaje raz prawdziwy rysunek, raz podróbkę generatora.', 'GELU'),
     dl('k2', 'Krytyk: warstwa 2', Hh, Hh >> 1, `${Hh >> 1}`, '', 'GELU'),
     { id: 'k3', name: 'Krytyk: ocena (+ projekcja kategorii)', out: '1 liczba', w: [['W', `${Hh >> 1} × 1`, Hh >> 1], ['bias', '1', 1], ['wektory kategorii', `${C} × ${Hh >> 1}`, C * (Hh >> 1)]], desc: 'Jedna liczba: jak bardzo krytyk wierzy, że rysunek jest prawdziwy i pasuje do kategorii. Krytyk chce: prawdziwe → 1, podróbki → 0. Generator chce, żeby jego podróbki dostawały 1.' },
     { id: 'out', name: 'Gra: krytyk ↔ generator', out: 'dwa błędy', io: true, desc: 'Na zmianę krok krytyka i krok generatora. Błąd generatora liczony jest przez krytyka: gradient płynie przez krytyka do generatora, ale uczy się tylko generator.' },
   ] }; }
   if (kind === 'diff') { const Hh = hp.hidden; return { nodes: [
-    { id: 'in', name: 'Wejście: zaszumiony rysunek', out: `${N} liczb`, io: true, desc: `Rysunek z dodanym szumem w kroku t (od 1 do ${hp.T}). Przy t = ${hp.T} to prawie sam szum.` },
-    { id: 'te', name: '+ krok t i kategoria', out: `${N} + 32 + 32`, w: [['wektory kategorii (+ „brak”)', `${C + 1} × 32`, (C + 1) * 32]], desc: 'Krok t jako 32 sinusy i kosinusy (bez wag do nauki), kategoria jako wyuczony wektor 32 liczb. Dodatkowy wektor „brak kategorii” do rysowania bez podpowiedzi.' },
-    dl('l1', 'Warstwa 1', N + 64, Hh, `${Hh}`, '', 'GELU'), dl('l2', 'Warstwa 2', Hh, Hh, `${Hh}`, '', 'GELU'), dl('l3', 'Warstwa 3', Hh, Hh, `${Hh}`, '', 'GELU'),
-    dl('l4', 'Wyjście: zgadnięty rysunek', Hh, N, `${N}`, 'Sieć zgaduje czysty rysunek spod szumu. Błąd: średni kwadrat różnicy z prawdziwym rysunkiem.'),
-    { id: 'out', name: `Rysowanie: ${hp.T} małych kroków`, out: '16 × 16', io: true, desc: `Start z czystego szumu. W każdym z ${hp.T} kroków sieć zgaduje rysunek (dwa razy: z kategorią i bez, mieszane siłą podpowiedzi), a my przesuwamy szum trochę w jego stronę i dodajemy odrobinę nowego szumu.` },
+    { id: 'in', name: 'Wejście: zaszumiony rysunek', out: `${DIN} liczb`, io: true, desc: `Rysunek z dodanym szumem w kroku t (od 1 do ${hp.T}). Przy t = ${hp.T} to prawie sam szum.` },
+    { id: 'te', name: '+ krok t i kategoria', out: `${DIN} + 32 + 32`, w: [['wektory kategorii (+ „brak”)', `${C + 1} × 32`, (C + 1) * 32]], desc: 'Krok t jako 32 sinusy i kosinusy (bez wag do nauki), kategoria jako wyuczony wektor 32 liczb. Dodatkowy wektor „brak kategorii” do rysowania bez podpowiedzi.' },
+    dl('l1', 'Warstwa 1', DIN + 64, Hh, `${Hh}`, '', 'GELU'), dl('l2', 'Warstwa 2', Hh, Hh, `${Hh}`, '', 'GELU'), dl('l3', 'Warstwa 3', Hh, Hh, `${Hh}`, '', 'GELU'),
+    dl('l4', 'Wyjście: zgadnięty rysunek', Hh, DIN, `${DIN}`, 'Sieć zgaduje czysty rysunek spod szumu. Błąd: średni kwadrat różnicy z prawdziwym rysunkiem.'),
+    { id: 'out', name: `Rysowanie: ${hp.T} małych kroków`, out: `${W} × ${H}`, io: true, desc: `Start z czystego szumu. W każdym z ${hp.T} kroków sieć zgaduje rysunek (dwa razy: z kategorią i bez, mieszane siłą podpowiedzi), a my przesuwamy szum trochę w jego stronę i dodajemy odrobinę nowego szumu.` },
   ] }; }
   const d = hp.dim, L = hp.layers, nh = hp.heads, Vin = LV + C;
   const blk = [
-    { id: 'ln1', name: 'Normalizacja warstwy', out: `256 × ${d}`, w: [['skala g', `${d}`, d], ['przesunięcie b', `${d}`, d]], desc: 'Każdy wektor pozycji sprowadzony do średniej 0 i wariancji 1, potem przeskalowany. Trzyma liczby w rozsądnym zakresie przy wielu warstwach.' },
-    { id: 'att', name: `Uwaga przyczynowa (${nh} głowy)`, out: `256 × ${d}`, w: [['Wqkv', `${d} × ${3 * d}`, 3 * d * d], ['bias qkv', `${3 * d}`, 3 * d], ['Wo (wyjście uwagi)', `${d} × ${d}`, d * d], ['bias wyjścia', `${d}`, d]],
-      desc: `Każda pozycja liczy zapytanie, klucz i wartość (3 × ${d} liczb). ${nh} głowy po ${d / nh} liczb niezależnie decydują, na które wcześniejsze piksele patrzeć. „Przyczynowa”: piksel widzi tylko piksele przed sobą, nigdy po. Tu sieć odkrywa, że piksel nad nim jest 16 pozycji wcześniej.`, res: true },
-    { id: 'ln2', name: 'Normalizacja warstwy', out: `256 × ${d}`, w: [['skala g', `${d}`, d], ['przesunięcie b', `${d}`, d]], desc: 'Jak wyżej, przed siecią w każdej pozycji.' },
-    { id: 'mlp', name: `Sieć w pozycji: ${d} → ${4 * d} → ${d}`, out: `256 × ${d}`, w: [['W1', `${d} × ${4 * d}`, 4 * d * d], ['bias 1', `${4 * d}`, 4 * d], ['W2', `${4 * d} × ${d}`, 4 * d * d], ['bias 2', `${d}`, d]],
+    { id: 'ln1', name: 'Normalizacja warstwy', out: `${N} × ${d}`, w: [['skala g', `${d}`, d], ['przesunięcie b', `${d}`, d]], desc: 'Każdy wektor pozycji sprowadzony do średniej 0 i wariancji 1, potem przeskalowany. Trzyma liczby w rozsądnym zakresie przy wielu warstwach.' },
+    { id: 'att', name: `Uwaga przyczynowa (${nh} głowy)`, out: `${N} × ${d}`, w: [['Wqkv', `${d} × ${3 * d}`, 3 * d * d], ['bias qkv', `${3 * d}`, 3 * d], ['Wo (wyjście uwagi)', `${d} × ${d}`, d * d], ['bias wyjścia', `${d}`, d]],
+      desc: `Każda pozycja liczy zapytanie, klucz i wartość (3 × ${d} liczb). ${nh} głowy po ${d / nh} liczb niezależnie decydują, na które wcześniejsze piksele patrzeć. „Przyczynowa”: piksel widzi tylko piksele przed sobą, nigdy po. Tu sieć odkrywa, że piksel nad nim jest ${W} pozycji wcześniej.`, res: true },
+    { id: 'ln2', name: 'Normalizacja warstwy', out: `${N} × ${d}`, w: [['skala g', `${d}`, d], ['przesunięcie b', `${d}`, d]], desc: 'Jak wyżej, przed siecią w każdej pozycji.' },
+    { id: 'mlp', name: `Sieć w pozycji: ${d} → ${4 * d} → ${d}`, out: `${N} × ${d}`, w: [['W1', `${d} × ${4 * d}`, 4 * d * d], ['bias 1', `${4 * d}`, 4 * d], ['W2', `${4 * d} × ${d}`, 4 * d * d], ['bias 2', `${d}`, d]],
       desc: 'Dwie warstwy z funkcją GELU, osobno w każdej pozycji. Tu siedzi większość parametrów: przetwarza to, co uwaga zebrała z innych pikseli.', res: true },
   ];
   return { nodes: [
-    { id: 'in', name: 'Wejście: kategoria + 255 pikseli', out: '256 numerów', io: true, desc: `Ciąg 256 liczb: najpierw numer kategorii (${LV}–${Vin - 1}), potem odcienie pikseli 0–254 (0–15), wiersz po wierszu. Ostatni piksel nie wchodzi, bo nie ma już czego po nim zgadywać.` },
-    { id: 'emb', name: 'Embedding', out: `256 × ${d}`, w: [['tabela wektorów', `${Vin} × ${d}`, Vin * d]], desc: `Każdy z ${Vin} „wyrazów” (16 odcieni i ${C} kategorii) ma własny wektor ${d} liczb. Tak numer kategorii zamienia się w coś, z czego sieć może korzystać, bez rozumienia słowa „kot”.` },
-    { id: 'pos', name: '+ pozycja', out: `256 × ${d}`, w: [['wektory pozycji', `256 × ${d}`, N * d]], desc: 'Do wektora każdego piksela dodajemy wyuczony wektor jego miejsca (0–255). Bez tego uwaga nie wiedziałaby, który piksel jest który.' },
+    { id: 'in', name: `Wejście: kategoria + ${N - 1} pikseli`, out: `${N} numerów`, io: true, desc: `Ciąg ${N} liczb: najpierw numer kategorii (${LV}–${Vin - 1}), potem ${COLOR ? 'numery kolorów' : 'odcienie'} pikseli 0–${N - 2} (0–${LV - 1}), wiersz po wierszu. Ostatni piksel nie wchodzi, bo nie ma już czego po nim zgadywać.` },
+    { id: 'emb', name: 'Embedding', out: `${N} × ${d}`, w: [['tabela wektorów', `${Vin} × ${d}`, Vin * d]], desc: `Każdy z ${Vin} „wyrazów” (${LV} ${LVNAME} i ${C} kategorii) ma własny wektor ${d} liczb. Tak numer kategorii zamienia się w coś, z czego sieć może korzystać, bez rozumienia słowa „kot”.` },
+    { id: 'pos', name: '+ pozycja', out: `${N} × ${d}`, w: [['wektory pozycji', `${N} × ${d}`, N * d]], desc: `Do wektora każdego piksela dodajemy wyuczony wektor jego miejsca (0–${N - 1}). Bez tego uwaga nie wiedziałaby, który piksel jest który.` },
     { group: true, repeat: L, nodes: blk },
-    { id: 'lnf', name: 'Normalizacja końcowa', out: `256 × ${d}`, w: [['skala g', `${d}`, d], ['przesunięcie b', `${d}`, d]], desc: 'Ostatnie wyrównanie przed wyjściem.' },
-    { id: 'out', name: 'Wyjście: 16 odcieni', out: '256 × 16', w: [['W', `${d} × 16`, d * LV], ['bias', '16', LV]], desc: 'Dla każdej z 256 pozycji 16 liczb, po softmaksie prawdopodobieństwa odcieni następnego piksela. Błąd = −ln(prawdopodobieństwa prawdziwego odcienia), średnio po pikselach.' },
-    { id: 'smp', name: 'Softmax → losowanie', out: 'następny piksel', io: true, desc: 'Przy rysowaniu losujemy odcień z tego rozkładu (z temperaturą), dopisujemy go do ciągu i liczymy dalej. 256 razy.' },
+    { id: 'lnf', name: 'Normalizacja końcowa', out: `${N} × ${d}`, w: [['skala g', `${d}`, d], ['przesunięcie b', `${d}`, d]], desc: 'Ostatnie wyrównanie przed wyjściem.' },
+    { id: 'out', name: `Wyjście: ${LV} ${LVNAME}`, out: `${N} × ${LV}`, w: [['W', `${d} × ${LV}`, d * LV], ['bias', `${LV}`, LV]], desc: `Dla każdej z ${N} pozycji ${LV} liczb, po softmaksie prawdopodobieństwa ${LVNAME} następnego piksela. Błąd = −ln(prawdopodobieństwa prawdziwej wartości), średnio po pikselach.` },
+    { id: 'smp', name: 'Softmax → losowanie', out: 'następny piksel', io: true, desc: 'Przy rysowaniu losujemy z tego rozkładu (z temperaturą), dopisujemy do ciągu i liczymy dalej. ' + N + ' razy.' },
   ] };
 }
 let selNode = null, graphView = 'blocks', wviz = null;
@@ -283,8 +309,8 @@ function gpuNote() {
 function renderNeurons() {
   const svg = $('graph'), hp = hpValues(), C = catData.length || 12;
   if (cur === 'stats') {
-    const cols = [{ n: C, show: Math.min(C, 12), label: 'kategoria', sub: `${C} wejść` }, { n: LV, show: LV, label: 'odcienie piksela', sub: '16 wyjść × 256 pikseli' }];
-    return drawNeuronCols(svg, cols, [{ type: 'full', note: 'tabela' }], 'Statystyka nie ma warstw ukrytych: każda kategoria ma po prostu własną tabelę odcieni dla każdego z 256 miejsc. To jedno „połączenie” na parę kategoria → odcień w każdym miejscu.');
+    const cols = [{ n: C, show: Math.min(C, 12), label: 'kategoria', sub: `${C} wejść` }, { n: LV, show: Math.min(LV, 16), label: COLOR ? 'kolory piksela' : 'odcienie piksela', sub: `${LV} wyjść × ${N} pikseli` }];
+    return drawNeuronCols(svg, cols, [{ type: 'full', note: 'tabela' }], `Statystyka nie ma warstw ukrytych: każda kategoria ma po prostu własną tabelę ${LVNAME} dla każdego z ${N} miejsc. To jedno „połączenie” na parę kategoria → wartość w każdym miejscu.`);
   }
   if (cur !== 'ar') {
     const wv = wviz && wviz.cols ? wviz : null;
@@ -297,7 +323,7 @@ function renderNeurons() {
     cols.push({ n: 4 * d, show: 16, label: `sieć ${l + 1}: warstwa ukryta`, sub: `${4 * d} · GELU` }); links.push({ type: 'w', key: 'w1', l });
     cols.push({ n: d, show: 12, label: `wynik bloku ${l + 1}`, sub: `${d}` }); links.push({ type: 'w', key: 'w2', l });
   }
-  cols.push({ n: LV, show: LV, label: 'wyjście', sub: '16 odcieni', shades: true }); links.push({ type: 'w', key: 'wo' });
+  cols.push({ n: LV, show: Math.min(LV, 16), label: 'wyjście', sub: `${LV} ${LVNAME}`, shades: !COLOR, labels: COLOR && wviz && wviz.outIdx ? wviz.outIdx.map(i => `kolor ${i}`) : undefined }); links.push({ type: 'w', key: 'wo' });
   drawNeuronCols(svg, cols, links, wviz ? 'Wagi z aktualnego stanu sieci. Pokazana jest próbka kółek (np. 12 z ' + d + '), więc i połączeń. Przerywane linie przy uwadze to „zbierz informacje z wcześniejszych pikseli”: ta warstwa łączy różne pozycje, reszta działa w każdej pozycji osobno. Połączenia omijające (dodawanie wejścia bloku do wyniku) pominięte dla czytelności.' : 'Po rozpoczęciu nauki linie pokażą prawdziwe wagi: zielone dodatnie, niebieskie ujemne, grubsze silniejsze.');
 }
 function drawNeuronCols(svg, cols, links, note) {
@@ -359,7 +385,7 @@ $('temp').addEventListener('input', () => $('tempOut').textContent = (+$('temp')
 $('guide').addEventListener('input', () => $('guideOut').textContent = (+$('guide').value).toFixed(1).replace('.', ','));
 let genId = 0;
 $('gen').addEventListener('click', () => {
-  $('gen').disabled = true; const cx = $('draw').getContext('2d'); cx.fillStyle = '#2a2a33'; cx.fillRect(0, 0, 192, 192);
+  $('gen').disabled = true; const cx = $('draw').getContext('2d'); cx.fillStyle = '#2a2a33'; cx.fillRect(0, 0, W * BIG, H * BIG);
   worker.postMessage({ cmd: 'generate', kind: cur, classes: [+$('genCat').value], temp: +$('temp').value, guide: +$('guide').value, id: ++genId });
 });
 function showErr(msg) { $('err').textContent = 'Błąd: ' + msg; $('err').hidden = false; }
@@ -376,7 +402,7 @@ worker.onmessage = e => {
   if (m.type === 'gen') {
     if (m.id !== genId) return;
     const cx = $('draw').getContext('2d'), img = m.imgs[0];
-    for (let i = 0; i < m.n; i++) { const g = shade(img[i]); cx.fillStyle = `rgb(${g},${g},${g})`; cx.fillRect((i % S) * 12, Math.floor(i / S) * 12, 12, 12); }
+    drawImg(cx, img, 0, 0, BIG, m.n);
     $('drawNote').textContent = cur === 'diff' ? (m.done ? 'Gotowe: rysunek wyłonił się z szumu.' : 'Odszumianie: z czystego szumu krok po kroku wyłania się rysunek.') : BITS(cur) ? 'Sieć rysuje piksel po pikselu, wiersz po wierszu od lewego górnego rogu. Na każdym kroku widzi tylko kategorię i to, co już narysowała.' : 'Wszystkie piksele naraz, w jednym przejściu sieci, z nowego losowego szumu. Kliknij jeszcze raz: inny rysunek tej samej kategorii.';
     if (m.done) $('gen').disabled = false;
     return;
@@ -413,8 +439,8 @@ function renderMetrics(m) {
   const v = m ? m.val : null, st = (m && m.stats) || {}, k = cur;
   const krok = ['Krok', m ? m.step.toLocaleString('pl') : '–', m ? `${m.params.toLocaleString('pl')} parametrów` + (m.ms ? ` · ${fmt(m.ms, 0)} ms/krok (${m.device})` : '') + (m.bestStep != null && m.step > 1 ? ` · najlepsza wersja: krok ${m.bestStep.toLocaleString('pl')}` : '') : ''];
   const rows = BITS(k) ? [
-    ['Bity na piksel', fmt(v != null ? v / LN2 : null), m && m.train != null ? `treningowe ${fmt(m.train / LN2)} · bez wiedzy: 4,00` : 'bez wiedzy: 4,00'],
-    ['Waha się między', v != null ? `${fmt(Math.exp(v), 1)} odcieniami` : '–', 'z 16 możliwych'], krok]
+    ['Bity na piksel', fmt(v != null ? v / LN2 : null), m && m.train != null ? `treningowe ${fmt(m.train / LN2)} · bez wiedzy: ${fmt(BITS0)}` : `bez wiedzy: ${fmt(BITS0)}`],
+    ['Waha się między', v != null ? `${fmt(Math.exp(v), 1)} ${COLOR ? 'kolorami' : 'odcieniami'}` : '–', `z ${LV} możliwych`], krok]
   : k === 'vae' ? [
     ['Błąd na piksel', fmt(v, 4), 'sprawdzający: odtworzenie + KL, mniej = lepiej'],
     ['Odtworzenie i KL', st.rec != null ? `${fmt(st.rec, 3)} + ${fmt(st.kl / N, 3)}` : '–', st.kl != null ? `KL całego rysunku: ${fmt(st.kl, 1)} (ile informacji mieści z)` : 'rozmycie kontra gładkość przestrzeni'], krok]
@@ -429,7 +455,7 @@ function renderMetrics(m) {
 }
 function renderSamples(m) {
   const box = $('samples'); box.innerHTML = '';
-  const add = (pix, label) => { const d = document.createElement('div'), cv = document.createElement('canvas'), sp = document.createElement('span'); d.className = 'samp'; cv.width = cv.height = S; drawImg(cv.getContext('2d'), pix, 0, 0, 1); sp.textContent = label; d.append(cv, sp); box.appendChild(d); };
+  const add = (pix, label) => { const d = document.createElement('div'), cv = document.createElement('canvas'), sp = document.createElement('span'); d.className = 'samp'; cv.width = W; cv.height = H; drawImg(cv.getContext('2d'), pix, 0, 0, 1); sp.textContent = label; d.append(cv, sp); box.appendChild(d); };
   const head = t => { const h = document.createElement('h4'); h.textContent = t; box.appendChild(h); };
   if (m.mean) m.mean.forEach((pix, c) => add(pix.map(v => Math.round(v)), `${catData[c].name}: średni`));
   const cls = m.sampleClasses || m.samples.map((_, i) => i);
@@ -461,16 +487,16 @@ function renderInner() {
     if (!have.has('vae')) clearInner('Najpierw naucz VAE.');
   } else {
     $('innerTitle').textContent = 'Odszumianie krok po kroku';
-    $('innerNote').textContent = 'Cztery rysunki (kot, dom, drzewo, ryba), od lewej co ok. ' + Math.round(hpValues('diff').T / 10) + ' kroków odszumiania: od czystego szumu do gotowego rysunku. Na początku sieć ustala ogólny kształt, na końcu szczegóły.';
+    $('innerNote').textContent = `Cztery ${COLOR ? 'obrazki' : 'rysunki'} (${catData.slice(0, 4).map(c => c.name).join(', ')}), od lewej co ok. ` + '' + Math.round(hpValues('diff').T / 10) + ' kroków odszumiania: od czystego szumu do gotowego rysunku. Na początku sieć ustala ogólny kształt, na końcu szczegóły.';
     if (lastFrames) drawFrames(lastFrames); else clearInner('Pojawi się w trakcie nauki.');
   }
 }
 function clearInner(t) { const cv = $('inner'); cv.width = 288; cv.height = 60; const cx = cv.getContext('2d'); cx.fillStyle = '#1b1b22'; cx.fillRect(0, 0, 288, 60); cx.fillStyle = '#9a9aa6'; cx.font = '13px system-ui'; cx.fillText(t, 12, 34); }
-function drawGrid(imgs, n) { const cv = $('inner'), sc = 2, cell = S * sc + 2; cv.width = cv.height = n * cell; const cx = cv.getContext('2d'); cx.fillStyle = '#1b1b22'; cx.fillRect(0, 0, cv.width, cv.height); imgs.forEach((p, k) => drawImg(cx, p, (k % n) * cell + 1, Math.floor(k / n) * cell + 1, sc)); cv.style.width = Math.min(n * cell * 2, 576) + 'px'; }
+function drawGrid(imgs, n) { const cv = $('inner'), sc = 2, cw = W * sc + 2, ch = H * sc + 2; cv.width = n * cw; cv.height = n * ch; const cx = cv.getContext('2d'); cx.fillStyle = '#1b1b22'; cx.fillRect(0, 0, cv.width, cv.height); imgs.forEach((p, k) => drawImg(cx, p, (k % n) * cw + 1, Math.floor(k / n) * ch + 1, sc)); cv.style.width = Math.min(n * cw * (COLOR ? 1 : 2), COLOR ? 900 : 576) + 'px'; }
 function drawFrames(fr) {
-  const cv = $('inner'), sc = 2, cell = S * sc + 2, nf = fr.length, rows = fr[0].length; cv.width = nf * cell; cv.height = rows * cell;
+  const cv = $('inner'), sc = 2, cw = W * sc + 2, ch = H * sc + 2, nf = fr.length, rows = fr[0].length; cv.width = nf * cw; cv.height = rows * ch;
   const cx = cv.getContext('2d'); cx.fillStyle = '#1b1b22'; cx.fillRect(0, 0, cv.width, cv.height);
-  fr.forEach((imgs, f) => imgs.forEach((p, r) => drawImg(cx, p, f * cell + 1, r * cell + 1, sc))); cv.style.width = Math.min(nf * cell * 2, 900) + 'px';
+  fr.forEach((imgs, f) => imgs.forEach((p, r) => drawImg(cx, p, f * cw + 1, r * ch + 1, sc))); cv.style.width = Math.min(nf * cw * (COLOR ? 1 : 2), 900) + 'px';
 }
 
 // ---------- wyobraźnia: mieszanie kategorii i obszary ----------
@@ -482,7 +508,7 @@ function renderImagine() {
   const ok = have.has(cur); $('imGo').disabled = $('regGo').disabled = !ok;
   if ($('imA').options.length !== catData.length) {
     ['imA', 'imB'].forEach((id, k) => { $(id).innerHTML = ''; catData.forEach((c, i) => $(id).add(new Option(c.name, i))); });
-    $('imA').value = String(catData.findIndex(c => c.quickdraw === 'tree')); $('imB').value = String(catData.findIndex(c => c.quickdraw === 'cat'));
+    $('imA').value = String(Math.max(0, catData.findIndex(c => c.quickdraw === 'tree' || c.cifar === 'horse'))); $('imB').value = String(Math.max(0, catData.findIndex(c => c.quickdraw === 'cat' || c.cifar === 'bird')));
   }
   drawMask();
 }
@@ -490,37 +516,42 @@ function mixLabel() { const a = +$('imMix').value, nA = catData[+$('imA').value]
 ['imMix', 'imA', 'imB'].forEach(id => $(id).addEventListener('input', () => { mixLabel(); drawMask(); }));
 function imagine(useMask) {
   $('imGo').disabled = $('regGo').disabled = true;
-  const cx = $('imMain').getContext('2d'); cx.fillStyle = '#2a2a33'; cx.fillRect(0, 0, 192, 192);
+  const cx = $('imMain').getContext('2d'); cx.fillStyle = '#2a2a33'; cx.fillRect(0, 0, W * BIG, H * BIG);
   worker.postMessage({ cmd: 'imagine', kind: cur, c1: +$('imA').value, c2: +$('imB').value, a: +$('imMix').value, guide: +$('guide').value, mask: useMask ? Array.from(mask) : null, id: ++imId });
 }
 $('imGo').addEventListener('click', () => imagine(false));
 $('regGo').addEventListener('click', () => { if (!mask.some(v => v)) { showErr('Zaznacz na siatce obszar kategorii B (albo wybierz gotowy układ).'); return; } $('err').hidden = true; imagine(true); });
-function drawBig(img) { const cx = $('imMain').getContext('2d'); drawImg(cx, img, 0, 0, 12); }
+function drawBig(img) { const cx = $('imMain').getContext('2d'); drawImg(cx, img, 0, 0, BIG); }
 function showImagined(m) {
   drawBig(m.main); $('imGo').disabled = $('regGo').disabled = false;
   if (m.strip) {
     const box = $('imStrip'); box.innerHTML = '';
     const lab = [0, 17, 33, 50, 67, 83, 100], nA = catData[+$('imA').value].name, nB = catData[+$('imB').value].name;
-    m.strip.forEach((p, i) => { const d = document.createElement('div'), cv = document.createElement('canvas'), sp = document.createElement('span'); d.className = 'samp'; cv.width = cv.height = S; drawImg(cv.getContext('2d'), p, 0, 0, 1); sp.textContent = i === 0 ? nA : i === 6 ? nB : `${lab[i]}% ${nB}`; d.append(cv, sp); box.appendChild(d); });
+    m.strip.forEach((p, i) => { const d = document.createElement('div'), cv = document.createElement('canvas'), sp = document.createElement('span'); d.className = 'samp'; cv.width = W; cv.height = H; drawImg(cv.getContext('2d'), p, 0, 0, 1); sp.textContent = i === 0 ? nA : i === 6 ? nB : `${lab[i]}% ${nB}`; d.append(cv, sp); box.appendChild(d); });
   }
   $('imNote').textContent = m.region ? `Jedna postać złożona z obszarów: ${catData[+$('imB').value].name} tam, gdzie malowałeś, ${catData[+$('imA').value].name} w reszcie. Kliknij jeszcze raz: inny szum, inna wersja.` : 'Sieć nigdy nie widziała takich rysunków: składa je z tego, co wie o dwóch kategoriach. Pasek pokazuje przemianę od 100% A do 100% B przy tym samym losowym szumie, więc zmienia się tylko podpowiedź.' + (cur !== 'diff' ? ' W VAE i GAN-ie mieszamy samą kategorię na wejściu sieci; w dyfuzji mieszamy odpowiedzi sieci w każdym kroku odszumiania.' : '');
 }
-// maska 16×16: malowanie przeciąganiem; pierwsze kliknięcie decyduje, czy malujemy, czy wymazujemy
+// maska W×H: malowanie przeciąganiem; pierwsze kliknięcie decyduje, czy malujemy, czy wymazujemy
 function drawMask() {
-  const cv = $('mask'), cx = cv.getContext('2d'), c = 12;
-  cx.fillStyle = 'rgba(156,172,112,.18)'; cx.fillRect(0, 0, 192, 192);
-  for (let i = 0; i < N; i++) if (mask[i]) { cx.fillStyle = 'rgba(127,166,216,.75)'; cx.fillRect((i % S) * c, Math.floor(i / S) * c, c, c); }
-  cx.strokeStyle = 'rgba(255,255,255,.08)'; cx.lineWidth = 1; for (let k = 0; k <= 16; k++) { cx.beginPath(); cx.moveTo(k * c + .5, 0); cx.lineTo(k * c + .5, 192); cx.stroke(); cx.beginPath(); cx.moveTo(0, k * c + .5); cx.lineTo(192, k * c + .5); cx.stroke(); }
-  cx.font = '11px system-ui'; cx.fillStyle = '#e8e8ee'; cx.fillText('A: ' + (catData[+$('imA').value]?.name || ''), 4, 188); cx.textAlign = 'right'; cx.fillText('B: ' + (catData[+$('imB').value]?.name || ''), 188, 12); cx.textAlign = 'left';
+  const cv = $('mask'), cx = cv.getContext('2d'), c = BIG, PW = W * c, PH = H * c, g = COLOR ? 4 : 1;   // w 64×40 linie co 4 piksele
+  cx.clearRect(0, 0, PW, PH); cx.fillStyle = 'rgba(156,172,112,.18)'; cx.fillRect(0, 0, PW, PH);
+  for (let i = 0; i < N; i++) if (mask[i]) { cx.fillStyle = 'rgba(127,166,216,.75)'; cx.fillRect((i % W) * c, Math.floor(i / W) * c, c, c); }
+  cx.strokeStyle = 'rgba(255,255,255,.08)'; cx.lineWidth = 1;
+  for (let k = 0; k <= W; k += g) { cx.beginPath(); cx.moveTo(k * c + .5, 0); cx.lineTo(k * c + .5, PH); cx.stroke(); }
+  for (let k = 0; k <= H; k += g) { cx.beginPath(); cx.moveTo(0, k * c + .5); cx.lineTo(PW, k * c + .5); cx.stroke(); }
+  cx.font = '11px system-ui'; cx.fillStyle = '#e8e8ee'; cx.fillText('A: ' + (catData[+$('imA').value]?.name || ''), 4, H * BIG - 4); cx.textAlign = 'right'; cx.fillText('B: ' + (catData[+$('imB').value]?.name || ''), W * BIG - 4, 12); cx.textAlign = 'left';
 }
 let painting = null;
-const cellAt = e => { const r = $('mask').getBoundingClientRect(), x = Math.floor((e.clientX - r.left) / r.width * 16), y = Math.floor((e.clientY - r.top) / r.height * 16); return x >= 0 && x < 16 && y >= 0 && y < 16 ? y * 16 + x : -1; };
-$('mask').addEventListener('pointerdown', e => { const k = cellAt(e); if (k < 0) return; painting = mask[k] ? 0 : 1; mask[k] = painting; $('mask').setPointerCapture(e.pointerId); drawMask(); });
-$('mask').addEventListener('pointermove', e => { if (painting == null) return; const k = cellAt(e); if (k >= 0 && mask[k] !== painting) { mask[k] = painting; drawMask(); } });
+const cellAt = e => { const r = $('mask').getBoundingClientRect(), x = Math.floor((e.clientX - r.left) / r.width * W), y = Math.floor((e.clientY - r.top) / r.height * H); return x >= 0 && x < W && y >= 0 && y < H ? y * W + x : -1; };
+// pędzel: w 64×40 kwadrat 3×3 pikseli, żeby dało się malować obszary
+const paint = (k, v) => { const r = COLOR ? 1 : 0, x0 = k % W, y0 = Math.floor(k / W); for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { const x = x0 + dx, y = y0 + dy; if (x >= 0 && x < W && y >= 0 && y < H) mask[y * W + x] = v; } };
+$('mask').addEventListener('pointerdown', e => { const k = cellAt(e); if (k < 0) return; painting = mask[k] ? 0 : 1; paint(k, painting); $('mask').setPointerCapture(e.pointerId); drawMask(); });
+$('mask').addEventListener('pointermove', e => { if (painting == null) return; const k = cellAt(e); if (k >= 0 && mask[k] !== painting) { paint(k, painting); drawMask(); } });
 ['pointerup', 'pointercancel'].forEach(ev => $('mask').addEventListener(ev, () => { painting = null; }));
-[['B na górze', (x, y) => y < 7], ['B na dole', (x, y) => y >= 9], ['B z lewej', (x, y) => x < 8], ['B z prawej', (x, y) => x >= 8], ['B w środku', (x, y) => x >= 4 && x < 12 && y >= 4 && y < 12], ['odwróć', null], ['wyczyść', () => false]].forEach(([nm, f]) => {
+// gotowe układy w ułamkach szerokości i wysokości (u, v od 0 do 1), więc działają w 16×16 i w 64×40
+[['B na górze', (u, v) => v < 7 / 16], ['B na dole', (u, v) => v >= 9 / 16], ['B z lewej', (u, v) => u < .5], ['B z prawej', (u, v) => u >= .5], ['B w środku', (u, v) => u >= .25 && u < .75 && v >= .25 && v < .75], ['odwróć', null], ['wyczyść', () => false]].forEach(([nm, f]) => {
   const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = nm;
-  b.addEventListener('click', () => { for (let i = 0; i < N; i++) mask[i] = f ? (f(i % 16, i >> 4) ? 1 : 0) : 1 - mask[i]; drawMask(); });
+  b.addEventListener('click', () => { for (let i = 0; i < N; i++) mask[i] = f ? (f((i % W + .5) / W, (Math.floor(i / W) + .5) / H) ? 1 : 0) : 1 - mask[i]; drawMask(); });
   $('maskPresets').appendChild(b);
 });
 
@@ -656,5 +687,18 @@ function renderCmp() {
 }
 
 // ---------- start ----------
+// wybór danych na pasku narzędzi: przeładowanie strony z ?set= (inny rozmiar to inne sieci od zera)
+Object.entries(SETS).forEach(([k, v]) => $('dataSet').add(new Option(v.label, k)));
+$('dataSet').value = SET;
+$('dataSet').addEventListener('change', () => { try { localStorage.setItem('gameLab.img.set', $('dataSet').value); } catch (e) { /* zablokowane */ } location.search = '?set=' + $('dataSet').value; });
+if (COLOR) {
+  document.body.classList.add('imgColor');
+  ['draw', 'imMain', 'mask'].forEach(id => { $(id).width = W * BIG; $(id).height = H * BIG; });
+  $('dataDir').textContent = `data/${DIR}/`;
+  $('intro').textContent = 'Własna sieć uczy się rysować od zera, tu w kolorze: obrazki 64×40 z jednej palety 256 kolorów, 10 kategorii zdjęć z CIFAR-10. Te same konstrukcje i ten sam silnik co przy szarych rysunkach 16×16, ale obrazek ma 2560 pikseli zamiast 256, a piksel 256 możliwych kolorów zamiast 16 odcieni. Nauka trwa dłużej, a zwykłe sieci gęste widzą każdy piksel osobno, więc obrazki wychodzą bardziej plamami niż kształtami.';
+  // zgadywanie z rysunku myszką i mapa uwagi (2560 × 2560 na głowę) są tylko przy 16×16
+  $('guessPanel').hidden = true; ['attTitle', 'attCtl', 'attRow'].forEach(id => $(id).hidden = true);
+  $('drawNote').textContent = 'Krok 2 rysuje piksel po pikselu: 2560 kroków na obrazek, więc to chwilę trwa.';
+}
 renderAll(); resetLearn(); renderCmp(); padDraw(); showSeen(null); renderAnswers();
 loadData().then(renderGraph);

@@ -76,3 +76,8 @@
 .bar small{color:var(--muted)}
 .ans button{justify-self:start;font-size:13px;padding:5px 10px}
 .acc{font-size:13px;color:var(--fg)}
+
+/* 64×40 w kolorze (js/labs/img/img.js: body.imgColor) — proporcje 8:5 */
+.imgColor .samp canvas{width:128px;height:80px}
+.imgColor #draw,.imgColor #imMain,.imgColor #mask{width:256px;height:160px}
+.imgColor .imstrip .samp canvas{width:96px;height:60px}

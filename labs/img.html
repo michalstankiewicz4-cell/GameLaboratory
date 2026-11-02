@@ -15,14 +15,17 @@
 <script src="../ui/data/catalog.js"></script>
 <script src="../ui/shell/log.js"></script>
 <script src="../ui/shell/menubar.js"></script>
-<div class="bar"><span class="sp"></span></div>
+<div class="bar">
+  <select id="dataSet" aria-label="Dane do nauki" title="Dane do nauki: rozmiar obrazków i kolory"></select>
+  <span class="sp"></span>
+</div>
 <div class="foot"><span id="fps" data-auto></span><span class="sp"></span><span>GameLaboratory</span></div>
 <script src="../ui/shell/bars.js"></script>
 <div class="wrap">
   <header>
     <p class="crumb"><a href="walkers.html">← SDF Walkers</a> · <a href="lang.html">Laboratorium języka</a></p>
     <h1>Laboratorium obrazów</h1>
-    <p>Własna sieć uczy się rysować od zera: obrazki 16×16 w 16 odcieniach, z 12 kategorii. Konstrukcje w kolejności, w jakiej powstawały, ten sam silnik co w laboratorium języka. Obrazek to dla sieci po prostu ciąg 256 liczb, a kategoria to jeszcze jedna liczba na początku: sieć nie zna słów, uczy się tylko, jakie kształty idą za którym numerem.</p>
+    <p id="intro">Własna sieć uczy się rysować od zera: obrazki 16×16 w 16 odcieniach, z 12 kategorii. Konstrukcje w kolejności, w jakiej powstawały, ten sam silnik co w laboratorium języka. Obrazek to dla sieci po prostu ciąg 256 liczb, a kategoria to jeszcze jedna liczba na początku: sieć nie zna słów, uczy się tylko, jakie kształty idą za którym numerem.</p>
   </header>
 
   <section class="panel" aria-labelledby="h-data">
@@ -30,7 +33,7 @@
     <dl class="stats" id="dataStats"></dl>
     <div class="gallery" id="gallery"></div>
     <details class="hint">
-      <summary>Pliki źródłowe w folderze <code>data/img/</code></summary>
+      <summary>Pliki źródłowe w folderze <code id="dataDir">data/img/</code></summary>
       <div id="files"></div>
     </details>
     <p class="err" id="dataErr" hidden></p>
@@ -83,7 +86,7 @@
     </div>
     <h3 id="attTitle">Uwaga</h3>
     <div class="vizctl" id="attCtl"></div>
-    <div class="attrow">
+    <div class="attrow" id="attRow">
       <canvas id="att" class="pix" width="384" height="192" aria-label="Mapa uwagi na obrazku"></canvas>
       <p class="note" id="attNote">Po nauce kroku 2 zobaczysz tu, na które wcześniejsze piksele patrzy sieć, zgadując wybrany piksel.</p>
     </div>
@@ -116,7 +119,7 @@
     <div class="innerrow" id="innerRow" hidden><canvas id="inner" class="pix" width="288" height="288" aria-label="Podgląd wnętrza sieci"></canvas><p class="note" id="innerNote"></p></div>
   </section>
 
-  <section class="panel" aria-labelledby="h-guess">
+  <section class="panel" aria-labelledby="h-guess" id="guessPanel">
     <h2 id="h-guess"><span class="num">4</span> Zgadnij, co narysowałem</h2>
     <p class="note guessintro">Narysuj coś myszką (kot, dom, drzewo, ryba, samochód, słońce, kwiat, rower, jabłko, gwiazda, czaszka albo księżyc). Rysunek jest kadrowany, skalowany i pomniejszany do 16×16 tak samo jak dane do nauki. Zgadują dwa rodzaje sieci. <b>Klasyfikator</b> uczył się tylko odpowiadać „co to jest?”: zna różnice między kategoriami, ale rysować nie umie. Sieci z kroków 1 i 2 umieją <b>rysować</b>, a nigdy nie uczyły się rozpoznawać. Zgadują, licząc dla każdej kategorii, jak bardzo Twój rysunek je zaskakuje, i wybierając najmniej zaskakującą.</p>
     <div class="guessrow">

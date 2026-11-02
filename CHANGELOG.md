@@ -3,6 +3,19 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Laboratorium obrazów 0.29.0 — 2026-11-03 (64×40 w 256 kolorach)
+
+### Dodane
+- **Drugi zbiór danych: 64×40 × 256 kolorów** — 10 kategorii zdjęć CIFAR-10 po 600 (`data/img-color/`, skrypt
+  `tools/img/build_cifar.py`): środkowy pas 32×20 powiększony ×2, jedna wspólna paleta 256 kolorów (median cut).
+  Wybór na pasku narzędzi: 16×16 · 16 odcieni szarości (jak dotąd) albo 64×40 · 256 kolorów (`?set=color`, pamiętany).
+- Wszystkie pięć konstrukcji działa na obu zbiorach: statystyka i transformer zgadują numer koloru (1 z 256), VAE, GAN,
+  dyfuzja i klasyfikator rysują R, G, B (7680 liczb), a wynik idzie do najbliższego koloru palety. Rozmiar i paleta
+  przychodzą do wątku treningowego z danymi; maska obszarów i gotowe układy działają w 64×40 (pędzel 3×3).
+- W kolorze: mniejszy transformer na start (2 × 32, 2 głowy, 2 obrazki na krok, 1000 kroków), podglądy rzadziej
+  (dyfuzja co 40 s, transformer 4 obrazki co minutę), sprawdzanie transformera po jednym obrazku. Zgadywanie z rysunku
+  myszką i mapa uwagi (2560 × 2560 na głowę) tylko przy 16×16.
+
 ## Program 0.20.9 — 2026-11-02 (domek w nawigacji)
 
 ### Dodane

@@ -1,0 +1,27 @@
+OBRAZKI W KOLORZE DO NAUKI LABORATORIUM OBRAZÓW: ŹRÓDŁO
+=======================================================
+
+Źródło: CIFAR-10 (Alex Krizhevsky, Vinod Nair, Geoffrey Hinton; University of Toronto)
+https://www.cs.toronto.edu/~kriz/cifar.html
+Zbiór 60 000 kolorowych zdjęć 32×32 w 10 kategoriach, wybranych ze zbioru „80 Million Tiny Images”.
+Pliki pobrano z kopii w postaci JPEG: https://github.com/YoongiKim/CIFAR-10-images (2 listopada 2026).
+
+Autorzy proszą o cytowanie przy korzystaniu ze zbioru:
+  Alex Krizhevsky, „Learning Multiple Layers of Features from Tiny Images”, 2009.
+  https://www.cs.toronto.edu/~kriz/learning-features-2009-TR.pdf
+Zbiór nie ma osobnej licencji; jest powszechnie używany do badań i nauki. Zdjęcia pochodzą z internetu
+i mogą należeć do różnych autorów — pliki służą tu wyłącznie do nauki sieci w laboratorium.
+
+ZMIANY WOBEC ORYGINAŁU
+----------------------
+Z każdej kategorii wzięto pierwsze 600 zdjęć ze zbioru treningowego. Każde zdjęcie:
+- przycięto do środkowego pasa 32×20 (wiersze 6–25), bo obrazek ma proporcje 64:40,
+- powiększono ×2 do 64×40 (bicubic),
+- sprowadzono do 256 kolorów wspólnej palety (median cut z próbki wszystkich kategorii, bez ditheringu).
+Obrazki ułożono w siatkę po 25 w wierszu, jeden plik PNG z paletą na kategorię. Paleta jest też
+w manifest.json. Robi to skrypt tools/img/build_cifar.py.
+
+KATEGORIE
+---------
+samolot (airplane), samochód (automobile), ptak (bird), kot (cat), jeleń (deer), pies (dog),
+żaba (frog), koń (horse), statek (ship), ciężarówka (truck)

@@ -65,13 +65,24 @@ Uwaga: Web Worker nie działa z pliku otwartego bezpośrednio (`file://`), labor
 
 Osobna strona `labs/img.html`: sieć uczy się rysować od zera, na rysunkach 16×16 w 16 odcieniach z 12 kategorii (Quick, Draw!, CC BY 4.0). Ten sam silnik co w laboratorium języka (`js/labs/lang/`). Kategoria to jeszcze jedna liczba na początku ciągu: sieć nie zna słów, uczy się tylko, jakie kształty idą za którym numerem. Pięć konstrukcji w kolejności historycznej: statystyka pikseli → piksel po pikselu (transformer, jak ImageGPT) → VAE → GAN → dyfuzja (jak Stable Diffusion, z siłą podpowiedzi). Na stronie jest graf modelu w dwóch widokach: bloki z kształtami danych i parametrami albo neurony z połączeniami w kolorze prawdziwych wag.
 
+**Dane do wyboru** (lista na pasku narzędzi; adres `?set=gray` / `?set=color`, wybór pamiętany w przeglądarce, `gameLab.img.set`):
+- **16×16 · 16 odcieni szarości** — rysunki Quick, Draw! (`data/img/`), 12 kategorii po 2000.
+- **64×40 · 256 kolorów** — zdjęcia CIFAR-10 (`data/img-color/`), 10 kategorii po 600: środkowy pas 32×20 powiększony ×2,
+  jedna wspólna paleta 256 kolorów (median cut, w `manifest.json`). Statystyka i transformer zgadują numer koloru
+  (1 z 256); VAE, GAN, dyfuzja i klasyfikator widzą obrazek jako 2560 × R, G, B (7680 liczb), a wynik sprowadzamy
+  do najbliższego koloru palety (tablica 32×32×32 w wątku treningowym). Transformer ma tu ciąg 2560 pikseli, więc
+  mniejsze ustawienia na start (2 warstwy × 32, 2 głowy, 2 obrazki na krok, 1000 kroków), a podgląd rysuje 4 obrazki
+  co minutę. Zgadywanie z rysunku myszką i mapa uwagi (2560 × 2560 na głowę) są tylko przy 16×16.
+
 ```
 labs/img.html               strona laboratorium
 ui/pages/img.css            układ (reszta z ui/pages/walkers.css i ui/pages/lang.css)
 js/labs/img/img.js          strona: dane z PNG, graf modelu, nauka, rysowanie, mapa uwagi
 js/labs/img/worker.js       trening w tle: statystyka pikseli, transformer piksel po pikselu (CPU/GPU, KV cache), VAE, GAN, dyfuzja
 data/img/                   rysunki do nauki: jeden PNG na kategorię (siatka 16×16), manifest.json, LICENCJA.txt
+data/img-color/             obrazki 64×40 × 256 kolorów: PNG z paletą na kategorię, manifest.json (z paletą), LICENCJA.txt
 tools/img/build_quickdraw.py  robi data/img/ z Quick, Draw! (pobiera tylko pierwsze 2000 rysunków każdej kategorii)
+tools/img/build_cifar.py    robi data/img-color/ z CIFAR-10 (kopia JPEG: github.com/YoongiKim/CIFAR-10-images)
 ```
 
 ## Struktura
