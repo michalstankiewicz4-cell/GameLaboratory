@@ -4,14 +4,17 @@
   // ---------- stage scale, like the game (1536x1024 design surface) ----------
   const stageEl = document.getElementById("stage");
   function fitStage(){
-    // under the labs' menu bar (ui/menubar.js), if there is one
-    const top = window.LabMenu ? window.LabMenu.MENU_H : 0;
-    const s = Math.min(window.innerWidth / 1536, (window.innerHeight - top) / 1024);
+    // between the bars (the menu bar, the lab's bar, the bottom bar: ui/bars.css), whichever are shown
+    const bar = document.querySelector("body > .bar"), foot = document.querySelector("body > .foot");
+    const top = bar && bar.offsetHeight ? bar.getBoundingClientRect().bottom : window.LabMenu ? window.LabMenu.MENU_H : 0;
+    const bottom = foot && foot.offsetHeight ? foot.offsetHeight : 0;
+    const s = Math.min(window.innerWidth / 1536, (window.innerHeight - top - bottom) / 1024);
     stageEl.style.top = top + "px";
     document.documentElement.style.setProperty("--uiScale", s);
     stageEl.style.left = "50%";
   }
   window.addEventListener("resize", fitStage); fitStage();
+  new MutationObserver(fitStage).observe(document.body, { attributes: true, attributeFilter: ["class"] });   // OPTIONS → Bars
 
   // ---------- skins ----------
   const SKINS = {

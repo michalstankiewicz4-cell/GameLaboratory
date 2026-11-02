@@ -120,7 +120,6 @@ document.head.appendChild(sheet);
   const cj = document.createElement("script"); cj.src = ROOT + "ui/console.js"; document.head.appendChild(cj);
 }
 if (!START) document.body.classList.add("lmLab");
-if (isTool) document.body.classList.add("lmTool");
 // the lab's two bars (ui/bars.css), shown or hidden for every page (OPTIONS → Bars); both on by default
 const BARS = [["bar", "gamelab.bars.tool", "lmNoBar"], ["foot", "gamelab.bars.info", "lmNoFoot"]];
 const barOn = (key) => { try { return localStorage.getItem(key) !== "off"; } catch (e) { return true; } };

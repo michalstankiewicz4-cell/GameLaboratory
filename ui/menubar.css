@@ -47,6 +47,3 @@
   font: inherit; cursor: pointer; }
 #lmDialog button:hover { border-color: var(--accent); }
 
-/* the tools without the lab's bars: their page starts under the menu bar */
-body.lmLab.lmTool { padding-top: 48px !important; }
-body.lmLab.lmTool #app { height: calc(100% - 32px) !important; margin-top: 32px; }

@@ -3,6 +3,18 @@
 Wersja programu i każdego laboratorium: `ui/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.18.2 — 2026-11-02
+
+### Zmienione
+- **Paski na każdej stronie**: pasek narzędzi (z przyciskiem konsoli) i pasek informacyjny (klatki na sekundę,
+  GameLaboratory) mają teraz także laboratorium obrazów, laboratorium języka, SDF Walkers, skórki, Kontrola kitów
+  i Tekstura ziarna. Strony przewijane jak dokument dostały `<body class="pageFlow">` (`ui/bars.css`): zaczynają się
+  pod paskami i kończą nad dolnym, także gdy któryś pasek jest wyłączony. Skórki dopasowują scenę do miejsca
+  między paskami (i po przełączeniu pasków).
+- Prostszy kod: bez osobnych odstępów tych stron (`walkers.css`, `kitcheck.css`, `grainTexture.css`) i bez reguł
+  `lmTool` w `ui/menubar.css`.
+- Wersje: program 0.18.2; te laboratoria i narzędzia z+1.
+
 ## Program 0.18.1 — 2026-11-02
 
 ### Zmienione

@@ -1,4 +1,4 @@
-/* The lab's two bars, the same on every page: one under the menu bar (the lab's own controls: drop-downs, buttons,
+/* The two bars, on every page (the labs, the tools, the start page) and the same everywhere: one under the menu bar (the lab's own controls: drop-downs, buttons,
    the environment switch, a status) and one at the bottom (scale, frames per second, GameLaboratory).
      <div class="bar"> <select>… <div class="btns"><button>…</div> <div class="envSwitch">… <span class="dimtxt" id="status"></span> <span class="sp"></span> </div>
      <div class="foot"> <span id="fps" data-auto></span> <span class="sp"></span> <span>GameLaboratory</span> </div>
@@ -49,3 +49,9 @@ body > .foot :is(#fps, .mono){font-family:var(--mono)}
 body > .foot #hint{color:var(--dim);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto;min-width:0}
 body > .foot .scale{display:flex;align-items:center;gap:8px}
 body > .foot .scale i{display:block;height:6px;border:1px solid var(--text);border-top:0}
+
+/* a page that scrolls as a document (the language and image labs, SDF Walkers, the tools): it starts under the menu
+   bar and the bar, and ends above the bottom bar — <body class="pageFlow"> */
+body.pageFlow{padding-top:calc(var(--menuH) + var(--barH) + 24px);padding-bottom:calc(var(--footH) + 24px)}
+body.pageFlow.lmNoBar{padding-top:calc(var(--menuH) + 24px)}
+body.pageFlow.lmNoFoot{padding-bottom:24px}
