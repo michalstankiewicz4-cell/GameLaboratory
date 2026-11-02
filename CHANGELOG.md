@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.20.5 — 2026-11-02 (pasek menu od razu ze stroną)
+
+### Poprawione
+- Przy odświeżeniu (zwłaszcza Ctrl+Shift+R) pasek menu znikał na chwilę, a paski narzędzi i informacyjny już były.
+  Jego arkusz był dokładany przez `menubar.js` dopiero w trakcie ładowania, a do tego czasu pasek był ukryty.
+  Teraz `ui/shell/menubar.css` i `console.css` są w `ui/ui.css` (strona startowa linkuje je sama), więc pasek menu
+  rysuje się razem ze stroną; `menubar.js` już go nie ukrywa.
+
 ## Program 0.20.4 — 2026-11-02 (pojazdy w menu Narzędzia)
 
 ### Zmienione

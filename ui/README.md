@@ -5,7 +5,7 @@ gold headings and controls). Font: Space Grotesk; numbers: IBM Plex Mono. Colour
 
 | Folder | What is in it |
 |---|---|
-| `ui.css` | every sheet a page needs, in one link (the styles and the shell's sheets, except the menu bar's and the console's: those load themselves) |
+| `ui.css` | every sheet a page needs, in one link (the styles and all the shell's sheets, the menu bar's and the console's too, so the menu bar is drawn with the page) |
 | `style/` | how things look: tokens, fonts, base, controls, the two page themes |
 | `shell/` | what every page has around the lab: menu bar, the two bars, windows, standard windows, performance, console, log, loading card, environment switch |
 | `data/` | the catalog of labs and tools, the versions |
@@ -27,7 +27,7 @@ gold headings and controls). Font: Space Grotesk; numbers: IBM Plex Mono. Colour
 | File | What it is |
 |---|---|
 | `log.js` | the page's log (`window.LabLog`): errors (also uncaught ones and files that failed to load), warnings, the console's messages, loading steps and times; kept for the tab until it is closed (`sessionStorage`). The first script on every page |
-| `menubar.css` + `menubar.js` | the menu bar: GameLaboratory · Options · Tools · Help, the lab's name and the versions; languages; OPTIONS → Bars, Windows, Language, Reset saved settings. The script loads its own sheet and the console |
+| `menubar.css` + `menubar.js` | the menu bar: GameLaboratory · Options · Tools · Help, the lab's name and the versions; languages; OPTIONS → Bars, Windows, Language, Reset saved settings. The script loads the console's script |
 | `bars.css` + `bars.js` | the two bars on every page: the toolbar under the menu bar (drop-downs, buttons, the environment switch, a status, the console's button) and the info bar at the bottom (frames per second, scale); fixed heights, opaque, everything in them defined here only. `<body class="pageFlow">`: a page that scrolls as a document starts under the bars |
 | `windows.css` + `windows.js` | floating windows with a lab's options (`data-window`), opened and closed from OPTIONS → Windows; dragged by the title, kept per page; windows without a remembered place stack on their side, and a full column continues in the next one |
 | `labwin.css` + `labwin.js` | the standard windows (`data-std`): **Description** (left, first), **Camera**, **Light and weather**, **Performance** (right, in this order) — the same titles (EN/PL), sides and order on every lab |

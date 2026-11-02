@@ -1,5 +1,5 @@
 /* GameLaboratory UI — everything a lab or tool page needs, in one link: <link rel="stylesheet" href="../ui/ui.css">.
-   The menu bar loads its own sheet (ui/shell/menubar.css) from ui/shell/menubar.js. See ui/README.md. */
+   The menu bar's and the console's sheets are here too, so the menu bar is drawn with the page, never after it. See ui/README.md. */
 @import url("style/tokens.css");
 @import url("style/fonts.css");
 @import url("style/base.css");
@@ -9,3 +9,5 @@
 @import url("shell/bars.css");
 @import url("shell/envswitch.css");
 @import url("shell/loader.css");
+@import url("shell/menubar.css");
+@import url("shell/console.css");

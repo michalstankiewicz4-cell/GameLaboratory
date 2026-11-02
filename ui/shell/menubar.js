@@ -5,8 +5,8 @@
    A classic script with no dependencies, at the top of <body> right after ui/shell/log.js:
      a <script> of ../ui/shell/menubar.js   (a lab or a tool; the start page: ui/shell/menubar.js)
    It finds the site's root from its own address, adds the bar (fixed, at
-   the top, MENU_H high — --menuH in ui/style/tokens.css) and loads its sheet,
-   ui/shell/menubar.css, which also moves each page's top panels down by that
+   the top, MENU_H high — --menuH in ui/style/tokens.css); its sheet,
+   ui/shell/menubar.css (in ui/ui.css),  also moves each page's top panels down by that
    much (a new lab with a panel at the top adds its own there). The labs
    live in labs/, the tools in tools/; the start screen is index.html.
    ======================================================================= */
@@ -69,14 +69,10 @@ const all = LABS.concat(TOOLS);
 const isTool = DIR === "tools";
 const me = all.find((x) => x.file === PAGE) || null;
 
-// styles: ui/shell/menubar.css, as a <link> (pages with a strict CSP, the labs from Battle, allow style-src 'self').
-// The bar stays hidden until its sheet has loaded, so it never flashes unstyled.
-const sheet = document.createElement("link");
-sheet.rel = "stylesheet"; sheet.href = ROOT + "ui/shell/menubar.css";
-document.head.appendChild(sheet);
+// styles: ui/shell/menubar.css and ui/shell/console.css come with the page (ui/ui.css; the start page links them), so the
+// bar is drawn at once with everything else — a sheet added from here arrived late and the bar showed after the page's bars.
 // the console window and its button on the bar (ui/shell/console.js, its sheet ui/shell/console.css), on every page
 {
-  const cs = document.createElement("link"); cs.rel = "stylesheet"; cs.href = ROOT + "ui/shell/console.css"; document.head.appendChild(cs);
   const cj = document.createElement("script"); cj.src = ROOT + "ui/shell/console.js"; document.head.appendChild(cj);
 }
 if (!START) document.body.classList.add("lmLab");
@@ -185,9 +181,6 @@ function help() {
 }
 
 const bar = el("div"); bar.id = "labMenu"; bar.lang = LANG;
-bar.style.visibility = "hidden";
-sheet.addEventListener("load", () => { bar.style.visibility = ""; });
-sheet.addEventListener("error", () => { bar.style.visibility = ""; });
 const home = el("a", "lmHome"); home.href = ROOT + "index.html"; home.title = t("Start screen", "Strona startowa");
 home.append(el("span", "lmMark"), document.createTextNode("GameLaboratory"));
 bar.appendChild(home);
