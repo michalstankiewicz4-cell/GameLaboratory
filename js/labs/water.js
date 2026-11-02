@@ -128,13 +128,14 @@ function shore(v, p) {
   const opt = { width: p.width, wall: p.wall, steep: p.steep, depth: p.depth, meander: p.meander, seed: 7 }, key = JSON.stringify(opt);
   if (key === v.bankKey) { if (v.terrain) v.terrain.group.visible = true; return; }
   clearTimeout(v.bankTimer);
-  v.bankTimer = setTimeout(() => {
+  v.bankTimer = setTimeout(() => window.LabLoad.run('Shaping the banks…', async (step) => {   // a second or so: the loading card
+    await step('The channel and its banks', 0.2);
     const T = generateWaterway(opt), tex = heightTexture(T);
     if (v.tex) v.tex.dispose();
     v.T = T; v.tex = tex; v.bankKey = key;
     if (!v.terrain) { v.terrain = terrainMeshes(T, tex, { uniforms: v.u, n: 320, nFar: 160 }); scene.add(v.terrain.group); } else v.terrain.set(T, tex);
     v.terrain.group.visible = true;
-  }, v.bankKey ? 250 : 0);
+  }), v.bankKey ? 250 : 0);
 }
 
 /* ---------------- spray ---------------- */

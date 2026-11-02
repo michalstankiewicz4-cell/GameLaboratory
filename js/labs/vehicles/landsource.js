@@ -9,20 +9,25 @@
 //   sky                    { fog, sunDir, sunColor, sunIntensity, ambient, sky, ground } from the land lab's weather
 //   update(t, camera)      each frame: the terrain's rings and the sea follow the camera
 //   dispose()
+// window.LandLabWorld(step) is async: step(name, fraction) is the loading card's (ui/loader.js LabLoad.run).
 import * as THREE from '../../../vendor/three/three.module.js';
 import { WEATHER, skyUniforms, GLSL_SKY, applySky } from '../../envs/sky/skykit.js';
 import { waveSet, heightAt as waveHeight, waterUniforms, setWaves, polarGrid, waterMaterial, LOOKS } from '../../envs/water/waterkit.js';
 import { heightTexture, terrainMeshes, sampleHeight, TERRAIN_DEFAULTS, GLSL_LAND } from '../../envs/land/landkit.js';
 import { generateWorld, regionTextures, regionUniforms, GLSL_REGIONS, WORLD_DEFAULTS, biomeTexture } from '../../envs/land/regionkit.js';
 
-function landLabWorld() {
+async function landLabWorld(step = async () => {}) {
   let saved = null; try { saved = JSON.parse(localStorage.getItem('gameLab.land.v1') || 'null'); } catch { saved = null; }
   const map = { ...TERRAIN_DEFAULTS, ...(saved && saved.map) }, water = { ...WORLD_DEFAULTS, ...(saved && saved.water) };
   const skyS = { weather: 'fair', sunEl: 24, sunAz: 210, ...(saved && saved.sky) };
-  const T = generateWorld(map, water), tex = heightTexture(T), rtex = regionTextures(T), btex = biomeTexture(T);
+  await step('Heightmap, rivers and water regions', 0.05);
+  const T = generateWorld(map, water);
+  await step('Terrain, regions and biomes', 0.65);
+  const tex = heightTexture(T), rtex = regionTextures(T), btex = biomeTexture(T);
   const terrain = terrainMeshes(T, tex, { biome: btex });
   const group = new THREE.Group(); group.add(terrain.group);
 
+  await step('The sea and the weather', 0.82);
   // the sea, as in the land lab: the land's uniforms (shallows, surf), the regions (looks, ice, oil), the sky's colours
   const skyU = skyUniforms();
   const WU = Object.assign(waterUniforms(), skyU, terrain.uniforms, regionUniforms(rtex));
@@ -47,6 +52,7 @@ function landLabWorld() {
   WU.uSun.value.copy(L.sunDir); WU.uSunCol.value.copy(L.glitterColor).multiplyScalar(1.1 * (1 - w.coverage * w.density * 0.8) * L.sunSeen * L.sunSeen);
   WU.uLight.value = 0.03 + 0.97 * L.day;
 
+  await step('A place to start, by the water', 0.92);
   // where to start: land 0.5–6 m above the sea, by the water, nearest the middle (a spiral search)
   const heightAt = (x, z) => sampleHeight(T, x, z);
   let start = [T.size / 2, T.size / 2];

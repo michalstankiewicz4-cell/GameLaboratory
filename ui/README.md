@@ -14,7 +14,8 @@ gold headings and controls). Font: Space Grotesk; numbers: IBM Plex Mono.
 | `windows.css` + `windows.js` | floating windows with a lab's options (OPTIONS → Windows) |
 | `bars.css` + `bars.js` | the lab's two bars: under the menu bar (drop-downs, buttons, the environment switch, a status) and at the bottom (frames per second, scale); fixed heights, opaque, everything in them defined here only; OPTIONS → Bars hides either |
 | `envswitch.css` + `envswitch.js` | the environment switch: space · water · land (28 px, in the bar) |
-| `loader.css` + `loader.js` | the loading card: a ring, a plain sentence, an optional step, a bar; `loader.js` fades a card marked `data-auto` once the page has loaded and drawn |
+| `loader.css` + `loader.js` | the loading card: a ring, a plain sentence, the step being done, a bar with a percentage. At the start it shows the page's own progress (its scripts, building the scene, the first frame); `LabLoad.step(name, fraction)` — the lab's own steps; `LabLoad.run(title, async step => …)` — the card over a running lab for something long; `LabLoad.done()`; a card marked `data-auto` fades by itself |
+| `console.css` + `console.js` | the console window: the page's log (`window.LabLog`, started in `menubar.js`: errors, warnings, console messages, loading steps and times), newest first, date and time, a filter by kind and text; a button on the right of the lab's bar; loaded by `menubar.js` |
 | `ui.css` | all of the above in one link |
 | `menubar.css` + `menubar.js` | the menu bar; the script loads its own sheet |
 | `versions.js` | the program's and every lab's version |
@@ -48,5 +49,6 @@ CSSOM (`el.style.x = …`), which the CSP allows.
   <span class="labLoadStep"></span><span class="labLoadBar"><i></i></span></div></div>
 ```
 
-A plain sentence, not capitals. The bar runs back and forth; give its `<i>` a width to show progress,
-and the step (`.labLoadStep`) a text to say what is being done.
+A plain sentence, not capitals. `ui/loader.js` (right after the card) fills the step and the bar: the page's own
+progress until the lab reports its steps with `LabLoad.step(name, fraction)`; for something long later on,
+`LabLoad.run(title, async (step) => { await step('Heightmap', 0.1); … })`. Without steps the bar runs back and forth.

@@ -79,7 +79,7 @@ function world() {
   return generateWorld({ seed: S.mapSeed, res: 384, size: 2400, land: 0.86, shape: 'islands', relief: 220, depth: 25, rough: 0.5, erosion: 0.4, wrap: false, barrier: 'wall' },
     { layout: 'single', body: 'lake', biome: S.biome, biomeBlend: 900, blend: 300 });
 }
-function buildLand() { $('landStats').textContent = 'Growing the landscape…'; setTimeout(buildLandNow, 30); }
+function buildLand() { $('landStats').textContent = 'Growing the landscape…'; window.LabLoad.run('Growing the landscape…', async (step) => { await step('Terrain, trees and grass', 0.2); buildLandNow(); }); }
 function buildLandNow() {
   const t0 = performance.now();
   T = world();

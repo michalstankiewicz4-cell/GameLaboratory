@@ -45,7 +45,8 @@ function build() {
     .flatMap(([a, b]) => [el('span', { textContent: a }), el('b', { textContent: String(b) })]));
   applyView(true);
 }
-const rebuild = (() => { let t = 0; return () => { clearTimeout(t); $('status').textContent = 'generating…'; t = setTimeout(() => { build(); $('status').textContent = ''; }, 250); }; })();
+// a new cave takes a second or two: the loading card meanwhile (ui/loader.js), once the sliders have stopped
+const rebuild = (() => { let t = 0; return () => { clearTimeout(t); $('status').textContent = 'generating…'; t = setTimeout(() => window.LabLoad.run('Generating the cave…', async (step) => { await step('Carving the passages and chambers', 0.3); build(); $('status').textContent = ''; }), 250); }; })();
 
 function applyLight() {
   const inside = S.view === 'inside';
@@ -110,9 +111,10 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 resize();
-requestAnimationFrame(() => setTimeout(() => {   // let the loading card paint first: the cave takes a moment
+requestAnimationFrame(() => setTimeout(async () => {   // the cave takes a moment: the loading card shows it (ui/loader.js)
+  await window.LabLoad.step('Carving the passages and chambers', 0.6);
   build();
-  const ld = $('loading'); ld.style.opacity = '0'; setTimeout(() => ld.remove(), 700);
+  window.LabLoad.done();
   window.__caves = { S, get cave() { return cave; }, build, free, camera, scene };
   requestAnimationFrame(frame);
 }, 30));

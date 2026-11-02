@@ -91,12 +91,23 @@ function clearAt(x, z, hd, minDepth = DRAUGHT + 0.5) {
 }
 
 /* ---------------- map (re)generation ---------------- */
-function generate() {
-  const t0 = performance.now();
-  T = generateWorld(S.map, S.water); if (tex) tex.dispose(); tex = heightTexture(T);
+// the world in three stages, so the loading card can show each (generateShown); generate() runs them at once
+let genT0 = 0;
+const GEN_STAGES = [
+  ['Heightmap, rivers and water regions', 0.05, () => { genT0 = performance.now(); T = generateWorld(S.map, S.water); }],
+  ['Terrain, regions and biomes', 0.7, genTextures],
+  ['Chart, sea and the ship', 0.85, genRest],
+];
+function generate() { for (const [, , f] of GEN_STAGES) f(); }
+const generateShown = () => window.LabLoad.run('Generating the world…', async (step) => { for (const [n, p, f] of GEN_STAGES) { await step(n, p); f(); } });
+function genTextures() {
+  if (tex) tex.dispose(); tex = heightTexture(T);
   terrain.set(T, tex);
   rtex.a.dispose(); rtex.b.dispose(); rtex = regionTextures(T); setRegions(WU, rtex);
   btex.dispose(); btex = biomeTexture(T); terrain.setBiome(btex);
+}
+function genRest() {
+  const t0 = genT0;
   $('biomeBlend').disabled = S.water.biome !== 'zones';
   $('biomeShare').replaceChildren(...BIOME_ORDER.filter((b) => T.biomes.share[b] > 0.005).flatMap((b) => [el('span', { textContent: BIOMES[b].label.replace(/ \(.*/, '') }), el('b', { textContent: `${(T.biomes.share[b] * 100).toFixed(0)} %` })]));
   const sh = T.regions.share;
@@ -202,7 +213,7 @@ const NOTES = {
 };
 const showNote = () => { $('layoutNote').textContent = NOTES[S.water.layout] || ''; };
 let genTimer = 0;
-const regen = () => { clearTimeout(genTimer); genTimer = setTimeout(() => { generate(); save(); }, 250); };
+const regen = () => { clearTimeout(genTimer); genTimer = setTimeout(() => { generateShown(); save(); }, 250); };
 const fmts = { land: (v) => Math.round(v * 100) + ' %', relief: (v) => v + ' m', depth: (v) => v + ' m', rough: (v) => v.toFixed(2), erosion: (v) => v.toFixed(2) };
 for (const [k, f] of Object.entries(fmts)) {
   const r = $(k), o = $(k + 'V'); r.value = S.map[k]; o.textContent = f(+r.value);
@@ -217,8 +228,8 @@ for (const [k, b] of Object.entries(BIOMES)) $('biome').append(el('option', { va
 $('biome').value = S.water.biome; $('biome').onchange = () => { S.water.biome = $('biome').value; regen(); };
 showNote();
 $('seed').value = S.map.seed; $('seed').addEventListener('change', () => { S.map.seed = Math.max(0, Math.min(999999, +$('seed').value | 0)); regen(); });
-$('random').onclick = () => { S.map.seed = Math.floor(Math.random() * 1e6); $('seed').value = S.map.seed; generate(); save(); };
-$('gen').onclick = () => { generate(); save(); };
+$('random').onclick = () => { S.map.seed = Math.floor(Math.random() * 1e6); $('seed').value = S.map.seed; generateShown(); save(); };
+$('gen').onclick = () => { generateShown(); save(); };
 for (const k of ['shape', 'size', 'res', 'barrier']) { $(k).value = String(S.map[k]); $(k).onchange = () => { S.map[k] = k === 'size' || k === 'res' ? +$(k).value : $(k).value; regen(); }; }
 $('wrap').value = S.map.wrap ? '1' : '0'; $('wrap').onchange = () => { S.map.wrap = $('wrap').value === '1'; regen(); };
 $('sail').checked = S.sail; $('sail').onchange = () => { S.sail = $('sail').checked; ship.obj.visible = ship.on && S.sail; if (!S.sail && camMode !== 'Overview') setCam('Free flight'); else if (S.sail) setCam('Chase'); save(); };

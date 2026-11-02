@@ -13,6 +13,36 @@
    ======================================================================= */
 (function () {
 "use strict";
+// THE LOG — the most important things that happen on the page, for the console window (ui/console.js, the button on
+// the right of the lab's bar): errors (also uncaught ones and files that failed to load), warnings, the console's
+// messages, and the loading card's steps and times (ui/loader.js). Started here, the first script on every page, so
+// nothing early is missed. window.LabLog: entries (oldest first), add(level, message), on(listener) → off().
+(function () {
+  if (window.LabLog) return;
+  const entries = [], subs = new Set(), MAX = 1000;
+  const text = (a) => (a instanceof Error ? a.message : typeof a === "object" && a !== null ? (() => { try { return JSON.stringify(a); } catch (e) { return String(a); } })() : String(a));
+  const LabLog = window.LabLog = {
+    entries,
+    add(level, msg) {
+      const e = { time: new Date(), level, msg: String(msg).slice(0, 4000) };
+      entries.push(e); if (entries.length > MAX) entries.shift();
+      subs.forEach((f) => { try { f(e); } catch (err) { /* a listener's own trouble */ } });
+    },
+    on(f) { subs.add(f); return () => subs.delete(f); },
+  };
+  for (const level of ["error", "warn", "info", "log"]) {
+    const orig = console[level];
+    console[level] = function (...a) { orig.apply(console, a); LabLog.add(level, a.map(text).join(" ")); };
+  }
+  addEventListener("error", (e) => {
+    const el = e.target;
+    if (el && el !== window && (el.src || el.href)) LabLog.add("error", "Could not load " + (el.src || el.href));
+    else LabLog.add("error", (e.message || "Error") + (e.filename ? ` (${e.filename.split("/").pop()}:${e.lineno})` : ""));
+  }, true);
+  addEventListener("unhandledrejection", (e) => LabLog.add("error", "Unhandled: " + text(e.reason)));
+  LabLog.add("info", "Page opened: " + location.pathname.split("/").slice(-2).join("/"));
+  addEventListener("load", () => LabLog.add("info", `Page loaded in ${Math.round(performance.now())} ms`));
+})();
 // VERSIONS — the program's and every lab's own: ui/versions.js (one place).
 // A change to a lab bumps that lab's version; a change to the start page or the
 // shared layers bumps the program's; each with an entry in CHANGELOG.md
@@ -75,6 +105,11 @@ const me = all.find((x) => x.file === PAGE) || null;
 const sheet = document.createElement("link");
 sheet.rel = "stylesheet"; sheet.href = ROOT + "ui/menubar.css";
 document.head.appendChild(sheet);
+// the console window and its button on the lab's bar (ui/console.js, its sheet ui/console.css)
+if (!START) {
+  const cs = document.createElement("link"); cs.rel = "stylesheet"; cs.href = ROOT + "ui/console.css"; document.head.appendChild(cs);
+  const cj = document.createElement("script"); cj.src = ROOT + "ui/console.js"; document.head.appendChild(cj);
+}
 if (!START) document.body.classList.add("lmLab");
 if (isTool) document.body.classList.add("lmTool");
 // the lab's two bars (ui/bars.css), shown or hidden for every page (OPTIONS → Bars); both on by default
@@ -144,10 +179,9 @@ function options() {
 }
 function barItems() {
   const names = { bar: t("Toolbar", "Pasek narzędzi"), foot: t("Info bar", "Pasek informacyjny") };
-  const have = BARS.filter(([c]) => document.querySelector("body > ." + c));
-  if (!have.length) return [];
+  // on every page, the start page too: the choice holds for all the labs
   return [el("div", "lmSep"), el("div", "lmLabel", t("Bars", "Paski")),
-    ...have.map(([c, key, cls]) => action(names[c], () => {
+    ...BARS.map(([c, key, cls]) => action(names[c], () => {
       const on = !barOn(key);
       try { if (on) localStorage.removeItem(key); else localStorage.setItem(key, "off"); } catch (e) { /* storage blocked */ }
       document.body.classList.toggle(cls, !on);

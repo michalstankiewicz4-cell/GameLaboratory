@@ -3,6 +3,8 @@
 - Odpowiadaj po polsku.
 - Nigdy nie dodawaj własnych pomysłów — tylko je proponuj; implementuj to, o co poproszono.
 
+- Po każdym zadaniu: commit i push na `labs-import` i `main`.
+
 ## Co jest w repozytorium
 
 - Tylko laboratoria i ich strona startowa (`index.html`), z modelami, środowiskami i narzędziami, których używają. Gier nie przenosimy.
@@ -64,7 +66,8 @@
 - Strona linkuje `ui/ui.css`, potem `ui/space.css` lub `ui/sea.css`, potem `ui/pages/<lab>.css`. Bez bloków `<style>` i atrybutów `style=` w stronach (CSP `style-src 'self'`); skrypty ustawiają style przez CSSOM. W CSP potrzebne `font-src 'self'`.
 - Pasek menu ładuje własny arkusz `ui/menubar.css` (`<link>`).
 - Każde laboratorium ze sceną ma dwa paski jak laboratorium wody (`ui/bars.css`): `.bar` pod paskiem menu (własne kontrolki laboratorium, przełącznik środowiska) i `.foot` na dole (skala, klatki na sekundę, GameLaboratory; `#fps[data-auto]` liczy `ui/bars.js`). Paski i wszystko na nich są zdefiniowane tylko w `ui/bars.css` (stałe wysokości, nieprzezroczyste tło) — arkusze laboratoriów ich nie stylują; w paskach nie ma nazwy, wersji ani linków (są na pasku menu). OPCJE → Paski: pasek narzędzi i pasek informacyjny, domyślnie włączone (`body.lmNoBar`, `body.lmNoFoot`).
-- Ładowanie: karta `.labLoad` z kółkiem, zwykłym zdaniem (nie wielkimi literami), krokiem i paskiem.
+- Ładowanie: karta `.labLoad` z kółkiem, zwykłym zdaniem (nie wielkimi literami), nazwą etapu, paskiem i procentem (`ui/loader.js`). Przy starcie sama pokazuje postęp strony; laboratorium zgłasza własne etapy `LabLoad.step(nazwa, ułamek)`, a długie operacje w trakcie pracy (powyżej ok. 1 s) idą przez `LabLoad.run(tytuł, async step => …)`.
+- Konsola: przycisk po prawej na pasku narzędzi otwiera okno z dziennikiem strony (`ui/console.js`, dziennik `window.LabLog` zaczyna się w `ui/menubar.js`): błędy, ostrzeżenia, komunikaty, etapy ładowania — najnowsze na górze, data i czas, filtr.
 
 ## Wersjonowanie
 

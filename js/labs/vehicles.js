@@ -91,14 +91,13 @@ function setMode(m) {
   if (!m.group) { m.group = m.build(scene); scene.add(m.group); if (m.panel) $("modePanel").appendChild(m.panel); }
   m.group.visible = true;
   $("hudTitle").textContent = m.name; $("role").textContent = m.role;
-  [...$("vehTabs").children].forEach((b) => b.classList.toggle("on", b === m.tab));
+  $("vehicle").value = "m:" + modes.indexOf(m);
   $("vehRows").textContent = ""; m.rows().forEach(([k, v]) => $("vehRows").appendChild(row(k, v)));
   controls.target.fromArray(m.target); camera.position.fromArray(m.camera); controls.update();
 }
 function addMode(m) {
-  const b = document.createElement("button"); b.className = "tBtn"; b.textContent = m.tabName || m.name;
-  b.addEventListener("click", () => setMode(m));
-  m.tab = b; modes.push(m); $("vehTabs").appendChild(b);
+  modes.push(m);
+  $("vehicle").appendChild(new Option(m.tabName || m.name, "m:" + (modes.length - 1)));
 }
 function load() {
   setMode(null);
@@ -110,7 +109,7 @@ function load() {
   $("hudTitle").textContent = def.name;
   $("role").textContent = def.role;
   $("btnWork").textContent = def.work.toUpperCase();
-  [...$("vehTabs").children].forEach((b, i) => b.classList.toggle("on", i === state.index));
+  $("vehicle").value = "v:" + state.index;
   const st = VK.modelStats(veh.group);
   const rows = [["Length × width × height", def.length + " × " + def.width + " × " + def.height + " m"], ["Top speed", Math.round(def.maxSpeed * 3.6) + " km/h"],
     ["Turns", def.turnRadius ? "in " + def.turnRadius + " m" : "on the spot"], ["Cargo", def.cargo + " t"],
@@ -118,10 +117,13 @@ function load() {
   $("vehRows").textContent = ""; rows.forEach(([k, v]) => $("vehRows").appendChild(row(k, v)));
 }
 function row(k, v) { const r = document.createElement("div"); r.className = "row"; const s = document.createElement("span"); s.textContent = k; const b = document.createElement("b"); b.textContent = v; r.append(s, b); return r; }
-LIST.forEach(({ def: d }, i) => {
-  const b = document.createElement("button"); b.className = "tBtn"; b.textContent = d.name;
-  b.addEventListener("click", () => { state.index = i; load(); });
-  $("vehTabs").appendChild(b);
+// the list in the top bar: the vehicles, then the other families (the train) as they register (addMode)
+LIST.forEach(({ def: d }, i) => $("vehicle").appendChild(new Option(d.name, "v:" + i)));
+$("vehicle").addEventListener("change", () => {
+  const [k, i] = $("vehicle").value.split(":");
+  const m = k === "m" ? modes[+i] : null;   // a family built the first time it is shown (the train: a few seconds) gets the loading card
+  if (m && !m.group) LabLoad.run(`Building the ${(m.tabName || m.name).toLowerCase()}…`, async (step) => { await step("Model and track", 0.3); setMode(m); });
+  else if (m) setMode(m); else { state.index = +i; load(); }
 });
 
 // ---------- the controls ----------
@@ -217,9 +219,9 @@ function frame() {
   perf.update(performance.now(), performance.now() - t0);
   requestAnimationFrame(frame);
 }
-function setGround(src) {
+async function setGround(src, step) {
   if (world) { scene.remove(world.group); world.dispose(); world = null; }
-  if (src === "lab" && window.LandLabWorld) { world = window.LandLabWorld(); scene.add(world.group); [home.x, home.z] = world.start; }
+  if (src === "lab" && window.LandLabWorld) { world = await window.LandLabWorld(step); scene.add(world.group); [home.x, home.z] = world.start; }
   else { home.x = home.z = 0; }
   ground.visible = !world && !mode;
   $("hSlider").disabled = $("bSlider").disabled = !!world;
@@ -228,7 +230,11 @@ function setGround(src) {
   controls.target.set(home.x, y, home.z); camera.position.set(home.x + 9, y + 3, home.z - 10); controls.update();
   applyLight();
 }
-$("groundSrc").addEventListener("change", () => setGround($("groundSrc").value));
+// the land lab's world takes a few seconds to generate: the loading card meanwhile
+$("groundSrc").addEventListener("change", () => {
+  const src = $("groundSrc").value;
+  if (src === "lab") LabLoad.run("Building the land lab's world…", (step) => setGround(src, step)); else setGround(src);
+});
 rebuildGround(); resize(); load();
 controls.target.set(0, heightAt(0, 0) + 1.5, 0);
 frame();

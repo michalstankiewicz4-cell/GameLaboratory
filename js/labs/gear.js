@@ -87,7 +87,7 @@ $('phosphor').value = S.phosphor; $('phosphor').onchange = () => { S.phosphor = 
 for (const k of ['ir', 'reticle']) { $(k).checked = S[k]; $(k).onchange = () => { S[k] = $(k).checked; applyMode(); }; }
 $('rock').replaceChildren(...Object.entries(ROCKS).map(([id, r]) => el('option', { value: id, textContent: r.name })));
 $('rock').value = S.rock; $('rock').onchange = () => { S.rock = $('rock').value; if (cave) setRock(cave, S.rock); save(); };
-const rebuild = () => { $('status').textContent = 'generating…'; setTimeout(() => { buildPlace(); $('status').textContent = ''; }, 30); };
+const rebuild = () => { $('status').textContent = 'generating…'; window.LabLoad.run('Generating the cave…', async (step) => { await step('Carving the cave', 0.3); buildPlace(); $('status').textContent = ''; }); };
 $('seed').value = S.seed; $('seed').onchange = () => { S.seed = Math.max(1, +$('seed').value | 0); save(); rebuild(); };
 $('another').onclick = () => { S.seed = 1 + Math.floor(Math.random() * 99998); $('seed').value = S.seed; save(); rebuild(); };
 
@@ -115,9 +115,12 @@ function frame(now) {
 }
 ambient.intensity = S.ambient * Math.PI;
 resize();
-requestAnimationFrame(() => setTimeout(() => {   // let the loading card paint first: the cave takes a moment
-  buildPlace(); equip(S.item); applyMode();
-  const ld = $('loading'); ld.style.opacity = '0'; setTimeout(() => ld.remove(), 700);
+requestAnimationFrame(() => setTimeout(async () => {   // the cave takes a moment: the loading card shows it (ui/loader.js)
+  await window.LabLoad.step('Carving the cave', 0.5);
+  buildPlace();
+  await window.LabLoad.step('Taking out the gear', 0.9);
+  equip(S.item); applyMode();
+  window.LabLoad.done();
   window.__gear = { S, get item() { return item; }, get cave() { return cave; }, equip, free, camera, scene };
   requestAnimationFrame(frame);
 }, 30));

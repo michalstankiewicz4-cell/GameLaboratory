@@ -427,9 +427,7 @@ loadShip(0, false);
 paintSlider(qSlider); paintSlider(dSlider); paintSlider(dmgSlider);
 applyQuality(state.quality);
 frame();
-const loading = document.getElementById("loading");
-loading.style.opacity = "0";
-setTimeout(() => loading.remove(), 700);
+window.LabLoad.done();   // the loading card (ui/loader.js)
 // for scripts (tests, screenshots)
 window.shipLab = { camera, controls, state, loadShip, get model() { return current; } };
 })();

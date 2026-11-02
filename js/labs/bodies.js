@@ -346,7 +346,5 @@ paintSlider(qSlider); paintSlider(dSlider);
 loadBody(false);
 applyQuality(state.quality);
 frame();
-const loading = $("loading");
-loading.style.opacity = "0";
-setTimeout(() => loading.remove(), 700);
+window.LabLoad.done();   // the loading card (ui/loader.js)
 })();

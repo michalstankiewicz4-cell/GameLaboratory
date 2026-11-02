@@ -549,8 +549,6 @@ applyQuality(state.quality);
 preset.value = "1";
 load(SK.PRESETS[1].make());
 frame();
-const loading = $("loading");
-loading.style.opacity = "0";
-setTimeout(() => loading.remove(), 700);
+window.LabLoad.done();   // the loading card (ui/loader.js)
 window.systemLab = { load, state, get handle() { return handle; }, camera, controls, setView, selectOrbit, setOrbit };
 })();

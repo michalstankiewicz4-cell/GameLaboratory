@@ -3,6 +3,34 @@
 Wersja programu i każdego laboratorium: `ui/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.18.0 — 2026-11-02 (konsola, karta ładowania z etapami, lista pojazdów na lądzie)
+
+### Nowe
+- **Konsola**: przycisk „Console” po prawej na pasku narzędzi każdego laboratorium otwiera przesuwane, zamykane okno
+  z dziennikiem strony — błędy (także nieprzechwycone i pliki, których nie udało się wczytać), ostrzeżenia, komunikaty
+  konsoli, etapy i czasy ładowania. Najnowsze na górze, data i czas, filtr po rodzaju i po tekście, „Wyczyść”.
+  Położenie i to, czy jest otwarte, zostają w przeglądarce (`gamelab.console`). Pliki: `ui/console.js`,
+  `ui/console.css`; dziennik `window.LabLog` zaczyna `ui/menubar.js` (pierwszy skrypt strony).
+- **Karta ładowania** (`ui/loader.js`) pokazuje nazwę etapu i procent:
+  - przy starcie strony sama liczy postęp — wczytywane skrypty („Loading shipkit.js”), budowa sceny, pierwsza klatka;
+  - laboratorium zgłasza własne etapy przez `LabLoad.step(nazwa, ułamek)`;
+  - długie operacje w trakcie pracy idą przez `LabLoad.run(tytuł, async step => …)`.
+
+  Podłączone (z etapami tam, gdzie da się je rozdzielić):
+  - laboratorium lądu — generowanie świata, trzy etapy;
+  - laboratorium pojazdów, ląd — świat z laboratorium lądu (cztery etapy) i pierwsze zbudowanie pociągu;
+  - laboratorium wody — kształtowanie brzegów;
+  - laboratorium roślin — krajobraz;
+  - jaskinie i przedmioty — nowa jaskinia.
+
+  Statki, ciała i układy kończą swoją kartę przez `LabLoad.done()`.
+- OPCJE → Paski: przełączniki paska narzędzi i paska informacyjnego na każdej stronie, także na stronie startowej.
+
+### Zmienione
+- Laboratorium pojazdów, ląd: wybór pojazdu z listy w górnym pasku (jak na wodzie), z pociągiem na końcu listy; bez
+  przycisków w oknie.
+- Wersje: program 0.18.0; ląd 1.5.0; pozostałe laboratoria z paskami i doktor — z+1 (przycisk konsoli).
+
 ## Program 0.17.0 — 2026-11-02 (jedno laboratorium pojazdów)
 
 ### Zmienione
