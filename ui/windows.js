@@ -75,18 +75,21 @@ function make(body) {
   return w;
 }
 
-// windows with no remembered place: one under another on their side (the page's order); when a side is full,
-// the next ones cascade from its top
+// windows with no remembered place: one under another on their side (the page's order); when a column is full, the
+// next ones start a new column beside it (towards the middle), so they do not cover each other
 function stack() {
+  const bottom = innerHeight - 46;
   for (const side of ["left", "right"]) {
-    let y = TOP, k = 0;
+    let y = TOP, x = 12, colW = 0;
     for (const w of wins) {
       if (w.fresh !== side || !w.open) continue;
-      const h = w.el.getBoundingClientRect().height;
-      if (y > TOP && y + Math.min(h, 160) > innerHeight - 46) { k++; y = TOP + 28 * k; }
+      const r = w.el.getBoundingClientRect();
+      if (y > TOP && y + Math.min(r.height, 200) > bottom) { x += colW + 10; y = TOP; colW = 0; }
       w.el.style.top = y + "px";
-      if (k) w.el.style[side] = 12 + 28 * k + "px";
-      y += h + 10;
+      w.el.style[side] = x + "px"; w.el.style[side === "left" ? "right" : "left"] = "auto";
+      w.el.style.maxHeight = (bottom - y) + "px";
+      colW = Math.max(colW, r.width);
+      y += Math.min(r.height, bottom - y) + 10;
     }
   }
 }

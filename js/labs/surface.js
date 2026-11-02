@@ -253,7 +253,7 @@ window.addEventListener("keyup", (e) => { state.keys[e.code] = false; });
 // =====================================================================
 // the loop
 // =====================================================================
-LabKit.autoHideHud([$("hud"), $("opt")], 5);
+LabKit.autoHideHud([...document.querySelectorAll("[data-window]")], 5);   // every window of the page fades when idle (ui/windows.js)
 const perf = LabKit.perfCounters(renderer);
 renderer.info.autoReset = false;
 let quality = 2;

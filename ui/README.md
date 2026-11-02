@@ -12,6 +12,7 @@ gold headings and controls). Font: Space Grotesk; numbers: IBM Plex Mono.
 | `base.css` | thin scroll bars without arrow buttons, everywhere |
 | `controls.css` | what is inside a window (`.labWin`) or any `.labUi`: buttons (`.tBtn`, `.btn`, `.btns button`), sliders (gold up to `--fill`), check boxes, radio buttons, drop-downs, fields, headings |
 | `windows.css` + `windows.js` | floating windows with a lab's options (OPTIONS → Windows) |
+| `labwin.css` + `labwin.js` | the standard windows (`data-std`): Description, Camera, Light and weather, Performance — the same titles, sides and order everywhere; `LabPerf`: the Performance window's numbers (frames, CPU, triangles, draw calls, resolution, graph, the model) |
 | `bars.css` + `bars.js` | the lab's two bars: under the menu bar (drop-downs, buttons, the environment switch, a status) and at the bottom (frames per second, scale); fixed heights, opaque, everything in them defined here only; OPTIONS → Bars hides either |
 | `envswitch.css` + `envswitch.js` | the environment switch: space · water · land (28 px, in the bar) |
 | `loader.css` + `loader.js` | the loading card: a ring, a plain sentence, the step being done, a bar with a percentage. At the start it shows the page's own progress (its scripts, building the scene, the first frame); `LabLoad.step(name, fraction)` — the lab's own steps; `LabLoad.run(title, async step => …)` — the card over a running lab for something long; `LabLoad.done()`; a card marked `data-auto` fades by itself |

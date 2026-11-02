@@ -25,14 +25,15 @@
 <canvas id="viz"></canvas>
 <div id="tapHint"><b>PRESS PLAY</b>the music is made live, here, from code</div>
 
-<div id="hud" data-window="left" data-side="left">
-  <div id="hudTop">
-    <div id="hudTitle">SOUND</div>
-  </div>
+<div data-std="info">
   <div class="hudPanel">
-    <div class="secHd first">PLAYER</div>
-    <button class="tBtn" id="btnPlay">▶ PLAY</button>
+    <div id="hudTitle" class="stdName">SOUND</div>
     <div id="nowPlaying"></div>
+  </div>
+</div>
+<div id="hud" data-window="player" data-title="Player" data-title-pl="Odtwarzacz">
+  <div class="hudPanel">
+    <button class="tBtn" id="btnPlay">▶ PLAY</button>
     <div class="secHd tabHd"><button type="button" id="tabMoods" class="on" title="Ambient: endless, by chance">MOODS</button><button type="button" id="tabMusic" title="Songs: intro, verse, chorus, bridge, outro">MUSIC</button></div>
     <div class="btnGrid" id="presets"></div>
     <div class="songList hidden" id="songs"></div>
@@ -59,7 +60,7 @@
   </div>
 </div>
 
-<div id="opt" data-window="right" data-side="right">
+<div id="opt" data-window="instruments" data-side="right" data-title="Instruments and voice" data-title-pl="Instrumenty i głos">
   <div class="hudPanel">
     <div class="secHd first">INSTRUMENTS</div>
     <div id="instruments"></div>
@@ -83,6 +84,7 @@
   </div>
 </div>
 
+<script src="../ui/labwin.js"></script>
 <script src="../ui/windows.js"></script>
 <script type="module" src="../js/labkit/labkit.js"></script>
 <script type="module" src="../js/audio/musickit/musickit.js"></script>

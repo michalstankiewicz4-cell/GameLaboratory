@@ -66,9 +66,9 @@ function drawHandles() {
   H.legs.forEach((p, k) => { const m = new THREE.Mesh(hGeo, teal); m.scale.setScalar(sz * (k === state.leg ? 1.3 : 1)); m.position.copy(p); m.renderOrder = 20; m.userData = { kind: "leg", k }; handles.add(m); });
 }
 function showStats() {
-  const st = ShipKit.modelStats(cre.group);
   let bones = 0; cre.group.traverse((o) => { if (o.isBone) bones++; });
-  const rows = [["Legs", design.legs.length * 2], ["Spine points", design.spine.length], ["Height", cre.dims.H.toFixed(2) + " m"], ["Triangles", st.triangles.toLocaleString("en-US")], ["Bones", bones]];
+  const rows = [["Legs", design.legs.length * 2], ["Spine points", design.spine.length], ["Height", cre.dims.H.toFixed(2) + " m"], ["Bones", bones]];
+  window.LabPerf.model(cre.group);   // the Performance window (ui/labwin.js)
   $("stats").textContent = "";
   rows.forEach(([k, v]) => { const r = document.createElement("div"); r.className = "row"; const a = document.createElement("span"); a.textContent = k; const b = document.createElement("b"); b.textContent = v; r.append(a, b); $("stats").appendChild(r); });
 }
@@ -207,7 +207,7 @@ function frameCamera() {
 }
 
 // ---------- the loop ----------
-LabKit.autoHideHud([$("hud"), $("opt")], 10);
+LabKit.autoHideHud([...document.querySelectorAll("[data-window]")], 5);   // every window of the page fades when idle (ui/windows.js)
 const perf = LabKit.perfCounters(renderer); renderer.info.autoReset = false;
 function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); }
 window.addEventListener("resize", resize);

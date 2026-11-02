@@ -34,21 +34,19 @@
 <canvas id="view"></canvas>
 
 <div id="partTip" class="hidden"></div>
-<div id="hud" data-window="ship" data-side="left" data-title="Ship" data-title-pl="Statek">
+<div id="hud" data-std="info">
   <div id="hudTop">
-    <div id="hudTitle" title="Double-click to rename (empty: the original name)"></div>
-    <div id="hudSub" title="Double-click to change the caption (empty: the original)">GAMELABORATORY // SHIP LAB</div>
+    <div id="hudTitle" class="stdName" title="Double-click to rename (empty: the original name)"></div>
+    <div id="hudSub" class="stdSub" title="Double-click to change the caption (empty: the original)">GAMELABORATORY // SHIP LAB</div>
   </div>
 </div>
-<div class="hudPanel block" id="blkCtrl" data-window="controls" data-side="left" data-title="Controls" data-title-pl="Sterowanie">
+<div class="hudPanel block" id="blkCtrl" data-window="controls" data-title="Controls" data-title-pl="Sterowanie">
     <div id="hudBtns">
-      <button class="tBtn on" id="btnRotate">AUTO-ROTATE</button>
       <button class="tBtn on" id="btnEngines">ENGINES</button>
       <button class="tBtn on" id="btnLights">RUNNING LIGHTS</button>
       <button class="tBtn" id="btnWire">WIREFRAME</button>
       <button class="tBtn tgl off" id="btnFreeze" title="Stop the ship's moving parts (spinners, rings, turrets, particles) and its idle bobbing; lights and engines stay on. OFFLINE switches everything off">STOP ANIMATIONS</button>
       <button class="tBtn" id="btnMerge" title="Build the way the game does: static meshes merged per material (far fewer draw calls), at the game's detail for this model">GAME BUILD</button>
-      <button class="tBtn" id="btnGameLight" title="Light the ship the way the game does: its ambient and two scene lights, no shadows">GAME LIGHTING</button>
       <button class="tBtn on" id="btnInspect" title="Point at the ship: its part lights up and its name shows (not in GAME BUILD, where the parts are merged)">PART NAMES</button>
     </div>
     <div class="secHd">SHAPING</div>
@@ -64,36 +62,30 @@
     <div id="actBtns"></div>
     <label class="sl"><span>Damage</span><b id="dmgVal">0%</b></label>
     <input type="range" id="dmgSlider" min="0" max="1" step="0.01" value="0">
+  </div>
+<div class="hudPanel block" data-std="camera">
+    <div class="twoBtns"><button class="tBtn on" id="btnRotate">AUTO-ROTATE</button></div>
+    <div id="fxPanel"></div>
     <div id="hint">Left-drag: rotate · Right-drag: pan · Scroll: zoom</div>
   </div>
-<div class="hudPanel block" id="blkStats" data-window="stats" data-side="left" data-title="Stats" data-title-pl="Statystyki">
-    <div class="secHd">MODEL</div>
-    <div id="infoRows"></div>
-    <div class="secHd">FIGURES</div>
-    <ul id="figList"></ul>
+<div class="hudPanel block" data-std="light">
+    <div class="twoBtns"><button class="tBtn" id="btnGameLight" title="Light the ship the way the game does: its ambient and two scene lights, no shadows">GAME LIGHTING</button></div>
   </div>
-<div class="hudPanel block" id="blkOpt" data-window="optimization" data-side="right" data-title="Optimization" data-title-pl="Optymalizacja">
+<div class="hudPanel block" data-std="perf">
+    <div class="secHd">QUALITY</div>
     <label class="sl"><span>Render quality</span><b id="qVal">ULTRA</b></label>
     <input type="range" id="qSlider" min="0" max="4" step="1" value="3">
     <div class="ticks"><span>LOW</span><span>MED</span><span>HIGH</span><span>ULTRA</span><span>MAX</span></div>
     <label class="sl"><span>Geometry detail (triangles)</span><b id="dVal">100%</b></label>
     <input type="range" id="dSlider" min="0.2" max="2" step="0.05" value="1">
     <div class="ticks"><span>20%</span><span>100%</span><span>200%</span></div>
-    <div id="fxPanel"></div>
-  </div>
-<div class="hudPanel block" id="blkPerf" data-window="performance" data-side="right" data-title="Performance" data-title-pl="Wydajność">
-    <div class="row"><span>Frames per second</span><b id="statFps">–</b></div>
-    <div class="row"><span>Frame time</span><b id="statMs">–</b></div>
-    <div class="row"><span>CPU per frame (JS + draw submit)</span><b id="statCpu">–</b></div>
-    <div class="row"><span>Triangles drawn / frame</span><b id="statTris">–</b></div>
-    <div class="row"><span>Draw calls / frame</span><b id="statCalls">–</b></div>
-    <div class="row"><span>Render resolution</span><b id="statRes">–</b></div>
-    <canvas id="fpsGraph" width="270" height="46"></canvas>
-    <div class="legend"><i class="lg1"></i>≥50 <i class="lg2"></i>30–50 <i class="lg3"></i>&lt;30 FPS · lines: 30 / 60</div>
+    <div class="secHd">FIGURES</div>
+    <ul id="figList"></ul>
   </div>
 <div id="loading" class="labLoad"><div class="labLoadCard"><i class="labSpin"></i><b>Generating the hull…</b><span class="labLoadStep"></span><span class="labLoadBar"><i></i></span></div></div>
 <script src="../ui/loader.js"></script>
 
+<script src="../ui/labwin.js"></script>
 <script src="../ui/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
 <!-- PostKit: the IMAGE EFFECTS panel's post-processing -->

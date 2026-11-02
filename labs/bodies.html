@@ -32,35 +32,30 @@
 <script src="../ui/bars.js"></script>
 <canvas id="view"></canvas>
 
-<div id="hud" data-window="left" data-side="left">
+<div id="hud" data-std="info">
   <div id="hudTop">
-    <div id="hudTitle"></div>
+    <div id="hudTitle" class="stdName"></div>
   </div>
   <div class="hudPanel">
     <div id="emptyNote" class="note hidden">No bodies in this group yet — its shape, parameters and example bodies are still to be designed.</div>
     <div id="bodyStats">
       <div class="secHd">PHYSICAL</div>
       <div id="physRows"></div>
-      <div class="secHd">MODEL</div>
-      <div id="modelRows"></div>
     </div>
+  </div>
+</div>
+
+<div id="opt" data-window="params" data-title="Parameters" data-title-pl="Parametry">
+  <div class="hudPanel">
     <div id="hudBtns">
-      <button class="tBtn on" id="btnRotate">AUTO-ROTATE</button>
       <button class="tBtn on" id="btnClouds">CLOUDS</button>
       <button class="tBtn on" id="btnAtmo">ATMOSPHERE</button>
       <button class="tBtn" id="btnWire">WIREFRAME</button>
       <button class="tBtn" id="btnGameBuild" title="Build the body the way the game does: geometry detail × BodyKit.GAME_DETAIL_SCALE (the sky: as is)">GAME BUILD</button>
-      <button class="tBtn" id="btnShipLight" title="A ship's glow light orbiting the body, as in the game when a ship bites it">SHIP LIGHT</button>
     </div>
-    <div id="hint">Left-drag: rotate · Right-drag: pan · Scroll: zoom</div>
-  </div>
-</div>
-
-<div id="opt" data-window="right" data-side="right">
-  <div class="hudPanel">
     <div id="paramsEmpty" class="note hidden">Select a body to edit its parameters.</div>
     <div id="paramsBody">
-      <div class="secHd first" id="commonHd">COMMON</div>
+      <div class="secHd" id="commonHd">COMMON</div>
       <div id="commonParams"></div>
       <div class="secHd" id="groupParamsHd">PARAMETERS</div>
       <div id="groupParams"></div>
@@ -71,28 +66,28 @@
       <button class="tBtn wideBtn" id="btnCopy" title="Copies this body's entry for js/models/bodies/bodykit.js (values that differ from the defaults)">COPY VALUES</button>
     </div>
   </div>
-  <div class="hudPanel">
-    <div class="secHd first">OPTIMIZATION</div>
-    <label class="sl"><span>Render quality</span><b id="qVal">ULTRA</b></label>
-    <input type="range" id="qSlider" min="0" max="4" step="1" value="3">
-    <div class="ticks"><span>LOW</span><span>MED</span><span>HIGH</span><span>ULTRA</span><span>MAX</span></div>
-    <label class="sl"><span>Geometry detail (triangles)</span><b id="dVal">100%</b></label>
-    <input type="range" id="dSlider" min="0.2" max="2" step="0.05" value="1">
-    <div class="ticks"><span>20%</span><span>100%</span><span>200%</span></div>
-    <div id="fxPanel"></div>
-    <div class="secHd">PERFORMANCE</div>
-    <div class="row"><span>Frames per second</span><b id="statFps">–</b></div>
-    <div class="row"><span>Frame time</span><b id="statMs">–</b></div>
-    <div class="row"><span>CPU per frame</span><b id="statCpu">–</b></div>
-    <div class="row"><span>Triangles drawn / frame</span><b id="statTris">–</b></div>
-    <div class="row"><span>Draw calls / frame</span><b id="statCalls">–</b></div>
-    <div class="row"><span>Render resolution</span><b id="statRes">–</b></div>
-    <canvas id="fpsGraph" width="270" height="40"></canvas>
-  </div>
+</div>
+<div class="hudPanel" data-std="camera">
+  <div class="twoBtns"><button class="tBtn on" id="btnRotate">AUTO-ROTATE</button></div>
+  <div id="fxPanel"></div>
+  <div id="hint">Left-drag: rotate · Right-drag: pan · Scroll: zoom</div>
+</div>
+<div class="hudPanel" data-std="light">
+  <div class="twoBtns"><button class="tBtn" id="btnShipLight" title="A ship's glow light orbiting the body, as in the game when a ship bites it">SHIP LIGHT</button></div>
+</div>
+<div class="hudPanel" data-std="perf">
+  <div class="secHd">QUALITY</div>
+  <label class="sl"><span>Render quality</span><b id="qVal">ULTRA</b></label>
+  <input type="range" id="qSlider" min="0" max="4" step="1" value="3">
+  <div class="ticks"><span>LOW</span><span>MED</span><span>HIGH</span><span>ULTRA</span><span>MAX</span></div>
+  <label class="sl"><span>Geometry detail (triangles)</span><b id="dVal">100%</b></label>
+  <input type="range" id="dSlider" min="0.2" max="2" step="0.05" value="1">
+  <div class="ticks"><span>20%</span><span>100%</span><span>200%</span></div>
 </div>
 <div id="loading" class="labLoad"><div class="labLoadCard"><i class="labSpin"></i><b>Generating the sky…</b><span class="labLoadStep"></span><span class="labLoadBar"><i></i></span></div></div>
 <script src="../ui/loader.js"></script>
 
+<script src="../ui/labwin.js"></script>
 <script src="../ui/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
 <!-- PostKit: the IMAGE EFFECTS panel's post-processing -->

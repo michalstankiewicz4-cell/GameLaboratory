@@ -105,15 +105,10 @@ function row(box, k, v) {
   r.append(a, b); box.appendChild(r);
 }
 function refreshModelStats() {
-  const box = $("modelRows"); box.textContent = "";
   if (!current) return;
   const st = BodyKit.modelStats(current.group);
-  row(box, "Meshes", st.meshes);
-  row(box, "Triangles", fmtInt(st.triangles));
-  row(box, "Vertices", fmtInt(st.vertices));
-  row(box, "Custom shaders", st.shaderCount);
-  row(box, "Noise octaves per pixel", QUALITY[state.quality].octaves);
-  row(box, "Textures", "0 (fully procedural)");
+  window.LabPerf.modelRows([["Meshes", st.meshes], ["Triangles", fmtInt(st.triangles)], ["Vertices", fmtInt(st.vertices)],   // ui/labwin.js
+    ["Custom shaders", st.shaderCount], ["Noise octaves per pixel", QUALITY[state.quality].octaves], ["Textures", "0 (fully procedural)"]]);
 }
 let measureTimer = 0;
 function queueMeasure() { clearTimeout(measureTimer); measureTimer = setTimeout(measure, 120); }
@@ -186,7 +181,6 @@ function applyQuality(level) {
   if (current) current.setOctaves(q.octaves);
   backdrop.setOctaves(q.octaves);
   $("qVal").textContent = q.name;
-  $("statRes").textContent = `${Math.round(window.innerWidth * q.pr)}×${Math.round(window.innerHeight * q.pr)}`;
   refreshModelStats();
   queueMeasure();
 }
@@ -297,7 +291,7 @@ dSlider.addEventListener("input", () => {
   }
 });
 
-LabKit.autoHideHud([$("hud"), $("opt")], 5);   // the panels fade out when idle
+LabKit.autoHideHud([...document.querySelectorAll("[data-window]")], 5);   // every window of the page fades when idle (ui/windows.js)
 
 // =====================================================================
 // HUD scaling: all panels share one scale factor (--ui) so they follow

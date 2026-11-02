@@ -124,9 +124,9 @@ $("btnClose").addEventListener("click", () => {
   controls.target.copy(p); camera.position.set(p.x + 0.14, p.y + 0.02, p.z + 0.42);
 });
 function showStats() {
-  const st = ShipKit.modelStats(cre.group);
   let bones = 0; cre.group.traverse((o) => { if (o.isBone) bones++; });
-  const rows = [[cre.params.size ? "Shoulder height" : "Height", (cre.params.height || cre.params.size) ? (cre.params.height || cre.params.size).toFixed(2) + " m" : "–"], ["Triangles", st.triangles.toLocaleString("en-US")], ["Meshes", st.meshes], ["Bones", bones], ["Materials", st.materials.size]];
+  const rows = [[cre.params.size ? "Shoulder height" : "Height", (cre.params.height || cre.params.size) ? (cre.params.height || cre.params.size).toFixed(2) + " m" : "–"], ["Bones", bones]];
+  window.LabPerf.model(cre.group);   // triangles, meshes, materials: the Performance window (ui/labwin.js)
   $("stats").textContent = "";
   rows.forEach(([k, v]) => { const r = document.createElement("div"); r.className = "row"; const a = document.createElement("span"); a.textContent = k; const b = document.createElement("b"); b.textContent = v; r.append(a, b); $("stats").appendChild(r); });
 }
@@ -223,7 +223,7 @@ const flip = (id, key) => $(id).addEventListener("click", () => { state[key] = !
 flip("btnBones", "bones"); flip("btnWire", "wire"); flip("btnScale", "scale");
 
 // ---------- the loop ----------
-LabKit.autoHideHud([$("hud"), $("opt")], 6);
+LabKit.autoHideHud([...document.querySelectorAll("[data-window]")], 5);   // every window of the page fades when idle (ui/windows.js)
 const perf = LabKit.perfCounters(renderer);
 renderer.info.autoReset = false;
 function resize() {

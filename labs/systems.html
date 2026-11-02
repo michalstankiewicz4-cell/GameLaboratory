@@ -30,10 +30,14 @@
 <div id="labels"></div>
 <div id="handles"></div>
 
-<div id="hud" data-window="left" data-side="left" data-title="System" data-title-pl="Układ">
-  <div id="hudTop">
-    <div id="hudTitle">SYSTEMS</div>
+<div data-std="info">
+  <div class="hudPanel">
+    <div id="hudTitle" class="stdName">SYSTEMS</div>
+    <div id="sysName" class="stdSub"></div>
+    <div id="sysRows"></div>
   </div>
+</div>
+<div id="hud" data-window="system" data-title="System" data-title-pl="Układ">
   <div class="hudPanel">
     <div class="secHd first">RANDOM</div>
     <div class="seedRow">
@@ -41,7 +45,6 @@
       <button class="tBtn" id="btnDice" title="A new seed">🎲</button>
       <button class="tBtn" id="btnRandom">GENERATE</button>
     </div>
-    <div id="sysName"></div>
     <div class="secHd">CENTRE (1–3)</div>
     <div class="list" id="centers"></div>
     <button class="tBtn addBtn" id="addCenter">+ ADD A CENTRE BODY</button>
@@ -67,56 +70,44 @@
         <input type="range" id="oPeri" min="0" max="180" step="1" value="0">
       </div>
     </div>
-    <div class="secHd">BACKGROUND</div>
-    <select class="lab wide" id="sky"></select>
-    <button class="tBtn wideBtn" id="btnCopy" title="This system as data (JSON), for SystemKit">COPY SYSTEM</button>
-    <div id="hint">Left-drag: rotate · Right-drag: pan · Scroll: zoom · Drag a gold diamond on the ruler: distance · teal point (from above): stretch the orbit · violet point (from the side): tilt</div>
-  </div>
-</div>
-
-<div id="opt" data-window="right" data-side="right">
-  <div class="hudPanel">
-    <div class="secHd first">VIEW</div>
-    <label class="sl"><span>Follow</span></label>
-    <select class="lab wide" id="focus"></select>
-    <label class="sl"><span>Camera</span></label>
-    <div class="viewRow">
-      <button class="tBtn" id="vTop" title="From above: the orbits' shapes; drag a teal point to stretch an orbit">FROM ABOVE</button>
-      <button class="tBtn" id="vSide" title="From the side: the orbits' tilts; drag a violet point to tilt an orbit">FROM THE SIDE</button>
-      <button class="tBtn on" id="vFree" title="Turn the camera freely">FREE</button>
-    </div>
+    <div class="secHd">TIME AND MARKS</div>
     <label class="sl"><span>Time</span><b id="speedVal">×1.0</b></label>
     <input type="range" id="speed" min="0" max="6" step="0.1" value="1">
     <div id="hudBtns">
       <button class="tBtn on" id="btnLines">ORBITS</button>
       <button class="tBtn on" id="btnLabels">LABELS</button>
-      <button class="tBtn" id="btnRotate">AUTO-ROTATE</button>
       <button class="tBtn" id="btnPause">PAUSE</button>
     </div>
-    <div class="secHd">SYSTEM</div>
-    <div id="sysRows"></div>
+    <div class="secHd">BACKGROUND</div>
+    <select class="lab wide" id="sky"></select>
+    <button class="tBtn wideBtn" id="btnCopy" title="This system as data (JSON), for SystemKit">COPY SYSTEM</button>
   </div>
-  <div class="hudPanel">
-    <div class="secHd first">OPTIMIZATION</div>
-    <label class="sl"><span>Render quality</span><b id="qVal">HIGH</b></label>
-    <input type="range" id="qSlider" min="0" max="4" step="1" value="2">
-    <div class="ticks"><span>LOW</span><span>MED</span><span>HIGH</span><span>ULTRA</span><span>MAX</span></div>
-    <label class="sl"><span>Geometry detail (triangles)</span><b id="dVal">40%</b></label>
-    <input type="range" id="dSlider" min="0.15" max="1.2" step="0.05" value="0.4">
-    <div class="ticks"><span>15%</span><span>60%</span><span>120%</span></div>
-    <div id="fxPanel"></div>
-    <div class="secHd">PERFORMANCE</div>
-    <div class="row"><span>Frames per second</span><b id="statFps">–</b></div>
-    <div class="row"><span>Frame time</span><b id="statMs">–</b></div>
-    <div class="row"><span>CPU per frame</span><b id="statCpu">–</b></div>
-    <div class="row"><span>Triangles drawn / frame</span><b id="statTris">–</b></div>
-    <div class="row"><span>Draw calls / frame</span><b id="statCalls">–</b></div>
-    <canvas id="fpsGraph" width="270" height="40"></canvas>
+</div>
+<div id="opt" class="hudPanel" data-std="camera">
+  <label class="sl"><span>Follow</span></label>
+  <select class="lab wide" id="focus"></select>
+  <div class="viewRow">
+    <button class="tBtn" id="vTop" title="From above: the orbits' shapes; drag a teal point to stretch an orbit">FROM ABOVE</button>
+    <button class="tBtn" id="vSide" title="From the side: the orbits' tilts; drag a violet point to tilt an orbit">FROM THE SIDE</button>
+    <button class="tBtn on" id="vFree" title="Turn the camera freely">FREE</button>
   </div>
+  <div class="twoBtns"><button class="tBtn" id="btnRotate">AUTO-ROTATE</button></div>
+  <div id="fxPanel"></div>
+  <div id="hint">Left-drag: rotate · Right-drag: pan · Scroll: zoom · Drag a gold diamond on the ruler: distance · teal point (from above): stretch the orbit · violet point (from the side): tilt</div>
+</div>
+<div class="hudPanel" data-std="perf">
+  <div class="secHd">QUALITY</div>
+  <label class="sl"><span>Render quality</span><b id="qVal">HIGH</b></label>
+  <input type="range" id="qSlider" min="0" max="4" step="1" value="2">
+  <div class="ticks"><span>LOW</span><span>MED</span><span>HIGH</span><span>ULTRA</span><span>MAX</span></div>
+  <label class="sl"><span>Geometry detail (triangles)</span><b id="dVal">40%</b></label>
+  <input type="range" id="dSlider" min="0.15" max="1.2" step="0.05" value="0.4">
+  <div class="ticks"><span>15%</span><span>60%</span><span>120%</span></div>
 </div>
 <div id="loading" class="labLoad"><div class="labLoadCard"><i class="labSpin"></i><b>Building the system…</b><span class="labLoadStep"></span><span class="labLoadBar"><i></i></span></div></div>
 <script src="../ui/loader.js"></script>
 
+<script src="../ui/labwin.js"></script>
 <script src="../ui/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
 <script type="module" src="../js/render/postkit/postkit.js"></script>

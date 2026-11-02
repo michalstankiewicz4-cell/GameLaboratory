@@ -45,7 +45,8 @@ function load() {
   applyView();
   const st = BaseKit.modelStats(mod.solid);
   const rows = [["Footprint (radius)", def.footprint + " m"], ["Height", def.height + " m"], ["Max slope", Math.round(Math.atan(def.maxSlope) * 180 / Math.PI) + "°"],
-    ["Build time", def.build + " s"], ["Triangles", st.triangles.toLocaleString("en-US")], ["Meshes", st.meshes]];
+    ["Build time", def.build + " s"]];
+  window.LabPerf.model(mod.group);   // the Performance window's Model section (ui/labwin.js)
   $("modRows").textContent = ""; rows.forEach(([k, v]) => $("modRows").appendChild(row(k, v)));
   $("costList").textContent = ""; def.cost.forEach(([k, v]) => $("costList").appendChild(row(k, "×" + v)));
   controls.target.set(0, def.height * 0.45, 0);
@@ -69,7 +70,7 @@ $("vBad").addEventListener("click", () => { state.view = "bad"; applyView(); });
 $("pSlider").addEventListener("input", () => { state.progress = +$("pSlider").value; state.view = "built"; state.anim = false; $("btnAnim").classList.remove("on"); applyView(); });
 $("btnRotate").addEventListener("click", () => { controls.autoRotate = !controls.autoRotate; $("btnRotate").classList.toggle("on", controls.autoRotate); });
 $("btnAnim").addEventListener("click", () => { state.anim = true; state.view = "built"; state.progress = 0; $("btnAnim").classList.add("on"); });
-LabKit.autoHideHud([$("hud"), $("opt")], 5);
+LabKit.autoHideHud([...document.querySelectorAll("[data-window]")], 5);   // every window of the page fades when idle (ui/windows.js)
 const perf = LabKit.perfCounters(renderer);
 renderer.info.autoReset = false;
 function resize() {

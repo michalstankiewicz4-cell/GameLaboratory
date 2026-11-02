@@ -190,7 +190,7 @@ function draw(t) {
   requestAnimationFrame(draw);
 }
 
-LabKit.autoHideHud([$("hud"), $("opt")], 8);
+LabKit.autoHideHud([...document.querySelectorAll("[data-window]")], 5);   // every window of the page fades when idle (ui/windows.js)
 showAll(); markPreset("station");
 try { if (localStorage.getItem("soundLab.tab") === "music") showTab(true); } catch (e) { /* blocked */ }
 requestAnimationFrame(draw);

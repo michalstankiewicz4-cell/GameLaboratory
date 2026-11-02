@@ -37,18 +37,21 @@
 <div id="compass" class="hidden"><svg viewBox="0 0 30 30"><g id="cArrow"><path d="M15 3 L21 22 L15 18 L9 22 Z" fill="#f8bb56"/></g></svg><span>BASE</span><span class="d" id="cDist">–</span></div>
 <div id="readout" class="hidden"><span>Speed <b id="rSpeed">0</b> m/s</span><span>Altitude <b id="rAlt">0</b> m</span><span id="rWhere"></span></div>
 
-<div id="hud" data-window="left" data-side="left">
-  <div id="hudTop">
-    <div id="hudTitle">SURFACE</div>
+<div data-std="info">
+  <div class="hudPanel">
+    <div id="hudTitle" class="stdName">SURFACE</div>
+    <div class="secHd">WORLD</div>
+    <div id="pRows"></div>
+    <div class="secHd">BASE</div>
+    <div id="bRows"></div>
   </div>
+</div>
+<div id="hud" data-window="surface" data-title="Surface" data-title-pl="Powierzchnia">
   <div class="hudPanel">
     <div class="secHd first">SYSTEM</div>
     <select class="lab" id="system"></select>
     <div class="secHd">WORLD</div>
     <select class="lab" id="planet"></select>
-    <div id="pRows"></div>
-    <div class="secHd">BASE</div>
-    <div id="bRows"></div>
     <!-- orbit -->
     <div id="orbitUi" class="btnCol">
       <div class="note" id="pickNote">Click the planet to pick a landing site.</div>
@@ -66,36 +69,31 @@
       <div id="modBtns"></div>
       <div class="note">Pick a module, click the ground to place it (R: turn, Esc: cancel). Delete: remove the one under the pointer.</div>
     </div>
-    <div id="hint">Orbit: drag to turn the globe · Ground: W/S speed, A/D turn, Shift boost, right-drag camera (down to look at the sky), scroll zoom</div>
   </div>
 </div>
-<div id="opt" data-window="right" data-side="right">
-  <div class="hudPanel">
-    <div class="secHd first">SKY</div>
-    <label class="sl"><span>Local time</span><b id="tVal">10:00</b></label>
-    <input type="range" id="tSlider" min="0" max="24" step="0.05" value="10">
-    <div class="row"><span>A day passes in</span><select class="lab mini" id="daySpeed">
-      <option value="0">paused</option><option value="600">10 minutes</option><option value="120" selected>2 minutes</option><option value="30">30 seconds</option></select></div>
-    <div class="row"><span>Sun's height</span><b id="sunEl">–</b></div>
-    <div class="secHd">WEATHER</div>
-    <select class="lab" id="wxSel"></select>
-    <label class="sl"><span>Strength</span><b id="wxVal">70%</b></label>
-    <input type="range" id="wxSlider" min="0" max="1" step="0.01" value="0.7">
-    <div class="secHd">OPTIMIZATION</div>
-    <label class="sl"><span>Render quality</span><b id="qVal">HIGH</b></label>
-    <input type="range" id="qSlider" min="0" max="3" step="1" value="2">
-    <div class="ticks"><span>LOW</span><span>MED</span><span>HIGH</span><span>ULTRA</span></div>
-    <div class="secHd">PERFORMANCE</div>
-    <div class="row"><span>Frames per second</span><b id="statFps">–</b></div>
-    <div class="row"><span>Frame time</span><b id="statMs">–</b></div>
-    <div class="row"><span>CPU per frame</span><b id="statCpu">–</b></div>
-    <div class="row"><span>Triangles drawn / frame</span><b id="statTris">–</b></div>
-    <div class="row"><span>Draw calls / frame</span><b id="statCalls">–</b></div>
-    <div class="row"><span>Ground tiles loaded</span><b id="statTiles">–</b></div>
-    <canvas id="fpsGraph" width="270" height="40"></canvas>
-  </div>
+<div class="hudPanel" data-std="camera">
+  <div id="hint">Orbit: drag to turn the globe · Ground: W/S speed, A/D turn, Shift boost, right-drag camera (down to look at the sky), scroll zoom</div>
 </div>
-
+<div id="opt" class="hudPanel" data-std="light">
+  <div class="secHd first">SKY</div>
+  <label class="sl"><span>Local time</span><b id="tVal">10:00</b></label>
+  <input type="range" id="tSlider" min="0" max="24" step="0.05" value="10">
+  <div class="row"><span>A day passes in</span><select class="lab mini" id="daySpeed">
+    <option value="0">paused</option><option value="600">10 minutes</option><option value="120" selected>2 minutes</option><option value="30">30 seconds</option></select></div>
+  <div class="row"><span>Sun's height</span><b id="sunEl">–</b></div>
+  <div class="secHd">WEATHER</div>
+  <select class="lab" id="wxSel"></select>
+  <label class="sl"><span>Strength</span><b id="wxVal">70%</b></label>
+  <input type="range" id="wxSlider" min="0" max="1" step="0.01" value="0.7">
+</div>
+<div class="hudPanel" data-std="perf">
+  <div class="secHd">QUALITY</div>
+  <label class="sl"><span>Render quality</span><b id="qVal">HIGH</b></label>
+  <input type="range" id="qSlider" min="0" max="3" step="1" value="2">
+  <div class="ticks"><span>LOW</span><span>MED</span><span>HIGH</span><span>ULTRA</span></div>
+  <div class="row"><span>Ground tiles loaded</span><b id="statTiles">–</b></div>
+</div>
+<script src="../ui/labwin.js"></script>
 <script src="../ui/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
 <script type="module" src="../js/labkit/labkit.js"></script>

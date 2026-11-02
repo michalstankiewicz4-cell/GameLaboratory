@@ -53,6 +53,7 @@ function rebuild() {
   $("sysName").textContent = state.system.name || "";
   fillFocus();
   fillStats();
+  window.LabPerf.model(handle.root);   // the Performance window's Model section (ui/labwin.js)
   buildLabels();
   buildRuler();
   buildHandles();
@@ -510,7 +511,7 @@ function systemFx(o) {
     lens: o.lens && hole ? { object: hole.body.group, position: hole.body.group.getWorldPosition(new THREE.Vector3()), radius: hole.size } : null,
   };
 }
-LabKit.autoHideHud([$("hud"), $("opt")], 5);   // the panels fade out when idle
+LabKit.autoHideHud([...document.querySelectorAll("[data-window]")], 5);   // every window of the page fades when idle (ui/windows.js)
 const perf = LabKit.perfCounters(renderer);
 
 // ---------- the loop ----------

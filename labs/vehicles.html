@@ -31,52 +31,49 @@
 <script src="../ui/windows.js"></script>
 <script src="../ui/envswitch.js"></script>
 <canvas id="view"></canvas>
-<div id="hud" data-window="left" data-side="left" data-title="Vehicle" data-title-pl="Pojazd">
-  <div id="hudTop">
-    <div id="hudTitle"></div>
-  </div>
+<div data-std="info">
   <div class="hudPanel">
-    <div id="role"></div>
+    <div id="hudTitle" class="stdName"></div>
+    <div id="role" class="stdText"></div>
+    <div class="secHd">VEHICLE</div>
+    <div id="vehRows"></div>
+    <div class="secHd">NOW</div>
+    <div class="row"><span>Speed</span><b id="nowSpeed">–</b></div>
+    <div class="row"><span>Pitch / roll</span><b id="nowTilt">–</b></div>
+  </div>
+</div>
+<div id="hud" data-window="drive" data-title="Drive and ground" data-title-pl="Jazda i teren">
+  <div class="hudPanel">
     <div id="vkPanel">
-    <div class="secHd">DRIVE</div>
+    <div class="secHd first">DRIVE</div>
     <div class="twoBtns">
       <button class="tBtn on" id="dAuto">AUTO</button>
       <button class="tBtn" id="dKeys">WASD</button>
     </div>
     <label class="sl"><span>Speed (auto)</span><b id="sVal">50%</b></label>
     <input type="range" id="sSlider" min="0" max="1" step="0.01" value="0.5">
+    <div class="twoBtns">
+      <button class="tBtn on" id="btnDust">DUST</button>
+      <button class="tBtn" id="btnWork">WORK</button>
+    </div>
     <div class="secHd">GROUND</div>
     <div class="prow"><span>Ground</span><select id="groundSrc" class="lab"><option value="plain">Plain</option><option value="lab">Land lab</option></select></div>
     <label class="sl"><span>Hills</span><b id="hVal">40%</b></label>
     <input type="range" id="hSlider" min="0" max="1" step="0.01" value="0.4">
     <label class="sl"><span>Bumps and rocks</span><b id="bVal">40%</b></label>
     <input type="range" id="bSlider" min="0" max="1" step="0.01" value="0.4">
-    <div class="threeBtns">
-      <button class="tBtn" id="btnNight">NIGHT</button>
-      <button class="tBtn on" id="btnDust">DUST</button>
-      <button class="tBtn" id="btnWork">WORK</button>
-    </div>
     </div>
     <div id="modePanel"></div>
-    <div id="hint">WASD: drive · Left-drag: orbit the camera · Scroll: zoom</div>
   </div>
 </div>
-<div id="opt" data-window="right" data-side="right">
-  <div class="hudPanel">
-    <div class="secHd first">VEHICLE</div>
-    <div id="vehRows"></div>
-    <div class="secHd">NOW</div>
-    <div class="row"><span>Speed</span><b id="nowSpeed">–</b></div>
-    <div class="row"><span>Pitch / roll</span><b id="nowTilt">–</b></div>
-    <div class="secHd">PERFORMANCE</div>
-    <div class="row"><span>Frames per second</span><b id="statFps">–</b></div>
-    <div class="row"><span>Frame time</span><b id="statMs">–</b></div>
-    <div class="row"><span>CPU per frame</span><b id="statCpu">–</b></div>
-    <div class="row"><span>Triangles drawn / frame</span><b id="statTris">–</b></div>
-    <div class="row"><span>Draw calls / frame</span><b id="statCalls">–</b></div>
-    <canvas id="fpsGraph" width="270" height="40"></canvas>
-  </div>
+<div id="opt" class="hudPanel" data-std="camera">
+  <div id="hint">WASD: drive · Left-drag: orbit the camera · Scroll: zoom</div>
 </div>
+<div class="hudPanel" data-std="light">
+  <div class="twoBtns"><button class="tBtn" id="btnNight">NIGHT</button></div>
+</div>
+<div class="hudPanel" data-std="perf"></div>
+<script src="../ui/labwin.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
 <script type="module" src="../js/labkit/labkit.js"></script>
 <script type="module" src="../js/models/ships-space/shipkit.js"></script>

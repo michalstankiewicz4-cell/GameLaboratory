@@ -3,6 +3,36 @@
 Wersja programu i każdego laboratorium: `ui/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.19.0 — 2026-11-02 (wspólne okna, część 1: laboratoria ze Space)
+
+### Nowe
+- **Standardowe okna** (`ui/labwin.js`, `ui/labwin.css`): element z `data-std` staje się jednym z czterech okien,
+  które na każdej stronie mają ten sam tytuł (EN/PL), stronę i miejsce w kolejności:
+  - **Opis** (lewa, pierwsze): nazwa (`.stdName`), podpis (`.stdSub`), opis (`.stdText`), dane modelu;
+  - **Kamera** (prawa): widoki, auto-obrót, wygląd kamery;
+  - **Światło i pogoda** (prawa);
+  - **Wydajność** (prawa, ostatnie) — generowana w jednym miejscu, wszędzie identyczna: klatki na sekundę, czas
+    klatki, CPU na klatkę, rysowane trójkąty, wywołania rysowania, rozdzielczość, wykres; pod spodem **Model**
+    (trójkąty, wierzchołki, siatki, materiały, tekstury, czas budowy — `LabPerf.model(grupa)` albo własne wiersze
+    `LabPerf.modelRows`), a niżej ustawienia jakości laboratorium.
+
+  Własne okna laboratorium stoją po lewej, za Opisem. Drugie duże okno własne może stać po prawej, nad wspólnymi.
+- `LabPerf` (w `ui/labwin.js`) zastępuje liczniki laboratoriów; `LabKit.perfCounters` tylko do niego przekazuje.
+  Licznik klatek na pasku dolnym też idzie z `LabPerf`.
+- Okna bez zapamiętanego miejsca: gdy kolumna się zapełni, kolejne stają w następnej kolumnie obok, a nie na sobie.
+- Wszystkie okna strony wygasają przy bezczynności (wcześniej tylko dwa panele).
+
+### Zmienione — laboratoria ze Space (y+1)
+- Statki, ciała, układy, powierzchnia, budynki, pojazdy (ląd), dźwięk, życie, człowiek, edytor stworów — okna
+  przebudowane na Opis + własne + Kamera / Światło i pogoda / Wydajność:
+  - auto-obrót i efekty obrazu przeszły do Kamery;
+  - „Game lighting”, „Ship light”, „Night”, niebo i pogoda — do Światła;
+  - jakość renderowania i szczegółowość geometrii — do Wydajności;
+  - statystyki modelu z okien „Stats” i „Model” — do Wydajności;
+  - dane opisowe (fizyczne, moduł, pojazd, układ) — do Opisu.
+- Dźwięk nie ma kamery ani wydajności (bez sceny 3D).
+- Usunięte stare style liczników (`#fpsGraph`, `.legend`, `#hudTitle`, `#hudSub` w `ui/space.css`).
+
 ## Program 0.18.2 — 2026-11-02
 
 ### Zmienione

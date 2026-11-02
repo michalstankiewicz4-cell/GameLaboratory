@@ -164,14 +164,7 @@ function renderModelStats(st) {
     ["Textures", `${st.texCount} (≈${st.texMB.toFixed(0)} MB GPU)`],
     ["Build time", st.buildMs.toFixed(0) + " ms"],
   ];
-  const box = document.getElementById("infoRows");
-  box.textContent = "";
-  for (const [k, v] of rows) {
-    const r = document.createElement("div"); r.className = "row";
-    const a = document.createElement("span"); a.textContent = k;
-    const b = document.createElement("b"); b.textContent = v;
-    r.append(a, b); box.appendChild(r);
-  }
+  window.LabPerf.modelRows(rows);   // the Performance window's Model section (ui/labwin.js)
   const list = document.getElementById("figList");
   list.textContent = "";
   for (const [name, n] of Object.entries(st.figures).sort((x, y) => y[1] - x[1])) {
@@ -210,8 +203,6 @@ function applyQuality(level) {
   }
   for (const t of ShipKit.allTextures) { t.anisotropy = Math.min(q.aniso, maxAniso); t.needsUpdate = true; }
   document.getElementById("qVal").textContent = q.name;
-  document.getElementById("statRes").textContent =
-    `${Math.round(window.innerWidth * q.pr)}×${Math.round(window.innerHeight * q.pr)}`;
 }
 
 // =====================================================================

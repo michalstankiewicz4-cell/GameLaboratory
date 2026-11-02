@@ -24,10 +24,13 @@
 <div class="foot"><span id="fps" data-auto></span><span class="sp"></span><span>GameLaboratory</span></div>
 <script src="../ui/bars.js"></script>
 <canvas id="view"></canvas>
-<div id="hud" data-window="left" data-side="left">
-  <div id="hudTop">
-    <div id="hudTitle">CREATOR</div>
+<div data-std="info">
+  <div class="hudPanel">
+    <div id="hudTitle" class="stdName">CREATOR</div>
+    <div id="stats"></div>
   </div>
+</div>
+<div id="hud" data-window="spine" data-title="Body" data-title-pl="Ciało">
   <div class="hudPanel">
     <div class="secHd first">START FROM</div>
     <div id="presets"></div>
@@ -59,14 +62,9 @@
       <button class="tBtn" id="ptAdd" title="A new point after the selected one">+ POINT</button>
       <button class="tBtn" id="ptDel" title="Remove the selected point">− POINT</button>
     </div>
-    <div class="twoBtns">
-      <button class="tBtn on" id="vSide" title="The camera from the side (best for dragging)">SIDE VIEW</button>
-      <button class="tBtn" id="vFree" title="Turn the camera freely">FREE VIEW</button>
-    </div>
-    <div id="hint">Drag the gold points (spine) and the teal ones (legs, along the spine) · wheel on a point: thickness</div>
   </div>
 </div>
-<div id="opt" data-window="right" data-side="right">
+<div id="opt" data-window="legs" data-side="right" data-title="Legs, head and skin" data-title-pl="Nogi, głowa i skóra">
   <div class="hudPanel">
     <div class="secHd first">LEGS (PAIRS)</div>
     <div id="pairs"></div>
@@ -100,16 +98,17 @@
       <button class="tBtn" id="fLoad">LOAD…</button>
     </div>
     <textarea class="lab hidden" id="fText" placeholder="Paste a design here, then LOAD again"></textarea>
-    <div class="secHd">MODEL</div>
-    <div id="stats"></div>
-    <canvas id="fpsGraph" width="270" height="40"></canvas>
-    <div class="row hidden"><span>Frames per second</span><b id="statFps">–</b></div>
-    <div class="row hidden"><span>Frame time</span><b id="statMs">–</b></div>
-    <div class="row hidden"><span>CPU per frame</span><b id="statCpu">–</b></div>
-    <div class="row hidden"><span>Triangles drawn / frame</span><b id="statTris">–</b></div>
-    <div class="row hidden"><span>Draw calls / frame</span><b id="statCalls">–</b></div>
   </div>
 </div>
+<div class="hudPanel" data-std="camera">
+  <div class="twoBtns">
+    <button class="tBtn on" id="vSide" title="The camera from the side (best for dragging)">SIDE VIEW</button>
+    <button class="tBtn" id="vFree" title="Turn the camera freely">FREE VIEW</button>
+  </div>
+  <div id="hint">Drag the gold points (spine) and the teal ones (legs, along the spine) · wheel on a point: thickness</div>
+</div>
+<div class="hudPanel" data-std="perf"></div>
+<script src="../ui/labwin.js"></script>
 <script src="../ui/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
 <script type="module" src="../js/labkit/labkit.js"></script>

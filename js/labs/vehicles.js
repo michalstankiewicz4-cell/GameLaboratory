@@ -110,10 +110,10 @@ function load() {
   $("role").textContent = def.role;
   $("btnWork").textContent = def.work.toUpperCase();
   $("vehicle").value = "v:" + state.index;
-  const st = VK.modelStats(veh.group);
   const rows = [["Length × width × height", def.length + " × " + def.width + " × " + def.height + " m"], ["Top speed", Math.round(def.maxSpeed * 3.6) + " km/h"],
     ["Turns", def.turnRadius ? "in " + def.turnRadius + " m" : "on the spot"], ["Cargo", def.cargo + " t"],
-    ["Wheels", veh.parts.tracks ? "2 tracks" : (veh.wheels || veh.parts.wheels).length], ["Triangles", st.triangles.toLocaleString("en-US")], ["Meshes", st.meshes]];
+    ["Wheels", veh.parts.tracks ? "2 tracks" : (veh.wheels || veh.parts.wheels).length]];
+  window.LabPerf.model(veh.group);   // the Performance window's Model section (ui/labwin.js)
   $("vehRows").textContent = ""; rows.forEach(([k, v]) => $("vehRows").appendChild(row(k, v)));
 }
 function row(k, v) { const r = document.createElement("div"); r.className = "row"; const s = document.createElement("span"); s.textContent = k; const b = document.createElement("b"); b.textContent = v; r.append(s, b); return r; }
@@ -154,7 +154,7 @@ function applyLight() {
 }
 
 // ---------- the loop ----------
-LabKit.autoHideHud([$("hud"), $("opt")], 5);
+LabKit.autoHideHud([...document.querySelectorAll("[data-window]")], 5);   // every window of the page fades when idle (ui/windows.js)
 const perf = LabKit.perfCounters(renderer);
 renderer.info.autoReset = false;
 function resize() {

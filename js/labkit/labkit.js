@@ -31,39 +31,10 @@ function makeGlow(inner = "rgba(255,255,255,1)", mid = "rgba(255,200,120,0.5)") 
   return new THREE.CanvasTexture(c);
 }
 
-// Performance counters (#statFps, #statMs, #statCpu, #statTris, #statCalls)
-// and the FPS graph (#fpsGraph), refreshed every 250 ms.
+// Performance counters: the standard Performance window (ui/labwin.js, LabPerf), one implementation for every lab.
+// update(now, cpuMs) once a frame, after it is drawn.
 function perfCounters(renderer) {
-  const graph = $("fpsGraph"), gctx = graph.getContext("2d"), hist = new Array(90).fill(0);
-  let frames = 0, cpuAcc = 0, last = performance.now();
-  function draw() {
-    const w = graph.width, h = graph.height;
-    gctx.clearRect(0, 0, w, h);
-    gctx.strokeStyle = "rgba(95,119,247,0.35)"; gctx.lineWidth = 1;
-    for (const f of [30, 60]) { const y = h - f / 75 * h; gctx.beginPath(); gctx.moveTo(0, y); gctx.lineTo(w, y); gctx.stroke(); }
-    const bw = w / hist.length;
-    hist.forEach((f, i) => {
-      const bh = Math.min(1, f / 75) * h;
-      gctx.fillStyle = f >= 50 ? "#f8bb56" : f >= 30 ? "#8ea6fd" : "#d05b69";
-      gctx.fillRect(i * bw, h - bh, Math.max(1, bw - 1), bh);
-    });
-  }
-  return {
-    // once a frame: now, and the CPU milliseconds that frame took
-    update(now, cpuMs) {
-      frames++; cpuAcc += cpuMs;
-      const elapsed = now - last;
-      if (elapsed < 250) return;
-      const fps = frames * 1000 / elapsed;
-      $("statFps").textContent = fps.toFixed(0);
-      $("statMs").textContent = (elapsed / frames).toFixed(1) + " ms";
-      $("statCpu").textContent = (cpuAcc / frames).toFixed(1) + " ms";
-      $("statTris").textContent = Math.round(renderer.info.render.triangles).toLocaleString("en-US");
-      $("statCalls").textContent = renderer.info.render.calls;
-      hist.push(fps); hist.shift(); draw();
-      frames = 0; cpuAcc = 0; last = now;
-    },
-  };
+  return { update(now, cpuMs) { if (window.LabPerf) window.LabPerf.end(renderer, cpuMs); } };
 }
 
 // IMAGE EFFECTS (PostKit, shared with the game): the camera's picture, not
