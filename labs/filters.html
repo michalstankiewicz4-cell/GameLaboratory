@@ -23,6 +23,7 @@
 <div class="bar">
   <select id="scene" aria-label="Scene"></select>
   <select id="light" aria-label="Light"></select>
+  <select id="profile" aria-label="Profile" title="Your saved profiles (made in the Camera window)"></select>
   <span class="sp"></span>
 </div>
 <aside class="panel" data-std="info">
@@ -40,6 +41,10 @@
   <div class="row"><span>Tone mapping</span><select id="tone"><option value="0">ACES</option><option value="1">AgX</option><option value="2">Hable</option></select><output></output></div>
   <label class="chk"><input type="checkbox" id="autoExposure"> Automatic exposure</label>
   <div id="sliders"></div>
+  <h3>Profiles</h3>
+  <div class="row"><span>Name</span><input type="text" id="profName" maxlength="40" placeholder="My look"><output></output></div>
+  <div class="btns"><button type="button" id="profSave">Save profile</button><button type="button" id="profDel">Delete profile</button></div>
+  <p class="note" id="profNote">A profile keeps the look (every slider, tone mapping, automatic exposure); pick it later in the bar.</p>
   <p class="note">Drag to orbit, right-drag to pan, wheel to zoom.</p>
 </aside>
 <aside class="panel" data-std="perf">

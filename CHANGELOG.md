@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Laboratorium filtrów 0.4.0 — 2026-11-02 (profile)
+
+### Dodane
+- **Profile**: w oknie Kamera nazwa i przyciski Save profile / Delete profile — profil to cały wygląd (suwaki, tone mapping,
+  automatyczna ekspozycja), zapisany w przeglądarce (`gameLab.lookProfiles.v1`). Zapisane profile wybiera się z listy
+  na pasku narzędzi; zmiana suwaka odznacza profil.
+
 ## Laboratorium skórek 1.0.5 — 2026-11-02 (wybór skórki na pasku, bez CRT)
 
 ### Zmienione

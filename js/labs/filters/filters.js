@@ -26,6 +26,10 @@ let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null');
 const S = { scene: SCENES[0].id, light: 'afternoon', look: pick(LOOK_PRESETS.cinematic), preset: 'cinematic', fov: 40, perf: { scale: 1, autoRes: false, aa: true, shadows: true }, ...(saved || {}) };
 S.look = { ...LOOK_DEFAULTS, ...S.look };
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { /* prywatny tryb */ } };
+// profiles: named looks kept in this browser (gameLab.lookProfiles.v1 — { name: look }), chosen in the bar
+const PKEY = 'gameLab.lookProfiles.v1';
+let profiles = {}; try { profiles = JSON.parse(localStorage.getItem(PKEY) || '{}') || {}; } catch { profiles = {}; }
+const saveProfiles = () => { try { localStorage.setItem(PKEY, JSON.stringify(profiles)); } catch { /* prywatny tryb */ } };
 
 /* ---------------- renderer, scena ---------------- */
 const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
@@ -73,7 +77,34 @@ $('scene').onchange = () => { loadScene($('scene').value); applyLight(); };
 for (const [k, p] of Object.entries(LIGHTS)) $('light').append(el('option', { value: k, textContent: p.label }));
 $('light').value = S.light; $('light').onchange = () => { S.light = $('light').value; applyLight(); save(); };
 
-const markPreset = () => [...$('presets').children].forEach((b) => b.classList.toggle('on', b.dataset.k === S.preset));
+const markPreset = () => {
+  [...$('presets').children].forEach((b) => b.classList.toggle('on', b.dataset.k === S.preset));
+  $('profile').value = S.profile && profiles[S.profile] && S.preset === 'profile' ? S.profile : '';
+};
+function fillProfiles() {
+  const names = Object.keys(profiles).sort((a, b) => a.localeCompare(b));
+  $('profile').replaceChildren(el('option', { value: '', textContent: names.length ? 'Profile…' : 'No profiles yet' }), ...names.map((n) => el('option', { value: n, textContent: n })));
+  $('profile').disabled = !names.length;
+}
+function useProfile(name) {
+  if (!profiles[name]) return;
+  S.look = { ...LOOK_DEFAULTS, ...profiles[name] }; S.preset = 'profile'; S.profile = name; $('profName').value = name;
+  fillLook(); markPreset(); applyLook(); save();
+}
+$('profile').onchange = () => { if ($('profile').value) useProfile($('profile').value); };
+$('profSave').onclick = () => {
+  const name = $('profName').value.trim();
+  if (!name) { $('profNote').textContent = 'Give the profile a name first.'; $('profName').focus(); return; }
+  const had = !!profiles[name]; profiles[name] = { ...S.look }; saveProfiles();
+  S.preset = 'profile'; S.profile = name; save(); fillProfiles(); markPreset();
+  $('profNote').textContent = had ? `Profile “${name}” updated.` : `Profile “${name}” saved — pick it in the bar.`;
+};
+$('profDel').onclick = () => {
+  const name = $('profName').value.trim() || S.profile;
+  if (!name || !profiles[name]) { $('profNote').textContent = 'No profile of that name.'; return; }
+  delete profiles[name]; saveProfiles(); if (S.profile === name) S.profile = ''; save(); fillProfiles(); markPreset();
+  $('profNote').textContent = `Profile “${name}” deleted.`;
+};
 for (const [k, p] of Object.entries(LOOK_PRESETS)) {
   const b = el('button', { type: 'button', textContent: p.label, onclick: () => { S.look = { ...LOOK_DEFAULTS, ...pick(p) }; S.preset = k; fillLook(); markPreset(); applyLook(); save(); } });
   b.dataset.k = k; $('presets').append(b);
@@ -140,6 +171,7 @@ function frame(now) {
   window.LabPerf.end(renderer);   // the Performance window and the bottom bar (ui/shell/labwin.js)
   requestAnimationFrame(frame);
 }
+fillProfiles(); if (S.profile) $('profName').value = S.profile;
 fillLook(); markPreset(); applyLook();
 look.setScale(S.perf.scale); look.setAA(S.perf.aa); stage.sun.castShadow = S.perf.shadows; camera.fov = S.fov;
 resize(); loadScene(S.scene); applyLight();
