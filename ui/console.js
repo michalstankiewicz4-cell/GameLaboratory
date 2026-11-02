@@ -1,5 +1,6 @@
 /* The console window: what ui/menubar.js logs (window.LabLog) — errors, warnings, the console's messages, the loading
-   card's steps and times — newest at the top, each with its date and time, filtered by kind and by text.
+   card's steps and times — newest at the top, each with its date and time and the page it came from (the log is kept
+   for the tab until it is closed), filtered by kind and by text.
    A button on the right of the lab's bar (body > .bar) opens and closes it; the window floats over the lab, is
    dragged by its title and closed with ×. Where it stands and whether it is open are kept in this browser
    (gamelab.console). Loaded by ui/menubar.js on every lab and tool page; its look: ui/console.css. */
@@ -42,26 +43,25 @@ function build() {
   if (bar) bar.append(btn);
 
   // the entries, newest first
-  let since = 0;   // entries cleared before this index are not shown
-  const match = (e) => (st.kind === "all" || e.level === st.kind) && (!st.q || (e.msg + " " + e.level).toLowerCase().includes(st.q.toLowerCase()));
+  const match = (e) => (st.kind === "all" || e.level === st.kind) && (!st.q || (e.msg + " " + e.level + " " + (e.page || "")).toLowerCase().includes(st.q.toLowerCase()));
   const row = (e) => {
     const r = el("div", "lcRow lc-" + e.level);
-    r.append(el("span", "lcTime", stamp(e.time)), el("span", "lcKind", LABEL[e.level] || e.level), el("span", "lcMsg", e.msg));
+    r.append(el("span", "lcTime", stamp(e.time)), el("span", "lcKind", LABEL[e.level] || e.level), el("span", "lcPage", e.page || ""), el("span", "lcMsg", e.msg));
     return r;
   };
   function render() {
-    const shown = LOG.entries.slice(since).filter(match).reverse().slice(0, 400);
+    const shown = LOG.entries.filter(match).reverse().slice(0, 400);
     list.replaceChildren(...shown.map(row));
-    count.textContent = `${shown.length} / ${LOG.entries.length - since}`;
+    count.textContent = `${shown.length} / ${LOG.entries.length}`;
   }
   LOG.on((e) => {
-    if (win.hidden || !match(e)) { if (!win.hidden) count.textContent = count.textContent.replace(/\/ \d+$/, "/ " + (LOG.entries.length - since)); return; }
+    if (win.hidden || !match(e)) { if (!win.hidden) count.textContent = count.textContent.replace(/\/ \d+$/, "/ " + LOG.entries.length); return; }
     list.prepend(row(e)); while (list.childElementCount > 400) list.lastChild.remove();
-    count.textContent = `${list.childElementCount} / ${LOG.entries.length - since}`;
+    count.textContent = `${list.childElementCount} / ${LOG.entries.length}`;
   });
   kind.onchange = () => { st.kind = kind.value; save(); render(); };
   q.oninput = () => { st.q = q.value; save(); render(); };
-  clear.onclick = () => { since = LOG.entries.length; render(); };
+  clear.onclick = () => { LOG.clear(); render(); };   // also forgets the log kept for this tab
 
   // open, close, place
   const place = () => {

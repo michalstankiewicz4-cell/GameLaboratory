@@ -53,12 +53,18 @@
      live in labs/, the tools in tools/): a tile for every lab and tool, with the menu
      bar every lab and tool page carries (ui/menubar.js — the lists
      live there, the tiles' pictures and words here). A workshop, not a cockpit. -->
+<link rel="stylesheet" href="ui/tokens.css">
+<link rel="stylesheet" href="ui/bars.css">
+<link rel="stylesheet" href="ui/windows.css">
+<link rel="stylesheet" href="ui/controls.css">
 <link rel="stylesheet" href="ui/pages/start.css">
 </head>
 <body>
 <script src="ui/versions.js"></script>
 <script src="ui/catalog.js"></script>
 <script src="ui/menubar.js"></script>
+<div class="bar"><span class="sp"></span></div>
+<div class="foot"><span class="sp"></span><span>GameLaboratory · MIT</span></div>
 <main>
   <header>
     <div>
@@ -79,7 +85,6 @@
   <div class="grid" id="labs"></div>
   <h2 data-pl="Narzędzia">Tools</h2>
   <div class="grid" id="tools"></div>
-  <footer><span>GameLaboratory · MIT</span></footer>
 </main>
 <script>
 (() => {

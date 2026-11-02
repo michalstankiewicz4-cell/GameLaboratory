@@ -3,6 +3,15 @@
 Wersja programu i każdego laboratorium: `ui/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.18.1 — 2026-11-02
+
+### Zmienione
+- Konsola: dziennik zostaje w przeglądarce do zamknięcia karty (`sessionStorage` `gamelab.log`, do 600 wpisów), więc
+  idzie za Tobą z laboratorium do laboratorium; przy każdym wpisie strona, z której pochodzi (też w filtrze).
+  „Clear” czyści także zapisany dziennik.
+- Strona startowa: oba paski (pasek narzędzi z przyciskiem konsoli i pasek informacyjny „GameLaboratory · MIT”
+  zamiast stopki); przełączniki w OPCJE → Paski działają też tutaj.
+
 ## Program 0.18.0 — 2026-11-02 (konsola, karta ładowania z etapami, lista pojazdów na lądzie)
 
 ### Nowe

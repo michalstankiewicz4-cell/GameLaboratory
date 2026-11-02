@@ -67,7 +67,7 @@
 - Pasek menu ładuje własny arkusz `ui/menubar.css` (`<link>`).
 - Każde laboratorium ze sceną ma dwa paski jak laboratorium wody (`ui/bars.css`): `.bar` pod paskiem menu (własne kontrolki laboratorium, przełącznik środowiska) i `.foot` na dole (skala, klatki na sekundę, GameLaboratory; `#fps[data-auto]` liczy `ui/bars.js`). Paski i wszystko na nich są zdefiniowane tylko w `ui/bars.css` (stałe wysokości, nieprzezroczyste tło) — arkusze laboratoriów ich nie stylują; w paskach nie ma nazwy, wersji ani linków (są na pasku menu). OPCJE → Paski: pasek narzędzi i pasek informacyjny, domyślnie włączone (`body.lmNoBar`, `body.lmNoFoot`).
 - Ładowanie: karta `.labLoad` z kółkiem, zwykłym zdaniem (nie wielkimi literami), nazwą etapu, paskiem i procentem (`ui/loader.js`). Przy starcie sama pokazuje postęp strony; laboratorium zgłasza własne etapy `LabLoad.step(nazwa, ułamek)`, a długie operacje w trakcie pracy (powyżej ok. 1 s) idą przez `LabLoad.run(tytuł, async step => …)`.
-- Konsola: przycisk po prawej na pasku narzędzi otwiera okno z dziennikiem strony (`ui/console.js`, dziennik `window.LabLog` zaczyna się w `ui/menubar.js`): błędy, ostrzeżenia, komunikaty, etapy ładowania — najnowsze na górze, data i czas, filtr.
+- Konsola: przycisk po prawej na pasku narzędzi otwiera okno z dziennikiem strony (`ui/console.js`, dziennik `window.LabLog` zaczyna się w `ui/menubar.js`): błędy, ostrzeżenia, komunikaty, etapy ładowania — najnowsze na górze, data i czas, strona, filtr; dziennik zostaje do zamknięcia karty (`sessionStorage`). Na każdej stronie, także startowej (ma oba paski).
 
 ## Wersjonowanie
 

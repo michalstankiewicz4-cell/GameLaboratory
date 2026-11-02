@@ -15,7 +15,7 @@ gold headings and controls). Font: Space Grotesk; numbers: IBM Plex Mono.
 | `bars.css` + `bars.js` | the lab's two bars: under the menu bar (drop-downs, buttons, the environment switch, a status) and at the bottom (frames per second, scale); fixed heights, opaque, everything in them defined here only; OPTIONS → Bars hides either |
 | `envswitch.css` + `envswitch.js` | the environment switch: space · water · land (28 px, in the bar) |
 | `loader.css` + `loader.js` | the loading card: a ring, a plain sentence, the step being done, a bar with a percentage. At the start it shows the page's own progress (its scripts, building the scene, the first frame); `LabLoad.step(name, fraction)` — the lab's own steps; `LabLoad.run(title, async step => …)` — the card over a running lab for something long; `LabLoad.done()`; a card marked `data-auto` fades by itself |
-| `console.css` + `console.js` | the console window: the page's log (`window.LabLog`, started in `menubar.js`: errors, warnings, console messages, loading steps and times), newest first, date and time, a filter by kind and text; a button on the right of the lab's bar; loaded by `menubar.js` |
+| `console.css` + `console.js` | the console window: the page's log (`window.LabLog`, started in `menubar.js`: errors, warnings, console messages, loading steps and times), newest first, date and time, the page, a filter by kind and text; kept for the tab until it is closed (`sessionStorage`); a button on the right of the bar, on every page (the start page has both bars too); loaded by `menubar.js` |
 | `ui.css` | all of the above in one link |
 | `menubar.css` + `menubar.js` | the menu bar; the script loads its own sheet |
 | `versions.js` | the program's and every lab's version |

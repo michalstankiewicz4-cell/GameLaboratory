@@ -10,7 +10,10 @@ body{ background:
   radial-gradient(1200px 500px at 10% -10%, rgba(91,140,255,.14), transparent 60%),
   radial-gradient(900px 500px at 100% 0%, rgba(54,214,181,.10), transparent 60%),
   var(--bg); }
-main{ max-width:1240px; margin:0 auto; padding:76px 28px 70px; }
+/* under the menu bar and the bar under it, above the bottom bar (ui/bars.css; OPTIONS → Bars hides either) */
+main{ max-width:1240px; margin:0 auto; padding:calc(var(--menuH, 32px) + var(--barH, 44px) + 28px) 28px calc(var(--footH, 34px) + 40px); }
+body.lmNoBar main{ padding-top:calc(var(--menuH, 32px) + 28px); }
+body.lmNoFoot main{ padding-bottom:70px; }
 header{ display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; margin-bottom:34px; }
 h1{ margin:0; font-size:40px; line-height:1.1; font-weight:700; letter-spacing:-.5px; color:var(--head); }
 h1 span{ background:linear-gradient(90deg, #5b8cff, #36d6b5 55%, #f2b84b); -webkit-background-clip:text; background-clip:text; color:transparent; }
@@ -85,6 +88,4 @@ h2::after{ order:1; }
 .tag.game{ color:var(--game); border-color:rgba(54,214,181,.4); background:rgba(54,214,181,.08); }
 .tag.lab{ color:var(--lab); border-color:rgba(242,184,75,.4); background:rgba(242,184,75,.08); }
 .tag.tool{ color:var(--tool); border-color:rgba(139,156,255,.4); background:rgba(139,156,255,.08); }
-footer{ margin-top:46px; color:var(--dim); font-size:13px; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; }
-footer a{ color:#9aa1b0; }
 @media (max-width:600px){ h1{ font-size:30px; } main{ padding:64px 16px 50px; } }

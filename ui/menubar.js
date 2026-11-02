@@ -16,19 +16,28 @@
 // THE LOG — the most important things that happen on the page, for the console window (ui/console.js, the button on
 // the right of the lab's bar): errors (also uncaught ones and files that failed to load), warnings, the console's
 // messages, and the loading card's steps and times (ui/loader.js). Started here, the first script on every page, so
-// nothing early is missed. window.LabLog: entries (oldest first), add(level, message), on(listener) → off().
+// nothing early is missed. window.LabLog: entries (oldest first; each: time, level, msg, page), add(level, message),
+// on(listener) → off(), clear().
 (function () {
   if (window.LabLog) return;
-  const entries = [], subs = new Set(), MAX = 1000;
+  // kept for this tab until it is closed (sessionStorage gamelab.log), so the log follows you from lab to lab
+  const KEY = "gamelab.log", MAX = 600, page = location.pathname.split("/").pop().replace(/\.html$/, "") || "index";
+  const entries = [], subs = new Set();
+  try { for (const e of JSON.parse(sessionStorage.getItem(KEY) || "[]")) entries.push({ time: new Date(e.time), level: e.level, msg: e.msg, page: e.page }); } catch (e) { /* storage blocked */ }
+  let saveT = 0;
+  const save = () => { clearTimeout(saveT); saveT = 0; try { sessionStorage.setItem(KEY, JSON.stringify(entries.map((e) => ({ time: e.time.toISOString(), level: e.level, msg: e.msg.slice(0, 600), page: e.page })))); } catch (e) { /* full or blocked */ } };
+  addEventListener("pagehide", save);
   const text = (a) => (a instanceof Error ? a.message : typeof a === "object" && a !== null ? (() => { try { return JSON.stringify(a); } catch (e) { return String(a); } })() : String(a));
   const LabLog = window.LabLog = {
     entries,
     add(level, msg) {
-      const e = { time: new Date(), level, msg: String(msg).slice(0, 4000) };
+      const e = { time: new Date(), level, msg: String(msg).slice(0, 4000), page };
       entries.push(e); if (entries.length > MAX) entries.shift();
+      if (!saveT) saveT = setTimeout(save, 400);
       subs.forEach((f) => { try { f(e); } catch (err) { /* a listener's own trouble */ } });
     },
     on(f) { subs.add(f); return () => subs.delete(f); },
+    clear() { entries.length = 0; save(); },
   };
   for (const level of ["error", "warn", "info", "log"]) {
     const orig = console[level];
@@ -105,8 +114,8 @@ const me = all.find((x) => x.file === PAGE) || null;
 const sheet = document.createElement("link");
 sheet.rel = "stylesheet"; sheet.href = ROOT + "ui/menubar.css";
 document.head.appendChild(sheet);
-// the console window and its button on the lab's bar (ui/console.js, its sheet ui/console.css)
-if (!START) {
+// the console window and its button on the bar (ui/console.js, its sheet ui/console.css), on every page
+{
   const cs = document.createElement("link"); cs.rel = "stylesheet"; cs.href = ROOT + "ui/console.css"; document.head.appendChild(cs);
   const cj = document.createElement("script"); cj.src = ROOT + "ui/console.js"; document.head.appendChild(cj);
 }
