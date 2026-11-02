@@ -214,6 +214,11 @@ document.addEventListener("pointerdown", (e) => { if (!bar.contains(e.target)) c
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeAll(); dlg.classList.remove("open"); } });
 
 document.body.prepend(bar);
+// a page whose ui/ui.css is still an older copy from the browser's cache (from before the menu bar's sheet went into
+// it) gets the sheets here, so the bar never goes missing
+if (getComputedStyle(bar).position !== "fixed") {
+  for (const f of ["menubar.css", "console.css"]) { const l = document.createElement("link"); l.rel = "stylesheet"; l.href = ROOT + "ui/shell/" + f; document.head.appendChild(l); }
+}
 
 // the start screen's QUICK ACCESS row: every visit to a lab or tool is counted
 // here, in this browser (labsHub.visits: { file: count }, labsHub.recent:

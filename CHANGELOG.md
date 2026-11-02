@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.20.6 — 2026-11-02 (pasek menu przy starej kopii ui.css)
+
+### Poprawione
+- Po 0.20.5 przeglądarka mogła mieć w pamięci podręcznej starą kopię `ui/ui.css` (bez arkusza paska menu) i nową
+  `menubar.js` (która już go nie dokładała) — pasek menu znikał do czasu odświeżenia kopii. Teraz `menubar.js`
+  sprawdza, czy styl paska działa, a jeśli nie — sam dokłada `ui/shell/menubar.css` i `console.css`.
+
 ## Program 0.20.5 — 2026-11-02 (pasek menu od razu ze stroną)
 
 ### Poprawione
