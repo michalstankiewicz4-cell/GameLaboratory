@@ -86,7 +86,7 @@ const link = (label, href, opts = {}) => {
   const a = el("a", "lmItem"); a.href = href;
   const c = el("span", "lmChk", opts.on ? "●" : ""); a.append(c, document.createTextNode(label));
   if (opts.blank) { a.target = "_blank"; a.rel = "noopener"; }
-  if (opts.cls) a.classList.add(opts.cls);
+  if (opts.group) { a.classList.add("lmGlow"); a.dataset.group = opts.group; }
   return a;
 };
 const action = (label, fn, opts = {}) => {
@@ -162,9 +162,11 @@ function windowItems() {
 const short = (name) => { const s = name.replace(/^Laboratorium\s+/, "").replace(/\s+lab(?=\s*·|$)/i, ""); return s.charAt(0).toUpperCase() + s.slice(1); };
 function tools() {
   const d = [el("div", "lmLabel", t("Labs", "Laboratoria"))];
-  // a lab with several pages (one per environment, each with its own tile): one item per page, their text glowing
-  const family = (l) => !!l.page || LABS.some((x) => x.page === l.file);
-  LABS.filter((l) => !l.page || l.art).forEach((l) => d.push(link(short(l.name), ROOT + l.file, { on: me === l || (!!me && !me.art && me.page === l.file), cls: family(l) ? "lmGlow" : "" })));
+  // labs that belong together (catalog "group": the vehicles, the space labs): their text glows in the group's colour
+  LABS.filter((l) => !l.page || l.art).forEach((l) => d.push(link(short(l.name), ROOT + l.file, { on: me === l || (!!me && !me.art && me.page === l.file), group: l.group })));
+  // an item of a group under the pointer lights up the whole group, with a dot at each
+  const light = (g, on) => d.forEach((x) => { if (x.dataset && x.dataset.group === g) x.classList.toggle("lmGrpOn", on); });
+  d.forEach((x) => { if (x.dataset && x.dataset.group) { x.addEventListener("mouseenter", () => light(x.dataset.group, true)); x.addEventListener("mouseleave", () => light(x.dataset.group, false)); } });
   d.push(el("div", "lmSep"), el("div", "lmLabel", t("Tools", "Narzędzia")));
   TOOLS.forEach((t) => d.push(link(t.name, ROOT + t.file, { on: me === t })));
   return d;

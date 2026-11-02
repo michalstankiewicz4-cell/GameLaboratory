@@ -43,6 +43,7 @@
 
 - W laboratorium każdej rodziny modeli przełącznik ma zawsze 3 pozycje: kosmos, woda, ląd, i stoi w górnym pasku laboratorium (`.bar`). Pozycje, w których rodzina nie ma zachowania, są wyszarzone.
 - Wspólny komponent: `ui/shell/envswitch.js` + `ui/shell/envswitch.css` (znacznik `<div class="envSwitch" data-current=… data-space=… data-water=… data-land=…>`; pusty adres = wyszarzone).
+- Grupy laboratoriów (`group`, `tab`/`tabPl` w `ui/data/catalog.js`): pojazdy (kosmos · woda · ląd, złote) i laboratoria kosmosu (ciała niebieskie · układy · skala, śliwkowe `--plum`). Grupa ma wspólne tło kafelków, poświatę w menu Narzędzia, wspólne podświetlenie kafelków i pozycji menu po najechaniu; laboratoria kosmosu mają na pasku przełącznik grupy (`<div class="envSwitch groupSwitch" data-group="space">`, `ui/shell/envswitch.js`).
 - Pojazdy (wszystko, czym można się poruszać): jedno laboratorium pojazdów — `labs/vehicles-space.html` kosmos (statki, dron, stacja), `labs/vehicles-water.html` woda (okręty i roboty morskie z MarineKit: ślizgacz, barka, nurek), `labs/vehicles-land.html` ląd (łaziki, amfibia, pociąg). Woda i ląd w nim są zwykłe (umowne), z możliwością pobrania z laboratorium wody i lądu. Laboratorium morza usunięte (0.17.0).
 
 ## Naprawy modeli

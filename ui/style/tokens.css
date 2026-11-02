@@ -14,6 +14,7 @@
   --head:#eef2f6;          /* titles, values */
   --dim:#7f8a98;           /* notes, labels */
   --accent:#f2b84b;        /* gold: headings, active, sliders, ticks */
+  --plum:#c68ae8;          /* the space labs' group (bodies, systems, scale): its glow in the menu */
   --ok:#5fd0a0;
   --err:#e04b50;
   --font:"Space Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;

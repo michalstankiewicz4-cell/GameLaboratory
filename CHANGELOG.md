@@ -3,6 +3,16 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.20.7 — 2026-11-02 (grupy laboratoriów)
+
+### Dodane
+- **Grupy laboratoriów** w katalogu (`group`, `tab` / `tabPl`): **pojazdy** (kosmos · woda · ląd) i **laboratoria kosmosu**
+  (ciała niebieskie · układy · skala).
+- Laboratoria kosmosu: wspólne śliwkowe tło kafelków (jak ciał niebieskich), śliwkowa poświata w menu Narzędzia (token `--plum`)
+  i **przełącznik grupy** na pasku narzędzi (`.groupSwitch` w `ui/shell/envswitch.js`): ciała niebieskie 1.3.1, układy, skala.
+- Najechanie na kafelek grupy podświetla wszystkie jej kafelki; najechanie na pozycję grupy w menu Narzędzia podświetla
+  wszystkie jej pozycje, z kropką przy każdej. Tak samo dla pojazdów (złote).
+
 ## Program 0.20.6 — 2026-11-02 (pasek menu przy starej kopii ui.css)
 
 ### Poprawione

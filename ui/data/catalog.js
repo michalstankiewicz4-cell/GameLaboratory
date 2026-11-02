@@ -9,7 +9,9 @@
    Fields: file, name / namePl, doc, page (another page of a lab — the lab's
    file: no entry of its own in the lists), desc / descPl, kind ("lab" | "tool"), kit,
    phrases (Polish; their English in phraseEn — a new phrase needs both),
-   saved (localStorage key prefixes), art (the tile: bg + svg, or img).
+   saved (localStorage key prefixes), art (the tile: bg + svg, or img),
+   group + tab / tabPl (labs that belong together — one background, one glow in the menu, a switch on the bar:
+   "vehicles": space · water · land, "space": bodies · systems · scale).
    The JSON between the markers is read by tools/sitemap.py — keep it JSON.
    ======================================================================= */
 window.GameLabCatalog =
@@ -20,6 +22,9 @@ window.GameLabCatalog =
   "labs": [
     {
       "file": "labs/vehicles-space.html",
+      "group": "vehicles",
+      "tab": "Space",
+      "tabPl": "Kosmos",
       "name": "Vehicle lab · space",
       "namePl": "Laboratorium pojazdów · kosmos",
       "doc": "docs/labs/vehicles-space.md",
@@ -36,6 +41,9 @@ window.GameLabCatalog =
     },
     {
       "file": "labs/vehicles-water.html",
+      "group": "vehicles",
+      "tab": "Water",
+      "tabPl": "Woda",
       "name": "Vehicle lab · water",
       "namePl": "Laboratorium pojazdów · woda",
       "doc": "docs/models/ships-sea/blyskawica.md",
@@ -52,6 +60,9 @@ window.GameLabCatalog =
     },
     {
       "file": "labs/vehicles-land.html",
+      "group": "vehicles",
+      "tab": "Land",
+      "tabPl": "Ląd",
       "name": "Vehicle lab · land",
       "namePl": "Laboratorium pojazdów · ląd",
       "doc": "docs/labs/vehicles-land.md",
@@ -68,6 +79,9 @@ window.GameLabCatalog =
     },
     {
       "file": "labs/bodies.html",
+      "group": "space",
+      "tab": "Bodies",
+      "tabPl": "Ciała niebieskie",
       "name": "Body lab",
       "namePl": "Laboratorium ciał niebieskich",
       "doc": "docs/labs/bodies.md",
@@ -83,6 +97,9 @@ window.GameLabCatalog =
     },
     {
       "file": "labs/systems.html",
+      "group": "space",
+      "tab": "Systems",
+      "tabPl": "Układy",
       "name": "System lab",
       "namePl": "Laboratorium układów",
       "doc": "docs/labs/systems.md",
@@ -92,12 +109,15 @@ window.GameLabCatalog =
       "kit": "SystemKit",
       "phrases": ["kosmos", "układy", "orbity", "gwiazdy"],
       "art": {
-        "bg": ["#2c2312", "#120f08"],
+        "bg": ["#3b1d4f", "#140d24"],
         "svg": "<circle cx=\"100\" cy=\"50\" r=\"9\" fill=\"#ffd27a\"/><circle cx=\"100\" cy=\"50\" r=\"16\" fill=\"#ffd27a\" opacity=\".18\"/><g fill=\"none\" stroke=\"#f2b84b\" stroke-width=\"1.4\" opacity=\".55\"><ellipse cx=\"100\" cy=\"50\" rx=\"34\" ry=\"13\"/><ellipse cx=\"100\" cy=\"50\" rx=\"58\" ry=\"23\"/><ellipse cx=\"100\" cy=\"50\" rx=\"84\" ry=\"34\"/></g><circle cx=\"134\" cy=\"50\" r=\"4\" fill=\"#8be0ff\"/><circle cx=\"58\" cy=\"66\" r=\"5\" fill=\"#ff9a6b\"/><circle cx=\"168\" cy=\"30\" r=\"6\" fill=\"#c7b2ff\"/>"
       }
     },
     {
       "file": "labs/scale.html",
+      "group": "space",
+      "tab": "Scale",
+      "tabPl": "Skala",
       "name": "Scale lab",
       "namePl": "Laboratorium skali",
       "doc": "docs/labs/scale.md",
@@ -107,7 +127,7 @@ window.GameLabCatalog =
       "kit": "scale",
       "phrases": ["kosmos", "skala", "proporcje"],
       "art": {
-        "bg": ["#173236", "#0a1517"],
+        "bg": ["#3b1d4f", "#140d24"],
         "svg": "<g fill=\"none\" stroke=\"url(#g)\" stroke-width=\"2.5\"><circle cx=\"46\" cy=\"58\" r=\"8\"/><circle cx=\"86\" cy=\"54\" r=\"14\"/><circle cx=\"140\" cy=\"46\" r=\"26\"/></g><path d=\"M24 84 H180\" stroke=\"#9fe8de\" stroke-width=\"2\"/><g stroke=\"#9fe8de\" stroke-width=\"2\"><path d=\"M24 84 V76\"/><path d=\"M43.5 84 V80\"/><path d=\"M63 84 V76\"/><path d=\"M82.5 84 V80\"/><path d=\"M102 84 V76\"/><path d=\"M121.5 84 V80\"/><path d=\"M141 84 V76\"/><path d=\"M160.5 84 V80\"/><path d=\"M180 84 V76\"/></g>"
       }
     },

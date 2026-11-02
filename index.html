@@ -117,6 +117,7 @@ const LABS = window.LabMenu.ITEMS.LABS.filter((l) => !l.page || l.art), TOOLS = 
 function tile(item) {
   const a = document.createElement("a"), art = ART[item.file], info = INFO[item.file] || ["", "lab", ""];
   a.className = "tile"; a.href = window.LabMenu.ROOT + item.file;
+  if (item.group) a.dataset.group = item.group;   // labs that belong together light up together (below)
   const id = "g" + item.file.replace(/\W/g, "");
   const pic = art.img ? `<div class="art"><img src="${window.LabMenu.ROOT + art.img}" alt="" loading="lazy"></div>`
     : `<div class="art" style="background:linear-gradient(135deg, ${art.bg[0]}, ${art.bg[1]})">
@@ -135,6 +136,14 @@ function tile(item) {
   for (const w of PHRASES[item.file] || []) { const e = document.createElement("span"); e.className = "phrase"; e.textContent = phrase(w); ph.appendChild(e); }
   return a;
 }
+// a tile of a group under the pointer lights up the group's other tiles (catalog "group": the vehicles, the space labs)
+function groupLight(e, on) {
+  const t = e.target.closest && e.target.closest(".tile[data-group]");
+  if (!t || (e.relatedTarget && t.contains(e.relatedTarget))) return;
+  document.querySelectorAll('.tile[data-group="' + t.dataset.group + '"]').forEach((x) => x.classList.toggle("grpOn", on));
+}
+document.addEventListener("mouseover", (e) => groupLight(e, true));
+document.addEventListener("mouseout", (e) => groupLight(e, false));
 // ---------- the order: yours, dragged by the six-dot grip, kept in this browser ----------
 const ORDER_KEY = "labsHub.order";
 function loadOrder() { try { return JSON.parse(localStorage.getItem(ORDER_KEY) || "{}") || {}; } catch (e) { return {}; } }
