@@ -1,8 +1,9 @@
 /* =======================================================================
    MARINEKIT — the sea and what sails it (window.MarineKit)
    =======================================================================
-   A classic script like the other kits: the sea vehicles lab (marine.html)
-   uses it; the surface lab and the game can later. Vessels are built from
+   A classic script like the other kits: the vehicle lab uses its vessels
+   (water page: skimmer, barge, diver; land page: the amphibian); its own sea
+   (makeSea, the snow) is used by no lab now. Vessels are built from
    ShipKit's generators (plating, struts); the amphibian borrows
    VehicleKit's wheels. Needs THREE, ShipKit and VehicleKit.
    docs/marine.md.

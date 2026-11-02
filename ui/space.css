@@ -1,4 +1,4 @@
-/* The labs from Space (ship, bodies, systems, surface, buildings, vehicles, marine, sound, life, human, creator):
+/* The labs from Space (ship, bodies, systems, surface, buildings, vehicles, sound, life, human, creator):
    the page, the panels (#hud, #opt, .hudPanel) and what is in them, in the look of ui/ (ui/tokens.css).
    Load after ui/ui.css. Each page adds its own rules in ui/pages/<lab>.css. */
 *{box-sizing:border-box}

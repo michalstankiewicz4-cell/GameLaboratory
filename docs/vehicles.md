@@ -1,9 +1,10 @@
 # Vehicle lab (vehicles.html) and VehicleKit
 
 Ground vehicles for the planets' surfaces. Started 2026-10-03. The user's
-call: a lab of its own, separate from the ship lab ("too much in one file",
-and these get driving animations). Sea vehicles will get a separate lab too,
-because you'll be able to go under water.
+call: a page of its own, separate from the ship page ("too much in one file",
+and these get driving animations). Since 2026-11-02 it is the land page of one
+**vehicle lab** (space: `ship.html`, water: `warship.html`, land: this page),
+with MarineKit's amphibian on its list ([marine.md](marine.md)).
 
 ## Files
 

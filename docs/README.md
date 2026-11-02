@@ -7,15 +7,14 @@ UI: [`../ui/README.md`](../ui/README.md).
 
 | Laboratorium | Strona | Dokument |
 |---|---|---|
-| Statki — kosmos | `labs/ship.html` | [ship.md](ship.md) |
-| Statki — woda (ORP Błyskawica, ORP Orzeł) | `labs/warship.html` | [ships-sea/blyskawica.md](ships-sea/blyskawica.md), [ships-sea/orzel.md](ships-sea/orzel.md) |
+| Pojazdy — kosmos (statki, dron, stacja) | `labs/ship.html` | [ship.md](ship.md) |
+| Pojazdy — woda (ORP Błyskawica, ORP Orzeł, roboty morskie) | `labs/warship.html` | [ships-sea/blyskawica.md](ships-sea/blyskawica.md), [ships-sea/orzel.md](ships-sea/orzel.md), [marine.md](marine.md) |
 | Ciała niebieskie | `labs/bodies.html` | [bodies.md](bodies.md) |
 | Układy | `labs/systems.html` | [systems.md](systems.md) |
 | Skala | `labs/scale.html` | [scale.md](scale.md) |
 | Skórki | `labs/skins.html` | [skins.md](skins.md) |
 | Powierzchnia, budynki | `labs/surface.html`, `labs/buildings.html` | [surface.md](surface.md) |
-| Pojazdy (z pociągiem) | `labs/vehicles.html` | [vehicles.md](vehicles.md), [train/fizyka.md](train/fizyka.md), [train/grafika.md](train/grafika.md) |
-| Morze | `labs/marine.html` | [marine.md](marine.md) |
+| Pojazdy — ląd (łaziki, amfibia, pociąg) | `labs/vehicles.html` | [vehicles.md](vehicles.md), [marine.md](marine.md), [train/fizyka.md](train/fizyka.md), [train/grafika.md](train/grafika.md) |
 | Dźwięk | `labs/sound.html` | [sound.md](sound.md) |
 | Życie, edytor stworów | `labs/life.html`, `labs/creator.html` | [life.md](life.md) |
 | Człowiek | `labs/human.html` | [human.md](human.md) |

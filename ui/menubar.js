@@ -163,7 +163,7 @@ function windowItems() {
 const short = (name) => { const s = name.replace(/^Laboratorium\s+/, "").replace(/\s+lab$/i, ""); return s.charAt(0).toUpperCase() + s.slice(1); };
 function tools() {
   const d = [el("div", "lmLabel", t("Labs", "Laboratoria"))];
-  LABS.filter((l) => !l.page).forEach((l) => d.push(link(short(l.name), ROOT + l.file, { on: me === l || (l.file === "labs/ship.html" && me && me.page) })));
+  LABS.filter((l) => !l.page).forEach((l) => d.push(link(short(l.name), ROOT + l.file, { on: me === l || (!!me && me.page === l.file) })));
   d.push(el("div", "lmSep"), el("div", "lmLabel", t("Tools", "Narzędzia")));
   TOOLS.forEach((t) => d.push(link(t.name, ROOT + t.file, { on: me === t })));
   return d;

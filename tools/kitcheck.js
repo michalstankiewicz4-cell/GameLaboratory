@@ -4,7 +4,7 @@
 const $ = (id) => document.getElementById(id);
 // ?labs=a.html,b.html checks only those (e.g. to try the checker itself)
 const LABS = new URLSearchParams(location.search).get("labs") ? new URLSearchParams(location.search).get("labs").split(",") :
-  ["labs/ship.html", "labs/bodies.html", "labs/systems.html", "labs/scale.html", "labs/skins.html", "labs/surface.html", "labs/buildings.html", "labs/vehicles.html", "labs/marine.html", "labs/sound.html", "labs/life.html", "labs/human.html", "labs/creator.html"];
+  ["labs/ship.html", "labs/bodies.html", "labs/systems.html", "labs/scale.html", "labs/skins.html", "labs/surface.html", "labs/buildings.html", "labs/vehicles.html", "labs/sound.html", "labs/life.html", "labs/human.html", "labs/creator.html"];
 const r3 = (v) => Math.round(v * 1000) / 1000;
 
 // a model's fingerprint: what a refactor must not change

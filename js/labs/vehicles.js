@@ -1,9 +1,13 @@
-// The vehicles lab's own script (vehicles.html): its scene and panels, wired to the kits'
+// The vehicle lab's land page (vehicles.html): its scene and panels, wired to the kits'
 // public APIs. Moved out of the page (2026-10-03) so the page is markup and styles.
+// The list: VehicleKit's rovers and MarineKit's amphibian (moved here from the sea lab: on land it drives on its
+// wheels; where there is water it floats). The train is another family (js/labs/vehicles/train.js).
 (() => {
 "use strict";
 const $ = (id) => document.getElementById(id);
-const VK = window.VehicleKit;
+const VK = window.VehicleKit, MK = window.MarineKit;
+const LIST = VK.VEHICLES.map((def) => ({ def, kit: "vk" })).concat(MK ? MK.VESSELS.filter((d) => d.id === "amphibian").map((def) => ({ def, kit: "mk" })) : []);
+const NO_WATER = () => -1e9;   // the water's height where there is none
 const view = $("view");
 const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -43,6 +47,11 @@ function heightAt(x, z) {
   h += Math.max(0, rk - 0.55) * 1.6 * G.bumps;
   return h;
 }
+// the ground can come from the land lab instead (OPTIONS: Ground → Land lab; js/labs/vehicles/landsource.js): its
+// terrain, its sea and its weather; the amphibian floats where there is water, the rovers stop at it
+let world = null;
+const groundAt = (x, z) => (world ? world.heightAt(x, z) : heightAt(x, z));
+const home = { x: 0, z: 0 };             // where AUTO turns back to
 const groundTex = (() => {
   const S = 512, [c, ctx] = ShipKit.util.canvas(S, S), r = ShipKit.util.rng(5);
   ctx.fillStyle = "#6e5642"; ctx.fillRect(0, 0, S, S);
@@ -75,7 +84,7 @@ function setMode(m) {
   if (mode && mode.group) mode.group.visible = false;
   mode = m;
   const on = !!m;
-  ground.visible = !on; dust.points.visible = !on; if (veh) veh.group.visible = !on;
+  ground.visible = !on && !world; if (world) world.group.visible = !on; dust.points.visible = !on; if (veh) veh.group.visible = !on;
   $("vkPanel").classList.toggle("hidden", on);
   for (const x of modes) if (x.panel) x.panel.classList.toggle("hidden", x !== m);
   if (!m) return;
@@ -93,9 +102,10 @@ function addMode(m) {
 }
 function load() {
   setMode(null);
-  if (veh) VK.disposeVehicle(veh);
-  const def = VK.VEHICLES[state.index];
-  veh = VK.buildVehicle(def.id, { detail: 1 });
+  if (veh) { if (veh.kit === "mk") MK.disposeVessel(veh); else VK.disposeVehicle(veh); }
+  const { def, kit } = LIST[state.index];
+  veh = kit === "mk" ? MK.buildVessel(def.id, { detail: 1 }) : VK.buildVehicle(def.id, { detail: 1 });
+  veh.kit = kit;
   scene.add(veh.group);
   $("hudTitle").textContent = def.name;
   $("role").textContent = def.role;
@@ -104,11 +114,11 @@ function load() {
   const st = VK.modelStats(veh.group);
   const rows = [["Length × width × height", def.length + " × " + def.width + " × " + def.height + " m"], ["Top speed", Math.round(def.maxSpeed * 3.6) + " km/h"],
     ["Turns", def.turnRadius ? "in " + def.turnRadius + " m" : "on the spot"], ["Cargo", def.cargo + " t"],
-    ["Wheels", veh.parts.tracks ? "2 tracks" : veh.wheels.length], ["Triangles", st.triangles.toLocaleString("en-US")], ["Meshes", st.meshes]];
+    ["Wheels", veh.parts.tracks ? "2 tracks" : (veh.wheels || veh.parts.wheels).length], ["Triangles", st.triangles.toLocaleString("en-US")], ["Meshes", st.meshes]];
   $("vehRows").textContent = ""; rows.forEach(([k, v]) => $("vehRows").appendChild(row(k, v)));
 }
 function row(k, v) { const r = document.createElement("div"); r.className = "row"; const s = document.createElement("span"); s.textContent = k; const b = document.createElement("b"); b.textContent = v; r.append(s, b); return r; }
-VK.VEHICLES.forEach((d, i) => {
+LIST.forEach(({ def: d }, i) => {
   const b = document.createElement("button"); b.className = "tBtn"; b.textContent = d.name;
   b.addEventListener("click", () => { state.index = i; load(); });
   $("vehTabs").appendChild(b);
@@ -131,9 +141,13 @@ window.addEventListener("keydown", (e) => {
 });
 window.addEventListener("keyup", (e) => { state.keys[e.code] = false; });
 function applyLight() {
-  const n = state.night;
-  scene.background.copy(n ? NIGHT_BG : DAY_BG); scene.fog.color.copy(scene.background);
-  sun.intensity = (n ? 0.05 : 2.2) * THREE.LIGHT_SCALE; hemi.intensity = (n ? 0.06 : 0.55) * THREE.LIGHT_SCALE;
+  const n = state.night, W = world && world.sky;
+  scene.background.copy(n ? NIGHT_BG : W ? W.fog : DAY_BG); scene.fog.color.copy(scene.background);
+  scene.fog.near = W ? 300 : 90; scene.fog.far = W ? 3200 : 260;
+  sun.color.set(0xfff1dc); hemi.color.set(0xcfa98a); hemi.groundColor.set(0x2a1d14);
+  if (W && !n) { sun.color.copy(W.sunColor); hemi.color.copy(W.sky); hemi.groundColor.copy(W.ground); }
+  sun.intensity = n ? 0.05 * THREE.LIGHT_SCALE : W ? W.sunIntensity : 2.2 * THREE.LIGHT_SCALE;
+  hemi.intensity = n ? 0.06 * THREE.LIGHT_SCALE : W ? W.ambient : 0.55 * THREE.LIGHT_SCALE;
   dust.material.uniforms.uLight.value = n ? 0.15 : 1;
 }
 
@@ -162,8 +176,8 @@ function frame() {
   let input;
   if (state.auto) {
     wander += dt;
-    const far = Math.hypot(drv.x, drv.z) > 110;
-    const home = Math.atan2(-drv.x, -drv.z), diff = Math.atan2(Math.sin(home - drv.yaw), Math.cos(home - drv.yaw));
+    const far = Math.hypot(drv.x - home.x, drv.z - home.z) > 110;
+    const back = Math.atan2(home.x - drv.x, home.z - drv.z), diff = Math.atan2(Math.sin(back - drv.yaw), Math.cos(back - drv.yaw));
     input = { throttle: state.autoSpeed, steer: far ? Math.sign(diff) : Math.sin(wander * 0.23) * 0.7 + Math.sin(wander * 0.61) * 0.3 };
   } else {
     const k = state.keys;
@@ -171,21 +185,31 @@ function frame() {
   }
   prev.set(drv.x, 0, drv.z);
   VK.drive(drv, input, def, dt);
-  const gy = heightAt(drv.x, drv.z);
+  // on the land lab's ground the rovers stop at the water (only the amphibian goes in)
+  if (world && veh.kit !== "mk" && groundAt(drv.x, drv.z) < -0.4) { drv.x = prev.x; drv.z = prev.z; drv.speed *= -0.2; }
+  const gy = groundAt(drv.x, drv.z);
   veh.group.position.set(drv.x, gy, drv.z);
   veh.group.rotation.y = drv.yaw;
   const cy = Math.cos(drv.yaw), sy = Math.sin(drv.yaw);
-  veh.update(t, dt, {
+  if (veh.kit === "mk") {   // the amphibian: on its wheels on the ground (it would float where there is water)
+    veh.group.position.y = 0;
+    const wx = (x, z) => drv.x + x * cy + z * sy, wz = (x, z) => drv.z - x * sy + z * cy;
+    veh.update(t, dt, { speed: drv.speed, steer: input.steer, surface: world ? (x, z) => world.waterAt(wx(x, z), wz(x, z), t) : NO_WATER,
+      floor: (x, z) => groundAt(wx(x, z), wz(x, z)), lights: state.night ? 1 : 0, work: state.work ? 1 : 0 });
+  } else veh.update(t, dt, {
     speed: drv.speed, steer: input.steer,
-    contact: (x, z) => heightAt(drv.x + x * cy + z * sy, drv.z - x * sy + z * cy) - gy,
+    contact: (x, z) => groundAt(drv.x + x * cy + z * sy, drv.z - x * sy + z * cy) - gy,
     lights: state.night ? 1 : 0, work: state.work ? 1 : 0, dust: state.dust ? dust : null,
   });
   dust.update(dt);
-  // the camera rides along
-  delta.set(drv.x, gy, drv.z).sub(prev.set(controls.target.x, controls.target.y - 1.5, controls.target.z));
+  // the camera rides along (the amphibian afloat: at its hull, not at the sea floor)
+  const vy = veh.kit === "mk" ? veh.body.position.y : gy;
+  delta.set(drv.x, vy, drv.z).sub(prev.set(controls.target.x, controls.target.y - 1.5, controls.target.z));
   camera.position.add(delta); controls.target.add(delta);
   controls.update();
-  sun.position.set(drv.x + 30, gy + 40, drv.z + 20); sun.target.position.set(drv.x, gy, drv.z);
+  if (world) { world.update(t, camera); sun.position.set(drv.x, vy, drv.z).addScaledVector(world.sky.sunDir, 60); }
+  else sun.position.set(drv.x + 30, vy + 40, drv.z + 20);
+  sun.target.position.set(drv.x, vy, drv.z);
   $("nowSpeed").textContent = Math.round(Math.abs(drv.speed) * 3.6) + " km/h";
   $("nowTilt").textContent = Math.round(-veh.body.rotation.x * 57.3) + "° / " + Math.round(veh.body.rotation.z * 57.3) + "°";
   renderer.info.reset();
@@ -193,9 +217,21 @@ function frame() {
   perf.update(performance.now(), performance.now() - t0);
   requestAnimationFrame(frame);
 }
+function setGround(src) {
+  if (world) { scene.remove(world.group); world.dispose(); world = null; }
+  if (src === "lab" && window.LandLabWorld) { world = window.LandLabWorld(); scene.add(world.group); [home.x, home.z] = world.start; }
+  else { home.x = home.z = 0; }
+  ground.visible = !world && !mode;
+  $("hSlider").disabled = $("bSlider").disabled = !!world;
+  Object.assign(drv, { x: home.x, z: home.z, speed: 0 });
+  const y = Math.max(groundAt(home.x, home.z), 0) + 1.5;
+  controls.target.set(home.x, y, home.z); camera.position.set(home.x + 9, y + 3, home.z - 10); controls.update();
+  applyLight();
+}
+$("groundSrc").addEventListener("change", () => setGround($("groundSrc").value));
 rebuildGround(); resize(); load();
 controls.target.set(0, heightAt(0, 0) + 1.5, 0);
 frame();
-window.vehicleLab = { state, drv, G, heightAt, load, get veh() { return veh; }, camera, controls, applyLight, scene, sun, addMode, setMode, modes, row };
+window.vehicleLab = { state, drv, G, heightAt, groundAt, setGround, get world() { return world; }, load, get veh() { return veh; }, camera, controls, applyLight, scene, sun, addMode, setMode, modes, row };
 window.dispatchEvent(new Event("vehiclelab:ready"));
 })();

@@ -39,7 +39,7 @@
 
 - W laboratorium każdej rodziny modeli przełącznik ma zawsze 3 pozycje: kosmos, woda, ląd, i stoi w górnym pasku laboratorium (`.bar`). Pozycje, w których rodzina nie ma zachowania, są wyszarzone.
 - Wspólny komponent: `ui/envswitch.js` + `ui/envswitch.css` (znacznik `<div class="envSwitch" data-current=… data-space=… data-water=… data-land=…>`; pusty adres = wyszarzone).
-- Statki: jedno laboratorium (`labs/ship.html` — kosmos, `labs/warship.html` — woda, ląd wyszarzony). Pojazdy: `labs/vehicles.html` — ląd, `labs/marine.html` — woda, kosmos wyszarzony.
+- Pojazdy (wszystko, czym można się poruszać): jedno laboratorium pojazdów — `labs/ship.html` kosmos (statki, dron, stacja), `labs/warship.html` woda (okręty i roboty morskie z MarineKit: ślizgacz, barka, nurek), `labs/vehicles.html` ląd (łaziki, amfibia, pociąg). Woda i ląd w nim są zwykłe (umowne), z możliwością pobrania z laboratorium wody i lądu. Laboratorium morza usunięte (0.17.0).
 
 ## Naprawy modeli
 

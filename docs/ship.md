@@ -564,7 +564,7 @@ A new file `js/models/ships-space/ships/<id>.js`, shaped like the others: one II
 that takes the helpers it needs from `ShipKit._` and pushes its entry into
 `ShipKit.SHIP_DEFS`, built from the blocks above. Then load it after the
 others on **every page that loads ShipKit** — the labs (`ship.html`, `scale.html`,
-`surface.html`, `buildings.html`, `vehicles.html`, `marine.html`), `tools/kitcheck.html`
+`surface.html`, `buildings.html`, `vehicles.html`), `tools/kitcheck.html`
 and the model doctor's sources (`tools/doctor/sources/`). A helper the core doesn't export yet:
 add it to the `_` list at the end of `shipkit.js`. Finally run
 `tools/kitcheck.html`, and add the new ship's fingerprint to the golden

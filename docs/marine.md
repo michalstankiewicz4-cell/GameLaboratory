@@ -1,15 +1,21 @@
-# Sea lab (marine.html) and MarineKit
+# MarineKit: the robot vessels (and a sea of its own)
 
-The sea, and the vehicles that sail it and go under it. Started 2026-10-03.
-The user's call: a lab of its own, separate from the ground vehicles,
-because you'll be able to go under water.
+The sea, and the vehicles that sail it and go under it. Started 2026-10-03 as a lab of its own (the sea lab,
+`marine.html`), separate from the ground vehicles, because you'll be able to go under water.
+
+The owner's call (2026-11-02): one **vehicle lab** with the environment switch — space (`ship.html`), water
+(`warship.html`), land (`vehicles.html`). The sea lab is gone: the skimmer, the barge and the diver are on the water
+page's list next to the warships (on its plain water: drive, dive, night, wake, work), the amphibian on the land page
+(it drives on the ground; where there is water it floats). MarineKit's own sea (`makeSea`, the view under water,
+marine snow) is used by no lab now; it stays in the kit — the water lab's sea from Battle is the one in use.
 
 ## Files
 
 | File | What it is |
 |---|---|
 | `js/envs/water/marinekit/marinekit.js` | **MarineKit** (`window.MarineKit`), a classic script like the other kits. It holds the sea (waves, the seabed and an island, the water's and the bed's shaders), the vessels, the wake and marine snow. It needs THREE, ShipKit and VehicleKit (the amphibian's wheels: `VehicleKit.parts`). Not in the game, nor in the surface lab, yet. |
-| `marine.html` | The lab: AUTO (wandering, keeping off the island; the amphibian shuttles to the island and back) or WASD + Q/E to dive, waves and depth sliders, NIGHT, WAKE, WORK. |
+| `labs/warship.html`, `js/labs/warship.js` | The vehicle lab's water page: the skimmer, the barge and the diver — AUTO (wandering, turning back toward the middle) or WASD + Q/E to dive, NIGHT, WAKE, WORK. |
+| `labs/vehicles.html`, `js/labs/vehicles.js` | The land page: the amphibian, with the rovers' DRIVE and GROUND. |
 
 ## The sea
 

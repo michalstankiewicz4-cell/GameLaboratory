@@ -3,6 +3,34 @@
 Wersja programu i każdego laboratorium: `ui/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.17.0 — 2026-11-02 (jedno laboratorium pojazdów)
+
+### Zmienione
+- **Laboratorium pojazdów** — wszystko, czym można się poruszać, w jednym laboratorium z przełącznikiem środowiska
+  (wszystkie trzy pozycje czynne):
+  - kosmos — statki, dron i stacja (`labs/ship.html`, 1.5.0);
+  - woda — ORP Błyskawica, ORP Orzeł i roboty morskie (`labs/warship.html`, 1.2.0);
+  - ląd — łaziki, amfibia i pociąg (`labs/vehicles.html`, 1.4.0).
+
+  W katalogu, menu i na stronie startowej jest jeden wpis „Laboratorium pojazdów”; strony wody i lądu są jego
+  stronami (`page` w katalogu wskazuje teraz plik laboratorium).
+- **Woda**: roboty morskie z MarineKit (SKIMMER, BARGE, DIVER) na liście obok okrętów (grupy „Warships” i „Robot
+  vessels”). Jazda jak w laboratorium morza: AUTO albo W/A/S/D, nurek schodzi Q/E albo suwakiem, NIGHT, WAKE, praca;
+  kamera jedzie za robotem. Woda: **zwykła** albo **z laboratorium wody** (lista „Water”: jego wariant A zapisany w tej
+  przeglądarce — fale, wygląd, prąd, olej, lawa, lód; otwarta woda, bez brzegów); roboty kołyszą się na jej falach.
+- **Ląd**: amfibia na liście pojazdów (jeździ na kołach; gdzie jest woda — pływa). Ląd: **zwykły** albo **z laboratorium
+  lądu** (lista „Ground”: świat z zapisanych ustawień laboratorium lądu — mapa z ziarnem, woda w regionach, pogoda;
+  start na lądzie przy wodzie). Na tym lądzie amfibia wjeżdża do morza i wyjeżdża, łaziki zatrzymują się przy wodzie.
+
+### Usunięte
+- Laboratorium morza (`labs/marine.html`, `js/labs/marine.js`, `ui/pages/marine.css`). MarineKit zostaje (statki-roboty
+  w laboratorium pojazdów; jego własne morze i widok pod wodą nie są teraz używane przez żadne laboratorium).
+
+### Poprawione
+- Strona wody nie startowała w 0.16.0: skrypt szukał linku do doktora modeli, usuniętego z paska.
+
+- Wersje: program 0.17.0; statki 1.5.0, woda 1.2.0, ląd 1.4.0; kontrola kitów 1.0.5 (bez laboratorium morza).
+
 ## Program 0.16.0 — 2026-11-02 (jednakowe paski, przełączniki pasków)
 
 ### Nowe
