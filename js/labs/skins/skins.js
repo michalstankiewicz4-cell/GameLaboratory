@@ -36,6 +36,7 @@
   }
   // the skin: the drop-down on the bar, or keys 1 / 2 (screen effects will come from the filters lab)
   document.getElementById("skinSel").addEventListener("change", function(e){ setSkin(e.target.value); });
+  document.getElementById("toFilters").addEventListener("click", function(){ location.href = "filters.html"; });
   window.addEventListener("keydown", function(e){
     if(e.target.closest && e.target.closest("select, input, textarea")) return;
     if(e.key === "1") setSkin("term"); else if(e.key === "2") setSkin("syn");

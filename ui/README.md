@@ -32,6 +32,7 @@ gold headings and controls). Font: Space Grotesk; numbers: IBM Plex Mono. Colour
 | `windows.css` + `windows.js` | floating windows with a lab's options (`data-window`), opened and closed from OPTIONS → Windows; dragged by the title, kept per page; windows without a remembered place stack on their side, and a full column continues in the next one |
 | `labwin.css` + `labwin.js` | the standard windows (`data-std`): **Description** (left, first), **Camera**, **Light and weather**, **Performance** (right, in this order) — the same titles (EN/PL), sides and order on every lab |
 | `perf.js` | `LabPerf`: the Performance window's numbers — frames per second, frame time, CPU per frame, triangles and draw calls, resolution, the graph, the model (`LabPerf.model(group, ms)` or `modelRows`); also the info bar's frames per second. `begin(renderer)` / `end(renderer)` once a frame |
+| `nav.js` | back / forward: two joined buttons first on every toolbar, the browser's history; greyed out when there is nowhere to go. Loaded by the menu bar |
 | `console.css` + `console.js` | the console window: the log, newest first, date and time, the page, a filter by kind and text, Clear; a button on the right of the toolbar |
 | `loader.css` + `loader.js` | the loading card: a ring, a plain sentence, the step being done, a bar with a percentage (see below) |
 | `envswitch.css` + `envswitch.js` | the environment switch: space · water · land, in the toolbar; a greyed-out position has no page |

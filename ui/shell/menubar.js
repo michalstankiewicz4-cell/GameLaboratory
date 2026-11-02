@@ -74,6 +74,8 @@ const me = all.find((x) => x.file === PAGE) || null;
 // the console window and its button on the bar (ui/shell/console.js, its sheet ui/shell/console.css), on every page
 {
   const cj = document.createElement("script"); cj.src = ROOT + "ui/shell/console.js"; document.head.appendChild(cj);
+  // back / forward at the start of the toolbar (ui/shell/nav.js), on every page
+  const nj = document.createElement("script"); nj.src = ROOT + "ui/shell/nav.js"; document.head.appendChild(nj);
 }
 if (!START) document.body.classList.add("lmLab");
 // the lab's two bars (ui/shell/bars.css), shown or hidden for every page (OPTIONS → Bars); both on by default
@@ -175,6 +177,7 @@ function help() {
   return [
     link(t("Documentation", "Dokumentacja"), DOCS, { blank: true }),
     link(t("What's new", "Co nowego"), REPO + "CHANGELOG.md", { blank: true }),
+    link(t("Repository (GitHub)", "Repozytorium (GitHub)"), "https://github.com/michalstankiewicz4-cell/GameLaboratory", { blank: true }),
     el("div", "lmSep"),
     action(t("About the labs", "O laboratoriach"), () => dialog("GameLaboratory", [[t("What", "Co to"), t("an engine for AI in the browser: laboratories of models and worlds — space, land and water", "silnik dla AI w przeglądarce: laboratoria modeli i światów — kosmos, ląd i woda")],
       [t("Program", "Program"), "v" + APP_VERSION], ...(me && V.labs[me.file] ? [[isTool ? t("This tool", "To narzędzie") : t("This lab", "To laboratorium"), "v" + V.labs[me.file]]] : []), [t("Code", "Kod"), "MIT, github.com/michalstankiewicz4-cell/GameLaboratory"]],

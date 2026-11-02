@@ -38,6 +38,12 @@ body > .bar select option{background:var(--card);color:var(--text)}
 body > .bar .seg{display:inline-flex}
 body > .bar .seg button{border-radius:0}
 body > .bar .seg button + button{margin-left:-1px}
+/* back / forward (ui/shell/nav.js), first on every toolbar */
+body > .bar .navSeg{display:inline-flex}
+body > .bar .navSeg button{padding:0 9px;font-size:15px;line-height:26px;border-radius:0}
+body > .bar .navSeg button + button{margin-left:-1px}
+body > .bar .navSeg button:first-child{border-radius:6px 0 0 6px}
+body > .bar .navSeg button:last-child{border-radius:0 6px 6px 0}
 body > .bar .seg button:first-child{border-radius:6px 0 0 6px}
 body > .bar .seg button:last-child{border-radius:0 6px 6px 0}
 body > .bar .seg button.on{position:relative;z-index:1}

@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.20.8 — 2026-11-02 (cofnij / ponów, repozytorium w Pomocy)
+
+### Dodane
+- **Cofnij / ponów** na każdej stronie: dwa połączone przyciski ← → jako pierwsze na pasku narzędzi (historia przeglądarki,
+  `ui/shell/nav.js`, ładowany przez pasek menu jak konsola); wyszarzone, gdy nie ma dokąd iść.
+- **Pomoc → Repozytorium (GitHub)**: link do repozytorium GameLaboratory.
+- Laboratorium skórek 1.0.6: przycisk **Filters lab** na pasku narzędzi (laboratorium filtrów).
+
 ## Laboratorium filtrów 0.4.0 — 2026-11-02 (profile)
 
 ### Dodane
