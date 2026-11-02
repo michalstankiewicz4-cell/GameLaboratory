@@ -42,7 +42,7 @@ export function createMenu(root, { actions, settings, progress }) {
     best,
     h('p', { class: 'labs' }, tx('menu.labs', 'span'), ' ',
       // the labs moved to GameLaboratory (its own repository and site)
-      h('a', { href: 'https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/warship.html' }, tx('menu.shipLab', 'span')), ' · ',
+      h('a', { href: 'https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/vehicles-water.html' }, tx('menu.shipLab', 'span')), ' · ',
       h('a', { href: 'https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/water.html' }, tx('menu.waterLab', 'span')), ' · ',
       h('a', { href: 'https://michalstankiewicz4-cell.github.io/GameLaboratory/' }, tx('menu.allLabs', 'span'))),
     h('p', { class: 'foot' }, 'v' + VERSION, ' · ', tx('menu.credit')));
