@@ -23,12 +23,13 @@ Contents:
 
 - Open `skins.html` straight from disk (or `/skins.html` on the local
   server / GitHub Pages). No game modules, no server calls.
-- **1** / **2** (or the buttons in the viewport's top-right corner)
-  switch TERMINAL / SYNTAX; **C** (or the CRT button, TERMINAL only)
-  toggles the CRT effects. The choice is remembered per browser
-  (`localStorage["gameLab.skins"]`).
+- The drop-down on the bar (or **1** / **2**) switches TERMINAL / SYNTAX.
+  The choice is remembered per browser (`localStorage["gameLab.skins"]`).
+- No screen effects of its own: the CRT layer (scanlines, roll band,
+  flicker) was removed in 2026-11; screen effects are to come from the
+  filters lab.
 - Everything is sample data (points tick up so it feels alive); nothing
-  is clickable beyond the switches and hover states.
+  is clickable beyond the drop-down and hover states.
 - The sample text is English (the repo's rule; until the 2026-10 review it
   was Polish, as in the devlog screenshots).
 
@@ -61,7 +62,6 @@ Monochrome green phosphor, "programming" as an old terminal.
 |---|---|
 | Monospace everywhere (IBM Plex Mono, already self-hosted) | `#stage` font |
 | Phosphor glow | `text-shadow` on `.glow` / values; canvas `shadowBlur` (`glowStroke`) |
-| CRT layer | `#crt`: scanlines (`repeating-linear-gradient`, multiply), a slow roll band + vignette (`#crt::after`, `@keyframes roll`), flicker on the whole stage (`@keyframes flicker`) |
 | Box-drawing panel headers | `.panel .hd::before/::after` → `┤ FLOTA ├`, the header sitting on the frame |
 | Segmented LED bars | `.seg` — two `repeating-linear-gradient`s (dim empty segments, lit filled ones with a drop-shadow) |
 | Inverse-video selection | nav/buttons: green background, black text on hover/active; `> ` cursor on the active menu item |
@@ -97,7 +97,7 @@ Not done yet — a separate, bigger step:
    `--uiFrameGlow`, `--uiHdText`, `--uiText`, `--uiText2`, fonts). The
    current look becomes the default set of values — no visible change.
 2. **A skin = a set of variable values + a small stylesheet of extras**
-   (the CRT layer, gradient rims), switched by a `data-skin` attribute
+   (gradient rims; screen effects from the filters lab), switched by a `data-skin` attribute
    on `<html>`, like this lab.
 3. **Canvas/3D colours** (minimap, trajectory lines, selection frames,
    orbit lines) read from the same variables at runtime

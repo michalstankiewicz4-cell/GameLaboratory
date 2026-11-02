@@ -10,7 +10,7 @@
      prototype-then-integrate workflow). Same layout as the game's HUD
      (1536x1024 design surface, scaled to the window), static sample data,
      a live 2D sketch of the solar system in the viewport. Opens from disk.
-       TERMINAL — monochrome green phosphor CRT: scanlines, glow, flicker,
+       TERMINAL — monochrome green phosphor: glow,
                   box-drawing frames, block-character bars, radar sweep
        SYNTAX   — a colourful code-editor theme: syntax-highlight palette,
                   editor tabs and gutters, function-call buttons, a status
@@ -19,19 +19,21 @@
      Not wired to the game yet: the game's CSS still has its colours written
      out (~150 of them) — adopting a skin means turning those into
      variables first (docs/labs/skins.md).
-     Keys: 1 / 2 switch skins, C toggles the CRT effects (TERMINAL). -->
+     The skin: the drop-down on the bar (or keys 1 / 2). Screen effects will come from the filters lab. -->
 <link rel="stylesheet" href="../ui/ui.css">
 <link rel="stylesheet" href="../ui/pages/skins.css">
 </head>
-<body data-skin="term" data-crt="on">
+<body data-skin="term">
 <script src="../ui/data/versions.js"></script>
 <script src="../ui/data/catalog.js"></script>
 <script src="../ui/shell/log.js"></script>
 <script src="../ui/shell/menubar.js"></script>
-<div class="bar"><span class="sp"></span></div>
+<div class="bar">
+  <select id="skinSel" aria-label="Skin"><option value="term">TERMINAL</option><option value="syn">SYNTAX</option></select>
+  <span class="sp"></span>
+</div>
 <div class="foot"><span id="fps" data-auto></span><span class="sp"></span><span>GameLaboratory</span></div>
 <script src="../ui/shell/bars.js"></script>
-<div id="crt"></div>
 
 <div id="stage">
   <!-- logo: same shape, the skin only recolours it -->
@@ -137,11 +139,6 @@
 
   <!-- SYNTAX: an editor status bar under the viewport -->
   <div id="statusBar"></div>
-  <div id="skinSwitch">
-    <button data-s="term">1 · TERMINAL</button>
-    <button data-s="syn">2 · SYNTAX</button>
-    <button id="crtBtn" title="CRT effects (key C)">CRT</button>
-  </div>
 </div>
 
 <script src="../js/labs/skins/skins.js"></script>

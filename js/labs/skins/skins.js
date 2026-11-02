@@ -30,24 +30,15 @@
     document.querySelector(".lgA0").setAttribute("stop-color", k.logoA[0]); document.querySelector(".lgA1").setAttribute("stop-color", k.logoA[1]);
     document.querySelector(".lgB0").setAttribute("stop-color", k.logoB[0]); document.querySelector(".lgB1").setAttribute("stop-color", k.logoB[1]);
     document.getElementById("logoG").setAttribute("filter", k.filter);
-    document.querySelectorAll("#skinSwitch button[data-s]").forEach(function(b){ paintSwitch(b, b.dataset.s === skin); });
-    paintSwitch(document.getElementById("crtBtn"), document.body.dataset.crt === "on");
-    document.getElementById("crtBtn").style.display = skin === "term" ? "" : "none";
+    document.getElementById("skinSel").value = skin;
     renderText();
     try{ localStorage.setItem("gameLab.skins", skin); }catch(e){}
   }
-  function paintSwitch(b, on){
-    const term = skin === "term";
-    b.style.fontFamily = term ? "'IBM Plex Mono',monospace" : "'Oswald',sans-serif";
-    b.style.background = on ? (term ? "#39ff7a" : "linear-gradient(90deg,#ff6ac1,#ffb45c)") : (term ? "#010502" : "#1d2033");
-    b.style.color = on ? "#0b0c10" : (term ? "#39ff7a" : "#e6e8f2");
-    b.style.border = "1px solid " + (term ? "#1f9b48" : "#2a2e48");
-  }
-  document.querySelectorAll("#skinSwitch button[data-s]").forEach(function(b){ b.addEventListener("click", function(){ setSkin(b.dataset.s); }); });
-  document.getElementById("crtBtn").addEventListener("click", toggleCrt);
-  function toggleCrt(){ document.body.dataset.crt = document.body.dataset.crt === "on" ? "off" : "on"; setSkin(skin); }
+  // the skin: the drop-down on the bar, or keys 1 / 2 (screen effects will come from the filters lab)
+  document.getElementById("skinSel").addEventListener("change", function(e){ setSkin(e.target.value); });
   window.addEventListener("keydown", function(e){
-    if(e.key === "1") setSkin("term"); else if(e.key === "2") setSkin("syn"); else if(e.key.toLowerCase() === "c") toggleCrt();
+    if(e.target.closest && e.target.closest("select, input, textarea")) return;
+    if(e.key === "1") setSkin("term"); else if(e.key === "2") setSkin("syn");
   });
 
   // ---------- sample data ----------

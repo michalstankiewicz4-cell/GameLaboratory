@@ -3,6 +3,15 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Laboratorium skórek 1.0.5 — 2026-11-02 (wybór skórki na pasku, bez CRT)
+
+### Zmienione
+- Skórkę (TERMINAL / SYNTAX) wybiera się z listy na pasku narzędzi (dalej też klawisze 1 / 2); przełącznik w rogu podglądu usunięty.
+- Efekt CRT (linie, przesuwający się pas, migotanie, przycisk CRT, klawisz C) usunięty — efekty ekranu mają przyjść z laboratorium filtrów.
+
+### Poprawione
+- Paski makiety (`.bar` w `ui/pages/skins.css`) zawężone do `#stage`: w skórce SYNTAX pasek narzędzi strony robił się fioletowy.
+
 ## Program 0.20.7 — 2026-11-02 (grupy laboratoriów)
 
 ### Dodane

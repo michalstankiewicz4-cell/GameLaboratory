@@ -11,7 +11,7 @@
     "labs/bodies.html": "1.3.1",
     "labs/systems.html": "1.3.1",
     "labs/scale.html": "1.1.9",
-    "labs/skins.html": "1.0.4",
+    "labs/skins.html": "1.0.5",
     "labs/surface.html": "1.3.0",
     "labs/buildings.html": "1.3.0",
     "labs/vehicles-land.html": "1.6.1",
