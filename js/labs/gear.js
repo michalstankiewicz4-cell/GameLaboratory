@@ -37,7 +37,7 @@ let cave = null;
 function buildPlace() {
   if (cave) { scene.remove(cave.group); cave.dispose(); }
   cave = buildCave({ seed: S.seed, rock: S.rock, length: 60, chambers: 3, branches: 2, cell: 0.5 });
-  scene.add(cave.group);
+  scene.add(cave.group); window.LabPerf.model(cave.group, cave.stats.ms);   // the place: the Performance window's Model
   free.place(cave.spawn, 0, 0); free.lookAt(cave.nodes[Math.min(2, cave.nodes.length - 1)]);
 }
 
@@ -49,7 +49,7 @@ function equip(id) {
   S.item = id; item = makeItem(id, tuneOf(id)); item.drain = S.drain; item.timeScale = 60; camera.add(item.group);
   [...$('items').children].forEach((b) => b.classList.toggle('on', b.dataset.id === id));
   const d = ITEMS[id], t = item.state;
-  $('itemNote').textContent = d.note;
+  $('itemName').textContent = d.name; $('itemNote').textContent = d.note;
   $('angleRow').hidden = d.kind !== 'spot'; $('kelvinRow').hidden = d.color != null;
   for (const k of ['power', 'angle', 'kelvin', 'charge']) { $(k).value = t[k]; $(k + 'V').textContent = FMT[k](t[k]); }
   applyShow(); save();
@@ -98,17 +98,16 @@ let last = performance.now(), frames = 0, fpsT = last;
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   free.update(dt); item.update(dt);
-  renderer.info.autoReset = false; renderer.info.reset();
+  window.LabPerf.begin(renderer);
   look.render(scene, camera, vision.input);
   vision.render({ mode: S.mode, grain: S.grain, phosphor: S.phosphor, reticle: S.reticle });
+  window.LabPerf.end(renderer);   // the Performance window and the bottom bar (ui/labwin.js)
   frames++;
   if (now - fpsT > 500) {
-    $('fps').textContent = `${Math.round(frames * 1000 / (now - fpsT))} fps`; frames = 0; fpsT = now;
+    frames = 0; fpsT = now;
     const t = item.state;
     if (S.drain) { $('charge').value = t.charge; $('chargeV').textContent = FMT.charge(t.charge); }
     $('itemStats').replaceChildren(...[['Light', ITEMS[S.item].kind === 'spot' ? 'a beam' : 'all around'], ['Range', `${ITEMS[S.item].range} m`], ['Lasts', `${Math.round(ITEMS[S.item].drainMin / 60 * 10) / 10} h`]]
-      .flatMap(([a, b]) => [el('span', { textContent: a }), el('b', { textContent: String(b) })]));
-    $('stats').replaceChildren(...[['Draw calls', renderer.info.render.calls], ['Triangles drawn', renderer.info.render.triangles.toLocaleString('en')]]
       .flatMap(([a, b]) => [el('span', { textContent: a }), el('b', { textContent: String(b) })]));
   }
   requestAnimationFrame(frame);

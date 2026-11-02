@@ -28,9 +28,13 @@
   <span class="dimtxt" id="status">transforming…</span>
   <span class="sp"></span>
 </div>
-<aside class="panel left" id="leftPanel" data-window="left" data-side="left">
+<aside class="panel" data-std="info">
+  <h2 class="stdName">Transformer</h2>
+  <p class="stdText">The lab's ORP Błyskawica turned into a game-ready ship: levels of detail, hitboxes with damage, and a fleet test.</p>
   <h3>Levels of detail</h3>
   <table class="specs" id="levels"></table>
+</aside>
+<aside class="panel" id="leftPanel" data-window="lod" data-title="Levels and fleet" data-title-pl="Poziomy i flota">
   <div class="btns" id="show"></div>
   <div class="row"><span>LOD1 from</span><input type="range" id="d1" min="40" max="600" step="10" value="170"><output id="d1V"></output></div>
   <div class="row"><span>LOD2 from</span><input type="range" id="d2" min="150" max="2000" step="25" value="650"><output id="d2V"></output></div>
@@ -38,12 +42,9 @@
   <h3>Fleet test</h3>
   <div class="row"><span>Ships</span><input type="range" id="fleet" min="1" max="24" step="1" value="1"><output id="fleetV"></output></div>
   <label class="chk"><input type="checkbox" id="useLod" checked> Use the transformed ships (off = lab models)</label>
-  <div class="stats" id="perf"></div>
-  <p class="note">The fleet is spread from 100 m to 2 km so every level is in use. Compare fps and draw calls with the box on and off.</p>
+  <p class="note">The fleet is spread from 100 m to 2 km so every level is in use. Compare fps and draw calls (Performance) with the box on and off.</p>
 </aside>
-<aside class="panel right" id="rightPanel" data-window="right" data-side="right">
-  <h3>Camera</h3>
-  <div class="btns" id="cams"></div>
+<aside class="panel" id="rightPanel" data-window="hits" data-side="right" data-title="Hitboxes and armament" data-title-pl="Strefy trafień i uzbrojenie">
   <h3>Hitboxes</h3>
   <label class="chk"><input type="checkbox" id="boxes" checked> Show hitboxes</label>
   <div id="kinds"></div>
@@ -55,12 +56,19 @@
   <div class="row"><span>Elevation</span><input type="range" id="elev" min="0" max="30" value="0"><output id="elevV"></output></div>
   <div class="stats" id="hbStats"></div>
 </aside>
+<aside class="panel" data-std="camera">
+  <div class="btns" id="cams"></div>
+</aside>
+<aside class="panel" data-std="perf">
+  <div class="stats" id="perf"></div>
+</aside>
 <div class="foot">
   <span class="scale"><i id="scaleBar"></i><span id="scaleTxt"></span></span>
   <span id="fps"></span>
   <span class="sp"></span>
   <span>GameLaboratory</span>
 </div>
+<script src="../ui/labwin.js"></script>
 <script src="../ui/windows.js"></script>
 <script type="module" src="../js/labs/transform.js"></script>
 </body>

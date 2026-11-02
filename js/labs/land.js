@@ -129,7 +129,7 @@ function genRest() {
   $('edgeNote').textContent = T.wrap ? 'Wrap-around: sail out of one edge and you come in at the opposite one — land, sea and waves continue without a seam.' : ({ buoys: 'Bounded by a line of buoys 60 m inside the edge; the ship stops at it.', mountains: 'Bounded by a mountain range along the edge.', wall: 'Bounded by an invisible wall 60 m inside the edge.' })[T.barrier];
   $('barrier').disabled = T.wrap;
   const lay = S.water.layout, what = lay === 'single' ? `${SHAPES[T.shape].label}, ${WATER_BODIES[S.water.body].label.replace(/ \(.*/, '').toLowerCase()}` : lay === 'mixed' ? `Mixed (${SHAPES[T.shape].label})` : LAYOUTS[lay].label.replace(/:.*/, '');
-  $('status').textContent = `${what} · ${(T.landShare * 100).toFixed(0)} % land · ${T.size / 1000} km ${T.wrap ? 'wrap-around' : 'bounded'} map · seed ${T.seed}`;
+  $('status').textContent = $('landSub').textContent = `${what} · ${(T.landShare * 100).toFixed(0)} % land · ${T.size / 1000} km ${T.wrap ? 'wrap-around' : 'bounded'} map · seed ${T.seed}`;
   window.__landGenMs = performance.now() - t0;
 }
 
@@ -253,7 +253,7 @@ const keys = new Set();
 addEventListener('keydown', (e) => {
   if (e.target.closest && e.target.closest('input,select')) return;
   keys.add(e.code);
-  if (e.code === 'KeyH') [$('leftPanel'), $('rightPanel')].forEach((p) => p.classList.toggle('hidden-panel'));
+  if (e.code === 'KeyH') document.querySelectorAll('[data-window]').forEach((p) => p.classList.toggle('hidden-panel'));
   if (camMode !== 'Free flight' && ship.on && S.sail) {
     if (e.code === 'KeyW') ship.thr = Math.min(4, ship.thr + 1);
     if (e.code === 'KeyS') ship.thr = Math.max(-1, ship.thr - 1);
@@ -355,12 +355,13 @@ function frame(now) {
   sun.target.position.copy(tgt); sun.position.copy(tgt).addScaledVector(sd, 1200);
   envT += dt; if (envDirty && envT > 0.4) { if (envRT) envRT.dispose(); envRT = skyEnvironment(renderer, skyU); scene.environment = envRT.texture; envDirty = false; envT = 0; }
   look.sun(camera, skyU.uSkySun.value);
-  renderer.info.autoReset = false; renderer.info.reset();
+  window.LabPerf.begin(renderer);
   look.render(scene, camera);
+  window.LabPerf.end(renderer);   // the Performance window and the bottom bar (ui/labwin.js)
   frames++;
   if (now - fpsT > 500) {
-    $('fps').textContent = `${Math.round(frames * 1000 / (now - fpsT))} fps`; frames = 0; fpsT = now;
-    $('stats').replaceChildren(...[['Draw calls', renderer.info.render.calls], ['Triangles', renderer.info.render.triangles.toLocaleString('en')], ['Terrain grid', terrain.triangles.toLocaleString('en')], ['Camera', `${Math.round(camera.position.y)} m up`]]
+    frames = 0; fpsT = now;
+    $('stats').replaceChildren(...[['Terrain grid', terrain.triangles.toLocaleString('en')], ['Camera', `${Math.round(camera.position.y)} m up`]]
       .flatMap(([a, b]) => [el('span', { textContent: a }), el('b', { textContent: String(b) })]));
     drawChart();
   }

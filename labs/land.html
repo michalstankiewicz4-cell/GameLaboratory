@@ -28,7 +28,12 @@
   <span class="dimtxt" id="status">generating…</span>
   <span class="sp"></span>
 </div>
-<aside class="panel left" id="leftPanel" data-window="left" data-side="left">
+<aside class="panel" data-std="info">
+  <h2 class="stdName">Land</h2>
+  <div class="stdSub" id="landSub"></div>
+  <div class="stats" id="genStats"></div>
+</aside>
+<aside class="panel" id="leftPanel" data-window="map" data-title="Map" data-title-pl="Mapa">
   <h3>Map</h3>
   <div class="row"><span>Seed</span><input type="number" id="seed" min="0" max="999999" step="1"><output></output></div>
   <div class="btns"><button type="button" id="random">New random map</button><button type="button" id="gen">Generate</button></div>
@@ -57,33 +62,36 @@
   <div class="row"><span>Topology</span><select id="wrap"><option value="1">Wrap-around (torus)</option><option value="0">Bounded</option></select><output></output></div>
   <div class="row"><span>Barrier</span><select id="barrier"><option value="buoys">Buoy line (minefield)</option><option value="mountains">Mountain range</option><option value="wall">Invisible wall</option></select><output></output></div>
   <p class="note" id="edgeNote"></p>
-  <div class="stats" id="genStats"></div>
   <div class="btns"><button type="button" id="copy">Copy settings (JSON)</button></div>
   <p class="note" id="copied">Same seed and settings always give the same map.</p>
 </aside>
-<aside class="panel right" id="rightPanel" data-window="right" data-side="right">
-  <h3>Chart</h3>
+<aside class="panel" data-window="chart" data-side="right" data-title="Chart and ship" data-title-pl="Mapa morska i okręt">
   <canvas id="mini" class="minimap" width="256" height="256"></canvas>
   <label class="chk"><input type="checkbox" id="labels" checked> Names of the waters on the chart</label>
   <p class="note">Click the chart to move the ship (or the camera) there. Water is tinted by body: ocean blue, fjord dark, lake green, river brown, harbour grey, ice white.</p>
   <h3>Ship</h3>
   <label class="chk"><input type="checkbox" id="sail" checked> Sail ORP Błyskawica (W/S speed, A/D rudder)</label>
   <div class="status" id="shipStatus"></div>
-  <h3>Camera</h3>
+</aside>
+<aside class="panel" data-std="camera">
   <div class="btns" id="cams"></div>
-  <h3>Light and weather</h3>
+  <p class="note">Drag to orbit, wheel to zoom. Free flight: W/A/S/D, Q/E down/up, Shift faster. H hides the windows.</p>
+</aside>
+<aside class="panel" data-std="light">
   <div class="row"><span>Weather</span><select id="weather"></select><output></output></div>
   <div class="row"><span>Sun height</span><input type="range" id="sunEl" min="-10" max="70" step="0.5"><output id="sunElV"></output></div>
   <div class="row"><span>Sun bearing</span><input type="range" id="sunAz" min="0" max="360"><output id="sunAzV"></output></div>
-  <h3>Performance</h3>
+</aside>
+<aside class="panel" id="rightPanel" data-std="perf">
+  <h3>Land</h3>
   <div class="stats" id="stats"></div>
-  <p class="note">Drag to orbit, wheel to zoom. Free flight: W/A/S/D, Q/E down/up, Shift faster. H hides the panels.</p>
 </aside>
 <div class="foot">
   <span id="fps"></span>
   <span class="sp"></span>
   <span>GameLaboratory</span>
 </div>
+<script src="../ui/labwin.js"></script>
 <script src="../ui/windows.js"></script>
 <script type="module" src="../js/labs/land.js"></script>
 </body>

@@ -183,6 +183,7 @@ function setMode(m) {
   S.mode = m; save();
   [...$('modes').children].forEach((b) => b.classList.toggle('on', b.dataset.m === m));
   for (const [id, k] of [['p3d', '3d'], ['pgen', 'gen'], ['pdraw', 'draw']]) $(id).hidden = m !== k;
+  for (const id of ['p3dCam', 'p3dLight']) $(id).classList.toggle('hidden-panel', m !== '3d');   // the 3D model's Camera and Light windows
   $('pipe').hidden = m === 'draw';
   view.classList.toggle('drawing', m === 'draw');
   if (m === 'draw') { playing = false; $('play').textContent = 'Play'; if (doc.frames[0].w !== S.w || doc.frames[0].h !== S.h) doc.frames = doc.frames.map((f) => fit(f, S.w, S.h)); frames = doc.frames; shown = 0; afterFrames(); }

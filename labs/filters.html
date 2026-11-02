@@ -24,36 +24,39 @@
   <select id="light" aria-label="Light"></select>
   <span class="sp"></span>
 </div>
-<aside class="panel left" data-window="left" data-side="left">
-  <h3>Camera look</h3>
+<aside class="panel" data-std="info">
+  <h2 class="stdName">Filters</h2>
+  <p class="stdText">The camera's look on its own: presets, tone mapping, exposure and every effect, on a scene and a light chosen in the bar — and what each effect costs.</p>
+  <div class="btns"><button type="button" id="copy">Copy settings (JSON)</button></div>
+  <p class="note" id="copied"></p>
+</aside>
+<aside class="panel" data-std="camera">
+  <div class="row"><span>Field of view</span><input type="range" id="fov" min="20" max="95" value="40"><output id="fovV"></output></div>
+  <h3>Look</h3>
   <div class="btns" id="presets"></div>
   <label class="chk"><input type="checkbox" id="splitOn"> Compare: clean on the left</label>
   <div class="row"><span>Divider</span><input type="range" id="splitX" min="0.1" max="0.9" step="0.01" value="0.5"><output id="splitXV"></output></div>
   <div class="row"><span>Tone mapping</span><select id="tone"><option value="0">ACES</option><option value="1">AgX</option><option value="2">Hable</option></select><output></output></div>
   <label class="chk"><input type="checkbox" id="autoExposure"> Automatic exposure</label>
   <div id="sliders"></div>
-  <div class="btns"><button type="button" id="copy">Copy settings (JSON)</button></div>
-  <p class="note" id="copied"></p>
+  <p class="note">Drag to orbit, right-drag to pan, wheel to zoom.</p>
 </aside>
-<aside class="panel right" data-window="right" data-side="right">
-  <h3>Camera</h3>
-  <div class="row"><span>Field of view</span><input type="range" id="fov" min="20" max="95" value="40"><output id="fovV"></output></div>
-  <h3>Performance</h3>
+<aside class="panel" data-std="perf">
+  <h3>Quality</h3>
   <div class="row"><span>Render scale</span><input type="range" id="scale" min="0.4" max="1" step="0.05" value="1"><output id="scaleV"></output></div>
   <label class="chk"><input type="checkbox" id="autoRes"> Automatic resolution (keeps ~60 fps)</label>
   <label class="chk"><input type="checkbox" id="aa"> Anti-aliasing (MSAA)</label>
   <label class="chk"><input type="checkbox" id="shadows"> Shadows</label>
-  <div class="stats" id="stats"></div>
   <h3>Cost of each effect</h3>
   <div class="btns"><button type="button" id="measure">Measure</button></div>
   <div id="costs"></div>
-  <p class="note">Drag to orbit, right-drag to pan, wheel to zoom.</p>
 </aside>
 <div class="foot">
   <span id="fps"></span>
   <span class="sp"></span>
   <span>GameLaboratory</span>
 </div>
+<script src="../ui/labwin.js"></script>
 <script src="../ui/windows.js"></script>
 <script type="module" src="../js/labs/filters/page.js"></script>
 </body>

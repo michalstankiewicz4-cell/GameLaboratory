@@ -52,6 +52,7 @@ function updateEnvironment() {
 const S = SHIPS.blyskawica;
 const shipRoot = new THREE.Group(); scene.add(shipRoot);
 const model = buildShip('blyskawica', { detail: 1 });
+window.LabPerf.model(model.group);   // the ship: the Performance window's Model (ui/labwin.js)
 shipRoot.add(model.group);
 // searchlights are off by day (the lab's HDR lens would bloom over the sea)
 model.group.traverse((o) => { if (o.isMesh && o.material.isMeshBasicMaterial && o.material.color.r > 1) o.material = new THREE.MeshStandardMaterial({ color: 0xbfc4c0, roughness: 0.1, metalness: 0.6 }); });
@@ -370,7 +371,7 @@ function fillUI() {
 }
 function seaText() {
   const s = (id) => `${id}: ${(WATER_BODIES[V[id].body] || WATER_BODIES.ocean).label}, ${SEAS[V[id].sea] ? SEAS[V[id].sea].label.replace(/ \(.*/, '').replace(/^.*: /, '') : 'custom'} ${V[id].Hs.toFixed(1)} m, ${V[id].kn} kn${V[id].current ? `, current ${V[id].current.toFixed(1)} m/s` : ''}`;
-  $('seaTxt').textContent = $('splitOn').checked ? `${s('A')}  |  ${s('B')}` : `${s(edit)} · ${LOOKS[V[edit].look] ? LOOKS[V[edit].look].label : 'custom look'}`;
+  $('seaTxt').textContent = $('seaSub').textContent = $('splitOn').checked ? `${s('A')}  |  ${s('B')}` : `${s(edit)} · ${LOOKS[V[edit].look] ? LOOKS[V[edit].look].label : 'custom look'}`;
 }
 function changed(id = edit) { applyVariant(id); save(); seaText(); }
 for (const k of Object.keys(FMT)) $(k).addEventListener('input', () => {
@@ -405,7 +406,7 @@ $('pixN').onchange = () => { applyVariant('A'); applyVariant('B'); };
 $('shells').onclick = () => { for (const v of Object.values(vars)) shellSalvo(v); };
 $('torpedo').onclick = () => { for (const v of Object.values(vars)) torpedoRun(v); };
 $('splitOn').onchange = () => { $('split').hidden = !$('splitOn').checked; seaText(); };
-addEventListener('keydown', (e) => { if (e.code === 'KeyH' && !e.target.closest('input,select')) [$('leftPanel'), $('rightPanel')].forEach((p) => p.classList.toggle('hidden-panel')); });
+addEventListener('keydown', (e) => { if (e.code === 'KeyH' && !e.target.closest('input,select')) document.querySelectorAll('[data-window]').forEach((p) => p.classList.toggle('hidden-panel')); });
 
 function setSun() {
   const el_ = THREE.MathUtils.degToRad(+$('sun').value), az = THREE.MathUtils.degToRad(+$('sunAz').value);
@@ -492,6 +493,7 @@ function frame(now) {
   const dtR = Math.min(0.05, (now - clock.last) / 1000); clock.last = now;
   const dt = dtR * +$('tscale').value; clock.t += dt;
   fpsLog.push(dtR);
+  window.LabPerf.begin(renderer);   // every pass of the frame counted together (ui/labwin.js)
   const split = $('splitOn').checked, cur = split ? vars.A : vars[edit];
   for (const v of Object.values(vars)) if (split || v === cur) prepare(v, dt);
   poseShip(cur); placeCamera(dtR, cur);
@@ -509,15 +511,14 @@ function frame(now) {
   renderer.autoClear = true; post.rt.scissorTest = false; renderer.setScissorTest(false);
   renderer.setRenderTarget(null);
   renderer.render(post.postScene, post.postCam);
+  window.LabPerf.end(renderer);   // the Performance window and the bottom bar
   frames++;
   if (now - fpsT > 500) {
-    $('fps').textContent = `${Math.round(frames * 1000 / (now - fpsT))} fps`; frames = 0; fpsT = now;
-    const m = cur.m, info = renderer.info.render;
+    frames = 0; fpsT = now;
+    const m = cur.m;
     $('motionTxt').textContent = `heave ${m.heave.toFixed(2)} m · pitch ${(m.pitch * 57.3).toFixed(1)}° · roll ${(m.roll * 57.3).toFixed(1)}°`;
     $('stats').replaceChildren(el('span', { textContent: 'Water triangles' }), el('b', { textContent: (geo.current.index.count / 3).toLocaleString('en') }),
-      el('span', { textContent: 'Waves' }), el('b', { textContent: cur.waves.length }),
-      el('span', { textContent: 'Draw calls' }), el('b', { textContent: sceneCalls }),
-      el('span', { textContent: 'Frame' }), el('b', { textContent: (fpsLog.slice(-30).reduce((s, x) => s + x, 0) / Math.min(30, fpsLog.length) * 1000).toFixed(1) + ' ms' }));
+      el('span', { textContent: 'Waves' }), el('b', { textContent: cur.waves.length }));
   }
   if (fpsLog.length > 2000) fpsLog.splice(0, 1000);
   requestAnimationFrame(frame);

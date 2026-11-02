@@ -21,7 +21,14 @@
   <span class="dimtxt" id="status"></span>
   <span class="sp"></span>
 </div>
-<aside class="panel left" data-window="cave" data-title="Cave" data-title-pl="Jaskinia" data-side="left">
+<aside class="panel" data-std="info">
+  <h2 class="stdName">Cave</h2>
+  <div class="stdSub" id="caveSub"></div>
+  <div class="stats" id="caveStats"></div>
+  <p class="stdText" id="rockNote"></p>
+  <p class="note">Lakes are plain water or lava here; how water and lava look (their style) is chosen in the water lab.</p>
+</aside>
+<aside class="panel" data-window="cave" data-title="Cave" data-title-pl="Jaskinia">
   <h3>Shape</h3>
   <div class="row"><span>Seed</span><input type="number" id="seed" min="1" max="99999" step="1"><output></output></div>
   <div class="btns"><button type="button" id="another">Another cave</button></div>
@@ -37,27 +44,25 @@
   <div class="row"><span>Rubble</span><input type="range" id="rubble" min="0" max="2" step="0.1"><output id="rubbleV"></output></div>
   <div class="row"><span>Lakes</span><input type="range" id="lakes" min="0" max="1" step="0.05"><output id="lakesV"></output></div>
   <div class="row"><span>Of them lava</span><input type="range" id="lava" min="0" max="1" step="0.05"><output id="lavaV"></output></div>
-  <div class="stats" id="caveStats"></div>
-  <p class="note">Lakes are plain water or lava here; how water and lava look (their style) is chosen in the water lab.</p>
 </aside>
-<aside class="panel right" data-window="rock" data-title="Rock and light" data-title-pl="Skała i światło" data-side="right">
-  <h3>Rock</h3>
+<aside class="panel" data-window="rock" data-side="right" data-title="Rock" data-title-pl="Skała">
   <div class="row"><span>Rock</span><select id="rock"></select><output></output></div>
-  <p class="note" id="rockNote"></p>
   <div class="row"><span>Wet</span><input type="range" id="wet" min="0" max="1" step="0.05"><output id="wetV"></output></div>
   <div class="row"><span>Relief</span><input type="range" id="relief" min="0" max="2.5" step="0.1"><output id="reliefV"></output></div>
-  <h3>Light</h3>
+</aside>
+<aside class="panel" data-std="camera">
+  <div class="row"><span>Exposure</span><input type="range" id="exposure" min="0.3" max="3" step="0.05"><output id="exposureV"></output></div>
+  <p class="note">Inside: drag to look, wheel to go forward and back, right-drag to move sideways and up (or W/A/S/D, Q/E, Shift). Overview: drag to turn, wheel to zoom.</p>
+</aside>
+<aside class="panel" data-std="light">
   <label class="chk"><input type="checkbox" id="torch"> Flashlight (in the hand)</label>
   <div class="row"><span>Power</span><input type="range" id="torchPow" min="0" max="3" step="0.05"><output id="torchPowV"></output></div>
   <div class="row"><span>Beam</span><input type="range" id="torchAng" min="8" max="60" step="1"><output id="torchAngV"></output></div>
   <label class="chk"><input type="checkbox" id="lamp"> Lantern (warm, all around)</label>
   <div class="row"><span>Power</span><input type="range" id="lampPow" min="0" max="3" step="0.05"><output id="lampPowV"></output></div>
   <div class="row"><span>Ambient</span><input type="range" id="ambient" min="0" max="1" step="0.02"><output id="ambientV"></output></div>
-  <div class="row"><span>Exposure</span><input type="range" id="exposure" min="0.3" max="3" step="0.05"><output id="exposureV"></output></div>
-  <h3>Performance</h3>
-  <div class="stats" id="stats"></div>
-  <p class="note">Inside: drag to look, wheel to go forward and back, right-drag to move sideways and up (or W/A/S/D, Q/E, Shift). Overview: drag to turn, wheel to zoom.</p>
 </aside>
+<aside class="panel" data-std="perf"></aside>
 <div class="foot">
   <span id="fps"></span>
   <span class="sp"></span>
@@ -65,6 +70,7 @@
 </div>
 <div id="loading" class="labLoad"><div class="labLoadCard"><i class="labSpin"></i><b>Generating the cave…</b><span class="labLoadStep"></span><span class="labLoadBar"><i></i></span></div></div>
 <script src="../ui/loader.js"></script>
+<script src="../ui/labwin.js"></script>
 <script src="../ui/windows.js"></script>
 <script type="module" src="../js/labs/caves.js"></script>
 </body>

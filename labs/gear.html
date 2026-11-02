@@ -21,19 +21,26 @@
   <span class="dimtxt" id="status"></span>
   <span class="sp"></span>
 </div>
-<aside class="panel left" data-window="item" data-title="Item" data-title-pl="Przedmiot" data-side="left">
+<aside class="panel" data-std="info">
+  <h2 class="stdName" id="itemName"></h2>
+  <p class="stdText" id="itemNote"></p>
+  <div class="stats" id="itemStats"></div>
+</aside>
+<aside class="panel" data-window="item" data-title="Item" data-title-pl="Przedmiot">
   <h3>In the hand</h3>
   <div class="btns" id="items"></div>
-  <p class="note" id="itemNote"></p>
   <div class="row"><span>Power</span><input type="range" id="power" min="0" max="2" step="0.05"><output id="powerV"></output></div>
   <div class="row" id="angleRow"><span>Beam</span><input type="range" id="angle" min="6" max="80" step="1"><output id="angleV"></output></div>
   <div class="row" id="kelvinRow"><span>Colour</span><input type="range" id="kelvin" min="1500" max="9000" step="100"><output id="kelvinV"></output></div>
   <div class="row"><span>Charge</span><input type="range" id="charge" min="0" max="1" step="0.01"><output id="chargeV"></output></div>
   <label class="chk"><input type="checkbox" id="drain"> Runs down with time (fast: a minute is an hour)</label>
   <label class="chk"><input type="checkbox" id="show"> Show the item in the hand</label>
-  <div class="stats" id="itemStats"></div>
+  <h3>Place</h3>
+  <div class="row"><span>Cave</span><input type="number" id="seed" min="1" max="99999" step="1"><output></output></div>
+  <div class="btns"><button type="button" id="another">Another cave</button></div>
+  <div class="row"><span>Rock</span><select id="rock"></select><output></output></div>
 </aside>
-<aside class="panel right" data-window="vision" data-title="Vision" data-title-pl="Widzenie" data-side="right">
+<aside class="panel" data-std="camera">
   <h3>Night vision</h3>
   <div class="row"><span>Gain</span><input type="range" id="gain" min="2" max="60" step="1"><output id="gainV"></output></div>
   <div class="row"><span>Noise</span><input type="range" id="grain" min="0" max="1" step="0.05"><output id="grainV"></output></div>
@@ -42,15 +49,12 @@
   <h3>Binoculars</h3>
   <div class="row"><span>Zoom</span><input type="range" id="zoom" min="2" max="16" step="0.5"><output id="zoomV"></output></div>
   <label class="chk"><input type="checkbox" id="reticle"> Range scale</label>
-  <h3>Place</h3>
-  <div class="row"><span>Cave</span><input type="number" id="seed" min="1" max="99999" step="1"><output></output></div>
-  <div class="btns"><button type="button" id="another">Another cave</button></div>
-  <div class="row"><span>Rock</span><select id="rock"></select><output></output></div>
-  <div class="row"><span>Ambient</span><input type="range" id="ambient" min="0" max="0.5" step="0.01"><output id="ambientV"></output></div>
-  <h3>Performance</h3>
-  <div class="stats" id="stats"></div>
   <p class="note">Drag to look, wheel to go forward and back, right-drag to move sideways and up (or W/A/S/D, Q/E, Shift).</p>
 </aside>
+<aside class="panel" data-std="light">
+  <div class="row"><span>Ambient</span><input type="range" id="ambient" min="0" max="0.5" step="0.01"><output id="ambientV"></output></div>
+</aside>
+<aside class="panel" data-std="perf"></aside>
 <div class="foot">
   <span id="fps"></span>
   <span class="sp"></span>
@@ -58,6 +62,7 @@
 </div>
 <div id="loading" class="labLoad"><div class="labLoadCard"><i class="labSpin"></i><b>Generating the cave…</b><span class="labLoadStep"></span><span class="labLoadBar"><i></i></span></div></div>
 <script src="../ui/loader.js"></script>
+<script src="../ui/labwin.js"></script>
 <script src="../ui/windows.js"></script>
 <script type="module" src="../js/labs/gear.js"></script>
 </body>

@@ -79,6 +79,7 @@ function rebuild() {
   buildMs = Math.round(performance.now() - t0);
   scene.add(st.group);
   st.group.traverse((o) => { if (o.isMesh && !o.material.isMeshBasicMaterial) { o.castShadow = true; o.receiveShadow = true; } });
+  window.LabPerf.model(st.group, buildMs);   // the Performance window's Model (ui/labwin.js)
   const inf = structureInfo(S.id);
   $('sName').textContent = inf.name; $('sSub').textContent = `${inf.type} · ${inf.year}`;
   $('sNote').textContent = inf.note || '';
@@ -207,7 +208,7 @@ cv.addEventListener('pointermove', (e) => {
   else { orbit.yaw -= dx * 0.005; orbit.pitch = Math.max(-1.2, Math.min(1.45, orbit.pitch + dy * 0.004)); }
 });
 cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.min(3000, Math.max(5, orbit.dist * Math.exp(e.deltaY * 0.0011))); orbit.want = null; }, { passive: false });
-addEventListener('keydown', (e) => { if (e.code === 'KeyH' && !e.target.closest('input,select')) [$('leftPanel'), $('rightPanel')].forEach((p) => p.classList.toggle('hidden-panel')); });
+addEventListener('keydown', (e) => { if (e.code === 'KeyH' && !e.target.closest('input,select')) document.querySelectorAll('[data-window]').forEach((p) => p.classList.toggle('hidden-panel')); });
 
 /* ---------------- loop ---------------- */
 function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); look.resize(innerWidth, innerHeight); }
@@ -242,14 +243,15 @@ function frame(now) {
   sun.target.position.set(orbit.target.x, 0, orbit.target.z); sun.position.copy(sun.target.position).addScaledVector(sd, 500);
   envT += dt; if (envDirty && envT > 0.4) { if (envRT) envRT.dispose(); envRT = skyEnvironment(renderer, skyU); scene.environment = envRT.texture; envDirty = false; envT = 0; }
   look.sun(camera, skyU.uSkySun.value);
-  renderer.info.autoReset = false; renderer.info.reset();
+  window.LabPerf.begin(renderer);
   look.render(scene, camera);
+  window.LabPerf.end(renderer);   // the Performance window and the bottom bar (ui/labwin.js)
   frames++;
   if (now - fpsT > 500) {
-    $('fps').textContent = `${Math.round(frames * 1000 / (now - fpsT))} fps`; frames = 0; fpsT = now;
+    frames = 0; fpsT = now;
     const legTop = st && st.legs ? st.legs[0].group.position.y + st.legs[0].len : 0;
     if (st && st.pose) $('jackStatus').textContent = jack.phase ? `Jacking: ${jack.phase}…` : jack.air < 0 ? `Afloat, draught ${(-jack.air).toFixed(1)} m — legs raised for tow` : `Elevated: air gap ${jack.air.toFixed(1)} m, legs ${Math.max(0, legTop - jack.air - st.dim.D).toFixed(0)} m above the deck`;
-    $('stats').replaceChildren(...[['Build', buildMs + ' ms'], ['Draw calls', renderer.info.render.calls], ['Triangles', renderer.info.render.triangles.toLocaleString('en')], ['Camera', `${Math.round(camera.position.y)} m`]]
+    $('stats').replaceChildren(...[['Camera height', `${Math.round(camera.position.y)} m`]]
       .flatMap(([a, b]) => [el('span', { textContent: a }), el('b', { textContent: String(b) })]));
   }
   requestAnimationFrame(frame);

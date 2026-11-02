@@ -23,10 +23,8 @@
 <div class="bar">
   <span class="sp"></span>
 </div>
-<aside class="panel left" data-window="left" data-side="left">
-  <h3>Specimen</h3>
+<aside class="panel" data-window="specimen" data-title="Specimen" data-title-pl="Okaz">
   <div class="btns"><button type="button" id="roll">Roll a zombie</button></div>
-  <div class="row"><span>Camera angle</span><input id="ang" type="range" min="-180" max="180" step="1" value="14"><output id="angV"></output></div>
   <label class="chk"><input id="spin" type="checkbox" checked> Head sway</label>
   <label class="chk"><input id="outline" type="checkbox" checked> Outline</label>
   <div class="row"><span>Resolution</span><select id="res">
@@ -40,13 +38,17 @@
     <div class="meta"><span id="seedLabel">SPECIMEN #0</span><span id="resLabel">64×64 PX</span></div>
   </div>
 </main>
-<aside class="panel right" data-window="right" data-side="right">
-  <h3>Specimen card</h3>
+<aside class="panel" data-std="info">
+  <h2 class="stdName">Specimen card</h2>
   <dl class="sheet" id="sheet"></dl>
   <div class="swatches" id="sw"></div>
   <p class="note">The engine is about 120 lines of GLSL. The first pass computes each pixel's material, light tone and depth; the second maps them to palette colors and draws an outline wherever the material changes or the depth jumps.</p>
   <p class="note err" id="err" hidden></p>
 </aside>
+<aside class="panel" data-std="camera">
+  <div class="row"><span>Camera angle</span><input id="ang" type="range" min="-180" max="180" step="1" value="14"><output id="angV"></output></div>
+</aside>
+<script src="../ui/labwin.js"></script>
 <script src="../ui/windows.js"></script>
 <script src="../js/render/sdf-glsl.js"></script>
 <script type="module" src="../js/labs/morgue.js"></script>

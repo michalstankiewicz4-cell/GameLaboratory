@@ -59,7 +59,7 @@
 ## Okna z opcjami
 
 - Opcje laboratorium (dawne panele po lewej i prawej) są w pływających oknach otwieranych z OPCJE → Okna: `ui/windows.js` + `ui/windows.css`. Panel dostaje `data-window`, `data-title`, `data-title-pl`, `data-side`. Wszystkie laboratoria z panelami (poza skalą i skórkami) i doktor. Bez `data-title` tytułem jest pierwsza sekcja panelu (`h3` / `.secHd`). Okna bez zapisanego położenia układają się jedno pod drugim po swojej stronie, a gdy kolumna się zapełni — w następnej kolumnie obok.
-- Okna standardowe (`ui/labwin.js`, `data-std`), wszędzie te same: **Opis** (lewa, pierwsze), **Kamera**, **Światło i pogoda**, **Wydajność** (prawa, w tej kolejności). Wydajność jest generowana w jednym miejscu (`LabPerf`: klatki, czas klatki, CPU, trójkąty, wywołania rysowania, rozdzielczość, wykres, Model); statystyki modelu idą do niej. Własne okna laboratorium po lewej, za Opisem; drugie duże może stać po prawej, nad wspólnymi. Laboratorium pokazuje tylko te okna standardowe, które mają u niego sens.
+- Okna standardowe (`ui/labwin.js`, `data-std`), wszędzie te same: **Opis** (lewa, pierwsze), **Kamera**, **Światło i pogoda**, **Wydajność** (prawa, w tej kolejności). Wydajność jest generowana w jednym miejscu (`LabPerf`: klatki, czas klatki, CPU, trójkąty, wywołania rysowania, rozdzielczość, wykres, Model); statystyki modelu idą do niej. Własne okna laboratorium po lewej, za Opisem; drugie duże może stać po prawej, nad wspólnymi. Laboratorium pokazuje tylko te okna standardowe, które mają u niego sens. Wyjątki bez okien standardowych: doktor modeli, skala, skórki, SDF Walkers, laboratorium języka i obrazów.
 
 ## Wygląd (UI)
 

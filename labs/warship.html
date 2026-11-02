@@ -30,10 +30,10 @@
   <div class="envSwitch" data-current="water" data-space="ship.html" data-water="warship.html" data-land="vehicles.html"></div>
   <span class="sp"></span>
 </div>
-<aside class="panel left" id="infoPanel" data-window="left" data-side="left" data-title="Vessel" data-title-pl="Jednostka">
+<aside class="panel" id="infoPanel" data-std="info">
   <div id="robotInfo" hidden>
-  <h2 id="robotName"></h2>
-  <div class="sub" id="robotRole"></div>
+  <h2 class="stdName" id="robotName"></h2>
+  <div class="stdSub" id="robotRole"></div>
   <h3>Vessel</h3>
   <table class="specs" id="robotRows"></table>
   <h3>Now</h3>
@@ -41,8 +41,8 @@
   <p class="note">A robot vessel from MarineKit (the world has no people: sensor bands and lamps, no bridges or cabins).</p>
   </div>
   <div id="shipInfo">
-  <h2 id="shipName"></h2>
-  <div class="sub" id="shipSub"></div>
+  <h2 class="stdName" id="shipName"></h2>
+  <div class="stdSub" id="shipSub"></div>
   <h3>Specifications</h3>
   <table class="specs" id="specs"></table>
   <h3>Reconstruction</h3>
@@ -51,7 +51,7 @@
   <ol class="src" id="sources"></ol>
   </div>
 </aside>
-<aside class="panel right" id="ctlPanel" data-window="right" data-side="right" data-title="Controls" data-title-pl="Sterowanie">
+<aside class="panel" id="ctlPanel" data-window="controls" data-title="Controls" data-title-pl="Sterowanie">
   <div id="robotCtl" hidden>
   <h3>Drive</h3>
   <div class="btns"><button type="button" id="dAuto" class="on">Auto</button><button type="button" id="dKeys">WASD</button></div>
@@ -60,20 +60,12 @@
   <div class="btns"><button type="button" id="rNight">Night</button><button type="button" id="rWake" class="on">Wake</button><button type="button" id="rWork">Work</button></div>
   <p class="note">W/A/S/D: steer · Q/E: dive and rise (the diver) · the camera rides along.</p>
   </div>
-  <div id="shipCam">
-  <h3>Camera</h3>
-  <div class="btns" id="cams"></div>
-  </div>
   <h3>View</h3>
   <label class="chk"><input type="checkbox" id="sea" checked> Sea (off = dry dock, full hull)</label>
   <div class="row"><span>Water</span><select id="waterSrc"><option value="plain">Plain</option><option value="lab">Water lab</option></select><output></output></div>
   <label class="chk"><input type="checkbox" id="dimsChk" checked> Dimensions</label>
   <label class="chk"><input type="checkbox" id="grid"> 10 m grid at the waterline</label>
   <label class="chk"><input type="checkbox" id="wire"> Wireframe</label>
-  <label class="chk"><input type="checkbox" id="spin"> Auto-rotate</label>
-  <div class="row"><span>Sun height</span><input type="range" id="sun" min="4" max="80" value="38"><output id="sunV"></output></div>
-  <div class="row"><span>Sun bearing</span><input type="range" id="sunAz" min="0" max="360" value="140"><output id="sunAzV"></output></div>
-  <div class="row"><span>Exposure</span><input type="range" id="exp" min="0.6" max="1.8" step="0.05" value="1.2"><output id="expV"></output></div>
   <div id="shipCtl">
   <h3>Parts</h3>
   <div id="parts"></div>
@@ -98,15 +90,27 @@
   </div>
   <h3>Model</h3>
   <div class="row"><span>Detail</span><input type="range" id="detail" min="0.5" max="2" step="0.25" value="1"><output id="detailV"></output></div>
-  <div class="stats" id="stats"></div>
+</aside>
+<aside class="panel" data-std="camera">
+  <div id="shipCam">
+  <div class="btns" id="cams"></div>
+  </div>
+  <label class="chk"><input type="checkbox" id="spin"> Auto-rotate</label>
+  <div class="row"><span>Exposure</span><input type="range" id="exp" min="0.6" max="1.8" step="0.05" value="1.2"><output id="expV"></output></div>
   <p class="note">Mouse: drag to orbit, right-drag to pan, wheel to zoom, double-click to focus. Keys: F frame the ship, H hide panels.</p>
 </aside>
+<aside class="panel" data-std="light">
+  <div class="row"><span>Sun height</span><input type="range" id="sun" min="4" max="80" value="38"><output id="sunV"></output></div>
+  <div class="row"><span>Sun bearing</span><input type="range" id="sunAz" min="0" max="360" value="140"><output id="sunAzV"></output></div>
+</aside>
+<aside class="panel" data-std="perf"></aside>
 <div class="foot">
   <span class="scale"><i id="scaleBar"></i><span id="scaleTxt"></span></span>
   <span id="fps"></span>
   <span class="sp"></span>
   <span>GameLaboratory</span>
 </div>
+<script src="../ui/labwin.js"></script>
 <script src="../ui/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
 <script type="module" src="../js/models/ships-space/shipkit.js"></script>

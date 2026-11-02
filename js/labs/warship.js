@@ -297,7 +297,7 @@ $('wire').onchange = applyWire;
 
 // panels fade after a few idle seconds (not while the pointer rests on them); H hides them
 let idleT = 0;
-const panels = [$('infoPanel'), $('ctlPanel')];
+const panels = [...document.querySelectorAll('[data-window]')];   // every window of the page
 function idle() { idleT = 0; panels.forEach((p) => p.classList.remove('idle')); }
 addEventListener('pointermove', idle);
 addEventListener('keydown', (e) => {
@@ -420,15 +420,7 @@ function updateDims() {
 
 /* ---------------- statistics, scale bar ---------------- */
 function stats() {
-  let tris = 0, meshes = 0; const mats = new Set();
-  cur().traverse((o) => { if (o.isMesh) { meshes++; [].concat(o.material).forEach((m) => mats.add(m)); const g = o.geometry; tris += (g.index ? g.index.count : g.attributes.position.count) / 3; } });
-  $('stats').replaceChildren(
-    el('span', { textContent: 'Triangles' }), el('b', { textContent: Math.round(tris).toLocaleString('en') }),
-    el('span', { textContent: 'Meshes' }), el('b', { textContent: meshes }),
-    el('span', { textContent: 'Materials' }), el('b', { textContent: mats.size }),
-    el('span', { textContent: 'Build' }), el('b', { textContent: buildMs.toFixed(0) + ' ms' }),
-    el('span', { textContent: 'Draw calls' }), el('b', { id: 'calls', textContent: '–' }),
-  );
+  window.LabPerf.model(cur(), buildMs);   // the Performance window's Model (ui/labwin.js)
 }
 function scaleBar() {
   // world metres per pixel at the orbit target
@@ -463,12 +455,12 @@ function frame(now) {
   updateDive(dt);
   dimLines.position.y = model ? model.group.position.y : 0;
   updateDims(); scaleBar();
-  renderer.info.reset(); renderer.info.autoReset = false;
+  window.LabPerf.begin(renderer);
   post.render(scene, camera);
+  window.LabPerf.end(renderer);   // the Performance window and the bottom bar
   frames++;
   if (now - fpsT > 500) {
-    $('fps').textContent = `${Math.round(frames * 1000 / (now - fpsT))} fps`; frames = 0; fpsT = now;
-    const c = document.getElementById('calls'); if (c) c.textContent = renderer.info.render.calls;
+    frames = 0; fpsT = now;
     if (robot) robotNow();
   }
   requestAnimationFrame(frame);

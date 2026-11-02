@@ -135,15 +135,9 @@ function frame(now) {
   look.split = $('splitOn').checked ? +$('splitX').value : 0;
   $('split').hidden = !look.split; if (look.split) $('split').style.left = (look.split * 100) + '%';
   look.sun(camera, stage.sunDir);
-  renderer.info.autoReset = false; renderer.info.reset();
+  window.LabPerf.begin(renderer);
   look.render(scene, camera);
-  frames++;
-  if (now - fpsT > 500) {
-    $('fps').textContent = `${Math.round(frames * 1000 / (now - fpsT))} fps`; frames = 0; fpsT = now;
-    const ms = frameLog.slice(-30), avg = ms.reduce((s, x) => s + x, 0) / Math.max(1, ms.length);
-    $('stats').replaceChildren(el('span', { textContent: 'Frame' }), el('b', { textContent: avg.toFixed(1) + ' ms' }), el('span', { textContent: 'Draw calls' }), el('b', { textContent: renderer.info.render.calls }),
-      el('span', { textContent: 'Triangles' }), el('b', { textContent: renderer.info.render.triangles.toLocaleString('en') }), el('span', { textContent: 'Render scale' }), el('b', { textContent: Math.round(look.scale * 100) + '%' }));
-  }
+  window.LabPerf.end(renderer);   // the Performance window and the bottom bar (ui/labwin.js)
   requestAnimationFrame(frame);
 }
 fillLook(); markPreset(); applyLook();

@@ -41,7 +41,9 @@ function build() {
   cave = buildCave(S);
   scene.add(cave.group);
   const st = cave.stats;
-  $('caveStats').replaceChildren(...[['Triangles', st.triangles.toLocaleString('en')], ['Drip stones and rocks', st.formations], ['Lakes', st.lakes], ['Grid', `${st.grid} · ${st.cell.toFixed(2)} m`], ['Built in', `${st.ms.toFixed(0)} ms`]]
+  $('caveSub').textContent = `seed ${S.seed} · ${ROCKS[S.rock].name}`;
+  window.LabPerf.model(cave.group, st.ms);   // the Performance window's Model (ui/labwin.js)
+  $('caveStats').replaceChildren(...[['Drip stones and rocks', st.formations], ['Lakes', st.lakes], ['Grid', `${st.grid} · ${st.cell.toFixed(2)} m`]]
     .flatMap(([a, b]) => [el('span', { textContent: a }), el('b', { textContent: String(b) })]));
   applyView(true);
 }
@@ -88,7 +90,7 @@ for (const [k, [fmt, rock]] of Object.entries(LIGHT)) {
 const repaint = (() => { let t = 0; return () => { clearTimeout(t); t = setTimeout(() => { if (cave) { setRock(cave, S.rock, S); applyView(false); } }, 120); }; })();
 $('rock').replaceChildren(...Object.entries(ROCKS).map(([id, r]) => el('option', { value: id, textContent: r.name })));
 $('rock').value = S.rock; $('rockNote').textContent = ROCKS[S.rock].note;
-$('rock').onchange = () => { S.rock = $('rock').value; $('rockNote').textContent = ROCKS[S.rock].note; save(); repaint(); };
+$('rock').onchange = () => { S.rock = $('rock').value; $('rockNote').textContent = ROCKS[S.rock].note; $('caveSub').textContent = `seed ${S.seed} · ${ROCKS[S.rock].name}`; save(); repaint(); };
 for (const k of ['torch', 'lamp']) { $(k).checked = S[k]; $(k).onchange = () => { S[k] = $(k).checked; save(); applyLight(); }; }
 $('seed').value = S.seed; $('seed').onchange = () => { S.seed = Math.max(1, +$('seed').value | 0); save(); rebuild(); };
 $('another').onclick = () => { S.seed = 1 + Math.floor(Math.random() * 99998); $('seed').value = S.seed; save(); rebuild(); };
@@ -96,18 +98,13 @@ $('another').onclick = () => { S.seed = 1 + Math.floor(Math.random() * 99998); $
 /* ---------------- loop ---------------- */
 function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); look.resize(innerWidth, innerHeight); }
 addEventListener('resize', resize);
-let last = performance.now(), frames = 0, fpsT = last;
+let last = performance.now();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   if (S.view === 'inside') free.update(dt); else orbit.update();
-  renderer.info.autoReset = false; renderer.info.reset();
+  window.LabPerf.begin(renderer);
   look.render(scene, camera);
-  frames++;
-  if (now - fpsT > 500) {
-    $('fps').textContent = `${Math.round(frames * 1000 / (now - fpsT))} fps`; frames = 0; fpsT = now;
-    $('stats').replaceChildren(...[['Draw calls', renderer.info.render.calls], ['Triangles drawn', renderer.info.render.triangles.toLocaleString('en')]]
-      .flatMap(([a, b]) => [el('span', { textContent: a }), el('b', { textContent: String(b) })]));
-  }
+  window.LabPerf.end(renderer);   // the Performance window and the bottom bar (ui/labwin.js)
   requestAnimationFrame(frame);
 }
 resize();

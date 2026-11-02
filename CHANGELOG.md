@@ -3,6 +3,25 @@
 Wersja programu i każdego laboratorium: `ui/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.19.1 — 2026-11-02 (wspólne okna, część 2: laboratoria z Battle i reszta)
+
+### Zmienione (y+1)
+- Jaskinie, przedmioty bohatera, woda, ląd, wygląd, rośliny, budowle, filtry, transformator, laboratorium pojazdów
+  (woda), Pixel Studio, generator zombie i Kostnica SDF — na standardowych oknach (`ui/labwin.js`):
+  - **Opis**: nazwa, podpis, tekst o laboratorium lub modelu, dane, rekonstrukcja i źródła;
+  - **Kamera**: widoki, auto-obrót, ekspozycja, pole widzenia, wygląd kamery (presety, mapowanie tonów, efekty),
+    noktowizor i lornetka;
+  - **Światło i pogoda**: słońce, pogoda, wiatr, pora dnia, latarka i lampa, światło otoczenia;
+  - **Wydajność**: wspólne liczby i wykres z `LabPerf`, model, ustawienia jakości i pomiar kosztu efektów.
+- Własne liczniki klatek i wywołań rysowania w tych laboratoriach usunięte — liczy `LabPerf` (także licznik na
+  pasku dolnym).
+- Klawisz H chowa wszystkie okna strony (wcześniej tylko dwa panele).
+- Pixel Studio: okna Kamera i Światło dotyczą modelu 3D i chowają się w trybach „Generate” i „Draw”.
+
+### Wyjątki
+- Bez okien opcji: doktor modeli (własne listy modeli i znalezisk), skala, skórki, SDF Walkers, laboratorium języka
+  i obrazów (strony-dokumenty).
+
 ## Program 0.19.0 — 2026-11-02 (wspólne okna, część 1: laboratoria ze Space)
 
 ### Nowe

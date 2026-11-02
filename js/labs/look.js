@@ -196,7 +196,7 @@ $('autoRes').checked = S.perf.autoRes; $('autoRes').onchange = () => { S.perf.au
 $('aa').checked = S.perf.aa; $('aa').onchange = () => { S.perf.aa = $('aa').checked; look.setAA(S.perf.aa); save(); };
 $('shadows').checked = S.perf.shadows; $('shadows').onchange = () => { S.perf.shadows = $('shadows').checked; sun.castShadow = S.perf.shadows; save(); };
 $('copy').onclick = async () => { try { await navigator.clipboard.writeText(JSON.stringify(S, null, 1)); $('copied').textContent = 'Copied. Paste it into the chat to keep this look.'; } catch { $('copied').textContent = 'Clipboard blocked by the browser.'; } };
-addEventListener('keydown', (e) => { if (e.code === 'KeyH' && !e.target.closest('input,select')) [$('leftPanel'), $('rightPanel')].forEach((p) => p.classList.toggle('hidden-panel')); });
+addEventListener('keydown', (e) => { if (e.code === 'KeyH' && !e.target.closest('input,select')) document.querySelectorAll('[data-window]').forEach((p) => p.classList.toggle('hidden-panel')); });
 
 /* ---------------- camera ---------------- */
 const orbit = { target: new THREE.Vector3(0, 5, 4), dist: 135, yaw: 0.72, pitch: 0.05, want: null };
@@ -289,14 +289,13 @@ function frame(now) {
   look.split = $('splitOn').checked ? +splitR.value : 0;
   if (look.split) $('split').style.left = (look.split * 100) + '%';
   look.sun(camera, skyU.uSkySun.value);
-  renderer.info.autoReset = false; renderer.info.reset();
+  window.LabPerf.begin(renderer);
   look.render(scene, camera);
+  window.LabPerf.end(renderer);   // the Performance window and the bottom bar (ui/labwin.js)
   frames++;
   if (now - fpsT > 500) {
-    $('fps').textContent = `${Math.round(frames * 1000 / (now - fpsT))} fps`; frames = 0; fpsT = now;
-    const ms = frameLog.slice(-30), avg = ms.reduce((s, x) => s + x, 0) / Math.max(1, ms.length);
-    $('stats').replaceChildren(el('span', { textContent: 'Frame' }), el('b', { textContent: avg.toFixed(1) + ' ms' }), el('span', { textContent: 'Draw calls' }), el('b', { textContent: renderer.info.render.calls }),
-      el('span', { textContent: 'Render scale' }), el('b', { textContent: Math.round(look.scale * 100) + '%' }), el('span', { textContent: 'Visibility' }), el('b', { textContent: visKm < 1 ? Math.round(visKm * 1000) + ' m' : visKm.toFixed(1) + ' km' }), el('span', { textContent: 'Wave height' }), el('b', { textContent: (S.sky.windSea ? Math.min(6.5, 0.0246 * S.sky.wind ** 2) : 1.2).toFixed(1) + ' m' }));
+    frames = 0; fpsT = now;
+    $('lookNow').replaceChildren(el('span', { textContent: 'Render scale' }), el('b', { textContent: Math.round(look.scale * 100) + '%' }), el('span', { textContent: 'Visibility' }), el('b', { textContent: visKm < 1 ? Math.round(visKm * 1000) + ' m' : visKm.toFixed(1) + ' km' }), el('span', { textContent: 'Wave height' }), el('b', { textContent: (S.sky.windSea ? Math.min(6.5, 0.0246 * S.sky.wind ** 2) : 1.2).toFixed(1) + ' m' }));
   }
   requestAnimationFrame(frame);
 }

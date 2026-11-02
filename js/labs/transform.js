@@ -167,7 +167,7 @@ cv.addEventListener('pointermove', (e) => {
   else { orbit.yaw -= dx * 0.005; orbit.pitch = Math.min(1.5, Math.max(-0.1, orbit.pitch + dy * 0.004)); }
 });
 cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.min(4000, Math.max(5, orbit.dist * Math.exp(e.deltaY * 0.0011))); orbit.want = null; }, { passive: false });
-addEventListener('keydown', (e) => { if (e.code === 'KeyH' && !e.target.closest('input,select')) [$('leftPanel'), $('rightPanel')].forEach((p) => p.classList.toggle('hidden-panel')); });
+addEventListener('keydown', (e) => { if (e.code === 'KeyH' && !e.target.closest('input,select')) document.querySelectorAll('[data-window]').forEach((p) => p.classList.toggle('hidden-panel')); });
 
 /* ---------------- loop ---------------- */
 function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); post.resize(innerWidth, innerHeight); }
@@ -186,19 +186,16 @@ function frame(now) {
   camera.lookAt(orbit.target); camera.far = Math.max(9000, orbit.dist * 4); camera.updateProjectionMatrix();
   sky.position.copy(camera.position);
   DAMAGE.uniforms.uDamageT.value = now / 1000;
-  renderer.info.autoReset = false; renderer.info.reset();
+  window.LabPerf.begin(renderer);
   post.render(scene, camera);
+  window.LabPerf.end(renderer);   // the Performance window and the bottom bar (ui/labwin.js)
   frames++;
   if (now - fpsT > 500) {
-    const fps = Math.round(frames * 1000 / (now - fpsT)); frames = 0; fpsT = now;
-    $('fps').textContent = `${fps} fps`;
+    frames = 0; fpsT = now;
     const lv = ship.getCurrentLevel(), d = camera.position.distanceTo(ship.position);
     $('lodNow').textContent = mode === 'auto' ? `Camera ${Math.round(d)} m from the ship → ${T.levels[lv].name}` : `Showing ${mode}`;
     const ms = frameMs.slice(-30), avg = ms.reduce((s, x) => s + x, 0) / Math.max(1, ms.length);
-    $('perf').replaceChildren(el('span', { textContent: 'Ships' }), el('b', { textContent: fleet.children.length + 1 }),
-      el('span', { textContent: 'Draw calls' }), el('b', { textContent: renderer.info.render.calls }),
-      el('span', { textContent: 'Triangles drawn' }), el('b', { textContent: renderer.info.render.triangles.toLocaleString('en') }),
-      el('span', { textContent: 'Frame' }), el('b', { textContent: avg.toFixed(1) + ' ms' }));
+    $('perf').replaceChildren(el('span', { textContent: 'Ships' }), el('b', { textContent: fleet.children.length + 1 }));
     if (frameMs.length > 600) frameMs = frameMs.slice(-60);
     const h = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * orbit.dist, mpp = h / innerHeight, steps = [1, 2, 5, 10, 20, 50, 100, 200, 500];
     const sm = steps.find((s) => s / mpp > 60) || 500; $('scaleBar').style.width = `${Math.round(sm / mpp)}px`; $('scaleTxt').textContent = `${sm} m`;

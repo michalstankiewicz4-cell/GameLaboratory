@@ -67,7 +67,8 @@ function buildSpecimen() {
   const sp = SPECIES[S.species];
   $('spName').textContent = `${sp.name} (${sp.latin})`;
   $('spNote').textContent = sp.note;
-  $('spStats').replaceChildren(...[['Height', `${plant.height.toFixed(1)} m`], ['Crown radius', `${plant.radius.toFixed(1)} m`], ['Triangles', Math.round(tris).toLocaleString('en')], ['Grown in', `${ms.toFixed(0)} ms`], ['Biomes', sp.biomes.map((b) => BIOMES[b].label.replace(/ \(.*/, '')).join(', ')]]
+  window.LabPerf.model(spec, ms);   // the specimen: the Performance window's Model (ui/labwin.js)
+  $('spStats').replaceChildren(...[['Height', `${plant.height.toFixed(1)} m`], ['Crown radius', `${plant.radius.toFixed(1)} m`], ['Biomes', sp.biomes.map((b) => BIOMES[b].label.replace(/ \(.*/, '')).join(', ')]]
     .flatMap(([a, b]) => [el('span', { textContent: a }), el('b', { textContent: String(b) })]));
   orbit.target.set(plant.radius * (S.compare ? 1.3 : 0), plant.height * 0.45, 0); orbit.dist = Math.max(10, plant.height * (S.compare ? 2.6 : 2.0));
 }
@@ -197,7 +198,7 @@ function setCam(name) {
 }
 function camButtons() { $('cams').replaceChildren(...CAMS[S.mode].map((n) => el('button', { type: 'button', textContent: n, onclick: () => setCam(n) }))); }
 const keys = new Set();
-addEventListener('keydown', (e) => { if (e.target.closest && e.target.closest('input,select')) return; keys.add(e.code); if (e.code === 'KeyH') [$('leftPanel'), $('rightPanel')].forEach((p) => p.classList.toggle('hidden-panel')); });
+addEventListener('keydown', (e) => { if (e.target.closest && e.target.closest('input,select')) return; keys.add(e.code); if (e.code === 'KeyH') document.querySelectorAll('[data-window]').forEach((p) => p.classList.toggle('hidden-panel')); });
 addEventListener('keyup', (e) => keys.delete(e.code));
 let drag = null; const cv = renderer.domElement;
 cv.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY }; cv.setPointerCapture(e.pointerId); });
@@ -286,12 +287,13 @@ function frame(now) {
   sun.target.position.copy(tgt); sun.position.copy(tgt).addScaledVector(sd, 400);
   envT += dt; if (envDirty && envT > 0.4) { if (envRT) envRT.dispose(); envRT = skyEnvironment(renderer, skyU); scene.environment = envRT.texture; envDirty = false; envT = 0; }
   look.sun(camera, skyU.uSkySun.value);
-  renderer.info.autoReset = false; renderer.info.reset();
+  window.LabPerf.begin(renderer);
   look.render(scene, camera);
+  window.LabPerf.end(renderer);   // the Performance window and the bottom bar (ui/labwin.js)
   frames++;
   if (now - fpsT > 500) {
-    $('fps').textContent = `${Math.round(frames * 1000 / (now - fpsT))} fps`; frames = 0; fpsT = now;
-    const rows = [['Draw calls', renderer.info.render.calls], ['Triangles', renderer.info.render.triangles.toLocaleString('en')]];
+    frames = 0; fpsT = now;
+    const rows = [];
     if (S.mode === 'landscape' && forest) rows.push(['Full models', forest.counts.near.toLocaleString('en')], ['Impostors', forest.counts.far.toLocaleString('en')]);
     $('stats').replaceChildren(...rows.flatMap(([a, b]) => [el('span', { textContent: a }), el('b', { textContent: String(b) })]));
   }

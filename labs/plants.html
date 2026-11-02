@@ -27,7 +27,12 @@
   <div class="btns" id="modes"></div>
   <span class="sp"></span>
 </div>
-<aside class="panel left" id="leftPanel" data-window="model" data-title="Model" data-title-pl="Model">
+<aside class="panel" data-std="info">
+  <h2 class="stdName" id="spName"></h2>
+  <p class="stdText" id="spNote"></p>
+  <div class="stats" id="spStats"></div>
+</aside>
+<aside class="panel" id="leftPanel" data-window="plants" data-title="Plants" data-title-pl="Rośliny">
   <div id="specPanel">
     <h3>Specimen</h3>
     <div class="row"><span>Species</span><select id="species"></select><output></output></div>
@@ -37,9 +42,6 @@
     <div class="row"><span>Detail</span><input type="range" id="detail" min="0.5" max="1.5" step="0.25"><output id="detailV"></output></div>
     <div class="row"><span>Season</span><input type="range" id="season" min="0" max="1" step="0.01"><output id="seasonV"></output></div>
     <label class="chk"><input type="checkbox" id="compare" checked> Its impostor beside it (what is drawn far away)</label>
-    <h2 id="spName"></h2>
-    <p class="note" id="spNote"></p>
-    <div class="stats" id="spStats"></div>
   </div>
   <div id="landPanel" hidden>
     <h3>Landscape</h3>
@@ -55,25 +57,27 @@
     <p class="note">Plants stand by biome, height, slope and water: spruce and pine forests with birch at their edges and juniper on the heath; copses and lone oaks on the plains; palm oases by the water, acacias and saltbush in the desert. Rocks come in their own lab.</p>
   </div>
 </aside>
-<aside class="panel right" id="rightPanel" data-window="scene" data-title="Scene" data-title-pl="Scena">
-  <h3>Camera</h3>
+<aside class="panel" data-std="camera">
   <div class="btns" id="cams"></div>
-  <h3>Wind</h3>
-  <div class="row"><span>Strength</span><input type="range" id="wind" min="0" max="1.5" step="0.05"><output id="windV"></output></div>
-  <div class="row"><span>Direction</span><input type="range" id="windDir" min="0" max="355" step="5"><output id="windDirV"></output></div>
-  <h3>Light and weather</h3>
+  <p class="note">Specimen: drag to orbit, wheel to zoom. Landscape: drag to look, W/A/S/D to move, Q/E down/up, Shift faster. H hides the windows.</p>
+</aside>
+<aside class="panel" data-std="light">
   <div class="row"><span>Weather</span><select id="weather"></select><output></output></div>
   <div class="row"><span>Sun height</span><input type="range" id="sunEl" min="-6" max="70" step="1"><output id="sunElV"></output></div>
   <div class="row"><span>Sun bearing</span><input type="range" id="sunAz" min="0" max="360" step="2"><output id="sunAzV"></output></div>
-  <h3>Performance</h3>
+  <h3>Wind</h3>
+  <div class="row"><span>Strength</span><input type="range" id="wind" min="0" max="1.5" step="0.05"><output id="windV"></output></div>
+  <div class="row"><span>Direction</span><input type="range" id="windDir" min="0" max="355" step="5"><output id="windDirV"></output></div>
+</aside>
+<aside class="panel" id="rightPanel" data-std="perf">
   <div class="stats" id="stats"></div>
-  <p class="note">Specimen: drag to orbit, wheel to zoom. Landscape: drag to look, W/A/S/D to move, Q/E down/up, Shift faster. H hides the panels.</p>
 </aside>
 <div class="foot">
   <span id="fps"></span>
   <span class="sp"></span>
   <span>GameLaboratory</span>
 </div>
+<script src="../ui/labwin.js"></script>
 <script src="../ui/windows.js"></script>
 <script type="module" src="../js/labs/plants.js"></script>
 </body>

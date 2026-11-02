@@ -28,7 +28,12 @@
   <span class="dimtxt" id="seaTxt"></span>
   <span class="sp"></span>
 </div>
-<aside class="panel left" id="leftPanel" data-window="left" data-side="left">
+<aside class="panel" data-std="info">
+  <h2 class="stdName">Water</h2>
+  <div class="stdSub" id="seaSub"></div>
+  <p class="stdText">Two variants of the sea (A and B) around ORP Błyskawica under way: the water body, the sea state, the look, and how the ship and the water meet. The other labs take variant A from here.</p>
+</aside>
+<aside class="panel" id="leftPanel" data-window="water" data-title="Water" data-title-pl="Woda">
   <h3>Compare</h3>
   <label class="chk"><input type="checkbox" id="splitOn"> Split screen: variant A left, B right</label>
   <div class="row"><span>Divider</span><input type="range" id="splitX" min="0.2" max="0.8" step="0.01" value="0.5"><output id="splitXV"></output></div>
@@ -70,30 +75,32 @@
   <label class="chk"><input type="checkbox" id="wet"> Wet band on the hull</label>
   <label class="chk"><input type="checkbox" id="spray"> Bow spray</label>
   <label class="chk"><input type="checkbox" id="foamMap"> Foam with memory (whitecaps leave lace, the wake stays for minutes)</label>
+  <div class="row"><span>Time speed</span><input type="range" id="tscale" min="0" max="2" step="0.05" value="1"><output id="tscaleV"></output></div>
   <div class="btns"><button type="button" id="shells">Shell splashes</button><button type="button" id="torpedo">Torpedo track</button></div>
   <div class="btns"><button type="button" id="copyJson">Copy settings (JSON)</button><button type="button" id="reset">Reset variant</button></div>
   <p class="note" id="copied"></p>
 </aside>
-<aside class="panel right" id="rightPanel" data-window="right" data-side="right">
-  <h3>Camera</h3>
+<aside class="panel" data-std="camera">
   <div class="btns" id="cams"></div>
   <label class="chk"><input type="checkbox" id="follow" checked> Camera rides with the ship</label>
-  <h3>Light</h3>
+  <div class="row"><span>Exposure</span><input type="range" id="exp" min="0.6" max="1.8" step="0.05" value="1.15"><output id="expV"></output></div>
+  <p class="note">Mouse: drag to orbit, right-drag to pan, wheel to zoom. H hides the windows. Settings are remembered in this browser; "Copy settings" gives the JSON to paste back to the developer.</p>
+</aside>
+<aside class="panel" data-std="light">
   <div class="row"><span>Sun height</span><input type="range" id="sun" min="2" max="80" value="28"><output id="sunV"></output></div>
   <div class="row"><span>Sun bearing</span><input type="range" id="sunAz" min="0" max="360" value="150"><output id="sunAzV"></output></div>
-  <div class="row"><span>Exposure</span><input type="range" id="exp" min="0.6" max="1.8" step="0.05" value="1.15"><output id="expV"></output></div>
-  <div class="row"><span>Time speed</span><input type="range" id="tscale" min="0" max="2" step="0.05" value="1"><output id="tscaleV"></output></div>
-  <h3>Performance</h3>
+</aside>
+<aside class="panel" id="rightPanel" data-std="perf">
+  <h3>Water</h3>
+  <div class="stats" id="stats"></div>
   <div class="row"><span>Water mesh</span><select id="grid"><option value="96,90">Light (17k tris)</option><option value="192,160" selected>Medium (61k)</option><option value="320,240">High (153k)</option><option value="480,320">Ultra (307k)</option></select><output></output></div>
   <label class="chk"><input type="checkbox" id="pixN" checked> Per-pixel wave normals</label>
   <div class="row"><span>Render scale</span><input type="range" id="scale" min="0.5" max="1" step="0.05" value="1"><output id="scaleV"></output></div>
   <label class="chk"><input type="checkbox" id="aa" checked> Anti-aliasing (MSAA)</label>
   <label class="chk"><input type="checkbox" id="bloom" checked> Glow</label>
   <label class="chk"><input type="checkbox" id="shadows" checked> Ship shadows</label>
-  <div class="stats" id="stats"></div>
   <div class="btns"><button type="button" id="measure">Measure the cost of each effect</button></div>
   <table class="specs" id="costs"></table>
-  <p class="note">Mouse: drag to orbit, right-drag to pan, wheel to zoom. H hides the panels. Settings are remembered in this browser; "Copy settings" gives the JSON to paste back to the developer.</p>
 </aside>
 <div class="foot">
   <span id="fps"></span>
@@ -101,6 +108,7 @@
   <span class="sp"></span>
   <span>GameLaboratory</span>
 </div>
+<script src="../ui/labwin.js"></script>
 <script src="../ui/windows.js"></script>
 <script type="module" src="../js/labs/water.js"></script>
 </body>
