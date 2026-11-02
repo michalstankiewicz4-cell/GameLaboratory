@@ -89,12 +89,12 @@ function resize() {
   camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
 }
 window.addEventListener("resize", resize);
-const clock = new THREE.Clock(), anchor = new THREE.Vector3(), delta = new THREE.Vector3(), tmp = new THREE.Vector3();
+const clock = new THREE.Timer(), anchor = new THREE.Vector3(), delta = new THREE.Vector3(), tmp = new THREE.Vector3();
 const sunCol = new THREE.Color(), skyCol = new THREE.Color();
 let wander = 0;
 const ISLAND = sea.params.island;
 function frame() {
-  const t0 = performance.now(), dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
+  const t0 = performance.now(), dt = Math.min(clock.update().getDelta(), 0.05), t = clock.getElapsed();
   const def = ves.def, amph = def.id === "amphibian";
   // the input: keys, or a wandering course (the amphibian shuttles to the island and back)
   let input;

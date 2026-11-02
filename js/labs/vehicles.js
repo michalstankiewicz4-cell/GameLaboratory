@@ -146,10 +146,10 @@ function resize() {
   camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
 }
 window.addEventListener("resize", resize);
-const clock = new THREE.Clock(), prev = new THREE.Vector3(), delta = new THREE.Vector3();
+const clock = new THREE.Timer(), prev = new THREE.Vector3(), delta = new THREE.Vector3();
 let wander = 0;
 function frame() {
-  const t0 = performance.now(), dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
+  const t0 = performance.now(), dt = Math.min(clock.update().getDelta(), 0.05), t = clock.getElapsed();
   if (mode) {   // another family: its own behaviour, if it has one
     if (mode.update) mode.update(dt, t);
     controls.update();

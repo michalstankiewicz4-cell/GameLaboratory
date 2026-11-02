@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.15.1 — 2026-11-02
+
+### Poprawione
+- `THREE.Clock` (przestarzały w r186, ostrzeżenie w konsoli) zamieniony na `THREE.Timer` w 11 laboratoriach Space:
+  statki, ciała, układy, skala, powierzchnia, budynki, pojazdy, morze, edytor stworów, życie i człowiek (wspólne studio).
+  Czas i krok klatki liczone jak wcześniej.
+- Wersje: program i te laboratoria z+1.
+
 ## Program 0.15.0 — 2026-11-02 (laboratorium obrazów z NeuroLabPA, lawa, karty ładowania, szybszy doktor)
 
 ### Nowe

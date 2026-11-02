@@ -514,11 +514,11 @@ LabKit.autoHideHud([$("hud"), $("opt")], 5);   // the panels fade out when idle
 const perf = LabKit.perfCounters(renderer);
 
 // ---------- the loop ----------
-const clock = new THREE.Clock();
+const clock = new THREE.Timer();
 const followPrev = new THREE.Vector3(), followNow = new THREE.Vector3();
 function frame() {
   const t0 = performance.now();
-  const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
+  const dt = Math.min(clock.update().getDelta(), 0.05), t = clock.getElapsed();
   if (!state.paused) state.simTime += dt * state.speed;
   // follow: the camera moves along with the followed body
   const e = state.focus >= 0 && handle.bodies[state.focus];

@@ -77,9 +77,9 @@ function resize() {
   camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
 }
 window.addEventListener("resize", resize);
-const clock = new THREE.Clock();
+const clock = new THREE.Timer();
 function frame() {
-  const t0 = performance.now(), dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
+  const t0 = performance.now(), dt = Math.min(clock.update().getDelta(), 0.05), t = clock.getElapsed();
   if (state.anim) {
     state.progress = Math.min(1, state.progress + dt / 6);       // 6 s here; the real build time is the module's
     $("pSlider").value = state.progress; applyView();

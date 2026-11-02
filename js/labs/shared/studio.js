@@ -231,10 +231,10 @@ function resize() {
   camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
 }
 window.addEventListener("resize", resize);
-const clock = new THREE.Clock(), prev = new THREE.Vector3(), now = new THREE.Vector3();
+const clock = new THREE.Timer(), prev = new THREE.Vector3(), now = new THREE.Vector3();
 let t = 0;
 function frame() {
-  const t0 = performance.now(), dt = Math.min(clock.getDelta(), 0.05) * state.timeScale;
+  const t0 = performance.now(), dt = Math.min(clock.update().getDelta(), 0.05) * state.timeScale;
   t += dt;
   const moving = state.gait === "walk" || state.gait === "run";
   cre.animate(t, dt, { gait: state.gait, speed: state.speed, lively: state.lively, talk: state.talk, layers: state.layers });

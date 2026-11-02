@@ -211,10 +211,10 @@ LabKit.autoHideHud([$("hud"), $("opt")], 10);
 const perf = LabKit.perfCounters(renderer); renderer.info.autoReset = false;
 function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); }
 window.addEventListener("resize", resize);
-const clock = new THREE.Clock();
+const clock = new THREE.Timer();
 let t = 0;
 function frame() {
-  const t0 = performance.now(), dt = Math.min(clock.getDelta(), 0.05); t += dt;
+  const t0 = performance.now(), dt = Math.min(clock.update().getDelta(), 0.05); t += dt;
   if (dirty && performance.now() - lastBuild > 60) rebuild();
   if (state.mode === "play") {
     cre.animate(t, dt, { gait: state.gait, speed: state.speed, layers: { look: state.look, low: state.low } });

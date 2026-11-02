@@ -314,10 +314,10 @@ const perf = LabKit.perfCounters(renderer);   // FPS, frame/CPU time, triangles,
 // =====================================================================
 // Animation
 // =====================================================================
-const clock = new THREE.Clock();
+const clock = new THREE.Timer();
 function frame() {
   const t0 = performance.now();
-  const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
+  const dt = Math.min(clock.update().getDelta(), 0.05), t = clock.getElapsed();
   controls.update();
   camera.updateMatrixWorld();
   if (current) {

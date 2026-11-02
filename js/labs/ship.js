@@ -387,12 +387,12 @@ const perf = LabKit.perfCounters(renderer);   // FPS, frame/CPU time, triangles,
 // =====================================================================
 // Animation
 // =====================================================================
-const clock = new THREE.Clock();
+const clock = new THREE.Timer();
 let power = 1;
 let bob = 1;
 function frame() {
   const t0 = performance.now();
-  const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
+  const dt = Math.min(clock.update().getDelta(), 0.05), t = clock.getElapsed();
   power += ((state.engines ? 1 : 0) - power) * Math.min(1, dt * 3);
 
   // idle drift of the whole ship (the lab only): STOP ANIMATIONS eases it

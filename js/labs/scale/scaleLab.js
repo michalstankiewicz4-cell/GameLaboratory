@@ -337,11 +337,11 @@ function stepFlight(dt){
 if(document.fonts) document.fonts.ready.then(function(){ labelsDirty = true; });
 buildModels();
 fit(0, rowEnd);
-const clock = new THREE.Clock();
+const clock = new THREE.Timer();
 const fpsEl = document.getElementById("fps");
 let t = 0, frames = 0, fpsT = 0;
 function frame(){
-  const dt = Math.min(0.05, clock.getDelta());
+  const dt = Math.min(0.05, clock.update().getDelta());
   t += dt;
   live.forEach(function(l){ l.update(t, dt); });
   stepFlight(dt);

@@ -265,7 +265,7 @@ function resize() {
   G.setAspect(window.innerWidth / window.innerHeight);
 }
 window.addEventListener("resize", resize);
-const clock = new THREE.Clock();
+const clock = new THREE.Timer();
 function stepGround(dt, t) {
   const info = G.update(dt, t, state.keys, mouse);
   if (state.mode !== "ground") return;                // took off this frame
@@ -282,7 +282,7 @@ function stepGround(dt, t) {
   buildTip();
 }
 function frame() {
-  const t0 = performance.now(), dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
+  const t0 = performance.now(), dt = Math.min(clock.update().getDelta(), 0.05), t = clock.getElapsed();
   renderer.info.reset();
   if (state.mode === "orbit" || state.mode === "transit") {
     if (state.mode === "orbit") { oc.update(); G.advanceDay(dt, siteDir()); showHour(); }
