@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.20.3 — 2026-11-02 (trzy kafelki laboratorium pojazdów)
+
+### Zmienione
+- **Strona startowa**: laboratorium pojazdów ma trzy kafelki — **kosmos** (`labs/vehicles-space.html`), **woda**
+  (`labs/vehicles-water.html`), **ląd** (`labs/vehicles-land.html`). Wspólne tło; każdy ma swój obrazek (statek, okręt,
+  pociąg), opis, kity i frazy (kosmos / woda / ląd). Katalog: strony wody i lądu mają własne opisy, frazy i obrazki;
+  strona startowa robi kafelek każdej strony laboratorium, która ma obrazek. Pasek menu bez zmian (jedna pozycja).
+
 ## Program 0.20.2 — 2026-11-02 (nazwy stron laboratorium pojazdów; bez Tekstury ziarna)
 
 ### Zmienione

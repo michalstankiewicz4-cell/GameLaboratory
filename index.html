@@ -111,7 +111,7 @@ const ART = {}, INFO = {}, INFO_PL = {}, PHRASES = {}, PHRASE_EN = CAT.phraseEn 
 for (const f in BY) { const c = BY[f]; if (c.art) ART[f] = c.art; if (c.desc) { INFO[f] = [c.desc, c.kind, c.kit]; INFO_PL[f] = c.descPl; } if (c.phrases) PHRASES[f] = c.phrases; }
 const phrase = (w) => (PL ? w : PHRASE_EN[w] || w);
 const STATUS = { tool: tr("Tool", "Narzędzie") };
-const LABS = window.LabMenu.ITEMS.LABS.filter((l) => !l.page), TOOLS = window.LabMenu.ITEMS.TOOLS;
+const LABS = window.LabMenu.ITEMS.LABS.filter((l) => !l.page || l.art), TOOLS = window.LabMenu.ITEMS.TOOLS;   // another page of a lab gets a tile when it has its own picture
 function tile(item) {
   const a = document.createElement("a"), art = ART[item.file], info = INFO[item.file] || ["", "lab", ""];
   a.className = "tile"; a.href = window.LabMenu.ROOT + item.file;

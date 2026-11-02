@@ -20,14 +20,14 @@ window.GameLabCatalog =
   "labs": [
     {
       "file": "labs/vehicles-space.html",
-      "name": "Vehicle lab",
-      "namePl": "Laboratorium pojazdów",
+      "name": "Vehicle lab · space",
+      "namePl": "Laboratorium pojazdów · kosmos",
       "doc": "docs/labs/vehicles-space.md",
-      "desc": "Everything you can travel in — switch the environment. Space: ships, the drone and the station: build, shape, rename, light, animate. Water: real warships at true scale, ORP Błyskawica and the submarine ORP Orzeł, and robot vessels: a skimmer on foils, a barge, a diver. Land: robot rovers, the amphibian and a train with real wheel–rail physics.",
-      "descPl": "Wszystko, czym można się poruszać — przełącz środowisko. Kosmos: statki, dron i stacja: buduj, kształtuj, nazywaj, oświetlaj, animuj. Woda: prawdziwe okręty w prawdziwej skali, ORP Błyskawica i okręt podwodny ORP Orzeł, oraz roboty morskie: ślizgacz na płatach, barka, nurek. Ląd: łaziki-roboty, amfibia i pociąg z prawdziwą fizyką koło–szyna.",
+      "desc": "Ships, the drone and the station: build, shape, rename, light, animate.",
+      "descPl": "Statki, dron i stacja: buduj, kształtuj, nazywaj, oświetlaj, animuj.",
       "kind": "game",
-      "kit": "ShipKit · ShipKit (sea) · MarineKit · VehicleKit · TrainKit",
-      "phrases": ["kosmos", "woda", "ląd", "pojazdy", "statki", "okręty", "okręt podwodny", "Orzeł", "pod wodą", "łaziki", "koła", "gąsienice", "pociąg", "tor", "stacja", "dron", "światła"],
+      "kit": "ShipKit",
+      "phrases": ["kosmos", "pojazdy", "statki", "stacja", "dron", "światła"],
       "saved": ["shipLab."],
       "art": {
         "bg": ["#1b2a5e", "#0f1630"],
@@ -39,14 +39,32 @@ window.GameLabCatalog =
       "name": "Vehicle lab · water",
       "namePl": "Laboratorium pojazdów · woda",
       "doc": "docs/models/ships-sea/blyskawica.md",
-      "page": "labs/vehicles-space.html"
+      "page": "labs/vehicles-space.html",
+      "desc": "Real warships at true scale, ORP Błyskawica and the submarine ORP Orzeł, and robot vessels: a skimmer on foils, a barge, a diver.",
+      "descPl": "Prawdziwe okręty w prawdziwej skali, ORP Błyskawica i okręt podwodny ORP Orzeł, oraz roboty morskie: ślizgacz na płatach, barka, nurek.",
+      "kind": "game",
+      "kit": "ShipKit (sea) · MarineKit",
+      "phrases": ["woda", "pojazdy", "okręty", "okręt podwodny", "Orzeł", "pod wodą"],
+      "art": {
+        "bg": ["#1b2a5e", "#0f1630"],
+        "svg": "<path d=\"M0 74 Q25 68 50 74 T100 74 T150 74 T200 74 V100 H0 Z\" fill=\"#5be0ff\" opacity=\".18\"/><path d=\"M30 66 L46 74 H150 L170 66 Z\" fill=\"url(#g)\" opacity=\".95\"/><path d=\"M70 66 V56 H96 V50 H110 V56 H128 V66 Z\" fill=\"#9fb4ff\" opacity=\".7\"/><path d=\"M102 50 V34 M96 40 H110\" stroke=\"#d8f6ff\" stroke-width=\"2\" stroke-linecap=\"round\" opacity=\".8\"/><path d=\"M128 60 H146 M56 60 H70\" stroke=\"#d8f6ff\" stroke-width=\"2.4\" stroke-linecap=\"round\" opacity=\".7\"/><path d=\"M20 82 Q40 78 60 82 M120 84 Q145 80 170 84\" stroke=\"#5be0ff\" stroke-width=\"2\" fill=\"none\" stroke-linecap=\"round\" opacity=\".5\"/>"
+      }
     },
     {
       "file": "labs/vehicles-land.html",
       "name": "Vehicle lab · land",
       "namePl": "Laboratorium pojazdów · ląd",
       "doc": "docs/labs/vehicles-land.md",
-      "page": "labs/vehicles-space.html"
+      "page": "labs/vehicles-space.html",
+      "desc": "Robot rovers, the amphibian and a train with real wheel–rail physics.",
+      "descPl": "Łaziki-roboty, amfibia i pociąg z prawdziwą fizyką koło–szyna.",
+      "kind": "game",
+      "kit": "VehicleKit · TrainKit",
+      "phrases": ["ląd", "pojazdy", "łaziki", "koła", "gąsienice", "pociąg", "tor"],
+      "art": {
+        "bg": ["#1b2a5e", "#0f1630"],
+        "svg": "<path d=\"M10 78 H190\" stroke=\"#9fb4ff\" stroke-width=\"2.4\" opacity=\".7\"/><path d=\"M20 84 H180\" stroke=\"#9fb4ff\" stroke-width=\"1.4\" opacity=\".35\"/><path d=\"M44 46 H118 V70 H44 Z\" fill=\"url(#g)\" opacity=\".95\"/><path d=\"M118 54 H148 L160 62 V70 H118 Z\" fill=\"url(#g)\" opacity=\".8\"/><path d=\"M60 46 V36 H72 V46\" fill=\"#9fb4ff\" opacity=\".7\"/><rect x=\"88\" y=\"52\" width=\"20\" height=\"10\" rx=\"2\" fill=\"#0f1630\" opacity=\".7\"/><circle cx=\"62\" cy=\"72\" r=\"6\" fill=\"#0f1630\" stroke=\"#d8f6ff\" stroke-width=\"2\"/><circle cx=\"96\" cy=\"72\" r=\"6\" fill=\"#0f1630\" stroke=\"#d8f6ff\" stroke-width=\"2\"/><circle cx=\"140\" cy=\"72\" r=\"6\" fill=\"#0f1630\" stroke=\"#d8f6ff\" stroke-width=\"2\"/><circle cx=\"160\" cy=\"60\" r=\"3\" fill=\"#5be0ff\"/><path d=\"M166 60 H188\" stroke=\"#5be0ff\" stroke-width=\"3\" stroke-linecap=\"round\" opacity=\".5\"/>"
+      }
     },
     {
       "file": "labs/bodies.html",
