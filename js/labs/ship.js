@@ -115,8 +115,7 @@ function loadShip(index, keepCamera) {
   if (!keepCamera) camera.position.set(...def.camera);
   // HUD
   showLabels();
-  document.getElementById("shipIndex").textContent = `${index + 1} / ${ShipKit.SHIP_DEFS.length}`;
-  document.getElementById("prevShip").disabled = document.getElementById("nextShip").disabled = ShipKit.SHIP_DEFS.length < 2;
+  shipSelect.value = String(index);
 }
 
 // One button per model action: triggers flash, toggles stay lit.
@@ -281,9 +280,13 @@ const fx = LabKit.imageEffects({ renderer, scene, camera, panel: document.getEle
   setQuality: (level) => { state.quality = level; qSlider.value = level; paintSlider(qSlider); applyQuality(level); },
 });
 
-const step = (d) => { state.shipIndex = (state.shipIndex + d + ShipKit.SHIP_DEFS.length) % ShipKit.SHIP_DEFS.length; loadShip(state.shipIndex, false); };
-document.getElementById("prevShip").addEventListener("click", () => step(-1));
-document.getElementById("nextShip").addEventListener("click", () => step(1));
+// the ship: a drop-down in the lab's top bar, as on the water page (labs/warship.html); a renamed ship shows its new name
+const shipSelect = document.getElementById("ship");
+function fillShipSelect() {
+  shipSelect.replaceChildren(...ShipKit.SHIP_DEFS.map((d, i) => Object.assign(document.createElement("option"), { value: String(i), textContent: shipLabels(d.id).name || d.name })));
+  shipSelect.value = String(state.shipIndex);
+}
+shipSelect.addEventListener("change", () => { state.shipIndex = +shipSelect.value; loadShip(state.shipIndex, false); });
 
 LabKit.autoHideHud([...document.querySelectorAll("[data-window]")], 5);   // every window of the page (ui/windows.js)
 // PART NAMES: the ship's named part under the pointer (ShipKit partsOf) lights
@@ -367,7 +370,7 @@ for (const [elId, key] of [["hudTitle", "name"], ["hudSub", "sub"]]) {
     const changed = keepIt && text !== (all[def.id] || {})[key] && !(text === "" && !(all[def.id] || {})[key]);
     if (keepIt) { if (text) mine[key] = text; else delete mine[key]; all[def.id] = mine; store.set("names", all); }
     else el.textContent = before;
-    showLabels();
+    showLabels(); fillShipSelect();
     if (changed) loadShip(state.shipIndex, true);          // repaint the hull's lettering
   };
   el.addEventListener("dblclick", () => {
@@ -419,6 +422,7 @@ window.addEventListener("resize", () => {
   applyQuality(state.quality);
 });
 
+fillShipSelect();
 loadShip(0, false);
 paintSlider(qSlider); paintSlider(dSlider); paintSlider(dmgSlider);
 applyQuality(state.quality);

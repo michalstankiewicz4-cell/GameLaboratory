@@ -1,4 +1,4 @@
-/* GameLaboratory UI — controls inside a window (.labWin) or any element with .labUi: buttons, the model arrows,
+/* GameLaboratory UI — controls inside a window (.labWin) or any element with .labUi: buttons,
    sliders, check boxes, drop-downs, number and text fields, rows of values. Gold for what is on or chosen;
    numbers in IBM Plex Mono. Scoped so a lab's own scene UI (pixel editor, walkers) keeps its look. */
 :is(.labWin, .labUi){font:13.5px/1.45 var(--font);color:var(--text)}
@@ -11,14 +11,6 @@
 :is(.labWin, .labUi) :is(.tBtn, .btn, .btns button):hover{border-color:var(--line2);color:var(--head);box-shadow:none}
 :is(.labWin, .labUi) :is(.tBtn, .btn, .btns button).on{border-color:var(--accent);color:var(--accent);box-shadow:none}
 :is(.labWin, .labUi) .btn.primary{background:var(--accent);border-color:var(--accent);color:#14110a;font-weight:600}
-
-/* previous / next model: square buttons with a gold arrow on hover */
-:is(.labWin, .labUi) .navArrow{width:30px;height:30px;display:grid;place-items:center;padding:0;border:1px solid var(--line);
-  border-radius:var(--r2);background:var(--field);color:var(--text);cursor:pointer;filter:none;box-shadow:none;transition:border-color .15s,color .15s}
-:is(.labWin, .labUi) .navArrow svg{width:14px;height:14px}
-:is(.labWin, .labUi) .navArrow path{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-:is(.labWin, .labUi) .navArrow:hover:not(:disabled){border-color:var(--accent);color:var(--accent);filter:none}
-:is(.labWin, .labUi) .navArrow:disabled{opacity:.35;filter:none;cursor:default}
 
 /* sliders: a thin track, gold up to the value (--fill), a gold knob */
 :is(.labWin, .labUi) input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:18px;margin:4px 0 0;background:none;cursor:pointer}

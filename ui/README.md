@@ -10,7 +10,7 @@ gold headings and controls). Font: Space Grotesk; numbers: IBM Plex Mono.
 | `tokens.css` | colours, fonts, radii, the menu bar's height (`--menuH`) — every other file uses these |
 | `fonts.css` | the self-hosted fonts (`fonts/`, latin + latin-ext) |
 | `base.css` | thin scroll bars without arrow buttons, everywhere |
-| `controls.css` | what is inside a window (`.labWin`) or any `.labUi`: buttons (`.tBtn`, `.btn`, `.btns button`), the model arrows (`.navArrow`), sliders (gold up to `--fill`), check boxes, radio buttons, drop-downs, fields, headings |
+| `controls.css` | what is inside a window (`.labWin`) or any `.labUi`: buttons (`.tBtn`, `.btn`, `.btns button`), sliders (gold up to `--fill`), check boxes, radio buttons, drop-downs, fields, headings |
 | `windows.css` + `windows.js` | floating windows with a lab's options (OPTIONS → Windows) |
 | `envswitch.css` + `envswitch.js` | the environment switch: space · water · land |
 | `loader.css` + `loader.js` | the loading card: a ring, a plain sentence, an optional step, a bar; `loader.js` fades a card marked `data-auto` once the page has loaded and drawn |

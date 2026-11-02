@@ -3,8 +3,7 @@
 .tBtn.trig:active, .tBtn.pulse{ border-color:var(--ok); box-shadow:none; color:var(--ok); }
 .tBtn:disabled{ opacity:.32; filter:saturate(0); cursor:not-allowed; box-shadow:none; border-color:var(--line); color:var(--text); }
 input[type=range]:disabled{ opacity:.35; cursor:not-allowed; }
-#hudTop, #shipNav{ flex:none; }
-#shipNav{ margin:0 0 10px; }
+#hudTop{ flex:none; }
 #opt .block .secHd:first-of-type{ margin-top:4px; }
 #hudTitle, #hudSub{ cursor:text; outline:none; }
 #hudTitle[contenteditable="true"], #hudSub[contenteditable="true"]{ box-shadow:0 0 0 1px var(--accent); border-radius:4px; padding:0 4px;

@@ -24,6 +24,7 @@
 <script src="../ui/catalog.js"></script>
 <script src="../ui/menubar.js"></script>
 <div class="bar">
+  <select id="ship" aria-label="Ship"></select>
   <div class="envSwitch" data-current="space" data-space="ship.html" data-water="warship.html" data-land=""></div>
   <span class="sp"></span>
 </div>
@@ -38,11 +39,6 @@
     <div id="hudTitle" title="Double-click to rename (empty: the original name)"></div>
     <div id="hudSub" title="Double-click to change the caption (empty: the original)">GAMELABORATORY // SHIP LAB</div>
   </div>
-    <div id="shipNav">
-      <button class="navArrow" id="prevShip" aria-label="Previous ship"><svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></button>
-      <span id="shipIndex">1 / 1</span>
-      <button class="navArrow" id="nextShip" aria-label="Next ship"><svg viewBox="0 0 16 16"><path d="m6 3 5 5-5 5"/></svg></button>
-    </div>
 </div>
 <div class="hudPanel block" id="blkCtrl" data-window="controls" data-side="left" data-title="Controls" data-title-pl="Sterowanie">
     <div id="hudBtns">

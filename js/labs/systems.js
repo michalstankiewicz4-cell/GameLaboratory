@@ -154,12 +154,12 @@ $("addOrbit").addEventListener("click", () => {
 $("sky").addEventListener("change", () => { state.system.sky = $("sky").value; setSky(state.system.sky); });
 
 // presets and random
-SK.PRESETS.forEach((p) => {
-  const b = document.createElement("button"); b.className = "tBtn"; b.textContent = p.name.toUpperCase();
-  b.addEventListener("click", () => load(p.make()));
-  $("presets").appendChild(b);
-});
-$("btnRandom").addEventListener("click", () => load(SK.random(Math.max(1, Math.round(+$("seed").value) || 1))));
+// the presets: a drop-down in the lab's top bar; a generated system shows as "Generated" there
+const preset = $("preset");
+preset.replaceChildren(...SK.PRESETS.map((p, i) => Object.assign(document.createElement("option"), { value: String(i), textContent: p.name })),
+  Object.assign(document.createElement("option"), { value: "", textContent: "Generated (seed)", disabled: true }));
+preset.addEventListener("change", () => { if (preset.value !== "") load(SK.PRESETS[+preset.value].make()); });
+$("btnRandom").addEventListener("click", () => { preset.value = ""; load(SK.random(Math.max(1, Math.round(+$("seed").value) || 1))); });
 $("btnDice").addEventListener("click", () => { $("seed").value = Math.floor(Math.random() * 99999) + 1; $("btnRandom").click(); });
 $("btnCopy").addEventListener("click", () => {
   const text = JSON.stringify(state.system, (k, v) => typeof v === "number" ? Math.round(v * 1000) / 1000 : v, 1);
@@ -546,6 +546,7 @@ window.addEventListener("resize", () => { camera.aspect = window.innerWidth / wi
 
 [$("speed"), $("qSlider"), $("dSlider")].forEach(paint);
 applyQuality(state.quality);
+preset.value = "1";
 load(SK.PRESETS[1].make());
 frame();
 const loading = $("loading");

@@ -26,9 +26,6 @@ canvas#view{position:fixed;inset:0;width:100%;height:100%;display:block}
 .legend{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:5px;font-size:11.5px;color:var(--dim)}
 .legend i{display:inline-block;width:10px;height:10px;margin-left:4px;border-radius:2px}
 
-/* the model arrows: previous · 1 / 4 · next */
-#shipNav{display:flex;align-items:center;gap:8px}
-#shipIndex{flex:1;text-align:center;font:13px var(--mono);color:var(--dim)}
 #figList{list-style:none;margin:0;padding:0;columns:2;column-gap:14px}
 #figList li{display:flex;justify-content:space-between;font-size:13px;line-height:18px;color:var(--dim);break-inside:avoid}
 #figList li b{margin-left:6px;font:12px var(--mono);font-weight:400;color:var(--head)}

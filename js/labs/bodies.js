@@ -70,8 +70,7 @@ function currentGroup() { return BodyKit.GROUPS[state.groupIndex]; }
 function loadBody(keepValues) {
   if (current) { BodyKit.disposeBody(current); current = null; }
   const g = currentGroup(), def = g.bodies[state.bodyIndex];
-  $("bodyIndex").textContent = def ? `${state.bodyIndex + 1} / ${g.bodies.length}` : "0 / 0";
-  $("prevBody").disabled = $("nextBody").disabled = g.bodies.length < 2;
+  $("group").value = String(state.groupIndex); fillBodies();
   $("hudTitle").textContent = def ? def.name + (def.slot != null ? ` · ORBIT ${def.slot}` : "") : g.name;
   $("emptyNote").classList.toggle("hidden", !!def);
   $("bodyStats").classList.toggle("hidden", !def);
@@ -195,27 +194,26 @@ function applyQuality(level) {
 // =====================================================================
 // HUD wiring
 // =====================================================================
-const tabs = $("groupTabs");
-BodyKit.GROUPS.forEach((g, i) => {
-  const b = document.createElement("button");
-  b.className = "mat groupTab"; b.textContent = g.name;
-  b.addEventListener("click", () => {
-    state.groupIndex = i; state.bodyIndex = 0;
-    camera.position.setLength((g.bodies[0] && g.bodies[0].view) || g.view || 4.4);    // frame the group's bodies (a comet's tail is long)
-    [...tabs.children].forEach((t, j) => { t.classList.toggle("gold", j === i); t.classList.toggle("blueT", j !== i); });
-    loadBody(false);
-  });
-  b.classList.add(i === 0 ? "gold" : "blueT");
-  tabs.appendChild(b);
+// the group and the body: two drop-downs in the lab's top bar (a group may hold several bodies)
+const opt = (value, text) => Object.assign(document.createElement("option"), { value, textContent: text });
+$("group").replaceChildren(...BodyKit.GROUPS.map((g, i) => opt(String(i), g.name)));
+function fillBodies() {
+  const g = currentGroup();
+  $("body").replaceChildren(...(g.bodies.length ? g.bodies.map((b, i) => opt(String(i), b.name)) : [opt("", "—")]));
+  $("body").disabled = g.bodies.length < 2;
+  $("body").value = g.bodies.length ? String(state.bodyIndex) : "";
+}
+$("group").addEventListener("change", () => {
+  state.groupIndex = +$("group").value; state.bodyIndex = 0;
+  const g = currentGroup();
+  camera.position.setLength((g.bodies[0] && g.bodies[0].view) || g.view || 4.4);    // frame the group's bodies (a comet's tail is long)
+  loadBody(false);
 });
-const stepBody = (d) => {
-  const n = currentGroup().bodies.length; if (n < 2) return;
-  state.bodyIndex = (state.bodyIndex + d + n) % n; loadBody(false);
+$("body").addEventListener("change", () => {
+  state.bodyIndex = +$("body").value; loadBody(false);
   const g = currentGroup();
   camera.position.setLength(g.bodies[state.bodyIndex].view || g.view || 4.4);   // a body may need more room (rings)
-};
-$("prevBody").addEventListener("click", () => stepBody(-1));
-$("nextBody").addEventListener("click", () => stepBody(1));
+});
 
 const toggle = (id, key, apply) => LabKit.toggle(id, state, key, apply);
 toggle("btnRotate", "rotate", (on) => { controls.autoRotate = on; });

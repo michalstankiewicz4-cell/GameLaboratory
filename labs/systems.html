@@ -21,6 +21,7 @@
 <script src="../ui/catalog.js"></script>
 <script src="../ui/menubar.js"></script>
 <div class="bar">
+  <select id="preset" aria-label="System"></select>
   <span class="sp"></span>
 </div>
 <div class="foot"><span id="fps" data-auto></span><span class="sp"></span><span>GameLaboratory</span></div>
@@ -29,14 +30,12 @@
 <div id="labels"></div>
 <div id="handles"></div>
 
-<div id="hud" data-window="left" data-side="left">
+<div id="hud" data-window="left" data-side="left" data-title="System" data-title-pl="Układ">
   <div id="hudTop">
     <div id="hudTitle">SYSTEMS</div>
   </div>
   <div class="hudPanel">
-    <div class="secHd first">PRESETS</div>
-    <div class="btnGrid" id="presets"></div>
-    <div class="secHd">RANDOM</div>
+    <div class="secHd first">RANDOM</div>
     <div class="seedRow">
       <input class="lab" id="seed" type="number" min="1" step="1" value="1" title="The seed: the same seed gives the same system">
       <button class="tBtn" id="btnDice" title="A new seed">🎲</button>

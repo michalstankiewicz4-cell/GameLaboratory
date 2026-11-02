@@ -3,6 +3,16 @@
 Wersja programu i każdego laboratorium: `ui/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.15.2 — 2026-11-02
+
+### Zmienione
+- Statki, ciała i układy: wybór z list rozwijanych w górnym pasku (`.bar`), jak w laboratorium wody — bez strzałek
+  i przycisków. Statki: lista statków. Ciała: dwie listy, kategoria i ciało w niej (lista ciał wyszarzona, gdy
+  w kategorii jest jedno). Układy: lista układów; po „losuj” pokazuje „Generated (seed)”.
+- Usunięte nieużywane style: `.navArrow` (`ui/controls.css`), `#shipNav`, `#shipIndex` (`ui/space.css`),
+  zakładki grup w ciałach, siatka przycisków w układach.
+- Wersje: program 0.15.2, statki 1.4.3, ciała 1.2.5, układy 1.2.5.
+
 ## Program 0.15.1 — 2026-11-02
 
 ### Poprawione
