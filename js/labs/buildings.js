@@ -9,7 +9,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1;
 renderer.localClippingEnabled = true;
-renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
 const scene = new THREE.Scene();
 scene.environment = ShipKit.makeEnvironment(renderer);
 scene.background = new THREE.Color(0x05070d);

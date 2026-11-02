@@ -55,7 +55,7 @@ Wyjątki dla zamierzonych przypadków: `userData.doctorOk = 'floating'` (albo ta
 
 ## Użycie
 
-- Strona: `tools/doctor.html`; `?model=sea/lab/blyskawica` otwiera jeden model. `window.doctorReport` — wyniki jako dane.
+- Strona: `tools/doctor.html` bada jeden model naraz — ten, z którym się otwiera (`?model=sea/lab/blyskawica`, bez tego pierwszy z listy), a każdy następny, gdy się go wybierze; „Examine all” (albo `?all=1`) bada całą listę. `window.doctorReport` — wyniki jako dane.
 - Bez okna: `python3 tools/doctor.py` (porównanie z wzorcem), `--update` (nowy wzorzec), `--shots` (zrzuty).
 - Strona ładuje kity Space przez `js/core/three-global.js` — w grafice Battle, jak laboratoria (od 0.12.0;
   wcześniej w trybie legacy r128). Na wyniki doktora nie ma to wpływu.

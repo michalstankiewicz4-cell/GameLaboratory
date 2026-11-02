@@ -18,7 +18,7 @@ const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch
 /* ---------------- renderer, camera, light ---------------- */
 const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
-renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
 $('view').append(renderer.domElement);
 const scene = new THREE.Scene(); scene.background = new THREE.Color(0x020203);
 const camera = new THREE.PerspectiveCamera(70, 1, 0.05, 2000); scene.add(camera);

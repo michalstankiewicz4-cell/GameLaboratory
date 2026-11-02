@@ -226,6 +226,38 @@ window.GameLabCatalog =
       }
     },
     {
+      "file": "labs/caves.html",
+      "name": "Cave lab",
+      "namePl": "Laboratorium jaskiń",
+      "doc": "docs/caves.md",
+      "desc": "Caves from a seed — passages, chambers, drip stones, rubble and lakes — cut in limestone, granite, sandstone or basalt, dry or wet, seen in the light of a flashlight and a lantern.",
+      "descPl": "Jaskinie z ziarna — korytarze, komory, nacieki, gruz i jeziorka — w wapieniu, granicie, piaskowcu albo bazalcie, suche lub mokre, w świetle latarki i lampy.",
+      "kind": "lab",
+      "kit": "CaveKit",
+      "phrases": ["jaskinie", "skały", "materiały", "światło", "teren"],
+      "saved": ["gameLab.caves."],
+      "art": {
+        "bg": ["#1c1a17", "#0b0a09"],
+        "svg": "<path d=\"M0 100 L0 30 Q30 10 60 28 Q90 46 120 22 Q150 0 200 26 L200 100 Z\" fill=\"#2b2620\"/><path d=\"M20 100 Q40 60 80 62 Q120 64 150 52 Q175 44 190 70 L190 100 Z\" fill=\"#0b0a09\"/><path d=\"M70 28 L74 44 L78 30 Z M110 30 L113 48 L116 30 Z M140 18 L143 34 L146 20 Z\" fill=\"#d8cdb8\" opacity=\".8\"/><path d=\"M95 100 L99 82 L103 100 Z\" fill=\"#d8cdb8\" opacity=\".7\"/><ellipse cx=\"130\" cy=\"88\" rx=\"34\" ry=\"5\" fill=\"#2b6f9a\" opacity=\".55\"/><path d=\"M30 86 L100 58 L100 74 Z\" fill=\"#fff3d6\" opacity=\".18\"/>"
+      }
+    },
+    {
+      "file": "labs/gear.html",
+      "name": "Hero's gear lab",
+      "namePl": "Laboratorium przedmiotów bohatera",
+      "doc": "docs/gear.md",
+      "desc": "The hero's items that give light — a flashlight, a lantern, a glow stick, a lighter, a phone screen — held in first person in a dark cave, and the ways of seeing: the bare eye, night vision, binoculars.",
+      "descPl": "Przedmioty bohatera, które dają światło — latarka, lampa naftowa, światło chemiczne, zapalniczka, ekran telefonu — trzymane w dłoni w ciemnej jaskini, i sposoby widzenia: oko, noktowizor, lornetka.",
+      "kind": "lab",
+      "kit": "GearKit",
+      "phrases": ["latarka", "noktowizor", "lornetka", "światło", "ekwipunek", "jaskinie"],
+      "saved": ["gameLab.gear."],
+      "art": {
+        "bg": ["#13201a", "#060a08"],
+        "svg": "<circle cx=\"78\" cy=\"50\" r=\"30\" fill=\"#46ff7a\" opacity=\".18\"/><circle cx=\"122\" cy=\"50\" r=\"30\" fill=\"#46ff7a\" opacity=\".18\"/><circle cx=\"78\" cy=\"50\" r=\"30\" fill=\"none\" stroke=\"#7dffa0\" stroke-width=\"2\" opacity=\".6\"/><circle cx=\"122\" cy=\"50\" r=\"30\" fill=\"none\" stroke=\"#7dffa0\" stroke-width=\"2\" opacity=\".6\"/><path d=\"M60 50 H140 M100 40 V60\" stroke=\"#0b1a10\" stroke-width=\"2\"/><rect x=\"150\" y=\"70\" width=\"36\" height=\"9\" rx=\"3\" fill=\"#2a2d33\"/><path d=\"M150 70 L132 62 L132 87 L150 79 Z\" fill=\"#fff3d6\" opacity=\".35\"/>"
+      }
+    },
+    {
       "file": "labs/structures.html",
       "name": "Structures lab",
       "namePl": "Laboratorium budowli",
@@ -546,6 +578,14 @@ window.GameLabCatalog =
     "WebGPU": "WebGPU",
     "łaziki": "rovers",
     "światła": "lights",
-    "życie": "life"
+    "życie": "life",
+    "jaskinie": "caves",
+    "skały": "rocks",
+    "materiały": "materials",
+    "światło": "light",
+    "latarka": "flashlight",
+    "noktowizor": "night vision",
+    "lornetka": "binoculars",
+    "ekwipunek": "gear"
   }
 }/*END*/;

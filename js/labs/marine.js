@@ -9,7 +9,7 @@ const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1;
-renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
 const scene = new THREE.Scene();
 scene.environment = ShipKit.makeEnvironment(renderer);
 const SKY_DAY = new THREE.Color(0.62, 0.76, 0.9), SKY_NIGHT = new THREE.Color(0.012, 0.018, 0.035);

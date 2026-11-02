@@ -33,8 +33,10 @@ export const ITEMS = {
 };
 
 /* ---------------- the models in the hand (simple, readable shapes) ---------------- */
-const metal = (c, r = 0.35) => new THREE.MeshStandardMaterial({ color: c, roughness: r, metalness: 0.8 });
-const plastic = (c, r = 0.6) => new THREE.MeshStandardMaterial({ color: c, roughness: r, metalness: 0 });
+// The parts held in the hand are unlit (their own light is centimetres away and would burn them white — light falls
+// off with the square of distance); only what glows (a lens, a flame, a screen) shines, through its emissive colour.
+const metal = (c) => new THREE.MeshBasicMaterial({ color: c });
+const plastic = (c) => new THREE.MeshBasicMaterial({ color: c });
 const glow = (c, i = 2) => new THREE.MeshStandardMaterial({ color: 0x000000, emissive: c, emissiveIntensity: i });
 function cyl(r1, r2, h, mat, seg = 20) { const m = new THREE.Mesh(new THREE.CylinderGeometry(r1, r2, h, seg), mat); return m; }
 
@@ -48,7 +50,7 @@ function modelOf(id, def) {
     const btn = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.006, 0.014), plastic(0x8a1f1f)); btn.position.set(0, 0.018, -0.02); g.add(btn);
   } else if (id === 'lantern') {
     const base = cyl(0.05, 0.055, 0.03, metal(0x3a3024, 0.5)); g.add(base);
-    const glass = cyl(0.035, 0.04, 0.09, new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.05, transmission: 0.9, thickness: 0.01, transparent: true, opacity: 0.35 })); glass.position.y = 0.06; g.add(glass);
+    const glass = cyl(0.035, 0.04, 0.09, new THREE.MeshBasicMaterial({ color: 0xffd9a0, transparent: true, opacity: 0.12, depthWrite: false })); glass.position.y = 0.06; g.add(glass);
     const flame = new THREE.Mesh(new THREE.SphereGeometry(0.008, 12, 8).scale(1, 2.2, 1), glow(0xffa040, 6)); flame.position.y = 0.055; g.add(flame); emitters.push(flame);
     const cap = cyl(0.03, 0.045, 0.025, metal(0x3a3024, 0.5)); cap.position.y = 0.118; g.add(cap);
     const handle = new THREE.Mesh(new THREE.TorusGeometry(0.035, 0.003, 6, 24, Math.PI), metal(0x3a3024, 0.5)); handle.position.y = 0.13; g.add(handle);
@@ -69,7 +71,7 @@ function modelOf(id, def) {
 
 // where each item is held, in the camera's space (right hand; the lantern lower and to the left)
 const HOLD = {
-  flashlight: [[0.16, -0.14, -0.32], [0.04, 0.06, 0]], lantern: [[-0.2, -0.24, -0.4], [0, 0, 0]], glowstick: [[0.16, -0.16, -0.34], [0.2, 0.3, 0]],
+  flashlight: [[0.16, -0.14, -0.32], [0.04, 0.06, 0]], lantern: [[-0.26, -0.32, -0.6], [0, 0, 0]], glowstick: [[0.16, -0.16, -0.34], [0.2, 0.3, 0]],
   lighter: [[0.13, -0.15, -0.3], [0, 0, 0]], phone: [[0.12, -0.13, -0.3], [-0.5, 0.25, 0]],
 };
 
@@ -90,7 +92,7 @@ export function makeItem(id, opts = {}) {
   } else {
     main = new THREE.PointLight(0xffffff, 1, def.range, 2); main.castShadow = id === 'lantern';
     main.shadow.mapSize.set(512, 512); main.shadow.bias = -0.002; main.shadow.camera.near = 0.03;
-    main.position.copy(emitters[0].position); g.add(main); lights.push(main);
+    main.position.copy(emitters[0].position); g.add(main); lights.push(main);   // its parts cast no shadow: they do not close it in
   }
   let flick = 1, phase = Math.random() * 100;
   const item = {
@@ -114,8 +116,8 @@ export function makeItem(id, opts = {}) {
     if (def.kind === 'spot') {
       main.color.copy(col); main.angle = st.angle * Math.PI / 180; main.intensity = I * (id === 'phone' ? 3 : 120) * Math.PI;
       if (spill) { spill.color.copy(col); spill.angle = Math.min(1.2, main.angle * 2.6); spill.intensity = I * 10 * Math.PI; }
-    } else { main.color.copy(col); main.intensity = I * 4 * Math.PI; }
-    for (const e of emitters) { e.material.emissive.copy(col); e.material.emissiveIntensity = (id === 'phone' ? 1.2 : 4) * Math.max(0.05, charge * flick); }
+    } else { main.color.copy(col); main.intensity = I * 25 * Math.PI; }
+    for (const e of emitters) { e.material.emissive.copy(col); e.material.emissiveIntensity = (id === 'phone' ? 1.2 : 2) * Math.max(0.05, charge * flick); }
   }
   apply();
   return item;

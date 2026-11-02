@@ -14,7 +14,7 @@ const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}) => Object.assign(document.createElement(tag), props);
 const KEY = 'gameLab.gear.v1';
 let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { saved = null; }
-const S = { item: 'flashlight', mode: 'eye', show: true, drain: false, tune: {}, gain: 18, grain: 0.35, phosphor: 'green', ir: true, zoom: 7, reticle: true,
+const S = { item: 'flashlight', mode: 'eye', show: true, drain: false, tune: {}, gain: 10, grain: 0.35, phosphor: 'green', ir: true, zoom: 7, reticle: true,
   seed: 11, rock: 'limestone', ambient: 0.02, ...(saved || {}) };
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { /* private mode */ } };
 const FOV = 70, EXPOSURE = 1.15;
@@ -22,7 +22,7 @@ const FOV = 70, EXPOSURE = 1.15;
 /* ---------------- renderer, camera, place ---------------- */
 const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
-renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
 $('view').append(renderer.domElement);
 const scene = new THREE.Scene(); scene.background = new THREE.Color(0x010102);
 const camera = new THREE.PerspectiveCamera(FOV, 1, 0.02, 2000); scene.add(camera);
@@ -61,7 +61,8 @@ for (const k of Object.keys(FMT)) {
     item.set({ [k]: v }); (S.tune[S.item] = S.tune[S.item] || {})[k] = v; save();
   });
 }
-function applyShow() { item.group.children[0].visible = S.show && S.mode !== 'binoculars'; }
+// hides only the item's model: its light stays on (in binoculars both hands hold the binoculars, the item is lowered)
+function applyShow() { const v = S.show && S.mode !== 'binoculars'; item.group.traverse((o) => { if (o.isMesh) o.visible = v; }); }
 $('items').replaceChildren(...Object.entries(ITEMS).map(([id, d]) => { const b = el('button', { type: 'button', textContent: d.name }); b.dataset.id = id; b.onclick = () => equip(id); return b; }));
 $('show').checked = S.show; $('show').onchange = () => { S.show = $('show').checked; applyShow(); save(); };
 $('drain').checked = S.drain; $('drain').onchange = () => { S.drain = $('drain').checked; item.drain = S.drain; save(); };

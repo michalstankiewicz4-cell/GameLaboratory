@@ -3,6 +3,29 @@
 Wersja programu i każdego laboratorium: `ui/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.14.0 — 2026-11-02 (dwa nowe laboratoria: jaskinie, przedmioty bohatera)
+
+### Nowe
+- **Laboratorium jaskiń** (`labs/caves.html`, 1.0.0) i **CaveKit** (`js/models/caves/cavekit.js`): jaskinie z ziarna —
+  korytarze, odgałęzienia, komory, stalaktyty i stalagmity, gruz, ogólne jeziorka (styl wody wybiera się w laboratorium
+  wody); skały: wapień, granit, piaskowiec, bazalt, suche lub mokre (warstwa wody), relief; światło: latarka w dłoni,
+  lampa, otoczenie, ekspozycja; widok ze środka (wolna kamera) i z zewnątrz. Opis: `docs/caves.md`.
+- **Laboratorium przedmiotów bohatera** (`labs/gear.html`, 1.0.0) i **GearKit** (`js/models/gear/gearkit.js`): latarka
+  (wąska plama i szeroka poświata, cienie), lampa naftowa, światło chemiczne, zapalniczka, ekran telefonu — każdy z
+  modelem w dłoni, mocą, barwą (kelwiny), stożkiem, naładowaniem, migotaniem i rozładowywaniem. **Widzenie**
+  (`js/render/vision.js`): oko, noktowizor (wzmocnienie, szum, fosfor zielony lub biały, oświetlacz podczerwieni widoczny
+  tylko w urządzeniu), lornetka (zoom, skala). Miejsce testu: ciemna jaskinia z CaveKit. Opis: `docs/gear.md`.
+- `js/labkit/freecam.js`: wolna kamera do oglądania wnętrz (mysz: przeciąganie, kółko, prawy przycisk; albo W/A/S/D).
+- `LookPipeline.render(scene, camera, target)` może oddać obraz do celu renderowania (dla przejścia po nim).
+
+### Zmienione
+- **Doktor modeli bada jeden model naraz**: ten, z którym się otwiera, i każdy następny po wybraniu; „Examine all”
+  (albo `?all=1`, tak uruchamia go `tools/doctor.py`) bada całą listę. Wcześniej na starcie badał wszystkie.
+- Laboratorium języka: poprawione ścieżki do `data/lang/rozmowy/rozmowy.txt` w opisie kroku i komunikacie błędu.
+- `THREE.PCFSoftShadowMap` (usunięty w r186, ostrzeżenie w konsoli) zamieniony na `PCFShadowMap` we wszystkich
+  laboratoriach — wygląd bez zmian (r186 i tak go zastępował).
+- Wersje: program 0.14.0; doktor i laboratorium języka z+1.
+
 ## Program 0.13.3 — 2026-11-01 (dokumentacja i komentarze)
 
 ### Zmienione

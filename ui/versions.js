@@ -5,7 +5,7 @@
 (function () {
   "use strict";
   const V = {
-  app: "0.13.3",
+  app: "0.14.0",
   labs: {
     "labs/ship.html": "1.4.1",
     "labs/bodies.html": "1.2.3",
@@ -27,7 +27,7 @@
     "labs/look.html": "1.1.2",
     "labs/pixel.html": "1.1.2",
     "labs/zombies.html": "1.1.2",
-    "tools/doctor.html": "1.1.4",
+    "tools/doctor.html": "1.1.5",
     "labs/transform.html": "1.1.2",
     "tools/kitcheck.html": "1.0.4",
     "tools/grainTexture.html": "1.0.3",
@@ -35,7 +35,9 @@
     "labs/warship.html": "1.1.3",
     "labs/morgue.html": "1.0.2",
     "labs/walkers.html": "0.23.3",
-    "labs/lang.html": "0.23.2",
+    "labs/lang.html": "0.23.3",
+    "labs/caves.html": "1.0.0",
+    "labs/gear.html": "1.0.0",
   },
   };
   window.GameLabVersions = V;

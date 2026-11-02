@@ -16,6 +16,7 @@
 - `js/models/` — modele (geometria, materiały, światła, części); nie wiedzą, w jakim środowisku są.
 - Ludzie mają osobne laboratorium (`labs/human.html`) i osobny folder modeli (`js/models/human/`) — oddzielone od laboratorium życia (zwierzęta i inne formy życia, `js/models/life/`). Oba stoją na LifeKit (`js/models/life/lifekit.js`). Postacie człekokształtne z SDF i pixel artu (generator zombie, SDF Walkers, Kostnica SDF): `js/models/human/zombie/`.
 - `js/envs/space|land|water/` — środowiska i ich prawa (kosmos bez grawitacji, ląd z grawitacją, woda z wypornością); `js/envs/sky/` — niebo i deszcz, wspólne dla lądu i wody.
+- Jaskinie (CaveKit, `js/models/caves/`) i przedmioty bohatera dające światło (GearKit, `js/models/gear/`) to modele; sposoby widzenia (oko, noktowizor, lornetka) — warstwa obrazu `js/render/vision.js`. Jeziorka w jaskiniach są ogólne — styl wody wybiera się w laboratorium wody.
 - `js/behaviors/` — zachowania (napęd i ruch) podpinane do modeli; każde deklaruje, w których środowiskach działa.
 - `ui/` — całe UI: tokeny, czcionki, kontrolki, okna, przełącznik środowiska, ładowanie, pasek menu, wersje; style stron w `ui/pages/` (opis: `ui/README.md`).
 - `js/render/`, `js/audio/`, `js/labkit/` — wspólne warstwy.

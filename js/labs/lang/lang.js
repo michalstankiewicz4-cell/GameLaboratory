@@ -24,7 +24,7 @@ const STEPS = [
     what: 'Bierze kopię sieci wytrenowanej w kroku 2, 3 albo 4 i uczy ją dalej na krótkich dialogach w formacie „Ty: … / Sieć: …”. Potem w oknie czatu dopisujemy Twoją wiadomość i „Sieć:”, a sieć dokańcza linijkę. To jest cała „rozmowa”: zwykłe przewidywanie dalszego ciągu tekstu w odpowiednim formacie.',
     why: 'Tak samo (w ogromnej skali) powstają asystenci: najpierw sieć uczy się języka z dużej ilości tekstu, potem jest dostrajana na przykładach rozmów. Błąd liczymy tylko na kwestiach Sieci (maskowanie): sieć ma się nauczyć odpowiadać, a nie mówić za rozmówcę. Bez maski uczy się też pisać Twoje kwestie.',
     lim: 'Uczy się formy, nie wiedzy: odpowiada we własnej kolejce, krótkimi zdaniami, w podobnym tonie, ale nie rozumie pytań i nie wie nic poza tym, co przeczytała. 140 rozmów to bardzo mało, więc szybko zaczyna je powtarzać na pamięć (pilnuje tego najlepsza wersja). Sieć z oknem widzi tylko kilka ostatnich znaków, więc nie zobaczy nawet całego pytania.',
-    more: 'Dialogi napisał Claude dla tego laboratorium (domena publiczna, plik lang/data/rozmowy). Słownik liter albo tokenów zostaje taki jak w sieci bazowej. Najlepiej dostrajać transformer albo GRU wytrenowane wcześniej na Grabińskim.' },
+    more: 'Dialogi napisał Claude dla tego laboratorium (domena publiczna, plik data/lang/rozmowy/rozmowy.txt). Słownik liter albo tokenów zostaje taki jak w sieci bazowej. Najlepiej dostrajać transformer albo GRU wytrenowane wcześniej na Grabińskim.' },
   { kind: 'transformer', name: '4 · Transformer', sub: 'uwaga, 2017', ready: true,
     what: 'Sieć widzi naraz okno ostatnich liter (np. 64). Każda pozycja zadaje pytanie (zapytanie), każda wcześniejsza ma etykietę (klucz) i treść (wartość). Pozycja bierze treści tych liter, których klucze najlepiej pasują do jej pytania. To jest uwaga. Kilka „głów” pyta równolegle o różne rzeczy, a kilka warstw powtarza to na coraz bardziej przetworzonej treści.',
     why: 'Usuwa wąskie gardło RNN: nic nie musi przecisnąć się przez jeden mały wektor pamięci, bo każda litera może sięgnąć wprost do dowolnej wcześniejszej w oknie, bez osłabiania sygnału. Wszystkie pozycje liczą się jednocześnie, a nie po kolei, więc ogromnie zyskuje na kartach graficznych. To dlatego wygrał i na nim stoją GPT, Claude i inne duże modele.',
@@ -119,7 +119,7 @@ function renderTokView() {
   const p3 = h('p', 'note'); p3.textContent = 'Najdłuższe tokeny: ' + u.longest.map(showTok).join('  ');
   box.append(p1, ex, p2, p3);
 }
-// Przykłady: zestawy tekstów z lang/data/ (lista w manifest.json, bo serwer statyczny nie pokazuje zawartości folderu).
+// Przykłady: zestawy tekstów z data/lang/ (lista w manifest.json, bo serwer statyczny nie pokazuje zawartości folderu).
 // Gdy ich brak albo strona jest otwarta z dysku, zostaje krótki tekst wbudowany w data.js.
 // Pliki z Wolnych Lektur kończą się notą licencyjną po linii „-----”; to nie jest tekst utworu.
 function stripFooter(t) { const i = t.search(/\r?\n-----\r?\n[^]*$/); return (i > 0 ? t.slice(0, i) : t).replace(/^ISBN[^\n]*\n/m, ''); }
@@ -257,7 +257,7 @@ async function startFinetune() {
   try {
     if (!dialogText) dialogText = await (await fetch('../data/lang/rozmowy/rozmowy.txt')).text();
     worker.postMessage({ cmd: 'finetune', base: hp.base, hp, dialog: dialogText });
-  } catch (e) { showErr('Nie udało się wczytać rozmów (data/rozmowy/rozmowy.txt). Strona musi być otwarta przez serwer.'); training = false; $('train').disabled = false; $('stop').disabled = true; }
+  } catch (e) { showErr('Nie udało się wczytać rozmów (data/lang/rozmowy/rozmowy.txt). Strona musi być otwarta przez serwer.'); training = false; $('train').disabled = false; $('stop').disabled = true; }
 }
 $('stop').addEventListener('click', () => worker.postMessage({ cmd: 'stop' }));
 $('temp').addEventListener('input', () => $('tempOut').textContent = (+$('temp').value).toFixed(1).replace('.', ','));

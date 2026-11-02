@@ -347,7 +347,7 @@ function stage() {
   if (R3) return R3;
   const canvas = document.createElement('canvas');
   const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true, premultipliedAlpha: false });
-  r.setPixelRatio(1); r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap;
+  r.setPixelRatio(1); r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFShadowMap;
   r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.15; r.outputColorSpace = THREE.SRGBColorSpace;
   const scene = new THREE.Scene(), cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 20);
   const key = new THREE.DirectionalLight(0xfff2e0, 2.6), rim = new THREE.DirectionalLight(0x9fb4d0, 1.1), hemi = new THREE.HemisphereLight(0x8fa0b8, 0x4a4036, 0.9);

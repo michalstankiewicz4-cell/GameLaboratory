@@ -130,7 +130,8 @@ $('allOn').onclick = () => setChecks(() => true);
 $('errOnly').onclick = () => setChecks((c) => SEVERITY[c] !== 'info');
 const bindRange = (id, fmt) => { const r = $(id), o = $(id + 'V'); const f = () => { o.textContent = fmt(+r.value); }; r.addEventListener('input', f); f(); };
 bindRange('tol', (v) => (v * 100).toFixed(1) + '%'); bindRange('bTri', (v) => (v / 1000) + 'k'); bindRange('bCalls', (v) => v);
-$('rerun').onclick = () => runAll(current && current.id);
+$('rerun').onclick = () => open(current ? current.id : MODELS[0].id, true);
+$('all').onclick = () => { for (const k of Object.keys(built)) delete built[k]; for (const k of Object.keys(report.models)) delete report.models[k]; if (shown) { scene.remove(shown); shown = null; } runAll(current && current.id); };
 $('copy').onclick = async () => {
   const txt = JSON.stringify(report, null, 1);
   try { await navigator.clipboard.writeText(txt); $('copied').textContent = 'Report copied (' + Math.round(txt.length / 1024) + ' kB).'; } catch { $('copied').textContent = 'Clipboard blocked: the report is in window.doctorReport.'; }
@@ -147,7 +148,7 @@ function listModels() {
   $('models').replaceChildren(...MODELS.map((m) => {
     const c = countsOf(m.id);
     const tags = c ? (c.error + c.warning + c.info ? ['error', 'warning', 'info'].filter((s) => c[s]).map((s) => el('span', { className: 'cnt ' + s, textContent: c[s] })) : [el('span', { className: 'cnt ok', textContent: '✓' })]) : [el('span', { className: 'cnt', textContent: '…' })];
-    const b = el('button', { type: 'button', onclick: () => show(m.id) }, el('span', {}, m.label, el('small', { className: 'dimtxt', textContent: ' ' + m.sub })), ...tags);
+    const b = el('button', { type: 'button', onclick: () => open(m.id) }, el('span', {}, m.label, el('small', { className: 'dimtxt', textContent: ' ' + m.sub })), ...tags);
     b.dataset.id = m.id; if (current && current.id === m.id) b.classList.add('on');
     return b;
   }));
@@ -182,20 +183,40 @@ function listFindings() {
   $('findings').replaceChildren(...kids);
 }
 
+// One model at a time: the page examines the model it opens with (?model=… or the first) and every other one when
+// it is picked; "Examine all" (or ?all=1 — tools/doctor.py) goes through the whole list.
+function examineSafe(m) {
+  try { return examineModel(m); } catch (e) { console.error(e); delete built[m.id]; report.models[m.id] = { label: m.label, family: m.family, error: String(e && e.stack || e), counts: {}, findings: [] }; return null; }
+}
+function summary() {
+  const ids = Object.keys(report.models).filter((id) => !id.startsWith('test/')), tot = { error: 0, warning: 0, info: 0 };
+  ids.forEach((id) => report.models[id].findings.forEach((f) => tot[f.severity]++));
+  const all = MODELS.filter((m) => !m.id.startsWith('test/')).length;
+  $('status').textContent = `${ids.length} of ${all} models examined · ${tot.error} errors · ${tot.warning} warnings · ${tot.info} info` + (ids.length < all ? ' · “Examine all” for the rest' : '');
+}
+async function open(id, again) {
+  const m = MODELS.find((x) => x.id === id) || MODELS[0];
+  if (again) { restoreMaterials(); if (shown) { scene.remove(shown); shown = null; } delete built[m.id]; delete report.models[m.id]; }
+  if (!built[m.id]) {
+    $('status').textContent = `examining ${m.label}…`;
+    await new Promise((r) => setTimeout(r, 30));
+    examineSafe(m);
+  }
+  summary(); listModels();
+  if (built[m.id]) show(m.id); else $('status').textContent = `${m.label}: could not be built (see the console)`;
+}
 async function runAll(keep) {
   report.done = false; restoreMaterials(); selected = null;
   for (const m of MODELS) {
     $('status').textContent = `examining ${m.label}…`; listModels();
     await new Promise((r) => setTimeout(r, 30));
-    try { examineModel(m); } catch (e) { console.error(e); report.models[m.id] = { label: m.label, family: m.family, error: String(e && e.stack || e), counts: {}, findings: [] }; }
+    examineSafe(m);
   }
-  const tot = { error: 0, warning: 0, info: 0 };
-  Object.entries(report.models).forEach(([id, r]) => { if (!id.startsWith('test/')) r.findings.forEach((f) => tot[f.severity]++); });
-  $('status').textContent = `${MODELS.length - 1} models · ${tot.error} errors · ${tot.warning} warnings · ${tot.info} info (test bench not counted)`;
+  summary();
   report.done = true;
   listModels();
   const want = keep || params.get('model');
-  show(MODELS.some((m) => m.id === want) ? want : MODELS[0].id);
+  show(MODELS.some((m) => m.id === want && built[m.id]) ? want : MODELS[0].id);
 }
 
 /* ---------------- loop ---------------- */
@@ -210,4 +231,4 @@ function frame() {
 }
 window.__doctor = { report, built, show, highlight, get selected() { return selected; } };
 requestAnimationFrame(frame);
-runAll();
+if (params.get('all')) runAll(); else open(params.get('model') || MODELS[0].id);

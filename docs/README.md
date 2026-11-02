@@ -19,6 +19,8 @@ UI: [`../ui/README.md`](../ui/README.md).
 | Dźwięk | `labs/sound.html` | [sound.md](sound.md) |
 | Życie, edytor stworów | `labs/life.html`, `labs/creator.html` | [life.md](life.md) |
 | Człowiek | `labs/human.html` | [human.md](human.md) |
+| Jaskinie | `labs/caves.html` | [caves.md](caves.md) |
+| Przedmioty bohatera | `labs/gear.html` | [gear.md](gear.md) |
 | Budowle | `labs/structures.html` | [structures.md](structures.md), [structures/coastal.md](structures/coastal.md), [structures/super300.md](structures/super300.md) |
 | Woda | `labs/water.html` | [water.md](water.md) |
 | Ląd | `labs/land.html` | [land.md](land.md) |
