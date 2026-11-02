@@ -4,7 +4,7 @@ Ground vehicles for the planets' surfaces. Started 2026-10-03. The user's
 call: a page of its own, separate from the ship page ("too much in one file",
 and these get driving animations). Since 2026-11-02 it is the land page of one
 **vehicle lab** (space: `ship.html`, water: `warship.html`, land: this page),
-with MarineKit's amphibian on its list ([marine.md](marine.md)).
+with MarineKit's amphibian on its list ([marine.md](../models/marine.md)).
 
 ## Files
 
@@ -66,4 +66,4 @@ everything inside it in `update(t, dt, opts)`:
     there is along great circles, and `contact` comes from
     `surf.groundAt` in the vehicle's tangent frame;
   - give the hauler a real load to carry between modules;
-  - the sea vehicles lab: done, see [`marine.md`](marine.md).
+  - the sea vehicles lab: done, see [`marine.md`](../models/marine.md).

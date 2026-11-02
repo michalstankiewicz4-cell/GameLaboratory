@@ -1,7 +1,7 @@
 // Jack-up drilling rig of the Marathon LeTourneau Super 300 design (1983): triangular hull, three square truss legs
 // with rack-and-pinion jacking, cantilevered drill floor and derrick over the stern, quarters and helideck forward.
 // Main figures from the operator's published specification sheet of a Super 300 unit; the deck layout is
-// reconstructed (see docs/structures/super300.md for sources and every assumption). Metres, y up, +z = bow.
+// reconstructed (see docs/labs/structures/super300.md for sources and every assumption). Metres, y up, +z = bow.
 import * as THREE from '../../../../vendor/three/three.module.js';
 import { Part, plan } from '../../ships-sea/geom.js';
 import { structMaterials } from '../materials.js';
@@ -14,7 +14,7 @@ export const info = {
   year: '1983 (built) · 2015 (last upgrade)',
   type: 'Self-elevating (jack-up) drilling unit, independent legs, cantilever',
   builder: 'Design: Marathon LeTourneau, Super 300 · modelled on a unit whose specification sheet is public (see sources)',
-  note: 'Built from code at real scale (1 unit = 1 m). Hull, legs, spud cans, derrick, cranes and quarters follow the published specification sheet; the deck layout, the leg truss pattern and the colours are reconstructed — every assumption is listed in docs/structures/super300.md.',
+  note: 'Built from code at real scale (1 unit = 1 m). Hull, legs, spud cans, derrick, cranes and quarters follow the published specification sheet; the deck layout, the leg truss pattern and the colours are reconstructed — every assumption is listed in docs/labs/structures/super300.md.',
   specs: [
     ['Hull', '270 ft × 268 ft × 28 ft (82.3 × 81.7 × 8.5 m)'],
     ['Legs', '3 × 515 ft (157 m), square truss, rack and pinion'],

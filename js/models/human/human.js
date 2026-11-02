@@ -1,5 +1,5 @@
 /* LifeKit — the human (js/models/life/creatures/human.js). Loaded after
-   lifekit.js and move/walk.js. docs/life.md.
+   lifekit.js and move/walk.js. docs/labs/life.md.
 
    Lore: there are no living humans in the game's world — this model is
    for the Wiki, holograms, statues, remains, and a base for androids and

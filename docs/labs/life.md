@@ -1,6 +1,6 @@
 # Life lab (labs/life.html) and LifeKit
 
-> **Humans moved to their own lab** — `labs/human.html`, models in `js/models/human/`; see `docs/human.md`. This lab keeps the other life forms (animals) and LifeKit itself; the creature editor is `labs/creator.html`.
+> **Humans moved to their own lab** — `labs/human.html`, models in `js/models/human/`; see `docs/labs/human.md`. This lab keeps the other life forms (animals) and LifeKit itself; the creature editor is `labs/creator.html`.
 
 
 Life forms, built from blocks the way ShipKit builds ships. Started
@@ -18,7 +18,7 @@ the game yet. The plan and its reasons: IDEAS.md, "Life forms".
 | `js/models/life/creatures/strider.js` | The plains strider, an invented grazer — the first land animal. |
 | `js/models/life/design.js` + `js/models/life/move/legs.js` | The creature editor's builder (a creature from a design, JSON) and its walker (any number of legs). |
 | `labs/creator.html` + `js/labs/creator/creator.js` | The creature editor. |
-| `labs/life.html` + `js/labs/life/life.js` | The lab: the creatures, MOVEMENT (gait, speed, in place / around), VIEW (skeleton, wireframe, scale bar), BODY (the creature's own parameters, generated from `params`), MODEL and PERFORMANCE. |
+| `labs/life.html` + `js/labs/life/life.js` | The lab: the creatures, MOVEMENT (gait, speed, in place / around), VIEW (skeleton, wireframe, scale bar), BODY (the creature's own parameters, generated from `params`); the model's numbers in the standard Performance window. |
 
 Load order on a page: THREE → `lifekit.js` → the `move/` files → `parts/` →
 the creature files. The lab also loads ShipKit's core (`makeEnvironment`,
@@ -44,9 +44,9 @@ the creature files. The lab also loads ShipKit's core (`makeEnvironment`,
 - **Materials** (`util.materials()`, one cache per creature, disposed with
   it): skin (a warm mottled map, a pore bump), cloth (a weave), rubber,
   metal, hair (strands), eyes (the iris and pupil around the front pole);
-  colours converted to linear like everywhere else. r128 needs
-  `skinning: true` on a skinned mesh's material — the cache keeps skinned
-  and rigid copies apart.
+  colours converted to linear like everywhere else. The cache keeps skinned
+  and rigid copies apart (written for r128, which needed `skinning: true`
+  on a skinned mesh's material; r186 sets it up by itself).
 
 Gotcha (cost an hour): THREE's Catmull-Rom curve through **two** points
 gives a tangent pointing *backwards* at the start, so a two-section ring

@@ -14,15 +14,17 @@
 
 ## Układ folderów
 
-- `labs/` — strony laboratoriów; `js/labs/` — ich skrypty.
-- `js/models/` — modele (geometria, materiały, światła, części); nie wiedzą, w jakim środowisku są.
+- `labs/` — strony laboratoriów; `js/labs/<lab>/` — skrypty laboratorium we własnym folderze, główny plik `<lab>.js` (np. `js/labs/ship/ship.js`); wspólne skrypty laboratoriów — `js/labs/shared/`.
+- `js/models/` — modele (geometria, materiały, światła, części); nie wiedzą, w jakim środowisku są. Statki-roboty (MarineKit) — `js/models/marine/`.
 - Ludzie mają osobne laboratorium (`labs/human.html`) i osobny folder modeli (`js/models/human/`) — oddzielone od laboratorium życia (zwierzęta i inne formy życia, `js/models/life/`). Oba stoją na LifeKit (`js/models/life/lifekit.js`). Postacie człekokształtne z SDF i pixel artu (generator zombie, SDF Walkers, Kostnica SDF): `js/models/human/zombie/`.
 - `js/envs/space|land|water/` — środowiska i ich prawa (kosmos bez grawitacji, ląd z grawitacją, woda z wypornością); `js/envs/sky/` — niebo i deszcz, wspólne dla lądu i wody.
 - Jaskinie (CaveKit, `js/models/caves/`) i przedmioty bohatera dające światło (GearKit, `js/models/gear/`) to modele; sposoby widzenia (oko, noktowizor, lornetka) — warstwa obrazu `js/render/vision.js`. Jeziorka w jaskiniach (woda i lawa) są ogólne — ich styl wybiera się w laboratorium wody (tam też lawa).
 - `js/behaviors/` — zachowania (napęd i ruch) podpinane do modeli; każde deklaruje, w których środowiskach działa.
-- `ui/` — całe UI: tokeny, czcionki, kontrolki, okna, przełącznik środowiska, ładowanie, pasek menu, wersje; style stron w `ui/pages/` (opis: `ui/README.md`).
+- `ui/` — całe UI (opis: `ui/README.md`): `ui/ui.css` (jedno wejście), `ui/style/` (tokeny, czcionki, kontrolki, motywy `space.css` i `sea.css`), `ui/shell/` (dziennik, pasek menu, paski, okna, okna standardowe, wydajność, konsola, karta ładowania, przełącznik środowiska), `ui/data/` (katalog, wersje), `ui/pages/` (style stron).
 - `js/render/`, `js/audio/`, `js/labkit/` — wspólne warstwy.
-- `tools/` — narzędzia (doktor modeli, kitcheck, `paths.py` — sprawdzanie ścieżek); `docs/` — dokumentacja (mapa: `docs/README.md`, historia sprzed przeniesienia: `docs/history/`).
+- `tools/` — narzędzia (doktor modeli, kitcheck, `paths.py` — sprawdzanie ścieżek).
+- `docs/` — dokumentacja w układzie kodu (mapa: `docs/README.md`): `docs/labs/` (laboratoria), `docs/models/` (modele), `docs/tools/` (narzędzia), `docs/guides/` (przewodniki, renderowanie, pułapki), `docs/history/` (historia sprzed przeniesienia, wykonany remanent).
+- Nazwy plików i folderów małymi literami, słowa łączone myślnikiem (`solar-system.js`, `grain-texture.html`); w kodzie nazwy mówią, co robią teraz (np. `LabKit.autoHideWindows`, nie dawne „hud”).
 
 ## Fizyka
 
@@ -48,7 +50,7 @@
 - Modeli nie naprawiamy ręcznie.
 - Naprawa odbywa się przez ulepszanie doktora modeli. Doktor ma być uniwersalny — nigdy dostosowany do jednego modelu.
 - Jeśli naprawa przez doktora nie jest możliwa, zostaje po stronie gry.
-- Jeden doktor dla wszystkich modeli: `tools/doctor.html`, logika `tools/doctor/modeldoctor.js`, źródła modeli `tools/doctor/sources/` (opis: `docs/doctor/README.md`). Wzorzec: `tools/doctor.golden.json` (`python3 tools/doctor.py`, `--update`).
+- Jeden doktor dla wszystkich modeli: `tools/doctor.html`, logika `tools/doctor/modeldoctor.js`, źródła modeli `tools/doctor/sources/` (opis: `docs/tools/doctor.md`). Wzorzec: `tools/doctor.golden.json` (`python3 tools/doctor.py`, `--update`).
 - Pixel Doctor (`js/render/pixel/doctor.js`, w Pixel Studio) jest osobny i dotyczy tylko pixel artu (obrazków 2D): kolory, półprzezroczystość, samotne piksele, pillow shading, banding, kontrast.
 
 ## Grafika
@@ -58,8 +60,8 @@
 
 ## Okna z opcjami
 
-- Opcje laboratorium (dawne panele po lewej i prawej) są w pływających oknach otwieranych z OPCJE → Okna: `ui/shell/windows.js` + `ui/shell/windows.css`. Panel dostaje `data-window`, `data-title`, `data-title-pl`, `data-side`. Wszystkie laboratoria z panelami (poza skalą i skórkami) i doktor. Bez `data-title` tytułem jest pierwsza sekcja panelu (`h3` / `.secHd`). Okna bez zapisanego położenia układają się jedno pod drugim po swojej stronie, a gdy kolumna się zapełni — w następnej kolumnie obok.
-- Okna standardowe (`ui/shell/labwin.js`, `data-std`), wszędzie te same: **Opis** (lewa, pierwsze), **Kamera**, **Światło i pogoda**, **Wydajność** (prawa, w tej kolejności). Wydajność jest generowana w jednym miejscu (`LabPerf`: klatki, czas klatki, CPU, trójkąty, wywołania rysowania, rozdzielczość, wykres, Model); statystyki modelu idą do niej. Własne okna laboratorium po lewej, za Opisem; drugie duże może stać po prawej, nad wspólnymi. Laboratorium pokazuje tylko te okna standardowe, które mają u niego sens. Wyjątki bez okien standardowych: doktor modeli, skala, skórki, SDF Walkers, laboratorium języka i obrazów.
+- Opcje laboratorium są w pływających oknach otwieranych z OPCJE → Okna: `ui/shell/windows.js` + `ui/shell/windows.css`. Panel dostaje `data-window`, `data-title`, `data-title-pl`, `data-side`. Wszystkie laboratoria z opcjami (poza skalą i skórkami) i doktor. Bez `data-title` tytułem jest pierwsza sekcja panelu (`h3` / `.secHd`). Okna bez zapisanego położenia układają się jedno pod drugim po swojej stronie, a gdy kolumna się zapełni — w następnej kolumnie obok.
+- Okna standardowe (`ui/shell/labwin.js`, `data-std`), wszędzie te same: **Opis** (lewa, pierwsze), **Kamera**, **Światło i pogoda**, **Wydajność** (prawa, w tej kolejności). Wydajność jest generowana w jednym miejscu (`LabPerf`, `ui/shell/perf.js`: klatki, czas klatki, CPU, trójkąty, wywołania rysowania, rozdzielczość, wykres, Model); statystyki modelu idą do niej. Własne okna laboratorium po lewej, za Opisem; drugie duże może stać po prawej, nad wspólnymi. Laboratorium pokazuje tylko te okna standardowe, które mają u niego sens. Wyjątki bez okien standardowych: doktor modeli, skala, skórki, SDF Walkers, laboratorium języka i obrazów.
 
 ## Wygląd (UI)
 
@@ -68,7 +70,7 @@
 - Pasek menu ładuje własny arkusz `ui/shell/menubar.css` (`<link>`).
 - Każda strona (laboratoria, narzędzia, strona startowa) ma dwa paski jak laboratorium wody (`ui/shell/bars.css`): `.bar` pod paskiem menu (własne kontrolki laboratorium, przełącznik środowiska) i `.foot` na dole (skala, klatki na sekundę, GameLaboratory; `#fps[data-auto]` liczy `ui/shell/bars.js`). Paski i wszystko na nich są zdefiniowane tylko w `ui/shell/bars.css` (stałe wysokości, nieprzezroczyste tło) — arkusze laboratoriów ich nie stylują; w paskach nie ma nazwy, wersji ani linków (są na pasku menu). OPCJE → Paski: pasek narzędzi i pasek informacyjny, domyślnie włączone (`body.lmNoBar`, `body.lmNoFoot`). Strona przewijana jak dokument (języka, obrazów, SDF Walkers, narzędzia) ma `<body class="pageFlow">`: zaczyna się pod paskami i kończy nad dolnym.
 - Ładowanie: karta `.labLoad` z kółkiem, zwykłym zdaniem (nie wielkimi literami), nazwą etapu, paskiem i procentem (`ui/shell/loader.js`). Przy starcie sama pokazuje postęp strony; laboratorium zgłasza własne etapy `LabLoad.step(nazwa, ułamek)`, a długie operacje w trakcie pracy (powyżej ok. 1 s) idą przez `LabLoad.run(tytuł, async step => …)`.
-- Konsola: przycisk po prawej na pasku narzędzi otwiera okno z dziennikiem strony (`ui/shell/console.js`, dziennik `window.LabLog` zaczyna się w `ui/shell/menubar.js`): błędy, ostrzeżenia, komunikaty, etapy ładowania — najnowsze na górze, data i czas, strona, filtr; dziennik zostaje do zamknięcia karty (`sessionStorage`). Na każdej stronie, także startowej (ma oba paski).
+- Konsola: przycisk po prawej na pasku narzędzi otwiera okno z dziennikiem strony (`ui/shell/console.js`; dziennik `window.LabLog` — `ui/shell/log.js`, pierwszy skrypt każdej strony): błędy, ostrzeżenia, komunikaty, etapy ładowania — najnowsze na górze, data i czas, strona, filtr; dziennik zostaje do zamknięcia karty (`sessionStorage`). Na każdej stronie, także startowej (ma oba paski).
 
 ## Wersjonowanie
 

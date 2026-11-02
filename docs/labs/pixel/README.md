@@ -16,7 +16,7 @@ Every result has a **transparent background**, any size from 4 to 256 pixels eac
 | **Draw** | A pixel editor: pencil, eraser (or right button), fill, line (Bresenham, pixel-perfect), rectangle, picker, mirror left–right, frames (new, duplicate, delete), onion skin, undo/redo (Ctrl+Z / Ctrl+Shift+Z), samples drawn by hand, and **sprites as text** in and out. The drawing is kept in the browser. | `js/labs/pixel/pixel.js`, `js/render/pixel/sprites.js` |
 | **Hybrid** | *Edit in Draw* takes the current 3D or generated result (all frames, its colours added to the swatches) into the editor for retouching by hand. | `js/labs/pixel/pixel.js` |
 
-## The shared pipeline (right panel)
+## The shared pipeline (the Picture and export window)
 
 1. **Palette**: *Auto* (median cut in OKLab, 2–32 colours), fixed palettes (Steel 16, Moss 12, Desert 10, Ember 8,
    Night 8, Sea 12, Green 4, Mono 4, 1-bit) or *Free* (no reduction). Nearest colour is measured in OKLab.
@@ -69,7 +69,7 @@ text* writes it, *Text → drawing* reads it — sprites can be written, read an
 
 ## Zombie Generator
 
-`pixel/zombies.html` — original zombies as Unity sprite sheets, realistic or pixel art: see `docs/pixel/zombies.md`.
+`pixel/zombies.html` — original zombies as Unity sprite sheets, realistic or pixel art: see `docs/labs/pixel/zombies.md`.
 
 ## Known limits / next
 

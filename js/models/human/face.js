@@ -1,6 +1,6 @@
 /* LifeKit — a humanoid head with a face that moves (js/models/life/parts/face.js).
    Loaded after lifekit.js; used by creatures/human.js (and, later, androids
-   and other humanoids). docs/life.md, "The face".
+   and other humanoids). docs/labs/life.md, "The face".
 
    The head is one mesh computed by a function of a direction (like a sphere
    reshaped), on a grid that is dense where the face is (the front) and

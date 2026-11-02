@@ -3,15 +3,13 @@
 Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHANGELOG.md`.
 
 ## Język
-- [ ] Przetłumaczyć panele wewnątrz laboratoriów na polski (teraz po polsku są tylko pasek menu i strona startowa).
+- [ ] Przetłumaczyć okna laboratoriów na polski (teraz po polsku są pasek menu, strona startowa, tytuły okien standardowych, konsola i okno Wydajność).
 
 ## Pociąg (zachowanie „koło na szynie”)
 - [ ] Dźwięki pociągu z aTrain (tarcie kół, łańcuch, sprzęg, styki szyn, zderzaki, koło o podkład).
 - [ ] Dym i iskry z aTrain.
 - [ ] Teren z aTrain: góra, skarpa, morze, las (fizyka zna go przez `sim.groundH`).
 - [ ] Pogoda z aTrain.
-
-## Dokumentacja
 
 ## Modele — błędy znalezione przez doktora (po stronie gry, chyba że doktor nauczy się je naprawiać)
 - [ ] Dziury: talerz anteny (haven), kadłub (swarmer), kadłuby (skimmer, barka, amfibia), półkula (scout).
@@ -24,12 +22,12 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 - [ ] Poświaty silników statków słabsze niż wcześniej.
 
 ## Do przeniesienia
-- [ ] SDF Walkers i laboratorium języka (z NeuroLabPA): przenieść na okna z opcjami i styl Battle — dziś to przewijane strony we własnym stylu.
+- [ ] SDF Walkers, laboratorium języka i obrazów (z NeuroLabPA): przenieść na okna z opcjami (w tym okna standardowe) — dziś to przewijane strony (`pageFlow`) we własnym stylu.
 
 ## Testy
 - [ ] Pełny kitcheck po wersji 0.5.0 (przerwany; doktor przeszedł).
 
-## Z remanentu (do decyzji — `docs/AUDIT.md`, „Stan wykonania”)
+## Z remanentu (do decyzji — `docs/history/audit-2026-11.md`, „Stan wykonania”)
 - [ ] D6: wspólne pomocnicze `$()` / `el()` (np. nowy plik w `js/labkit/`).
 - [ ] F3: dane głowy człowieka jako plik `.bin` (wczytywany asynchronicznie).
 - [ ] F4: kity Space jako importy ES zamiast globali `window.*`.
@@ -45,7 +43,7 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 - [ ] Rośliny: podszyt (paprocie, wrzos, trzcina), martwe drewno, płynne przejście model↔impostor, jesienne impostory, rośliny w laboratorium lądu.
 - [ ] **Laboratorium skał** (właściciel, 2026-10-22): głazy, piarg, wychodnie i ściany skalne jako obiekty, rozmieszczane wg biomu i nachylenia.
 - [ ] Więcej biomów (tundra, tropiki, wulkany…), potem inne planety (zestawy nieba, wody i biomów).
-- [ ] Środowisko: ławice mgły, bryzgi przy silnym wietrze; panele nieba i pogody w laboratorium wody.
+- [ ] Środowisko: ławice mgły, bryzgi przy silnym wietrze; okna nieba i pogody w laboratorium wody.
 - [ ] Właściciel wybiera poziom starzenia i wygląd (do materiałów i ustawień grafiki gier).
 - [ ] Proceduralne zniszczenia na hitboxach transformatora: model uszkodzeń, rozprzestrzenianie, odłamki, ogień i dym.
 - [ ] Transformator: instancjonowanie powtarzalnych okuć i scalone materiały stanowisk na LOD0 (~30 wywołań rysowania).

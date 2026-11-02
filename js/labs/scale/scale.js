@@ -1,5 +1,5 @@
 // Scale lab (scale.html): every object of the game Space in one row at its
-// in-game size, over a ruler in world units (docs/scale.md). Every number
+// in-game size, over a ruler in world units (docs/labs/scale.md). Every number
 // comes from the game's data carried over with the models (js/envs/space/) —
 // none are copied here.
 import { SOLAR_BODY_BY_SLOT } from "../../envs/space/solar-system.js";

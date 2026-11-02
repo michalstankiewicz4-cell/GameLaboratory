@@ -5,7 +5,7 @@
 //            superstructure with a wave wall, and a tetrapod berm in front against wave reflection (as on the new
 //            breakwaters at Gdańsk).
 // The breakwater runs along z from z0 to its head at z1 (a round head with a harbour light); the sea is on +x.
-// Armour units are instanced (thousands per draw call). Sources and assumptions: docs/structures/coastal.md.
+// Armour units are instanced (thousands per draw call). Sources and assumptions: docs/labs/structures/coastal.md.
 import * as THREE from '../../../../vendor/three/three.module.js';
 import { Part } from '../../ships-sea/geom.js';
 import { structMaterials } from '../materials.js';
@@ -16,8 +16,8 @@ export const info = {
   name: 'Breakwater',
   year: 'typical construction',
   type: 'Rubble-mound (rock or tetrapod armour) or caisson breakwater with a round head and a harbour light',
-  builder: 'Parametric: cross-sections after common coastal-engineering practice (see docs/structures/coastal.md)',
-  note: 'A typical breakwater, not a particular one: cross-sections follow common coastal-engineering practice (two armour layers on a 1:1.5 slope, crest three units wide, crown wall), the caisson type follows the mixed breakwaters now built at Gdańsk. Assumptions and sources: docs/structures/coastal.md.',
+  builder: 'Parametric: cross-sections after common coastal-engineering practice (see docs/labs/structures/coastal.md)',
+  note: 'A typical breakwater, not a particular one: cross-sections follow common coastal-engineering practice (two armour layers on a 1:1.5 slope, crest three units wide, crown wall), the caisson type follows the mixed breakwaters now built at Gdańsk. Assumptions and sources: docs/labs/structures/coastal.md.',
   specs: [
     ['Armour slope', '1:1.5 seaward and lee (rock), 1:1.5 tetrapods'],
     ['Armour layer', 'two units thick; underlayer of rock about a tenth of the armour weight'],

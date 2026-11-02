@@ -1,8 +1,8 @@
 > **W GameLaboratory** (przeniesione z repozytorium NeuroLabPA, z historią): SDF Walkers to `labs/walkers.html`
 > (skrypty `js/labs/walkers/`, model — shadery, cechy, render — `js/models/human/zombie/walkers/`, dane `data/walkers/`),
 > laboratorium języka to `labs/lang.html` (`js/labs/lang/`, teksty `data/lang/`, narzędzia `tools/lang/`), laboratorium obrazów
-> to `labs/img.html` (`js/labs/img/`, rysunki `data/img/`, narzędzie `tools/img/`), notatki z NeuroLabPA — `docs/walkers/notatki/`.
-> Pierwotne SDF Morgue: `docs/morgue/sdf-morgue-original.html`. Ścieżki niżej są obecne (po przeniesieniu).
+> to `labs/img.html` (`js/labs/img/`, rysunki `data/img/`, narzędzie `tools/img/`), notatki z NeuroLabPA — `docs/labs/walkers/notatki/`.
+> Pierwotne SDF Morgue: `docs/labs/morgue/sdf-morgue-original.html`. Ścieżki niżej są obecne (po przeniesieniu).
 
 # SDF Walkers
 
@@ -93,7 +93,7 @@ js/labs/walkers/grid.js                  siatka oceniania
 js/labs/walkers/roll.js                  losowanie (zwykłe i sterowane siecią)
 js/labs/walkers/hud.js                   panel Network view
 js/labs/walkers/walkers.js                  start i podpięcie zdarzeń
-docs/morgue/sdf-morgue-original.html     pierwsza wersja: sama głowa zombie
+docs/labs/morgue/sdf-morgue-original.html     pierwsza wersja: sama głowa zombie
 docs/walkers/img/                        zrzuty z kolejnych etapów
 data/walkers/                            oceny Claude'a i sieć wytrenowana na nich (przycisk Load repo model)
 ```
@@ -111,7 +111,7 @@ Skrypty są zwykłymi `<script>` (bez modułów ES) i dzielą zmienne globalne, 
 
 ## Plany i notatki
 
-Plan: `docs/walkers/ROADMAP.md`. Historia zmian: `CHANGELOG.md` (od przeniesienia) i `docs/history/walkers.md` (NeuroLabPA). Konwencje pracy, zmierzone wyniki, decyzje i sprawy otwarte: `docs/walkers/notatki/`.
+Plan: `docs/labs/walkers/ROADMAP.md`. Historia zmian: `CHANGELOG.md` (od przeniesienia) i `docs/history/walkers.md` (NeuroLabPA). Konwencje pracy, zmierzone wyniki, decyzje i sprawy otwarte: `docs/labs/walkers/notatki/`.
 
 ## Wersjonowanie
 

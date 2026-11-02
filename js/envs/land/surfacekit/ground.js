@@ -5,7 +5,7 @@
    A classic script after surfacekit.js, sky.js and weather.js (adds to
    window.SurfaceKit); needs ShipKit (the craft) and BaseKit (the modules).
    The surface lab and the game both run the ground through this — the lab
-   is a lab, the game is the game, the ground is the same. docs/surface.md.
+   is a lab, the game is the game, the ground is the same. docs/labs/surface.md.
 
    No DOM here: the caller owns the page. It passes the keys and the
    pointer, renders G.scene with G.camera into its own viewport, and shows

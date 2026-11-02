@@ -1,7 +1,7 @@
 // PlantKit: procedural plants at real scale (metres, y up, the base at the origin) — trees, palms and shrubs grown from
 // a seed by species rules (trunk, branch whorls or limbs, twigs), dressed with bark and foliage drawn on canvases (no
 // image files), and moved by the wind in the vertex shader (the trunk bends with height, leaves flutter).
-//  SPECIES                      what each plant is (botanical name, heights, biomes) — sources in docs/plants.md
+//  SPECIES                      what each plant is (botanical name, heights, biomes) — sources in docs/labs/plants.md
 //  growPlant(id, { seed, size }) → { bark, leaf: BufferGeometry, height, radius, crown } (merged, one per material)
 //  plantMaterials(id, wind)     bark and foliage materials (+ shadow-casting depth materials) sharing the wind uniforms
 //  windUniforms()               uWind (strength 0..1.5), uWindDir (xz), uTime, uSeason (0 summer … 1 autumn)

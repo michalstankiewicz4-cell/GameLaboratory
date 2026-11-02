@@ -13,8 +13,8 @@ quays, piers and jetties, breakwaters, harbours, lighthouses (owner's decision, 
 | `js/models/structures/parts.js` | Building blocks: square truss leg with rack plates, spud can, jack house with pinion units, tapered lattice tower (derrick), lattice boom, pedestal crane (slewing, luffing), enclosed lifeboat on davits, helideck markings (canvas texture), railings, stairs, window rows |
 | `js/models/structures/coastal.js` | Coastal works: tetrapod and quarry-rock geometry, `layUnits` (armour units on any parametric surface, two layers, random turns), `instanced`, bollards, cylindrical fenders, ladders, lighting masts, `sweepZ` (cross-sections) |
 | `js/models/structures/coastal/quay.js` | Quay wall: gravity block wall, steel sheet-pile wall or open piled deck, with kerb, bollards, fenders, ladders, crane rails, masts, apron; `PARAMS` (construction, length, cope level), `heightAt` |
-| `js/models/structures/coastal/breakwater.js` | Breakwater: rubble mound with rock or tetrapod armour, or caissons with a tetrapod berm; round head with a harbour light; `PARAMS` (type, length, crest, armour unit mass), `heightAt`. Research sheet for both: `docs/structures/coastal.md` |
-| `js/models/structures/offshore/super300.js` | Jack-up drilling rig, Super 300 class: `info` (specifications, sources), `DIM`, `build()` → group, parts, legs, cranes, cantilever, `pose({ depth, air, legsDown })`. Research sheet: `docs/structures/super300.md` |
+| `js/models/structures/coastal/breakwater.js` | Breakwater: rubble mound with rock or tetrapod armour, or caissons with a tetrapod berm; round head with a harbour light; `PARAMS` (type, length, crest, armour unit mass), `heightAt`. Research sheet for both: `docs/labs/structures/coastal.md` |
+| `js/models/structures/offshore/super300.js` | Jack-up drilling rig, Super 300 class: `info` (specifications, sources), `DIM`, `build()` → group, parts, legs, cranes, cantilever, `pose({ depth, air, legsDown })`. Research sheet: `docs/labs/structures/super300.md` |
 
 Geometry is merged per material with ShipKit's `Part` (the rig is ~156k triangles and ~170 draw calls at detail 1);
 armour units are instanced. A structure may export `PARAMS` (its own settings: the lab builds sliders and selects from
@@ -23,7 +23,7 @@ them) and return `heightAt(x, z)` and `bounds` (the lab bakes the heights into a
 ## The lab
 
 - **Structure** (top bar): jack-up rig, quay wall, breakwater; **Site**: water depth (each structure keeps its own);
-  **Structure** panel: the structure's own settings; for the quay, *ORP Błyskawica moored alongside*.
+  **Structure** window: the structure's own settings; for the quay, *ORP Błyskawica moored alongside*.
 
 - **Jacking**: *Afloat (under tow)* lowers the hull to its 4 m draught and raises the legs; *Jack up* lowers the legs to
   the seabed and lifts the hull to the air gap — at the LeTourneau rate (≈ 90 ft per hour) times the *Jacking speed*.

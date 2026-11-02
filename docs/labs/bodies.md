@@ -15,7 +15,7 @@ The page needs a local server (ES modules): `python3 -m http.server`, then
 | Part | What it is |
 |---|---|
 | 1. `js/core/three-global.js` | Three.js r186 (`vendor/three/`) as the global `THREE`, in the graphics of the labs from Battle |
-| 2. `js/labkit/labkit.js` + `ui/style/space.css` | Shared with the ship lab: sliders, toggles, performance counters, the IMAGE EFFECTS render (see docs/ship.md) |
+| 2. `js/labkit/labkit.js` + `ui/style/space.css` | Shared with the ship lab: sliders, toggles, performance counters, the IMAGE EFFECTS render (see docs/labs/ship.md) |
 | 3. `js/models/bodies/bodykit.js` | **BodyKit's core**: the shared GLSL (noise, the body uniforms), the shared blocks, the groups and their parameter schemas, the public API (`window.BodyKit`; its header repeats it), and `BodyKit._`: the internals the kind files build with (not a public API) |
 | 3b. `js/models/bodies/kinds/planets.js`, `giants.js`, `pulsars.js`, `suns.js`, `rocks.js`, `holes.js`, `sky.js` | **One file per kind of body**. Each holds its shaders and builder(s) and registers them in `KINDS`. A group's `build` names its kind: `"planet"`, `"giant"`, `"rings"`, `"pulsar"`, `"sun"`, `"rock"`, `"comet"`, `"hole"` or `"sky"`.<br>Their public parts (`planetTerrain`, `GLSL_PLANET`, `GLSL_PLANET_SURFACE`, `GLSL_SUN`, `GLSL_ROCK`, `GLSL_HOLE`, `GLSL_SKY`) are added to `window.BodyKit` by these files.<br>Load order matters: `planets.js` before `giants.js`, because the giants use the planets' atmosphere |
 | 4. `js/labs/bodies/bodies.js` | The lab: sky, camera, the windows, sliders generated from the schemas, statistics, counters |
@@ -68,7 +68,7 @@ Every body also has the **common** parameters: rotation speed
 ### The game's bodies
 
 Every body with a `slot` is the body on that fixed orbit of the game's
-solar system (`world/solarSystem.js`); the HUD title shows it
+solar system (`world/solarSystem.js` in the game); the Description window shows it
 ("TERRA-1 · ORBIT 3"). A body with `kind` is the look of every game
 body of that kind that comes and goes (comets). Since v2.11.0 every
 body in the game is a BodyKit body: SOL (0), the six planets below,
@@ -337,7 +337,7 @@ Body handle:
 
 ## Building blocks and rules (DRY)
 
-BodyKit follows the same rules as ShipKit ([`docs/ship.md`](ship.md),
+BodyKit follows the same rules as ShipKit ([`docs/labs/ship.md`](ship.md),
 "Building blocks"): **one file, nothing written twice**. What exists to
 be reused:
 
@@ -392,7 +392,7 @@ Rules, for every new body and every change:
 
 - **Another planet**: add an entry to the fitting planet group's `bodies` (`lava`, `earthlike`, `icy`, `desert`, `clouded`, `airless`), e.g.
   `{ id: "ocean", name: "…", values: { sea: 0.35, clouds: 0.6 } }`. The
-  body-navigation arrows pick it up. Give it `slot: n` to put it on that
+  body list picks it up. Give it `slot: n` to put it on that
   orbit in the game (one body per slot).
 - **A new kind** (a gas giant, a nebula, …): a new file
   `js/models/bodies/kinds/<kind>.js`, shaped like the others.
@@ -409,40 +409,31 @@ Rules, for every new body and every change:
   `tools/kitcheck.html`, then run `tools/kitcheck.html`. The lab generates
   the sliders and statistics from these, so no lab code is needed.
 
-## Viewer (preview page)
+## The lab page
 
-- **IMAGE EFFECTS** (right panel, v2.25.1): PostKit's lab panel, as in
-  the ship lab, plus SUN FLARE and LIGHT RAYS (the SUNS tab's sun, else
-  the light sprite; both fade out when the sun fills the view) and LENSING (the BLACK HOLES tab's hole: hidden while the scene
-  renders, drawn over the warped picture). The camera's picture, not
-  part of the body.
-- **Backdrop**: the game's own sky (BodyKit's kind `sky`), so a body looks
-  here exactly as in the game; hidden while the SKY tab shows a sky of its
-  own.
-- **Camera distance**: a group's `view`, or a body's own `view` (SATURN:
-  its rings need more room), applied when the group or the body changes.
-- **Left panel**: group tabs (LAVA WORLDS / EARTH-LIKE / ICE WORLDS / DESERT WORLDS / CLOUD WORLDS / AIRLESS / GAS GIANTS / SUNS / COMETS / ROCKS / BLACK HOLES / SKY), body
-  navigation, PHYSICAL statistics and MODEL statistics, and toggles for
-  auto-rotate, the two layers (named by the group), wireframe, GAME BUILD
-  (the body at the detail the game builds it: × `BodyKit.GAME_DETAIL_SCALE`,
-  0.5; the sky as is) and SHIP LIGHT (a teal light circling the body, as a
-  ship's glow light does in the game). The clouds and
-  atmosphere toggles are hidden for empty groups.
-  - PHYSICAL: radius in km (size × the group's `kmPerSize`), surface
-    area, then the body's own `describe()` rows (a planet: the measured
-    land, water, lava, ice and cloud coverage, re-measured after each
-    change and every 2 s while clouds drift).
-  - MODEL: meshes, triangles, vertices, shaders, octaves and textures.
-- **Right panel**: COMMON and group parameters, generated from the
-  schemas, plus NEW SEED, RESET and **COPY VALUES**.
-- **COPY VALUES**: the sliders only change the preview (a reload goes
-  back to the file); the game shows what's in `js/models/bodies/bodykit.js`.
-  This button copies the current body as a ready `bodies` entry (id,
-  name, slot, and only the values that differ from the group defaults,
-  plus the seed; `damage` left out) — paste it over the body's line in
-  `bodykit.js` to make the change permanent (then the usual version
-  bump). Also printed to the console, in case the clipboard is blocked.
-- **OPTIMIZATION**:
+The top bar: two lists — the group (LAVA WORLDS / EARTH-LIKE / ICE WORLDS / DESERT WORLDS / CLOUD WORLDS / AIRLESS /
+GAS GIANTS / SUNS / COMETS / ROCKS / BLACK HOLES / SKY) and the body in it (greyed out when the group has one). The
+windows are the standard ones (`ui/shell/labwin.js`) plus the lab's own:
+
+- **Description**: the body's name (a game body shows its orbit: "TERRA-1 · ORBIT 3") and PHYSICAL — radius in km
+  (size × the group's `kmPerSize`), surface area, then the body's own `describe()` rows (a planet: the measured land,
+  water, lava, ice and cloud coverage, re-measured after each change and every 2 s while clouds drift).
+- **Parameters** (the lab's own): the two layers (named by the group; hidden for empty groups), wireframe, GAME BUILD
+  (the body at the detail the game builds it: × `BodyKit.GAME_DETAIL_SCALE`, 0.5; the sky as is); COMMON and the
+  group's parameters, generated from the schemas; NEW SEED, RESET and **COPY VALUES**.
+  - COPY VALUES: the sliders only change the preview (a reload goes back to the file); the game shows what's in
+    `js/models/bodies/bodykit.js`. This button copies the current body as a ready `bodies` entry (id, name, slot, and
+    only the values that differ from the group defaults, plus the seed; `damage` left out) — paste it over the body's
+    line in `bodykit.js` to make the change permanent (then the usual version bump). Also printed to the console, in
+    case the clipboard is blocked.
+- **Camera**: auto-rotate and the IMAGE EFFECTS — PostKit's lab panel, as on the ship page, plus SUN FLARE and LIGHT
+  RAYS (the SUNS group's sun, else the light sprite; both fade out when the sun fills the view) and LENSING (the BLACK
+  HOLES group's hole: hidden while the scene renders, drawn over the warped picture). The camera's picture, not part
+  of the body. The camera distance: a group's `view`, or a body's own `view` (SATURN: its rings need more room),
+  applied when the group or the body changes.
+- **Light and weather**: SHIP LIGHT (a teal light circling the body, as a ship's glow light does in the game).
+- **Performance**: the standard numbers; Model: meshes, triangles, vertices, shaders, noise octaves, textures; then
+  QUALITY:
   - **Render quality**, 5 presets (octaves from `BodyKit.QUALITY_OCTAVES`):
 
     | Preset | Pixel ratio | Noise octaves |
@@ -453,13 +444,9 @@ Rules, for every new body and every change:
     | ULTRA (default) | device pixel ratio, clamped to 1–2 | 6 |
     | MAX | 1.5 × device pixel ratio, up to 3 | 8 |
 
-  - **Geometry detail** (20–200%) rebuilds the body live and keeps the
-    current values.
-- **PERFORMANCE**: FPS, frame time, CPU time per frame, triangles and
-  draw calls per frame, render resolution, and an FPS graph.
-- **Scaling**: all panels share one CSS scale factor (`--ui`), exactly
-  as in `ship.html`: it follows the window only, and a panel taller than
-  the window scrolls, so switching tabs never changes the UI size.
+  - **Geometry detail** (20–200%) rebuilds the body live and keeps the current values.
+- **Backdrop**: the game's own sky (BodyKit's kind `sky`), so a body looks here exactly as in the game; hidden while
+  the SKY group shows a sky of its own.
 
 ## Gotchas
 

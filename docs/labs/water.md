@@ -7,7 +7,7 @@ streams past it at the ship's speed (`uShift`), so ship-relative effects are com
 ## What can be compared
 
 Two variants, **A** and **B**, each with its own sea state, look and interaction switches. "Split screen" draws A on
-the left and B on the right (draggable divider); "Edit A/B" picks which one the panel changes; "Copy A → B" and "Swap".
+the left and B on the right (draggable divider); "Edit A/B" picks which one the Water window changes; "Copy A → B" and "Swap".
 Settings are remembered in the browser (localStorage) and "Copy settings (JSON)" gives them to paste back into the chat.
 
 - **Sea state** (`SEAS`): calm (Beaufort 2), moderate (4), rough (6), gale (8), long swell; or custom: significant wave
@@ -113,7 +113,7 @@ whole sea, a region map gives every place a blend of the six bodies and a flow; 
 scatter colours, glitter, ripples, crest foam, reflection), the share of the open sea's waves that gets in, oil, ice
 cover and the current (ripples, foam and oil drift with it; foam streaks run along it) from that blend. Far away the
 floes are drawn as their average cover (they flickered as a pattern smaller than a pixel). Used by the Land Lab — see
-`docs/land.md`, *Water bodies by region*.
+`docs/labs/land.md`, *Water bodies by region*.
 
 ## Not yet
 

@@ -6,7 +6,7 @@
    (makeSea, the snow) is used by no lab now. Vessels are built from
    ShipKit's generators (plating, struts); the amphibian borrows
    VehicleKit's wheels. Needs THREE, ShipKit and VehicleKit.
-   docs/marine.md.
+   docs/models/marine.md.
 
    The world has no people (the story): every vessel is a robot.
 

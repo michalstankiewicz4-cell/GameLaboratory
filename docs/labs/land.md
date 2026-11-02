@@ -27,7 +27,7 @@ Map size 4–32 km, heightmap 256²–1024² (512² over 8 km: 15.6 m texels, ab
 
 One world, several kinds of water. A **region map** (two RGBA8 textures over the map) holds, for every texel, the weight
 of each water body — ocean, fjord, lake, river, harbour water, ice — and the flow (x, z, up to 2.5 m/s). The sea shader
-blends the bodies' looks and behaviour by those weights (see `docs/water.md`), so there are no seams between them; the
+blends the bodies' looks and behaviour by those weights (see `docs/labs/water.md`), so there are no seams between them; the
 ship reads the same blend in JS (`regionAt`): sheltered water gives it smaller waves, the current carries it, and the
 status line says what water it is in.
 

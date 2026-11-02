@@ -1,13 +1,13 @@
 # Human lab (labs/human.html)
 
 Split from the life lab (2026-11-01, the user's call: humans and their animation get a lab of their own).
-The humans are built on LifeKit (`js/models/life/lifekit.js`, described in `docs/life.md`: how a body is built).
+The humans are built on LifeKit (`js/models/life/lifekit.js`, described in `docs/labs/life.md`: how a body is built).
 
 ## Files
 
 | File | What it is |
 |---|---|
-| `labs/human.html` + `js/labs/human/human.js` | The lab: the humans, MOVEMENT (gait, speed, in place / around), LAYERS, VIEW, BODY, FACE (expressions, LIVELY, TALK, CLOSE-UP), MODEL and PERFORMANCE. |
+| `labs/human.html` + `js/labs/human/human.js` | The lab: the humans, MOVEMENT (gait, speed, in place / around), LAYERS, VIEW, BODY, FACE (expressions, LIVELY, TALK; CLOSE-UP in the Camera window); the model's numbers in the standard Performance window. |
 | `js/models/human/walk.js` | Moving on land: a biped's gaits (stand, walk, run, T-pose). Swimming, flying and space come as `move/<medium>.js`. |
 | `js/models/human/face.js` | A humanoid head with a face that moves (`LifeKit.face`): openings for the eyes and the mouth, teeth, a tongue, 14 expressions as morph targets. Used by the human; meant for androids and other humanoids too. |
 | `js/models/human/human.js` | The humans: "Human I" (a bust's head and neck) and "Human II" (a made low-poly head); our own round sculpt isn't listed. One file per creature. |
@@ -109,8 +109,9 @@ scanned head would clash with bodies built from blocks) — its ideas were:
   one at full strength, stored as the difference (`morphTargetsRelative`),
   normals too. The jaw turns the face under the mouth line about a hinge in
   front of the ears, fading out past the corners and toward the ears.
-  r128 blends the **4 strongest at a time** (with normals) — enough for a
-  face (blink both + jaw + smile).
+  Written when r128 blended only the 4 strongest at a time (with normals) —
+  enough for a face (blink both + jaw + smile); r186 keeps every target in a
+  texture and blends them all.
 - **The controller** (`face.set`, `update`): the lab's slider values plus
   the lively motion — a blink every 2–6 s, a glance every 1–3 s (the
   eyeballs turn), breathing through the mouth when running, TALK.

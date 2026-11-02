@@ -3,7 +3,7 @@
    =======================================================================
    A classic script (window.SurfaceKit) like the other kits; the surface
    lab (surface.html) uses it, the game reads the bases (their markers on
-   the planets). Needs THREE and window.BodyKit. docs/surface.md.
+   the planets). Needs THREE and window.BodyKit. docs/labs/surface.md.
 
    Scale: the ground is not to scale — a planet of BodyKit `size` 1 (one
    Earth radius) is 8 km in radius on the ground (M_PER_SIZE), ~50 km round,

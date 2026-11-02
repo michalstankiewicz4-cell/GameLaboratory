@@ -887,7 +887,7 @@ function createDamageFx(ship, radius) {
 // =====================================================================
 // SHIP BUILDING BLOCKS — parts and behaviours more than one ship uses.
 // A ship definition composes these instead of re-writing them (see
-// docs/ship.md "Adding a ship": anything a second ship would need goes
+// docs/labs/ship.md "Adding a ship": anything a second ship would need goes
 // here, not into the ship).
 // =====================================================================
 
@@ -1541,7 +1541,7 @@ function makeOnlineFader(rate = 2) {
 // loaded after this one; each pushes its entry here (ShipKit.SHIP_DEFS)
 // and takes what it needs from ShipKit._ (the building blocks and helpers
 // below). To add a ship: a new file of the same shape, added after the
-// others on every page that loads ShipKit (docs/ship.md, "Adding a ship").
+// others on every page that loads ShipKit (docs/labs/ship.md, "Adding a ship").
 // =====================================================================
 const SHIP_DEFS = [];
 

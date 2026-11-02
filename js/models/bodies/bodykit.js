@@ -159,7 +159,7 @@ float fbm(vec3 p, int octaves, float persistence){
 `;
 
 // =====================================================================
-// SHARED BY EVERY BODY — building blocks (see docs/bodies.md, "Building
+// SHARED BY EVERY BODY — building blocks (see docs/labs/bodies.md, "Building
 // blocks and rules"): reuse these, never copy them into a body.
 // =====================================================================
 // GLSL every body shader includes right after GLSL_NOISE: the uniforms

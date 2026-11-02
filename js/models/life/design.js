@@ -1,6 +1,6 @@
 /* LifeKit — creatures from a design (js/models/life/design.js): the creature
    editor's builder (labs/creator.html). Loaded after lifekit.js and
-   move/legs.js. docs/life.md, "The creature editor".
+   move/legs.js. docs/labs/life.md, "The creature editor".
 
    A design is data (JSON), so it can be saved, shared and loaded:
      {

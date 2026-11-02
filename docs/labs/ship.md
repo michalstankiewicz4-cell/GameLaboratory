@@ -1,8 +1,8 @@
-# Ship lab (`ship.html`)
+# Vehicle lab · space (`ship.html`) and ShipKit
 
-A standalone preview page for procedurally built 3D spaceships. The
+The space page of the vehicle lab, for procedurally built 3D spaceships. The
 ships themselves live in **`js/models/ships-space/shipkit.js`** (ShipKit, from the
-game Space); the lab, the scale, surface, building, vehicle and sea labs, the model
+game Space); this page, the scale, surface and building labs, the vehicle lab's land page, the model
 doctor and the kit check all build from it. A change to a lab bumps that lab's
 version; a change to ShipKit bumps the program's (`ui/data/versions.js`, `CHANGELOG.md`).
 
@@ -24,7 +24,7 @@ repository, then `http://localhost:8000/labs/ship.html`.
 |---|---|
 | 1. `js/core/three-global.js` | Three.js r186 (`vendor/three/`) as the global `THREE`, with OrbitControls and the post-processing passes, in the graphics of the labs from Battle (CLAUDE.md, "Grafika") |
 | 2. `js/render/postkit/postkit.js` | The IMAGE EFFECTS: post-processing |
-| 3. `js/labkit/labkit.js` | What the Space labs share around the model (`window.LabKit`): slider fills, toggles, performance counters, the IMAGE EFFECTS render, the camera look panel and the windows fading out after 5 idle seconds (`autoHideHud`). Styles: `ui/style/space.css` + `ui/pages/ship.css` |
+| 3. `js/labkit/labkit.js` | What the Space labs share around the model (`window.LabKit`): slider fills, toggles, the IMAGE EFFECTS render, the camera look panel and the windows fading out after 5 idle seconds (`autoHideWindows`). Styles: `ui/style/space.css` + `ui/pages/ship.css` |
 | 4. `js/models/ships-space/shipkit.js` | **ShipKit's core**: texture generators, materials, shaders, shared effects, the building blocks, SHAPING, the model build, public API (`window.ShipKit`), and `ShipKit._`: the internals the ship files build with (not a public API) |
 | 4b. `js/models/ships-space/ships/codewing.js`, `scribe.js`, `swarmer.js`, `haven.js` | **One file per ship**. Each pushes its definition into `ShipKit.SHIP_DEFS` and takes what it uses from `ShipKit._`; they load after the core, in the lab's order |
 | 5. `js/labs/ship/ship.js` | The lab: sky, lights, renderer, camera, the windows' wiring, sliders. Uses only the kits' public APIs |
@@ -264,74 +264,38 @@ What each ship does:
 Bolts and waves live in the ship's own space. A scene where the ship moves would
 need them as world-space objects (so a turning ship doesn't drag its shots along).
 
-## Viewer (preview page)
+## The lab page
 
-- **IMAGE EFFECTS** (right panel, v2.25.1): PostKit's lab panel
-  (`js/render/postkit/postkit.js#labPanel`) — the post-processing
-  (bloom, FXAA, sharpening, robot-eyes filter, depth of field, MSAA ×0–8) with
-  presets AUTO / MIN / NORMAL / MAX (a preset also sets the render
-  quality; AUTO steps by frame rate, not in the first 6 s). The camera's
-  picture, **not part of the ship** — kept apart from the model's toggles
-  on purpose (user's call). `renderer.info` is reset once per frame
-  (several passes).
-- **Left panel**: ship name and prev/next navigation over `SHIP_DEFS`,
-  the MODEL statistics, a per-type FIGURES list, toggles for
-  auto-rotate, engines (the throttle eases in and out), running lights,
-  wireframe and STOP ANIMATIONS.
-  - STOP ANIMATIONS (red when on, like OFFLINE) gives the model `dt = 0`.
-    Every moving part stands still: spinners, rings, the drone's hover
-    and gimbals, the station's dish and debris, particles. Lights and
-    engine flames keep running, because they go by the clock `t`. OFFLINE
-    still switches everything off.
-  - It also eases the lab's idle bobbing to rest. That bobbing (±12 cm up
-    and down and a slight rock) is the ship moving, not the camera. It
-    had its own BOBBING button for a moment; the user merged it into this
-    one.
-- After the toggles, SHAPING (Rounded edges, Sealed joints: rebuild live, like
-  Geometry detail), then ACTIONS — one button per `model.actions` entry
-  (disabled ones greyed out, triggers flash, toggles stay lit, OFFLINE in
-  red) — and a Damage slider. Toggles and damage survive a detail
-  rebuild; switching ships resets the toggles.
-- **Five blocks** (the user's final layout, 2026-10-03).
-  - On the left:
-    - the **name** (the ship's name and caption, the gold bar and the
-      ship arrows), which stays put;
-    - **CONTROLS**: the toggles, SHAPING, ACTIONS, damage;
-    - **STATS**: MODEL, FIGURES.
+The space page of the **vehicle lab** (water: `warship.html`, land: `vehicles.html`; the environment switch in the
+top bar goes between them). The top bar: the ship list and the environment switch. The windows are the standard ones
+(`ui/shell/labwin.js`, the same on every lab) plus the lab's own:
 
-    The two blocks under the name scroll (`.hudCol`).
-  - On the right: **OPTIMIZATION** and **PERFORMANCE**.
-  - Every block but the name has a **KEEP** checkbox in its header.
-  - **C**, or the **CHANGE VIEW** button (top centre, always on screen),
-    switches between the full UI and only the ticked blocks. The ticked
-    blocks move to the top of their column, and the name block goes away.
-    With nothing ticked, only the ship is left. The kept blocks don't fade
-    when idle.
-  - C works with a checkbox or a slider in focus. It is ignored while
-    typing (a text field, a name being edited).
-  - **PART NAMES** (in CONTROLS, on by default): point at the ship and its
-    named part (`partsOf`) lights up, with a tip by the pointer: the part's
-    name, its pieces and triangles.
-    - Each lit material is a cached copy with a teal emissive.
-    - Not while dragging the view, not for the effects part, not in GAME
-      BUILD (the parts are merged there).
-    - A rebuilt model clears it (`partTipClear` in `loadShip`).
-  - **Double-click the name or the caption to edit it.** Enter keeps it,
-    Esc cancels, and empty brings the original back. Kept per ship.
-  - **The hull's lettering follows** (`buildShipModel` option `labels: {
-    name, sub }`). On the codewing, the name replaces "SP-01" and the
-    caption replaces "SWARM PROTOCOL"; on the station, the name replaces
-    "HAVEN-04".
-    - Each label pair gets its own texture set (`assets(labels)`, keyed by
-      `labelKey`). The default set stays the shared one, so the game is
-      unchanged.
-    - Long texts shrink to fit (a marking's `max`, in canvas px).
-  - The ticks and the names are per-viewer conveniences, in `localStorage`
-    under `shipLab.*`, wrapped in try/catch.
-  - Dropped on the way:
-    - a three-step CHANGE VIEW (full / stats only / nothing);
-    - a ⇅ button swapping the stats and the controls.
-- **Right panel, OPTIMIZATION**:
+- **Description**: the ship's name and caption.
+  - **Double-click the name or the caption to edit it.** Enter keeps it, Esc cancels, and empty brings the original
+    back. Kept per ship (`localStorage` `shipLab.*`, wrapped in try/catch).
+  - **The hull's lettering follows** (`buildShipModel` option `labels: { name, sub }`). On the codewing, the name
+    replaces "SP-01" and the caption replaces "SWARM PROTOCOL"; on the station, the name replaces "HAVEN-04". Each
+    label pair gets its own texture set (`assets(labels)`, keyed by `labelKey`); the default set stays the shared one,
+    so the game is unchanged. Long texts shrink to fit (a marking's `max`, in canvas px).
+- **Controls** (the lab's own): engines (the throttle eases in and out), running lights, wireframe, STOP ANIMATIONS,
+  GAME BUILD, PART NAMES; then SHAPING (Rounded edges, Sealed joints: rebuild live, like Geometry detail), ACTIONS —
+  one button per `model.actions` entry (disabled ones greyed out, triggers flash, toggles stay lit, OFFLINE in red) —
+  and a Damage slider. Toggles and damage survive a detail rebuild; switching ships resets the toggles.
+  - STOP ANIMATIONS (red when on, like OFFLINE) gives the model `dt = 0`: spinners, rings, the drone's hover and
+    gimbals, the station's dish and debris, particles stand still; lights and engine flames keep running (they go by
+    the clock `t`). It also eases the lab's idle bobbing (±12 cm and a slight rock — the ship moving, not the camera).
+  - PART NAMES (on by default): point at the ship and its named part (`partsOf`) lights up, with a tip by the
+    pointer: the part's name, its pieces and triangles. Each lit material is a cached copy with a teal emissive. Not
+    while dragging the view, not for the effects part, not in GAME BUILD (the parts are merged there). A rebuilt model
+    clears it (`partTipClear` in `loadShip`).
+- **Camera**: auto-rotate and the IMAGE EFFECTS — PostKit's lab panel (`js/render/postkit/postkit.js#labPanel`): bloom,
+  FXAA, sharpening, robot-eyes filter, depth of field, MSAA ×0–8, with presets AUTO / MIN / NORMAL / MAX (a preset
+  also sets the render quality; AUTO steps by frame rate, not in the first 6 s). The camera's picture, **not part of
+  the ship** — kept apart from the model's toggles on purpose (user's call).
+- **Light and weather**: GAME LIGHTING (the game's ambient and two scene lights, no shadows).
+- **Performance**: the standard numbers (`ui/shell/perf.js`), the ship's own Model rows (objects, meshes, instanced
+  groups, glow sprites, wire and particle systems, triangles, vertices, figure types, materials and shaders, textures,
+  build time), then:
   - **Render quality**, 5 presets:
 
     | Preset | Pixel ratio | Shadow map | Anisotropy | Particles |
@@ -342,25 +306,13 @@ need them as world-space objects (so a turning ship doesn't drag its shots along
     | ULTRA (default) | device pixel ratio, clamped to 1–2 | 2048 | 8 | on |
     | MAX | 1.5 × device pixel ratio, up to 3 | 4096 | 16 | on |
 
-    Toggling shadows sets `material.needsUpdate` on every material so
-    the shaders recompile.
-  - **Geometry detail** (20–200%) rebuilds the model live through
-    `buildShipModel(id, { detail })`, at most once per animation frame
-    while the slider is dragged.
-  - **PERFORMANCE**: FPS, frame time, CPU time per frame (JS update plus
-    draw submission), triangles and draw calls per frame
-    (`renderer.info`), render resolution, and a color-coded FPS graph.
-- **Scaling**: both panels share one CSS scale factor (`--ui`, 0.45–1.35),
-  set by `fitHud()`. It follows **the window size only** and stops the
-  panels overlapping; a panel taller than the window scrolls (CSS
-  `max-height` on `#hud` / `#opt`). It used to shrink the whole UI to fit
-  the tallest panel, so GAME BUILD (a shorter stats list after merging)
-  made the UI jump in size — don't make the scale depend on content again.
-- **Scene**: a generated equirectangular nebula sky is used both as the
-  sky dome and, through `PMREMGenerator`, as `scene.environment`
-  (reflections on the metal). A warm key light casts shadows, with a
-  cool rim light and a hemisphere fill. Output is sRGB with ACES
-  filmic tone mapping.
+    Toggling shadows sets `material.needsUpdate` on every material so the shaders recompile.
+  - **Geometry detail** (20–200%) rebuilds the model live through `buildShipModel(id, { detail })`, at most once per
+    animation frame while the slider is dragged.
+  - **FIGURES**: how many of each figure type the ship is made of.
+- **Scene**: a generated equirectangular nebula sky is used both as the sky dome and, through `PMREMGenerator`, as
+  `scene.environment` (reflections on the metal). A warm key light casts shadows, with a cool rim light and a
+  hemisphere fill.
 
 ## Building blocks (reuse, don't re-write)
 
@@ -573,7 +525,7 @@ file:
 ```js
 SHIP_DEFS.push({
   id: "myship",               // key for buildShipModel(id)
-  name: "SP-02 …",            // HUD title
+  name: "SP-02 …",            // the name in the Description window
   camera: [x, y, z],          // viewer's starting camera position
   _assets: null,
   assets() { /* create + cache textures/materials once; add them to

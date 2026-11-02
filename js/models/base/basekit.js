@@ -4,7 +4,7 @@
    A classic script like ShipKit and BodyKit: the building lab
    (buildings.html) and the surface lab (surface.html) use it; the game can
    later. Built from ShipKit's generators (plating, solar cells, struts) —
-   needs THREE and window.ShipKit. Not in the game yet (docs/surface.md).
+   needs THREE and window.ShipKit. Not in the game yet (docs/labs/surface.md).
 
    Units are metres, origin at the module's base centre, up +Y, "front"
    +Z. Every module stands on its own footprint (a circle, `footprint`).

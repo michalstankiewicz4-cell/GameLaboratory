@@ -4,7 +4,7 @@
 //  piled: an open piled deck (relieving platform) on steel tubular piles over a rock revetment.
 // Common furniture: capping beam with a yellow safety kerb, tee-head bollards, cylindrical rubber fenders on chains,
 // recessed ladders, crane rails, lighting masts, paved apron. Metres; the quay face is the plane x = 0, water on +x,
-// land on −x, the quay runs along z. Sources and assumptions: docs/structures/coastal.md.
+// land on −x, the quay runs along z. Sources and assumptions: docs/labs/structures/coastal.md.
 import * as THREE from '../../../../vendor/three/three.module.js';
 import { Part } from '../../ships-sea/geom.js';
 import { structMaterials } from '../materials.js';
@@ -15,8 +15,8 @@ export const info = {
   name: 'Quay wall (berth)',
   year: 'typical construction',
   type: 'Quay: gravity block wall, steel sheet-pile wall or open piled deck',
-  builder: 'Parametric: built from typical port-engineering dimensions (see docs/structures/coastal.md)',
-  note: 'A typical quay, not a particular one: the construction types, the furniture and their spacing follow common port practice; sizes are parameters. Assumptions and sources: docs/structures/coastal.md.',
+  builder: 'Parametric: built from typical port-engineering dimensions (see docs/labs/structures/coastal.md)',
+  note: 'A typical quay, not a particular one: the construction types, the furniture and their spacing follow common port practice; sizes are parameters. Assumptions and sources: docs/labs/structures/coastal.md.',
   specs: [
     ['Cope level', '+2.6 m above mean sea level (default)'],
     ['Berth depth', 'the lab\'s water depth (default 11 m)'],

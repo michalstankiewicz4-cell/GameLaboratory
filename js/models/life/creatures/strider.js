@@ -1,5 +1,5 @@
 /* LifeKit — the plains strider (js/models/life/creatures/strider.js). Loaded
-   after lifekit.js and move/quad.js. docs/life.md, "Four legs".
+   after lifekit.js and move/quad.js. docs/labs/life.md, "Four legs".
 
    An invented grazer of open plains, built to be believable rather than
    any real animal: long legs on hooves, a deep chest, a back sloping to

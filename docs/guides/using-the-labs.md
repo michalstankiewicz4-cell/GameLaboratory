@@ -9,7 +9,7 @@ each lab is for, how to drive it and what to try. Technical details are in the p
 ## Opening the labs
 
 - **Online:** <https://michalstankiewicz4-cell.github.io/GameLaboratory/> (the start page lists every lab).
-- **Locally:** in the repository folder run `py -m http.server 8000` and open `http://localhost:8000/`
+- **Locally:** in the repository folder run `python3 -m http.server 8000` (Windows: `py -m http.server 8000`) and open `http://localhost:8000/`
   (pages are ES modules: opening the file directly from disk does not work).
 - A desktop browser with a real graphics card is assumed; the labs show fps and draw calls, and most have
   "Measure the cost of each effect".
@@ -21,18 +21,22 @@ each lab is for, how to drive it and what to try. Technical details are in the p
 | Orbit the camera | drag with the left mouse button |
 | Pan | drag with the right mouse button (Ship, Water, Look, Transformer) |
 | Zoom | mouse wheel |
-| Camera presets | the buttons under **Camera** |
-| Hide the panels (clean view, screenshots) | **H** |
+| Camera presets | the buttons in the **Camera** window |
+| Windows | OPTIONS → Windows opens and closes them; every lab has **Description** (left), its own windows, **Camera**, **Light and weather** and **Performance** (right) |
+| Hide the windows (clean view, screenshots) | **H** |
+| The log | **Console** on the right of the top bar: errors, warnings, loading steps, newest first |
 | Keep a result | **Copy settings (JSON)** — paste it into the chat; it is what moves into the game |
 | Settings survive a reload | yes (stored in the browser); "Reset" buttons where they exist |
 
-## Ship Lab — `labs/warship.html`
+## Vehicle lab, water — `labs/warship.html`
 
-ORP Błyskawica (1937) and ORP Orzeł (1939) at real scale, built from code; pick the ship in the top bar.
+ORP Błyskawica (1937) and ORP Orzeł (1939) at real scale, built from code, and MarineKit's robot vessels (skimmer,
+barge, diver); pick one in the top bar. The environment switch next to it goes to the space and land pages.
 
 - **Camera** presets per ship (Błyskawica: Bow ¾, Bridge, Funnel & tubes, Quarterdeck…; Orzeł: Conning tower, Deck gun,
   40 mm well, Bow and net cutter, Stern and screws…); **F** frames the whole ship; double-click focuses.
-- **View**: sea or dry dock, dimensions, 10 m grid, wireframe, auto-rotate, sun height and bearing, exposure.
+- **View** (Controls window): sea or dry dock, the water (plain, or the water lab's variant A), dimensions, 10 m grid,
+  wireframe; auto-rotate and exposure are in Camera, the sun in Light and weather.
 - **Parts**: switch hull, superstructure, guns, AA, torpedo tubes, fittings on and off.
 - **Armament**: train and elevate all mounts, **Action stations** (they sweep), **Stow**.
 - **Signal lamp**: type a short message (A–Z, 0–9; SOS by default) and press **Signal with the searchlight** — the
@@ -42,7 +46,8 @@ ORP Błyskawica (1937) and ORP Orzeł (1939) at real scale, built from code; pic
   periscope depth; the status line shows the keel depth and how much periscope is above the sea. The checkboxes raise
   the periscopes, the 40 mm and the planes by hand. Untick *Sea* to see the hull under water; untick *Outer hull* to see
   the pressure hull with its frames, the tube nests and the twin tubes between the hulls.
-- **Model**: detail level (rebuilds the ship), triangle and draw-call counts.
+- **Model**: detail level (rebuilds the ship); triangles, draw calls and the model's numbers are in Performance.
+- **Robot vessels**: AUTO or W/A/S/D, the diver dives with Q/E or the slider; Night, Wake, Work; the camera rides along.
 - Try: compare the specifications and sources (left) with the model; find something wrong and report it.
 
 ## Water Lab — `labs/water.html`
@@ -50,7 +55,7 @@ ORP Błyskawica (1937) and ORP Orzeł (1939) at real scale, built from code; pic
 The ship on a procedural sea; two variants **A** and **B** side by side.
 
 - **Compare**: *Split screen* shows A left and B right (drag the divider); *Edit A / Edit B* chooses which one the
-  panel changes; *Copy A → B*, *Swap*.
+  Water window changes; *Copy A → B*, *Swap*.
 - **Water body**: *Open ocean*, *Fjord* (dark still water between high walls, mirrored), *Lake* (fresh, peaty water,
   low shores), *River* (silty, narrow, with a **current** that slows the ship over the ground — watch the banks),
   *Harbour water* (murky, with oil sheen), *Ice and pack ice* (floes, the lane the ship breaks). *Width*,
@@ -86,8 +91,8 @@ The jack-up rig:
   gap — or the reverse); *Jacking speed* multiplies the real ≈ 90 ft per hour; *Water depth* and *Air gap*.
 - **Drilling**: *Cantilever out* skids the derrick over the stern; *Cranes working* animates the three cranes.
 - **Camera**: Overview, Helideck, Drill floor, Leg and jack house, From the sea, Underwater, High.
-- **Sea and light**: weather; Day, Low sun, Dusk, Night (obstruction and helideck lights).
-- **Left panel**: specifications, sources, the reconstruction note and part toggles.
+- **Light and weather**: weather; Day, Low sun, Dusk, Night (obstruction and helideck lights).
+- **Description**: specifications, sources and the reconstruction note; part toggles in the Structure window.
 - Try: float the rig, then jack it up in 110 m of water at ×2000; the Underwater camera with the legs on the seabed;
   Night with a storm.
 
@@ -172,29 +177,28 @@ Checks every lab and game ship for the mistakes that keep coming back.
 - **Models**: pick a model (lab ship, its LOD levels, game ships, the test bench).
 - **Checks**: the list of findings by severity; click one to light up the pieces (and the source line that added them).
 - **Options** and **Budget**: what is checked and the game's limits per ship.
-- From the command line: `py tools/doctor.py` (compares with the golden file).
+- From the command line: `python3 tools/doctor.py` (compares with the golden file).
 
 ## Pixel Studio — `labs/pixel.html`
-Open <https://michalstankiewicz4-cell.github.io/Battle/pixel/>. Pick a mode at the top: **3D model**, **Generate** or **Draw**.
-- Set the size on the right (width, height or a preset). The background is always transparent (shown as a checkerboard).
+Open `labs/pixel.html` (from the start page). Pick a mode at the top: **3D model**, **Generate** or **Draw**.
+- Set the size in *Picture and export* (width, height or a preset). The background is always transparent (shown as a checkerboard).
 - 3D model: subject, camera preset (Front, ¾, Side, Isometric, Top-down ¾, Top), light side and height, light steps,
   hue shift; *Supersample* 3–4 gives cleaner shapes, *Inner lines* draws edges inside the shape.
 - Generate: generator, seed (*Another one*), colour sliders; tiles repeat seamlessly.
-- Right panel: palette (Auto = best colours for this image), dither, outline (Selective is softer), clean-up.
+- *Picture and export*: palette (Auto = best colours for this image), dither, outline (Selective is softer), clean-up.
 - **Edit in Draw** takes the result into the editor. Draw: B pencil, E eraser, G fill, L line, R rectangle, I picker,
   right button erases, Ctrl+Z undo, Space play/pause. *Drawing → text* / *Text → drawing* for sprites as text.
-- Pixel Doctor (bottom right): score and findings; **Show** marks the pixels, **Fix** repairs what can be repaired.
+- Pixel Doctor (at the bottom of *Picture and export*): score and findings; **Show** marks the pixels, **Fix** repairs what can be repaired.
 - Export: scale, then *PNG frame*, *PNG sprite sheet* or *GIF animation*.
 - Settings: *Copy settings* to send the exact setup (e.g. to Claude), *Apply pasted settings* to load one, *Reset* for defaults.
-- On a narrow window or a phone everything is one column: preview, then the mode's controls, then output.
-Details: `docs/pixel/README.md`.
+Details: `docs/labs/pixel/README.md`.
 
 **Zombie Generator** (`labs/zombies.html`): choose *GPU* or *CPU* in the top bar,
 then *Another zombie* or a seed and any trait on
 the left; animation, direction, camera, light, style (realistic or pixel art) and the sheet on the right; *PNG sheet*,
-*JSON*, *GIF preview*, *All 8 directions (ZIP)* and *Unity slicer (.cs)*. Nothing renders until you press *Start render*. Details: `docs/pixel/zombies.md`.
+*JSON*, *GIF preview*, *All 8 directions (ZIP)* and *Unity slicer (.cs)*. Nothing renders until you press *Start render*. Details: `docs/labs/pixel/zombies.md`.
 
 ## When something looks wrong
 
-Take a screenshot (H hides the panels), note the lab, the camera preset and — if possible — *Copy settings (JSON)*,
+Take a screenshot (H hides the windows), note the lab, the camera preset and — if possible — *Copy settings (JSON)*,
 and send them; that is enough to reproduce it.

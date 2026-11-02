@@ -1,7 +1,20 @@
 # GameLaboratory — zmiany
 
-Wersja programu i każdego laboratorium: `ui/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
+Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
+
+## Program 0.20.1 — 2026-11-02 (dokumentacja w układzie kodu)
+
+### Zmienione
+- **`docs/`** w tym samym układzie co kod: `docs/labs/` (laboratoria), `docs/models/` (statki morskie, pociąg, MarineKit),
+  `docs/tools/` (doktor modeli, dawne `doctor/README.md`), `docs/guides/` (przewodnik po laboratoriach, renderowanie,
+  pułapki), `docs/history/` (historia sprzed przeniesienia, remanent `AUDIT.md` → `history/audit-2026-11.md`,
+  mapa laboratoriów z Battle). `docs/README.md` przepisany jako mapa.
+- **`ui/README.md`** opisuje podfoldery `style/`, `shell/`, `data/` i wzorzec strony (`log.js`, `perf.js`, `labwin.js`).
+- Dokumenty laboratoriów (pojazdy · kosmos, ciała niebieskie, układy, życie, człowiek, budowle, woda, pixel) opisują
+  okna zamiast dawnego HUD-u i paneli; przewodnik — okna, konsolę, laboratorium pojazdów · woda.
+- **`CLAUDE.md`**: nowe ścieżki (`js/labs/<lab>/`, `js/models/marine/`, `ui/` w podfolderach, `docs/`) i zasada nazewnictwa.
+- **`TODO.md`**: bez pustych sekcji i nieaktualnych pozycji.
 
 ## Program 0.20.0 — 2026-11-02 (porządek w plikach i nazwach)
 

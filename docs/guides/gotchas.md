@@ -75,7 +75,7 @@ eclipse lighting):
 
 ## Lab-building lessons (2026-10: surface, vehicles, sea, ship shaping)
 
-**Three.js r128 API traps**
+**Three.js API traps** (met under r128, still true in r186)
 - **`THREE.Color` has no `addScaledVector`.** That's a Vector3 method; on
   a colour it throws (it broke the ship lab once). Blend colours with
   `lerp`, `add` or `multiplyScalar`.

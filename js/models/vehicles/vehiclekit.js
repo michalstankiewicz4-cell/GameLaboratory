@@ -4,7 +4,7 @@
    A classic script like ShipKit, BodyKit and BaseKit: the vehicles lab
    (vehicles.html) uses it, the surface lab and the game can later. Built
    from ShipKit's generators (plating, solar cells, struts) — needs THREE
-   and window.ShipKit. Not in the game yet (docs/vehicles.md).
+   and window.ShipKit. Not in the game yet (docs/labs/vehicles.md).
 
    The world has no people (the story): every vehicle is a robot — sensor
    heads and lamps, no cabins or seats.

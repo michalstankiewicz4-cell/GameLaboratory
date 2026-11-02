@@ -3,7 +3,7 @@
    builds the ships: no audio files, parameters and a seed
    =======================================================================
    A classic script (window.MusicKit). The sound lab (labs/sound.html)
-   tunes it; the game will play it (docs/sound.md). No dependencies.
+   tunes it; the game will play it (docs/labs/sound.md). No dependencies.
 
    The music is layers over a slow chord progression in one scale:
      drone     two detuned saws and a sub on the root, a slow filter sweep

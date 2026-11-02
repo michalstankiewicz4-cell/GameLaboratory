@@ -1,53 +1,65 @@
 # GameLaboratory — dokumentacja
 
 Mapa dokumentacji. Zasady pracy: [`../CLAUDE.md`](../CLAUDE.md); zmiany: [`../CHANGELOG.md`](../CHANGELOG.md);
-UI: [`../ui/README.md`](../ui/README.md).
+UI (paski, okna, konsola, karta ładowania, style): [`../ui/README.md`](../ui/README.md).
+
+Układ folderów jest taki sam jak w kodzie:
+
+| Folder | Co w nim jest | Kod |
+|---|---|---|
+| `labs/` | jeden dokument na laboratorium | `labs/*.html`, `js/labs/<lab>/` |
+| `models/` | modele używane przez kilka laboratoriów | `js/models/` |
+| `tools/` | narzędzia | `tools/` |
+| `guides/` | jak korzystać z laboratoriów, renderowanie, znane pułapki | — |
+| `history/` | historia sprzed przeniesienia i wykonany remanent | — |
 
 ## Laboratoria
 
 | Laboratorium | Strona | Dokument |
 |---|---|---|
-| Pojazdy — kosmos (statki, dron, stacja) | `labs/ship.html` | [ship.md](ship.md) |
-| Pojazdy — woda (ORP Błyskawica, ORP Orzeł, roboty morskie) | `labs/warship.html` | [ships-sea/blyskawica.md](ships-sea/blyskawica.md), [ships-sea/orzel.md](ships-sea/orzel.md), [marine.md](marine.md) |
-| Ciała niebieskie | `labs/bodies.html` | [bodies.md](bodies.md) |
-| Układy | `labs/systems.html` | [systems.md](systems.md) |
-| Skala | `labs/scale.html` | [scale.md](scale.md) |
-| Skórki | `labs/skins.html` | [skins.md](skins.md) |
-| Powierzchnia, budynki | `labs/surface.html`, `labs/buildings.html` | [surface.md](surface.md) |
-| Pojazdy — ląd (łaziki, amfibia, pociąg) | `labs/vehicles.html` | [vehicles.md](vehicles.md), [marine.md](marine.md), [train/fizyka.md](train/fizyka.md), [train/grafika.md](train/grafika.md) |
-| Dźwięk | `labs/sound.html` | [sound.md](sound.md) |
-| Życie, edytor stworów | `labs/life.html`, `labs/creator.html` | [life.md](life.md) |
-| Człowiek | `labs/human.html` | [human.md](human.md) |
-| Jaskinie | `labs/caves.html` | [caves.md](caves.md) |
-| Przedmioty bohatera | `labs/gear.html` | [gear.md](gear.md) |
-| Budowle | `labs/structures.html` | [structures.md](structures.md), [structures/coastal.md](structures/coastal.md), [structures/super300.md](structures/super300.md) |
-| Woda | `labs/water.html` | [water.md](water.md) |
-| Ląd | `labs/land.html` | [land.md](land.md) |
-| Rośliny | `labs/plants.html` | [plants.md](plants.md) |
-| Wygląd | `labs/look.html` | [look.md](look.md) |
-| Filtry | `labs/filters.html` | [filters.md](filters.md) |
-| Pixel Studio, generator zombie | `labs/pixel.html`, `labs/zombies.html` | [pixel/README.md](pixel/README.md), [pixel/zombies.md](pixel/zombies.md) |
-| Kostnica SDF | `labs/morgue.html` | [morgue.md](morgue.md) |
-| SDF Walkers, laboratorium języka, laboratorium obrazów | `labs/walkers.html`, `labs/lang.html`, `labs/img.html` | [walkers/README.md](walkers/README.md), [walkers/ROADMAP.md](walkers/ROADMAP.md), [walkers/notatki/](walkers/notatki/README.md) |
-
-Przegląd laboratoriów z Battle: [labs-sea.md](labs-sea.md), przewodnik: [guide-sea.md](guide-sea.md).
+| Pojazdy — kosmos (statki, dron, stacja) | `labs/ship.html` | [labs/ship.md](labs/ship.md) |
+| Pojazdy — woda (ORP Błyskawica, ORP Orzeł, roboty morskie) | `labs/warship.html` | [models/ships-sea/blyskawica.md](models/ships-sea/blyskawica.md), [models/ships-sea/orzel.md](models/ships-sea/orzel.md), [models/marine.md](models/marine.md) |
+| Pojazdy — ląd (łaziki, amfibia, pociąg) | `labs/vehicles.html` | [labs/vehicles.md](labs/vehicles.md), [models/train/fizyka.md](models/train/fizyka.md), [models/train/grafika.md](models/train/grafika.md) |
+| Ciała niebieskie | `labs/bodies.html` | [labs/bodies.md](labs/bodies.md) |
+| Układy | `labs/systems.html` | [labs/systems.md](labs/systems.md) |
+| Skala | `labs/scale.html` | [labs/scale.md](labs/scale.md) |
+| Skórki | `labs/skins.html` | [labs/skins.md](labs/skins.md) |
+| Powierzchnia, budynki | `labs/surface.html`, `labs/buildings.html` | [labs/surface.md](labs/surface.md) |
+| Dźwięk | `labs/sound.html` | [labs/sound.md](labs/sound.md) |
+| Życie, edytor stworów | `labs/life.html`, `labs/creator.html` | [labs/life.md](labs/life.md) |
+| Człowiek | `labs/human.html` | [labs/human.md](labs/human.md) |
+| Jaskinie | `labs/caves.html` | [labs/caves.md](labs/caves.md) |
+| Przedmioty bohatera | `labs/gear.html` | [labs/gear.md](labs/gear.md) |
+| Budowle | `labs/structures.html` | [labs/structures.md](labs/structures.md), [labs/structures/coastal.md](labs/structures/coastal.md), [labs/structures/super300.md](labs/structures/super300.md) |
+| Woda | `labs/water.html` | [labs/water.md](labs/water.md) |
+| Ląd | `labs/land.html` | [labs/land.md](labs/land.md) |
+| Rośliny | `labs/plants.html` | [labs/plants.md](labs/plants.md) |
+| Wygląd | `labs/look.html` | [labs/look.md](labs/look.md) |
+| Filtry | `labs/filters.html` | [labs/filters.md](labs/filters.md) |
+| Transformator | `labs/transform.html` | [labs/transform.md](labs/transform.md) |
+| Pixel Studio, generator zombie | `labs/pixel.html`, `labs/zombies.html` | [labs/pixel/README.md](labs/pixel/README.md), [labs/pixel/zombies.md](labs/pixel/zombies.md) |
+| Kostnica SDF | `labs/morgue.html` | [labs/morgue.md](labs/morgue.md) |
+| SDF Walkers, laboratorium języka, laboratorium obrazów | `labs/walkers.html`, `labs/lang.html`, `labs/img.html` | [labs/walkers/README.md](labs/walkers/README.md), [labs/walkers/ROADMAP.md](labs/walkers/ROADMAP.md), [labs/walkers/notatki/](labs/walkers/notatki/README.md) |
 
 ## Narzędzia
 
 | Narzędzie | Strona | Dokument |
 |---|---|---|
-| Doktor modeli | `tools/doctor.html` | [doctor/README.md](doctor/README.md) |
-| Transformator | `labs/transform.html` | [transform.md](transform.md) |
-| Kontrola kitów | `tools/kitcheck.html` | [../CLAUDE.md](../CLAUDE.md) |
+| Doktor modeli | `tools/doctor.html` | [tools/doctor.md](tools/doctor.md) |
+| Kontrola kitów | `tools/kitcheck.html` | sprawdza modele kitów Space z wzorcem `tools/kitcheck.golden.json` |
+| Tekstura ziarna | `tools/grain-texture.html` | robi `grain.png` dla paneli gry |
+| Sprawdzenia (przy każdym wypchnięciu) | `tools/paths.py`, `tools/sitemap.py` | [../CLAUDE.md](../CLAUDE.md), „Strona startowa” |
 
-## Wspólne
+## Przewodniki
 
-- Grafika i renderowanie: [rendering.md](rendering.md)
-- Pułapki: [gotchas.md](gotchas.md)
-- Remanent: [AUDIT.md](AUDIT.md)
+- Jak korzystać z laboratoriów z Battle: [guides/using-the-labs.md](guides/using-the-labs.md)
+- Renderowanie modeli ShipKit i BodyKit, niebo: [guides/rendering.md](guides/rendering.md)
+- Znane pułapki: [guides/gotchas.md](guides/gotchas.md)
 
-## Historia (sprzed przeniesienia)
+## Historia
 
-- Laboratoria Space: [history/space-labs.md](history/space-labs.md)
+- Laboratoria Space sprzed przeniesienia: [history/space-labs.md](history/space-labs.md)
+- Mapa laboratoriów z Battle (październik 2026): [history/labs-sea-map.md](history/labs-sea-map.md)
 - Doktor: [history/doctor-space.md](history/doctor-space.md), [history/doctor-sea.md](history/doctor-sea.md)
 - SDF Walkers (NeuroLabPA): [history/walkers.md](history/walkers.md)
+- Remanent kodu i dokumentacji (listopad 2026, wykonany): [history/audit-2026-11.md](history/audit-2026-11.md)

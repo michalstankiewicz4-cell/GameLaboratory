@@ -10,7 +10,7 @@ seed + editing on top", a full hand editor later if needed).
 | File | What it is |
 |---|---|
 | `js/envs/space/systemkit/systemkit.js` | **SystemKit** (`window.SystemKit`), a classic script like ShipKit and BodyKit: the system data format, presets, the random generator, building a system from BodyKit bodies. Not loaded by the game yet; meant for it (other systems on the galaxy map). |
-| `systems.html` | The lab: Three.js, OrbitControls, PostKit (IMAGE EFFECTS), LabKit (the labs' HUD helpers, `ui/style/space.css`), BodyKit, SystemKit. |
+| `systems.html` | The lab: Three.js, OrbitControls, PostKit (IMAGE EFFECTS), LabKit (the Space labs' shared helpers, `ui/style/space.css`), BodyKit, SystemKit. |
 
 ## The data
 
@@ -121,8 +121,8 @@ bodies at once. `dispose()` frees everything.
   geometry detail (40% by default: many bodies); IMAGE EFFECTS (the sun's
   flare from the main star, lensing from a black hole in the centre);
   performance.
-- The panels fade out after 5 idle seconds (LabKit's `autoHideHud`, as in
-  the ship and body labs); the labels stay.
+- The windows fade out after 5 idle seconds (LabKit's `autoHideWindows`, as in
+  every Space lab); the labels stay.
 - Measured: the Solar System preset (18 bodies) and the others hold 60 fps
   on the test machine at the defaults.
 

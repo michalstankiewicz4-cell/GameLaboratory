@@ -1,5 +1,5 @@
 /* LifeKit — moving on land (js/models/life/move/walk.js): a biped's gaits.
-   Loaded after lifekit.js. docs/life.md.
+   Loaded after lifekit.js. docs/labs/life.md.
 
    A creature using it gives a rig: { pelvis, spine, chest, neck, head,
    upperArm[2], forearm[2], hand[2], thigh[2], shin[2], foot[2] } (bones;
