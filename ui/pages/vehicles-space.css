@@ -1,4 +1,4 @@
-/* The ship lab (labs/ship.html): its own rules, on top of ui/ui.css and ui/style/space.css. */
+/* The ship lab (labs/vehicles-space.html): its own rules, on top of ui/ui.css and ui/style/space.css. */
 #actBtns{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px 0 4px; }
 .tBtn.trig:active, .tBtn.pulse{ border-color:var(--ok); box-shadow:none; color:var(--ok); }
 .tBtn:disabled{ opacity:.32; filter:saturate(0); cursor:not-allowed; box-shadow:none; border-color:var(--line); color:var(--text); }

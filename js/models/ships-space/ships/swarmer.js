@@ -1,6 +1,6 @@
 /* =======================================================================
    SHIPKIT · SWARMER — one ship definition (see js/models/ships-space/shipkit.js,
-   "SHIP DEFINITIONS", and docs/labs/ship.md). A classic script loaded after
+   "SHIP DEFINITIONS", and docs/labs/vehicles-space.md). A classic script loaded after
    shipkit.js: it pushes its entry into ShipKit.SHIP_DEFS and builds with
    ShipKit's blocks and helpers (ShipKit._).
    ======================================================================= */

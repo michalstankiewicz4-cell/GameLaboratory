@@ -1,7 +1,7 @@
 # Body lab (`bodies.html`) and BodyKit
 
 A standalone preview page for procedurally generated celestial bodies,
-the companion of [`ship.html`](ship.md) and built on the same scheme.
+the companion of [`ship.html`](vehicles-space.md) and built on the same scheme.
 The bodies themselves live in **`js/models/bodies/bodykit.js` (BodyKit, from the
 game Space)**; the body, system, scale and surface labs and the kit check build
 from it. A change to the lab bumps its version; a change to BodyKit bumps the
@@ -15,7 +15,7 @@ The page needs a local server (ES modules): `python3 -m http.server`, then
 | Part | What it is |
 |---|---|
 | 1. `js/core/three-global.js` | Three.js r186 (`vendor/three/`) as the global `THREE`, in the graphics of the labs from Battle |
-| 2. `js/labkit/labkit.js` + `ui/style/space.css` | Shared with the ship lab: sliders, toggles, performance counters, the IMAGE EFFECTS render (see docs/labs/ship.md) |
+| 2. `js/labkit/labkit.js` + `ui/style/space.css` | Shared with the ship lab: sliders, toggles, performance counters, the IMAGE EFFECTS render (see docs/labs/vehicles-space.md) |
 | 3. `js/models/bodies/bodykit.js` | **BodyKit's core**: the shared GLSL (noise, the body uniforms), the shared blocks, the groups and their parameter schemas, the public API (`window.BodyKit`; its header repeats it), and `BodyKit._`: the internals the kind files build with (not a public API) |
 | 3b. `js/models/bodies/kinds/planets.js`, `giants.js`, `pulsars.js`, `suns.js`, `rocks.js`, `holes.js`, `sky.js` | **One file per kind of body**. Each holds its shaders and builder(s) and registers them in `KINDS`. A group's `build` names its kind: `"planet"`, `"giant"`, `"rings"`, `"pulsar"`, `"sun"`, `"rock"`, `"comet"`, `"hole"` or `"sky"`.<br>Their public parts (`planetTerrain`, `GLSL_PLANET`, `GLSL_PLANET_SURFACE`, `GLSL_SUN`, `GLSL_ROCK`, `GLSL_HOLE`, `GLSL_SKY`) are added to `window.BodyKit` by these files.<br>Load order matters: `planets.js` before `giants.js`, because the giants use the planets' atmosphere |
 | 4. `js/labs/bodies/bodies.js` | The lab: sky, camera, the windows, sliders generated from the schemas, statistics, counters |
@@ -337,7 +337,7 @@ Body handle:
 
 ## Building blocks and rules (DRY)
 
-BodyKit follows the same rules as ShipKit ([`docs/labs/ship.md`](ship.md),
+BodyKit follows the same rules as ShipKit ([`docs/labs/vehicles-space.md`](vehicles-space.md),
 "Building blocks"): **one file, nothing written twice**. What exists to
 be reused:
 

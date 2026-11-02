@@ -14,7 +14,7 @@
 
 ## Układ folderów
 
-- `labs/` — strony laboratoriów; `js/labs/<lab>/` — skrypty laboratorium we własnym folderze, główny plik `<lab>.js` (np. `js/labs/ship/ship.js`); wspólne skrypty laboratoriów — `js/labs/shared/`.
+- `labs/` — strony laboratoriów; `js/labs/<lab>/` — skrypty laboratorium we własnym folderze, główny plik `<lab>.js` (np. `js/labs/vehicles-space/vehicles-space.js`); wspólne skrypty laboratoriów — `js/labs/shared/`.
 - `js/models/` — modele (geometria, materiały, światła, części); nie wiedzą, w jakim środowisku są. Statki-roboty (MarineKit) — `js/models/marine/`.
 - Ludzie mają osobne laboratorium (`labs/human.html`) i osobny folder modeli (`js/models/human/`) — oddzielone od laboratorium życia (zwierzęta i inne formy życia, `js/models/life/`). Oba stoją na LifeKit (`js/models/life/lifekit.js`). Postacie człekokształtne z SDF i pixel artu (generator zombie, SDF Walkers, Kostnica SDF): `js/models/human/zombie/`.
 - `js/envs/space|land|water/` — środowiska i ich prawa (kosmos bez grawitacji, ląd z grawitacją, woda z wypornością); `js/envs/sky/` — niebo i deszcz, wspólne dla lądu i wody.
@@ -24,7 +24,7 @@
 - `js/render/`, `js/audio/`, `js/labkit/` — wspólne warstwy.
 - `tools/` — narzędzia (doktor modeli, kitcheck, `paths.py` — sprawdzanie ścieżek).
 - `docs/` — dokumentacja w układzie kodu (mapa: `docs/README.md`): `docs/labs/` (laboratoria), `docs/models/` (modele), `docs/tools/` (narzędzia), `docs/guides/` (przewodniki, renderowanie, pułapki), `docs/history/` (historia sprzed przeniesienia, wykonany remanent).
-- Nazwy plików i folderów małymi literami, słowa łączone myślnikiem (`solar-system.js`, `grain-texture.html`); w kodzie nazwy mówią, co robią teraz (np. `LabKit.autoHideWindows`, nie dawne „hud”).
+- Nazwy plików i folderów małymi literami, słowa łączone myślnikiem (`solar-system.js`, `vehicles-water.html`); w kodzie nazwy mówią, co robią teraz (np. `LabKit.autoHideWindows`, nie dawne „hud”).
 
 ## Fizyka
 
@@ -43,7 +43,7 @@
 
 - W laboratorium każdej rodziny modeli przełącznik ma zawsze 3 pozycje: kosmos, woda, ląd, i stoi w górnym pasku laboratorium (`.bar`). Pozycje, w których rodzina nie ma zachowania, są wyszarzone.
 - Wspólny komponent: `ui/shell/envswitch.js` + `ui/shell/envswitch.css` (znacznik `<div class="envSwitch" data-current=… data-space=… data-water=… data-land=…>`; pusty adres = wyszarzone).
-- Pojazdy (wszystko, czym można się poruszać): jedno laboratorium pojazdów — `labs/ship.html` kosmos (statki, dron, stacja), `labs/warship.html` woda (okręty i roboty morskie z MarineKit: ślizgacz, barka, nurek), `labs/vehicles.html` ląd (łaziki, amfibia, pociąg). Woda i ląd w nim są zwykłe (umowne), z możliwością pobrania z laboratorium wody i lądu. Laboratorium morza usunięte (0.17.0).
+- Pojazdy (wszystko, czym można się poruszać): jedno laboratorium pojazdów — `labs/vehicles-space.html` kosmos (statki, dron, stacja), `labs/vehicles-water.html` woda (okręty i roboty morskie z MarineKit: ślizgacz, barka, nurek), `labs/vehicles-land.html` ląd (łaziki, amfibia, pociąg). Woda i ląd w nim są zwykłe (umowne), z możliwością pobrania z laboratorium wody i lądu. Laboratorium morza usunięte (0.17.0).
 
 ## Naprawy modeli
 

@@ -1,6 +1,6 @@
 /* =======================================================================
    SHIPKIT · SCRIBE — one ship definition (see js/models/ships-space/shipkit.js,
-   "SHIP DEFINITIONS", and docs/labs/ship.md). A classic script loaded after
+   "SHIP DEFINITIONS", and docs/labs/vehicles-space.md). A classic script loaded after
    shipkit.js: it pushes its entry into ShipKit.SHIP_DEFS and builds with
    ShipKit's blocks and helpers (ShipKit._).
    ======================================================================= */
@@ -84,7 +84,7 @@ function makeEyeMaterial(U) {
 
 // The print laser: moving dashes along the beam, bright where it faces the
 // camera. Additive, so alpha 1 and the intensity rides in RGB (see the
-// plume gotcha in docs/labs/ship.md). uOn fades it in and out.
+// plume gotcha in docs/labs/vehicles-space.md). uOn fades it in and out.
 function makeBeamMaterial(U) {
   return new THREE.ShaderMaterial({
     uniforms: { uTime: U.uTime, uOn: { value: 0 } },

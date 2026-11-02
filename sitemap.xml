@@ -14,9 +14,9 @@
     <xhtml:link rel="alternate" hreflang="pl" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/?lang=pl"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/"/>
   </url>
-  <url><loc>https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/ship.html</loc></url>
-  <url><loc>https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/warship.html</loc></url>
-  <url><loc>https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/vehicles.html</loc></url>
+  <url><loc>https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/vehicles-space.html</loc></url>
+  <url><loc>https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/vehicles-water.html</loc></url>
+  <url><loc>https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/vehicles-land.html</loc></url>
   <url><loc>https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/bodies.html</loc></url>
   <url><loc>https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/systems.html</loc></url>
   <url><loc>https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/scale.html</loc></url>
@@ -44,5 +44,4 @@
   <url><loc>https://michalstankiewicz4-cell.github.io/GameLaboratory/tools/doctor.html</loc></url>
   <url><loc>https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/transform.html</loc></url>
   <url><loc>https://michalstankiewicz4-cell.github.io/GameLaboratory/tools/kitcheck.html</loc></url>
-  <url><loc>https://michalstankiewicz4-cell.github.io/GameLaboratory/tools/grain-texture.html</loc></url>
 </urlset>

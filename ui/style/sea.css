@@ -1,4 +1,4 @@
-/* The labs from Battle (water, land, look, plants, structures, transform, filters, warship, pixel, zombies, morgue)
+/* The labs from Battle (water, land, look, plants, structures, transform, filters, vehicles-water, pixel, zombies, morgue)
    and the model doctor: the page, the top bar, the side panels, the doctor's lists. Load after ui/ui.css.
    --lab and --card2 are the old names of --accent and --field (ui/style/tokens.css). */
 :root{color-scheme:dark;--card2:var(--field);--lab:var(--accent);--sea:#4fa3d8}

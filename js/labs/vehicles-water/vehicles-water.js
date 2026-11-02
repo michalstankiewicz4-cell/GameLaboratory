@@ -1,4 +1,4 @@
-// Vehicle lab, water (warship.html): builds a ShipKit warship at real scale and shows it with studio-quality lighting
+// Vehicle lab, water (vehicles-water.html): builds a ShipKit warship at real scale and shows it with studio-quality lighting
 // (sky dome, image-based reflections, sun with soft shadows, the game's post-process), an optional sea,
 // dimension labels, part toggles, turret training/elevation and statistics. Uses only ShipKit's public API.
 // The robot vessels (MarineKit: skimmer, barge, diver; moved here from the sea lab) are on the same list: they drive

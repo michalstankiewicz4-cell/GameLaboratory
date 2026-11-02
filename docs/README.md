@@ -17,9 +17,9 @@ Układ folderów jest taki sam jak w kodzie:
 
 | Laboratorium | Strona | Dokument |
 |---|---|---|
-| Pojazdy — kosmos (statki, dron, stacja) | `labs/ship.html` | [labs/ship.md](labs/ship.md) |
-| Pojazdy — woda (ORP Błyskawica, ORP Orzeł, roboty morskie) | `labs/warship.html` | [models/ships-sea/blyskawica.md](models/ships-sea/blyskawica.md), [models/ships-sea/orzel.md](models/ships-sea/orzel.md), [models/marine.md](models/marine.md) |
-| Pojazdy — ląd (łaziki, amfibia, pociąg) | `labs/vehicles.html` | [labs/vehicles.md](labs/vehicles.md), [models/train/fizyka.md](models/train/fizyka.md), [models/train/grafika.md](models/train/grafika.md) |
+| Pojazdy — kosmos (statki, dron, stacja) | `labs/vehicles-space.html` | [labs/vehicles-space.md](labs/vehicles-space.md) |
+| Pojazdy — woda (ORP Błyskawica, ORP Orzeł, roboty morskie) | `labs/vehicles-water.html` | [models/ships-sea/blyskawica.md](models/ships-sea/blyskawica.md), [models/ships-sea/orzel.md](models/ships-sea/orzel.md), [models/marine.md](models/marine.md) |
+| Pojazdy — ląd (łaziki, amfibia, pociąg) | `labs/vehicles-land.html` | [labs/vehicles-land.md](labs/vehicles-land.md), [models/train/fizyka.md](models/train/fizyka.md), [models/train/grafika.md](models/train/grafika.md) |
 | Ciała niebieskie | `labs/bodies.html` | [labs/bodies.md](labs/bodies.md) |
 | Układy | `labs/systems.html` | [labs/systems.md](labs/systems.md) |
 | Skala | `labs/scale.html` | [labs/scale.md](labs/scale.md) |
@@ -47,7 +47,6 @@ Układ folderów jest taki sam jak w kodzie:
 |---|---|---|
 | Doktor modeli | `tools/doctor.html` | [tools/doctor.md](tools/doctor.md) |
 | Kontrola kitów | `tools/kitcheck.html` | sprawdza modele kitów Space z wzorcem `tools/kitcheck.golden.json` |
-| Tekstura ziarna | `tools/grain-texture.html` | robi `grain.png` dla paneli gry |
 | Sprawdzenia (przy każdym wypchnięciu) | `tools/paths.py`, `tools/sitemap.py` | [../CLAUDE.md](../CLAUDE.md), „Strona startowa” |
 
 ## Przewodniki

@@ -1,4 +1,4 @@
-> Przeniesione z repozytorium Battle (docs/GUIDE.md), z adresami stron GameLaboratory (w Battle: labs/ship.html, labs/doctor.html, pixel/, pixel/zombies.html).
+> Przeniesione z repozytorium Battle (docs/GUIDE.md), z adresami stron GameLaboratory (w Battle: labs/vehicles-space.html, labs/doctor.html, pixel/, pixel/zombies.html).
 
 # Labs guide — how to use them
 
@@ -28,7 +28,7 @@ each lab is for, how to drive it and what to try. Technical details are in the p
 | Keep a result | **Copy settings (JSON)** — paste it into the chat; it is what moves into the game |
 | Settings survive a reload | yes (stored in the browser); "Reset" buttons where they exist |
 
-## Vehicle lab, water — `labs/warship.html`
+## Vehicle lab, water — `labs/vehicles-water.html`
 
 ORP Błyskawica (1937) and ORP Orzeł (1939) at real scale, built from code, and MarineKit's robot vessels (skimmer,
 barge, diver); pick one in the top bar. The environment switch next to it goes to the space and land pages.

@@ -21,7 +21,7 @@ const APP_VERSION = V.app;
 const MENU_H = 32;
 const ROOT = (document.currentScript && document.currentScript.src || "").replace(/ui\/shell\/menubar\.js.*$/, "");
 const PARTS = location.pathname.split("/"), HERE = PARTS.pop() || "index.html", DIR = PARTS.pop() || "";
-const PAGE = (DIR === "labs" || DIR === "tools" ? DIR + "/" : "") + HERE;   // e.g. "labs/ship.html"
+const PAGE = (DIR === "labs" || DIR === "tools" ? DIR + "/" : "") + HERE;   // e.g. "labs/vehicles-space.html"
 const START = PAGE === "index.html";
 const REPO = "https://github.com/michalstankiewicz4-cell/GameLaboratory/blob/main/";
 const DOCS = "https://github.com/michalstankiewicz4-cell/GameLaboratory/tree/main/docs";   // HELP → Documentation

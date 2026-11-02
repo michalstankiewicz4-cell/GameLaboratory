@@ -1,7 +1,7 @@
 // The vehicle lab's land page (vehicles.html): its scene and panels, wired to the kits'
 // public APIs. Moved out of the page (2026-10-03) so the page is markup and styles.
 // The list: VehicleKit's rovers and MarineKit's amphibian (moved here from the sea lab: on land it drives on its
-// wheels; where there is water it floats). The train is another family (js/labs/vehicles/train.js).
+// wheels; where there is water it floats). The train is another family (js/labs/vehicles-land/train.js).
 (() => {
 "use strict";
 const $ = (id) => document.getElementById(id);
@@ -47,7 +47,7 @@ function heightAt(x, z) {
   h += Math.max(0, rk - 0.55) * 1.6 * G.bumps;
   return h;
 }
-// the ground can come from the land lab instead (OPTIONS: Ground → Land lab; js/labs/vehicles/landsource.js): its
+// the ground can come from the land lab instead (OPTIONS: Ground → Land lab; js/labs/vehicles-land/land-source.js): its
 // terrain, its sea and its weather; the amphibian floats where there is water, the rovers stop at it
 let world = null;
 const groundAt = (x, z) => (world ? world.heightAt(x, z) : heightAt(x, z));
@@ -75,7 +75,7 @@ const state = { index: 0, auto: true, autoSpeed: 0.5, night: false, dust: true, 
 const drv = { x: 0, z: 0, yaw: 0, speed: 0 };
 let veh = null;
 const dust = VK.makeDust(0xc9a27c); scene.add(dust.points);
-// other model families (e.g. the train, js/labs/vehicles/train.js) show here instead
+// other model families (e.g. the train, js/labs/vehicles-land/train.js) show here instead
 // of a VehicleKit vehicle: { name, role, build(scene) → group, rows(), target, camera,
 // panel (their own controls, in place of DRIVE / GROUND), update(dt, t) (their behaviour, each frame) }
 let mode = null;

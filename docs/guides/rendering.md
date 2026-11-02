@@ -4,7 +4,7 @@ From the game Space (its `docs/guides/rendering.md`, split out of
 [`architecture.md`](https://github.com/michalstankiewicz4-cell/Space/blob/main/docs/architecture.md)):
 how the ShipKit and BodyKit models are lit and drawn, and the sky backdrop. The parts
 about the game's own screens (Setup → Graphics, the ship cam, the game against the labs)
-stayed in Space. The kits' APIs are in [`ship.md`](../labs/ship.md) and [`bodies.md`](../labs/bodies.md);
+stayed in Space. The kits' APIs are in [`ship.md`](../labs/vehicles-space.md) and [`bodies.md`](../labs/bodies.md);
 how the labs draw today (Three.js r186, the graphics of the labs from Battle): CLAUDE.md,
 "Grafika", and [`look.md`](../labs/look.md).
 

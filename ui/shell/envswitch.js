@@ -1,6 +1,6 @@
 // Przełącznik środowiska — wspólny dla laboratoriów rodzin modeli (CLAUDE.md: zawsze 3 pozycje,
 // kosmos · woda · ląd; pozycje bez zachowania są wyszarzone). Montowany w znaczniku:
-//   <div class="envSwitch" data-current="space" data-space="ship.html" data-water="warship.html" data-land=""></div>
+//   <div class="envSwitch" data-current="space" data-space="vehicles-space.html" data-water="vehicles-water.html" data-land=""></div>
 // Pusty adres = brak zachowania w tym środowisku (pozycja wyszarzona). Style: ui/shell/envswitch.css.
 // Klasyczny skrypt bez zależności — działa na stronach ze skryptami klasycznymi i z modułami (także pod CSP 'self').
 (function () {

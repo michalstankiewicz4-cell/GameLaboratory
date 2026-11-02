@@ -18,16 +18,16 @@ repository, then `http://localhost:8000/labs/ship.html`.
 
 ## File layout
 
-`labs/ship.html` loads, in this order (all as `<script type="module">`, after the menu bar):
+`labs/vehicles-space.html` loads, in this order (all as `<script type="module">`, after the menu bar):
 
 | Script | What it is |
 |---|---|
 | 1. `js/core/three-global.js` | Three.js r186 (`vendor/three/`) as the global `THREE`, with OrbitControls and the post-processing passes, in the graphics of the labs from Battle (CLAUDE.md, "Grafika") |
 | 2. `js/render/postkit/postkit.js` | The IMAGE EFFECTS: post-processing |
-| 3. `js/labkit/labkit.js` | What the Space labs share around the model (`window.LabKit`): slider fills, toggles, the IMAGE EFFECTS render, the camera look panel and the windows fading out after 5 idle seconds (`autoHideWindows`). Styles: `ui/style/space.css` + `ui/pages/ship.css` |
+| 3. `js/labkit/labkit.js` | What the Space labs share around the model (`window.LabKit`): slider fills, toggles, the IMAGE EFFECTS render, the camera look panel and the windows fading out after 5 idle seconds (`autoHideWindows`). Styles: `ui/style/space.css` + `ui/pages/vehicles-space.css` |
 | 4. `js/models/ships-space/shipkit.js` | **ShipKit's core**: texture generators, materials, shaders, shared effects, the building blocks, SHAPING, the model build, public API (`window.ShipKit`), and `ShipKit._`: the internals the ship files build with (not a public API) |
 | 4b. `js/models/ships-space/ships/codewing.js`, `scribe.js`, `swarmer.js`, `haven.js` | **One file per ship**. Each pushes its definition into `ShipKit.SHIP_DEFS` and takes what it uses from `ShipKit._`; they load after the core, in the lab's order |
-| 5. `js/labs/ship/ship.js` | The lab: sky, lights, renderer, camera, the windows' wiring, sliders. Uses only the kits' public APIs |
+| 5. `js/labs/vehicles-space/vehicles-space.js` | The lab: sky, lights, renderer, camera, the windows' wiring, sliders. Uses only the kits' public APIs |
 
 ## ShipKit (`window.ShipKit`)
 

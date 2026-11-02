@@ -271,7 +271,7 @@ const fx = LabKit.imageEffects({ renderer, scene, camera, panel: document.getEle
   setQuality: (level) => { state.quality = level; qSlider.value = level; paintSlider(qSlider); applyQuality(level); },
 });
 
-// the ship: a drop-down in the lab's top bar, as on the water page (labs/warship.html); a renamed ship shows its new name
+// the ship: a drop-down in the lab's top bar, as on the water page (labs/vehicles-water.html); a renamed ship shows its new name
 const shipSelect = document.getElementById("ship");
 function fillShipSelect() {
   shipSelect.replaceChildren(...ShipKit.SHIP_DEFS.map((d, i) => Object.assign(document.createElement("option"), { value: String(i), textContent: shipLabels(d.id).name || d.name })));

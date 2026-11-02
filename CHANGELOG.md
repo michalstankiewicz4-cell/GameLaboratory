@@ -3,6 +3,19 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.20.2 — 2026-11-02 (nazwy stron laboratorium pojazdów; bez Tekstury ziarna)
+
+### Zmienione
+- **Laboratorium pojazdów** — strony nazwane według środowiska: `labs/ship.html` → `labs/vehicles-space.html` (1.6.1),
+  `labs/warship.html` → `labs/vehicles-water.html` (1.3.1), `labs/vehicles.html` → `labs/vehicles-land.html` (1.6.1).
+  Tak samo skrypty (`js/labs/vehicles-space|vehicles-water|vehicles-land/`, `landsource.js` → `land-source.js`),
+  style (`ui/pages/vehicles-space.css`, `vehicles-land.css`) i dokumenty (`docs/labs/vehicles-space.md`, `vehicles-land.md`).
+  Przełącznik środowiska, katalog, wersje, mapa strony i `tools/lab-check.py` wskazują nowe strony.
+  Dawne adresy (`ship.html`, `warship.html`, `vehicles.html`) już nie działają. Zapisane ustawienia (`shipLab.*`) zostają.
+
+### Usunięte
+- Narzędzie **Tekstura ziarna** (`tools/grain-texture.*`, `ui/pages/grain-texture.css`) — laboratoria go nie używały.
+
 ## Program 0.20.1 — 2026-11-02 (dokumentacja w układzie kodu)
 
 ### Zmienione

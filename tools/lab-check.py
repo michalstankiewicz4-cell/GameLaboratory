@@ -1,6 +1,6 @@
 """Headless check of the model labs (Playwright + SwiftShader).
 
-Loads the start page (index.html) and labs/warship.html (the ship lab's water page), waits for the ship to build, toggles parts, trains the mounts,
+Loads the start page (index.html) and labs/vehicles-water.html (the ship lab's water page), waits for the ship to build, toggles parts, trains the mounts,
 rebuilds at another detail level and screenshots a few camera presets to tools/out/lab-*.png;
 then the water lab, the transformer, the look lab (weathers, look presets, split compare, cameras) and the land
 lab (seamless wrap, exact land share, 100 % land, mountain barrier).
@@ -35,7 +35,7 @@ def main():
             pg.goto(f'http://localhost:{PORT}/index.html')
             for t in ['ship', 'look', 'land', 'structures', 'plants', 'water', 'transform']:
                 assert pg.locator(f'#labs a.tile[href$="labs/{t}.html"]').count() == 1, t + ' tile missing'
-            pg.goto(f'http://localhost:{PORT}/labs/warship.html')
+            pg.goto(f'http://localhost:{PORT}/labs/vehicles-water.html')
             pg.wait_for_function('window.__lab && window.__lab.model', timeout=180000)
             print('stats', ' '.join(pg.inner_text('#stats').split()))
             assert pg.locator('#specs tr').count() > 5 and pg.locator('#sources li').count() > 2, 'info panel empty'
@@ -62,7 +62,7 @@ def main():
                 Image.open(tmp).convert('RGB').crop((60, 90, 1100, 675)).resize((1200, 675), Image.LANCZOS).save(os.path.join(OUT, 'lab-thumb.jpg'), quality=85)
                 print('thumbnail written')
             # ORP Orzeł: builds with its own cameras, dives to periscope depth (40 mm into its well, periscopes up, ensign struck)
-            pg.goto(f'http://localhost:{PORT}/labs/warship.html?ship=orzel')
+            pg.goto(f'http://localhost:{PORT}/labs/vehicles-water.html?ship=orzel')
             pg.wait_for_function("window.__lab && window.__lab.model && window.__lab.model.info.id === 'orzel'", timeout=180000)
             print('orzel', ' '.join(pg.inner_text('#stats').split()))
             assert pg.locator('#cams button').count() >= 8 and not pg.locator('#subPanel').is_hidden() and pg.locator('#signalPanel').is_hidden(), 'orzel panels'
