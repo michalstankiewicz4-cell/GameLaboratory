@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.20.4 — 2026-11-02 (pojazdy w menu Narzędzia)
+
+### Zmienione
+- **Pasek menu → Narzędzia**: laboratorium pojazdów ma trzy pozycje, jak kafelki — kosmos, woda, ląd (`Pojazdów · kosmos` itd.);
+  ich tekst ma złotą poświatę (`.lmGlow` w `ui/shell/menubar.css`), żeby było widać, że to jedno laboratorium.
+  Kropka bieżącej strony stoi przy właściwym środowisku.
+
 ## Program 0.20.3 — 2026-11-02 (trzy kafelki laboratorium pojazdów)
 
 ### Zmienione

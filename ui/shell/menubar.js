@@ -90,6 +90,7 @@ const link = (label, href, opts = {}) => {
   const a = el("a", "lmItem"); a.href = href;
   const c = el("span", "lmChk", opts.on ? "●" : ""); a.append(c, document.createTextNode(label));
   if (opts.blank) { a.target = "_blank"; a.rel = "noopener"; }
+  if (opts.cls) a.classList.add(opts.cls);
   return a;
 };
 const action = (label, fn, opts = {}) => {
@@ -161,11 +162,13 @@ function windowItems() {
     ...W.list().map((w) => action(w.title(), () => W.toggle(w.id), { on: w.open }))];
 }
 // the labs and the tools, all here (the start screen: the GameLaboratory mark on the left)
-// in the list under "Labs" the word "lab" / "Laboratorium" is left out: "Ship lab" → "Ship", "Laboratorium statków" → "Statków"
-const short = (name) => { const s = name.replace(/^Laboratorium\s+/, "").replace(/\s+lab$/i, ""); return s.charAt(0).toUpperCase() + s.slice(1); };
+// in the list under "Labs" the word "lab" / "Laboratorium" is left out: "Ship lab" → "Ship", "Vehicle lab · water" → "Vehicle · water", "Laboratorium statków" → "Statków"
+const short = (name) => { const s = name.replace(/^Laboratorium\s+/, "").replace(/\s+lab(?=\s*·|$)/i, ""); return s.charAt(0).toUpperCase() + s.slice(1); };
 function tools() {
   const d = [el("div", "lmLabel", t("Labs", "Laboratoria"))];
-  LABS.filter((l) => !l.page).forEach((l) => d.push(link(short(l.name), ROOT + l.file, { on: me === l || (!!me && me.page === l.file) })));
+  // a lab with several pages (one per environment, each with its own tile): one item per page, their text glowing
+  const family = (l) => !!l.page || LABS.some((x) => x.page === l.file);
+  LABS.filter((l) => !l.page || l.art).forEach((l) => d.push(link(short(l.name), ROOT + l.file, { on: me === l || (!!me && !me.art && me.page === l.file), cls: family(l) ? "lmGlow" : "" })));
   d.push(el("div", "lmSep"), el("div", "lmLabel", t("Tools", "Narzędzia")));
   TOOLS.forEach((t) => d.push(link(t.name, ROOT + t.file, { on: me === t })));
   return d;
