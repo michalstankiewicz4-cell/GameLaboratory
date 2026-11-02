@@ -63,7 +63,7 @@
 - Jeden wygląd wszędzie: styl laboratoriów Battle (ciemne szkło, cienka linia, złote nagłówki i kontrolki). Czcionka Space Grotesk, liczby IBM Plex Mono, cienkie paski przewijania bez strzałek. Kolory tylko z tokenów (`ui/tokens.css`).
 - Strona linkuje `ui/ui.css`, potem `ui/space.css` lub `ui/sea.css`, potem `ui/pages/<lab>.css`. Bez bloków `<style>` i atrybutów `style=` w stronach (CSP `style-src 'self'`); skrypty ustawiają style przez CSSOM. W CSP potrzebne `font-src 'self'`.
 - Pasek menu ładuje własny arkusz `ui/menubar.css` (`<link>`).
-- Każde laboratorium ze sceną ma dwa paski jak laboratorium wody (`ui/bars.css`): `.bar` pod paskiem menu (własne kontrolki laboratorium, przełącznik środowiska) i `.foot` na dole (skala, klatki na sekundę, GameLaboratory; `#fps[data-auto]` liczy `ui/bars.js`).
+- Każde laboratorium ze sceną ma dwa paski jak laboratorium wody (`ui/bars.css`): `.bar` pod paskiem menu (własne kontrolki laboratorium, przełącznik środowiska) i `.foot` na dole (skala, klatki na sekundę, GameLaboratory; `#fps[data-auto]` liczy `ui/bars.js`). Paski i wszystko na nich są zdefiniowane tylko w `ui/bars.css` (stałe wysokości, nieprzezroczyste tło) — arkusze laboratoriów ich nie stylują; w paskach nie ma nazwy, wersji ani linków (są na pasku menu). OPCJE → Paski: pasek narzędzi i pasek informacyjny, domyślnie włączone (`body.lmNoBar`, `body.lmNoFoot`).
 - Ładowanie: karta `.labLoad` z kółkiem, zwykłym zdaniem (nie wielkimi literami), krokiem i paskiem.
 
 ## Wersjonowanie
@@ -72,7 +72,7 @@
 - `x.y.z`: **y** — nowa funkcja (nowe laboratorium podnosi program), **z** — poprawka lub mała zmiana, **x** — duży zwrot.
 - Zmiana w laboratorium podnosi wersję tego laboratorium; zmiana strony startowej lub wspólnych warstw (`js/core`, `js/labkit`, `js/render`, wspólne kity) — wersję programu (a wspólnego kitu także laboratoriów, w których zmienia to, co widać).
 - Każda zmiana wersji ma wpis w `CHANGELOG.md` (katalog główny). `docs/history/space-labs.md` to historia laboratoriów Space sprzed przeniesienia.
-- Wersje widać: pasek menu (program · laboratorium), strona startowa (program i każdy kafelek), paski laboratoriów z Battle i Pixel Studio (znacznik `data-lab-version`).
+- Wersje widać: pasek menu (program · laboratorium), strona startowa (program i każdy kafelek).
 
 ## Strona startowa
 

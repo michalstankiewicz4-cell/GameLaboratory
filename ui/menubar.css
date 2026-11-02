@@ -2,9 +2,12 @@
    Loaded by ui/menubar.js itself (a <link>, allowed by the strict CSP of the labs from Battle: style-src 'self'). */
 @import url("tokens.css");
 @import url("fonts.css");
-#labMenu { position: fixed; left: 0; right: 0; top: 0; height: 32px; z-index: 1000; display: flex; align-items: center; gap: 2px;
-  padding: 0 10px; box-sizing: border-box; background: rgba(13,17,23,.94); backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--line); font: 500 13px/1 var(--font); color: var(--text); user-select: none; }
+#labMenu { position: fixed; left: 0; right: 0; top: 0; height: var(--menuH); z-index: 1000; display: flex; align-items: center; gap: 2px;
+  margin: 0; padding: 0 10px; box-sizing: border-box; background: var(--menuBg); border-bottom: 1px solid var(--line);
+  font: 500 13px/1 var(--font); letter-spacing: normal; text-transform: none; color: var(--text); user-select: none; }
+/* self-contained: nothing from a lab's own sheet (buttons, links, sizes) reaches into the menu */
+#labMenu *, #lmDialog * { box-sizing: border-box; }
+#labMenu :is(a, button, div, span, b, i) { margin: 0; font-family: var(--font); line-height: 1; }
 #labMenu .lmHome { display: flex; align-items: center; gap: 8px; margin-right: 10px; padding: 0 8px 0 2px; height: 24px; border-radius: 6px;
   color: var(--head); text-decoration: none; font-weight: 600; letter-spacing: .2px; }
 #labMenu .lmHome:hover { background: var(--field); }
@@ -27,7 +30,7 @@
 #labMenu .lmLabel { padding: 6px 10px 3px; color: var(--dim); font-size: 11px; letter-spacing: .8px; text-transform: uppercase; }
 #labMenu .lmWhere { margin-left: auto; color: var(--dim); font-weight: 400; }
 #labMenu .lmWhere b { color: var(--head); font-weight: 600; }
-#labMenu .lmVer { margin-left: 14px; padding: 2px 8px; border: 1px solid var(--line); border-radius: 999px; color: var(--dim); font-size: 11.5px;
+#labMenu .lmVer { display: inline-flex; align-items: center; height: 20px; margin-left: 14px; padding: 0 8px; border: 1px solid var(--line); border-radius: 999px; color: var(--dim); font-size: 11.5px;
   text-decoration: none; font-weight: 500; }
 #labMenu .lmVer:hover { color: var(--head); border-color: var(--line2); }
 #labMenu .lmWhere + .lmVer { margin-left: 12px; }
@@ -44,10 +47,6 @@
   font: inherit; cursor: pointer; }
 #lmDialog button:hover { border-color: var(--accent); }
 
-/* the pages' own top panels, moved down under the bar (not on the start page) */
-body.lmLab #hud, body.lmLab #opt { top: 48px !important; max-height: calc(100vh - 64px) !important; }
-body.lmLab #compass { top: 92px !important; }
-body.lmLab #toast { top: 140px !important; }
-body.lmLab > #bar { top: 32px !important; }
+/* the tools without the lab's bars: their page starts under the menu bar */
 body.lmLab.lmTool { padding-top: 48px !important; }
 body.lmLab.lmTool #app { height: calc(100% - 32px) !important; margin-top: 32px; }

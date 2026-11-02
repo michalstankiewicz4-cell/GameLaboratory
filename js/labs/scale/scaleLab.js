@@ -349,7 +349,7 @@ function frame(){
   if(labelsDirty){ labelsDirty = false; placeLabels(); }
   frames++; fpsT += dt;
   if(fpsT >= 0.5){
-    fpsEl.textContent = Math.round(frames / fpsT) + " FPS · " + renderer.info.render.triangles.toLocaleString() + " triangles";
+    fpsEl.textContent = Math.round(frames / fpsT) + " fps · " + renderer.info.render.triangles.toLocaleString() + " triangles";
     frames = 0; fpsT = 0;
   }
   requestAnimationFrame(frame);

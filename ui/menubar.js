@@ -77,6 +77,10 @@ sheet.rel = "stylesheet"; sheet.href = ROOT + "ui/menubar.css";
 document.head.appendChild(sheet);
 if (!START) document.body.classList.add("lmLab");
 if (isTool) document.body.classList.add("lmTool");
+// the lab's two bars (ui/bars.css), shown or hidden for every page (OPTIONS → Bars); both on by default
+const BARS = [["bar", "gamelab.bars.tool", "lmNoBar"], ["foot", "gamelab.bars.info", "lmNoFoot"]];
+const barOn = (key) => { try { return localStorage.getItem(key) !== "off"; } catch (e) { return true; } };
+BARS.forEach(([, key, cls]) => document.body.classList.toggle(cls, !barOn(key)));
 
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
 const link = (label, href, opts = {}) => {
@@ -118,6 +122,7 @@ function options() {
     action(t("Full screen", "Pełny ekran"), () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(() => {}); },
       { on: !!document.fullscreenElement }),
     action(t("Reload this page", "Odśwież stronę"), () => location.reload()),
+    ...barItems(),
     // this page's windows (ui/windows.js): its options, each in a window you open and close here
     ...windowItems(),
     el("div", "lmSep"),
@@ -137,15 +142,28 @@ function options() {
     }),
   ];
 }
+function barItems() {
+  const names = { bar: t("Toolbar", "Pasek narzędzi"), foot: t("Info bar", "Pasek informacyjny") };
+  const have = BARS.filter(([c]) => document.querySelector("body > ." + c));
+  if (!have.length) return [];
+  return [el("div", "lmSep"), el("div", "lmLabel", t("Bars", "Paski")),
+    ...have.map(([c, key, cls]) => action(names[c], () => {
+      const on = !barOn(key);
+      try { if (on) localStorage.removeItem(key); else localStorage.setItem(key, "off"); } catch (e) { /* storage blocked */ }
+      document.body.classList.toggle(cls, !on);
+    }, { on: barOn(key) }))];
+}
 function windowItems() {
   const W = window.LabWindows; if (!W || !W.list().length) return [];
   return [el("div", "lmSep"), el("div", "lmLabel", t("Windows", "Okna")),
     ...W.list().map((w) => action(w.title(), () => W.toggle(w.id), { on: w.open }))];
 }
 // the labs and the tools, all here (the start screen: the GameLaboratory mark on the left)
+// in the list under "Labs" the word "lab" / "Laboratorium" is left out: "Ship lab" → "Ship", "Laboratorium statków" → "Statków"
+const short = (name) => { const s = name.replace(/^Laboratorium\s+/, "").replace(/\s+lab$/i, ""); return s.charAt(0).toUpperCase() + s.slice(1); };
 function tools() {
   const d = [el("div", "lmLabel", t("Labs", "Laboratoria"))];
-  LABS.filter((l) => !l.page).forEach((l) => d.push(link(l.name, ROOT + l.file, { on: me === l || (l.file === "labs/ship.html" && me && me.page) })));
+  LABS.filter((l) => !l.page).forEach((l) => d.push(link(short(l.name), ROOT + l.file, { on: me === l || (l.file === "labs/ship.html" && me && me.page) })));
   d.push(el("div", "lmSep"), el("div", "lmLabel", t("Tools", "Narzędzia")));
   TOOLS.forEach((t) => d.push(link(t.name, ROOT + t.file, { on: me === t })));
   return d;

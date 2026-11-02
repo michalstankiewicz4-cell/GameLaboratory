@@ -3,6 +3,29 @@
 Wersja programu i każdego laboratorium: `ui/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.16.0 — 2026-11-02 (jednakowe paski, przełączniki pasków)
+
+### Nowe
+- OPCJE → **Paski**: pasek narzędzi (pod paskiem menu) i pasek informacyjny (na dole) można wyłączyć; domyślnie oba
+  włączone. Wybór dotyczy wszystkich stron i zostaje w przeglądarce (`gamelab.bars.tool`, `gamelab.bars.info`).
+
+### Zmienione
+- **Paski jednakowe na każdej stronie** i niezależne od laboratoriów: pasek menu, pasek narzędzi i pasek informacyjny
+  mają stałe wysokości (32, 44, 34 px) i nieprzezroczyste tło (scena za nimi nie zmienia już ich koloru). Wszystko, co
+  na nich stoi — listy rozwijane, przyciski, przyciski połączone (GPU · CPU), „Start render”, przełącznik środowiska,
+  statusy, licznik klatek — jest zdefiniowane tylko w `ui/bars.css` (listy z własną strzałką, wszystkie kontrolki 28 px).
+  Tokeny pasków nie dziedziczą motywu strony (`ui/tokens.css`).
+- Menu Narzędzia: w liście laboratoriów bez słowa „Laboratorium” / „lab” (np. „Wody”, „Water”).
+- Laboratorium skali: własny stary pasek `#bar` zamieniony na wspólny (bez ukrytego tytułu i drugiego, martwego
+  licznika klatek); licznik pisze „fps” jak pozostałe.
+
+### Usunięte (stare, niepotrzebne)
+- Z pasków laboratoriów z Battle, Pixel Studio, generatora zombie, kostnicy i doktora: ukryte nazwy, znaczniki wersji
+  i linki (wszystko to jest na pasku menu); napis „Pixel Studio” w generatorze zombie.
+- Reguły pasków w arkuszach stron (`ui/pages/pixel.css`, `ui/pages/scale.css`) i stare przesunięcia w
+  `ui/menubar.css` (`#hud`, `#opt`, `#bar`; kompas i komunikat powierzchni mają położenie we własnym arkuszu).
+- Wersje: program 0.16.0; wszystkie laboratoria z paskami i doktor — z+1.
+
 ## Program 0.15.2 — 2026-11-02
 
 ### Zmienione

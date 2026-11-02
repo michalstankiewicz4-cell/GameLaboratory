@@ -12,7 +12,8 @@ gold headings and controls). Font: Space Grotesk; numbers: IBM Plex Mono.
 | `base.css` | thin scroll bars without arrow buttons, everywhere |
 | `controls.css` | what is inside a window (`.labWin`) or any `.labUi`: buttons (`.tBtn`, `.btn`, `.btns button`), sliders (gold up to `--fill`), check boxes, radio buttons, drop-downs, fields, headings |
 | `windows.css` + `windows.js` | floating windows with a lab's options (OPTIONS → Windows) |
-| `envswitch.css` + `envswitch.js` | the environment switch: space · water · land |
+| `bars.css` + `bars.js` | the lab's two bars: under the menu bar (drop-downs, buttons, the environment switch, a status) and at the bottom (frames per second, scale); fixed heights, opaque, everything in them defined here only; OPTIONS → Bars hides either |
+| `envswitch.css` + `envswitch.js` | the environment switch: space · water · land (28 px, in the bar) |
 | `loader.css` + `loader.js` | the loading card: a ring, a plain sentence, an optional step, a bar; `loader.js` fades a card marked `data-auto` once the page has loaded and drawn |
 | `ui.css` | all of the above in one link |
 | `menubar.css` + `menubar.js` | the menu bar; the script loads its own sheet |

@@ -19,16 +19,17 @@
 <script src="../ui/menubar.js"></script>
 <div class="labLoad" data-auto><div class="labLoadCard"><i class="labSpin"></i><b>Building the row of objects…</b><span class="labLoadStep"></span><span class="labLoadBar"><i></i></span></div></div>
 <script src="../ui/loader.js"></script>
-<div class="foot"><span id="fps" data-auto></span><span class="sp"></span><span>GameLaboratory</span></div>
+<div class="foot"><span id="fps"></span><span class="sp"></span><span>GameLaboratory</span></div>
 <script src="../ui/bars.js"></script>
-<div id="bar">
-  <h1>SCALE LAB</h1>
-  <button type="button" id="btnModels" class="on" title="The game's own models (ShipKit, BodyKit)">Models</button>
-  <button type="button" id="btnOutlines" class="on" title="Outlines of the sizes that matter for gameplay">Outlines</button>
-  <button type="button" id="btnDetail" title="Model detail: low keeps it light, high is the game's high setting">Detail: low</button>
-  <button type="button" id="btnFit" title="Whole row in view">Fit all</button>
+<div class="bar">
+  <div class="btns">
+    <button type="button" id="btnModels" class="on" title="The game's own models (ShipKit, BodyKit)">Models</button>
+    <button type="button" id="btnOutlines" class="on" title="Outlines of the sizes that matter for gameplay">Outlines</button>
+    <button type="button" id="btnDetail" title="Model detail: low keeps it light, high is the game's high setting">Detail: low</button>
+    <button type="button" id="btnFit" title="Whole row in view">Fit all</button>
+  </div>
   <div id="legend"></div>   <!-- built from scaleLab.js's LEGEND, the same colours as the rings -->
-  <span id="fps"></span>
+  <span class="sp"></span>
 </div>
 <div id="labels"></div>
 <div id="scaleBar"><span></span><div></div></div>
