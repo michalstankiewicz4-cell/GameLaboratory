@@ -1,4 +1,4 @@
-/* The systems lab (labs/systems.html): its own rules, on top of ui/ui.css and ui/space.css. */
+/* The systems lab (labs/systems.html): its own rules, on top of ui/ui.css and ui/style/space.css. */
 #hud{ width:360px; }
 .seedRow{ display:grid; grid-template-columns:1fr 34px 1fr; gap:6px; margin-top:6px; }
 .seedRow input{ min-width:0; }

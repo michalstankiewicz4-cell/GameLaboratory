@@ -3,6 +3,33 @@
 Wersja programu i każdego laboratorium: `ui/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.20.0 — 2026-11-02 (porządek w plikach i nazwach)
+
+### Zmienione
+- **Skrypty laboratoriów**: każde laboratorium we własnym folderze `js/labs/<lab>/`, główny plik `<lab>.js`
+  (np. `js/labs/ship/ship.js`; `scale/scaleLab.js` → `scale/scale.js`, `filters/page.js` → `filters/filters.js`,
+  `pixel/app.js` → `pixel/pixel.js`, `walkers/main.js` → `walkers/walkers.js`). Wspólne skrypty laboratoriów:
+  `js/labs/shared/`.
+- **`ui/` w podfolderach**:
+  - `ui/style/` — tokeny, czcionki, podstawa, kontrolki, motywy `space.css` i `sea.css`;
+  - `ui/shell/` — pasek menu, paski, okna, okna standardowe, wydajność, konsola, dziennik, karta ładowania,
+    przełącznik środowiska;
+  - `ui/data/` — katalog i wersje;
+  - `ui/pages/` — style stron (bez zmian).
+
+  Jedno wejście dla stron zostaje: `ui/ui.css`.
+- **Mniejsze pliki**:
+  - dziennik konsoli (`LabLog`) wyszedł z `menubar.js` do `ui/shell/log.js` (pierwszy skrypt każdej strony);
+  - liczniki wydajności (`LabPerf`) wyszły z `labwin.js` do `ui/shell/perf.js`.
+- **MarineKit** (statki-roboty) przeniesiony do modeli: `js/models/marine/marinekit.js` (był w `js/envs/water/`).
+- **Nazwy plików** w kebab-case:
+  - `js/envs/space/solarSystem.js` → `solar-system.js`;
+  - narzędzie `tools/grainTexture.*` → `tools/grain-texture.*`, styl `ui/pages/grain-texture.css`.
+- **Nazwy w kodzie**: `LabKit.autoHideHud(panele, s)` → `LabKit.autoHideWindows()` (sam bierze wszystkie okna
+  strony); `LabKit.perfCounters` usunięty — laboratoria wołają `LabPerf.end(renderer, cpuMs)` bezpośrednio.
+- Narzędzia znają nowe miejsca (`tools/sitemap.py`: `ui/data/catalog.js`); wszystkie ścieżki w stronach,
+  arkuszach, narzędziach i dokumentach poprawione (`tools/paths.py --strict`: 0 / 0).
+
 ## Program 0.19.1 — 2026-11-02 (wspólne okna, część 2: laboratoria z Battle i reszta)
 
 ### Zmienione (y+1)

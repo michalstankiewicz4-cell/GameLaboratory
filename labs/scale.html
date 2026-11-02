@@ -8,19 +8,20 @@
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <!-- Scale lab: every object of the game Space side by side in one row, at its size in the game, over a
      ruler in world units (docs/scale.md). The sizes come from the game's data carried over with the models
-     (js/envs/space/config.js, solarSystem.js, comet.js), never copied into the page. Models from the same
+     (js/envs/space/config.js, solar-system.js, comet.js), never copied into the page. Models from the same
      kits (ShipKit, BodyKit); the outline mode draws the sizes that matter for gameplay instead. -->
 <link rel="stylesheet" href="../ui/ui.css">
 <link rel="stylesheet" href="../ui/pages/scale.css">
 </head>
 <body>
-<script src="../ui/versions.js"></script>
-<script src="../ui/catalog.js"></script>
-<script src="../ui/menubar.js"></script>
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/shell/menubar.js"></script>
 <div class="labLoad" data-auto><div class="labLoadCard"><i class="labSpin"></i><b>Building the row of objects…</b><span class="labLoadStep"></span><span class="labLoadBar"><i></i></span></div></div>
-<script src="../ui/loader.js"></script>
+<script src="../ui/shell/loader.js"></script>
 <div class="foot"><span id="fps"></span><span class="sp"></span><span>GameLaboratory</span></div>
-<script src="../ui/bars.js"></script>
+<script src="../ui/shell/bars.js"></script>
 <div class="bar">
   <div class="btns">
     <button type="button" id="btnModels" class="on" title="The game's own models (ShipKit, BodyKit)">Models</button>
@@ -28,7 +29,7 @@
     <button type="button" id="btnDetail" title="Model detail: low keeps it light, high is the game's high setting">Detail: low</button>
     <button type="button" id="btnFit" title="Whole row in view">Fit all</button>
   </div>
-  <div id="legend"></div>   <!-- built from scaleLab.js's LEGEND, the same colours as the rings -->
+  <div id="legend"></div>   <!-- built from scale.js's LEGEND, the same colours as the rings -->
   <span class="sp"></span>
 </div>
 <div id="labels"></div>
@@ -49,6 +50,6 @@
 <script type="module" src="../js/models/bodies/kinds/rocks.js"></script>
 <script type="module" src="../js/models/bodies/kinds/holes.js"></script>
 <script type="module" src="../js/models/bodies/kinds/sky.js"></script>
-<script type="module" src="../js/labs/scale/scaleLab.js"></script>
+<script type="module" src="../js/labs/scale/scale.js"></script>
 </body>
 </html>

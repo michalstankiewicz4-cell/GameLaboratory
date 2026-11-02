@@ -1,7 +1,7 @@
 // The studio shared by the life lab (labs/life.html) and the human lab (labs/human.html): a floor with a grid of
 // metres, a 2 m scale bar, three lights, the camera — and the creature from LifeKit on it, with its body's
 // parameters, face and gaits. Which creatures there are depends on the models the page loads (js/models/life/ or
-// js/models/human/); each lab's own script (js/labs/life.js, js/labs/human.js) starts the studio.
+// js/models/human/); each lab's own script (js/labs/life/life.js, js/labs/human/human.js) starts the studio.
 window.LifeStudio = function () {
 "use strict";
 const $ = (id) => document.getElementById(id);
@@ -126,7 +126,7 @@ $("btnClose").addEventListener("click", () => {
 function showStats() {
   let bones = 0; cre.group.traverse((o) => { if (o.isBone) bones++; });
   const rows = [[cre.params.size ? "Shoulder height" : "Height", (cre.params.height || cre.params.size) ? (cre.params.height || cre.params.size).toFixed(2) + " m" : "–"], ["Bones", bones]];
-  window.LabPerf.model(cre.group);   // triangles, meshes, materials: the Performance window (ui/labwin.js)
+  window.LabPerf.model(cre.group);   // triangles, meshes, materials: the Performance window (ui/shell/labwin.js)
   $("stats").textContent = "";
   rows.forEach(([k, v]) => { const r = document.createElement("div"); r.className = "row"; const a = document.createElement("span"); a.textContent = k; const b = document.createElement("b"); b.textContent = v; r.append(a, b); $("stats").appendChild(r); });
 }
@@ -223,8 +223,7 @@ const flip = (id, key) => $(id).addEventListener("click", () => { state[key] = !
 flip("btnBones", "bones"); flip("btnWire", "wire"); flip("btnScale", "scale");
 
 // ---------- the loop ----------
-LabKit.autoHideHud([...document.querySelectorAll("[data-window]")], 5);   // every window of the page fades when idle (ui/windows.js)
-const perf = LabKit.perfCounters(renderer);
+LabKit.autoHideWindows();   // every window of the page fades when idle
 renderer.info.autoReset = false;
 function resize() {
   renderer.setSize(window.innerWidth, window.innerHeight, false);
@@ -255,7 +254,7 @@ function frame() {
   controls.update();
   renderer.info.reset();
   LabKit.render(renderer, scene, camera);
-  perf.update(performance.now(), performance.now() - t0);
+  LabPerf.end(renderer, performance.now() - t0);   // the Performance window (ui/shell/perf.js)
   requestAnimationFrame(frame);
 }
 buildParams(); resize(); load(); showSpeed();

@@ -7,7 +7,7 @@ The humans are built on LifeKit (`js/models/life/lifekit.js`, described in `docs
 
 | File | What it is |
 |---|---|
-| `labs/human.html` + `js/labs/human.js` | The lab: the humans, MOVEMENT (gait, speed, in place / around), LAYERS, VIEW, BODY, FACE (expressions, LIVELY, TALK, CLOSE-UP), MODEL and PERFORMANCE. |
+| `labs/human.html` + `js/labs/human/human.js` | The lab: the humans, MOVEMENT (gait, speed, in place / around), LAYERS, VIEW, BODY, FACE (expressions, LIVELY, TALK, CLOSE-UP), MODEL and PERFORMANCE. |
 | `js/models/human/walk.js` | Moving on land: a biped's gaits (stand, walk, run, T-pose). Swimming, flying and space come as `move/<medium>.js`. |
 | `js/models/human/face.js` | A humanoid head with a face that moves (`LifeKit.face`): openings for the eyes and the mouth, teeth, a tongue, 14 expressions as morph targets. Used by the human; meant for androids and other humanoids too. |
 | `js/models/human/human.js` | The humans: "Human I" (a bust's head and neck) and "Human II" (a made low-poly head); our own round sculpt isn't listed. One file per creature. |

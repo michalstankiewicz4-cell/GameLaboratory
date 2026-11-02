@@ -3,7 +3,7 @@
    =======================================================================
    One script (window.ShipKit): the ship lab and the other Space labs build
    from it; in the game Space it is the same file. The ship lab's own script
-   is js/labs/ship.js.
+   is js/labs/ship/ship.js.
 
    Dependencies: the global THREE (js/core/three-global.js; written for r128) and a DOM
    (<canvas> for texture generation). No OrbitControls, no other libs.
@@ -60,7 +60,7 @@
    game renders like the labs (sRGB output, ACES, scene.environment from
    makeEnvironment()) and skips userData.shipkit objects in its color
    conversion. Mark animated/toggled parts userData.dynamic (mergeStatic).
-   Here: a change to this file bumps the program's version (ui/versions.js,
+   Here: a change to this file bumps the program's version (ui/data/versions.js,
    CHANGELOG.md; CLAUDE.md, "Wersjonowanie"). English comments, no
    trademarked franchise names.
    ======================================================================= */

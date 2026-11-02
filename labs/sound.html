@@ -10,18 +10,19 @@
      generated live from layers, parameters and a seed, like ShipKit builds
      ships. Play it, shape it, record it. docs/sound.md. -->
 <link rel="stylesheet" href="../ui/ui.css">
-<link rel="stylesheet" href="../ui/space.css">
+<link rel="stylesheet" href="../ui/style/space.css">
 <link rel="stylesheet" href="../ui/pages/sound.css">
 </head>
 <body>
-<script src="../ui/versions.js"></script>
-<script src="../ui/catalog.js"></script>
-<script src="../ui/menubar.js"></script>
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/shell/menubar.js"></script>
 <div class="bar">
   <span class="sp"></span>
 </div>
 <div class="foot"><span id="fps" data-auto></span><span class="sp"></span><span>GameLaboratory</span></div>
-<script src="../ui/bars.js"></script>
+<script src="../ui/shell/bars.js"></script>
 <canvas id="viz"></canvas>
 <div id="tapHint"><b>PRESS PLAY</b>the music is made live, here, from code</div>
 
@@ -84,10 +85,11 @@
   </div>
 </div>
 
-<script src="../ui/labwin.js"></script>
-<script src="../ui/windows.js"></script>
+<script src="../ui/shell/perf.js"></script>
+<script src="../ui/shell/labwin.js"></script>
+<script src="../ui/shell/windows.js"></script>
 <script type="module" src="../js/labkit/labkit.js"></script>
 <script type="module" src="../js/audio/musickit/musickit.js"></script>
-<script type="module" src="../js/labs/sound.js"></script>
+<script type="module" src="../js/labs/sound/sound.js"></script>
 </body>
 </html>

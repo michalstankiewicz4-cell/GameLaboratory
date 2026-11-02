@@ -131,7 +131,7 @@ h2{font-family:var(--display);font-size:16px;letter-spacing:.08em;text-transform
 header .xlink{font-size:14px}
 header .xlink a{color:var(--rot);font-family:var(--display);letter-spacing:.04em}
 
-/* ---- GameLaboratory: one look for every lab — the labs from Battle (ui/sea.css, ui/windows.css): dark glass,
+/* ---- GameLaboratory: one look for every lab — the labs from Battle (ui/style/sea.css, ui/shell/windows.css): dark glass,
    thin lines, gold headings, plain buttons, system fonts. The same tokens as there; the layout above stays. ---- */
 :root{
   --bg:#0c0f13; --panel:rgba(13,17,23,.9); --line:#26303d; --fg:#c8d0da; --muted:#7f8a98;

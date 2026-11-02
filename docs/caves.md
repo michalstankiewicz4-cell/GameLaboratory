@@ -10,7 +10,7 @@ style is chosen in the water lab. The hero's light sources and ways of seeing ha
 | File | What it is |
 |---|---|
 | `js/models/caves/cavekit.js` | **CaveKit**: `buildCave(opts)`, `setRock(cave, rock, { wet, relief })`, `ROCKS`, `rockMaterial()`, `lakeMaterial()`, `CAVE_DEFAULTS` |
-| `labs/caves.html`, `js/labs/caves.js` | The lab: windows *Cave* (shape) and *Rock and light*; views *Inside* and *Overview* in the top bar |
+| `labs/caves.html`, `js/labs/caves/caves.js` | The lab: windows *Cave* (shape) and *Rock and light*; views *Inside* and *Overview* in the top bar |
 | `js/labkit/freecam.js` | The free camera inside (shared with the gear lab) |
 
 ## How a cave is made

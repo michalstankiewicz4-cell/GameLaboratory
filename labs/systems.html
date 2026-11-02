@@ -13,19 +13,20 @@
      shared HUD helpers), BodyKit (the bodies), SystemKit (the systems:
      data, presets, generator, building — js/envs/space/systemkit/systemkit.js). -->
 <link rel="stylesheet" href="../ui/ui.css">
-<link rel="stylesheet" href="../ui/space.css">
+<link rel="stylesheet" href="../ui/style/space.css">
 <link rel="stylesheet" href="../ui/pages/systems.css">
 </head>
 <body>
-<script src="../ui/versions.js"></script>
-<script src="../ui/catalog.js"></script>
-<script src="../ui/menubar.js"></script>
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/shell/menubar.js"></script>
 <div class="bar">
   <select id="preset" aria-label="System"></select>
   <span class="sp"></span>
 </div>
 <div class="foot"><span id="fps" data-auto></span><span class="sp"></span><span>GameLaboratory</span></div>
-<script src="../ui/bars.js"></script>
+<script src="../ui/shell/bars.js"></script>
 <canvas id="view"></canvas>
 <div id="labels"></div>
 <div id="handles"></div>
@@ -105,10 +106,11 @@
   <div class="ticks"><span>15%</span><span>60%</span><span>120%</span></div>
 </div>
 <div id="loading" class="labLoad"><div class="labLoadCard"><i class="labSpin"></i><b>Building the system…</b><span class="labLoadStep"></span><span class="labLoadBar"><i></i></span></div></div>
-<script src="../ui/loader.js"></script>
+<script src="../ui/shell/loader.js"></script>
 
-<script src="../ui/labwin.js"></script>
-<script src="../ui/windows.js"></script>
+<script src="../ui/shell/perf.js"></script>
+<script src="../ui/shell/labwin.js"></script>
+<script src="../ui/shell/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
 <script type="module" src="../js/render/postkit/postkit.js"></script>
 <script type="module" src="../js/labkit/labkit.js"></script>
@@ -121,6 +123,6 @@
 <script type="module" src="../js/models/bodies/kinds/holes.js"></script>
 <script type="module" src="../js/models/bodies/kinds/sky.js"></script>
 <script type="module" src="../js/envs/space/systemkit/systemkit.js"></script>
-<script type="module" src="../js/labs/systems.js"></script>
+<script type="module" src="../js/labs/systems/systems.js"></script>
 </body>
 </html>

@@ -20,12 +20,13 @@
 <link rel="stylesheet" href="../ui/pages/kitcheck.css">
 </head>
 <body class="pageFlow">
-<script src="../ui/versions.js"></script>
-<script src="../ui/catalog.js"></script>
-<script src="../ui/menubar.js"></script>
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/shell/menubar.js"></script>
 <div class="bar"><span class="sp"></span></div>
 <div class="foot"><span id="fps" data-auto></span><span class="sp"></span><span>GameLaboratory</span></div>
-<script src="../ui/bars.js"></script>
+<script src="../ui/shell/bars.js"></script>
 <h1>Kit check</h1>
 <p>Every default model of every kit against the golden fingerprints, then every lab for errors. Building takes a while; the labs open one by one.</p>
 <div><button id="run">RUN AGAIN</button> <button id="copy">COPY NEW GOLDEN JSON</button> <span id="copied" class="dim"></span></div>
@@ -47,7 +48,7 @@
 <script type="module" src="../js/models/bodies/kinds/sky.js"></script>
 <script type="module" src="../js/models/base/basekit.js"></script>
 <script type="module" src="../js/models/vehicles/vehiclekit.js"></script>
-<script type="module" src="../js/envs/water/marinekit/marinekit.js"></script>
+<script type="module" src="../js/models/marine/marinekit.js"></script>
 <script type="module" src="../js/envs/space/systemkit/systemkit.js"></script>
 <script type="module" src="../js/models/life/lifekit.js"></script>
 <script type="module" src="../js/models/human/walk.js"></script>

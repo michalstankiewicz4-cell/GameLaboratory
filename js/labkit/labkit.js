@@ -3,14 +3,14 @@
    fills, toggle buttons, the performance counters, the IMAGE EFFECTS
    render (PostKit), the windows fading out when idle and the camera look
    panel (look-panel.js). window.LabKit, loaded as a module after
-   js/core/three-global.js. Styles: ui/space.css.
+   js/core/three-global.js. Styles: ui/style/space.css.
    ======================================================================= */
 import "./look-panel.js";   // grafika Battle: panel kamery z laboratoriów wodnych (window.LabLook)
 window.LabKit = (function () {
 "use strict";
 const $ = (id) => document.getElementById(id);
 
-// A range input's gold fill up to its value (ui/space.css reads --fill).
+// A range input's gold fill up to its value (ui/style/space.css reads --fill).
 function paintSlider(s) {
   s.style.setProperty("--fill", ((s.value - s.min) / (s.max - s.min) * 100) + "%");
 }
@@ -29,12 +29,6 @@ function makeGlow(inner = "rgba(255,255,255,1)", mid = "rgba(255,200,120,0.5)") 
   g.addColorStop(0, inner); g.addColorStop(0.25, mid); g.addColorStop(1, "rgba(0,0,0,0)");
   ctx.fillStyle = g; ctx.fillRect(0, 0, 128, 128);
   return new THREE.CanvasTexture(c);
-}
-
-// Performance counters: the standard Performance window (ui/labwin.js, LabPerf), one implementation for every lab.
-// update(now, cpuMs) once a frame, after it is drawn.
-function perfCounters(renderer) {
-  return { update(now, cpuMs) { if (window.LabPerf) window.LabPerf.end(renderer, cpuMs); } };
 }
 
 // IMAGE EFFECTS (PostKit, shared with the game): the camera's picture, not
@@ -76,11 +70,11 @@ function imageEffects({ renderer, scene, camera, panel, effects, setQuality }) {
   };
 }
 
-// The panels fade out after `seconds` without a mouse move, click, scroll
-// or key, and come back at the next one (like the game's Setup -> Mouse
-// option). Not while the pointer rests on a panel or a field in it has the
-// focus (a reader, a typist). Styles: ui/space.css .labIdle.
-function autoHideHud(panels, seconds = 5) {
+// Every window of the page (data-window, ui/shell/windows.js) fades out after `seconds` without a mouse move, click,
+// scroll or key, and comes back at the next one (like the game's Setup -> Mouse option). Not while the pointer rests
+// on a window or a field in it has the focus (a reader, a typist). Styles: ui/style/space.css .labIdle.
+function autoHideWindows(seconds = 5) {
+  const panels = [...document.querySelectorAll("[data-window]")];
   let last = performance.now(), hidden = false, over = 0;
   const show = () => {
     last = performance.now();
@@ -101,5 +95,5 @@ function autoHideHud(panels, seconds = 5) {
   }, 250);
 }
 
-return { paintSlider, toggle, makeGlow, perfCounters, imageEffects, autoHideHud, render };
+return { paintSlider, toggle, makeGlow, imageEffects, autoHideWindows, render };
 })();

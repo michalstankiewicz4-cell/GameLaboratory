@@ -29,14 +29,14 @@ gold headings and controls). Font: Space Grotesk; numbers: IBM Plex Mono.
 
 ```html
 <link rel="stylesheet" href="../ui/ui.css">
-<link rel="stylesheet" href="../ui/space.css">        <!-- or sea.css -->
+<link rel="stylesheet" href="../ui/style/space.css">        <!-- or sea.css -->
 <link rel="stylesheet" href="../ui/pages/<lab>.css">  <!-- if the lab has its own rules -->
 …
-<script src="../ui/versions.js"></script>
-<script src="../ui/catalog.js"></script>
-<script src="../ui/menubar.js"></script>              <!-- first thing in <body> -->
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/menubar.js"></script>              <!-- first thing in <body> -->
 …
-<script src="../ui/windows.js"></script>              <!-- after the panels -->
+<script src="../ui/shell/windows.js"></script>              <!-- after the panels -->
 ```
 
 No `<style>` blocks and no `style=""` attributes in the pages: the labs from Battle run under a
@@ -50,6 +50,6 @@ CSSOM (`el.style.x = …`), which the CSP allows.
   <span class="labLoadStep"></span><span class="labLoadBar"><i></i></span></div></div>
 ```
 
-A plain sentence, not capitals. `ui/loader.js` (right after the card) fills the step and the bar: the page's own
+A plain sentence, not capitals. `ui/shell/loader.js` (right after the card) fills the step and the bar: the page's own
 progress until the lab reports its steps with `LabLoad.step(name, fraction)`; for something long later on,
 `LabLoad.run(title, async (step) => { await step('Heightmap', 0.1); … })`. Without steps the bar runs back and forth.

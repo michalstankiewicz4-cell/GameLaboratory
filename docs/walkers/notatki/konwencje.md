@@ -1,7 +1,7 @@
 # Konwencje
 
 ## Wersje i historia
-- Jedno źródło numeru wersji: w NeuroLabPA js/version.js (APP_VERSION); w GameLaboratory `ui/versions.js`. Zmieniany razem z wpisem w `CHANGELOG.md`.
+- Jedno źródło numeru wersji: w NeuroLabPA js/version.js (APP_VERSION); w GameLaboratory `ui/data/versions.js`. Zmieniany razem z wpisem w `CHANGELOG.md`.
 - Schemat `0.MINOR.PATCH`: MINOR przy nowej funkcji, PATCH przy poprawce lub zmianie ustawień. W SDF Walkers zmiana listy wejść sieci zawsze podnosi MINOR, bo unieważnia wyeksportowane modele.
 - `ROADMAP.md`: plan, `CHANGELOG.md`: co się zmieniło, `notatki/`: reszta.
 

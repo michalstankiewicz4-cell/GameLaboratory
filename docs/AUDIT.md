@@ -8,7 +8,7 @@ spójność rejestrów laboratoriów, przegląd narzędzi testowych.
 ## Stan wykonania (program 0.13.0)
 
 - **Zrobione:** A1–A3, A6; B1–B4 (B4: klucze `gameLab.*` z jednorazową migracją); C1 (ścieżki z historii przeniesień;
-  zostały wzmianki o plikach samej gry), C2 (`docs/ui.md` i części `gotchas.md` o grze), C3, C4, C5, C6; D1 (`ui/catalog.js`
+  zostały wzmianki o plikach samej gry), C2 (`docs/ui.md` i części `gotchas.md` o grze), C3, C4, C5, C6; D1 (`ui/data/catalog.js`
   + `tools/sitemap.py`), D2, D3 (`js/labs/shared/studio.js`), D4 (`js/render/sdf-glsl.js`); E1–E4, E6; F1, F2; G1 (poza
   skórkami), G2, G3; H2–H4; J1–J4 (bez osobnych `panels.css` i `bar.css` — treść paneli jest w `space.css` / `sea.css`).
 - **Fałszywe trafienia:** A4, A5.
@@ -37,7 +37,7 @@ spójność rejestrów laboratoriów, przegląd narzędzi testowych.
 | A1 | `css/game-ui/` — 27 plików (style interfejsu gry Space: HUD, okna, ekran startowy, tła) | żadna strona ich nie ładuje; to interfejs gry, a gier tu nie przenosimy (makieta w laboratorium skórek ma własne style) | S |
 | A2 | `tools/out/` — 27 PNG, 3,8 MB | wyniki uruchomień `pixel-check.py` (zrzuty), nie wzorce — nic ich nie czyta; dodać `tools/out/` do `.gitignore` (dziś brak `.gitignore` w ogóle) | S |
 | A3 | `docs/walkers/gitignore.txt` | dawny `.gitignore` z NeuroLabPA, przeniesiony przez import | S |
-| A4 | ~~`console.log` w `js/labs/bodies.js`, `sound.js`, `systems.js`~~ | **fałszywe trafienie** — to celowa funkcja zapasowa „SEE CONSOLE” (gdy schowek jest zablokowany); zostaje | — |
+| A4 | ~~`console.log` w `js/labs/bodies/bodies.js`, `sound.js`, `systems.js`~~ | **fałszywe trafienie** — to celowa funkcja zapasowa „SEE CONSOLE” (gdy schowek jest zablokowany); zostaje | — |
 | A5 | ~~selektory `.sev1`, `.sev2` w `css/pixel.css`~~ | **fałszywe trafienie** — klasy nadawane dynamicznie przez skrypt Pixel Studio; zostają | — |
 | A6 | `assets/labs/ship.jpg`, `assets/labs/orzel.jpg` | nieużywane (kafelek okrętów nie istnieje — patrz B2); albo użyć ich w B2, albo usunąć | S |
 | A7 | `tools/walkers/prototype/*.py` (6 plików) i `tools/walkers/build_artifact.py` | prototypy SDF z Pythona i składacz artefaktu claude.ai — po przeniesieniu do GameLaboratory bez zastosowania (zostają w historii) | S |
@@ -68,7 +68,7 @@ spójność rejestrów laboratoriów, przegląd narzędzi testowych.
 |---|---|---|
 | D1 | **Jeden rejestr laboratoriów.** Dziś nowe laboratorium = 6 miejsc: `menubar.js` (LABS + PL_ITEMS), `versions.js`, `index.html` (ART, INFO, INFO_PL, PHRASES) i `sitemap.xml` — stąd B2. Propozycja: `js/labkit/catalog.js` (plik, nazwa EN/PL, opis EN/PL, frazy, obrazek, wersja, dokument), z którego czytają pasek menu i strona startowa; `sitemap.xml` generowana skryptem | M / średnie |
 | D2 | **Martwy markup HUD** w 11 stronach Space: logo SVG, `#hudBracket`, `#hudBar`, `#hudSub`, paski `.mat` — od okien wszystko schowane przez `windows.css`. Usunąć z HTML (i odpowiednie reguły z `lab.css`) | S / niskie |
-| D3 | Laboratoria życia i człowieka: wspólne „studio” (podłoga z siatką metrów, linijka 2 m, trzy światła, kamera) skopiowane w `js/labs/life.js` i `human.js` (188 wspólnych bloków; same strony 48). Wydzielić `js/labs/shared/studio.js`; reszta skryptów zostaje osobno, jak chciałeś | S / niskie |
+| D3 | Laboratoria życia i człowieka: wspólne „studio” (podłoga z siatką metrów, linijka 2 m, trzy światła, kamera) skopiowane w `js/labs/life/life.js` i `human.js` (188 wspólnych bloków; same strony 48). Wydzielić `js/labs/shared/studio.js`; reszta skryptów zostaje osobno, jak chciałeś | S / niskie |
 | D4 | Funkcje odległości (SDF) w GLSL powtórzone w `js/models/life/zombie/sdf-head.js` i `zombie/walkers/shaders.js` — wspólny fragment GLSL (`js/render/sdf-glsl.js`) | S / niskie |
 | D5 | Strony Battle: ten sam początek `<head>` (CSP, meta, ikona, style) w 12 plikach i skrót „H chowa panele” w 7 skryptach — teraz robią to okna; zostawić (decyzja z 0.11.1) albo przenieść do `windows.js` | S |
 | D6 | Pomocnicze `$()`, `el()`, budowanie suwaków powtarzają się w laboratoriach Battle, Space, okien i pociągu; wspólny `js/labkit/dom.js` | M / niskie |

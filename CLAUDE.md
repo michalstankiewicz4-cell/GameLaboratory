@@ -40,7 +40,7 @@
 ## Przełącznik środowiska
 
 - W laboratorium każdej rodziny modeli przełącznik ma zawsze 3 pozycje: kosmos, woda, ląd, i stoi w górnym pasku laboratorium (`.bar`). Pozycje, w których rodzina nie ma zachowania, są wyszarzone.
-- Wspólny komponent: `ui/envswitch.js` + `ui/envswitch.css` (znacznik `<div class="envSwitch" data-current=… data-space=… data-water=… data-land=…>`; pusty adres = wyszarzone).
+- Wspólny komponent: `ui/shell/envswitch.js` + `ui/shell/envswitch.css` (znacznik `<div class="envSwitch" data-current=… data-space=… data-water=… data-land=…>`; pusty adres = wyszarzone).
 - Pojazdy (wszystko, czym można się poruszać): jedno laboratorium pojazdów — `labs/ship.html` kosmos (statki, dron, stacja), `labs/warship.html` woda (okręty i roboty morskie z MarineKit: ślizgacz, barka, nurek), `labs/vehicles.html` ląd (łaziki, amfibia, pociąg). Woda i ląd w nim są zwykłe (umowne), z możliwością pobrania z laboratorium wody i lądu. Laboratorium morza usunięte (0.17.0).
 
 ## Naprawy modeli
@@ -58,21 +58,21 @@
 
 ## Okna z opcjami
 
-- Opcje laboratorium (dawne panele po lewej i prawej) są w pływających oknach otwieranych z OPCJE → Okna: `ui/windows.js` + `ui/windows.css`. Panel dostaje `data-window`, `data-title`, `data-title-pl`, `data-side`. Wszystkie laboratoria z panelami (poza skalą i skórkami) i doktor. Bez `data-title` tytułem jest pierwsza sekcja panelu (`h3` / `.secHd`). Okna bez zapisanego położenia układają się jedno pod drugim po swojej stronie, a gdy kolumna się zapełni — w następnej kolumnie obok.
-- Okna standardowe (`ui/labwin.js`, `data-std`), wszędzie te same: **Opis** (lewa, pierwsze), **Kamera**, **Światło i pogoda**, **Wydajność** (prawa, w tej kolejności). Wydajność jest generowana w jednym miejscu (`LabPerf`: klatki, czas klatki, CPU, trójkąty, wywołania rysowania, rozdzielczość, wykres, Model); statystyki modelu idą do niej. Własne okna laboratorium po lewej, za Opisem; drugie duże może stać po prawej, nad wspólnymi. Laboratorium pokazuje tylko te okna standardowe, które mają u niego sens. Wyjątki bez okien standardowych: doktor modeli, skala, skórki, SDF Walkers, laboratorium języka i obrazów.
+- Opcje laboratorium (dawne panele po lewej i prawej) są w pływających oknach otwieranych z OPCJE → Okna: `ui/shell/windows.js` + `ui/shell/windows.css`. Panel dostaje `data-window`, `data-title`, `data-title-pl`, `data-side`. Wszystkie laboratoria z panelami (poza skalą i skórkami) i doktor. Bez `data-title` tytułem jest pierwsza sekcja panelu (`h3` / `.secHd`). Okna bez zapisanego położenia układają się jedno pod drugim po swojej stronie, a gdy kolumna się zapełni — w następnej kolumnie obok.
+- Okna standardowe (`ui/shell/labwin.js`, `data-std`), wszędzie te same: **Opis** (lewa, pierwsze), **Kamera**, **Światło i pogoda**, **Wydajność** (prawa, w tej kolejności). Wydajność jest generowana w jednym miejscu (`LabPerf`: klatki, czas klatki, CPU, trójkąty, wywołania rysowania, rozdzielczość, wykres, Model); statystyki modelu idą do niej. Własne okna laboratorium po lewej, za Opisem; drugie duże może stać po prawej, nad wspólnymi. Laboratorium pokazuje tylko te okna standardowe, które mają u niego sens. Wyjątki bez okien standardowych: doktor modeli, skala, skórki, SDF Walkers, laboratorium języka i obrazów.
 
 ## Wygląd (UI)
 
-- Jeden wygląd wszędzie: styl laboratoriów Battle (ciemne szkło, cienka linia, złote nagłówki i kontrolki). Czcionka Space Grotesk, liczby IBM Plex Mono, cienkie paski przewijania bez strzałek. Kolory tylko z tokenów (`ui/tokens.css`).
-- Strona linkuje `ui/ui.css`, potem `ui/space.css` lub `ui/sea.css`, potem `ui/pages/<lab>.css`. Bez bloków `<style>` i atrybutów `style=` w stronach (CSP `style-src 'self'`); skrypty ustawiają style przez CSSOM. W CSP potrzebne `font-src 'self'`.
-- Pasek menu ładuje własny arkusz `ui/menubar.css` (`<link>`).
-- Każda strona (laboratoria, narzędzia, strona startowa) ma dwa paski jak laboratorium wody (`ui/bars.css`): `.bar` pod paskiem menu (własne kontrolki laboratorium, przełącznik środowiska) i `.foot` na dole (skala, klatki na sekundę, GameLaboratory; `#fps[data-auto]` liczy `ui/bars.js`). Paski i wszystko na nich są zdefiniowane tylko w `ui/bars.css` (stałe wysokości, nieprzezroczyste tło) — arkusze laboratoriów ich nie stylują; w paskach nie ma nazwy, wersji ani linków (są na pasku menu). OPCJE → Paski: pasek narzędzi i pasek informacyjny, domyślnie włączone (`body.lmNoBar`, `body.lmNoFoot`). Strona przewijana jak dokument (języka, obrazów, SDF Walkers, narzędzia) ma `<body class="pageFlow">`: zaczyna się pod paskami i kończy nad dolnym.
-- Ładowanie: karta `.labLoad` z kółkiem, zwykłym zdaniem (nie wielkimi literami), nazwą etapu, paskiem i procentem (`ui/loader.js`). Przy starcie sama pokazuje postęp strony; laboratorium zgłasza własne etapy `LabLoad.step(nazwa, ułamek)`, a długie operacje w trakcie pracy (powyżej ok. 1 s) idą przez `LabLoad.run(tytuł, async step => …)`.
-- Konsola: przycisk po prawej na pasku narzędzi otwiera okno z dziennikiem strony (`ui/console.js`, dziennik `window.LabLog` zaczyna się w `ui/menubar.js`): błędy, ostrzeżenia, komunikaty, etapy ładowania — najnowsze na górze, data i czas, strona, filtr; dziennik zostaje do zamknięcia karty (`sessionStorage`). Na każdej stronie, także startowej (ma oba paski).
+- Jeden wygląd wszędzie: styl laboratoriów Battle (ciemne szkło, cienka linia, złote nagłówki i kontrolki). Czcionka Space Grotesk, liczby IBM Plex Mono, cienkie paski przewijania bez strzałek. Kolory tylko z tokenów (`ui/style/tokens.css`).
+- Strona linkuje `ui/ui.css`, potem `ui/style/space.css` lub `ui/style/sea.css`, potem `ui/pages/<lab>.css`. Bez bloków `<style>` i atrybutów `style=` w stronach (CSP `style-src 'self'`); skrypty ustawiają style przez CSSOM. W CSP potrzebne `font-src 'self'`.
+- Pasek menu ładuje własny arkusz `ui/shell/menubar.css` (`<link>`).
+- Każda strona (laboratoria, narzędzia, strona startowa) ma dwa paski jak laboratorium wody (`ui/shell/bars.css`): `.bar` pod paskiem menu (własne kontrolki laboratorium, przełącznik środowiska) i `.foot` na dole (skala, klatki na sekundę, GameLaboratory; `#fps[data-auto]` liczy `ui/shell/bars.js`). Paski i wszystko na nich są zdefiniowane tylko w `ui/shell/bars.css` (stałe wysokości, nieprzezroczyste tło) — arkusze laboratoriów ich nie stylują; w paskach nie ma nazwy, wersji ani linków (są na pasku menu). OPCJE → Paski: pasek narzędzi i pasek informacyjny, domyślnie włączone (`body.lmNoBar`, `body.lmNoFoot`). Strona przewijana jak dokument (języka, obrazów, SDF Walkers, narzędzia) ma `<body class="pageFlow">`: zaczyna się pod paskami i kończy nad dolnym.
+- Ładowanie: karta `.labLoad` z kółkiem, zwykłym zdaniem (nie wielkimi literami), nazwą etapu, paskiem i procentem (`ui/shell/loader.js`). Przy starcie sama pokazuje postęp strony; laboratorium zgłasza własne etapy `LabLoad.step(nazwa, ułamek)`, a długie operacje w trakcie pracy (powyżej ok. 1 s) idą przez `LabLoad.run(tytuł, async step => …)`.
+- Konsola: przycisk po prawej na pasku narzędzi otwiera okno z dziennikiem strony (`ui/shell/console.js`, dziennik `window.LabLog` zaczyna się w `ui/shell/menubar.js`): błędy, ostrzeżenia, komunikaty, etapy ładowania — najnowsze na górze, data i czas, strona, filtr; dziennik zostaje do zamknięcia karty (`sessionStorage`). Na każdej stronie, także startowej (ma oba paski).
 
 ## Wersjonowanie
 
-- Program (GameLaboratory) ma swoją wersję, a każde laboratorium i narzędzie — osobną. Jedno miejsce: `ui/versions.js` (`app` i `labs`).
+- Program (GameLaboratory) ma swoją wersję, a każde laboratorium i narzędzie — osobną. Jedno miejsce: `ui/data/versions.js` (`app` i `labs`).
 - `x.y.z`: **y** — nowa funkcja (nowe laboratorium podnosi program), **z** — poprawka lub mała zmiana, **x** — duży zwrot.
 - Zmiana w laboratorium podnosi wersję tego laboratorium; zmiana strony startowej lub wspólnych warstw (`js/core`, `js/labkit`, `js/render`, wspólne kity) — wersję programu (a wspólnego kitu także laboratoriów, w których zmienia to, co widać).
 - Każda zmiana wersji ma wpis w `CHANGELOG.md` (katalog główny). `docs/history/space-labs.md` to historia laboratoriów Space sprzed przeniesienia.
@@ -80,9 +80,9 @@
 
 ## Strona startowa
 
-- Rejestr laboratoriów i narzędzi: `ui/catalog.js` (nazwa EN/PL, dokument, opis EN/PL, kit, frazy, klucze ustawień, obrazek kafelka) — czytają go pasek menu, strona startowa i `tools/sitemap.py`. Nowe laboratorium = wpis w katalogu + wersja w `ui/versions.js`, potem `python3 tools/sitemap.py`.
+- Rejestr laboratoriów i narzędzi: `ui/data/catalog.js` (nazwa EN/PL, dokument, opis EN/PL, kit, frazy, klucze ustawień, obrazek kafelka) — czytają go pasek menu, strona startowa i `tools/sitemap.py`. Nowe laboratorium = wpis w katalogu + wersja w `ui/data/versions.js`, potem `python3 tools/sitemap.py`.
 - Każde laboratorium ma kilka fraz, które je opisują (np. woda, kosmos, planeta, układy) — używa ich filtr laboratoriów na stronie startowej (`phrases` w katalogu, po angielsku `phraseEn`; nowa fraza potrzebuje obu).
 - Strona startowa pochodzi z gry kosmicznej (Space).
-- Języki: angielski i polski. Wybór w Opcjach (Automatycznie / English / Polski); automatycznie z przeglądarki, a gdy się nie da — angielski. Teksty: `ui/menubar.js` (`t(en, pl)`, `window.LabMenu.LANG`), `ui/catalog.js` (`namePl`, `descPl`) i `index.html` (`data-pl`).
+- Języki: angielski i polski. Wybór w Opcjach (Automatycznie / English / Polski); automatycznie z przeglądarki, a gdy się nie da — angielski. Teksty: `ui/shell/menubar.js` (`t(en, pl)`, `window.LabMenu.LANG`), `ui/data/catalog.js` (`namePl`, `descPl`) i `index.html` (`data-pl`).
 - SEO (angielski i polski): GameLaboratory jako silnik dla AI; miniatura `assets/og-image.jpg` (zrzut strony startowej), `robots.txt`, `sitemap.xml` (generowana: `tools/sitemap.py`).
 - Sprawdzenia przy każdym wypchnięciu (GitHub Actions `check.yml`): składnia JS, `tools/paths.py --strict`, `tools/sitemap.py --check`.

@@ -4,7 +4,7 @@ A standalone preview page for procedurally built 3D spaceships. The
 ships themselves live in **`js/models/ships-space/shipkit.js`** (ShipKit, from the
 game Space); the lab, the scale, surface, building, vehicle and sea labs, the model
 doctor and the kit check all build from it. A change to a lab bumps that lab's
-version; a change to ShipKit bumps the program's (`ui/versions.js`, `CHANGELOG.md`).
+version; a change to ShipKit bumps the program's (`ui/data/versions.js`, `CHANGELOG.md`).
 
 The page needs a local server (ES modules): `python3 -m http.server` in the
 repository, then `http://localhost:8000/labs/ship.html`.
@@ -24,10 +24,10 @@ repository, then `http://localhost:8000/labs/ship.html`.
 |---|---|
 | 1. `js/core/three-global.js` | Three.js r186 (`vendor/three/`) as the global `THREE`, with OrbitControls and the post-processing passes, in the graphics of the labs from Battle (CLAUDE.md, "Grafika") |
 | 2. `js/render/postkit/postkit.js` | The IMAGE EFFECTS: post-processing |
-| 3. `js/labkit/labkit.js` | What the Space labs share around the model (`window.LabKit`): slider fills, toggles, performance counters, the IMAGE EFFECTS render, the camera look panel and the windows fading out after 5 idle seconds (`autoHideHud`). Styles: `ui/space.css` + `ui/pages/ship.css` |
+| 3. `js/labkit/labkit.js` | What the Space labs share around the model (`window.LabKit`): slider fills, toggles, performance counters, the IMAGE EFFECTS render, the camera look panel and the windows fading out after 5 idle seconds (`autoHideHud`). Styles: `ui/style/space.css` + `ui/pages/ship.css` |
 | 4. `js/models/ships-space/shipkit.js` | **ShipKit's core**: texture generators, materials, shaders, shared effects, the building blocks, SHAPING, the model build, public API (`window.ShipKit`), and `ShipKit._`: the internals the ship files build with (not a public API) |
 | 4b. `js/models/ships-space/ships/codewing.js`, `scribe.js`, `swarmer.js`, `haven.js` | **One file per ship**. Each pushes its definition into `ShipKit.SHIP_DEFS` and takes what it uses from `ShipKit._`; they load after the core, in the lab's order |
-| 5. `js/labs/ship.js` | The lab: sky, lights, renderer, camera, the windows' wiring, sliders. Uses only the kits' public APIs |
+| 5. `js/labs/ship/ship.js` | The lab: sky, lights, renderer, camera, the windows' wiring, sliders. Uses only the kits' public APIs |
 
 ## ShipKit (`window.ShipKit`)
 

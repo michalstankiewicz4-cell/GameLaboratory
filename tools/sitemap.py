@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""sitemap.xml from the catalog (ui/catalog.js): the start page (English and Polish) and every lab and tool page,
+"""sitemap.xml from the catalog (ui/data/catalog.js): the start page (English and Polish) and every lab and tool page,
 except those marked noindex in their own <head>.
 
   python3 tools/sitemap.py           # writes sitemap.xml
@@ -12,7 +12,7 @@ SITE = "https://michalstankiewicz4-cell.github.io/GameLaboratory/"
 
 
 def catalog():
-    s = open(os.path.join(ROOT, "ui", "catalog.js"), encoding="utf-8").read()
+    s = open(os.path.join(ROOT, "ui", "data", "catalog.js"), encoding="utf-8").read()
     return json.loads(s[s.index("/*JSON*/") + 8:s.index("/*END*/")])
 
 

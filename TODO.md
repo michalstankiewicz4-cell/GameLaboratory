@@ -34,7 +34,7 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 - [ ] F3: dane głowy człowieka jako plik `.bin` (wczytywany asynchronicznie).
 - [ ] F4: kity Space jako importy ES zamiast globali `window.*`.
 - [ ] Narzędzie „Tekstura ziarna”: robiło `grain.png` dla paneli `.mat` gry; laboratoria już go nie używają — zostawić albo usunąć.
-- [ ] Laboratorium skórek bez CSP (atrybuty `style=` w makiecie i w `js/labs/skins.js`).
+- [ ] Laboratorium skórek bez CSP (atrybuty `style=` w makiecie i w `js/labs/skins/skins.js`).
 
 ## Pomysły na laboratoria przeniesione z TODO.md w Battle
 - [ ] Pixel Studio: edytor i import palet, warstwy, zaznaczanie i przesuwanie, czas klatki, podgląd kafelka 3×3, normalne koron drzew, więcej obiektów 3D.

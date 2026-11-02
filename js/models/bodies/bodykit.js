@@ -89,7 +89,7 @@
    The game builds the body for each fixed orbit slot listed in GAME_BODIES
    (sized to the slot's radius, detail and octaves from its graphics
    settings) and drives setDamage() from the body's health. Here: a change
-   to this file bumps the program's version (ui/versions.js, CHANGELOG.md;
+   to this file bumps the program's version (ui/data/versions.js, CHANGELOG.md;
    CLAUDE.md, "Wersjonowanie"). English comments.
    ======================================================================= */
 window.BodyKit = (function () {

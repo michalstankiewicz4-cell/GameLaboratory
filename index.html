@@ -51,18 +51,19 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <!-- The labs' start screen (index.html, in the root; the labs themselves
      live in labs/, the tools in tools/): a tile for every lab and tool, with the menu
-     bar every lab and tool page carries (ui/menubar.js — the lists
+     bar every lab and tool page carries (ui/shell/menubar.js — the lists
      live there, the tiles' pictures and words here). A workshop, not a cockpit. -->
-<link rel="stylesheet" href="ui/tokens.css">
-<link rel="stylesheet" href="ui/bars.css">
-<link rel="stylesheet" href="ui/windows.css">
-<link rel="stylesheet" href="ui/controls.css">
+<link rel="stylesheet" href="ui/style/tokens.css">
+<link rel="stylesheet" href="ui/shell/bars.css">
+<link rel="stylesheet" href="ui/shell/windows.css">
+<link rel="stylesheet" href="ui/style/controls.css">
 <link rel="stylesheet" href="ui/pages/start.css">
 </head>
 <body>
-<script src="ui/versions.js"></script>
-<script src="ui/catalog.js"></script>
-<script src="ui/menubar.js"></script>
+<script src="ui/data/versions.js"></script>
+<script src="ui/data/catalog.js"></script>
+<script src="ui/shell/log.js"></script>
+<script src="ui/shell/menubar.js"></script>
 <div class="bar"><span class="sp"></span></div>
 <div class="foot"><span class="sp"></span><span>GameLaboratory · MIT</span></div>
 <main>
@@ -89,7 +90,7 @@
 <script>
 (() => {
 "use strict";
-// language: chosen by the menu bar (OPTIONS → Language; ui/menubar.js) — English or Polish
+// language: chosen by the menu bar (OPTIONS → Language; ui/shell/menubar.js) — English or Polish
 const PL = window.LabMenu.LANG === "pl", tr = window.LabMenu.t;
 // a language chosen by the address (?lang=pl / ?lang=en) is its own page for search engines
 { const q = new URLSearchParams(location.search).get("lang"); const c = document.querySelector('link[rel="canonical"]');
@@ -103,7 +104,7 @@ if (PL) {
   meta('meta[property="og:title"]', T); meta('meta[name="twitter:title"]', T); meta('meta[property="og:locale"]', "pl_PL");
 }
 // gradient + line art per tile (viewBox 0 0 200 100)
-// the tiles' data (picture, description, kit, phrases): ui/catalog.js
+// the tiles' data (picture, description, kit, phrases): ui/data/catalog.js
 const CAT = window.LabMenu.CATALOG, BY = {};
 for (const c of CAT.labs.concat(CAT.tools)) BY[c.file] = c;
 const ART = {}, INFO = {}, INFO_PL = {}, PHRASES = {}, PHRASE_EN = CAT.phraseEn || {};
@@ -143,7 +144,7 @@ function ordered(items, ids) {
 }
 // ---------- QUICK ACCESS: the pinned one, the last opened, the two most opened ----------
 // The visits are counted by the menu bar on every lab and tool page
-// (ui/menubar.js); the pin is chosen here. Nothing shows twice.
+// (ui/shell/menubar.js); the pin is chosen here. Nothing shows twice.
 const PIN_KEY = "labsHub.pin";
 const ALL = LABS.concat(TOOLS);
 const store = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } };

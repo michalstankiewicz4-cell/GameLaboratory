@@ -10,7 +10,7 @@ binoculars. The test place is a dark cave from CaveKit ([`caves.md`](caves.md)).
 |---|---|
 | `js/models/gear/gearkit.js` | **GearKit**: `ITEMS`, `makeItem(id, { power, angle, kelvin, charge })`, `kelvinColor(T)` |
 | `js/render/vision.js` | **VisionPass**: the eye, night vision, binoculars — one full-screen pass after the camera look |
-| `labs/gear.html`, `js/labs/gear.js` | The lab: windows *Item* and *Vision*; the way of seeing in the top bar |
+| `labs/gear.html`, `js/labs/gear/gear.js` | The lab: windows *Item* and *Vision*; the way of seeing in the top bar |
 
 ## Items
 

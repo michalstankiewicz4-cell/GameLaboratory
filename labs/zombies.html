@@ -8,16 +8,17 @@
 <meta name="description" content="Zombie Generator: original zombies from a seed — body, face, decay, outfit, blood and dirt — animated in 12 frames from eight directions and exported as Unity sprite sheets (512×512 frames, pivot at the feet) with JSON and an editor script, realistic or as pixel art.">
 <link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/zombies.html">
 <link rel="icon" type="image/png" href="../assets/favicon-32.png">
-<link rel="stylesheet" href="../ui/sea.css">
+<link rel="stylesheet" href="../ui/style/sea.css">
 <link rel="stylesheet" href="../ui/ui.css">
 <link rel="stylesheet" href="../ui/pages/pixel.css">
 </head>
 <body class="lab pix zomb">
-<script src="../ui/versions.js"></script>
-<script src="../ui/catalog.js"></script>
-<script src="../ui/menubar.js"></script>
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/shell/menubar.js"></script>
 <div class="foot"><span id="fps" data-auto></span><span class="sp"></span><span>GameLaboratory</span></div>
-<script src="../ui/bars.js"></script>
+<script src="../ui/shell/bars.js"></script>
 <div class="bar">
   <div class="btns"><span class="dimtxt">Renderer</span><span class="seg" id="engine"><button type="button" data-e="gpu" title="The distance field on the graphics card: fast; the first time it compiles (about 20 s on Windows)">GPU</button><button type="button" data-e="cpu" title="Everything in JavaScript: slower, works everywhere">CPU</button></span>
     <button type="button" id="start" class="go">Start render</button>
@@ -70,8 +71,9 @@
   <div class="row"><span>Light from</span><input type="range" id="lightAz" min="-150" max="150" step="5"><output id="lightAzV"></output></div>
   <div class="row"><span>Light height</span><input type="range" id="lightEl" min="10" max="80" step="5"><output id="lightElV"></output></div>
 </aside>
-<script src="../ui/labwin.js"></script>
-<script src="../ui/windows.js"></script>
+<script src="../ui/shell/perf.js"></script>
+<script src="../ui/shell/labwin.js"></script>
+<script src="../ui/shell/windows.js"></script>
 <script type="module" src="../js/labs/pixel/zombies.js"></script>
 </body>
 </html>

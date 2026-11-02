@@ -9,5 +9,5 @@ Przeniesione z artefaktu claude.ai „SDF Morgue”. Głowa zombie liczona w sha
   4 kość, 5 rana, 6 koszula.
 - **Przebiegi:** 1 — dla każdego piksela ton światła, materiał i głębokość; 2 — kolory z palety i kontur tam, gdzie
   zmienia się materiał albo skacze głębokość (kontur tylko do 96 px).
-- **Laboratorium:** `js/labs/morgue.js` — losowanie okazu, kąt kamery, kołysanie głowy, kontur, rozdzielczość
+- **Laboratorium:** `js/labs/morgue/morgue.js` — losowanie okazu, kąt kamery, kołysanie głowy, kontur, rozdzielczość
   32–256 px, karta okazu z próbkami kolorów. Okna z opcjami jak w innych laboratoriach.

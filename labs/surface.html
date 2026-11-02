@@ -16,20 +16,21 @@
      and weather.js. The base lives in
      this browser (localStorage "gameLab.bases"). -->
 <link rel="stylesheet" href="../ui/ui.css">
-<link rel="stylesheet" href="../ui/space.css">
+<link rel="stylesheet" href="../ui/style/space.css">
 <link rel="stylesheet" href="../ui/pages/surface.css">
 </head>
 <body>
-<script src="../ui/versions.js"></script>
-<script src="../ui/catalog.js"></script>
-<script src="../ui/menubar.js"></script>
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/shell/menubar.js"></script>
 <div class="labLoad" data-auto><div class="labLoadCard"><i class="labSpin"></i><b>Generating the planet…</b><span class="labLoadStep"></span><span class="labLoadBar"><i></i></span></div></div>
-<script src="../ui/loader.js"></script>
+<script src="../ui/shell/loader.js"></script>
 <div class="bar">
   <span class="sp"></span>
 </div>
 <div class="foot"><span id="fps" data-auto></span><span class="sp"></span><span>GameLaboratory</span></div>
-<script src="../ui/bars.js"></script>
+<script src="../ui/shell/bars.js"></script>
 <canvas id="view"></canvas>
 <div id="fade"></div>
 <div id="toast"></div>
@@ -93,8 +94,9 @@
   <div class="ticks"><span>LOW</span><span>MED</span><span>HIGH</span><span>ULTRA</span></div>
   <div class="row"><span>Ground tiles loaded</span><b id="statTiles">–</b></div>
 </div>
-<script src="../ui/labwin.js"></script>
-<script src="../ui/windows.js"></script>
+<script src="../ui/shell/perf.js"></script>
+<script src="../ui/shell/labwin.js"></script>
+<script src="../ui/shell/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
 <script type="module" src="../js/labkit/labkit.js"></script>
 <script type="module" src="../js/models/ships-space/shipkit.js"></script>
@@ -116,6 +118,6 @@
 <script type="module" src="../js/envs/land/surfacekit/sky.js"></script>
 <script type="module" src="../js/envs/land/surfacekit/weather.js"></script>
 <script type="module" src="../js/envs/land/surfacekit/ground.js"></script>
-<script type="module" src="../js/labs/surface.js"></script>
+<script type="module" src="../js/labs/surface/surface.js"></script>
 </body>
 </html>

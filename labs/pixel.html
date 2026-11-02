@@ -8,16 +8,17 @@
 <meta name="description" content="Pixel Studio: pixel art made four ways — 3D models rendered small with hard, hue-shifted light; sprites and seamless tiles drawn by rules; a pixel editor; and the hybrid of all three — checked by a Pixel Doctor and exported as PNG or GIF with a transparent background.">
 <link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/pixel.html">
 <link rel="icon" type="image/png" href="../assets/favicon-32.png">
-<link rel="stylesheet" href="../ui/sea.css">
+<link rel="stylesheet" href="../ui/style/sea.css">
 <link rel="stylesheet" href="../ui/ui.css">
 <link rel="stylesheet" href="../ui/pages/pixel.css">
 </head>
 <body class="lab pix">
-<script src="../ui/versions.js"></script>
-<script src="../ui/catalog.js"></script>
-<script src="../ui/menubar.js"></script>
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/shell/menubar.js"></script>
 <div class="foot"><span id="fps" data-auto></span><span class="sp"></span><span>GameLaboratory</span></div>
-<script src="../ui/bars.js"></script>
+<script src="../ui/shell/bars.js"></script>
 <div class="bar">
   <div class="btns" id="modes"></div>
   <span class="sp"></span>
@@ -120,8 +121,9 @@
   <div class="doc"><span class="score" id="score"></span><span class="dimtxt">score for the frame shown</span></div>
   <div id="findings"></div>
 </aside>
-<script src="../ui/labwin.js"></script>
-<script src="../ui/windows.js"></script>
-<script type="module" src="../js/labs/pixel/app.js"></script>
+<script src="../ui/shell/perf.js"></script>
+<script src="../ui/shell/labwin.js"></script>
+<script src="../ui/shell/windows.js"></script>
+<script type="module" src="../js/labs/pixel/pixel.js"></script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 // The vehicle lab's land page (vehicles.html): the ground "from the land lab". Builds the land lab's world from what the
 // land lab saved in this browser (gameLab.land.v1: the map, the water layout, the weather; its defaults if nothing is
 // saved) — LandKit terrain with its biomes, and the WaterKit sea mixed by region, sharing the land's uniforms, as in
-// js/labs/land.js. The page asks for it through window.LandLabWorld(); what comes back:
+// js/labs/land/land.js. The page asks for it through window.LandLabWorld(); what comes back:
 //   group                  the terrain and the sea, to add to the scene
 //   heightAt(x, z)         the ground's height (negative under water), world metres
 //   waterAt(x, z, t)       the sea's height (its waves) at a point
@@ -9,7 +9,7 @@
 //   sky                    { fog, sunDir, sunColor, sunIntensity, ambient, sky, ground } from the land lab's weather
 //   update(t, camera)      each frame: the terrain's rings and the sea follow the camera
 //   dispose()
-// window.LandLabWorld(step) is async: step(name, fraction) is the loading card's (ui/loader.js LabLoad.run).
+// window.LandLabWorld(step) is async: step(name, fraction) is the loading card's (ui/shell/loader.js LabLoad.run).
 import * as THREE from '../../../vendor/three/three.module.js';
 import { WEATHER, skyUniforms, GLSL_SKY, applySky } from '../../envs/sky/skykit.js';
 import { waveSet, heightAt as waveHeight, waterUniforms, setWaves, polarGrid, waterMaterial, LOOKS } from '../../envs/water/waterkit.js';

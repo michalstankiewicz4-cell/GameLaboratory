@@ -10,7 +10,7 @@ body{ background:
   radial-gradient(1200px 500px at 10% -10%, rgba(91,140,255,.14), transparent 60%),
   radial-gradient(900px 500px at 100% 0%, rgba(54,214,181,.10), transparent 60%),
   var(--bg); }
-/* under the menu bar and the bar under it, above the bottom bar (ui/bars.css; OPTIONS → Bars hides either) */
+/* under the menu bar and the bar under it, above the bottom bar (ui/shell/bars.css; OPTIONS → Bars hides either) */
 main{ max-width:1240px; margin:0 auto; padding:calc(var(--menuH, 32px) + var(--barH, 44px) + 28px) 28px calc(var(--footH, 34px) + 40px); }
 body.lmNoBar main{ padding-top:calc(var(--menuH, 32px) + 28px); }
 body.lmNoFoot main{ padding-bottom:70px; }

@@ -1,6 +1,6 @@
 # Look Lab — ageing, weather and camera look
 
-`labs/look.html` (`js/labs/look.js`). ORP Błyskawica on the WaterKit sea under a procedural cloudy sky, with procedural
+`labs/look.html` (`js/labs/look/look.js`). ORP Błyskawica on the WaterKit sea under a procedural cloudy sky, with procedural
 ageing on every material and a single-pass camera-look post process. Every effect is switchable, the clean and the
 graded image can be compared side by side, and the cost of each effect can be measured. Settings are kept in the
 browser (`localStorage`, key `gameLab.look.v1`) and can be copied as JSON.

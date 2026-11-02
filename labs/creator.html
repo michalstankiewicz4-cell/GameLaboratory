@@ -11,18 +11,19 @@
      of legs. A design is data (JSON): copy it, load it. docs/life.md,
      "The creature editor". -->
 <link rel="stylesheet" href="../ui/ui.css">
-<link rel="stylesheet" href="../ui/space.css">
+<link rel="stylesheet" href="../ui/style/space.css">
 <link rel="stylesheet" href="../ui/pages/creator.css">
 </head>
 <body>
-<script src="../ui/versions.js"></script>
-<script src="../ui/catalog.js"></script>
-<script src="../ui/menubar.js"></script>
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/shell/menubar.js"></script>
 <div class="bar">
   <span class="sp"></span>
 </div>
 <div class="foot"><span id="fps" data-auto></span><span class="sp"></span><span>GameLaboratory</span></div>
-<script src="../ui/bars.js"></script>
+<script src="../ui/shell/bars.js"></script>
 <canvas id="view"></canvas>
 <div data-std="info">
   <div class="hudPanel">
@@ -108,14 +109,15 @@
   <div id="hint">Drag the gold points (spine) and the teal ones (legs, along the spine) · wheel on a point: thickness</div>
 </div>
 <div class="hudPanel" data-std="perf"></div>
-<script src="../ui/labwin.js"></script>
-<script src="../ui/windows.js"></script>
+<script src="../ui/shell/perf.js"></script>
+<script src="../ui/shell/labwin.js"></script>
+<script src="../ui/shell/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
 <script type="module" src="../js/labkit/labkit.js"></script>
 <script type="module" src="../js/models/ships-space/shipkit.js"></script>
 <script type="module" src="../js/models/life/lifekit.js"></script>
 <script type="module" src="../js/models/life/move/legs.js"></script>
 <script type="module" src="../js/models/life/design.js"></script>
-<script type="module" src="../js/labs/creator.js"></script>
+<script type="module" src="../js/labs/creator/creator.js"></script>
 </body>
 </html>

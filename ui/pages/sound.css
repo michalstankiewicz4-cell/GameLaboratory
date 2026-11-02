@@ -1,4 +1,4 @@
-/* The sound lab (labs/sound.html): its own rules, on top of ui/ui.css and ui/space.css. */
+/* The sound lab (labs/sound.html): its own rules, on top of ui/ui.css and ui/style/space.css. */
 #viz{ position:fixed; inset:0; width:100%; height:100%; display:block; background:var(--field); }
 #btnPlay{ width:100%; height:44px; font-size:17px; letter-spacing:2px; margin-top:4px; }
 #btnPlay.on{ --c:var(--accent); color:#241404; background:linear-gradient(180deg,var(--accent),#e7a23f); border-color:var(--accent); }

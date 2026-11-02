@@ -7,13 +7,14 @@
 <title>Model doctor | GameLaboratory</title>
 <meta name="description" content="GameLaboratory model doctor: every procedural model of every lab — space, sea, land, rail — examined for the repeating mistakes: inside-out shapes, holes, flicker, floating pieces, guns firing into their own ship, fittings through the hull.">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="../ui/sea.css">
+<link rel="stylesheet" href="../ui/style/sea.css">
 <link rel="stylesheet" href="../ui/ui.css">
 </head>
 <body class="lab">
-<script src="../ui/versions.js"></script>
-<script src="../ui/catalog.js"></script>
-<script src="../ui/menubar.js"></script>
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/shell/menubar.js"></script>
 <div id="view"></div>
 <div class="bar">
   <span id="status" class="dimtxt">examining…</span>
@@ -47,7 +48,7 @@
   <span>GameLaboratory</span>
 </div>
 <!-- Space kits (classic scripts on window, r186 through three-global), then the doctor -->
-<script src="../ui/windows.js"></script>
+<script src="../ui/shell/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
 <script type="module" src="../js/models/ships-space/shipkit.js"></script>
 <script type="module" src="../js/models/ships-space/ships/codewing.js"></script>
@@ -56,7 +57,7 @@
 <script type="module" src="../js/models/ships-space/ships/haven.js"></script>
 <script type="module" src="../js/models/base/basekit.js"></script>
 <script type="module" src="../js/models/vehicles/vehiclekit.js"></script>
-<script type="module" src="../js/envs/water/marinekit/marinekit.js"></script>
+<script type="module" src="../js/models/marine/marinekit.js"></script>
 <script type="module" src="doctor/page.js"></script>
 </body>
 </html>

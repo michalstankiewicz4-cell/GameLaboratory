@@ -1,0 +1,16 @@
+/* The standard windows (ui/shell/labwin.js): Description, Camera, Light and weather, Performance — the same on every page.
+   What is inside them, in the look of ui/style/controls.css; colours from ui/style/tokens.css. */
+.labWin .stdName{margin:0 0 2px;font:600 20px/1.2 var(--font);color:var(--head);white-space:normal;overflow:visible}
+.labWin .stdSub{margin:0 0 8px;font:400 12.5px/1.4 var(--font);color:var(--dim);letter-spacing:0;text-transform:none}
+.labWin .stdText{margin:6px 0;font-size:13px;line-height:1.45;color:var(--text)}
+.labWin .stdStats{display:grid;grid-template-columns:1fr auto;gap:3px 12px;font-size:13px;line-height:20px}
+.labWin .stdStats > span{color:var(--dim)}
+.labWin .stdStats > b{font:400 12.5px/20px var(--mono);color:var(--head);text-align:right;white-space:nowrap}
+.labWin .stdGraph{display:block;width:100%;height:44px;margin-top:8px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.labWin .stdLegend{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:5px;font-size:11.5px;color:var(--dim)}
+.labWin .stdLegend i{display:inline-block;width:10px;height:10px;margin-left:4px;border-radius:2px}
+.labWin .stdLegend i.g1{background:#f2b84b}.labWin .stdLegend i.g2{background:#8ea6fd}.labWin .stdLegend i.g3{background:#e04b50}
+.labWin .stdOwn{margin-top:4px}
+.labWin table.specs{width:100%;border-collapse:collapse;font-size:12.5px}
+.labWin table.specs td{padding:4px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.labWin table.specs td:first-child{width:42%;padding-right:8px;color:var(--dim)}

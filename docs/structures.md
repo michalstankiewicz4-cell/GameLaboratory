@@ -1,6 +1,6 @@
 # Waterside Structures Lab — and StructKit
 
-`labs/structures.html` (`js/labs/structures.js`), kit `js/models/structures/`. Static structures in and on the water, built
+`labs/structures.html` (`js/labs/structures/structures.js`), kit `js/models/structures/`. Static structures in and on the water, built
 from code at real scale like the ships: offshore platforms first, then everything built that touches the water —
 quays, piers and jetties, breakwaters, harbours, lighthouses (owner's decision, 2026-10-21).
 

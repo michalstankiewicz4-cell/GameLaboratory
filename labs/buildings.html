@@ -10,20 +10,21 @@
      ShipKit's generators): each module built, as a placement hologram
      (fits / doesn't fit) and under construction. docs/surface.md. -->
 <link rel="stylesheet" href="../ui/ui.css">
-<link rel="stylesheet" href="../ui/space.css">
+<link rel="stylesheet" href="../ui/style/space.css">
 <link rel="stylesheet" href="../ui/pages/buildings.css">
 </head>
 <body>
-<script src="../ui/versions.js"></script>
-<script src="../ui/catalog.js"></script>
-<script src="../ui/menubar.js"></script>
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/shell/menubar.js"></script>
 <div class="labLoad" data-auto><div class="labLoadCard"><i class="labSpin"></i><b>Building the module…</b><span class="labLoadStep"></span><span class="labLoadBar"><i></i></span></div></div>
-<script src="../ui/loader.js"></script>
+<script src="../ui/shell/loader.js"></script>
 <div class="bar">
   <span class="sp"></span>
 </div>
 <div class="foot"><span id="fps" data-auto></span><span class="sp"></span><span>GameLaboratory</span></div>
-<script src="../ui/bars.js"></script>
+<script src="../ui/shell/bars.js"></script>
 <canvas id="view"></canvas>
 <div data-std="info">
   <div class="hudPanel">
@@ -53,8 +54,9 @@
   <div id="hint">Left-drag: rotate · Right-drag: pan · Scroll: zoom</div>
 </div>
 <div class="hudPanel" data-std="perf"></div>
-<script src="../ui/labwin.js"></script>
-<script src="../ui/windows.js"></script>
+<script src="../ui/shell/perf.js"></script>
+<script src="../ui/shell/labwin.js"></script>
+<script src="../ui/shell/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
 <script type="module" src="../js/labkit/labkit.js"></script>
 <script type="module" src="../js/models/ships-space/shipkit.js"></script>
@@ -63,6 +65,6 @@
 <script type="module" src="../js/models/ships-space/ships/swarmer.js"></script>
 <script type="module" src="../js/models/ships-space/ships/haven.js"></script>
 <script type="module" src="../js/models/base/basekit.js"></script>
-<script type="module" src="../js/labs/buildings.js"></script>
+<script type="module" src="../js/labs/buildings/buildings.js"></script>
 </body>
 </html>

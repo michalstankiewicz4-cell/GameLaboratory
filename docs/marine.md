@@ -13,9 +13,9 @@ marine snow) is used by no lab now; it stays in the kit — the water lab's sea 
 
 | File | What it is |
 |---|---|
-| `js/envs/water/marinekit/marinekit.js` | **MarineKit** (`window.MarineKit`), a classic script like the other kits. It holds the sea (waves, the seabed and an island, the water's and the bed's shaders), the vessels, the wake and marine snow. It needs THREE, ShipKit and VehicleKit (the amphibian's wheels: `VehicleKit.parts`). Not in the game, nor in the surface lab, yet. |
-| `labs/warship.html`, `js/labs/warship.js` | The vehicle lab's water page: the skimmer, the barge and the diver — AUTO (wandering, turning back toward the middle) or WASD + Q/E to dive, NIGHT, WAKE, WORK. |
-| `labs/vehicles.html`, `js/labs/vehicles.js` | The land page: the amphibian, with the rovers' DRIVE and GROUND. |
+| `js/models/marine/marinekit.js` | **MarineKit** (`window.MarineKit`), a classic script like the other kits. It holds the sea (waves, the seabed and an island, the water's and the bed's shaders), the vessels, the wake and marine snow. It needs THREE, ShipKit and VehicleKit (the amphibian's wheels: `VehicleKit.parts`). Not in the game, nor in the surface lab, yet. |
+| `labs/warship.html`, `js/labs/warship/warship.js` | The vehicle lab's water page: the skimmer, the barge and the diver — AUTO (wandering, turning back toward the middle) or WASD + Q/E to dive, NIGHT, WAKE, WORK. |
+| `labs/vehicles.html`, `js/labs/vehicles/vehicles.js` | The land page: the amphibian, with the rovers' DRIVE and GROUND. |
 
 ## The sea
 

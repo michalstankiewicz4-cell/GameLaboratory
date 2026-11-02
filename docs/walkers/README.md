@@ -79,7 +79,7 @@ tools/img/build_quickdraw.py  robi data/img/ z Quick, Draw! (pobiera tylko pierw
 ```
 labs/walkers.html                        strona
 ui/pages/walkers.css                     wygląd
-ui/versions.js                           numer wersji (labs/walkers.html; js/labs/walkers/version.js go czyta)
+ui/data/versions.js                           numer wersji (labs/walkers.html; js/labs/walkers/version.js go czyta)
 js/render/sdf-glsl.js                    funkcje odległości GLSL wspólne z Kostnicą SDF
 js/models/human/zombie/walkers/shaders.js  GLSL: przebieg 1 (raymarching SDF), przebieg 2 (paleta, kontur, dithering)
 js/models/human/zombie/walkers/traits.js   palety, słowniki cech, animacje, generator okazów z ziarnem
@@ -92,7 +92,7 @@ js/labs/walkers/io.js                    eksport / import ocen i modelu
 js/labs/walkers/grid.js                  siatka oceniania
 js/labs/walkers/roll.js                  losowanie (zwykłe i sterowane siecią)
 js/labs/walkers/hud.js                   panel Network view
-js/labs/walkers/main.js                  start i podpięcie zdarzeń
+js/labs/walkers/walkers.js                  start i podpięcie zdarzeń
 docs/morgue/sdf-morgue-original.html     pierwsza wersja: sama głowa zombie
 docs/walkers/img/                        zrzuty z kolejnych etapów
 data/walkers/                            oceny Claude'a i sieć wytrenowana na nich (przycisk Load repo model)
@@ -115,4 +115,4 @@ Plan: `docs/walkers/ROADMAP.md`. Historia zmian: `CHANGELOG.md` (od przeniesieni
 
 ## Wersjonowanie
 
-Wersja jest w `ui/versions.js` (`labs/walkers.html`) i na pasku menu. Zmiany od przeniesienia: `CHANGELOG.md` w katalogu głównym; historia z NeuroLabPA: `docs/history/walkers.md`. Schemat: `0.MINOR.PATCH`. MINOR rośnie przy nowych funkcjach, a każda zmiana listy wejść sieci (nowa cecha) też podnosi MINOR, bo unieważnia wyeksportowane modele.
+Wersja jest w `ui/data/versions.js` (`labs/walkers.html`) i na pasku menu. Zmiany od przeniesienia: `CHANGELOG.md` w katalogu głównym; historia z NeuroLabPA: `docs/history/walkers.md`. Schemat: `0.MINOR.PATCH`. MINOR rośnie przy nowych funkcjach, a każda zmiana listy wejść sieci (nowa cecha) też podnosi MINOR, bo unieważnia wyeksportowane modele.

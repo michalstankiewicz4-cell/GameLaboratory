@@ -1,4 +1,4 @@
-# Water lab (`labs/water.html`, `js/labs/water.js`, `js/envs/water/waterkit.js`)
+# Water lab (`labs/water.html`, `js/labs/water/water.js`, `js/envs/water/waterkit.js`)
 
 A test bench for the look of the sea and its interaction with a ship, before any of it goes into the game. The ship is
 ORP Błyskawica from ShipKit at 1:1; units are metres and seconds. The ship stays at the origin heading +z and the sea
