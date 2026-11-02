@@ -21,9 +21,6 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 - [ ] Mgławica w tle laboratorium ciał niebieskich ciemniejsza po przejściu na grafikę Battle.
 - [ ] Poświaty silników statków słabsze niż wcześniej.
 
-## Skórki
-- [ ] Podłączyć do laboratorium skórek efekty ekranu z laboratorium filtrów (w miejsce usuniętego CRT).
-
 ## Do przeniesienia
 - [ ] SDF Walkers, laboratorium języka i obrazów (z NeuroLabPA): przenieść na okna z opcjami (w tym okna standardowe) — dziś to przewijane strony (`pageFlow`) we własnym stylu.
 

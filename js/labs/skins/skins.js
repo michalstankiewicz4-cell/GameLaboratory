@@ -302,6 +302,52 @@
     requestAnimationFrame(frame);
   }
 
+  // ---------- screen effects: a look profile saved in the filters lab (gameLab.lookProfiles.v1) ----------
+  // The filters lab's look runs on a 3D render; this page is HTML, so the profile is approximated with CSS: exposure,
+  // contrast, saturation + vibrance, glow (filter on the stage), temperature and tint (colour layers), vignette and grain
+  // (layers on top). Tone mapping, automatic exposure and the lens effects have nothing to act on here.
+  const PKEY = "gameLab.lookProfiles.v1", SEL_KEY = "gameLab.skins.profile";
+  const fx = document.createElement("div"); fx.id = "fx";
+  const fxTemp = document.createElement("i"), fxTint = document.createElement("i"), fxVig = document.createElement("i"), fxGrain = document.createElement("i");
+  fx.append(fxTemp, fxTint, fxVig, fxGrain); stageEl.appendChild(fx);
+  (function(){   // a tile of noise for the grain layer
+    const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d"), d = g.createImageData(128, 128);
+    for (let i = 0; i < d.data.length; i += 4){ const v = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
+    g.putImageData(d, 0, 0); fxGrain.style.backgroundImage = "url(" + c.toDataURL() + ")";
+  })();
+  function readProfiles(){ try{ return JSON.parse(localStorage.getItem(PKEY) || "{}") || {}; }catch(e){ return {}; } }
+  let profileName = ""; try{ profileName = localStorage.getItem(SEL_KEY) || ""; }catch(e){}
+  function applyProfile(){
+    const p = readProfiles()[profileName];
+    if(!p){ stageEl.style.filter = ""; fx.style.display = "none"; return; }
+    const sat = (p.saturation ?? 1) * (1 + (p.vibrance || 0) * 0.5), bloom = p.bloom || 0;
+    stageEl.style.filter = "brightness(" + ((p.exposure ?? 1.1) / 1.1).toFixed(3) + ") contrast(" + (p.contrast ?? 1).toFixed(3) + ") saturate(" + sat.toFixed(3) + ")"
+      + (bloom > 0.01 ? " drop-shadow(0 0 " + (bloom * 6).toFixed(1) + "px rgba(255,255,255," + (bloom * 0.18).toFixed(3) + "))" : "");
+    const tmp = p.temperature || 0, tnt = p.tint || 0;
+    fxTemp.style.background = tmp >= 0 ? "#ff9a3c" : "#3c8cff"; fxTemp.style.opacity = Math.min(1, Math.abs(tmp) * 0.9).toFixed(3);
+    fxTint.style.background = tnt >= 0 ? "#ff3cc8" : "#3cff6a"; fxTint.style.opacity = Math.min(1, Math.abs(tnt) * 1.2).toFixed(3);
+    fxVig.style.background = "radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0," + Math.min(0.9, (p.vignette || 0) * 0.9).toFixed(3) + ") 100%)";
+    fxGrain.style.opacity = Math.min(0.6, (p.grain || 0) * 0.45).toFixed(3);
+    fx.style.display = "";
+  }
+  function fillProfileSel(){
+    const sel = document.getElementById("profileSel"), names = Object.keys(readProfiles()).sort(function(a, b){ return a.localeCompare(b); });
+    sel.replaceChildren();
+    const none = document.createElement("option"); none.value = ""; none.textContent = names.length ? "No screen effects" : "No profiles (filters lab)"; sel.appendChild(none);
+    names.forEach(function(n){ const o = document.createElement("option"); o.value = n; o.textContent = n; sel.appendChild(o); });
+    if(names.indexOf(profileName) < 0) profileName = "";
+    sel.value = profileName; applyProfile();
+  }
+  document.getElementById("profileSel").addEventListener("change", function(e){
+    profileName = e.target.value; try{ localStorage.setItem(SEL_KEY, profileName); }catch(err){} applyProfile();
+  });
+  // a profile saved in the filters lab (another tab, or coming back with Back) shows up here
+  window.addEventListener("storage", function(e){ if(e.key === PKEY) fillProfileSel(); });
+  window.addEventListener("pageshow", fillProfileSel);
+  fillProfileSel();
+  let grainT = 0;
+  (function grainTick(){ if(fx.style.display !== "none" && ++grainT % 3 === 0) fxGrain.style.backgroundPosition = (Math.random() * 128 | 0) + "px " + (Math.random() * 128 | 0) + "px"; requestAnimationFrame(grainTick); })();
+
   setSkin(skin);
   requestAnimationFrame(frame);
 })();

@@ -25,9 +25,14 @@ Contents:
   server / GitHub Pages). No game modules, no server calls.
 - The drop-down on the bar (or **1** / **2**) switches TERMINAL / SYNTAX.
   The choice is remembered per browser (`localStorage["gameLab.skins"]`).
-- No screen effects of its own: the CRT layer (scanlines, roll band,
-  flicker) was removed in 2026-11; screen effects are to come from the
-  filters lab.
+- Screen effects: a profile saved in the filters lab (the second drop-down
+  on the bar; `localStorage["gameLab.lookProfiles.v1"]`, the choice in
+  `gameLab.skins.profile`). The page is HTML, so the look is approximated
+  with CSS: exposure, contrast, saturation + vibrance, glow (a filter on
+  `#stage`), temperature and tint (soft-light colour layers), vignette and
+  grain (layers in `#fx`). Tone mapping, automatic exposure and the lens
+  effects have nothing to act on here. The old CRT layer was removed in
+  2026-11. **Filters lab** on the bar opens the filters lab.
 - Everything is sample data (points tick up so it feels alive); nothing
   is clickable beyond the drop-down and hover states.
 - The sample text is English (the repo's rule; until the 2026-10 review it

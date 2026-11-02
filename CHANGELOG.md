@@ -3,6 +3,15 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Laboratorium skórek 1.1.0 — 2026-11-02 (efekty ekranu z profili laboratorium filtrów)
+
+### Dodane
+- Lista profili na pasku narzędzi: profile zapisane w laboratorium filtrów (`gameLab.lookProfiles.v1`) jako efekty ekranu
+  na makiecie. Strona jest w HTML, więc wygląd jest przybliżony CSS-em: ekspozycja, kontrast, nasycenie + vibrance,
+  poświata (filtr na `#stage`), temperatura i odcień (warstwy koloru), winieta i ziarno (warstwy w `#fx`). Tone mapping,
+  automatyczna ekspozycja i efekty obiektywu nie mają tu na czym działać. Profil zapisany w filtrach pojawia się po
+  powrocie (cofnij) albo od razu, gdy filtry są otwarte w innej karcie.
+
 ## Laboratorium pojazdów — kosmos 1.6.2, woda 1.3.2, ląd 1.6.2 — 2026-11-02 (kolejność na pasku)
 
 ### Zmienione
