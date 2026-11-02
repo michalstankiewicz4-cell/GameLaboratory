@@ -1,5 +1,5 @@
 ;; Laboratorium języka · mnożenie macierzy i uwaga w WebAssembly z SIMD (f32x4: 4 liczby jedną instrukcją).
-;; Źródło dla lang/js/wasm.js; kompilacja: node lang/tools/build_wasm.js
+;; Źródło dla js/labs/lang/wasm.js; kompilacja: node tools/lang/build_wasm.js
 ;; Wszystkie macierze float32, wiersz po wierszu; adresy w bajtach. acc=0: wynik nadpisuje C, acc=1: dodaje.
 (module
   (memory (export "mem") 1)

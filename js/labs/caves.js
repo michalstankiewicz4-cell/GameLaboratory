@@ -74,7 +74,7 @@ $('views').replaceChildren(...[['inside', 'Inside'], ['overview', 'Overview']].m
 /* ---------------- the controls ---------------- */
 const fix = (d) => (v) => (+v).toFixed(d);
 const SHAPE = { length: [(v) => `${v} m`], branches: [fix(0)], width: [(v) => `${v} m`], winding: [fix(2)], chambers: [fix(0)], rough: [fix(2)],
-  cell: [(v) => `${(+v).toFixed(2)} m`], drips: [fix(1)], rubble: [fix(1)], lakes: [fix(2)] };
+  cell: [(v) => `${(+v).toFixed(2)} m`], drips: [fix(1)], rubble: [fix(1)], lakes: [fix(2)], lava: [fix(2)] };
 for (const [k, [fmt]] of Object.entries(SHAPE)) {
   const r = $(k), o = $(k + 'V'); r.value = S[k]; o.textContent = fmt(r.value);
   r.addEventListener('input', () => { S[k] = +r.value; o.textContent = fmt(r.value); save(); rebuild(); });

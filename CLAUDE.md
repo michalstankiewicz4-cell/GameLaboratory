@@ -6,7 +6,7 @@
 ## Co jest w repozytorium
 
 - Tylko laboratoria i ich strona startowa (`index.html`), z modelami, środowiskami i narzędziami, których używają. Gier nie przenosimy.
-- Źródła (z historią): Space, Battle, aTrain (tabor i fizyka), NeuroLabPA (SDF Walkers, laboratorium języka); SDF Morgue z artefaktu claude.ai.
+- Źródła (z historią): Space, Battle, aTrain (tabor i fizyka), NeuroLabPA (SDF Walkers, laboratorium języka, laboratorium obrazów); SDF Morgue z artefaktu claude.ai.
 - Jedna wersja Three.js: r186, moduły ES (`vendor/three/`, dodatki w `vendor/three/addons/`).
 - Laboratoria z Battle importują r186 bezpośrednio. Kity i laboratoria ze Space ładują go przez `js/core/three-global.js` (globalne `THREE`, potem skrypty jako `type="module"`) — zawsze w grafice Battle (tryb legacy r128 usunięty w 0.12.0).
 
@@ -16,7 +16,7 @@
 - `js/models/` — modele (geometria, materiały, światła, części); nie wiedzą, w jakim środowisku są.
 - Ludzie mają osobne laboratorium (`labs/human.html`) i osobny folder modeli (`js/models/human/`) — oddzielone od laboratorium życia (zwierzęta i inne formy życia, `js/models/life/`). Oba stoją na LifeKit (`js/models/life/lifekit.js`). Postacie człekokształtne z SDF i pixel artu (generator zombie, SDF Walkers, Kostnica SDF): `js/models/human/zombie/`.
 - `js/envs/space|land|water/` — środowiska i ich prawa (kosmos bez grawitacji, ląd z grawitacją, woda z wypornością); `js/envs/sky/` — niebo i deszcz, wspólne dla lądu i wody.
-- Jaskinie (CaveKit, `js/models/caves/`) i przedmioty bohatera dające światło (GearKit, `js/models/gear/`) to modele; sposoby widzenia (oko, noktowizor, lornetka) — warstwa obrazu `js/render/vision.js`. Jeziorka w jaskiniach są ogólne — styl wody wybiera się w laboratorium wody.
+- Jaskinie (CaveKit, `js/models/caves/`) i przedmioty bohatera dające światło (GearKit, `js/models/gear/`) to modele; sposoby widzenia (oko, noktowizor, lornetka) — warstwa obrazu `js/render/vision.js`. Jeziorka w jaskiniach (woda i lawa) są ogólne — ich styl wybiera się w laboratorium wody (tam też lawa).
 - `js/behaviors/` — zachowania (napęd i ruch) podpinane do modeli; każde deklaruje, w których środowiskach działa.
 - `ui/` — całe UI: tokeny, czcionki, kontrolki, okna, przełącznik środowiska, ładowanie, pasek menu, wersje; style stron w `ui/pages/` (opis: `ui/README.md`).
 - `js/render/`, `js/audio/`, `js/labkit/` — wspólne warstwy.

@@ -3,17 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Laboratorium obrazów</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="../css/style.css">
-<link rel="stylesheet" href="../lang/lang.css">
-<link rel="stylesheet" href="img.css">
+<title>Laboratorium obrazów | GameLaboratory</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="../ui/pages/walkers.css">
+<link rel="stylesheet" href="../ui/pages/lang.css">
+<link rel="stylesheet" href="../ui/pages/img.css">
 </head>
 <body>
+<script src="../ui/versions.js"></script>
+<script src="../ui/catalog.js"></script>
+<script src="../ui/menubar.js"></script>
 <div class="wrap">
   <header>
-    <p class="crumb"><a href="../">← SDF Walkers</a> · <a href="../lang/">Laboratorium języka</a></p>
+    <p class="crumb"><a href="walkers.html">← SDF Walkers</a> · <a href="lang.html">Laboratorium języka</a></p>
     <h1>Laboratorium obrazów</h1>
     <p>Własna sieć uczy się rysować od zera: obrazki 16×16 w 16 odcieniach, z 12 kategorii. Konstrukcje w kolejności, w jakiej powstawały, ten sam silnik co w laboratorium języka. Obrazek to dla sieci po prostu ciąg 256 liczb, a kategoria to jeszcze jedna liczba na początku: sieć nie zna słów, uczy się tylko, jakie kształty idą za którym numerem.</p>
   </header>
@@ -23,7 +26,7 @@
     <dl class="stats" id="dataStats"></dl>
     <div class="gallery" id="gallery"></div>
     <details class="hint">
-      <summary>Pliki źródłowe w folderze <code>img/data/</code></summary>
+      <summary>Pliki źródłowe w folderze <code>data/img/</code></summary>
       <div id="files"></div>
     </details>
     <p class="err" id="dataErr" hidden></p>
@@ -133,6 +136,6 @@
   </section>
   <footer class="note">Laboratorium obrazów · część NeuroLabPA · rysunki: Quick, Draw! (Google), CC BY 4.0, <a href="data/LICENCJA.txt">szczegóły</a></footer>
 </div>
-<script src="js/img.js"></script>
+<script src="../js/labs/img/img.js"></script>
 </body>
 </html>

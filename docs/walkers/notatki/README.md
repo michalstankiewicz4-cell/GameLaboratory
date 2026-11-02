@@ -1,3 +1,6 @@
+> Notatki z repozytorium NeuroLabPA (przeniesione z historią do GameLaboratory). Ścieżki w nich są już obecne, ale zasady
+> wersji, commitów i GitHub Pages opisują NeuroLabPA — w GameLaboratory obowiązuje `CLAUDE.md`.
+
 # Notatki projektu
 
 Pamięć projektu: to, czego nie widać w kodzie ani w historii zmian. `ROADMAP.md` to plan, `CHANGELOG.md` to historia wersji, a tutaj jest reszta.

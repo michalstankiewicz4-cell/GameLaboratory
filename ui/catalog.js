@@ -425,6 +425,21 @@ window.GameLabCatalog =
         "bg": ["#1b2030", "#11141d"],
         "svg": "<text x=\"100\" y=\"44\" text-anchor=\"middle\" font-family=\"monospace\" font-size=\"20\" fill=\"#9cac70\">ą ę ł ó ś ż</text><rect x=\"30\" y=\"76\" width=\"20\" height=\"6\" fill=\"#f2b84b\" opacity=\"0.4\"/><rect x=\"60\" y=\"68.8\" width=\"20\" height=\"13.2\" fill=\"#f2b84b\" opacity=\"0.52\"/><rect x=\"90\" y=\"61.6\" width=\"20\" height=\"20.4\" fill=\"#f2b84b\" opacity=\"0.64\"/><rect x=\"120\" y=\"54.400000000000006\" width=\"20\" height=\"27.599999999999998\" fill=\"#f2b84b\" opacity=\"0.76\"/><rect x=\"150\" y=\"47.2\" width=\"20\" height=\"34.8\" fill=\"#f2b84b\" opacity=\"0.88\"/>"
       }
+    },
+    {
+      "file": "labs/img.html",
+      "name": "Image lab",
+      "namePl": "Laboratorium obrazów",
+      "doc": "docs/walkers/README.md",
+      "desc": "A network learns to draw from zero: 16×16 drawings in 16 shades from 12 categories (Quick, Draw!). Pixel statistics, pixel by pixel (a transformer, like ImageGPT), VAE, GAN, diffusion with guidance; imagination (mixed categories) and “Guess what I drew” — a classifier.",
+      "descPl": "Sieć uczy się rysować od zera: rysunki 16×16 w 16 odcieniach z 12 kategorii (Quick, Draw!). Statystyka pikseli, piksel po pikselu (transformer, jak ImageGPT), VAE, GAN, dyfuzja z podpowiedzią; wyobraźnia (mieszanie kategorii) i „Zgadnij, co narysowałem” — klasyfikator.",
+      "kind": "lab",
+      "kit": "own JS engine",
+      "phrases": ["obraz", "rysowanie", "sieć neuronowa", "dyfuzja", "transformer", "WebGPU"],
+      "art": {
+        "bg": ["#1b2030", "#11141d"],
+        "svg": "<rect x=\"90\" y=\"14\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.47\"/><rect x=\"100\" y=\"14\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.57\"/><rect x=\"70\" y=\"24\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.15\"/><rect x=\"80\" y=\"24\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.26\"/><rect x=\"90\" y=\"24\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.36\"/><rect x=\"100\" y=\"24\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.47\"/><rect x=\"110\" y=\"24\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.57\"/><rect x=\"120\" y=\"24\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.68\"/><rect x=\"70\" y=\"34\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"1.00\"/><rect x=\"80\" y=\"34\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.15\"/><rect x=\"90\" y=\"34\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.26\"/><rect x=\"100\" y=\"34\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.36\"/><rect x=\"110\" y=\"34\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.47\"/><rect x=\"120\" y=\"34\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.57\"/><rect x=\"60\" y=\"44\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.79\"/><rect x=\"70\" y=\"44\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.89\"/><rect x=\"80\" y=\"44\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"1.00\"/><rect x=\"90\" y=\"44\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.15\"/><rect x=\"100\" y=\"44\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.26\"/><rect x=\"110\" y=\"44\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.36\"/><rect x=\"120\" y=\"44\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.47\"/><rect x=\"130\" y=\"44\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.57\"/><rect x=\"60\" y=\"54\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.68\"/><rect x=\"70\" y=\"54\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.79\"/><rect x=\"80\" y=\"54\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.89\"/><rect x=\"90\" y=\"54\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"1.00\"/><rect x=\"100\" y=\"54\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.15\"/><rect x=\"110\" y=\"54\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.26\"/><rect x=\"120\" y=\"54\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.36\"/><rect x=\"130\" y=\"54\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.47\"/><rect x=\"70\" y=\"64\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.68\"/><rect x=\"80\" y=\"64\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.79\"/><rect x=\"90\" y=\"64\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.89\"/><rect x=\"100\" y=\"64\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"1.00\"/><rect x=\"110\" y=\"64\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.15\"/><rect x=\"120\" y=\"64\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.26\"/><rect x=\"70\" y=\"74\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.57\"/><rect x=\"80\" y=\"74\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.68\"/><rect x=\"90\" y=\"74\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.79\"/><rect x=\"100\" y=\"74\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.89\"/><rect x=\"110\" y=\"74\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"1.00\"/><rect x=\"120\" y=\"74\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.15\"/><rect x=\"90\" y=\"84\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.68\"/><rect x=\"100\" y=\"84\" width=\"10\" height=\"10\" fill=\"#f2b84b\" opacity=\"0.79\"/>"
+      }
     }
   ],
   "tools": [
@@ -586,6 +601,8 @@ window.GameLabCatalog =
     "latarka": "flashlight",
     "noktowizor": "night vision",
     "lornetka": "binoculars",
-    "ekwipunek": "gear"
+    "ekwipunek": "gear",
+    "rysowanie": "drawing",
+    "dyfuzja": "diffusion"
   }
 }/*END*/;

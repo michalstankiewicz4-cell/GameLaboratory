@@ -3,6 +3,33 @@
 Wersja programu i każdego laboratorium: `ui/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.15.0 — 2026-11-02 (laboratorium obrazów z NeuroLabPA, lawa, karty ładowania, szybszy doktor)
+
+### Nowe
+- **Laboratorium obrazów** (`labs/img.html`, 0.28.0 — numeracja z NeuroLabPA) przeniesione z NeuroLabPA **z historią**
+  (9 commitów, 0.24.0–0.28.0): sieć uczy się rysować 16×16 w 16 odcieniach z 12 kategorii Quick, Draw! — statystyka
+  pikseli, piksel po pikselu (transformer, KV cache), VAE, GAN, dyfuzja z podpowiedzią, wyobraźnia, „Zgadnij, co
+  narysowałem” (klasyfikator, 86%). Pliki: `js/labs/img/`, `data/img/`, `tools/img/build_quickdraw.py`,
+  `ui/pages/img.css`; notatki NeuroLabPA w `docs/walkers/notatki/`, ich historia w `docs/history/walkers.md`.
+
+### Zmienione
+- Laboratorium języka (0.24.0): uwaga liczona w WebAssembly SIMD (z NeuroLabPA 0.24.0), linki do laboratorium obrazów;
+  `tools/lang/build_wasm.js` zapisuje znowu do `js/labs/lang/wasm.js` (po przeniesieniu pisał w złe miejsce).
+- SDF Walkers: link do laboratorium obrazów.
+- Paski laboratorium (`ui/bars.css`) dotyczą tylko pasków strony (`body > .bar`, `body > .foot`) — klasa `.bar` w
+  środku strony (pasek postępu w laboratorium obrazów, paski w makiecie skórek) nie jest już przestawiana.
+- Laboratorium przedmiotów: części trzymane w dłoni nie są oświetlane własnym światłem (spalały się na biało).
+- **Lawa.** Jaskinie: część jeziorek to lawa (suwak „Of them lava”) — ciemna skorupa z pęknięciami świecącego stopu,
+  oświetla swoją komorę. Laboratorium wody: nowy akwen „Lava (molten rock)” i suwak „Lava” (WaterKit: `uLava`, stan
+  morza i wygląd „lava”) — skorupa z płyt, świecące szczeliny i plamy stopu, bez piany, prawie bez odbić.
+- **Karty ładowania** (`ui/loader.js`, znacznik `data-auto`) w laboratoriach, które przy starcie budują scenę dłużej niż
+  ~1,5 s: statki na wodzie, transformator, skala, ląd, człowiek, wygląd, budynki, powierzchnia, pojazdy, morze
+  (zmierzone w przeglądarce testowej; na ich miejscu wcześniej była pusta lub zamrożona strona).
+- Jaskinie: kamienie gruzu leżą na dnie (opuszczane do skały; wcześniej część wisiała w powietrzu).
+- **Doktor modeli szybszy ok. 80×** w sprawdzeniu „seethrough” (pierwsze trafienie promienia przez drzewo brył
+  trójkątów zamiast sprawdzania każdego trójkąta): SP-01 CODEWING 43 s → 0,5 s; wyniki bez zmian (`tools/doctor.py`: OK).
+- Wersje: program 0.15.0; język y+1, SDF Walkers z+1; jaskinie, woda i doktor z+1; laboratoria z kartą ładowania z+1.
+
 ## Program 0.14.0 — 2026-11-02 (dwa nowe laboratoria: jaskinie, przedmioty bohatera)
 
 ### Nowe

@@ -13,7 +13,7 @@ gold headings and controls). Font: Space Grotesk; numbers: IBM Plex Mono.
 | `controls.css` | what is inside a window (`.labWin`) or any `.labUi`: buttons (`.tBtn`, `.btn`, `.btns button`), the model arrows (`.navArrow`), sliders (gold up to `--fill`), check boxes, radio buttons, drop-downs, fields, headings |
 | `windows.css` + `windows.js` | floating windows with a lab's options (OPTIONS → Windows) |
 | `envswitch.css` + `envswitch.js` | the environment switch: space · water · land |
-| `loader.css` | the loading card: a ring, a plain sentence, an optional step, a bar |
+| `loader.css` + `loader.js` | the loading card: a ring, a plain sentence, an optional step, a bar; `loader.js` fades a card marked `data-auto` once the page has loaded and drawn |
 | `ui.css` | all of the above in one link |
 | `menubar.css` + `menubar.js` | the menu bar; the script loads its own sheet |
 | `versions.js` | the program's and every lab's version |

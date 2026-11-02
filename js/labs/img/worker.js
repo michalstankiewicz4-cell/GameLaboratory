@@ -1,5 +1,5 @@
 // Laboratorium obrazów · wątek treningowy. Silnik (autograd, WASM SIMD, WebGPU) wspólny z laboratorium języka.
-importScripts('../../lang/js/engine.js', '../../lang/js/wasm.js', '../../lang/js/gpu.js');
+importScripts('../lang/engine.js', '../lang/wasm.js', '../lang/gpu.js');
 
 const S2 = 256, LV = 16;            // pikseli w obrazku (16×16) i odcieni
 let cats = [], train = [], val = [], running = null;

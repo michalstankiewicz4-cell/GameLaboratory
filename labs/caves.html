@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <title>Cave Lab — procedural caves, rock and light | GameLaboratory</title>
-<meta name="description" content="GameLaboratory cave lab: caves generated from a seed — passages, chambers, stalactites, stalagmites, rubble and lakes — cut in limestone, granite, sandstone or basalt, dry or wet, lit by a flashlight and a lantern.">
+<meta name="description" content="GameLaboratory cave lab: caves generated from a seed — passages, chambers, stalactites, stalagmites, rubble, water and lava lakes — cut in limestone, granite, sandstone or basalt, dry or wet, lit by a flashlight and a lantern.">
 <link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/caves.html">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../ui/ui.css">
@@ -36,8 +36,9 @@
   <div class="row"><span>Drip stones</span><input type="range" id="drips" min="0" max="2" step="0.1"><output id="dripsV"></output></div>
   <div class="row"><span>Rubble</span><input type="range" id="rubble" min="0" max="2" step="0.1"><output id="rubbleV"></output></div>
   <div class="row"><span>Lakes</span><input type="range" id="lakes" min="0" max="1" step="0.05"><output id="lakesV"></output></div>
+  <div class="row"><span>Of them lava</span><input type="range" id="lava" min="0" max="1" step="0.05"><output id="lavaV"></output></div>
   <div class="stats" id="caveStats"></div>
-  <p class="note">Lakes are plain water here; how water looks (its style) is chosen in the water lab.</p>
+  <p class="note">Lakes are plain water or lava here; how water and lava look (their style) is chosen in the water lab.</p>
 </aside>
 <aside class="panel right" data-window="rock" data-title="Rock and light" data-title-pl="Skała i światło" data-side="right">
   <h3>Rock</h3>

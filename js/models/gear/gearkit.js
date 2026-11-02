@@ -56,7 +56,7 @@ function modelOf(id, def) {
     const handle = new THREE.Mesh(new THREE.TorusGeometry(0.035, 0.003, 6, 24, Math.PI), metal(0x3a3024, 0.5)); handle.position.y = 0.13; g.add(handle);
   } else if (id === 'glowstick') {
     const stick = cyl(0.008, 0.008, 0.15, glow(def.color, 3), 12); stick.rotation.z = Math.PI / 2.4; g.add(stick); emitters.push(stick);
-    const capA = cyl(0.009, 0.009, 0.012, plastic(0x2a2a2a)); capA.rotation.z = Math.PI / 2.4; capA.position.set(0.07, 0.027, 0); g.add(capA);
+    const capA = cyl(0.009, 0.009, 0.012, plastic(0x2a2a2a)); capA.rotation.z = Math.PI / 2.4; capA.position.set(-0.074, 0.02, 0); g.add(capA);
   } else if (id === 'lighter') {
     const body = new THREE.Mesh(new THREE.BoxGeometry(0.024, 0.06, 0.012), plastic(0xb03a2e, 0.4)); g.add(body);
     const top = new THREE.Mesh(new THREE.BoxGeometry(0.024, 0.012, 0.012), metal(0x9aa0a6, 0.3)); top.position.y = 0.036; g.add(top);

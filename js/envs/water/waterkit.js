@@ -23,6 +23,7 @@ export const SEAS = {
   river: { label: 'River: ripples', Hs: 0.06, Lp: 3.5, chop: 0.3, spread: 70, n: 6 },
   harbour: { label: 'Harbour: sheltered', Hs: 0.15, Lp: 6, chop: 0.3, spread: 60, n: 8 },
   ice: { label: 'Ice: swell under the floes', Hs: 0.7, Lp: 40, chop: 0.25, spread: 25, n: 10 },
+  lava: { label: 'Lava: slow, heavy swells', Hs: 0.08, Lp: 14, chop: 0.05, spread: 60, n: 6 },
 };
 export const LOOKS = {
   atlantic: { label: 'North Atlantic', deep: '#0a2536', scatter: '#1d6a68', shine: 900, ripples: 0.55, crest: 0.55 },
@@ -34,14 +35,16 @@ export const LOOKS = {
   river: { label: 'River (silty)', deep: '#24251a', scatter: '#4c4a30', shine: 700, ripples: 0.65, crest: 0 },
   harbour: { label: 'Harbour (murky)', deep: '#121a16', scatter: '#303c2e', shine: 900, ripples: 0.3, crest: 0.03 },
   arctic: { label: 'Arctic (cold, clear)', deep: '#061a23', scatter: '#1a525c', shine: 900, ripples: 0.3, crest: 0.1 },
+  lava: { label: 'Lava (molten rock)', deep: '#120604', scatter: '#3a1408', shine: 120, ripples: 0.15, crest: 0 },
 };
 
 // Water bodies: a sea state, a look and the shore around it. banks: a channel (LandKit generateWaterway) with its
 // width, wall height, steepness and depth (everything built that touches the water — quays, piers, breakwaters,
 // harbours — belongs to the waterside-buildings lab, not here);
 // current: m/s flowing towards the stern (the ship heads upstream); oil: sheen patches 0..1; ice: floe cover 0..1,
-// floe size (m), freeboard (m). planar: still water that mirrors its shore (planar reflection on).
-const CALM = { current: 0, oil: 0, iceCover: 0, floe: 18, freeboard: 0.35 };
+// floe size (m), freeboard (m); lava: molten rock instead of water 0..1 (a dark crust cracked over glowing melt).
+// planar: still water that mirrors its shore (planar reflection on).
+const CALM = { current: 0, oil: 0, iceCover: 0, floe: 18, freeboard: 0.35, lava: 0 };
 export const WATER_BODIES = {
   ocean: { label: 'Open ocean', sea: 'moderate', look: 'atlantic', reflect: 1, banks: null, planar: false, ...CALM },
   fjord: { label: 'Fjord', sea: 'fjord', look: 'fjord', reflect: 1.15, banks: { width: 800, wall: 650, steep: 0.7, depth: 180, meander: 0.12 }, planar: true, ...CALM },
@@ -49,6 +52,7 @@ export const WATER_BODIES = {
   river: { label: 'River', sea: 'river', look: 'river', reflect: 0.9, banks: { width: 240, wall: 22, steep: 0.35, depth: 9, meander: 0.18 }, planar: false, ...CALM, current: 1.8 },
   harbour: { label: 'Harbour water (murky, oil)', sea: 'harbour', look: 'harbour', reflect: 1.05, banks: null, planar: true, ...CALM, oil: 0.55 },
   ice: { label: 'Ice and pack ice', sea: 'ice', look: 'arctic', reflect: 0.9, banks: null, planar: false, ...CALM, iceCover: 0.7, floe: 18, freeboard: 0.35 },
+  lava: { label: 'Lava (molten rock)', sea: 'lava', look: 'lava', reflect: 0.15, banks: null, planar: false, ...CALM, lava: 1 },
 };
 
 // Builds a wave set: wavelengths spread (log) around the peak, amplitudes from a falloff, directions inside the
@@ -271,7 +275,7 @@ export function waterUniforms() {
     uDeep: { value: new THREE.Color() }, uScatter: { value: new THREE.Color() },
     uShine: { value: 900 }, uRipples: { value: 0.5 }, uCrest: { value: 0.5 }, uReflect: { value: 1 }, uPlanar: { value: 0 },
     uReflTex: { value: null }, uRes: { value: new THREE.Vector2(1, 1) }, uAlpha: { value: 1 }, uPixelN: { value: 1 },
-    uFogCol: { value: new THREE.Color() }, uFogFar: { value: 2600 }, uFogDen: { value: 0 }, uRain: { value: 0 }, uLight: { value: 1 }, uCurrent: { value: 0 }, uOil: { value: 0 }, uIce: { value: new THREE.Vector4(0, 18, 0.35, 1) }, uWet: { value: 0.7 }, uWetOn: { value: 1 },
+    uFogCol: { value: new THREE.Color() }, uFogFar: { value: 2600 }, uFogDen: { value: 0 }, uRain: { value: 0 }, uLight: { value: 1 }, uCurrent: { value: 0 }, uOil: { value: 0 }, uLava: { value: 0 }, uIce: { value: new THREE.Vector4(0, 18, 0.35, 1) }, uWet: { value: 0.7 }, uWetOn: { value: 1 },
     uFlash: { value: new THREE.Vector4(0, 0, 0, 0) },   // point flash on the sea: position, power (gun flashes, lightning)
     tNormal: { value: tex.normal }, tFoam: { value: tex.foam },
     // foam with memory (FoamKit): off until a FoamMap is attached; splash rings: water-frame x, z, start time, size
@@ -342,7 +346,7 @@ export function waterMaterial(u, opt = {}) {
     fragmentShader: L + GLSL_WAVES + GLSL_SHIP + GLSL_ICE + GLSL_FOAMMAP + /* glsl */`
       uniform vec4 uSplash[4];
       uniform vec3 uSun, uSunCol, uSkyH, uSkyZ, uSkySea, uDeep, uScatter, uFogCol;
-      uniform float uShine, uRipples, uCrest, uReflect, uPlanar, uAlpha, uPixelN, uFogFar, uFogDen, uRain, uLight, uCurrent, uOil;
+      uniform float uShine, uRipples, uCrest, uReflect, uPlanar, uAlpha, uPixelN, uFogFar, uFogDen, uRain, uLight, uCurrent, uOil, uLava;
       uniform sampler2D uReflTex, tNormal, tFoam; uniform vec2 uRes; uniform vec4 uFlash;
       varying vec3 vWorld; varying vec3 vN; varying float vFold; varying vec2 vXZ; varying float vShipH;
       ${opt.sky ? opt.sky + '\n      vec3 sky(vec3 d) { return skyColor(d); }' : `vec3 sky(vec3 d) {
@@ -464,6 +468,18 @@ export function waterMaterial(u, opt = {}) {
           foam = max(foam, max(fa, max(fr * 0.85, fs * 0.95))); foamP = mix(P, 0.75, far);
         }
         foam *= 1.0 - oil * 0.6;
+        // lava: a dark crust broken into plates by cracks of glowing melt; the melt shines by itself (not by daylight),
+        // brighter where the plates have split wider; no foam, almost no reflection
+        if (uLava > 0.0) {
+          float c1 = texture2D(tFoam, qf / 18.0 + vec2(uTime * 0.0008, 0.0)).r, c2 = texture2D(tFoam, qf / 5.5 - vec2(0.0, uTime * 0.0015)).r;
+          float crack = 1.0 - smoothstep(0.012, 0.045, abs(c1 - 0.5) + (c2 - 0.5) * 0.03);   // thin lines along the noise's mid level
+          float pool = smoothstep(0.74, 0.86, c2) * 0.55;                                      // a few patches where the crust has melted
+          float heat = clamp(crack + pool, 0.0, 1.0);
+          vec3 crust = vec3(0.045, 0.035, 0.032) * (0.35 + 0.65 * max(dot(N, L), 0.0) * sunUp + 0.25) * uLight;
+          vec3 melt = mix(vec3(1.6, 0.28, 0.03), vec3(3.2, 1.5, 0.35), heat * heat) * (0.75 + 0.25 * sin(uTime * 0.7 + c1 * 12.0));
+          col = mix(col, mix(crust, melt, heat), uLava);
+          foam *= 1.0 - uLava;
+        }
         vec3 foamCol = vec3(0.92, 0.95, 0.96) * (0.45 + 0.55 * max(dot(N, L), 0.0) * sunUp + 0.15) * uLight * (0.8 + 0.27 * foamP);
         col = mix(col, foamCol, foam * 0.9);
         // ice: snow-covered floes and bare blue-grey ice, wet dark rims, lit by the sun and the sky
@@ -493,7 +509,7 @@ export function waterMaterial(u, opt = {}) {
         // aerial perspective
         float fog = uFogDen > 0.0 ? 1.0 - exp(-pow(dist * uFogDen, 2.0)) : smoothstep(uFogFar * 0.25, uFogFar, dist);
         col = mix(col, uFogCol, fog);
-        float alpha = uAlpha;
+        float alpha = mix(uAlpha, 1.0, uLava);                    // lava is opaque
 #ifdef LAND
         alpha *= 0.3 + 0.7 * smoothstep(0.0, 9.0, depth);         // shallow water is clear
 #endif

@@ -6,12 +6,13 @@
 // The wall is where the field crosses zero, found on a grid with surface nets (one vertex per cell the wall passes
 // through, a quad per grid edge it crosses), its normals from the field's gradient, pointing into the air.
 // The rock's colour is painted per vertex from the same position (layers, veins, speckles); fine relief comes from a
-// generated normal map. Lakes: a flat, plain water surface in some chambers, cut to the walls; how the water looks
-// (its style) is chosen in the water lab.
+// generated normal map. Lakes: a flat, plain surface in some chambers, cut to the walls — water, or lava (a dark crust
+// over glowing melt that lights the chamber); how the water or lava looks (its style) is chosen in the water lab.
 //
 //   const cave = buildCave({ seed, length, branches, width, winding, chambers, rough, cell, drips, rubble, lakes, rock, wet });
 //   scene.add(cave.group); cave.spawn (a point in the air of the first chamber), cave.nodes, cave.lake (the water mesh,
-//   or null — its material is a plain placeholder for the water lab's styles), cave.stats; cave.dispose()
+//   or null — its material is a plain placeholder for the water lab's styles), cave.lava (the lava mesh or null) and
+//   cave.lavaLights (its glow), cave.stats; cave.dispose()
 //   setRock(cave, rockId, { wet, relief }) — repaints and changes the material without rebuilding the shape.
 import * as THREE from '../../../vendor/three/three.module.js';
 
@@ -203,7 +204,7 @@ function drips(geo, o, R) {
   }
   return geos;
 }
-function rubble(o, nodes, R) {
+function rubble(o, nodes, R, sample, cell) {
   const out = [], base = new THREE.IcosahedronGeometry(1, 1), nz = noise3(o.seed + 17);
   const n = Math.round(o.rubble * nodes.length * 2);
   for (let k = 0; k < n; k++) {
@@ -212,7 +213,12 @@ function rubble(o, nodes, R) {
     // each corner pushed by noise of its direction: corners shared by faces move together, the stone stays closed
     for (let i = 0; i < pa.count; i++) { const x = pa.getX(i), y = pa.getY(i), z = pa.getZ(i), f = 0.72 + 0.45 * (0.5 + 0.5 * nz(x * 1.7 + off, y * 1.7, z * 1.7)); pa.setXYZ(i, x * f, y * f * 0.7, z * f); }
     g.computeVertexNormals(); g.scale(s, s, s);
-    g.translate(at.x + (R() - 0.5) * o.width * 0.8, at.y - o.width * 0.35, at.z + (R() - 0.5) * o.width * 0.8);
+    // dropped onto the floor: down from the passage's middle until the field says rock
+    const x = at.x + (R() - 0.5) * o.width * 0.8, z = at.z + (R() - 0.5) * o.width * 0.8;
+    let y = at.y, k = 0;
+    while (sample(x, y, z) < 0 && k++ < 200) y -= cell * 0.5;
+    if (k >= 200 || k === 0) { g.dispose(); continue; }   // no floor below, or it started in the rock
+    g.translate(x, y + s * 0.35, z);
     out.push(g);
   }
   return out;
@@ -233,21 +239,44 @@ function merge(geos) {
 }
 
 /* ---------------- the cave ---------------- */
-export const CAVE_DEFAULTS = { seed: 7, length: 70, branches: 2, width: 6, winding: 0.5, chambers: 3, rough: 0.5, cell: 0.45, drips: 0.6, rubble: 0.5, lakes: 0.5, rock: 'limestone', wet: 0.3, relief: 1 };
+export const CAVE_DEFAULTS = { seed: 7, length: 70, branches: 2, width: 6, winding: 0.5, chambers: 3, rough: 0.5, cell: 0.45, drips: 0.6, rubble: 0.5, lakes: 0.5, lava: 0.25, rock: 'limestone', wet: 0.3, relief: 1 };
 
 // a plain water surface: dark, glossy, a little see-through — the look of the water itself belongs to the water lab
 export function lakeMaterial() {
   return new THREE.MeshPhysicalMaterial({ color: 0x0c1a1c, roughness: 0.04, metalness: 0, transparent: true, opacity: 0.86, clearcoat: 1, clearcoatRoughness: 0.03 });
 }
 
+// lava: a dark crust broken by cracks of glowing melt (a generated map; the melt shines by itself)
+let lavaTex = null;
+function lavaMap() {
+  if (lavaTex) return lavaTex;
+  const S = 256, c = document.createElement('canvas'); c.width = c.height = S;
+  const x = c.getContext('2d'), img = x.createImageData(S, S), n = noise3(41);
+  for (let j = 0; j < S; j++) for (let i = 0; i < S; i++) {
+    const u = i / S * 8, v = j / S * 8;
+    const t = (a, b, o) => { let s = 0, f = 1, m = 0.5; for (let k = 0; k < 3; k++) { const p = 8 * f; s += m * n((a * f) % p, (b * f) % p, o + k * 3.1); f *= 2; m *= 0.5; } return s; };
+    const crack = 1 - Math.min(1, Math.abs(t(u, v, 0)) * 9), pool = Math.max(0, t(u, v, 7) - 0.18) * 3;
+    const h = Math.min(1, Math.max(0, crack) ** 2 + pool), k = (i + j * S) * 4;
+    img.data[k] = 255 * Math.min(1, h * 1.2); img.data[k + 1] = 255 * h * h * 0.55; img.data[k + 2] = 255 * h ** 4 * 0.2; img.data[k + 3] = 255;
+  }
+  x.putImageData(img, 0, 0);
+  lavaTex = new THREE.CanvasTexture(c); lavaTex.wrapS = lavaTex.wrapT = THREE.RepeatWrapping; lavaTex.colorSpace = THREE.SRGBColorSpace;
+  return lavaTex;
+}
+export function lavaMaterial() {
+  return new THREE.MeshStandardMaterial({ color: 0x120a08, roughness: 0.9, metalness: 0, emissive: 0xffffff, emissiveMap: lavaMap(), emissiveIntensity: 2.5 });
+}
+
 // lakes: in some chambers (never the first), a flat surface a little above the chamber's floor, kept only where the
-// field says air — so it ends at the walls whatever their shape
+// field says air — so it ends at the walls whatever their shape; `lava` is the chance that a lake is lava
 function lakes(o, rooms, sample, cell, R) {
-  const pos = [], ind = [];
+  const out = { water: { pos: [], ind: [] }, lava: { pos: [], ind: [] }, glows: [] };
   for (let r = 1; r < rooms.length; r++) {
     if (R() >= o.lakes) continue;
+    const isLava = R() < o.lava, L = isLava ? out.lava : out.water, pos = L.pos, ind = L.ind;
     const [c, rad] = rooms[r], ry = rad / 1.5, level = c.y - ry * (0.55 + R() * 0.2), ext = rad * 1.3, st = cell;
     const n = Math.ceil(ext * 2 / st) + 1, base = pos.length / 3, air = new Uint8Array(n * n);
+    if (isLava) out.glows.push([c.x, level + ry * 0.45, c.z, rad]);
     for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
       const x = c.x - ext + i * st, z = c.z - ext + j * st;
       air[i + j * n] = sample(x, level, z) < -0.05 ? 1 : 0;
@@ -258,9 +287,14 @@ function lakes(o, rooms, sample, cell, R) {
       if (air[a] && air[a + 1] && air[a + n] && air[a + n + 1]) ind.push(base + a, base + a + n, base + a + 1, base + a + 1, base + a + n, base + a + n + 1);
     }
   }
-  if (!ind.length) return null;
-  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(ind); g.computeVertexNormals();
-  return g;
+  const geo = ({ pos, ind }) => {
+    if (!ind.length) return null;
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(ind); g.computeVertexNormals();
+    const uv = new Float32Array(pos.length / 3 * 2); for (let i = 0; i < pos.length / 3; i++) { uv[i * 2] = pos[i * 3] / 6; uv[i * 2 + 1] = pos[i * 3 + 2] / 6; }
+    g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+    return g;
+  };
+  return { water: geo(out.water), lava: geo(out.lava), glows: out.glows };
 }
 
 export function buildCave(opts = {}) {
@@ -300,24 +334,28 @@ export function buildCave(opts = {}) {
   const group = new THREE.Group(), R = rng(o.seed + 101);
   const wall = new THREE.Mesh(geo, rockMaterial(o.rock, o)); wall.name = 'wall'; wall.castShadow = wall.receiveShadow = true;
   group.add(wall);
-  const extras = drips(geo, o, R).concat(rubble(o, sk.nodes, R));
+  const sample = (x, y, z) => G(Math.round((x - min.x) / cell), Math.round((y - min.y) / cell), Math.round((z - min.z) / cell));
+  const extras = drips(geo, o, R).concat(rubble(o, sk.nodes, R, sample, cell));
   let extra = null;
   if (extras.length) {
     const eg = merge(extras); projectUV(eg, 1.2);
     extra = new THREE.Mesh(eg, rockMaterial(o.rock, o)); extra.name = 'formations'; extra.castShadow = extra.receiveShadow = true; group.add(extra);
   }
   paint(geo, o.rock, o.seed, o.wet); if (extra) paint(extra.geometry, o.rock, o.seed, o.wet);
-  const sample = (x, y, z) => G(Math.round((x - min.x) / cell), Math.round((y - min.y) / cell), Math.round((z - min.z) / cell));
-  const lg = o.lakes > 0 ? lakes(o, sk.rooms, sample, cell, rng(o.seed + 303)) : null;
-  const lake = lg ? new THREE.Mesh(lg, lakeMaterial()) : null;
+  const lk = o.lakes > 0 ? lakes(o, sk.rooms, sample, cell, rng(o.seed + 303)) : { water: null, lava: null, glows: [] };
+  const lake = lk.water ? new THREE.Mesh(lk.water, lakeMaterial()) : null;
   if (lake) { lake.name = 'lake'; lake.receiveShadow = true; lake.renderOrder = 1; group.add(lake); }
+  const lava = lk.lava ? new THREE.Mesh(lk.lava, lavaMaterial()) : null;
+  if (lava) { lava.name = 'lava'; group.add(lava); }
+  // the melt lights its chamber: a warm light over each lava lake (no shadows: cheap, and the glow is soft)
+  const lavaLights = lk.glows.slice(0, 3).map(([x, y, z, r]) => { const l = new THREE.PointLight(0xff6a20, 30 * Math.PI * (r / 8) ** 2, r * 4, 2); l.position.set(x, y, z); group.add(l); return l; });
   const ms = performance.now() - t0;
-  const tris = ind.length / 3 + (extra ? extra.geometry.index.count / 3 : 0) + (lake ? lake.geometry.index.count / 3 : 0);
+  const tris = ind.length / 3 + [extra, lake, lava].reduce((a, m) => a + (m ? m.geometry.index.count / 3 : 0), 0);
   return {
-    group, wall, extra, lake, opts: o, nodes: sk.nodes, rooms: sk.rooms,
+    group, wall, extra, lake, lava, lavaLights, opts: o, nodes: sk.nodes, rooms: sk.rooms,
     spawn: sk.rooms[0][0].clone(), bounds: new THREE.Box3(min, max),
-    stats: { triangles: Math.round(tris), formations: extras.length, lakes: lake ? 'yes' : 'none', cell, grid: `${nx} × ${ny} × ${nz}`, ms },
-    dispose() { for (const m of [wall, extra, lake]) if (m) { m.geometry.dispose(); m.material.dispose(); } },
+    stats: { triangles: Math.round(tris), formations: extras.length, lakes: [lake ? 'water' : '', lava ? 'lava' : ''].filter(Boolean).join(', ') || 'none', cell, grid: `${nx} × ${ny} × ${nz}`, ms },
+    dispose() { for (const m of [wall, extra, lake, lava]) if (m) { m.geometry.dispose(); m.material.dispose(); } },
   };
 }
 

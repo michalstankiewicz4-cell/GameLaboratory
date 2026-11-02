@@ -1,7 +1,7 @@
 # Konwencje
 
 ## Wersje i historia
-- Jedno źródło numeru wersji: `js/version.js` (`APP_VERSION`). Zmieniany razem z wpisem w `CHANGELOG.md`.
+- Jedno źródło numeru wersji: w NeuroLabPA js/version.js (APP_VERSION); w GameLaboratory `ui/versions.js`. Zmieniany razem z wpisem w `CHANGELOG.md`.
 - Schemat `0.MINOR.PATCH`: MINOR przy nowej funkcji, PATCH przy poprawce lub zmianie ustawień. W SDF Walkers zmiana listy wejść sieci zawsze podnosi MINOR, bo unieważnia wyeksportowane modele.
 - `ROADMAP.md`: plan, `CHANGELOG.md`: co się zmieniło, `notatki/`: reszta.
 
@@ -14,13 +14,13 @@
 ## Uruchamianie
 - Laboratoria (`lang/`, `img/`) używają Web Workerów i `fetch`, więc **nie działają z pliku otwartego z dysku**. Trzeba je uruchomić przez serwer (`python3 -m http.server` w katalogu repo, potem `http://localhost:8000`) albo przez GitHub Pages.
 - Skrypty stron to zwykłe `<script>` bez modułów ES. Kolejność wczytywania w HTML ma znaczenie.
-- Silnik jest wspólny: `lang/js/engine.js` (CPU + autograd), `lang/js/wasm.js` (WASM SIMD), `lang/js/gpu.js` (WebGPU). `img/js/worker.js` wczytuje je z `../../lang/js/`.
+- Silnik jest wspólny: `js/labs/lang/engine.js` (CPU + autograd), `js/labs/lang/wasm.js` (WASM SIMD), `js/labs/lang/gpu.js` (WebGPU). `js/labs/img/worker.js` wczytuje je z `../lang/`.
 
 ## Budowanie
 - Wersja SDF Walkers jako jeden plik na claude.ai: `python3 tools/build_artifact.py` → `dist/sdf-walkers.html`.
-- Moduł WASM (mnożenie macierzy i uwaga): źródło `lang/tools/matmul.wat`. Kompilacja: `npm install wabt@1.0.36` w dowolnym katalogu, potem `NODE_PATH=…/node_modules node lang/tools/build_wasm.js` → `lang/js/wasm.js` (base64, nie edytować ręcznie).
+- Moduł WASM (mnożenie macierzy i uwaga): źródło `tools/lang/matmul.wat`. Kompilacja: `npm install wabt@1.0.36` w dowolnym katalogu, potem `NODE_PATH=…/node_modules node tools/lang/build_wasm.js` → `js/labs/lang/wasm.js` (base64, nie edytować ręcznie).
 - Dane laboratorium obrazów: `python3 img/tools/build_quickdraw.py` (numpy, pillow; potrzebny dostęp do `storage.googleapis.com`). Pobiera tylko pierwsze 2000 rysunków każdej kategorii przez zapytania o fragment pliku.
-- Dane laboratorium języka: pliki z Wolnych Lektur i Wikipedii są już w `lang/data/`. Każdy zestaw ma `LICENCJA.txt`, a lista jest w `manifest.json`.
+- Dane laboratorium języka: pliki z Wolnych Lektur i Wikipedii są już w `data/lang/`. Każdy zestaw ma `LICENCJA.txt`, a lista jest w `manifest.json`.
 
 ## Testy
 - Gradienty każdej nowej operacji silnika sprawdzamy numerycznie (różnice skończone) w Node przed użyciem.

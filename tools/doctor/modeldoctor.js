@@ -177,6 +177,77 @@ function overlapCentroid(A, B) {
 }
 const inTree = (o, root) => { for (; o; o = o.parent) if (o === root) return true; return false; };
 
+// A bounding-volume tree over a mesh's triangles in world space (instances included) for fast first hits: hit(ray, far)
+// returns { t, normal (the face's normal in the geometry's own space, as THREE's raycast gives it), mat } or null.
+function triTree(o) {
+  const g = o.geometry, pos = g.attributes.position, idx = g.index, mats = [];
+  const ranges = g.groups && g.groups.length ? g.groups.map((gr) => [gr.start, gr.start + gr.count, gr.materialIndex || 0]) : [[0, idx ? idx.count : pos.count, 0]];
+  const insts = o.isInstancedMesh ? Array.from({ length: o.count }, (_, k) => { const m = new THREE.Matrix4(); o.getMatrixAt(k, m); return m.premultiply(o.matrixWorld); }) : [o.matrixWorld];
+  const P = [], N = [], va = new THREE.Vector3(), vb = new THREE.Vector3(), vc = new THREE.Vector3(), e1 = new THREE.Vector3(), e2 = new THREE.Vector3();
+  for (const mw of insts) for (const [s0, s1, mi] of ranges) {
+    const end = Math.min(s1, idx ? idx.count : pos.count);
+    for (let k = s0; k + 2 < end + 0.5 && k + 2 < (idx ? idx.count : pos.count); k += 3) {
+      const ia = idx ? idx.getX(k) : k, ib = idx ? idx.getX(k + 1) : k + 1, ic = idx ? idx.getX(k + 2) : k + 2;
+      va.fromBufferAttribute(pos, ia); vb.fromBufferAttribute(pos, ib); vc.fromBufferAttribute(pos, ic);
+      e1.subVectors(vc, vb); e2.subVectors(va, vb); const n = e1.cross(e2); const l = n.length(); if (l > 0) n.divideScalar(l);
+      N.push(n.x, n.y, n.z); mats.push(mi);
+      va.applyMatrix4(mw); vb.applyMatrix4(mw); vc.applyMatrix4(mw);
+      P.push(va.x, va.y, va.z, vb.x, vb.y, vb.z, vc.x, vc.y, vc.z);
+    }
+  }
+  const T = mats.length, ids = new Uint32Array(T); for (let i = 0; i < T; i++) ids[i] = i;
+  const cen = new Float32Array(T * 3); for (let i = 0; i < T; i++) for (let a = 0; a < 3; a++) cen[i * 3 + a] = (P[i * 9 + a] + P[i * 9 + 3 + a] + P[i * 9 + 6 + a]) / 3;
+  const nodes = [];   // [minx,miny,minz,maxx,maxy,maxz,left,right,start,count]
+  function build(st, cnt) {
+    const mn = [Infinity, Infinity, Infinity], mx = [-Infinity, -Infinity, -Infinity];
+    for (let i = st; i < st + cnt; i++) { const t = ids[i] * 9; for (let v = 0; v < 9; v += 3) for (let a = 0; a < 3; a++) { const x = P[t + v + a]; if (x < mn[a]) mn[a] = x; if (x > mx[a]) mx[a] = x; } }
+    const id = nodes.length; nodes.push([mn[0], mn[1], mn[2], mx[0], mx[1], mx[2], -1, -1, st, cnt]);
+    if (cnt <= 6) return id;
+    const ax = mx[0] - mn[0] > mx[1] - mn[1] ? (mx[0] - mn[0] > mx[2] - mn[2] ? 0 : 2) : (mx[1] - mn[1] > mx[2] - mn[2] ? 1 : 2);
+    const sub = Array.from(ids.subarray(st, st + cnt)).sort((p, q) => cen[p * 3 + ax] - cen[q * 3 + ax]); ids.set(sub, st);
+    const h = cnt >> 1, L = build(st, h), R = build(st + h, cnt - h);
+    nodes[id][6] = L; nodes[id][7] = R; return id;
+  }
+  if (T) build(0, T);
+  const box = T ? new THREE.Box3(new THREE.Vector3(nodes[0][0], nodes[0][1], nodes[0][2]), new THREE.Vector3(nodes[0][3], nodes[0][4], nodes[0][5])) : new THREE.Box3();
+  const slab = (nd, ox, oy, oz, ix, iy, iz, far) => {
+    let t0 = ((ix >= 0 ? nd[0] : nd[3]) - ox) * ix, t1 = ((ix >= 0 ? nd[3] : nd[0]) - ox) * ix;
+    const ty0 = ((iy >= 0 ? nd[1] : nd[4]) - oy) * iy, ty1 = ((iy >= 0 ? nd[4] : nd[1]) - oy) * iy;
+    if (t0 > ty1 || ty0 > t1) return false; if (ty0 > t0) t0 = ty0; if (ty1 < t1) t1 = ty1;
+    const tz0 = ((iz >= 0 ? nd[2] : nd[5]) - oz) * iz, tz1 = ((iz >= 0 ? nd[5] : nd[2]) - oz) * iz;
+    if (t0 > tz1 || tz0 > t1) return false; if (tz0 > t0) t0 = tz0; if (tz1 < t1) t1 = tz1;
+    return t1 >= 0 && t0 <= far;
+  };
+  function hit(r, far) {
+    if (!T) return null;
+    const ox = r.origin.x, oy = r.origin.y, oz = r.origin.z, dx = r.direction.x, dy = r.direction.y, dz = r.direction.z;
+    const ix = 1 / dx, iy = 1 / dy, iz = 1 / dz;
+    let best = far, bi = -1; const stack = [0];
+    while (stack.length) {
+      const nd = nodes[stack.pop()];
+      if (!slab(nd, ox, oy, oz, ix, iy, iz, best)) continue;
+      if (nd[6] < 0) {
+        for (let i = nd[8]; i < nd[8] + nd[9]; i++) {
+          const t = ids[i] * 9;
+          const ax = P[t], ay = P[t + 1], az = P[t + 2];
+          const e1x = P[t + 3] - ax, e1y = P[t + 4] - ay, e1z = P[t + 5] - az, e2x = P[t + 6] - ax, e2y = P[t + 7] - ay, e2z = P[t + 8] - az;
+          const px = dy * e2z - dz * e2y, py = dz * e2x - dx * e2z, pz = dx * e2y - dy * e2x, det = e1x * px + e1y * py + e1z * pz;
+          if (Math.abs(det) < 1e-12) continue;
+          const inv = 1 / det, sx = ox - ax, sy = oy - ay, sz = oz - az, u = (sx * px + sy * py + sz * pz) * inv;
+          if (u < 0 || u > 1) continue;
+          const qx = sy * e1z - sz * e1y, qy = sz * e1x - sx * e1z, qz = sx * e1y - sy * e1x, v = (dx * qx + dy * qy + dz * qz) * inv;
+          if (v < 0 || u + v > 1) continue;
+          const tt = (e2x * qx + e2y * qy + e2z * qz) * inv;
+          if (tt >= 0 && tt < best) { best = tt; bi = ids[i]; }
+        }
+      } else stack.push(nd[6], nd[7]);
+    }
+    if (bi < 0) return null;
+    return { t: best, normal: new THREE.Vector3(N[bi * 3], N[bi * 3 + 1], N[bi * 3 + 2]), mat: mats[bi] };
+  }
+  return { box, hit };
+}
+
 export function examine(root, opts = {}) {
   root.updateMatrixWorld(true);
   const toRoot = root.matrixWorld.clone().invert();
@@ -242,7 +313,25 @@ export function examine(root, opts = {}) {
     for (const x of [-1, 0, 1]) for (const y of [-1, 0, 1]) for (const z of [-1, 0, 1]) if (x || y || z) dirs.push(new THREE.Vector3(x, y, z).normalize());
     const back = new Map(), front = new Map(), sides = new Map();
     objs.forEach((o) => matsOf(o).forEach((x) => { if (!sides.has(x)) sides.set(x, x.side); x.side = THREE.DoubleSide; }));   // so backs are hit too
-    let s = 12345; const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+    // the first hit, the same as intersectObjects(objs)[0] (both sides of every face, as the check sets them), found
+    // through a bounding-volume tree of each piece's triangles in world space instead of testing every triangle
+    const trees = objs.map(triTree), entry = new THREE.Vector3(), order = [];
+    const firstHit = () => {
+      order.length = 0;
+      for (let i = 0; i < trees.length; i++) {
+        const b = trees[i].box;
+        if (b.containsPoint(ray.ray.origin)) { order.push([0, i]); continue; }
+        if (ray.ray.intersectBox(b, entry)) { const d = entry.distanceTo(ray.ray.origin); if (d <= ray.far) order.push([d, i]); }
+      }
+      order.sort((p, q) => p[0] - q[0]);
+      let best = null;
+      for (const [d, i] of order) {
+        if (best && best.distance < d) break;
+        const h = trees[i].hit(ray.ray, best ? best.distance : ray.far);
+        if (h) best = { distance: h.t, object: objs[i], face: { normal: h.normal, materialIndex: h.mat } };
+      }
+      return best;
+    };
     // an orthographic grid of rays per view direction, over the model's bounding sphere
     const G = opts.seeGrid || 96, R = L / 2, uu = new THREE.Vector3(), vv = new THREE.Vector3();
     for (const d0 of dirs) {
@@ -252,7 +341,7 @@ export function examine(root, opts = {}) {
       for (let a = 0; a < G; a++) for (let b = 0; b < G; b++) {
       from.copy(ctr).addScaledVector(d0, L * 1.5).addScaledVector(uu, ((a + 0.5) / G * 2 - 1) * R).addScaledVector(vv, ((b + 0.5) / G * 2 - 1) * R);
       ray.set(from, dir); ray.far = L * 3;
-      const h = ray.intersectObjects(objs, false)[0];
+      const h = firstHit();
       if (!h || !h.face) continue;
       const mats = matsOf(h.object), mat = Array.isArray(h.object.material) ? h.object.material[h.face.materialIndex || 0] : h.object.material;
       if (!mats.length || sides.get(mat) !== THREE.FrontSide) continue;

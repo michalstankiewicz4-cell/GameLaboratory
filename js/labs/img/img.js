@@ -3,7 +3,7 @@ const $ = id => document.getElementById(id);
 const fmt = (v, d = 2) => v == null || !isFinite(v) ? '–' : v.toFixed(d).replace('.', ',');
 const LN2 = Math.log(2), S = 16, N = 256, LV = 16;
 const shade = v => Math.round(242 - (242 - 24) * v / (LV - 1));   // odcień 0..15 → szarość (papier → kreska)
-const worker = new Worker('js/worker.js');
+const worker = new Worker('../js/labs/img/worker.js');
 
 // ---------- kroki ----------
 const STEPS = [
@@ -65,12 +65,12 @@ const HP = {
 let cur = 'stats', man = null, catData = [], ready = false, training = false;
 const hpValues = (kind = cur) => { const o = { batch: kind === 'ar' ? 8 : 64 }; (HP[kind] || []).forEach(h => o[h.id] = h.val); return o; };
 
-// ---------- dane: pliki PNG z img/data, każdy kafelek 16×16 to jeden rysunek ----------
+// ---------- dane: pliki PNG z data/img, każdy kafelek 16×16 to jeden rysunek ----------
 async function loadData() {
   try {
-    man = await (await fetch('data/manifest.json', { cache: 'no-cache' })).json();
+    man = await (await fetch('../data/img/manifest.json', { cache: 'no-cache' })).json();
     catData = await Promise.all(man.categories.map(async c => {
-      const im = new Image(); im.src = 'data/' + c.file; await im.decode();
+      const im = new Image(); im.src = '../data/img/' + c.file; await im.decode();
       const cv = document.createElement('canvas'); cv.width = im.width; cv.height = im.height;
       const cx = cv.getContext('2d'); cx.drawImage(im, 0, 0);
       const d = cx.getImageData(0, 0, im.width, im.height).data, pix = new Uint8Array(c.count * N);
@@ -83,7 +83,7 @@ async function loadData() {
       }
       return { ...c, pix };
     }));
-  } catch (e) { $('dataErr').textContent = 'Nie udało się wczytać rysunków z img/data/. Strona musi być otwarta przez serwer (np. GitHub Pages).'; $('dataErr').hidden = false; return; }
+  } catch (e) { $('dataErr').textContent = 'Nie udało się wczytać rysunków z data/img/. Strona musi być otwarta przez serwer (np. GitHub Pages).'; $('dataErr').hidden = false; return; }
   const total = catData.reduce((s, c) => s + c.count, 0);
   $('dataStats').innerHTML = '';
   [['Kategorie', catData.length], ['Rysunki', total.toLocaleString('pl')], ['Rozmiar', '16 × 16'], ['Odcienie', LV], ['Liczb na rysunek', N]].forEach(([k, v]) => {
@@ -99,7 +99,7 @@ async function loadData() {
   });
   const ul = document.createElement('ul');
   [['manifest.json', 'lista kategorii i parametry danych'], ['LICENCJA.txt', 'źródło i licencja (CC BY 4.0)'], ...catData.map(c => [c.file, `${c.name}: ${c.count} rysunków w siatce po ${man.cols} w wierszu`])].forEach(([f, d]) => {
-    const li = document.createElement('li'), a = document.createElement('a'); a.href = 'data/' + f; a.target = '_blank'; a.rel = 'noopener';
+    const li = document.createElement('li'), a = document.createElement('a'); a.href = '../data/img/' + f; a.target = '_blank'; a.rel = 'noopener';
     const code = document.createElement('code'); code.textContent = f; a.appendChild(code); li.append(a, ' — ' + d); ul.appendChild(li);
   });
   const p = document.createElement('p'); p.className = 'note';

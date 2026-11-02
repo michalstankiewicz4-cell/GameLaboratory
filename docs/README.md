@@ -29,7 +29,7 @@ UI: [`../ui/README.md`](../ui/README.md).
 | Filtry | `labs/filters.html` | [filters.md](filters.md) |
 | Pixel Studio, generator zombie | `labs/pixel.html`, `labs/zombies.html` | [pixel/README.md](pixel/README.md), [pixel/zombies.md](pixel/zombies.md) |
 | Kostnica SDF | `labs/morgue.html` | [morgue.md](morgue.md) |
-| SDF Walkers, laboratorium języka | `labs/walkers.html`, `labs/lang.html` | [walkers/README.md](walkers/README.md), [walkers/ROADMAP.md](walkers/ROADMAP.md) |
+| SDF Walkers, laboratorium języka, laboratorium obrazów | `labs/walkers.html`, `labs/lang.html`, `labs/img.html` | [walkers/README.md](walkers/README.md), [walkers/ROADMAP.md](walkers/ROADMAP.md), [walkers/notatki/](walkers/notatki/README.md) |
 
 Przegląd laboratoriów z Battle: [labs-sea.md](labs-sea.md), przewodnik: [guide-sea.md](guide-sea.md).
 

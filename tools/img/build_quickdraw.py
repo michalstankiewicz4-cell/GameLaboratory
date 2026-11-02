@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Laboratorium obrazów · dane z Quick, Draw! (Google, CC BY 4.0) → img/data/.
+"""Laboratorium obrazów · dane z Quick, Draw! (Google, CC BY 4.0) → data/img/.
 
 Dla każdej kategorii pobiera tylko początek pliku numpy_bitmap (rysunki 28×28, 1 bajt na piksel):
 nagłówek .npy i pierwsze N rysunków, przez zapytanie o fragment pliku (HTTP Range). Rysunki pomniejsza
@@ -23,7 +23,7 @@ URL = 'https://storage.googleapis.com/quickdraw_dataset/full/numpy_bitmap/{}.npy
 CATS = [('cat', 'kot'), ('house', 'dom'), ('tree', 'drzewo'), ('fish', 'ryba'), ('car', 'samochód'),
         ('sun', 'słońce'), ('flower', 'kwiat'), ('bicycle', 'rower'), ('apple', 'jabłko'),
         ('star', 'gwiazda'), ('skull', 'czaszka'), ('moon', 'księżyc')]
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data')
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'data', 'img')
 UA = {'User-Agent': 'NeuroLabPA-img-lab (https://github.com/michalstankiewicz4-cell/NeuroLabPA)'}
 
 

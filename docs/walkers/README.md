@@ -1,6 +1,7 @@
 > **W GameLaboratory** (przeniesione z repozytorium NeuroLabPA, z historią): SDF Walkers to `labs/walkers.html`
 > (skrypty `js/labs/walkers/`, model — shadery, cechy, render — `js/models/human/zombie/walkers/`, dane `data/walkers/`),
-> laboratorium języka to `labs/lang.html` (`js/labs/lang/`, teksty `data/lang/`, narzędzia `tools/lang/`).
+> laboratorium języka to `labs/lang.html` (`js/labs/lang/`, teksty `data/lang/`, narzędzia `tools/lang/`), laboratorium obrazów
+> to `labs/img.html` (`js/labs/img/`, rysunki `data/img/`, narzędzie `tools/img/`), notatki z NeuroLabPA — `docs/walkers/notatki/`.
 > Pierwotne SDF Morgue: `docs/morgue/sdf-morgue-original.html`. Ścieżki niżej są obecne (po przeniesieniu).
 
 # SDF Walkers
@@ -62,15 +63,15 @@ Uwaga: Web Worker nie działa z pliku otwartego bezpośrednio (`file://`), labor
 
 ## Laboratorium obrazów
 
-Osobna strona `img/`: sieć uczy się rysować od zera, na rysunkach 16×16 w 16 odcieniach z 12 kategorii (Quick, Draw!, CC BY 4.0). Ten sam silnik co w `lang/`. Kategoria to jeszcze jedna liczba na początku ciągu: sieć nie zna słów, uczy się tylko, jakie kształty idą za którym numerem. Pięć konstrukcji w kolejności historycznej: statystyka pikseli → piksel po pikselu (transformer, jak ImageGPT) → VAE → GAN → dyfuzja (jak Stable Diffusion, z siłą podpowiedzi). Na stronie jest graf modelu w dwóch widokach: bloki z kształtami danych i parametrami albo neurony z połączeniami w kolorze prawdziwych wag.
+Osobna strona `labs/img.html`: sieć uczy się rysować od zera, na rysunkach 16×16 w 16 odcieniach z 12 kategorii (Quick, Draw!, CC BY 4.0). Ten sam silnik co w laboratorium języka (`js/labs/lang/`). Kategoria to jeszcze jedna liczba na początku ciągu: sieć nie zna słów, uczy się tylko, jakie kształty idą za którym numerem. Pięć konstrukcji w kolejności historycznej: statystyka pikseli → piksel po pikselu (transformer, jak ImageGPT) → VAE → GAN → dyfuzja (jak Stable Diffusion, z siłą podpowiedzi). Na stronie jest graf modelu w dwóch widokach: bloki z kształtami danych i parametrami albo neurony z połączeniami w kolorze prawdziwych wag.
 
 ```
-img/index.html          strona laboratorium
-img/img.css             układ (reszta z css/style.css i lang/lang.css)
-img/js/img.js           strona: dane z PNG, graf modelu, nauka, rysowanie, mapa uwagi
-img/js/worker.js        trening w tle: statystyka pikseli, transformer piksel po pikselu (CPU/GPU, KV cache), VAE, GAN, dyfuzja
-img/data/               rysunki do nauki: jeden PNG na kategorię (siatka 16×16), manifest.json, LICENCJA.txt
-img/tools/build_quickdraw.py  robi img/data/ z Quick, Draw! (pobiera tylko pierwsze 2000 rysunków każdej kategorii)
+labs/img.html               strona laboratorium
+ui/pages/img.css            układ (reszta z ui/pages/walkers.css i ui/pages/lang.css)
+js/labs/img/img.js          strona: dane z PNG, graf modelu, nauka, rysowanie, mapa uwagi
+js/labs/img/worker.js       trening w tle: statystyka pikseli, transformer piksel po pikselu (CPU/GPU, KV cache), VAE, GAN, dyfuzja
+data/img/                   rysunki do nauki: jeden PNG na kategorię (siatka 16×16), manifest.json, LICENCJA.txt
+tools/img/build_quickdraw.py  robi data/img/ z Quick, Draw! (pobiera tylko pierwsze 2000 rysunków każdej kategorii)
 ```
 
 ## Struktura
@@ -110,7 +111,7 @@ Skrypty są zwykłymi `<script>` (bez modułów ES) i dzielą zmienne globalne, 
 
 ## Plany i notatki
 
-Plan: `ROADMAP.md`. Historia zmian: `CHANGELOG.md`. Konwencje pracy, zmierzone wyniki, decyzje i sprawy otwarte: folder `notatki/`.
+Plan: `docs/walkers/ROADMAP.md`. Historia zmian: `CHANGELOG.md` (od przeniesienia) i `docs/history/walkers.md` (NeuroLabPA). Konwencje pracy, zmierzone wyniki, decyzje i sprawy otwarte: `docs/walkers/notatki/`.
 
 ## Wersjonowanie
 

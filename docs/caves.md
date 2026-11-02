@@ -24,8 +24,9 @@ style is chosen in the water lab. The hero's light sources and ways of seeing ha
 4. **Formations**: stalactites where the wall faces down, stalagmites where it faces up (`drips`); loose stones on the
    floor (`rubble`), closed shapes pushed by noise.
 5. **Lakes** (`lakes`: the chance per chamber, never the first): a flat surface a little above the chamber's floor,
-   kept only where the field says air, so it ends at the walls. Its material is a plain placeholder: the water lab
-   chooses how water looks.
+   kept only where the field says air, so it ends at the walls. `lava`: the chance that a lake is lava — a dark crust
+   with cracks of glowing melt (`lavaMaterial`), and a warm light over it (`cave.lavaLights`, at most three) that lights
+   the chamber. Both materials are plain placeholders: the water lab chooses how water and lava look.
 
 ## Rock and light
 

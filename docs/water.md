@@ -120,3 +120,10 @@ floes are drawn as their average cover (they flickered as a pattern smaller than
 Underwater view and caustics, ship shadows on the water, true
 screen-space refraction, shore and island interaction, the game's ocean replaced by this one (after the owner picks a
 variant).
+
+## Lava (0.15.0)
+
+A water body *Lava (molten rock)* and a *Lava* slider (0–1, WaterKit `uLava`): the surface becomes a dark crust broken
+into plates by cracks of glowing melt, with patches where the crust has melted; the melt shines by itself (not by
+daylight), the crust is lit like rock. No foam, almost no reflection; slow, heavy swells (sea state *lava*). The cave
+lab's lava lakes are generic; their style is meant to come from here.
