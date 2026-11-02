@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.20.9 — 2026-11-02 (domek w nawigacji)
+
+### Dodane
+- Między strzałkami cofnij / ponów **domek**: otwiera stronę startową laboratoriów (na stronie startowej wyszarzony).
+
+### Zmienione
+- Laboratorium skórek 1.1.1: przycisk **Filters lab** zaraz po nawigacji, przed listami (zasada kolejności w `CLAUDE.md`).
+
 ## Laboratorium skórek 1.1.0 — 2026-11-02 (efekty ekranu z profili laboratorium filtrów)
 
 ### Dodane

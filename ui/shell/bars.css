@@ -44,6 +44,8 @@ body > .bar .navSeg button{padding:0 9px;font-size:15px;line-height:26px;border-
 body > .bar .navSeg button + button{margin-left:-1px}
 body > .bar .navSeg button:first-child{border-radius:6px 0 0 6px}
 body > .bar .navSeg button:last-child{border-radius:0 6px 6px 0}
+body > .bar .navSeg .navHome{display:inline-flex;align-items:center;justify-content:center}
+body > .bar .navSeg .navHome svg{width:15px;height:15px;display:block}
 body > .bar .seg button:first-child{border-radius:6px 0 0 6px}
 body > .bar .seg button:last-child{border-radius:0 6px 6px 0}
 body > .bar .seg button.on{position:relative;z-index:1}
