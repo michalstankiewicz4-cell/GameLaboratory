@@ -66,3 +66,27 @@ zakładka Train. Liczona na CPU. Nic nie jest prowadzone po szynach „na sztywn
 ## Bezpieczniki
 
 - Jeśli pojawi się wartość nieskończona (NaN), symulacja zatrzymuje się i wyświetla komunikat; pętla rysowania działa dalej, więc przycisk Restart zawsze odpowiada.
+
+## Tor z dowolnej ścieżki i tramwaj (od programu 0.24.0)
+
+Obliczenia kontaktu, zawieszenia, napędu i hamulca są te same; dochodzą wejścia, z których korzysta gra (CityExplorer):
+
+- **`js/behaviors/rail/path.js` — `pathTrack(punkty)`**: oś toru (np. z OpenStreetMap) przepróbkowana i wygładzona
+  (także wysokości), zamieniona na łuki i proste — w każdym punkcie styczna wygładzonej osi, łuk trafia w kolejny punkt
+  (bez narastającego „wężykowania” na zaszumionych danych). Szyny to łuki/proste równoległe w ±`RAIL_HALF`.
+  Zwraca odcinki szyn dla fizyki (`base`), opis osi (`segs`, `station(s)`, `height(s)`, `L`) i trasy podkładów (`routes`).
+- **`createSim({ track, consist, gaps, s0, hinges, power })`** (`physics.js`): bez opcji — owal i skład z aTrain jak dotąd
+  (sprawdzone: ten sam wynik co przed zmianą). Z opcjami: pojazdy z `consist` ustawione od czoła na torze (pudło i
+  zestawy kołowe na osi, wózek może być poza środkiem pudła — `bx`), **przeguby** (dwa punkty na wspólnej pionowej osi,
+  sprężyna z tłumieniem; człony połączone przegubem nie zderzają się ze sobą), napęd na zestawach kołowych wszystkich
+  pojazdów z `def.driven` (w składzie z aTrain: lokomotywa), `sim.onStep(sim)` — siły z warstwy świata (spadek toru,
+  kozły oporowe) dodawane przed całkowaniem. Fizyka liczy w płaskim układzie toru (główka szyny y = 0); wysokość toru
+  dodaje warstwa świata przy rysowaniu, a spadek — jako siłę ciężaru wzdłuż osi.
+- **`js/behaviors/rail/tram.js`**: tramwaj z TramKit w tej fizyce — człony na wózkach stałych (PESA Swing 120Na: A, C, E)
+  jako pojazdy z dwoma zestawami kołowymi na zawieszeniu I stopnia, człony podwieszone (B, D) na przegubach; liczby w
+  `info.phys` modelu (`js/models/train/trams/swing.js`). `tramPoses` — pozy członów dla modelu (z przechyłem).
+- **`js/models/structures/railway/path-track.js`**: szyny (przekrój z `profile.js`, ten sam co w kontakcie), opcjonalnie
+  podkłady i podsypka, wzdłuż tego samego opisu toru.
+
+Próba: łuk R = 25 m — tramwaj przejeżdża przy 15 km/h, przy 36 km/h wykoleja się (siłami, nie warunkiem); prosta z
+szumem ±15 cm w punktach osi — 30 km/h bez zejścia z szyn. Koszt: ok. 0,2–0,3 s obliczeń na 1 s jazdy (krok 1/2400 s).

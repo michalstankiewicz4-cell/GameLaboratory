@@ -14,6 +14,10 @@ export const info = {
   work: 'Drzwi', paints: [['Tramwaje Warszawskie', 0xf1c400]],
   // człony: długość, wózek (położenie osi wózka w członie, null — podwieszony)
   sections: [{ L: 7.5, bogie: -1.35, cab: true }, { L: 4.6, bogie: null }, { L: 5.9, bogie: 0 }, { L: 4.6, bogie: null }, { L: 7.0, bogie: 1.2 }],
+  // fizyka (zachowanie „koło na szynie”, js/behaviors/rail/tram.js): masy członów [kg], środek masy nad główką szyny,
+  // bryła do bezwładności [L, H, W], koło, rozstaw osi wózka, sztywności zawieszenia I stopnia (gumowego) na sprężynę
+  phys: { mass: [10500, 5000, 9000, 5000, 10500], comY: [1.25, 1.5, 1.3, 1.5, 1.25], H: 2.7, W: 2.4, Rw: 0.3, wb: 1.8,
+    kv: 1.4e6, kl: 1.2e6, kx: 5e6, driven: [true, false, false, false, true], power: 420000, hinge: [0.55, 2.35] },
   gap: 0.13, seat: { x: 0, y: 1.25, z: 2.6 },
 };
 const HW = 1.2, FLOOR = 0.35, SKIRT = 0.13, SILL = 0.98, WTOP = 2.25, BAND = 2.42, ROOF = 2.74;
@@ -249,7 +253,8 @@ export function build({ paint = info.paints[0][1] } = {}) {
     // opts.poses: [{ x, y, z, yaw, pitch }] — człony w układzie grupy (w grze: na łuku toru); domyślnie prosto
     sections.forEach((s, i) => {
       const P = opts.poses && opts.poses[i];
-      if (P) { s.g.position.set(P.x, P.y, P.z); s.g.rotation.set(P.pitch || 0, P.yaw || 0, 0, 'YXZ'); }
+      if (P && P.q) { s.g.position.set(P.x, P.y, P.z); s.g.quaternion.copy(P.q); }   // z fizyki: pełny obrót (z przechyłem)
+      else if (P) { s.g.position.set(P.x, P.y, P.z); s.g.rotation.set(P.pitch || 0, P.yaw || 0, 0, 'YXZ'); }
       else { s.g.position.set(0, 0, s.z); s.g.rotation.set(0, 0, 0); }
       if (s.bogie) for (const w of s.bogie.userData.wheels) w.rotation.x += v / RW * dt;
     });

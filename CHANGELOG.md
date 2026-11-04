@@ -3,6 +3,17 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.24.0 — 2026-11-04 (koło na szynie: tor z dowolnej ścieżki, tramwaj)
+
+### Dodane
+- Zachowanie „koło na szynie”: tor z dowolnej ścieżki (`js/behaviors/rail/path.js` — łuki i proste z wygładzonej osi,
+  także z OpenStreetMap), `createSim` z własnym torem i składem, przeguby członów, napęd na wszystkich pojazdach
+  `driven`, siły z warstwy świata (`onStep`). Bez opcji fizyka działa jak dotąd (ten sam wynik).
+- Tramwaj w tej fizyce (`js/behaviors/rail/tram.js`): PESA Swing 120Na — człony na wózkach stałych na swoich zestawach
+  kołowych, podwieszone na przegubach; liczby fizyki w modelu (`info.phys`).
+- Tor wzdłuż ścieżki: szyny z przekroju z kontaktu, podkłady, podsypka (`js/models/structures/railway/path-track.js`).
+- Opis: `docs/models/train/fizyka.md` (tor z dowolnej ścieżki i tramwaj).
+
 ## Program 0.23.1 · laboratorium pojazdów (ląd) 1.9.1 — 2026-11-04 (tramwaj: widok z kabiny)
 
 ### Zmienione

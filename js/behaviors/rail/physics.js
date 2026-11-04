@@ -126,7 +126,12 @@ const T3 = [0, 0, 0], T3b = [0, 0, 0], T3c = [0, 0, 0];
 const BUMP = 0.08, REBOUND = 0.10;              // odboje zawieszenia (SPRING_LEQ: data.js)
 function bodyInertia(m, d) { const [L, Hh, W] = d; return [m / 12 * (Hh * Hh + W * W), m / 12 * (L * L + W * W), m / 12 * (L * L + Hh * Hh)]; }
 
-function createSim() {
+// opts (bez nich: owal i skład z aTrain, jak dotąd):
+//   track: { base, routes, station(s) → { px, pz, tx, tz }, L } — tor z dowolnej ścieżki (path.js: pathTrack)
+//   consist: [{ def, ... }] — pojazdy od czoła (def jak VEH: Lb, wb, comY, Rw, mass, dims, kv, kl, kx, driven; bez kół: wb = 0)
+//   gaps: odstęp między pojazdami [m]; s0: położenie czoła na torze [m]; hinges: przeguby [[i, j, h0, h1]] (pionowa oś między i a j)
+function createSim(opts) {
+  if (opts && opts.track) return createCustomSim(opts);
   const trainLen = VEH.loco.Lb + 2 * VEH.wagon.Lb + 6 * BUF_EXT;
   setTrack(3 * trainLen);
   const Lext = (2 * TRACK.Ls + 2 * Math.PI * R_CURVE) / 2;   // pętla przez przedłużenie = 2× obecny owal
@@ -217,6 +222,54 @@ function createSim() {
     if (Math.hypot(a[0] - h[0], a[1] - h[1], a[2] - h[2]) > c.links.length * c.pitch + 0.02) return false;
     c.lifting = true; c.liftT = sim.t; return true;
   };
+  return sim;
+}
+
+function createCustomSim(opts) {
+  const T = opts.track;
+  const track = { base: T.base, geo: {}, Lext: 0, gap: opts.gap ?? 0.012, version: 0, switches: [], custom: true };
+  track.setGap = g => { const sp = splitRails(track.base, g); track.pieces = sp.pieces; track.joints = sp.joints; track.grid = buildGrid(sp.pieces); track.gap = g; track.version++; };
+  track.setGap(track.gap);
+  const terrain = buildTerrain(0, R_CURVE, 0, T.routes);
+  const sim = {
+    H, t: 0, nc: 0, events: [], track, terrain, SL, btb: BTB, pieceSdf, pieceLocal, vehicles: [], bodies: [], couplers: [], buffers: [], contacts: [], joints: [], hinges: [],
+    ctrl: { target: 0, brake: false, lock: false, power: opts.power || 200000 },
+    groundH: null, routeGrid: routeGrid(T.routes), distToTrack: (x, z) => distToGrid(sim.routeGrid, x, z),
+    st: { brakeP: 0, F: 0, integ: 0, speed: 0 }, onStep: null,
+    trainLen: 0, TRACK, SAMPLES, PROFILE, profileDelta, trackAt: T.station, railSdf, RAIL_HALF, BTB, SLEEPER_TOP, BUF_EXT, BUF_Y, BUF_Z, HOOK_EXT, SPRING_LEQ,
+  };
+  // pojazdy wzdłuż toru od czoła: środek pudła i zestawy kołowe na osi toru, pudło skierowane wzdłuż stycznej
+  let sFront = opts.s0;
+  const yawQ = (tx, tz) => { const a = Math.atan2(-tz, tx) / 2; return [Math.cos(a), 0, Math.sin(a), 0]; };   // lokalne +x wzdłuż (tx, tz)
+  opts.consist.forEach((c, i) => {
+    const d = c.def, sc = sFront - d.Lb / 2;
+    sFront = sc - d.Lb / 2 - (opts.gaps || 0);
+    const I = bodyInertia(d.mass, d.dims), body = new Body(d.mass, I[0], I[1], I[2]);
+    const st = T.station(sc); body.p = [st.px, d.comY, st.pz]; body.q = yawQ(st.tx, st.tz); body.update();
+    const veh = { type: c.type || 'tram', def: d, body, ws: [], springs: [], massT: d.mass / 1000, idx: i, noCollide: new Set() };
+    if (d.wb > 0) {
+      const L0 = SPRING_LEQ + d.mass * G / 4 / d.kv;
+      for (const sx of [1, -1]) {
+        const bx = d.bx || 0, ws = new Body(WS_MASS, WS_I[0], WS_I[1], WS_I[2]), sw = T.station(sc + bx + sx * d.wb / 2);   // bx: wózek poza środkiem pudła
+        ws.p = [sw.px, d.Rw + 0.0005, sw.pz]; ws.q = yawQ(sw.tx, sw.tz); ws.update(); ws.Rw = d.Rw; ws.veh = veh;
+        veh.ws.push(ws); sim.bodies.push(ws);
+        for (const sz of [1, -1]) veh.springs.push({ ws, ax: bx + sx * d.wb / 2, ay: d.Rw + SPRING_LEQ - d.comY, az: sz * 1.0, wz: sz * 1.0, L0,
+          k: [d.kx, d.kv, d.kl], c: [4e4, 2 * 0.25 * Math.sqrt(d.kv * d.mass / 4), 2.5e4], len: SPRING_LEQ });
+        sim.joints.push({ ws, body, L: 0 });
+      }
+    }
+    sim.bodies.push(body); sim.vehicles.push(veh);
+  });
+  // przeguby: dwa punkty na wspólnej pionowej osi (sprężyna z tłumieniem) — człony obracają się względem siebie wokół pionu
+  for (const [i, j, h0, h1] of opts.hinges || []) {
+    const A = sim.vehicles[i], B = sim.vehicles[j], gap = opts.gaps || 0;
+    const xa = -A.def.Lb / 2 - gap / 2, xb = B.def.Lb / 2 + gap / 2;
+    for (const h of [h0, h1]) sim.hinges.push({ A: A.body, B: B.body, la: [xa, h - A.def.comY, 0], lb: [xb, h - B.def.comY, 0], k: opts.hingeK || 4e7, c: opts.hingeC || 3e5 });
+    A.noCollide.add(B); B.noCollide.add(A);
+  }
+  sim.bufHeads = [];
+  sim.step = () => stepSim(sim);
+  sim.reset = () => {};
   return sim;
 }
 
@@ -594,9 +647,9 @@ function extAt(s, hl, R, Lext) {
   if (s < Lext + A) { const th = -Math.PI / 2 + (s - Lext) / R; return { px: hl + Lext + R * Math.cos(th), pz: R * Math.sin(th), tx: -Math.sin(th), tz: Math.cos(th) }; }
   return { px: hl + Lext - (s - Lext - A), pz: R, tx: -1, tz: 0 };
 }
-function buildTerrain(hl, R, Lext) {
+function buildTerrain(hl, R, Lext, custom) {
   const sleepers = [], grid = new Map();
-  const routes = [{ at: s => trackAt(s), L: TRACK.L }, { at: s => extAt(s, hl, R, Lext), L: 2 * Lext + Math.PI * R }];
+  const routes = custom || [{ at: s => trackAt(s), L: TRACK.L }, { at: s => extAt(s, hl, R, Lext), L: 2 * Lext + Math.PI * R }];
   for (const r of routes) {
     const n = Math.floor(r.L / SL.step);
     for (let i = 0; i < n; i++) {
@@ -610,6 +663,17 @@ function buildTerrain(hl, R, Lext) {
   }
   return { sleepers, grid, routes };
 }
+// tor z dowolnej ścieżki (path.js): odległość od osi przez siatkę punktów osi co 1 m
+function routeGrid(routes) {
+  const g = new Map();
+  for (const r of routes) for (let s = 0; s <= r.L; s += 1) { const st = r.at(s), key = Math.floor(st.px / 4) * 100003 + Math.floor(st.pz / 4); let a = g.get(key); if (!a) g.set(key, a = []); a.push(st.px, st.pz); }
+  return g;
+}
+function distToGrid(g, x, z) {
+  let d = 1e9; const kx = Math.floor(x / 4), kz = Math.floor(z / 4);
+  for (let i = kx - 1; i <= kx + 1; i++) for (let j = kz - 1; j <= kz + 1; j++) { const a = g.get(i * 100003 + j); if (!a) continue; for (let k = 0; k < a.length; k += 2) { const e = Math.hypot(x - a[k], z - a[k + 1]); if (e < d) d = e; } }
+  return d;
+}
 function distToRoutes(x, z, hl, R, Lext) {     // odległość od osi najbliższego toru
   let d;
   if (x > hl || x < -hl) { const ox = x > hl ? hl : -hl; d = Math.abs(Math.hypot(x - ox, z) - R); } else d = Math.abs(Math.abs(z) - R);
@@ -622,7 +686,7 @@ function distToRoutes(x, z, hl, R, Lext) {     // odległość od osi najbliższ
 function terrainSdf(sim, x, y, z) {
   const T = sim.terrain, Rr = R_CURVE, hl = TRACK.hl;
   // podsypka: korona −0,26 m do 1,45 m od osi, skarpa do −0,45 m na 2,1 m, dalej grunt
-  const dl = distToRoutes(x, z, hl, Rr, sim.track.Lext);
+  const dl = sim.routeGrid ? distToGrid(sim.routeGrid, x, z) : distToRoutes(x, z, hl, Rr, sim.track.Lext);
   const hb = dl < 1.45 ? BAL_TOP : dl < 2.1 ? BAL_TOP + (GROUND_Y - BAL_TOP) * (dl - 1.45) / 0.65 : (sim.groundH ? sim.groundH(x, z) : GROUND_Y);
   let d = y - hb; TK = dl >= 2.1 ? 2 : 0;          // 0 podsypka, 1 podkład, 2 grunt
   if (y < SLEEPER_TOP + 0.05) {
@@ -782,6 +846,7 @@ function bodyCollisions(sim) {
   for (let i = 0; i < V.length; i++) for (let j = 0; j < V.length; j++) {
     if (i === j) continue;
     const A = V[i], B = V[j], a = A.body, b = B.body;
+    if (A.noCollide && A.noCollide.has(B)) continue;   // człony połączone przegubem
     const rx = a.p[0] - b.p[0], rz = a.p[2] - b.p[2], lim = (A.def.dims[0] + B.def.dims[0]) / 2 + 1;
     if (rx * rx + rz * rz > lim * lim) continue;
     const pts = A.probe || (A.probe = bodyProbe(A));
@@ -880,6 +945,14 @@ function stepSim(sim) {
     if (tm > 1e-6) { const fr = MU_BUFFER * F * Math.min(1, tm / 0.02) / tm; fx -= tx * fr; fy -= ty * fr; fz -= tz * fr; }
     B.addForceAt(fx, fy, fz, P); A.addForceAt(-fx, -fy, -fz, P);
   }
+  // --- przeguby członów (tor z dowolnej ścieżki) ---
+  for (const hg of sim.hinges || EMPTY) {
+    const A = hg.A, B = hg.B, pa = A.toWorld(hg.la[0], hg.la[1], hg.la[2], BHA), pb = B.toWorld(hg.lb[0], hg.lb[1], hg.lb[2], BHB);
+    P[0] = (pa[0] + pb[0]) / 2; P[1] = (pa[1] + pb[1]) / 2; P[2] = (pa[2] + pb[2]) / 2;
+    A.velAt(P, V1); B.velAt(P, V2);
+    const fx = hg.k * (pb[0] - pa[0]) + hg.c * (V2[0] - V1[0]), fy = hg.k * (pb[1] - pa[1]) + hg.c * (V2[1] - V1[1]), fz = hg.k * (pb[2] - pa[2]) + hg.c * (V2[2] - V1[2]);
+    A.addForceAt(fx, fy, fz, P); B.addForceAt(-fx, -fy, -fz, P);
+  }
   // --- zderzenia pudeł (gdy zderzaki się miną: najazd skośny, wykolejenie) ---
   bodyCollisions(sim);
   // --- kontakt koło–szyna ---
@@ -908,20 +981,24 @@ function stepSim(sim) {
     st.integ += e * H; const imax = FMAX / 8000; if (st.integ > imax) st.integ = imax; if (st.integ < -imax) st.integ = -imax;
     Fcmd = 4e4 * e + 8000 * st.integ; if (Fcmd > FMAX) Fcmd = FMAX; if (Fcmd < -FMAX) Fcmd = -FMAX;
   }
-  const nAx = loco.ws.length; st.F = 0;
-  for (const ws of loco.ws) {
+  // napędzane są zestawy kołowe pojazdów z def.driven (w składzie z aTrain: lokomotywa)
+  const driven = sim.driven || (sim.driven = sim.vehicles.filter(v => v.def.driven && v.ws.length));
+  let nAx = 0; for (const v of driven) nAx += v.ws.length; st.F = 0;
+  for (const dv of driven) for (const ws of dv.ws) {
     ws.dirWorld(0, 0, 1, D);
-    const wr = (ws.w[0] - loco.body.w[0]) * D[0] + (ws.w[1] - loco.body.w[1]) * D[1] + (ws.w[2] - loco.body.w[2]) * D[2];
+    const wr = (ws.w[0] - dv.body.w[0]) * D[0] + (ws.w[1] - dv.body.w[1]) * D[1] + (ws.w[2] - dv.body.w[2]) * D[2];
     // obroty maksymalne silnika: moment zanika między 100 a 115 km/h obwodu koła
     const vw = Math.abs(wr) * ws.Rw, VM = 100 / 3.6, rpmF = vw < VM ? 1 : vw > 1.15 * VM ? 0 : 1 - (vw - VM) / (0.15 * VM);
     const Tlim = rpmF * Math.min(FMAX / nAx * ws.Rw, (PW / nAx) / Math.max(Math.abs(wr), 0.5));
     let T = -(Fcmd / nAx) * ws.Rw; if (T > Tlim) T = Tlim; if (T < -Tlim) T = -Tlim;
     st.F += -T / ws.Rw;
     ws.t[0] += D[0] * T; ws.t[1] += D[1] * T; ws.t[2] += D[2] * T;
-    loco.body.t[0] -= D[0] * T; loco.body.t[1] -= D[1] * T; loco.body.t[2] -= D[2] * T;
+    dv.body.t[0] -= D[0] * T; dv.body.t[1] -= D[1] * T; dv.body.t[2] -= D[2] * T;
   }
   const TB = 3500; // maks. moment hamujący na zestaw kołowy [N·m]
   const Tmax = ctrl.lock ? 1e7 : st.brakeP * TB;
+  // siły zewnętrzne z warstwy, która zna świat (spadek toru, kozioł oporowy) — tor z dowolnej ścieżki
+  if (sim.onStep) sim.onStep(sim);
   // --- całkowanie prędkości ---
   for (const b of sim.bodies) b.integrateVel(H);
   // --- tarcie (Coulomb, impulsowo) + hamulec zestawów ---
