@@ -7,6 +7,7 @@ import { examine, CHECKS, SEVERITY, ABOUT } from './modeldoctor.js';
 import { models as spaceModels } from './sources/space.js';
 import { models as seaModels } from './sources/sea.js';
 import { models as trainModels } from './sources/train.js';
+import { models as roadModels } from './sources/road.js';
 import { models as testModels } from './sources/test-bench.js';
 
 const $ = (id) => document.getElementById(id);
@@ -14,7 +15,7 @@ const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag)
 const params = new URLSearchParams(location.search);
 
 /* ---------------- the models ---------------- */
-const MODELS = [...spaceModels(), ...seaModels, ...trainModels, ...testModels];
+const MODELS = [...spaceModels(), ...seaModels, ...trainModels, ...roadModels, ...testModels];
 
 /* ---------------- examining ---------------- */
 const report = { done: false, models: {} };

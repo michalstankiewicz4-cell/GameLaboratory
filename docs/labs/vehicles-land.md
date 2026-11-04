@@ -13,6 +13,13 @@ with MarineKit's amphibian on its list ([marine.md](../models/marine.md)).
 | `js/models/vehicles/vehiclekit.js` | **VehicleKit** (`window.VehicleKit`), a classic script like ShipKit, BodyKit and BaseKit. It holds the vehicles, their animation, a simple driving model and the dust. It is built from ShipKit's generators (plating, solar cells, struts) and needs THREE and ShipKit. Not in the game, nor in the surface lab, yet. |
 | `vehicles.html` | The lab. Rough ground with sliders, AUTO driving (wandering, turning back toward the middle) or WASD, NIGHT, DUST and WORK. |
 
+## Road vehicles (RoadKit)
+
+Since lab 1.7.0 the list also has **real-world road vehicles** from RoadKit (`js/models/road/`, [docs](../models/road/README.md)),
+built for the game CityExplorer (Warsaw 3D): the FSO Polonez 1500 first. They drive on the same ground with the same
+simple driving model; their own `update` does the wheels (Ackermann steering), the suspension on the ground, body roll
+and squat, the lamps (NIGHT) and the driver's door (WORK). A **Paint** list shows their colours.
+
 ## The vehicles
 
 The story's world has no people, so every vehicle is a robot: sensor heads,

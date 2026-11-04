@@ -22,6 +22,7 @@ ma wszystkie testy wersji ze Space i więcej.
 | `tools/doctor/sources/space.js` | modele Space: ShipKit, BaseKit, VehicleKit, MarineKit |
 | `tools/doctor/sources/sea.js` | modele Battle: statki laboratorium (1:1), modele klas gry, poziomy szczegółów transformera |
 | `tools/doctor/sources/train.js` | tabor: lokomotywa i wagony z TrainKit |
+| `tools/doctor/sources/road.js` | pojazdy drogowe z RoadKit (FSO Polonez…) |
 | `tools/doctor/sources/test-bench.js` | stanowisko testowe: model z jednym błędem na każdy test |
 | `tools/doctor/sources/common.js` | wspólne: koszt rysowania (trójkąty, wywołania, materiały) |
 | `tools/doctor.py` | doktor bez okna (Playwright): porównuje z `tools/doctor.golden.json` |

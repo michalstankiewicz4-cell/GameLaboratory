@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vehicle lab · land | GameLaboratory</title>
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
-<!-- Ground vehicles (VehicleKit, js/models/vehicles/vehiclekit.js — built from
+<!-- Ground vehicles (VehicleKit; road vehicles from RoadKit, js/models/road/roadkit.js, js/models/vehicles/vehiclekit.js — built from
      ShipKit's generators): each one driving over rough ground — wheels
      spinning and steering, suspension following the bumps, the body
      pitching and rolling, tracks running, dust, lamps at night, and its
@@ -53,6 +53,7 @@
     </div>
     <label class="sl"><span>Speed (auto)</span><b id="sVal">50%</b></label>
     <input type="range" id="sSlider" min="0" max="1" step="0.01" value="0.5">
+    <div class="prow hidden" id="paintRow"><span>Paint</span><select id="paint" class="lab"></select></div>
     <div class="twoBtns">
       <button class="tBtn on" id="btnDust">DUST</button>
       <button class="tBtn" id="btnWork">WORK</button>
@@ -85,6 +86,7 @@
 <script type="module" src="../js/models/ships-space/ships/haven.js"></script>
 <script type="module" src="../js/models/vehicles/vehiclekit.js"></script>
 <script type="module" src="../js/models/marine/marinekit.js"></script>
+<script type="module" src="../js/models/road/roadkit.js"></script>
 <script type="module" src="../js/labs/vehicles-land/vehicles-land.js"></script>
 <script type="module" src="../js/labs/vehicles-land/train.js"></script>
 <script type="module" src="../js/labs/vehicles-land/land-source.js"></script>

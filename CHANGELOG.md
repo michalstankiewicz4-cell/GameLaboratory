@@ -3,6 +3,19 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.21.0 · laboratorium pojazdów (ląd) 1.7.0 · doktor modeli 1.2.0 — 2026-11-04 (pojazdy drogowe: FSO Polonez)
+
+### Dodane
+- **RoadKit** (`js/models/road/`) — nowa rodzina modeli: prawdziwe pojazdy drogowe dla gry CityExplorer (Warszawa 3D).
+  Geometria nadwozia z przekrojów, materiały (lakier z lakierem bezbarwnym, chrom, szkło, klosze, bieżnik, tablice z PRL),
+  ruch w grupie pojazdu (koła z Ackermannem, zawieszenie na podłożu, przechył i „kucanie”, światła, drzwi). Opis:
+  `docs/models/road/README.md`.
+- **FSO Polonez 1500 (MR'78)** w wymiarach fabrycznych: okna jako otwory z szybami i wnętrzem za nimi, drzwi kierowcy
+  na zawiasie, maskownice słupka C, zderzaki owinięte na narożnikach, lampy ze światłem, wnętrze, podwozie, koła z
+  bieżnikiem (`docs/models/road/polonez.md`).
+- Laboratorium pojazdów (ląd): Polonez na liście, lista **Paint** z kolorami lakieru, DRZWI KIEROWCY pod WORK.
+- Doktor modeli: źródło `tools/doctor/sources/road.js` (pojazdy RoadKit).
+
 ## Laboratorium obrazów 0.29.0 — 2026-11-03 (64×40 w 256 kolorach)
 
 ### Dodane
