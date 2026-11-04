@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.23.0 · laboratorium pojazdów (ląd) 1.9.0 · doktor modeli 1.2.2 — 2026-11-04 (tramwaj PESA Swing 120Na)
+
+### Dodane
+- **TramKit** (`js/models/train/trams/`) i **PESA Swing 120Na** Tramwajów Warszawskich: 5 członów (3 na wózkach stałych),
+  człony jako osobne grupy do ustawienia na łuku toru, harmonijki rozciągane między nimi, drzwi odskokowo-przesuwne,
+  wnętrze, kabina, pantograf, wózki z zestawami kołowymi i silnikami (`docs/models/train/swing.md`).
+- Laboratorium pojazdów (ląd): tramwaj na liście; doktor modeli: źródło `tools/doctor/sources/tram.js`.
+
 ## Program 0.22.0 · laboratorium pojazdów (ląd) 1.8.0 · doktor modeli 1.2.1 — 2026-11-04 (M1A2 Abrams, Solaris Urbino 18)
 
 ### Dodane

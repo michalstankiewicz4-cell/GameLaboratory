@@ -549,5 +549,21 @@
    ],
    "triangles": 44632
   }
+ },
+ "tram/swing": {
+  "counts": {
+   "seethrough": 1,
+   "sliver": 20
+  },
+  "fingerprint": {
+   "drawCalls": 680,
+   "materials": 25,
+   "size": [
+    2.86,
+    3.41,
+    30.57
+   ],
+   "triangles": 107030
+  }
  }
 }

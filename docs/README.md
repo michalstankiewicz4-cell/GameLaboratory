@@ -19,7 +19,7 @@ Układ folderów jest taki sam jak w kodzie:
 |---|---|---|
 | Pojazdy — kosmos (statki, dron, stacja) | `labs/vehicles-space.html` | [labs/vehicles-space.md](labs/vehicles-space.md) |
 | Pojazdy — woda (ORP Błyskawica, ORP Orzeł, roboty morskie) | `labs/vehicles-water.html` | [models/ships-sea/blyskawica.md](models/ships-sea/blyskawica.md), [models/ships-sea/orzel.md](models/ships-sea/orzel.md), [models/marine.md](models/marine.md) |
-| Pojazdy — ląd (łaziki, amfibia, pociąg) | `labs/vehicles-land.html` | [labs/vehicles-land.md](labs/vehicles-land.md), [models/train/fizyka.md](models/train/fizyka.md), [models/train/grafika.md](models/train/grafika.md) |
+| Pojazdy — ląd (łaziki, amfibia, pociąg, pojazdy drogowe, tramwaj) | `labs/vehicles-land.html` | [labs/vehicles-land.md](labs/vehicles-land.md), [models/train/fizyka.md](models/train/fizyka.md), [models/train/grafika.md](models/train/grafika.md), [models/road/README.md](models/road/README.md), [models/train/swing.md](models/train/swing.md) |
 | Ciała niebieskie | `labs/bodies.html` | [labs/bodies.md](labs/bodies.md) |
 | Układy | `labs/systems.html` | [labs/systems.md](labs/systems.md) |
 | Skala | `labs/scale.html` | [labs/scale.md](labs/scale.md) |

@@ -6,9 +6,9 @@
 (() => {
 "use strict";
 const $ = (id) => document.getElementById(id);
-const VK = window.VehicleKit, MK = window.MarineKit, RK = window.RoadKit;
+const VK = window.VehicleKit, MK = window.MarineKit, RK = window.RoadKit, TK = window.TramKit;
 const LIST = VK.VEHICLES.map((def) => ({ def, kit: "vk" })).concat(MK ? MK.VESSELS.filter((d) => d.id === "amphibian").map((def) => ({ def, kit: "mk" })) : [])
-  .concat(RK ? RK.list.map((def) => ({ def, kit: "rk" })) : []);
+  .concat(RK ? RK.list.map((def) => ({ def, kit: "rk" })) : []).concat(TK ? TK.list.map((def) => ({ def, kit: "tram" })) : []);
 const NO_WATER = () => -1e9;   // the water's height where there is none
 const view = $("view");
 const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
@@ -103,21 +103,22 @@ function addMode(m) {
 }
 function load() {
   setMode(null);
-  if (veh) { if (veh.kit === "mk") MK.disposeVessel(veh); else if (veh.kit === "rk") RK.disposeVehicle(veh); else VK.disposeVehicle(veh); }
+  if (veh) { if (veh.kit === "mk") MK.disposeVessel(veh); else if (veh.kit === "rk") RK.disposeVehicle(veh); else if (veh.kit === "tram") TK.disposeTram(veh); else VK.disposeVehicle(veh); }
   const { def, kit } = LIST[state.index];
-  veh = kit === "mk" ? MK.buildVessel(def.id, { detail: 1 }) : kit === "rk" ? RK.buildVehicle(def.id, {}) : VK.buildVehicle(def.id, { detail: 1 });
+  veh = kit === "mk" ? MK.buildVessel(def.id, { detail: 1 }) : kit === "rk" ? RK.buildVehicle(def.id, {}) : kit === "tram" ? TK.buildTram(def.id, {}) : VK.buildVehicle(def.id, { detail: 1 });
   veh.kit = kit;
   scene.add(veh.group);
   $("hudTitle").textContent = def.name;
   $("role").textContent = def.role;
   $("btnWork").textContent = def.work.toUpperCase();
   // road vehicles: their paint colours
-  $("paintRow").classList.toggle("hidden", kit !== "rk");
-  if (kit === "rk") { $("paint").textContent = ""; def.paints.forEach(([n], i) => $("paint").appendChild(new Option(n, i))); }
+  $("paintRow").classList.toggle("hidden", kit !== "rk" && kit !== "tram");
+  if (kit === "rk" || kit === "tram") { $("paint").textContent = ""; def.paints.forEach(([n], i) => $("paint").appendChild(new Option(n, i))); }
   $("vehicle").value = "v:" + state.index;
   const rows = [["Length × width × height", def.length + " × " + def.width + " × " + def.height + " m"], ["Top speed", Math.round(def.maxSpeed * 3.6) + " km/h"],
     ["Turns", def.turnRadius ? "in " + def.turnRadius + " m" : "on the spot"], ["Cargo", def.cargo + " t"],
-    ["Wheels", veh.parts.tracks ? "2 tracks" : (veh.wheels || veh.parts.wheels).length]];
+    ["Wheels", veh.parts.tracks ? "2 tracks" : veh.kit === "tram" ? "3 bogies, 6 wheelsets" : (veh.wheels || veh.parts.wheels).length]];
+  if (kit === "tram") rows.splice(3, 2, ["Sections · bogies", def.sections.length + " · " + def.sections.filter((x) => x.bogie != null).length], ["Mass", def.mass + " kg"]);
   if (kit === "rk") rows.splice(3, 1, def.kind === "tracked" ? ["Track contact · gauge", def.wheelbase + " m · " + def.gauge + " m"] : ["Wheelbase · track", def.wheelbase + " m · " + def.trackF + " / " + def.trackR + " m"], ["Mass", def.mass + " kg"]);
   window.LabPerf.model(veh.group);   // the Performance window's Model section (ui/shell/labwin.js)
   $("vehRows").textContent = ""; rows.forEach(([k, v]) => $("vehRows").appendChild(row(k, v)));
@@ -143,7 +144,7 @@ slider("bSlider", "bVal", (v) => { G.bumps = v; rebuildGround(); });
 toggle("btnNight", "night", applyLight);
 toggle("btnDust", "dust");
 toggle("btnWork", "work");
-$("paint").addEventListener("change", () => { if (veh && veh.kit === "rk") veh.setPaint(veh.def.paints[+$("paint").value][1]); });
+$("paint").addEventListener("change", () => { if (veh && (veh.kit === "rk" || veh.kit === "tram")) veh.setPaint(veh.def.paints[+$("paint").value][1]); });
 window.addEventListener("keydown", (e) => {
   state.keys[e.code] = true;
   if (["KeyW", "KeyA", "KeyS", "KeyD"].includes(e.code) && state.auto) $("dKeys").click();
