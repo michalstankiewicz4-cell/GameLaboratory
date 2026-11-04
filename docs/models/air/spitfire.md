@@ -23,3 +23,8 @@ sprawność), współczynniki nośnej, oporu, przeciągnięcia, momentów i podw
 Czyta je zachowanie **„lot w atmosferze”** (`js/behaviors/air/flight.js`, środowisko ląd): bryła sztywna 6 stopni swobody,
 siły aerodynamiczne z kąta natarcia i ślizgu, ciąg z mocy, momenty stateczności i sterów, koła na sprężynach.
 Start, lot i lądowanie wynikają wyłącznie z sił.
+
+## Plan AirKit
+- Śmigłowiec PZL W-3 Sokół (z własnym zachowaniem lotu wirnika).
+- Boeing (samolot pasażerski).
+- F-15 (odrzutowy).

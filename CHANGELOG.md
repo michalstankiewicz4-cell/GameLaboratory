@@ -12,6 +12,7 @@ Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` 
 - Zachowanie **„lot w atmosferze”** (`js/behaviors/air/flight.js`, środowisko ląd): 6 stopni swobody, nośna i opór
   z przeciągnięciem, ciąg śmigła z mocy, momenty stateczności i sterów, koła na sprężynach z hamulcami.
 - Laboratorium pojazdów (ląd): samolot na liście; doktor modeli: źródło `tools/doctor/sources/air.js`.
+- Plan AirKit (`docs/models/air/spitfire.md`): śmigłowiec W-3 Sokół, Boeing, odrzutowy F-15.
 
 ## Program 0.24.0 — 2026-11-04 (koło na szynie: tor z dowolnej ścieżki, tramwaj)
 
