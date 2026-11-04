@@ -3,6 +3,16 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.25.0 · laboratorium pojazdów (ląd) 1.10.0 · doktor modeli 1.2.3 — 2026-11-04 (samolot Spitfire Mk I, lot)
+
+### Dodane
+- **AirKit** (`js/models/air/`) i **Supermarine Spitfire Mk I** (1940): kadłub z przekrojów, skrzydło eliptyczne z profilu
+  NACA, lotki, klapy, stery, chowane podwozie, przesuwana owiewka, kabina z przyrządami, śmigło, malowanie i znaki RAF
+  (`docs/models/air/spitfire.md`).
+- Zachowanie **„lot w atmosferze”** (`js/behaviors/air/flight.js`, środowisko ląd): 6 stopni swobody, nośna i opór
+  z przeciągnięciem, ciąg śmigła z mocy, momenty stateczności i sterów, koła na sprężynach z hamulcami.
+- Laboratorium pojazdów (ląd): samolot na liście; doktor modeli: źródło `tools/doctor/sources/air.js`.
+
 ## Program 0.24.0 — 2026-11-04 (koło na szynie: tor z dowolnej ścieżki, tramwaj)
 
 ### Dodane

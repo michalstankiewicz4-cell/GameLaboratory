@@ -1,4 +1,19 @@
 {
+ "air/spitfire": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 108,
+   "materials": 34,
+   "size": [
+    11.11,
+    4.44,
+    9.24
+   ],
+   "triangles": 19735
+  }
+ },
  "road/abrams": {
   "counts": {
    "sliver": 7

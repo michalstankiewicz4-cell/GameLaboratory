@@ -6,9 +6,9 @@
 (() => {
 "use strict";
 const $ = (id) => document.getElementById(id);
-const VK = window.VehicleKit, MK = window.MarineKit, RK = window.RoadKit, TK = window.TramKit;
+const VK = window.VehicleKit, MK = window.MarineKit, RK = window.RoadKit, TK = window.TramKit, AK = window.AirKit;
 const LIST = VK.VEHICLES.map((def) => ({ def, kit: "vk" })).concat(MK ? MK.VESSELS.filter((d) => d.id === "amphibian").map((def) => ({ def, kit: "mk" })) : [])
-  .concat(RK ? RK.list.map((def) => ({ def, kit: "rk" })) : []).concat(TK ? TK.list.map((def) => ({ def, kit: "tram" })) : []);
+  .concat(RK ? RK.list.map((def) => ({ def, kit: "rk" })) : []).concat(TK ? TK.list.map((def) => ({ def, kit: "tram" })) : []).concat(AK ? AK.list.map((def) => ({ def, kit: "air" })) : []);
 const NO_WATER = () => -1e9;   // the water's height where there is none
 const view = $("view");
 const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
@@ -103,9 +103,9 @@ function addMode(m) {
 }
 function load() {
   setMode(null);
-  if (veh) { if (veh.kit === "mk") MK.disposeVessel(veh); else if (veh.kit === "rk") RK.disposeVehicle(veh); else if (veh.kit === "tram") TK.disposeTram(veh); else VK.disposeVehicle(veh); }
+  if (veh) { if (veh.kit === "mk") MK.disposeVessel(veh); else if (veh.kit === "rk") RK.disposeVehicle(veh); else if (veh.kit === "tram") TK.disposeTram(veh); else if (veh.kit === "air") AK.disposeAircraft(veh); else VK.disposeVehicle(veh); }
   const { def, kit } = LIST[state.index];
-  veh = kit === "mk" ? MK.buildVessel(def.id, { detail: 1 }) : kit === "rk" ? RK.buildVehicle(def.id, {}) : kit === "tram" ? TK.buildTram(def.id, {}) : VK.buildVehicle(def.id, { detail: 1 });
+  veh = kit === "mk" ? MK.buildVessel(def.id, { detail: 1 }) : kit === "rk" ? RK.buildVehicle(def.id, {}) : kit === "tram" ? TK.buildTram(def.id, {}) : kit === "air" ? AK.buildAircraft(def.id, {}) : VK.buildVehicle(def.id, { detail: 1 });
   veh.kit = kit;
   scene.add(veh.group);
   $("hudTitle").textContent = def.name;
@@ -117,7 +117,8 @@ function load() {
   $("vehicle").value = "v:" + state.index;
   const rows = [["Length × width × height", def.length + " × " + def.width + " × " + def.height + " m"], ["Top speed", Math.round(def.maxSpeed * 3.6) + " km/h"],
     ["Turns", def.turnRadius ? "in " + def.turnRadius + " m" : "on the spot"], ["Cargo", def.cargo + " t"],
-    ["Wheels", veh.parts.tracks ? "2 tracks" : veh.kit === "tram" ? "3 bogies, 6 wheelsets" : (veh.wheels || veh.parts.wheels).length]];
+    ["Wheels", veh.parts.tracks ? "2 tracks" : veh.kit === "tram" ? "3 bogies, 6 wheelsets" : veh.kit === "air" ? "2 + tail wheel" : (veh.wheels || veh.parts.wheels).length]];
+  if (kit === "air") rows.splice(0, 5, ["Length · span · height", def.length + " · " + def.span + " · " + def.height + " m"], ["Top speed", Math.round(def.maxSpeed * 3.6) + " km/h"], ["Wing area", def.wingArea + " m²"], ["Mass", def.mass + " kg"]);
   if (kit === "tram") rows.splice(3, 2, ["Sections · bogies", def.sections.length + " · " + def.sections.filter((x) => x.bogie != null).length], ["Mass", def.mass + " kg"]);
   if (kit === "rk") rows.splice(3, 1, def.kind === "tracked" ? ["Track contact · gauge", def.wheelbase + " m · " + def.gauge + " m"] : ["Wheelbase · track", def.wheelbase + " m · " + def.trackF + " / " + def.trackR + " m"], ["Mass", def.mass + " kg"]);
   window.LabPerf.model(veh.group);   // the Performance window's Model section (ui/shell/labwin.js)
@@ -198,8 +199,8 @@ function frame() {
   // on the land lab's ground the rovers stop at the water (only the amphibian goes in)
   if (world && veh.kit !== "mk" && groundAt(drv.x, drv.z) < -0.4) { drv.x = prev.x; drv.z = prev.z; drv.speed *= -0.2; }
   const gy = groundAt(drv.x, drv.z);
-  veh.group.position.set(drv.x, gy, drv.z);
-  veh.group.rotation.y = drv.yaw;
+  veh.group.position.set(drv.x, gy + (veh.def.rest ? veh.def.rest.y : 0), drv.z);
+  veh.group.rotation.set(veh.def.rest ? veh.def.rest.pitch : 0, drv.yaw, 0, 'YXZ');   // samolot na ziemi: oparty na kole ogonowym
   const cy = Math.cos(drv.yaw), sy = Math.sin(drv.yaw);
   if (veh.kit === "mk") {   // the amphibian: on its wheels on the ground (it would float where there is water)
     veh.group.position.y = 0;
