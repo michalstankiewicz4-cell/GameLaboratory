@@ -552,18 +552,17 @@
  },
  "tram/swing": {
   "counts": {
-   "seethrough": 1,
-   "sliver": 20
+   "sliver": 22
   },
   "fingerprint": {
-   "drawCalls": 680,
-   "materials": 25,
+   "drawCalls": 685,
+   "materials": 26,
    "size": [
     2.86,
     3.41,
     30.57
    ],
-   "triangles": 107030
+   "triangles": 108410
   }
  }
 }

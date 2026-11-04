@@ -157,16 +157,22 @@ export function build({ paint = info.paints[0][1] } = {}) {
   rings.forEach((r) => r.forEach((p) => { pos.push(p.x, p.y, p.z); }));
   for (let i = 0; i < rings.length - 1; i++) for (let j = 0; j < RN; j++) { const a = i * RN + j, b = i * RN + (j + 1) % RN, c = (i + 1) * RN + (j + 1) % RN, d = (i + 1) * RN + j; idx.push(a, c, d, a, b, c); }
   // czołowa ściana nosa
-  const cIdx = pos.length / 3, last = rings[rings.length - 1]; let cx = 0, cy = 0; last.forEach((p) => { cx += p.x; cy += p.y; }); pos.push(cx / RN, cy / RN, last[0].z);
-  for (let j = 0; j < RN; j++) idx.push(cIdx, (rings.length - 1) * RN + j, (rings.length - 1) * RN + (j + 1) % RN);
   const ng = new THREE.BufferGeometry(); ng.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); ng.setIndex(idx); ng.computeVertexNormals();
   void cols;
-  add(A, ng, yellow, 'cab nose').material = yellow;
+  add(A, ng, yellow, 'cab nose');
+  const cabIn = new THREE.MeshStandardMaterial({ color: 0x3a3c40, roughness: 0.8, side: THREE.BackSide });   // wnętrze kabiny (od środka nosa)
+  const lg = ng.clone(), lp = lg.attributes.position; for (let k = 0; k < lp.count; k++) { lp.setX(k, lp.getX(k) * 0.96); lp.setY(k, 1.45 + (lp.getY(k) - 1.45) * 0.965); } lg.computeVertexNormals();
+  add(A, lg, cabIn, 'cab lining', { shadow: false });
   // maska czołowa (czarna) z szybą przednią, dolny pas czerwony
-  box(A, 2 * HW * 0.86, 1.36, 0.04, black, 'front mask', 0, 1.6, zN + 0.015, 0.08);
-  const shield = add(A, new THREE.PlaneGeometry(2 * HW * 0.8, 1.05), glass, 'windscreen', { shadow: false }); shield.position.set(0, 1.5, zN + 0.04); shield.renderOrder = 2;
+  // czoło: panel dolny, rama szyby (czarna maska) i pas nad szybą z wyświetlaczem — szyba otwarta do kabiny
+  const fw = 2 * HW * 0.9 - 0.02, ytop = ROOF - 0.42, ybot = SKIRT + 0.08;
+  box(A, fw, 0.95 - ybot, 0.04, yellow, 'front lower panel', 0, (0.95 + ybot) / 2, zN - 0.01, 0.04);
+  box(A, fw, ytop - 2.05, 0.04, black, 'front upper mask', 0, (ytop + 2.05) / 2, zN - 0.01, 0.03);
+  for (const sx of [1, -1]) box(A, 0.12, 2.05 - 0.95, 0.04, black, 'windscreen pillar', sx * (fw / 2 - 0.06), 1.5, zN - 0.01, 0.02);
+  box(A, fw, 0.06, 0.05, black, 'windscreen sill', 0, 0.95, zN + 0.012, 0.02);
+  const shield = add(A, new THREE.PlaneGeometry(fw - 0.2, 1.06), glass, 'windscreen', { shadow: false }); shield.position.set(0, 1.5, zN + 0.012); shield.renderOrder = 2;
   box(A, 2 * HW * 0.86, 0.36, 0.05, red, 'front red apron', 0, SKIRT + 0.24, zN + 0.02, 0.06);
-  const dest = add(A, new THREE.PlaneGeometry(1.6, 0.2), led, 'destination display', { shadow: false }); dest.position.set(0, 2.15, zN + 0.05);
+  const dest = add(A, new THREE.PlaneGeometry(1.6, 0.2), led, 'destination display', { shadow: false }); dest.position.set(0, (ytop + 2.05) / 2, zN + 0.024);
   const cpl = box(A, 0.4, 0.2, 0.25, black, 'coupler cover', 0, 0.55, zN + 0.16, 0.05); void cpl;
   for (const sx of [1, -1]) {
     const hl = box(A, 0.42, 0.16, 0.05, black, 'headlamp cluster', sx * 0.68, 0.72, zN + 0.025, 0.04);

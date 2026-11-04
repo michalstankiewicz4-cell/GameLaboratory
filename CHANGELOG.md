@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.23.1 · laboratorium pojazdów (ląd) 1.9.1 — 2026-11-04 (tramwaj: widok z kabiny)
+
+### Zmienione
+- PESA Swing 120Na: czoło z ramą wokół szyby (panel dolny, słupki, maska z wyświetlaczem) zamiast pełnej bryły — z kabiny
+  widać tor przed tramwajem; wnętrze kabiny wyłożone od środka nosa.
+
 ## Program 0.23.0 · laboratorium pojazdów (ląd) 1.9.0 · doktor modeli 1.2.2 — 2026-11-04 (tramwaj PESA Swing 120Na)
 
 ### Dodane

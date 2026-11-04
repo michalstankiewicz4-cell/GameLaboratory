@@ -19,7 +19,7 @@ Plik: `js/models/train/trams/swing.js`, rejestr: `js/models/train/trams/tramkit.
   Harmonijki między nimi rozciągają się między czołami członów co klatkę.
 - Burty: pas dolny czerwony (fartuchy, nad kołami wózków podniesione), pas okien z przyciemnianymi szybami, dach żółty;
   sufit ze świetlówkami, siedzenia, żółte poręcze; drzwi odskokowo-przesuwne (`work`).
-- Czoło: zaokrąglony nos, czarna maska z szybą, wyświetlacz linii (17 Tarchomin Kościelny), reflektory, światła dzienne,
+- Czoło: zaokrąglony nos otwarty z przodu (z kabiny widać tor): panel dolny, słupki i maska wokół szyby, wyświetlacz linii (17 Tarchomin Kościelny), reflektory, światła dzienne,
   kierunkowskazy, lusterka na wysięgnikach, osłona sprzęgu; kabina z pulpitem, fotelem i nastawnikiem.
 - Tył: ściana z oknem, numer linii, lampy. Dach: klimatyzatory, przetwornice, rezystory hamowania; pantograf
   jednoramienny na członie C (`pantograph` 0/1 — podnosi).
