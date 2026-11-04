@@ -5,8 +5,10 @@
 //   względem jego początku, lights, brake, indicator ('left' | 'right' | 'hazard'), work (0..1 — drzwi kierowcy).
 // Opis: docs/models/road/README.md.
 import * as polonez from './cars/polonez.js';
+import * as abrams from './tanks/abrams.js';
+import * as urbino18 from './buses/urbino18.js';
 
-export const VEHICLES = { polonez };
+export const VEHICLES = { polonez, abrams, urbino18 };
 export const VEHICLE_IDS = Object.keys(VEHICLES);
 export const vehicleInfo = (id) => VEHICLES[id].info;
 export function buildVehicle(id, opt) { return VEHICLES[id].build(opt); }

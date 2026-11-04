@@ -118,7 +118,7 @@ function load() {
   const rows = [["Length × width × height", def.length + " × " + def.width + " × " + def.height + " m"], ["Top speed", Math.round(def.maxSpeed * 3.6) + " km/h"],
     ["Turns", def.turnRadius ? "in " + def.turnRadius + " m" : "on the spot"], ["Cargo", def.cargo + " t"],
     ["Wheels", veh.parts.tracks ? "2 tracks" : (veh.wheels || veh.parts.wheels).length]];
-  if (kit === "rk") rows.splice(3, 1, ["Wheelbase · track", def.wheelbase + " m · " + def.trackF + " / " + def.trackR + " m"], ["Mass", def.mass + " kg"]);
+  if (kit === "rk") rows.splice(3, 1, def.kind === "tracked" ? ["Track contact · gauge", def.wheelbase + " m · " + def.gauge + " m"] : ["Wheelbase · track", def.wheelbase + " m · " + def.trackF + " / " + def.trackR + " m"], ["Mass", def.mass + " kg"]);
   window.LabPerf.model(veh.group);   // the Performance window's Model section (ui/shell/labwin.js)
   $("vehRows").textContent = ""; rows.forEach(([k, v]) => $("vehRows").appendChild(row(k, v)));
 }
@@ -192,6 +192,7 @@ function frame() {
     input = { throttle: (k.KeyW ? 1 : 0) - (k.KeyS ? 1 : 0), steer: (k.KeyA ? 1 : 0) - (k.KeyD ? 1 : 0) };
   }
   prev.set(drv.x, 0, drv.z);
+  const yaw0 = drv.yaw;
   VK.drive(drv, input, def, dt);
   // on the land lab's ground the rovers stop at the water (only the amphibian goes in)
   if (world && veh.kit !== "mk" && groundAt(drv.x, drv.z) < -0.4) { drv.x = prev.x; drv.z = prev.z; drv.speed *= -0.2; }
@@ -205,7 +206,7 @@ function frame() {
     veh.update(t, dt, { speed: drv.speed, steer: input.steer, surface: world ? (x, z) => world.waterAt(wx(x, z), wz(x, z), t) : NO_WATER,
       floor: (x, z) => groundAt(wx(x, z), wz(x, z)), lights: state.night ? 1 : 0, work: state.work ? 1 : 0 });
   } else veh.update(t, dt, {
-    speed: drv.speed, steer: input.steer,
+    speed: drv.speed, steer: input.steer, turn: Math.atan2(Math.sin(drv.yaw - yaw0), Math.cos(drv.yaw - yaw0)) / Math.max(1e-4, dt),
     contact: (x, z) => groundAt(drv.x + x * cy + z * sy, drv.z - x * sy + z * cy) - gy,
     lights: state.night ? 1 : 0, work: state.work ? 1 : 0, dust: state.dust ? dust : null,
   });

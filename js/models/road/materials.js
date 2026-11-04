@@ -20,11 +20,11 @@ export const treadBump = () => once('tread', () => {
   return tex(c, false, true);
 });
 // bok opony: napis rozmiaru i drobne żebrowanie
-export const sidewallMap = () => once('sidewall', () => {
+export const sidewallMap = (size = '175/70 R13  82S') => once('sidewall' + size, () => {
   const [c, g] = canvas(1024, 64); g.fillStyle = '#1b1b1c'; g.fillRect(0, 0, 1024, 64);
   g.fillStyle = 'rgba(255,255,255,0.05)'; for (let u = 0; u < 1024; u += 6) g.fillRect(u, 10, 2, 44);
   g.fillStyle = '#2c2c2e'; g.font = 'bold 26px sans-serif'; g.textBaseline = 'middle';
-  for (const u of [80, 590]) { g.fillText('175/70 R13  82S', u, 32); g.fillText('RADIAL · TUBELESS', u + 260, 32); }
+  for (const u of [80, 590]) { g.fillText(size, u, 32); g.fillText('RADIAL · TUBELESS', u + 260, 32); }
   return tex(c, true, true);
 });
 // odbłyśnik reflektora (pod szkłem): paraboliczne pierścienie + soczewki szkła
@@ -120,3 +120,32 @@ export function roadMaterials(paint) {
 // doktor modeli pomija naklejki z polygonOffset przy szukaniu migotania (tools/doctor/modeldoctor.js)
 export function decal(m) { const d = m.clone(); d.polygonOffset = true; d.polygonOffsetFactor = -2; d.polygonOffsetUnits = -4; return d; }
 export const plateMaterial = (text) => new THREE.MeshStandardMaterial({ map: plateMap(text), roughness: 0.45, metalness: 0.3 });
+
+// szum do brudu i zużycia (wartości 0..255, powtarzalny); scale — wielkość plam
+export const noiseMap = (seed = 1, size = 512, scale = 6) => once('noise' + seed + '/' + size + '/' + scale, () => {
+  const [c, g] = canvas(size, size), img = g.createImageData(size, size);
+  let a = seed * 9301 + 49297; const rnd = () => ((a = (a * 9301 + 49297) % 233280) / 233280);
+  const N = scale, grid = []; for (let i = 0; i <= N; i++) { grid.push([]); for (let j = 0; j <= N; j++) grid[i].push(rnd()); }
+  for (let i = 0; i <= N; i++) { grid[i][N] = grid[i][0]; grid[N][i] = grid[0][i]; }
+  const sm = (t) => t * t * (3 - 2 * t);
+  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+    const fx = x / size * N, fy = y / size * N, i = fx | 0, j = fy | 0, u = sm(fx - i), v = sm(fy - j);
+    const big = grid[i][j] * (1 - u) * (1 - v) + grid[i + 1][j] * u * (1 - v) + grid[i][j + 1] * (1 - u) * v + grid[i + 1][j + 1] * u * v;
+    const val = Math.max(0, Math.min(255, (big * 0.75 + rnd() * 0.25) * 255)), k = (y * size + x) * 4;
+    img.data[k] = img.data[k + 1] = img.data[k + 2] = val; img.data[k + 3] = 255;
+  }
+  g.putImageData(img, 0, 0); return tex(c, false, true);
+});
+// farba matowa z brudem (pojazdy wojskowe, użytkowe): kolor × plamy, chropowatość z szumu
+export function mattePaint(color, { dirt = 0.35, rough = 0.82, seed = 3 } = {}) {
+  const [c, g] = canvas(512, 512); const n = noiseMap(seed, 512, 7).image;
+  g.fillStyle = '#' + new THREE.Color(color).getHexString(); g.fillRect(0, 0, 512, 512);
+  g.globalAlpha = dirt; g.globalCompositeOperation = 'multiply'; g.drawImage(n, 0, 0); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
+  const map = tex(c, true, true);
+  return new THREE.MeshStandardMaterial({ map, roughness: rough, metalness: 0.08, roughnessMap: noiseMap(seed + 7, 256, 5), bumpMap: noiseMap(seed + 11, 512, 40), bumpScale: 0.6 });
+}
+export const textMap = (lines, { w = 512, h = 128, bg = '#000', fg = '#ffb000', font = 'bold 72px sans-serif', align = 'center' } = {}) => once('text' + lines.join('|') + w + h + bg + fg + font, () => {
+  const [c, g] = canvas(w, h); g.fillStyle = bg; g.fillRect(0, 0, w, h); g.fillStyle = fg; g.font = font; g.textBaseline = 'middle'; g.textAlign = align;
+  lines.forEach((t, i) => g.fillText(t, align === 'center' ? w / 2 : 12, h * (i + 0.5) / lines.length));
+  return tex(c);
+});

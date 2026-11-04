@@ -160,3 +160,20 @@ export function capFan(pts, normal) {
   const n = g.attributes.normal; if (n.getX(0) * normal.x + n.getY(0) * normal.y + n.getZ(0) * normal.z < 0) { for (let i = 0; i < idx.length; i += 3) { const t = idx[i + 1]; idx[i + 1] = idx[i + 2]; idx[i + 2] = t; } g.setIndex(idx); g.computeVertexNormals(); }
   return g;
 }
+
+// profil boczny [[z, y]...] wyciągnięty w poprzek auta od x0 do x1 (pancerz, burty, nadwozie skrzynkowe)
+export function sideExtrude(profile, x0, x1, bevel = 0) {
+  const sh = new THREE.Shape(profile.map(([z, y]) => new THREE.Vector2(z, y)));
+  const w = x1 - x0, g = new THREE.ExtrudeGeometry(sh, { depth: Math.max(0.001, w - 2 * bevel), bevelEnabled: bevel > 0, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 2, curveSegments: 8 });
+  g.rotateY(-Math.PI / 2); g.translate(x1 - bevel, 0, 0); g.computeVertexNormals(); g.userData.closed = true; return g;
+}
+// graniastosłup: dolny i górny wielokąt [[x, z]...] (ta sama liczba punktów, wypukłe), wysokości y0, y1
+export function prism(bot, top, y0, y1) {
+  const n = bot.length, pos = [], idx = [];
+  bot.forEach(([x, z]) => pos.push(x, y0, z)); top.forEach(([x, z]) => pos.push(x, y1, z));
+  for (let i = 0; i < n; i++) { const j = (i + 1) % n; idx.push(i, j, n + j, i, n + j, n + i); }
+  for (let i = 1; i < n - 1; i++) { idx.push(0, i + 1, i); idx.push(n, n + i, n + i + 1); }
+  // ściany osobno (ostre krawędzie): rozwinięcie na trójkąty bez wspólnych wierzchołków
+  const g0 = new THREE.BufferGeometry(); g0.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g0.setIndex(idx); fixOutward(g0);
+  const g = g0.toNonIndexed(); g.computeVertexNormals(); g.userData.closed = true; return g;
+}

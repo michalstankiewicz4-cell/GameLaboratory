@@ -1,4 +1,19 @@
 {
+ "road/abrams": {
+  "counts": {
+   "sliver": 7
+  },
+  "fingerprint": {
+   "drawCalls": 549,
+   "materials": 25,
+   "size": [
+    3.94,
+    5.03,
+    9.98
+   ],
+   "triangles": 72000
+  }
+ },
  "road/polonez": {
   "counts": {
    "seethrough": 2,
@@ -13,6 +28,23 @@
     4.3
    ],
    "triangles": 47752
+  }
+ },
+ "road/urbino18": {
+  "counts": {
+   "seethrough": 2,
+   "sliver": 24,
+   "speck": 3
+  },
+  "fingerprint": {
+   "drawCalls": 510,
+   "materials": 45,
+   "size": [
+    3.17,
+    3.27,
+    18.48
+   ],
+   "triangles": 81376
   }
  },
  "sea/game/bb": {

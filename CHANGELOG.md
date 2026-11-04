@@ -3,6 +3,19 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.22.0 · laboratorium pojazdów (ląd) 1.8.0 · doktor modeli 1.2.1 — 2026-11-04 (M1A2 Abrams, Solaris Urbino 18)
+
+### Dodane
+- **M1A2 Abrams** (RoadKit, `tanks/abrams.js`): kadłub z płytami czołowymi i pokładem przeciwpoślizgowym, osłony burt,
+  gąsienice z ogniw (instancje) biegnące po obwiedni kół, koła jezdne na drążkach skrętnych podążające za podłożem,
+  wieża z celownikami, wieżyczką dowódcy, karabinami, wyrzutniami dymnymi i koszem, armata 120 mm; obrót wieży,
+  podniesienie armaty, właz dowódcy (`docs/models/road/abrams.md`).
+- **Solaris Urbino 18 electric** w barwach MZA (RoadKit, `buses/urbino18.js`): dwa człony z przegubem liczonym jak
+  naczepa i gnącą się harmonijką, drzwi 2-2-2-2 odskokowo-przesuwne, wnętrze (siedzenia, poręcze, oświetlenie),
+  wyświetlacze LED linii 175, baterie i klimatyzatory na dachu (`docs/models/road/urbino18.md`).
+- RoadKit: gąsienice (`tracks.js`), farba matowa z brudem i szum (`materials.js`), profil wyciągnięty w poprzek i graniastosłup (`geom.js`).
+- Laboratorium pojazdów (ląd): oba na liście; pojazdom gąsienicowym podaje prędkość obrotu.
+
 ## Program 0.21.0 · laboratorium pojazdów (ląd) 1.7.0 · doktor modeli 1.2.0 — 2026-11-04 (pojazdy drogowe: FSO Polonez)
 
 ### Dodane
