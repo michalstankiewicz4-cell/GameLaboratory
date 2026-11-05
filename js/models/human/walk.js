@@ -30,7 +30,7 @@ const GAITS = {
   run: { speed: 3.6, hip: 38 * D, knee: 105 * D, load: 22 * D, arm: 34 * D, elbow: [80 * D, 20 * D], lean: 9 * D, yaw: 7 * D, drop: 4 * D, toeOff: 30 * D, heel: 6 * D, flight: 0.045 },
   tpose: { speed: 0 },
 };
-const LAYERS = ["sneak", "sad", "angry", "nod", "shake", "wave", "look", "zombie", "attack"];
+const LAYERS = ["sneak", "sad", "angry", "nod", "shake", "wave", "look", "zombie", "attack", "aim"];
 const FADE = 0.35;
 const smooth = (x) => { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); };
 // a bump on the cycle (wraps around): 1 at c, falling off over w
@@ -167,6 +167,13 @@ function addLayers(c, p, L, t) {
     p.spine[0] += 10 * D * k; p.chest[0] += 8 * D * k; p.neck[0] -= 6 * D * k;
     for (let i = 0; i < 2; i++) { const s2 = Math.sin(t * 8 + i * Math.PI); p.armRaise[i] -= (95 + 35 * s2) * D * k; p.forearm[i][0] -= (25 + 30 * Math.max(0, -s2)) * D * k; }
     p.armSwing *= 1 - k;
+  }
+  k = w("aim");
+  if (k) {
+    // holding a long gun at the ready: the right hand at the grip by the chest, the left forward under the barrel
+    p.armRaise[1] -= 38 * D * k; p.upperArm[1][2] -= 18 * D * k; p.forearm[1][0] -= 95 * D * k; p.forearm[1][1] += 0.5 * k;
+    p.armRaise[0] -= 62 * D * k; p.upperArm[0][2] -= 22 * D * k; p.forearm[0][0] -= 40 * D * k;
+    p.chest[1] += 0.12 * k; p.armSwing *= 1 - k;
   }
   // a damped swing (sad, sneaking): scale the arms' forward swing
   if (p.armSwing < 1) for (let i = 0; i < 2; i++) p.upperArm[i][0] *= p.armSwing;

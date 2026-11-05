@@ -7,7 +7,7 @@ Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` 
 
 ### Dodane
 - Człowiek (LifeKit): warstwy ruchu **zombie** (pochylony, głowa opadająca na bok, ręce wyciągnięte przed siebie,
-  powłóczona noga) i **atak** (wypad, ręce drapiące na zmianę); odcienie skóry „Zombie (grey-green)”, „Corpse (waxy)”,
+  powłóczona noga), **atak** (wypad, ręce drapiące na zmianę) i **broń gotowa** (`aim`: długa broń trzymana przed sobą); odcienie skóry „Zombie (grey-green)”, „Corpse (waxy)”,
   ubranie „Torn and filthy”.
 - **WeaponKit** (`js/models/weapons/`) i karabinek **kbs wz. 96 Beryl** z błyskiem wylotowym (`docs/models/weapons/README.md`);
   doktor modeli: źródło `tools/doctor/sources/weapons.js`.
