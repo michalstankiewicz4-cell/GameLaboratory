@@ -68,9 +68,50 @@ scenę Three.js), warstwy Input, szyny zdarzeń, sieci i API dla AI.
 
 ## Kolejność (propozycja, do decyzji właściciela)
 
-1. Scena jako dane (JSON: obiekty, składniki, środowisko) i jedna wspólna pętla.
-2. Laboratorium sceny („Warsztat”): drzewo obiektów, właściwości, podgląd; wstawianie modeli z kitów, środowisk
-   i zachowań z laboratoriów.
+1. Scena jako dane (JSON: obiekty, składniki, środowisko) i jedna wspólna pętla. *(scena jako dane: zrobione w 0.29.0,
+   `js/scene/`; wspólna pętla dla gier — jeszcze nie)*
+2. Edytor sceny („Warsztat”): drzewo obiektów, właściwości, podgląd; wstawianie modeli z kitów, środowisk
+   i zachowań z laboratoriów. *(pierwsza wersja: `editor/`, 0.1.0)*
 3. API dla AI na scenie jako danych.
 4. Input z akcjami, szyna zdarzeń, zapis.
 5. Sieć.
+
+## Rola edytora i docelowy układ repozytorium (plan, 2026-11-05)
+
+**Edytor sceny jest głównym, docelowym programem**: w nim składa się grę. Właściciel potwierdził ten kierunek
+i zostawił decyzję o przebudowie układu folderów.
+
+- **Edytor** (`editor/`): scena, obiekty, środowisko, potem zachowania, przycisk „Graj” i API dla AI. Z edytora gra
+  wychodzi jako osobna strona przeglądarkowa: scena jako dane + silnik.
+- **Laboratoria** (`labs/`): edytory zasobów — w nich robi się i sprawdza jedną rzecz (model, ląd, wodę, profil obrazu,
+  dźwięk). Laboratoria dostosowują się do edytora: każde dostaje „Zapisz jako zasób” (zasób z nazwą, wiele wersji)
+  i z czasem przechodzi na wspólną scenę i wspólną pętlę.
+- **Silnik**: wszystko, z czego korzystają edytor, laboratoria i gra.
+
+Docelowy układ:
+
+```
+editor/            główny program (edytor sceny); później strona startowa może prowadzić najpierw tutaj
+engine/            silnik, wspólny dla edytora, laboratoriów i gier:
+  scene/           scena jako dane, prefabrykaty, (później) zasoby z nazwą       ← dziś js/scene/
+  models/          kity modeli                                                    ← dziś js/models/
+  envs/            środowiska i ich prawa (niebo, woda, ląd, kosmos)               ← dziś js/envs/, js/labs/shared/stage.js
+  behaviors/       zachowania                                                     ← dziś js/behaviors/
+  render/          grafika i potok obrazu                                         ← dziś js/render/
+  audio/           dźwięk                                                         ← dziś js/audio/
+  core/            pętla, czas, (później) wejście, zdarzenia, zapis               ← dziś js/core/
+labs/              laboratoria (edytory zasobów): strony + js/labs/<lab>/ → labs/<lab>/ (strona i skrypty razem)
+ui/                wygląd i powłoka stron (bez zmian)
+tools/, docs/, data/, vendor/   bez zmian
+```
+
+Zasady przeprowadzki:
+- **Jednym ruchem**, gdy edytor urośnie i będzie widać, czego potrzebuje od silnika (zachowania w scenie, „Graj”),
+  a nie po kawałku — żeby ścieżki nie były w połowie stare, w połowie nowe.
+- Narzędziem jak przy 0.20.0: `git mv` z historią i automatyczne przepisanie importów, ścieżek w stronach, CSS i dokumentacji;
+  potem `tools/paths.py --strict`, `tools/sitemap.py --check` i przejście wszystkich stron w przeglądarce.
+- Adresy stron laboratoriów (`labs/*.html`) zostają, bo linkują do nich gry (Battle, Space); jeśli się zmienią —
+  poprawka linków w grach w tym samym kroku.
+- Doktor modeli, kitcheck i laboratoria języka / obrazów przechodzą na nowe ścieżki razem z resztą.
+- Po przeprowadzce: `CLAUDE.md` („Układ folderów”), `docs/README.md` i ten dokument — nowe ścieżki; wpis w `CHANGELOG.md`
+  (wersja programu: duży zwrot, `1.0.0` albo `y`, do decyzji właściciela).
