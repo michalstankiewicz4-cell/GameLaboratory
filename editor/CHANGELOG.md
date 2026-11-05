@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.2.1 — 2026-11-05 (Środek | Całość)
+
+### Dodane
+- Przełącznik **Środek | Całość** na pasku narzędzi: scena w wolnym środku między panelami i konsolą albo na całej
+  przestrzeni od paska narzędzi do paska informacji (pod panelami). Widok nie wchodzi już pod paski.
+
 ## 0.2.0 — 2026-11-05 (widok między panelami)
 
 ### Zmienione

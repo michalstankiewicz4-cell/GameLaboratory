@@ -39,6 +39,10 @@ body.lmNoFoot .labDock{bottom:0}
 .labWin > :is(.idle, .labIdle){opacity:1}
 .labWin > .labIdle, .labWin > .labIdle *{pointer-events:auto !important}
 /* a page that fits its 3D view into the free middle (body.viewFits: the scene editor) */
-body.viewFits.lmPanels #view{left:var(--viewL,0px);right:var(--viewR,0px);bottom:calc(var(--footH) + var(--viewB,0px));top:calc(var(--menuH) + var(--barH));width:auto;height:auto}
-body.viewFits.lmPanels.lmNoBar #view{top:var(--menuH)}
+/* Full: the whole space between the toolbar and the info bar; Middle (default): also between the panels and the console */
+body.viewFits #view{top:calc(var(--menuH) + var(--barH));bottom:var(--footH);left:0;right:0;width:auto;height:auto}
+body.viewFits.lmNoBar #view{top:var(--menuH)}
+body.viewFits.lmNoFoot #view{bottom:0}
+body.viewFits.lmPanels:not(.vfFull) #view{left:var(--viewL,0px);right:var(--viewR,0px);bottom:calc(var(--footH) + var(--viewB,0px))}
+body.viewFits.lmPanels.lmNoFoot:not(.vfFull) #view{bottom:var(--viewB,0px)}
 @media (max-width:640px){.labWin,.labWin.right{width:calc(100vw - 16px)}.labDock,.labDock.right{width:calc(100vw - 16px)}}

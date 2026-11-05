@@ -18,7 +18,9 @@
    Docked or not is kept with the window's place. Panels (all docked): real panels flush with the edges, the console
    (ui/shell/console.js) docked at the bottom between them, body.lmPanels; the free middle is published as --viewL,
    --viewR, --viewB on <html> and through window.LabView (a page with body.viewFits puts its #view there and sizes its
-   renderer from it — the scene editor; other pages keep the view full size, under the panels).
+   renderer from it — the scene editor; other pages keep the view full size, under the panels). Such a page also gets
+   a second toolbar switch, Middle | Full: the view in the free middle, or the whole space between the toolbar and the
+   info bar, under the panels (body.vfFull; gamelab.viewfit, the same on every page).
    ======================================================================= */
 (function () {
 "use strict";
@@ -152,6 +154,25 @@ function toolbarSwitch() {
   });
   const sp = bar.querySelector(":scope > .sp"); bar.insertBefore(sw, sp ? sp.nextSibling : null);
   syncSwitch();
+  if (document.body.classList.contains("viewFits")) fitSwitch(bar, sw);
+}
+// the view: in the free middle between the panels, or the whole space between the bars (pages with body.viewFits)
+const FIT_KEY = "gamelab.viewfit";
+function fitSwitch(bar, before) {
+  let full = false; try { full = localStorage.getItem(FIT_KEY) === "full"; } catch (e) { /* storage blocked */ }
+  const seg = document.createElement("div"); seg.className = "seg fitSeg"; seg.setAttribute("role", "group");
+  seg.setAttribute("aria-label", PL() ? "Widok sceny" : "Scene view");
+  const set = (f) => {
+    full = f; document.body.classList.toggle("vfFull", full);
+    seg.querySelectorAll("button").forEach((b) => b.classList.toggle("on", (b.dataset.v === "full") === full));
+    try { localStorage.setItem(FIT_KEY, full ? "full" : "middle"); } catch (e) { /* storage blocked */ }
+  };
+  [["middle", PL() ? "Środek" : "Middle", PL() ? "Scena w wolnym środku, między panelami i konsolą" : "The scene in the free middle, between the panels and the console"],
+   ["full", PL() ? "Całość" : "Full", PL() ? "Scena na całej przestrzeni od paska narzędzi do paska informacji, pod panelami" : "The scene on the whole space from the toolbar to the info bar, under the panels"]].forEach(([v, label, tip]) => {
+    const b = document.createElement("button"); b.type = "button"; b.dataset.v = v; b.textContent = label; b.title = tip;
+    b.addEventListener("click", () => set(v === "full")); seg.appendChild(b);
+  });
+  bar.insertBefore(seg, before); set(full);
 }
 
 // windows with no remembered place: one under another on their side (the page's order); when a column is full, the

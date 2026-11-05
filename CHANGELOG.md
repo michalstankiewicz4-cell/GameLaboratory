@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.31.1 · edytor sceny 0.2.1 — 2026-11-05 (Środek | Całość)
+
+### Dodane
+- Na stronach z widokiem dopasowanym do paneli (`body.viewFits`, na razie edytor sceny) przełącznik **Środek | Całość**
+  na pasku narzędzi: scena w wolnym środku albo na całej przestrzeni od paska narzędzi do paska informacji, pod panelami.
+  Zapamiętany w przeglądarce (`gamelab.viewfit`).
+
 ## Program 0.31.0 · edytor sceny 0.2.0 — 2026-11-05 (prawdziwe panele)
 
 ### Zmienione
