@@ -149,7 +149,7 @@ function toolbarSwitch() {
   [["win", PL() ? "Okna" : "Windows", PL() ? "Wszystkie okna pływające" : "All windows floating"],
    ["dock", PL() ? "Panele" : "Panels", PL() ? "Wszystkie okna w panelach po bokach" : "All windows docked in the side panels"]].forEach(([v, label, tip]) => {
     const b = document.createElement("button"); b.type = "button"; b.dataset.v = v; b.textContent = label; b.title = tip;
-    b.addEventListener("click", () => { wins.forEach((w) => { if (w.docked !== (v === "dock")) setDocked(w, v === "dock"); }); syncSwitch(); });
+    b.addEventListener("click", () => { wins.forEach((w) => { if (w.docked !== (v === "dock")) setDocked(w, v === "dock"); }); syncSwitch(); dispatchEvent(new Event("labwindows:layout")); });
     sw.appendChild(b);
   });
   const sp = bar.querySelector(":scope > .sp"); bar.insertBefore(sw, sp ? sp.nextSibling : null);

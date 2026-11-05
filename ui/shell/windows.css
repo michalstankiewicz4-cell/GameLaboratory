@@ -43,6 +43,6 @@ body.lmNoFoot .labDock{bottom:0}
 body.viewFits #view{top:calc(var(--menuH) + var(--barH));bottom:var(--footH);left:0;right:0;width:auto;height:auto}
 body.viewFits.lmNoBar #view{top:var(--menuH)}
 body.viewFits.lmNoFoot #view{bottom:0}
-body.viewFits.lmPanels:not(.vfFull) #view{left:var(--viewL,0px);right:var(--viewR,0px);bottom:calc(var(--footH) + var(--viewB,0px))}
-body.viewFits.lmPanels.lmNoFoot:not(.vfFull) #view{bottom:var(--viewB,0px)}
+body.viewFits:not(.vfFull) #view{left:var(--viewL,0px);right:var(--viewR,0px);bottom:calc(var(--footH) + var(--viewB,0px))}
+body.viewFits.lmNoFoot:not(.vfFull) #view{bottom:var(--viewB,0px)}
 @media (max-width:640px){.labWin,.labWin.right{width:calc(100vw - 16px)}.labDock,.labDock.right{width:calc(100vw - 16px)}}

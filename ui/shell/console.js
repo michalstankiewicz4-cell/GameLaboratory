@@ -26,7 +26,8 @@ function build() {
   const win = el("div", "labWin labConsole"); win.hidden = !st.open;
   const head = el("div", "labWinHead"), title = el("div", "labWinTitle", t("Console", "Konsola")), close = el("button", "labWinClose", "✕");
   close.type = "button"; close.title = t("Close", "Zamknij");
-  head.append(title, close);
+  const pin = el("button", "labWinPin", "⤓"); pin.type = "button";
+  head.append(title, pin, close);
   const tools = el("div", "lcTools");
   const kind = el("select"); KINDS.forEach(([v, l]) => kind.add(new Option(l, v))); kind.value = st.kind; kind.setAttribute("aria-label", t("Kind", "Rodzaj"));
   const q = el("input"); q.type = "search"; q.placeholder = t("Filter…", "Filtr…"); q.value = st.q; q.setAttribute("aria-label", t("Filter", "Filtr"));
@@ -70,15 +71,26 @@ function build() {
     win.style.left = x + "px"; win.style.top = y + "px"; win.style.right = "auto";
   };
   const show = (on) => { st.open = on; win.hidden = !on; btn.classList.toggle("on", on); save(); if (on) { place(); render(); } if (window.LabView) window.LabView.update(); };
-  // panels (ui/shell/windows.js, body.lmPanels): the console docks at the bottom, between the side panels
-  const dockState = () => { win.classList.toggle("lcDocked", document.body.classList.contains("lmPanels")); if (window.LabView) window.LabView.update(); };
+  // window or panel: docked at the bottom between the side panels, or floating. Its own pin (st.dock: true / false);
+  // without a choice it follows the toolbar switch Windows | Panels (ui/shell/windows.js, body.lmPanels); a click on that
+  // switch (event "labwindows:layout") clears the choice
+  const docked = () => (st.dock == null ? document.body.classList.contains("lmPanels") : st.dock);
+  addEventListener("labwindows:layout", () => { st.dock = null; save(); dockState(); });
+  const dockState = () => {
+    const d = docked(); win.classList.toggle("lcDocked", d);
+    pin.textContent = d ? "⤒" : "⤓";
+    pin.title = d ? t("Undock: a floating window", "Odepnij: okno pływające") : t("Dock at the bottom, between the panels", "Przypnij na dole, między panelami");
+    if (!d) place();
+    if (window.LabView) window.LabView.update();
+  };
+  pin.onclick = () => { st.dock = !docked(); save(); dockState(); };
   new MutationObserver(dockState).observe(document.body, { attributes: true, attributeFilter: ["class"] }); dockState();
   if (window.ResizeObserver) new ResizeObserver(() => { if (window.LabView) window.LabView.update(); }).observe(win);   // dragging its top edge
   btn.onclick = () => show(win.hidden);
   close.onclick = () => show(false);
   show(st.open);
   head.addEventListener("pointerdown", (e) => {
-    if (e.target === close || win.classList.contains("lcDocked")) return;
+    if (e.target === close || e.target === pin || win.classList.contains("lcDocked")) return;
     const r = win.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
     head.setPointerCapture(e.pointerId); win.classList.add("dragging");
     const move = (ev) => { st.x = ev.clientX - dx; st.y = ev.clientY - dy; place(); };

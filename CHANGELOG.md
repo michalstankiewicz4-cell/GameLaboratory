@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.31.2 · edytor sceny 0.2.2 — 2026-11-05 (konsola: okno albo panel)
+
+### Dodane
+- **Konsola: okno albo panel** — pinezka (⤓ / ⤒) na pasku tytułu konsoli przypina ją na dole, między panelami, albo
+  zostawia jako pływające okno, niezależnie od trybu Okna | Panele; kliknięcie tego przełącznika przywraca konsoli jego
+  ustawienie. Wybór zapamiętany w przeglądarce (`gamelab.console`).
+
 ## Program 0.31.1 · edytor sceny 0.2.1 — 2026-11-05 (Środek | Całość)
 
 ### Dodane

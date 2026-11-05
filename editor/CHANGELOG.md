@@ -3,6 +3,11 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.2.2 — 2026-11-05 (konsola: okno albo panel)
+
+### Zmienione
+- Przypięta na dole konsola zwęża widok sceny także w trybie okien (Środek).
+
 ## 0.2.1 — 2026-11-05 (Środek | Całość)
 
 ### Dodane
