@@ -2,7 +2,8 @@
 
 Plan, do którego zmierzamy: z laboratoriów (modele, środowiska, zachowania, grafika, dźwięk, UI) robimy silnik,
 w którym AI buduje grę przez API, a człowiek widzi wynik na żywo — jak w „Warsztacie dla AI” z pierwszej rozmowy
-(drzewo obiektów, właściwości, podgląd). Spisane 2026-11-05 na podstawie schematu właściciela; to plan, nie stan kodu.
+(drzewo obiektów, właściwości, podgląd). Cel: **gry przeglądarkowe** — wszystko działa w przeglądarce, bez instalacji
+(JavaScript, Three.js, Web Audio, WebRTC, IndexedDB). Spisane 2026-11-05 na podstawie schematu właściciela; to plan, nie stan kodu.
 
 ## Zasada: scena w środku
 
