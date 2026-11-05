@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Laboratorium obrazów 0.29.1 — 2026-11-05 (karta graficzna przy 64×40)
+
+### Poprawione
+- Przy 64×40 karta graficzna odmawiała („Binding size 209715200 … larger than the maximum storage buffer binding size
+  134217728”) i nauka szła na procesorze: macierze uwagi 2 × głowy × 2560 × 2560 mają ok. 200 MB, a WebGPU domyślnie
+  pozwala na 128 MB. Silnik GPU (`js/labs/lang/gpu.js`, wspólny z laboratorium języka) prosi teraz kartę o jej
+  największe bufory (`maxStorageBufferBindingSize`, `maxBufferSize` z limitów adaptera).
+
 ## Program 0.28.0 · doktor modeli 1.2.5 — 2026-11-05 (bomba 250 lb)
 
 ### Dodane

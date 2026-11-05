@@ -34,7 +34,7 @@
     "labs/morgue.html": "1.1.0",
     "labs/walkers.html": "0.23.5",
     "labs/lang.html": "0.24.1",
-    "labs/img.html": "0.29.0",
+    "labs/img.html": "0.29.1",
     "labs/caves.html": "1.1.0",
     "labs/gear.html": "1.1.0",
   },

@@ -271,7 +271,11 @@ class GPUEngine {
     if (typeof navigator === 'undefined' || !navigator.gpu) throw new Error('Ta przeglądarka nie obsługuje WebGPU.');
     const ad = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' });
     if (!ad) throw new Error('Brak karty graficznej dostępnej dla WebGPU.');
-    const dev = await ad.requestDevice({ requiredLimits: { maxStorageBuffersPerShaderStage: Math.min(8, ad.limits.maxStorageBuffersPerShaderStage) } });
+    // największe bufory, jakie karta pozwala: macierze uwagi B × głowy × T × T rosną z kwadratem długości ciągu
+    // (laboratorium obrazów, 64×40: T = 2560, ok. 200 MB na warstwę), a domyślny limit to 128 MB
+    const L = ad.limits, dev = await ad.requestDevice({ requiredLimits: {
+      maxStorageBuffersPerShaderStage: Math.min(8, L.maxStorageBuffersPerShaderStage),
+      maxStorageBufferBindingSize: L.maxStorageBufferBindingSize, maxBufferSize: L.maxBufferSize } });
     const info = ad.info || {};
     return new GPUEngine(dev, [info.vendor, info.architecture, info.description].filter(Boolean).join(' ') || 'WebGPU');
   }
