@@ -11,3 +11,4 @@
 .labLink:hover{border-color:var(--accent);color:var(--accent)}
 /* Właściwości mają miejsce na pełne pola obiektu od startu, żeby okna pod nimi (Kamera, Wydajność) nie wchodziły na nie */
 #propsWin{min-height:470px}
+.labWin.docked #propsWin{min-height:0}   /* w panelu okna idą jedno pod drugim: rezerwa niepotrzebna */

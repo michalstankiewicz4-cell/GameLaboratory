@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.30.0 · edytor sceny 0.1.1 — 2026-11-05 (okno albo panel)
+
+### Dodane
+- **Okno albo panel** we wszystkich laboratoriach, narzędziach i w edytorze (`ui/shell/windows.js`): pinezka (⇤ / ⇥) na pasku
+  tytułu przypina okno do panelu po jego stronie — kolumna między paskami, okna jedno pod drugim, przewijana — i odpina je
+  z powrotem tam, gdzie stało. Przełącznik **Okna | Panele** na pasku narzędzi (po prawej, przed Konsolą) robi to dla
+  wszystkich okien naraz; przy mieszanym układzie nie świeci żaden. Zapamiętane w przeglądarce razem z położeniem okien.
+
 ## Program 0.29.0 · edytor sceny 0.1.0 — 2026-11-05 (edytor sceny)
 
 ### Dodane

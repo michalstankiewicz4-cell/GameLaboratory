@@ -13,6 +13,9 @@
    stood (data-side="left" | "right"). Styles: ui/shell/windows.css and
    ui/style/controls.css (sliders fill gold up to their value: --fill, set here). No inline style attributes — only the CSSOM,
    so pages with a strict CSP work.
+   Window or panel: the pin on a title bar docks that window in the panel on its side (a column between the bars,
+   one window under another, scrolled), and back; the toolbar switch Windows | Panels does it for all of them.
+   Docked or not is kept with the window's place.
    ======================================================================= */
 (function () {
 "use strict";
@@ -22,6 +25,13 @@ const load = () => { try { return JSON.parse(localStorage.getItem(KEY) || "{}") 
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* storage blocked: lasts this visit */ } };
 const state = load(), wins = [];
 let zTop = 20;
+const PL = () => lang() === "pl";
+// the two panels windows dock into (created on the first docking)
+const docks = {};
+function dock(side) {
+  if (!docks[side]) { const d = document.createElement("div"); d.className = "labDock " + side; document.body.appendChild(d); docks[side] = d; }
+  return docks[side];
+}
 
 function clamp(w) {
   const r = w.el.getBoundingClientRect(), W = innerWidth, H = innerHeight;
@@ -32,7 +42,7 @@ function place(w, x, y) { w.el.style.left = x + "px"; w.el.style.top = y + "px";
 function front(w) { w.el.style.zIndex = ++zTop; }
 function show(w, open) {
   w.open = open; w.el.hidden = !open;
-  if (open) { front(w); requestAnimationFrame(() => clamp(w)); }
+  if (open && !w.docked) { front(w); requestAnimationFrame(() => clamp(w)); }
   (state[w.id] = state[w.id] || {}).open = open; save();
 }
 
@@ -42,19 +52,21 @@ function make(body) {
   const head = document.createElement("header"); head.className = "labWinHead";
   const title = document.createElement("span"); title.className = "labWinTitle";
   const close = document.createElement("button"); close.type = "button"; close.className = "labWinClose"; close.textContent = "✕";
-  head.append(title, close);
+  const pin = document.createElement("button"); pin.type = "button"; pin.className = "labWinPin"; pin.textContent = side === "right" ? "⇥" : "⇤";
+  head.append(title, pin, close);
   body.classList.add("labWinBody");
   body.parentNode.insertBefore(el, body);
   el.append(head, body);
   const heading = () => { const h = body.querySelector("h3, .secHd"); return h && h.textContent.trim(); };
-  const w = { id, el, body, open: true, title: () => (lang() === "pl" && body.dataset.titlePl) || body.dataset.title || heading() || id };
+  const w = { id, el, body, side, pin, open: true, docked: false, title: () => (lang() === "pl" && body.dataset.titlePl) || body.dataset.title || heading() || id };
   title.textContent = w.title();
   close.title = lang() === "pl" ? "Zamknij (OPCJE → Okna otwiera je znowu)" : "Close (OPTIONS → Windows opens it again)";
   close.addEventListener("click", () => show(w, false));
+  pin.addEventListener("click", () => { setDocked(w, !w.docked); syncSwitch(); });
   el.addEventListener("pointerdown", () => front(w));
   // drag by the title bar
   head.addEventListener("pointerdown", (e) => {
-    if (e.button !== 0 || e.target === close) return;
+    if (e.button !== 0 || e.target === close || e.target === pin || w.docked) return;
     const r = el.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
     head.setPointerCapture(e.pointerId); el.classList.add("dragging");
     const move = (ev) => place(w, ev.clientX - dx, Math.max(MENU_H + 4, ev.clientY - dy));
@@ -71,8 +83,52 @@ function make(body) {
   if (s.x != null) place(w, s.x, s.y);
   else { w.fresh = side; el.style.top = TOP + "px"; if (side === "right") { el.style.right = "12px"; el.style.left = "auto"; } else el.style.left = "12px"; }
   w.open = s.open !== false; el.hidden = !w.open;
+  w.home = { parent: el.parentNode, next: el.nextSibling };      // where it goes back when it floats again
   wins.push(w);
+  if (s.docked) setDocked(w, true, true);
+  pinTitle(w);
   return w;
+}
+function pinTitle(w) {
+  w.pin.title = w.docked ? (PL() ? "Odepnij: okno pływające" : "Undock: a floating window")
+    : (PL() ? (w.side === "right" ? "Przypnij do panelu po prawej" : "Przypnij do panelu po lewej") : (w.side === "right" ? "Dock in the right panel" : "Dock in the left panel"));
+}
+// into the side panel (in the page's order) or back to a floating window where it stood
+function setDocked(w, on, quiet) {
+  w.docked = on; w.el.classList.toggle("docked", on);
+  if (on) {
+    const d = dock(w.side), after = wins.slice(wins.indexOf(w) + 1).find((x) => x.docked && x.side === w.side && x.el.parentNode === d);
+    d.insertBefore(w.el, after ? after.el : null);
+    ["left", "right", "top", "maxHeight", "zIndex"].forEach((k) => { w.el.style[k] = ""; });
+  } else {
+    w.home.parent.insertBefore(w.el, w.home.next && w.home.next.parentNode === w.home.parent ? w.home.next : null);
+    const s = state[w.id] || {};
+    if (s.x != null) place(w, s.x, s.y); else { w.fresh = w.side; requestAnimationFrame(stack); }
+    if (w.open) { front(w); requestAnimationFrame(() => clamp(w)); }
+  }
+  pinTitle(w);
+  if (!quiet) { (state[w.id] = state[w.id] || {}).docked = on; save(); }
+}
+// the toolbar switch: Windows | Panels (all at once); neither lit when they are mixed
+let sw = null;
+function syncSwitch() {
+  if (!sw) return;
+  const n = wins.filter((w) => w.docked).length;
+  sw.querySelector('[data-v="win"]').classList.toggle("on", n === 0);
+  sw.querySelector('[data-v="dock"]').classList.toggle("on", n === wins.length);
+}
+function toolbarSwitch() {
+  const bar = document.querySelector("body > .bar"); if (!bar || !wins.length || bar.querySelector(".winSeg")) return;
+  sw = document.createElement("div"); sw.className = "seg winSeg"; sw.setAttribute("role", "group");
+  sw.setAttribute("aria-label", PL() ? "Okna albo panele" : "Windows or panels");
+  [["win", PL() ? "Okna" : "Windows", PL() ? "Wszystkie okna pływające" : "All windows floating"],
+   ["dock", PL() ? "Panele" : "Panels", PL() ? "Wszystkie okna w panelach po bokach" : "All windows docked in the side panels"]].forEach(([v, label, tip]) => {
+    const b = document.createElement("button"); b.type = "button"; b.dataset.v = v; b.textContent = label; b.title = tip;
+    b.addEventListener("click", () => { wins.forEach((w) => { if (w.docked !== (v === "dock")) setDocked(w, v === "dock"); }); syncSwitch(); });
+    sw.appendChild(b);
+  });
+  const sp = bar.querySelector(":scope > .sp"); bar.insertBefore(sw, sp ? sp.nextSibling : null);
+  syncSwitch();
 }
 
 // windows with no remembered place: one under another on their side (the page's order); when a column is full, the
@@ -82,7 +138,7 @@ function stack() {
   for (const side of ["left", "right"]) {
     let y = TOP, x = 12, colW = 0;
     for (const w of wins) {
-      if (w.fresh !== side || !w.open) continue;
+      if (w.fresh !== side || !w.open || w.docked) continue;
       const r = w.el.getBoundingClientRect();
       if (y > TOP && y + Math.min(r.height, 200) > bottom) { x += colW + 10; y = TOP; colW = 0; }
       w.el.style.top = y + "px";
@@ -98,6 +154,7 @@ const fill = (s) => { const lo = +s.min || 0, hi = s.max === "" ? 100 : +s.max; 
 const fillAll = () => document.querySelectorAll(".labWin input[type=range], .labUi input[type=range]").forEach(fill);
 function init() {
   document.querySelectorAll("[data-window]").forEach(make);
+  toolbarSwitch();
   document.addEventListener("input", (e) => { if (e.target.matches && e.target.matches("input[type=range]")) fill(e.target); }, true);
   requestAnimationFrame(stack); setTimeout(stack, 1200);   // again once the labs have filled their panels
   // titles from a heading: the labs fill their panels after loading
@@ -110,12 +167,13 @@ function init() {
     if (h) h.classList.add("labWinDup");
   });
   sync(); fillAll(); setInterval(() => { sync(); fillAll(); }, 1500);
-  addEventListener("resize", () => wins.forEach((w) => { if (w.open) clamp(w); }));
+  addEventListener("resize", () => wins.forEach((w) => { if (w.open && !w.docked) clamp(w); }));
 }
 window.LabWindows = {
   list: () => wins.map((w) => ({ id: w.id, title: w.title, open: w.open })),
   toggle: (id) => { const w = wins.find((x) => x.id === id); if (w) show(w, !w.open); },
   show: (id, open = true) => { const w = wins.find((x) => x.id === id); if (w) show(w, open); },
+  dock: (id, on = true) => { const w = wins.find((x) => x.id === id); if (w) { setDocked(w, on); syncSwitch(); } },
 };
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
