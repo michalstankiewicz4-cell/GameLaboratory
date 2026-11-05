@@ -45,3 +45,9 @@ Coordinates: metres, x = starboard, y = up (0 = waterline), z = forward (0 = ami
 
 - Check positions against a profile drawing (e.g. a published plan in Polish naval literature) when one is available.
 - Add the 1940–41 and 1942 configurations as variants.
+
+## Ruch (zachowanie „okręt na wodzie”)
+`js/behaviors/water/ship.js` (środowisko woda): `createShip(def, {x, z, th})` → `step(dt, {throttle, rudder}, waves, t, isWater)`.
+Ciąg z mocy (54 000 KM, sprawność 0,6), opór kadłuba dobrany do prędkości maksymalnej (39 w), ster działający
+z prędkością (promień cyrkulacji ≈ 3 długości), bezwładność obrotu; kołysanie za falami WaterKit (`heightAt`) jak
+w laboratorium wody; mielizna, gdy dziób, śródokręcie lub rufa są poza wodą. Używa go gra CityExplorer (Wisła).

@@ -3,6 +3,15 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.26.0 — 2026-11-05 (zachowanie „okręt na wodzie”)
+
+### Dodane
+- Zachowanie **„okręt na wodzie”** (`js/behaviors/water/ship.js`, środowisko woda): ruch w płaszczyźnie (naprzód, w bok,
+  obrót) z ciągu z mocy, oporu kadłuba ∝ v², steru zależnego od prędkości i promienia cyrkulacji; kołysanie (zanurzenie,
+  przegłębienie, przechył) za falami WaterKit pod kadłubem, przechył na cyrkulacji; mielizna — opór gruntu, bez
+  przyklejania. `shipDef(model, liczby)` — liczby ruchu z modelu ShipKit (ORP Błyskawica: 2144 t, 54 000 KM, 39 w).
+- Opis: `docs/models/ships-sea/blyskawica.md` (sekcja „Ruch”).
+
 ## Program 0.25.0 · laboratorium pojazdów (ląd) 1.10.0 · doktor modeli 1.2.3 — 2026-11-04 (samolot Spitfire Mk I, lot)
 
 ### Dodane
