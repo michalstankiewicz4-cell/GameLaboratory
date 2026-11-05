@@ -21,6 +21,9 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 - [ ] Mgławica w tle laboratorium ciał niebieskich ciemniejsza po przejściu na grafikę Battle.
 - [ ] Poświaty silników statków słabsze niż wcześniej.
 
+## Edytor sceny i okna
+- [ ] Zakładki zamiast okien jedno pod drugim (pomysł właściciela, 2026-11-05) — raczej dla innych rzeczy niż okna paneli bocznych, np. dolny panel z zakładkami: Konsola · (później) konsola API dla AI · oś czasu. Do ustalenia, czego dokładnie dotyczy.
+
 ## Do przeniesienia
 - [ ] SDF Walkers, laboratorium języka i obrazów (z NeuroLabPA): przenieść na okna z opcjami (w tym okna standardowe) — dziś to przewijane strony (`pageFlow`) we własnym stylu.
 
