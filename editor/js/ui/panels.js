@@ -1,7 +1,8 @@
-// Okna edytora: Scena (dodawanie modelu, hierarchia) i Właściwości (środowisko albo wybrany obiekt).
+// Okna edytora: Scena (dodawanie modelu, hierarchia) i Właściwości (środowisko albo wybrany obiekt, z zachowaniem).
 // Czytają dane ze store, zmiany wysyłają do store; świat 3D odbija je sam.
 import { PREFABS, FAMILIES, prefab } from '../../../js/scene/prefabs.js';
 import { LIGHTS, readProfiles } from '../world/world.js';
+import { BEHAVIORS, behaviorsFor, behaviorOf } from '../../../js/scene/behaviors.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
@@ -46,6 +47,11 @@ export function createPanels(store, actions) {
       return;
     }
     setVal('oName', o.name); $('oPrefab').value = o.prefab;
+    // zachowanie: tylko te, które pasują do modelu, i „Bez zachowania”
+    const fit = behaviorsFor(o.prefab);
+    $('oBehavior').replaceChildren(el('option', { value: '', textContent: t('obj.noBehavior') }),
+      ...fit.map((id) => el('option', { value: id, textContent: lang === 'pl' ? BEHAVIORS[id].labelPl : BEHAVIORS[id].label })));
+    $('oBehavior').value = behaviorOf(o); $('oBehavior').disabled = !fit.length || document.body.classList.contains('playing');
     setVal('pX', o.pos[0]); setVal('pY', o.pos[1]); setVal('pZ', o.pos[2]);
     setVal('rY', o.rot[1]); setVal('rX', o.rot[0]); setVal('rZ', o.rot[2]); setVal('sc', o.scale);
     const p = prefab(o.prefab), lab = p && labName(p.lab);
@@ -67,6 +73,7 @@ export function createPanels(store, actions) {
     const o = store.selected; if (!o) return; const old = prefab(o.prefab), nu = prefab($('oPrefab').value);
     actions.build(() => store.update(o.id, { prefab: nu.id, name: old && o.name === old.label ? nu.label : o.name }));   // nazwa domyślna idzie za modelem
   });
+  $('oBehavior').addEventListener('change', () => { const o = store.selected; if (o) store.update(o.id, { behavior: $('oBehavior').value }); });
   $('surface').addEventListener('change', () => store.setEnv({ surface: $('surface').value }));
   $('light').addEventListener('change', () => store.setEnv({ light: $('light').value }));
   $('look').addEventListener('change', () => store.setEnv({ look: $('look').value }));

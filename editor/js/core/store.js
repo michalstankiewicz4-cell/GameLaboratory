@@ -33,7 +33,7 @@ export function createStore(firstScene) {
       S.objects.push(c); sel = c.id; emit('objects'); return c;
     },
     remove(id) { S.objects = S.objects.filter((o) => o.id !== id); if (sel === id) sel = null; emit('objects'); },
-    // patch: { name, prefab, pos, rot, scale }; zmiana modelu to 'objects' (trzeba go zbudować), reszta 'place'
+    // patch: { name, prefab, pos, rot, scale, behavior }; zmiana modelu to 'objects' (trzeba go zbudować), reszta 'place'
     update(id, patch) {
       const o = find(id); if (!o) return;
       const rebuild = patch.prefab && patch.prefab !== o.prefab;

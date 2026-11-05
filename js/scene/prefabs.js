@@ -1,5 +1,7 @@
 // Prefabrykaty sceny: każdy model z kitów, który da się postawić w scenie, z jedną funkcją budowania.
 // Scena (js/scene/scene-data.js) zapisuje tylko id prefabrykatu; budowa i nazwa są tutaj.
+// build() → { root, kit, dispose }; kit — obiekt zwrócony przez kit (wymiary, linie kadłuba, update części), z niego
+// korzystają zachowania (js/scene/behaviors.js).
 // Pole lab: laboratorium, w którym model się robi i ogląda dokładnie („Otwórz w laboratorium” w edytorze sceny).
 // Kity ze Space (ShipKit, BaseKit, VehicleKit, MarineKit) jeszcze nie: potrzebują js/core/three-global.js,
 // które zmienia oświetlenie całej strony.
@@ -24,7 +26,7 @@ export const FAMILIES = {
 
 const P = [];
 const add = (id, label, family, surface, lab, build) => P.push({ id, label, family, surface, lab, build });
-const g = (v) => ({ root: v.group, dispose: v.dispose ? () => v.dispose() : null });
+const g = (v) => ({ root: v.group, kit: v, dispose: v.dispose ? () => v.dispose() : null });   // kit: to, co zwrócił kit (dane do zachowań)
 
 Object.keys(SHIPS).forEach((id) => add('sea/' + id, SHIPS[id].info.name, 'sea', 'sea', 'labs/vehicles-water.html?ship=' + id, () => g(buildShip(id, { detail: 1 }))));
 VEHICLE_IDS.forEach((id) => add('road/' + id, vehicleInfo(id).name, 'road', 'land', 'labs/vehicles-land.html', () => g(buildRoad(id, {}))));

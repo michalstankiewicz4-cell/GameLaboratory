@@ -21,6 +21,7 @@
 <script src="../ui/shell/menubar.js"></script>
 <div id="view"></div>
 <div class="bar">
+  <button type="button" id="play" data-i18n="bar.play" data-i18n-tip="bar.play.tip">▶ Play</button>
   <div class="seg" id="mode" role="group" aria-label="Gizmo">
     <button type="button" data-m="translate" class="on" data-i18n="bar.move" data-i18n-tip="bar.move.tip">Move</button><button type="button" data-m="rotate" data-i18n="bar.rotate" data-i18n-tip="bar.rotate.tip">Rotate</button><button type="button" data-m="scale" data-i18n="bar.scale" data-i18n-tip="bar.scale.tip">Scale</button>
   </div>
@@ -63,6 +64,7 @@
     <h3 data-i18n="obj.title">Object</h3>
     <div class="row"><span data-i18n="obj.name">Name</span><input type="text" id="oName" maxlength="60"><output></output></div>
     <div class="row"><span data-i18n="obj.model">Model</span><select id="oPrefab"></select><output></output></div>
+    <div class="row"><span data-i18n="obj.behavior">Behaviour</span><select id="oBehavior"></select><output></output></div>
     <div class="row"><span data-i18n="obj.x">Position X</span><input type="number" id="pX" step="0.5"><output>m</output></div>
     <div class="row"><span data-i18n="obj.y">Position Y</span><input type="number" id="pY" step="0.5"><output>m</output></div>
     <div class="row"><span data-i18n="obj.z">Position Z</span><input type="number" id="pZ" step="0.5"><output>m</output></div>

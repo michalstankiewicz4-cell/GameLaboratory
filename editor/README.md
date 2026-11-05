@@ -15,9 +15,13 @@ dostosowywać (zasoby z nazwą, wspólne zachowania).
 - Okna: **Opis**, **Scena** (dodaj model, hierarchia), **Właściwości** (środowisko albo wybrany obiekt), **Kamera**,
   **Wydajność**; OPCJE → Okna. **Okna | Panele** na pasku: w Panelach okna są panelami przy krawędziach, konsola na dole
   pośrodku, a widok 3D zajmuje wolny środek (`body.viewFits`).
-- Pasek narzędzi: cofnij · domek · ponów, uchwyt **Przesuń / Obróć / Skaluj**, **Nowa**, **Zapisz plik**, **Otwórz plik**.
+- Pasek narzędzi: cofnij · domek · ponów, **▶ Graj / ■ Stop**, uchwyt **Przesuń / Obróć / Skaluj**, **Nowa**, **Zapisz plik**, **Otwórz plik**.
 - Klawisze: W / E / R — przesuń, obróć, skaluj; Delete — usuń; Ctrl+D — powiel; F — pokaż wybrany; Esc — środowisko;
   H — chowa okna. Kliknięcie modelu wybiera go.
+- **Graj** (P; Esc — Stop): zachowania ruszają modele (okręty płyną i kołyszą się na falach, samolot lata), gracz steruje
+  wybranym modelem (albo pierwszym z zachowaniem), kamera jedzie za nim. Okręt: W / S maszyny, A / D ster. Samolot:
+  W / S gaz, ↑ ↓ ster wysokości (na rozbiegu trzymać ↓), ← → lotki, Q / E ster kierunku, B hamulce, G podwozie, F klapy.
+  Edycja w tym czasie wyłączona; dane sceny się nie zmieniają, po Stop modele wracają na swoje miejsca.
 - Scena zapisuje się sama w przeglądarce (`localStorage["gameLab.scene.v1"]`); plik: `nazwa.scene.json`.
 
 ## Języki
@@ -39,6 +43,8 @@ editor/
   js/world/controls.js  kamera (orbita, kadrowanie), uchwyt (TransformControls), wybór kliknięciem
   js/ui/panels.js       okna Scena i Właściwości
   js/ui/toolbar.js      pasek narzędzi i klawisze
+  js/play/play.js       gra: zachowania w ruchu, gracz, kamera za graczem, linia stanu
+  js/play/input.js      klawiatura gracza → sterowanie (dźwignia maszyn / gazu, stery, podwozie, klapy)
   js/i18n/              en.js, pl.js, i18n.js (klasyczne skrypty przed ui/shell/windows.js)
   README.md, CHANGELOG.md
 ```
@@ -48,7 +54,8 @@ Silnik (wspólny, poza folderem edytora — będą z niego korzystać też labor
 | Plik | Co |
 |---|---|
 | `js/scene/scene-data.js` | scena jako dane: format, nowa scena, obiekt, sprawdzanie danych z pliku (`normalize`) |
-| `js/scene/prefabs.js` | prefabrykaty: każdy model z kitów, który da się postawić w scenie (id, nazwa, rodzina, gdzie stoi, laboratorium, budowa) |
+| `js/scene/prefabs.js` | prefabrykaty: każdy model z kitów, który da się postawić w scenie (id, nazwa, rodzina, gdzie stoi, laboratorium, budowa → `{ root, kit, dispose }`) |
+| `js/scene/behaviors.js` | zachowania w scenie: okręt na wodzie (`js/behaviors/water/ship.js`), lot (`js/behaviors/air/flight.js`); które pasują do modelu, domyślne |
 | `js/labs/shared/stage.js` | scena bazowa: niebo SkyKit, morze WaterKit albo płaski grunt, słońce z cieniem (wspólna z laboratorium filtrów) |
 | `vendor/three/addons/controls/TransformControls.js` | uchwyt z Three.js r186 (import przepisany na `../../three.module.js`) |
 
@@ -62,7 +69,7 @@ Zasada: **dane są jedynym źródłem prawdy**. Okna, uchwyt i pliki zmieniają 
   "format": "gamelab-scene", "version": 1, "name": "Harbour",
   "env": { "surface": "sea", "light": "afternoon", "look": "" },
   "objects": [
-    { "id": "o…", "name": "ORP Błyskawica", "prefab": "sea/blyskawica", "pos": [0, 0, 0], "rot": [0, 0, 0], "scale": 1 }
+    { "id": "o…", "name": "ORP Błyskawica", "prefab": "sea/blyskawica", "pos": [0, 0, 0], "rot": [0, 0, 0], "scale": 1, "behavior": "ship" }
   ]
 }
 ```
@@ -71,6 +78,7 @@ Zasada: **dane są jedynym źródłem prawdy**. Okna, uchwyt i pliki zmieniają 
   z laboratorium filtrów (`gameLab.lookProfiles.v1`) albo `""`.
 - `pos` w metrach (Y w górę), `rot` w stopniach (kolejność YXZ: kurs, pochylenie, przechył), `scale` — mnożnik.
 - `prefab`: id z `js/scene/prefabs.js` (`sea/…`, `road/…`, `tram/…`, `train/…`, `air/…`, `structures/…`, `weapons/…`).
+- `behavior` (nieobowiązkowe): id z `js/scene/behaviors.js` (`ship`, `flight`); bez pola — domyślne dla modelu, `""` — stoi w miejscu.
 - Zmiana formatu podnosi `version` w `scene-data.js`, a `normalize` przenosi starsze sceny.
 
 ## Wersjonowanie
@@ -85,4 +93,5 @@ Zasada: **dane są jedynym źródłem prawdy**. Okna, uchwyt i pliki zmieniają 
 - Modele ze Space (statki kosmiczne, łaziki, roboty morskie) — ich kity potrzebują `js/core/three-global.js`.
 - Ląd z laboratorium lądu i woda z laboratorium wody jako zasoby z nazwą.
 - Woda wycięta w kadłubie każdego okrętu (dziś WaterKit umie jeden kadłub w środku sceny).
-- Cofnij / ponów zmian w scenie, zachowania (ruch, fizyka) i przycisk „Graj”.
+- Cofnij / ponów zmian w scenie.
+- Zachowania dla pozostałych modeli (koło na szynie dla tramwaju i pociągu — potrzebuje toru w scenie, pojazdy drogowe).

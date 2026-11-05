@@ -14,7 +14,7 @@
 
 ## Układ folderów
 
-- `editor/` — edytor sceny („Warsztat”), osobny folder z własną budową (`editor/js/core/`, `editor/js/world/`, `editor/js/ui/`, `editor/js/i18n/`), wersją (`ui/data/versions.js`, klucz `editor/index.html`) i `CHANGELOG.md`; języki angielski (domyślny, `<html data-lang-default="en">`) i polski (`editor/js/i18n/en.js`, `pl.js` — każdy nowy tekst w obu). Opis: `editor/README.md`. Silnik wspólny: `js/scene/` (scena jako dane, prefabrykaty).
+- `editor/` — edytor sceny („Warsztat”), osobny folder z własną budową (`editor/js/core/`, `editor/js/world/`, `editor/js/ui/`, `editor/js/i18n/`), wersją (`ui/data/versions.js`, klucz `editor/index.html`) i `CHANGELOG.md`; języki angielski (domyślny, `<html data-lang-default="en">`) i polski (`editor/js/i18n/en.js`, `pl.js` — każdy nowy tekst w obu). Opis: `editor/README.md`. Gra w edytorze (▶ Graj): `editor/js/play/`. Silnik wspólny: `js/scene/` (scena jako dane, prefabrykaty, zachowania w scenie `behaviors.js`).
 - `labs/` — strony laboratoriów; `js/labs/<lab>/` — skrypty laboratorium we własnym folderze, główny plik `<lab>.js` (np. `js/labs/vehicles-space/vehicles-space.js`); wspólne skrypty laboratoriów — `js/labs/shared/`.
 - `js/models/` — modele (geometria, materiały, światła, części); nie wiedzą, w jakim środowisku są. Statki-roboty (MarineKit) — `js/models/marine/`.
 - Ludzie mają osobne laboratorium (`labs/human.html`) i osobny folder modeli (`js/models/human/`) — oddzielone od laboratorium życia (zwierzęta i inne formy życia, `js/models/life/`). Oba stoją na LifeKit (`js/models/life/lifekit.js`). Postacie człekokształtne z SDF i pixel artu (generator zombie, SDF Walkers, Kostnica SDF): `js/models/human/zombie/`.

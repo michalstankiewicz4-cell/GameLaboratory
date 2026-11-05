@@ -4,9 +4,10 @@
 // {
 //   format: 'gamelab-scene', version: 1, name,
 //   env: { surface: 'sea' | 'land', light: 'afternoon' | 'noon' | 'dusk' | 'overcast', look: '' | nazwa profilu },
-//   objects: [{ id, name, prefab, pos: [x, y, z], rot: [x, y, z] (stopnie), scale }]
+//   objects: [{ id, name, prefab, pos: [x, y, z], rot: [x, y, z] (stopnie), scale, behavior? }]
 // }
-// prefab: id z js/scene/prefabs.js; look: profil z laboratorium filtrów (gameLab.lookProfiles.v1), '' = zwykły obraz.
+// prefab: id z js/scene/prefabs.js; behavior: id z js/scene/behaviors.js, '' = bez zachowania, brak pola = domyślne
+// dla prefabrykatu; look: profil z laboratorium filtrów (gameLab.lookProfiles.v1), '' = zwykły obraz.
 
 export const FORMAT = 'gamelab-scene', VERSION = 1;
 
@@ -30,6 +31,7 @@ export function normalize(d) {
   s.objects = (Array.isArray(d.objects) ? d.objects : []).filter((o) => o && typeof o.prefab === 'string').map((o) => ({
     id: String(o.id || newId()), name: String(o.name || o.prefab), prefab: o.prefab,
     pos: num3(o.pos, [0, 0, 0]), rot: num3(o.rot, [0, 0, 0]), scale: Number.isFinite(+o.scale) && +o.scale > 0 ? +o.scale : 1,
+    ...(typeof o.behavior === 'string' ? { behavior: o.behavior } : {}),
   }));
   return s;
 }

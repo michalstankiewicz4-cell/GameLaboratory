@@ -21,14 +21,14 @@ export function createWorld(container, store, onWarn) {
   const look = new LookPipeline(renderer); look.setAA(true);
   const stage = createStage(renderer, scene);
   const root = new THREE.Group(); root.name = 'scene objects'; scene.add(root);
-  const built = new Map();                                   // id obiektu → { prefab, root, dispose, size }
+  const built = new Map();                                   // id obiektu → { prefab, root, kit, dispose, size }
 
   function build(o) {
     const p = prefab(o.prefab);
     if (!p) { onWarn && onWarn(o.prefab); return; }
     const b = p.build(), g = new THREE.Group(); g.userData.sceneId = o.id; g.add(b.root);
     g.traverse((m) => { if (m.isMesh && !(m.material && m.material.isMeshBasicMaterial)) { m.castShadow = true; m.receiveShadow = true; } });
-    built.set(o.id, { prefab: o.prefab, root: g, dispose: b.dispose, size: new THREE.Box3().setFromObject(b.root).getSize(new THREE.Vector3()).length() });
+    built.set(o.id, { prefab: o.prefab, root: g, kit: b.kit || null, dispose: b.dispose, size: new THREE.Box3().setFromObject(b.root).getSize(new THREE.Vector3()).length() });
     root.add(g);
   }
   function drop(id) {
@@ -80,13 +80,13 @@ export function createWorld(container, store, onWarn) {
   let last = performance.now(), before = null;
   function frame(now) {
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
-    stage.update(dt, camera); if (before) before(dt);
+    const t = stage.update(dt, camera); if (before) before(dt, t);
     look.sun(camera, stage.sunDir);
     window.LabPerf.begin(renderer); look.render(scene, camera); window.LabPerf.end(renderer);   // okno Wydajność i dolny pasek
     requestAnimationFrame(frame);
   }
   return {
-    renderer, scene, camera, root, built, pending, syncObjects, syncPlaces, syncEnv, bounds,
+    renderer, scene, camera, root, built, stage, pending, syncObjects, syncPlaces, syncEnv, bounds,
     objectRoot: (id) => (built.get(id) || {}).root || null,
     size: (id) => (built.get(id) || {}).size || 10,
     start(beforeFrame) { before = beforeFrame; requestAnimationFrame((t) => { last = t; frame(t); }); },

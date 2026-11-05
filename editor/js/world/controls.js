@@ -1,4 +1,4 @@
-// Kamera (orbita, kadrowanie), uchwyt (przesuń / obróć / skaluj) i wybór kliknięciem. Uchwyt zmienia model na żywo,
+// Kamera (orbita, kadrowanie; w grze jedzie za graczem — play/play.js), uchwyt (przesuń / obróć / skaluj) i wybór kliknięciem. Uchwyt zmienia model na żywo,
 // a po puszczeniu (i w trakcie) zapisuje położenie z powrotem do danych sceny.
 import * as THREE from '../../../vendor/three/three.module.js';
 import { OrbitControls } from '../../../vendor/three/addons/controls/OrbitControls.js';
@@ -21,14 +21,14 @@ export function createControls(world, store) {
   };
   gizmo.addEventListener('objectChange', fromGizmo);
   gizmo.addEventListener('dragging-changed', (e) => { orbit.enabled = !e.value; });
-  const attach = () => { const r = world.objectRoot(store.selectedId); if (r) gizmo.attach(r); else gizmo.detach(); };
+  const attach = () => { if (playing) { gizmo.detach(); return; } const r = world.objectRoot(store.selectedId); if (r) gizmo.attach(r); else gizmo.detach(); };
 
   // wybór kliknięciem (nie przeciągnięciem)
-  const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(); let down = null;
+  const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(); let down = null, playing = false;
   renderer.domElement.addEventListener('pointerdown', (e) => { down = [e.clientX, e.clientY]; });
   renderer.domElement.addEventListener('pointerup', (e) => {
     const click = down && Math.hypot(e.clientX - down[0], e.clientY - down[1]) < 4 && !gizmo.dragging; down = null;
-    if (!click) return;
+    if (!click || playing) return;
     const r = renderer.domElement.getBoundingClientRect();
     ptr.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1); ray.setFromCamera(ptr, camera);
     let o = (ray.intersectObjects(world.root.children, true)[0] || {}).object;
@@ -46,6 +46,8 @@ export function createControls(world, store) {
   return {
     orbit, gizmo, attach,
     setMode: (m) => gizmo.setMode(m),
+    // w grze: bez uchwytu i bez wyboru kliknięciem (kamera dalej się obraca)
+    setPlaying(on) { playing = on; if (on) gizmo.detach(); },
     frameSelection: () => frameBox(world.bounds(store.selectedId)),
     frameAll: () => frameBox(world.bounds(null)),
     update: () => orbit.update(),

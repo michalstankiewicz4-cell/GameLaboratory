@@ -3,6 +3,17 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.32.0 · edytor sceny 0.3.0 — 2026-11-05 (zachowania i „Graj”)
+
+### Dodane
+- **Zachowania w scenie** (`js/scene/behaviors.js`, silnik): podpięcie zachowań z `js/behaviors/` do prefabrykatów —
+  „okręt na wodzie” (`water/ship.js`) dla okrętów i „lot w atmosferze” (`air/flight.js`) dla samolotu. Obiekt sceny
+  wybiera zachowanie polem `behavior` (bez pola — domyślne dla modelu, `''` — stoi w miejscu); format sceny dalej w wersji 1.
+- Prefabrykaty zwracają też obiekt kitu (`build() → { root, kit, dispose }`) — z niego zachowania biorą wymiary i ruchome części.
+- **Edytor sceny: ▶ Graj / ■ Stop** (klawisz P, Esc) — zachowania ruszają modele, gracz steruje wybranym klawiaturą,
+  kamera jedzie za nim; edycja w tym czasie wyłączona, po „Stop” modele wracają na miejsca z danych. We Właściwościach
+  lista **Zachowanie**.
+
 ## Program 0.31.2 · edytor sceny 0.2.2 — 2026-11-05 (konsola: okno albo panel)
 
 ### Dodane

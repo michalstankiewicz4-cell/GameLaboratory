@@ -3,6 +3,17 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.3.0 — 2026-11-05 (zachowania i „Graj”)
+
+### Dodane
+- **▶ Graj / ■ Stop** na pasku narzędzi (klawisz P; Esc zatrzymuje): zachowania (`js/scene/behaviors.js`) ruszają
+  modele sceny, gracz steruje wybranym (albo pierwszym z zachowaniem) z klawiatury (`js/play/input.js`), kamera jedzie
+  za nim, a linia stanu pokazuje prędkość, maszyny / gaz, wysokość. Okręt: W / S maszyny, A / D ster. Samolot: W / S gaz,
+  strzałki — ster wysokości i lotki, Q / E ster kierunku, B hamulce, G podwozie, F klapy.
+- W czasie gry edycja wyłączona (uchwyt, wybór kliknięciem, okna Scena i Właściwości); dane sceny się nie zmieniają —
+  po „Stop” modele wracają na swoje miejsca, a samolot do pozy postoju.
+- Właściwości: lista **Zachowanie** (tylko pasujące do modelu i „Brak”).
+
 ## 0.2.2 — 2026-11-05 (konsola: okno albo panel)
 
 ### Zmienione

@@ -1,4 +1,4 @@
-// Pasek narzędzi (uchwyt, nowa scena, zapis i odczyt pliku) i klawisze edytora.
+// Pasek narzędzi (Graj / Stop, uchwyt, nowa scena, zapis i odczyt pliku) i klawisze edytora.
 const $ = (id) => document.getElementById(id);
 const { t } = window.EditorI18n;
 
@@ -14,6 +14,13 @@ export function createToolbar(store, controls, actions) {
     actions.status(t('status.saved'));
   });
   $('loadFile').addEventListener('click', () => $('fileIn').click());
+  // Graj / Stop: w grze edycja (pasek, okna Scena i Właściwości) jest wyłączona
+  const playBtn = $('play');
+  playBtn.addEventListener('click', () => { playBtn.blur(); actions.play.toggle(); });
+  actions.play.onChange((on) => {
+    playBtn.textContent = t(on ? 'bar.stop' : 'bar.play'); playBtn.title = t(on ? 'bar.stop.tip' : 'bar.play.tip'); playBtn.classList.toggle('on', on);
+    document.querySelectorAll('#mode button, #newScene, #saveFile, #loadFile, #treeWin :is(input, select, button), #propsWin :is(input, select, button)').forEach((b) => { b.disabled = on; });
+  });
   $('fileIn').addEventListener('change', async () => {
     const f = $('fileIn').files[0]; $('fileIn').value = ''; if (!f) return;
     try { const data = JSON.parse(await f.text()); actions.build(() => { store.load(data); controls.frameAll(); }); actions.status(t('status.opened', { file: f.name })); }
@@ -23,7 +30,9 @@ export function createToolbar(store, controls, actions) {
   addEventListener('keydown', (e) => {
     if (e.target.closest && e.target.closest('input, select, textarea')) return;
     const k = e.key.toLowerCase();
-    if (k === 'w') setMode('translate'); else if (k === 'e') setMode('rotate'); else if (k === 'r') setMode('scale');
+    if (actions.play.playing) { if (k === 'escape') actions.play.stop(); return; }   // w grze klawisze ma gracz (play/input.js)
+    if (k === 'p' && !e.ctrlKey && !e.metaKey) actions.play.start();
+    else if (k === 'w') setMode('translate'); else if (k === 'e') setMode('rotate'); else if (k === 'r') setMode('scale');
     else if (k === 'f') controls.frameSelection();
     else if ((k === 'delete' || k === 'backspace') && store.selectedId) { e.preventDefault(); actions.remove(); }
     else if (k === 'd' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); actions.duplicate(); }

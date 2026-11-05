@@ -1,10 +1,11 @@
 // Edytor sceny · start: dane (core/store.js) → świat 3D (world/world.js) → kamera i uchwyt (world/controls.js)
-// → okna (ui/panels.js) i pasek narzędzi (ui/toolbar.js). Opis: editor/README.md.
+// → gra (play/play.js) → okna (ui/panels.js) i pasek narzędzi (ui/toolbar.js). Opis: editor/README.md.
 import { createStore } from './core/store.js';
 import { createWorld, PROFILES_KEY } from './world/world.js';
 import { createControls } from './world/controls.js';
 import { createPanels } from './ui/panels.js';
 import { createToolbar } from './ui/toolbar.js';
+import { createPlay } from './play/play.js';
 import { emptyScene, makeObject } from '../../js/scene/scene-data.js';
 import { prefab } from '../../js/scene/prefabs.js';
 
@@ -48,6 +49,7 @@ const actions = {
   },
   remove() { if (store.selectedId) store.remove(store.selectedId); },
 };
+actions.play = createPlay(store, world, controls, actions);
 const panels = createPanels(store, actions);
 createToolbar(store, controls, actions);
 
@@ -66,7 +68,7 @@ addEventListener('storage', (e) => { if (e.key === PROFILES_KEY) { panels.render
 step(t('load.models'), 0.3);
 world.syncObjects(); world.syncEnv(); controls.attach(); panels.renderTree(); panels.renderProps(); controls.frameAll();
 step(t('load.first'), 0.95);
-world.start(() => controls.update());
+world.start((dt, time) => { actions.play.frame(dt, time); controls.update(); });
 requestAnimationFrame(() => window.LabLoad && window.LabLoad.done());
 // do sprawdzania z konsoli i testów
-window.sceneEditor = { store, world, controls };
+window.sceneEditor = { store, world, controls, play: actions.play };
