@@ -4,6 +4,8 @@
    THE LAB — the page's own script.
    Uses ShipKit's public API exclusively.
    ======================================================================= */
+// the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
+const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 (() => {
 "use strict";
 
@@ -14,10 +16,10 @@ const makeSky = () => ShipKit.makeSpaceSky();
 // =====================================================================
 // Renderer, scene, camera, controls
 // =====================================================================
-const view = document.getElementById("view");
+const view = document.getElementById("viewCanvas");
 const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setSize(window.innerWidth, window.innerHeight, false);
+renderer.setSize(VS().w, VS().h, false);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.1;                 // the game's (scene/setup.js)
@@ -25,7 +27,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFShadowMap;
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 500);
+const camera = new THREE.PerspectiveCamera(38, VS().w / VS().h, 0.1, 500);
 camera.position.set(9.5, 4.2, 11.5);
 
 const controls = new THREE.OrbitControls(camera, view);
@@ -190,7 +192,7 @@ const QUALITY = [
 function applyQuality(level) {
   const q = QUALITY[level];
   renderer.setPixelRatio(q.pr);
-  renderer.setSize(window.innerWidth, window.innerHeight, false);
+  renderer.setSize(VS().w, VS().h, false);
   const shadowsOn = q.shadow > 0 && !state.gameLight;          // the game has no shadows
   if (renderer.shadowMap.enabled !== shadowsOn) {
     renderer.shadowMap.enabled = shadowsOn;
@@ -309,7 +311,7 @@ LabKit.autoHideWindows();   // every window of the page fades when idle
   view.addEventListener("pointerleave", clear);
   view.addEventListener("pointermove", (e) => {
     if (!state.inspect || state.merge || down || !current) { clear(); return; }   // not while dragging the view
-    ndc.set(e.clientX / window.innerWidth * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
+    ndc.set((e.clientX - VS().x) / VS().w * 2 - 1, -((e.clientY - VS().y) / VS().h) * 2 + 1);
     ray.setFromCamera(ndc, camera);
     const hit = ray.intersectObject(current.group, true).find((h) => solid(h.object) && partOf(h.object) && partOf(h.object).name !== "effects");
     const part = hit && partOf(hit.object);
@@ -407,7 +409,7 @@ function frame() {
 }
 
 window.addEventListener("resize", () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.aspect = VS().w / VS().h;
   camera.updateProjectionMatrix();
   applyQuality(state.quality);
 });

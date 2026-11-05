@@ -67,7 +67,7 @@ i edytor ją pokazują, AI ją zmienia.
 | Debug + Editor | edytor sceny `editor/` (hierarchia, właściwości, uchwyt, zapis do pliku, ▶ Graj) — [opis](../../editor/README.md) |
 
 Brakuje: jednej pętli silnika dla gier (edytor ma swoją, z trybem gry), laboratoriów na wspólnej scenie (dziś każde buduje własną
-scenę Three.js), warstwy Input, szyny zdarzeń i sieci.
+scenę Three.js; widok w wolnym środku mają już wszystkie, 0.35.0), warstwy Input, szyny zdarzeń i sieci.
 
 ## Kolejność (propozycja, do decyzji właściciela)
 

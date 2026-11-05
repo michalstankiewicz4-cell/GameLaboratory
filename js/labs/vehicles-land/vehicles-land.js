@@ -3,6 +3,8 @@
 // The list: VehicleKit's rovers, MarineKit's amphibian (moved here from the sea lab: on land it drives on its
 // wheels; where there is water it floats) and RoadKit's real-world road vehicles (js/models/road, the FSO Polonez…).
 // The train is another family (js/labs/vehicles-land/train.js).
+// the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
+const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 (() => {
 "use strict";
 const $ = (id) => document.getElementById(id);
@@ -10,7 +12,7 @@ const VK = window.VehicleKit, MK = window.MarineKit, RK = window.RoadKit, TK = w
 const LIST = VK.VEHICLES.map((def) => ({ def, kit: "vk" })).concat(MK ? MK.VESSELS.filter((d) => d.id === "amphibian").map((def) => ({ def, kit: "mk" })) : [])
   .concat(RK ? RK.list.map((def) => ({ def, kit: "rk" })) : []).concat(TK ? TK.list.map((def) => ({ def, kit: "tram" })) : []).concat(AK ? AK.list.map((def) => ({ def, kit: "air" })) : []);
 const NO_WATER = () => -1e9;   // the water's height where there is none
-const view = $("view");
+const view = $("viewCanvas");
 const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -166,8 +168,8 @@ function applyLight() {
 LabKit.autoHideWindows();   // every window of the page fades when idle
 renderer.info.autoReset = false;
 function resize() {
-  renderer.setSize(window.innerWidth, window.innerHeight, false);
-  camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(VS().w, VS().h, false);
+  camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix();
 }
 window.addEventListener("resize", resize);
 const clock = new THREE.Timer(), prev = new THREE.Vector3(), delta = new THREE.Vector3();

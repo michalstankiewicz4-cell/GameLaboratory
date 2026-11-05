@@ -2,11 +2,13 @@
 // metres, a 2 m scale bar, three lights, the camera — and the creature from LifeKit on it, with its body's
 // parameters, face and gaits. Which creatures there are depends on the models the page loads (js/models/life/ or
 // js/models/human/); each lab's own script (js/labs/life/life.js, js/labs/human/human.js) starts the studio.
+// the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
+const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 window.LifeStudio = function () {
 "use strict";
 const $ = (id) => document.getElementById(id);
 const LK = window.LifeKit;
-const view = $("view");
+const view = $("viewCanvas");
 const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -226,8 +228,8 @@ flip("btnBones", "bones"); flip("btnWire", "wire"); flip("btnScale", "scale");
 LabKit.autoHideWindows();   // every window of the page fades when idle
 renderer.info.autoReset = false;
 function resize() {
-  renderer.setSize(window.innerWidth, window.innerHeight, false);
-  camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(VS().w, VS().h, false);
+  camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix();
 }
 window.addEventListener("resize", resize);
 const clock = new THREE.Timer(), prev = new THREE.Vector3(), now = new THREE.Vector3();

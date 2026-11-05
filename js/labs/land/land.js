@@ -11,6 +11,8 @@ import { generateWorld, regionTextures, regionUniforms, setRegions, regionAt, GL
 import { WATER_BODIES } from '../../envs/water/waterkit.js';
 import { transformShip } from '../../models/ships-sea/transform.js';
 import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
+// the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
+const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
@@ -271,7 +273,7 @@ cv.addEventListener('pointermove', (e) => {
 cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.min(9000, Math.max(30, orbit.dist * Math.exp(e.deltaY * 0.0011))); }, { passive: false });
 
 /* ---------------- loop ---------------- */
-function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); look.resize(innerWidth, innerHeight); }
+function resize() { renderer.setSize(VS().w, VS().h, false); camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix(); look.resize(VS().w, VS().h); }
 addEventListener('resize', resize);
 let last = performance.now(), simT = 0, frames = 0, fpsT = last;
 const tmpV = new THREE.Vector3();

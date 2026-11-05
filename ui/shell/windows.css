@@ -40,9 +40,12 @@ body.lmNoFoot .labDock{bottom:0}
 .labWin > .labIdle, .labWin > .labIdle *{pointer-events:auto !important}
 /* a page that fits its 3D view into the free middle (body.viewFits: the scene editor) */
 /* Full: the whole space between the toolbar and the info bar; Middle (default): also between the panels and the console */
-body.viewFits #view{top:calc(var(--menuH) + var(--barH));bottom:var(--footH);left:0;right:0;width:auto;height:auto}
-body.viewFits.lmNoBar #view{top:var(--menuH)}
-body.viewFits.lmNoFoot #view{bottom:0}
-body.viewFits:not(.vfFull) #view{left:var(--viewL,0px);right:var(--viewR,0px);bottom:calc(var(--footH) + var(--viewB,0px))}
-body.viewFits.lmNoFoot:not(.vfFull) #view{bottom:var(--viewB,0px)}
+body.viewFits #view > canvas{display:block;width:100%;height:100%}
+/* .viewLayer: a page's overlay drawn over the view (labels, dimension lines) — the same box as #view */
+body.viewFits :is(#view, .viewLayer){top:calc(var(--menuH) + var(--barH));bottom:var(--footH);left:0;right:0;width:auto;height:auto}
+body.viewFits .viewLayer{overflow:hidden}
+body.viewFits.lmNoBar :is(#view, .viewLayer){top:var(--menuH)}
+body.viewFits.lmNoFoot :is(#view, .viewLayer){bottom:0}
+body.viewFits:not(.vfFull) :is(#view, .viewLayer){left:var(--viewL,0px);right:var(--viewR,0px);bottom:calc(var(--footH) + var(--viewB,0px))}
+body.viewFits.lmNoFoot:not(.vfFull) :is(#view, .viewLayer){bottom:var(--viewB,0px)}
 @media (max-width:640px){.labWin,.labWin.right{width:calc(100vw - 16px)}.labDock,.labDock.right{width:calc(100vw - 16px)}}

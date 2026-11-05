@@ -10,6 +10,8 @@ import { SEAS, LOOKS, WATER_BODIES, waveSet, heightAt, waterUniforms, setWaves, 
 import { FoamMap, breaking } from '../../envs/water/foamkit.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 import { generateWaterway, heightTexture, terrainMeshes, landUniforms, setLand, GLSL_LAND } from '../../envs/land/landkit.js';
+// the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
+const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
@@ -268,7 +270,7 @@ function poseShip(v) {
 /* ---------------- planar reflection ---------------- */
 let reflRT = null;
 function reflTarget() {
-  const w = Math.max(2, Math.round(innerWidth * 0.5)), h = Math.max(2, Math.round(innerHeight * 0.5));
+  const w = Math.max(2, Math.round(VS().w * 0.5)), h = Math.max(2, Math.round(VS().h * 0.5));
   if (!reflRT || reflRT.width !== w || reflRT.height !== h) { if (reflRT) reflRT.dispose(); reflRT = new THREE.WebGLRenderTarget(w, h, { type: THREE.HalfFloatType }); }
   return reflRT;
 }
@@ -476,7 +478,7 @@ $('measure').onclick = async () => {
 };
 
 /* ---------------- loop ---------------- */
-function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); post.resize(innerWidth, innerHeight); }
+function resize() { renderer.setSize(VS().w, VS().h, false); camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix(); post.resize(VS().w, VS().h); }
 addEventListener('resize', resize);
 const clock = { t: 0, last: performance.now() };
 let frames = 0, fpsT = performance.now();

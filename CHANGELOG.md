@@ -3,6 +3,21 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.35.0 · 19 laboratoriów — 2026-11-05 (laboratoria w wolnym środku)
+
+### Zmienione
+- **Laboratoria 3D w wolnym środku**, jak edytor sceny (`body.viewFits`): w trybie Panele widok zajmuje środek między
+  panelami i konsolą, a renderer liczy się z rozmiaru widoku; na pasku przełącznik **Środek | Całość**. Laboratoria:
+  pojazdy (kosmos, woda, ląd), woda, ląd, filtry, wygląd, jaskinie, przedmioty bohatera, rośliny, budowle,
+  transformator, ciała niebieskie, układy, powierzchnia, budynki, życie, edytor stworów, człowiek (każde +0.1).
+  Bez zmian: skala i skórki (bez okien), dźwięk (obraz 2D), Pixel Studio, generator zombie, Kostnica SDF, SDF Walkers,
+  laboratoria języka i obrazów.
+- Wspólne okna (`ui/shell/windows.js`): `LabView.size()` — prostokąt widoku `{ w, h, x, y }`; zmiana rozmiaru `#view`
+  (panele, konsola, Środek | Całość, paski) wysyła stronie zdarzenie `resize`, więc każde laboratorium dopasowuje się
+  w swoim zwykłym kodzie. Klasa `.viewLayer` — nakładka nad widokiem (podpisy w układach, wymiary w pojazdach — woda)
+  w tym samym prostokącie. Laboratoria ze Space mają teraz `<div id="view"><canvas id="viewCanvas">`.
+- Wskazywanie myszą (wybór części, trafienia, uchwyty) liczone względem widoku, nie okna przeglądarki.
+
 ## Program 0.34.0 · edytor sceny 0.6.0 · laboratorium wody 1.3.0 — 2026-11-05 (zasoby z nazwą: morze)
 
 ### Dodane

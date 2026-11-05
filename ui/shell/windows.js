@@ -20,7 +20,9 @@
    --viewR, --viewB on <html> and through window.LabView (a page with body.viewFits puts its #view there and sizes its
    renderer from it — the scene editor; other pages keep the view full size, under the panels). Such a page also gets
    a second toolbar switch, Middle | Full: the view in the free middle, or the whole space between the toolbar and the
-   info bar, under the panels (body.vfFull; gamelab.viewfit, the same on every page).
+   info bar, under the panels (body.vfFull; gamelab.viewfit, the same on every page). LabView.size() gives the view's
+   box ({ w, h, x, y }); when #view changes size the page gets a "resize" event, so a lab sizes its renderer from
+   LabView.size() in its usual resize handler and turns pointer coordinates into the view's (x, y).
    ======================================================================= */
 (function () {
 "use strict";
@@ -131,7 +133,27 @@ window.LabView = {
   insets: () => ({ left: parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--viewL")) || 0, right: parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--viewR")) || 0, bottom: parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--viewB")) || 0 }),
   onChange: (f) => { viewSubs.add(f); return () => viewSubs.delete(f); },
   update: () => { viewKey = ""; layoutView(); },
+  // the 3D view's own box: #view on a body.viewFits page, else the whole window — { w, h, x, y } in CSS pixels
+  size() {
+    const v = document.getElementById("view");
+    if (v && document.body.classList.contains("viewFits")) { const r = v.getBoundingClientRect(); if (r.width > 0 && r.height > 0) return { w: Math.round(r.width), h: Math.round(r.height), x: r.left, y: r.top }; }
+    return { w: innerWidth, h: innerHeight, x: 0, y: 0 };
+  },
 };
+// a viewFits page: when its #view changes size (panels docked, console, Middle | Full, bars) the page hears "resize",
+// the same event as a window resize, so every lab's own resize code follows the view
+let viewSeen = "";
+function watchView() {
+  const v = document.getElementById("view");
+  if (!v || !document.body.classList.contains("viewFits") || !window.ResizeObserver) return;
+  new ResizeObserver(() => {
+    const r = v.getBoundingClientRect(), k = Math.round(r.width) + "x" + Math.round(r.height);
+    if (k === viewSeen) return; viewSeen = k;
+    dispatchEvent(new Event("resize"));
+  }).observe(v);
+  // once everything has loaded (the labs' modules too), every page sizes itself to the view
+  addEventListener("load", () => requestAnimationFrame(() => dispatchEvent(new Event("resize"))));
+}
 // the toolbar switch: Windows | Panels (all at once); neither lit when they are mixed
 let sw = null;
 function syncSwitch() {
@@ -201,6 +223,7 @@ function init() {
   toolbarSwitch();
   syncSwitch();
   addEventListener("resize", layoutView);
+  watchView();
   new MutationObserver(() => layoutView()).observe(document.body, { attributes: true, attributeFilter: ["class", "hidden"], subtree: true });
   document.addEventListener("input", (e) => { if (e.target.matches && e.target.matches("input[type=range]")) fill(e.target); }, true);
   requestAnimationFrame(stack); setTimeout(stack, 1200);   // again once the labs have filled their panels

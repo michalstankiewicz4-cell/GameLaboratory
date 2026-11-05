@@ -1,9 +1,11 @@
 // The buildings lab's own script (buildings.html): its scene and panels, wired to the kits'
 // public APIs. Moved out of the page (2026-10-03) so the page is markup and styles.
+// the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
+const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 (() => {
 "use strict";
 const $ = (id) => document.getElementById(id);
-const view = $("view");
+const view = $("viewCanvas");
 const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -73,8 +75,8 @@ $("btnAnim").addEventListener("click", () => { state.anim = true; state.view = "
 LabKit.autoHideWindows();   // every window of the page fades when idle
 renderer.info.autoReset = false;
 function resize() {
-  renderer.setSize(window.innerWidth, window.innerHeight, false);
-  camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(VS().w, VS().h, false);
+  camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix();
 }
 window.addEventListener("resize", resize);
 const clock = new THREE.Timer();

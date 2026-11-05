@@ -7,6 +7,8 @@ import { OrbitControls } from '../../../vendor/three/addons/controls/OrbitContro
 import { buildCave, setRock, ROCKS, CAVE_DEFAULTS } from '../../models/caves/cavekit.js';
 import { FreeCam } from '../../labkit/freecam.js';
 import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
+// the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
+const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}) => Object.assign(document.createElement(tag), props);
@@ -96,7 +98,7 @@ $('seed').value = S.seed; $('seed').onchange = () => { S.seed = Math.max(1, +$('
 $('another').onclick = () => { S.seed = 1 + Math.floor(Math.random() * 99998); $('seed').value = S.seed; save(); rebuild(); };
 
 /* ---------------- loop ---------------- */
-function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); look.resize(innerWidth, innerHeight); }
+function resize() { renderer.setSize(VS().w, VS().h, false); camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix(); look.resize(VS().w, VS().h); }
 addEventListener('resize', resize);
 let last = performance.now();
 function frame(now) {

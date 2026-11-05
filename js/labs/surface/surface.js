@@ -1,10 +1,12 @@
 // The surface lab's own script (surface.html): its scene and panels, wired to the kits'
 // public APIs. Moved out of the page (2026-10-03) so the page is markup and styles.
+// the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
+const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 (() => {
 "use strict";
 const $ = (id) => document.getElementById(id);
 const SK = window.SurfaceKit, BK = window.BodyKit;
-const view = $("view");
+const view = $("viewCanvas");
 const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1;
@@ -105,7 +107,7 @@ view.addEventListener("pointerup", (e) => {
     $("btnLand").disabled = false;
   } else if (state.mode === "ground" && G.building && e.button === 0) place();
 });
-function setMouse(e) { mouse.set(e.clientX / window.innerWidth * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1); }
+function setMouse(e) { mouse.set((e.clientX - VS().x) / VS().w * 2 - 1, -((e.clientY - VS().y) / VS().h) * 2 + 1); }
 
 
 // =====================================================================
@@ -258,10 +260,10 @@ renderer.info.autoReset = false;
 let quality = 2;
 $("qSlider").addEventListener("input", () => { quality = +$("qSlider").value; LabKit.paintSlider($("qSlider")); resize(); });
 function resize() {
-  renderer.setPixelRatio(PR[quality]); renderer.setSize(window.innerWidth, window.innerHeight, false);
+  renderer.setPixelRatio(PR[quality]); renderer.setSize(VS().w, VS().h, false);
   $("qVal").textContent = QN[quality];
-  orbit.camera.aspect = window.innerWidth / window.innerHeight; orbit.camera.updateProjectionMatrix();
-  G.setAspect(window.innerWidth / window.innerHeight);
+  orbit.camera.aspect = VS().w / VS().h; orbit.camera.updateProjectionMatrix();
+  G.setAspect(VS().w / VS().h);
 }
 window.addEventListener("resize", resize);
 const clock = new THREE.Timer();

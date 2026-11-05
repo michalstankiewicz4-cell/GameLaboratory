@@ -9,6 +9,8 @@ import { rainUniforms, rainMesh, lightning } from '../../envs/sky/rainkit.js';
 import { navLights, gunFlashes, signalLamp } from '../../models/ships-sea/lights.js';
 import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, hullTexture, LOOKS } from '../../envs/water/waterkit.js';
 import { LookPipeline, AutoResolution, LOOK_PRESETS, LOOK_DEFAULTS } from '../../render/sea/look.js';
+// the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
+const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
@@ -243,7 +245,7 @@ $('measure').onclick = async () => {
 
 /* ---------------- loop ---------------- */
 const autoRes = new AutoResolution();
-function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); look.resize(innerWidth, innerHeight); }
+function resize() { renderer.setSize(VS().w, VS().h, false); camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix(); look.resize(VS().w, VS().h); }
 addEventListener('resize', resize);
 let last = performance.now(), simT = 0, shift = 0, frames = 0, fpsT = last;
 const motion = { h: 0, p: 0, r: 0, vh: 0, vp: 0, vr: 0 };

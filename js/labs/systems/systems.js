@@ -1,18 +1,20 @@
 // The systems lab's own script (systems.html): its scene and panels, wired to the kits'
 // public APIs. Moved out of the page (2026-10-03) so the page is markup and styles.
+// the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
+const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 (() => {
 "use strict";
 const $ = (id) => document.getElementById(id);
 const SK = window.SystemKit;
 
 // ---------- renderer, camera ----------
-const view = $("view");
+const view = $("viewCanvas");
 const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.1;
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.05, 6000);
+const camera = new THREE.PerspectiveCamera(40, VS().w / VS().h, 0.05, 6000);
 camera.position.set(0, 70, 150);
 const controls = new THREE.OrbitControls(camera, view);
 controls.enableDamping = true; controls.dampingFactor = 0.07;
@@ -222,7 +224,7 @@ const tmpV = new THREE.Vector3();
 // would cover one already placed stays hidden this frame
 const RANK = { center: 0, planet: 1, belt: 2, moon: 3 };
 function placeLabels() {
-  const w = window.innerWidth, h = window.innerHeight, taken = [];
+  const w = VS().w, h = VS().h, taken = [];
   const fits = (x, y, el, centred) => {
     const bw = el.offsetWidth || 60, bh = el.offsetHeight || 16;
     const r = centred ? [x - bw / 2, y - bh / 2, x + bw / 2, y + bh / 2] : [x - bw / 2, y - bh, x + bw / 2, y];
@@ -320,7 +322,7 @@ function handlePos(h, out) {
   return out.set(0, 0, -o.distance).applyMatrix4(orb.plane.matrixWorld);
 }
 function placeHandles() {
-  const w = window.innerWidth, h = window.innerHeight, show = state.lines;
+  const w = VS().w, h = VS().h, show = state.lines;
   handles.forEach((hd) => {
     const want = show && (hd.kind === "dist" || (hd.kind === "shape" && state.view === "top") || (hd.kind === "incl" && state.view === "side"));
     if (!want) { hd.el.style.display = "none"; return; }
@@ -336,7 +338,7 @@ function placeHandles() {
 // ---------- dragging ----------
 const rayc = new THREE.Raycaster(), ndc = new THREE.Vector2(), hit = new THREE.Vector3(), dragPlane = new THREE.Plane();
 let drag = null;
-function pointerRay(e) { ndc.set(e.clientX / window.innerWidth * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1); rayc.setFromCamera(ndc, camera); return rayc.ray; }
+function pointerRay(e) { ndc.set((e.clientX - VS().x) / VS().w * 2 - 1, -((e.clientY - VS().y) / VS().h) * 2 + 1); rayc.setFromCamera(ndc, camera); return rayc.ray; }
 function startDrag(e, i, kind) {
   e.preventDefault(); e.stopPropagation();
   selectOrbit(i);
@@ -430,8 +432,8 @@ function placeCenterGap() {
   if (tmpV.z > 1) { gapLabel.style.display = "none"; return; }
   gapLabel.style.display = "";
   gapLabel.textContent = "↔ " + cPos[0].distanceTo(cPos[1]).toFixed(1);
-  gapLabel.style.left = ((tmpV.x + 1) / 2 * window.innerWidth).toFixed(0) + "px";
-  gapLabel.style.top = ((1 - tmpV.y) / 2 * window.innerHeight + 14).toFixed(0) + "px";
+  gapLabel.style.left = ((tmpV.x + 1) / 2 * VS().w).toFixed(0) + "px";
+  gapLabel.style.top = ((1 - tmpV.y) / 2 * VS().h + 14).toFixed(0) + "px";
 }
 
 // ---------- the selected orbit: its sliders ----------
@@ -492,7 +494,7 @@ function stepGlide(dt) {
 function applyQuality(level) {
   const q = QUALITY[level];
   renderer.setPixelRatio(q.pr);
-  renderer.setSize(window.innerWidth, window.innerHeight, false);
+  renderer.setSize(VS().w, VS().h, false);
   if (sky) sky.setOctaves(q.octaves);
   $("qVal").textContent = q.name;
 }
@@ -542,7 +544,7 @@ function frame() {
   LabPerf.end(renderer, performance.now() - t0);   // the Performance window (ui/shell/perf.js)
   requestAnimationFrame(frame);
 }
-window.addEventListener("resize", () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); applyQuality(state.quality); });
+window.addEventListener("resize", () => { camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix(); applyQuality(state.quality); });
 
 [$("speed"), $("qSlider"), $("dSlider")].forEach(paint);
 applyQuality(state.quality);

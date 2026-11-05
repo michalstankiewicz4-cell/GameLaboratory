@@ -10,6 +10,8 @@ import { SHIP_IDS, buildShip, shipInfo, shipView } from '../../models/ships-sea/
 import { signalLamp } from '../../models/ships-sea/lights.js';
 import { SEAS, LOOKS, waveSet, heightAt as waveHeight, waterUniforms, setWaves, polarGrid, waterMaterial } from '../../envs/water/waterkit.js';
 import { heightTexture, landUniforms, GLSL_LAND } from '../../envs/land/landkit.js';
+// the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
+const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
@@ -146,7 +148,7 @@ renderer.domElement.addEventListener('pointermove', (e) => {
 renderer.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
 renderer.domElement.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.min(900, Math.max(3, orbit.dist * Math.exp(e.deltaY * 0.0011))); orbit.want = null; }, { passive: false });
 renderer.domElement.addEventListener('dblclick', (e) => {
-  const r = new THREE.Raycaster(); r.setFromCamera(new THREE.Vector2(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1), camera);
+  const r = new THREE.Raycaster(); r.setFromCamera(new THREE.Vector2((e.clientX - VS().x) / VS().w * 2 - 1, -((e.clientY - VS().y) / VS().h) * 2 + 1), camera);
   const hit = cur() && r.intersectObject(cur(), true)[0];
   if (hit) orbit.want = { target: hit.point.clone(), dist: Math.max(6, orbit.dist * 0.5) };
 });
@@ -414,7 +416,7 @@ function updateDims() {
     V.set(...list[i][1]); V.y += dimLines.position.y; V.project(camera);
     d.hidden = V.z > 1;
     d.textContent = list[i][0];
-    d.style.transform = `translate(${(V.x + 1) / 2 * innerWidth}px,${(1 - V.y) / 2 * innerHeight}px) translate(-50%,-50%)`;
+    d.style.transform = `translate(${(V.x + 1) / 2 * VS().w}px,${(1 - V.y) / 2 * VS().h}px) translate(-50%,-50%)`;
   });
 }
 
@@ -425,14 +427,14 @@ function stats() {
 function scaleBar() {
   // world metres per pixel at the orbit target
   const h = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.distanceTo(orbit.target);
-  const mpp = h / innerHeight, steps = [1, 2, 5, 10, 20, 50, 100, 200];
+  const mpp = h / VS().h, steps = [1, 2, 5, 10, 20, 50, 100, 200];
   const m = steps.find((s) => s / mpp > 60) || 200;
   $('scaleBar').style.width = `${Math.round(m / mpp)}px`;
   $('scaleTxt').textContent = `${m} m`;
 }
 
 /* ---------------- loop ---------------- */
-function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); post.resize(innerWidth, innerHeight); }
+function resize() { renderer.setSize(VS().w, VS().h, false); camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix(); post.resize(VS().w, VS().h); }
 addEventListener('resize', resize);
 let last = performance.now(), frames = 0, fpsT = last;
 function frame(now) {

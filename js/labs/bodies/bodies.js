@@ -4,6 +4,8 @@
    THE LAB — the page's own script.
    Uses BodyKit's public API exclusively.
    ======================================================================= */
+// the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
+const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 (() => {
 "use strict";
 
@@ -13,15 +15,15 @@ const makeGlow = LabKit.makeGlow;
 // =====================================================================
 // Renderer, scene, camera, controls
 // =====================================================================
-const view = document.getElementById("view");
+const view = document.getElementById("viewCanvas");
 const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight, false);
+renderer.setSize(VS().w, VS().h, false);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.1;
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(36, window.innerWidth / window.innerHeight, 0.05, 500);
+const camera = new THREE.PerspectiveCamera(36, VS().w / VS().h, 0.05, 500);
 camera.position.set(0.6, 0.9, 4.4);
 const controls = new THREE.OrbitControls(camera, view);
 controls.enableDamping = true;
@@ -177,7 +179,7 @@ QUALITY.forEach((q, i) => { q.octaves = BodyKit.QUALITY_OCTAVES[i]; }); // the g
 function applyQuality(level) {
   const q = QUALITY[level];
   renderer.setPixelRatio(q.pr);
-  renderer.setSize(window.innerWidth, window.innerHeight, false);
+  renderer.setSize(VS().w, VS().h, false);
   if (current) current.setOctaves(q.octaves);
   backdrop.setOctaves(q.octaves);
   $("qVal").textContent = q.name;
@@ -330,7 +332,7 @@ function frame() {
 }
 
 window.addEventListener("resize", () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.aspect = VS().w / VS().h;
   camera.updateProjectionMatrix();
   applyQuality(state.quality);
 });

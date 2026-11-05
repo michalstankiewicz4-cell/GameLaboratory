@@ -4,6 +4,8 @@
 import * as THREE from '../../../vendor/three/three.module.js';
 import { PostPipeline } from '../../render/sea/post.js';
 import { transformShip, KINDS } from '../../models/ships-sea/transform.js';
+// the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
+const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
@@ -111,7 +113,7 @@ function hit(h, power) {
   drawBoxes(); hbStats();
 }
 const rc = new THREE.Raycaster(), ndc = new THREE.Vector2();
-function rayAt(x, y) { ndc.set(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1); rc.setFromCamera(ndc, camera); return rc.ray; }
+function rayAt(x, y) { const v = VS(); ndc.set((x - v.x) / v.w * 2 - 1, -((y - v.y) / v.h) * 2 + 1); rc.setFromCamera(ndc, camera); return rc.ray; }
 bindRange('power', (v) => v.toFixed(2));
 $('salvo').onclick = () => {
   for (let i = 0; i < 12; i++) {
@@ -170,7 +172,7 @@ cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.min(
 addEventListener('keydown', (e) => { if (e.code === 'KeyH' && !e.target.closest('input,select')) document.querySelectorAll('[data-window]').forEach((p) => p.classList.toggle('hidden-panel')); });
 
 /* ---------------- loop ---------------- */
-function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); post.resize(innerWidth, innerHeight); }
+function resize() { renderer.setSize(VS().w, VS().h, false); camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix(); post.resize(VS().w, VS().h); }
 addEventListener('resize', resize); resize();
 let last = performance.now(), frames = 0, fpsT = last, frameMs = [];
 function frame(now) {
@@ -197,7 +199,7 @@ function frame(now) {
     const ms = frameMs.slice(-30), avg = ms.reduce((s, x) => s + x, 0) / Math.max(1, ms.length);
     $('perf').replaceChildren(el('span', { textContent: 'Ships' }), el('b', { textContent: fleet.children.length + 1 }));
     if (frameMs.length > 600) frameMs = frameMs.slice(-60);
-    const h = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * orbit.dist, mpp = h / innerHeight, steps = [1, 2, 5, 10, 20, 50, 100, 200, 500];
+    const h = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * orbit.dist, mpp = h / VS().h, steps = [1, 2, 5, 10, 20, 50, 100, 200, 500];
     const sm = steps.find((s) => s / mpp > 60) || 500; $('scaleBar').style.width = `${Math.round(sm / mpp)}px`; $('scaleTxt').textContent = `${sm} m`;
   }
   requestAnimationFrame(frame);
