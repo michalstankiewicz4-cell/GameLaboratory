@@ -20,7 +20,7 @@ export function createControls(world, store) {
     store.update(id, { pos: g.position.toArray().map((v) => +v.toFixed(3)), rot: [e.x, e.y, e.z].map((v) => +(v / D2R).toFixed(2)), scale: +Math.max(0.01, g.scale.x).toFixed(4) });
   };
   gizmo.addEventListener('objectChange', fromGizmo);
-  gizmo.addEventListener('dragging-changed', (e) => { orbit.enabled = !e.value; });
+  gizmo.addEventListener('dragging-changed', (e) => { orbit.enabled = !e.value; if (e.value) store.seal(); });   // każde przeciągnięcie to osobny krok cofania
   const attach = () => { if (playing) { gizmo.detach(); return; } const r = world.objectRoot(store.selectedId); if (r) gizmo.attach(r); else gizmo.detach(); };
 
   // wybór kliknięciem (nie przeciągnięciem)

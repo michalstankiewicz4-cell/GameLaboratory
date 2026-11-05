@@ -5,7 +5,7 @@
   'win.props': 'Właściwości',
   'info.name': 'Edytor sceny',
   'info.text': 'Warsztat: scena złożona z modeli laboratoriów. Dodaj model, przesuń, obróć i przeskaluj go uchwytem albo liczbami, zamień na inny jednym kliknięciem; środowisko to morze albo ląd ze światłem z laboratoriów wodnych. Scena to zwykłe dane (JSON): zostaje w tej przeglądarce i można ją zapisać do pliku.',
-  'info.keys': 'P albo ▶ Graj uruchamia zachowania (okręty na wodzie, samolot w powietrzu) i steruje wybranym modelem; Esc zatrzymuje. Kliknij model, żeby go wybrać. W / E / R: przesuwanie, obrót, skala. Delete usuwa, Ctrl+D powiela, F pokazuje wybrany, Esc wybiera środowisko, H chowa okna.',
+  'info.keys': 'P albo ▶ Graj uruchamia zachowania (okręty na wodzie, samolot w powietrzu) i steruje wybranym modelem; Esc zatrzymuje. Kliknij model, żeby go wybrać. W / E / R: przesuwanie, obrót, skala. Ctrl+Z cofa, Ctrl+Y ponawia, Delete usuwa, Ctrl+D powiela, F pokazuje wybrany, Esc wybiera środowisko, H chowa okna.',
   'bar.move': 'Przesuń', 'bar.rotate': 'Obróć', 'bar.scale': 'Skaluj',
   'bar.move.tip': 'Przesuń (W)', 'bar.rotate.tip': 'Obróć (E)', 'bar.scale.tip': 'Skaluj (R)',
   'bar.new': 'Nowa', 'bar.new.tip': 'Pusta scena',
@@ -51,5 +51,9 @@
   'api.note': "Jedno polecenie albo lista, w JSON. Ctrl+Enter wykonuje.",
   'api.notJson': "To nie JSON: {msg}",
   'api.again': "Kliknij, żeby wstawić z powrotem do pola",
+  'bar.undo': "Cofnij",
+  'bar.undo.tip': "Cofnij ostatnią zmianę sceny (Ctrl+Z)",
+  'bar.redo': "Ponów",
+  'bar.redo.tip': "Ponów (Ctrl+Y albo Ctrl+Shift+Z)",
   'scene.newName': 'Nowa scena', 'scene.startName': 'Port',
 };

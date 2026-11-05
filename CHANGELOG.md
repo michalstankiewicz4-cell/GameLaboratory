@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Edytor sceny 0.5.0 — 2026-11-05 (cofnij / ponów)
+
+### Dodane
+- **Cofnij / Ponów** w edytorze sceny (przyciski na pasku, Ctrl+Z, Ctrl+Y / Ctrl+Shift+Z): każda zmiana danych sceny —
+  z okien, uchwytu, klawiszy i API; lista poleceń API to jeden krok. Historia do 100 kroków, w pamięci karty.
+
 ## Program 0.33.0 · edytor sceny 0.4.0 — 2026-11-05 (API dla AI)
 
 ### Dodane

@@ -15,8 +15,8 @@ dostosowywać (zasoby z nazwą, wspólne zachowania).
 - Okna: **Opis**, **Scena** (dodaj model, hierarchia), **Właściwości** (środowisko albo wybrany obiekt), **Kamera**,
   **Wydajność**; OPCJE → Okna. **Okna | Panele** na pasku: w Panelach okna są panelami przy krawędziach, konsola na dole
   pośrodku, a widok 3D zajmuje wolny środek (`body.viewFits`).
-- Pasek narzędzi: cofnij · domek · ponów, **▶ Graj / ■ Stop**, uchwyt **Przesuń / Obróć / Skaluj**, **Nowa**, **Zapisz plik**, **Otwórz plik**.
-- Klawisze: W / E / R — przesuń, obróć, skaluj; Delete — usuń; Ctrl+D — powiel; F — pokaż wybrany; Esc — środowisko;
+- Pasek narzędzi: cofnij · domek · ponów (przeglądarka), **▶ Graj / ■ Stop**, **Cofnij / Ponów** (zmiany sceny), uchwyt **Przesuń / Obróć / Skaluj**, **Nowa**, **Zapisz plik**, **Otwórz plik**.
+- Klawisze: Ctrl+Z — cofnij, Ctrl+Y / Ctrl+Shift+Z — ponów; W / E / R — przesuń, obróć, skaluj; Delete — usuń; Ctrl+D — powiel; F — pokaż wybrany; Esc — środowisko;
   H — chowa okna. Kliknięcie modelu wybiera go.
 - **Graj** (P; Esc — Stop): zachowania ruszają modele (okręty płyną i kołyszą się na falach, samolot lata), gracz steruje
   wybranym modelem (albo pierwszym z zachowaniem), kamera jedzie za nim. Okręt: W / S maszyny, A / D ster. Samolot:
@@ -39,7 +39,7 @@ editor/
   index.html            strona: paski, okna, kolejność skryptów
   css/editor.css        hierarchia i odnośnik do laboratorium (reszta z ui/ui.css i ui/style/sea.css)
   js/main.js            start: dane → świat → kamera i uchwyt → okna i pasek; budowa modeli z kartą ładowania
-  js/core/store.js      stan: scena jako dane i wybór; jedyne źródło prawdy, słuchacze, zapis w przeglądarce
+  js/core/store.js      stan: scena jako dane i wybór; jedyne źródło prawdy, słuchacze, zapis w przeglądarce, cofnij / ponów
   js/world/world.js     świat 3D: renderer, scena bazowa, potok obrazu, modele z prefabrykatów, pętla
   js/world/controls.js  kamera (orbita, kadrowanie), uchwyt (TransformControls), wybór kliknięciem
   js/ui/panels.js       okna Scena i Właściwości
@@ -124,5 +124,4 @@ Jednostki: metry, stopnie; Y w górę, kurs 0 — wzdłuż +Z. W czasie gry pole
 - Modele ze Space (statki kosmiczne, łaziki, roboty morskie) — ich kity potrzebują `js/core/three-global.js`.
 - Ląd z laboratorium lądu i woda z laboratorium wody jako zasoby z nazwą.
 - Woda wycięta w kadłubie każdego okrętu (dziś WaterKit umie jeden kadłub w środku sceny).
-- Cofnij / ponów zmian w scenie.
 - Zachowania dla pozostałych modeli (koło na szynie dla tramwaju i pociągu — potrzebuje toru w scenie, pojazdy drogowe).

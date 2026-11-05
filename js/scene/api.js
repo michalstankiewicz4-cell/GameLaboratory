@@ -10,7 +10,8 @@
 //   prefabs      — [{ id, label, family, surface }] (z js/scene/prefabs.js, bez budowania)
 //   behaviorsFor — (prefabId) → [id zachowań] (js/scene/behaviors.js)
 //   lights       — dozwolone oświetlenia (['afternoon', …])
-//   hooks        — { build(fn) — zmiana, po której trzeba zbudować modele; play(), stop(), playing() } (nieobowiązkowe)
+//   hooks        — { build(fn) — zmiana, po której trzeba zbudować modele; group(fn) — lista poleceń jako jeden krok
+//                  historii (cofnij / ponów); play(), stop(), playing() } (nieobowiązkowe)
 import { normalize, clone } from './scene-data.js';
 
 const COMMANDS = {
@@ -113,7 +114,8 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
   // run(polecenie | lista | tekst JSON) → wynik | lista wyników
   function run(input) {
     if (typeof input === 'string') { try { input = JSON.parse(input); } catch (e) { return { ok: false, error: 'not JSON: ' + e.message }; } }
-    return Array.isArray(input) ? input.map(exec) : exec(input);
+    if (!Array.isArray(input)) return exec(input);
+    return hooks.group ? hooks.group(() => input.map(exec)) : input.map(exec);
   }
   return { run, commands: COMMANDS };
 }

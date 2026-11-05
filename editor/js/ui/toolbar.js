@@ -1,4 +1,4 @@
-// Pasek narzędzi (Graj / Stop, uchwyt, nowa scena, zapis i odczyt pliku) i klawisze edytora.
+// Pasek narzędzi (Graj / Stop, cofnij / ponów, uchwyt, nowa scena, zapis i odczyt pliku) i klawisze edytora.
 const $ = (id) => document.getElementById(id);
 const { t } = window.EditorI18n;
 
@@ -14,11 +14,16 @@ export function createToolbar(store, controls, actions) {
     actions.status(t('status.saved'));
   });
   $('loadFile').addEventListener('click', () => $('fileIn').click());
+  // cofnij / ponów: przyciski aktywne, gdy jest co cofać
+  $('undo').addEventListener('click', actions.undo); $('redo').addEventListener('click', actions.redo);
+  const histState = () => { const p = actions.play.playing; $('undo').disabled = p || !store.canUndo; $('redo').disabled = p || !store.canRedo; };
+  store.on(histState);
   // Graj / Stop: w grze edycja (pasek, okna Scena i Właściwości) jest wyłączona
   const playBtn = $('play');
   playBtn.addEventListener('click', () => { playBtn.blur(); actions.play.toggle(); });
   actions.play.onChange((on) => {
     playBtn.textContent = t(on ? 'bar.stop' : 'bar.play'); playBtn.title = t(on ? 'bar.stop.tip' : 'bar.play.tip'); playBtn.classList.toggle('on', on);
+    histState();
     document.querySelectorAll('#mode button, #newScene, #saveFile, #loadFile, #treeWin :is(input, select, button), #propsWin :is(input, select, button)').forEach((b) => { b.disabled = on; });
   });
   $('fileIn').addEventListener('change', async () => {
@@ -31,7 +36,10 @@ export function createToolbar(store, controls, actions) {
     if (e.target.closest && e.target.closest('input, select, textarea')) return;
     const k = e.key.toLowerCase();
     if (actions.play.playing) { if (k === 'escape') actions.play.stop(); return; }   // w grze klawisze ma gracz (play/input.js)
-    if (k === 'p' && !e.ctrlKey && !e.metaKey) actions.play.start();
+    const mod = e.ctrlKey || e.metaKey;
+    if (mod && k === 'z' && !e.shiftKey) { e.preventDefault(); actions.undo(); return; }
+    if (mod && (k === 'y' || (k === 'z' && e.shiftKey))) { e.preventDefault(); actions.redo(); return; }
+    if (k === 'p' && !mod) actions.play.start();
     else if (k === 'w') setMode('translate'); else if (k === 'e') setMode('rotate'); else if (k === 'r') setMode('scale');
     else if (k === 'f') controls.frameSelection();
     else if ((k === 'delete' || k === 'backspace') && store.selectedId) { e.preventDefault(); actions.remove(); }

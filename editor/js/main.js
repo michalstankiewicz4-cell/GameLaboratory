@@ -51,13 +51,16 @@ const actions = {
     build(() => store.duplicate(o.id, t('obj.copy', { name: o.name }), Math.max(5, world.size(o.id) * 0.35)));
   },
   remove() { if (store.selectedId) store.remove(store.selectedId); },
+  // cofnij / ponów: przywrócony stan może potrzebować zbudowania modeli (cofnięte usunięcie)
+  undo() { if (store.canUndo) build(() => store.undo()); },
+  redo() { if (store.canRedo) build(() => store.redo()); },
 };
 actions.play = createPlay(store, world, controls, actions);
 const panels = createPanels(store, actions);
 // API dla AI (js/scene/api.js): polecenia JSON na tych samych danych; zakładka API w konsoli i window.sceneApi.run(…)
 const api = createSceneApi({
   store, prefabs: PREFABS, behaviorsFor, lights: Object.keys(LIGHTS),
-  hooks: { build, play: () => actions.play.start(), stop: () => actions.play.stop(), playing: () => actions.play.playing },
+  hooks: { build, group: (fn) => store.group(fn), play: () => actions.play.start(), stop: () => actions.play.stop(), playing: () => actions.play.playing },
 });
 createApiConsole(api);
 createToolbar(store, controls, actions);

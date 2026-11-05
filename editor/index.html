@@ -22,6 +22,9 @@
 <div id="view"></div>
 <div class="bar">
   <button type="button" id="play" data-i18n="bar.play" data-i18n-tip="bar.play.tip">▶ Play</button>
+  <div class="seg" id="history" role="group" aria-label="History">
+    <button type="button" id="undo" data-i18n="bar.undo" data-i18n-tip="bar.undo.tip" disabled>Undo</button><button type="button" id="redo" data-i18n="bar.redo" data-i18n-tip="bar.redo.tip" disabled>Redo</button>
+  </div>
   <div class="seg" id="mode" role="group" aria-label="Gizmo">
     <button type="button" data-m="translate" class="on" data-i18n="bar.move" data-i18n-tip="bar.move.tip">Move</button><button type="button" data-m="rotate" data-i18n="bar.rotate" data-i18n-tip="bar.rotate.tip">Rotate</button><button type="button" data-m="scale" data-i18n="bar.scale" data-i18n-tip="bar.scale.tip">Scale</button>
   </div>

@@ -6,7 +6,7 @@
   'win.props': 'Properties',
   'info.name': 'Scene editor',
   'info.text': 'The workshop: a scene built from the labs\' models. Add a model, move, turn and scale it with the gizmo or the numbers, swap it for another one in one click; the environment is the sea or land with the light of the water labs. The scene is plain data (JSON): it is kept in this browser and can be saved to a file.',
-  'info.keys': 'P or ▶ Play runs the behaviours (ships on the water, the aircraft in the air) and drives the selected model; Esc stops. Click a model to select it. W / E / R: move, rotate, scale. Delete removes, Ctrl+D duplicates, F frames the selection, Esc selects the environment, H hides the windows.',
+  'info.keys': 'P or ▶ Play runs the behaviours (ships on the water, the aircraft in the air) and drives the selected model; Esc stops. Click a model to select it. W / E / R: move, rotate, scale. Ctrl+Z undoes, Ctrl+Y redoes, Delete removes, Ctrl+D duplicates, F frames the selection, Esc selects the environment, H hides the windows.',
   'bar.move': 'Move', 'bar.rotate': 'Rotate', 'bar.scale': 'Scale',
   'bar.move.tip': 'Move (W)', 'bar.rotate.tip': 'Rotate (E)', 'bar.scale.tip': 'Scale (R)',
   'bar.new': 'New', 'bar.new.tip': 'An empty scene',
@@ -52,5 +52,9 @@
   'api.note': "One command or a list, as JSON. Ctrl+Enter runs.",
   'api.notJson': "Not JSON: {msg}",
   'api.again': "Click to put it back in the box",
+  'bar.undo': "Undo",
+  'bar.undo.tip': "Undo the last change to the scene (Ctrl+Z)",
+  'bar.redo': "Redo",
+  'bar.redo.tip': "Redo (Ctrl+Y or Ctrl+Shift+Z)",
   'scene.newName': 'New scene', 'scene.startName': 'Harbour',
 };

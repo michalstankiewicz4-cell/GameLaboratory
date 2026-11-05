@@ -3,6 +3,14 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.5.0 — 2026-11-05 (cofnij / ponów)
+
+### Dodane
+- **Cofnij / Ponów** na pasku narzędzi i klawisze Ctrl+Z, Ctrl+Y (albo Ctrl+Shift+Z). Historia w `js/core/store.js`:
+  przed każdą zmianą danych stan sceny, do 100 kroków, tylko w pamięci karty. Pisanie w jednym polu i ciągnięcie
+  uchwytu to jeden krok (zmiany tego samego pola w ciągu 0,8 s, każde przeciągnięcie osobno); lista poleceń API to
+  jeden krok (`store.group`). Cofnięte usunięcie buduje model od nowa (z kartą ładowania). W czasie gry wyłączone.
+
 ## 0.4.0 — 2026-11-05 (API dla AI)
 
 ### Dodane
