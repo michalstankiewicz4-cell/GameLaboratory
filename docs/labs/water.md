@@ -128,9 +128,10 @@ into plates by cracks of glowing melt, with patches where the crust has melted; 
 daylight), the crust is lit like rock. No foam, almost no reflection; slow, heavy swells (sea state *lava*). The cave
 lab's lava lakes are generic; their style is meant to come from here.
 
-## Zasób dla edytora sceny
+## Asset for the scene editor (1.3.0)
 
-Sekcja **Asset for the scene editor**: edytowany wariant (stan morza: Hs, Lp, chop, spread, n, dir; wygląd wody: deep,
-scatter, shine, ripples, crest, reflect) zapisuje się pod nazwą jako zasób „morze” (`js/scene/assets.js`,
-`localStorage["gameLab.assets.v1"]`). Edytor sceny pokazuje go w Środowisko → Morze. Brzeg, lód, prąd, olej i lawa
-nie wchodzą do zasobu (scena bazowa edytora ma otwarte morze). Zapisany zasób można wczytać z powrotem do wariantu albo usunąć.
+The section **Asset for the scene editor** saves the variant being edited (sea state: Hs, Lp, chop, spread, n, dir;
+look of the water: deep, scatter, shine, ripples, crest, reflect) under a name as a "sea" asset (`js/scene/assets.js`,
+`localStorage["gameLab.assets.v1"]`). The scene editor offers it in Environment → Sea. Shores, ice, current, oil and
+lava are not part of the asset (the editor's base stage is the open sea). A saved sea can be loaded back into the
+variant or deleted.
