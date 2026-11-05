@@ -14,7 +14,7 @@
 
 ## Układ folderów
 
-- `editor/` — edytor sceny („Warsztat”), osobny folder z własną budową (`editor/js/core/`, `editor/js/world/`, `editor/js/ui/`, `editor/js/i18n/`), wersją (`ui/data/versions.js`, klucz `editor/index.html`) i `CHANGELOG.md`; języki angielski (domyślny, `<html data-lang-default="en">`) i polski (`editor/js/i18n/en.js`, `pl.js` — każdy nowy tekst w obu). Opis: `editor/README.md`. Gra w edytorze (▶ Graj): `editor/js/play/`. Silnik wspólny: `js/scene/` (scena jako dane, prefabrykaty, zachowania w scenie `behaviors.js`).
+- `editor/` — edytor sceny („Warsztat”), osobny folder z własną budową (`editor/js/core/`, `editor/js/world/`, `editor/js/ui/`, `editor/js/i18n/`), wersją (`ui/data/versions.js`, klucz `editor/index.html`) i `CHANGELOG.md`; języki angielski (domyślny, `<html data-lang-default="en">`) i polski (`editor/js/i18n/en.js`, `pl.js` — każdy nowy tekst w obu). Opis: `editor/README.md`. Gra w edytorze (▶ Graj): `editor/js/play/`. Silnik wspólny: `js/scene/` (scena jako dane, prefabrykaty, zachowania w scenie `behaviors.js`, API dla AI `api.js` — polecenia JSON na scenie).
 - `labs/` — strony laboratoriów; `js/labs/<lab>/` — skrypty laboratorium we własnym folderze, główny plik `<lab>.js` (np. `js/labs/vehicles-space/vehicles-space.js`); wspólne skrypty laboratoriów — `js/labs/shared/`.
 - `js/models/` — modele (geometria, materiały, światła, części); nie wiedzą, w jakim środowisku są. Statki-roboty (MarineKit) — `js/models/marine/`.
 - Ludzie mają osobne laboratorium (`labs/human.html`) i osobny folder modeli (`js/models/human/`) — oddzielone od laboratorium życia (zwierzęta i inne formy życia, `js/models/life/`). Oba stoją na LifeKit (`js/models/life/lifekit.js`). Postacie człekokształtne z SDF i pixel artu (generator zombie, SDF Walkers, Kostnica SDF): `js/models/human/zombie/`.
@@ -74,7 +74,7 @@
 - Ładowanie: karta `.labLoad` z kółkiem, zwykłym zdaniem (nie wielkimi literami), nazwą etapu, paskiem i procentem (`ui/shell/loader.js`). Przy starcie sama pokazuje postęp strony; laboratorium zgłasza własne etapy `LabLoad.step(nazwa, ułamek)`, a długie operacje w trakcie pracy (powyżej ok. 1 s) idą przez `LabLoad.run(tytuł, async step => …)`.
 - Nawigacja: na każdej stronie pierwsze na pasku narzędzi są cofnij · domek (strona startowa) · ponów (historia przeglądarki, `ui/shell/nav.js`, ładowany przez pasek menu).
 - Kolejność na pasku narzędzi: nawigacja, potem przełącznik laboratoriów (środowiska lub grupy) albo przycisk do powiązanego laboratorium (skórki → filtry), dopiero potem listy rozwijane i inne kontrolki laboratorium.
-- Konsola: przycisk po prawej na pasku narzędzi otwiera okno z dziennikiem strony (`ui/shell/console.js`; dziennik `window.LabLog` — `ui/shell/log.js`, pierwszy skrypt każdej strony): błędy, ostrzeżenia, komunikaty, etapy ładowania — najnowsze na górze, data i czas, strona, filtr; dziennik zostaje do zamknięcia karty (`sessionStorage`). Na każdej stronie, także startowej (ma oba paski).
+- Konsola: przycisk po prawej na pasku narzędzi otwiera okno z dziennikiem strony (`ui/shell/console.js`; dziennik `window.LabLog` — `ui/shell/log.js`, pierwszy skrypt każdej strony): błędy, ostrzeżenia, komunikaty, etapy ładowania — najnowsze na górze, data i czas, strona, filtr; dziennik zostaje do zamknięcia karty (`sessionStorage`). Zakładki: pierwsza Dziennik, strona dodaje własne (`window.LabConsole.addTab`, np. API w edytorze sceny). Na każdej stronie, także startowej (ma oba paski).
 
 ## Wersjonowanie
 

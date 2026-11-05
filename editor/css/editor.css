@@ -12,3 +12,15 @@
 /* Właściwości mają miejsce na pełne pola obiektu od startu, żeby okna pod nimi (Kamera, Wydajność) nie wchodziły na nie */
 #propsWin{min-height:470px}
 .labWin.docked #propsWin{min-height:0}   /* w panelu okna idą jedno pod drugim: rezerwa niepotrzebna */
+/* zakładka API w konsoli (js/ui/api-console.js) */
+.apiBox{flex:1;min-height:0;display:flex;flex-direction:column;gap:6px}
+.apiIn{width:100%;box-sizing:border-box;resize:vertical;min-height:52px;font:12px/1.45 var(--mono);color:var(--text);background:var(--bg);
+  border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+.apiIn:focus{outline:none;border-color:var(--accent)}
+.apiTools{display:flex;gap:6px;align-items:center}
+.apiNote{color:var(--dim);font-size:11.5px;margin-left:auto}
+.apiOut{flex:1;min-height:0;overflow:auto;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.apiItem{border-bottom:1px solid var(--line);padding:4px 8px}
+.apiCmd{font:11.5px var(--mono);color:var(--accent);cursor:pointer;white-space:pre-wrap;word-break:break-word}
+.apiItem.bad .apiCmd{color:var(--err)}
+.apiRes{margin:2px 0 0;font:11px/1.4 var(--mono);color:var(--text);white-space:pre-wrap;word-break:break-word;max-height:220px;overflow:auto}

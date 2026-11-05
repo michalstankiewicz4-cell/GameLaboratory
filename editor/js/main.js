@@ -1,13 +1,16 @@
 // Edytor sceny · start: dane (core/store.js) → świat 3D (world/world.js) → kamera i uchwyt (world/controls.js)
-// → gra (play/play.js) → okna (ui/panels.js) i pasek narzędzi (ui/toolbar.js). Opis: editor/README.md.
+// → gra (play/play.js) → API (js/scene/api.js, zakładka w konsoli) → okna (ui/panels.js) i pasek narzędzi (ui/toolbar.js). Opis: editor/README.md.
 import { createStore } from './core/store.js';
-import { createWorld, PROFILES_KEY } from './world/world.js';
+import { createWorld, PROFILES_KEY, LIGHTS } from './world/world.js';
 import { createControls } from './world/controls.js';
 import { createPanels } from './ui/panels.js';
 import { createToolbar } from './ui/toolbar.js';
 import { createPlay } from './play/play.js';
+import { createApiConsole } from './ui/api-console.js';
+import { createSceneApi } from '../../js/scene/api.js';
+import { behaviorsFor } from '../../js/scene/behaviors.js';
 import { emptyScene, makeObject } from '../../js/scene/scene-data.js';
-import { prefab } from '../../js/scene/prefabs.js';
+import { prefab, PREFABS } from '../../js/scene/prefabs.js';
 
 const { t } = window.EditorI18n;
 const $ = (id) => document.getElementById(id);
@@ -51,6 +54,12 @@ const actions = {
 };
 actions.play = createPlay(store, world, controls, actions);
 const panels = createPanels(store, actions);
+// API dla AI (js/scene/api.js): polecenia JSON na tych samych danych; zakładka API w konsoli i window.sceneApi.run(…)
+const api = createSceneApi({
+  store, prefabs: PREFABS, behaviorsFor, lights: Object.keys(LIGHTS),
+  hooks: { build, play: () => actions.play.start(), stop: () => actions.play.stop(), playing: () => actions.play.playing },
+});
+createApiConsole(api);
 createToolbar(store, controls, actions);
 
 // dane → świat i okna
@@ -72,3 +81,4 @@ world.start((dt, time) => { actions.play.frame(dt, time); controls.update(); });
 requestAnimationFrame(() => window.LabLoad && window.LabLoad.done());
 // do sprawdzania z konsoli i testów
 window.sceneEditor = { store, world, controls, play: actions.play };
+window.sceneApi = api;   // dla AI sterującej przeglądarką: window.sceneApi.run({ cmd: 'help' })

@@ -3,6 +3,18 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.33.0 · edytor sceny 0.4.0 — 2026-11-05 (API dla AI)
+
+### Dodane
+- **API sceny** (`js/scene/api.js`, silnik, bez Three.js): polecenia JSON na scenie jako danych — `help`, `describe`,
+  `prefabs`, `add`, `set`, `move`, `remove`, `env`, `select`, `new`, `load`, `play`, `stop`; jedno polecenie albo lista,
+  wynik `{ ok, … }` albo `{ ok: false, error }`. Obiekt wskazuje się przez `id` albo `name`. Sprawdza dane (model,
+  zachowanie pasujące do modelu, liczby, oświetlenie) i nie zmienia sceny w czasie gry.
+- **Konsola z zakładkami** (`ui/shell/console.js`): pierwsza — Dziennik, strona dodaje własne przez
+  `window.LabConsole.addTab({ id, title, titlePl, el })` (przed załadowaniem konsoli: `window.LabConsoleTabs`).
+- Edytor sceny: zakładka **API** w konsoli (polecenie, Ctrl+Enter, wyniki, wpis w dzienniku) i `window.sceneApi.run(…)`
+  dla AI sterującej przeglądarką.
+
 ## Program 0.32.0 · edytor sceny 0.3.0 — 2026-11-05 (zachowania i „Graj”)
 
 ### Dodane

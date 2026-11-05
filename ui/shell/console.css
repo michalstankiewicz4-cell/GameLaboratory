@@ -19,6 +19,14 @@ body > .bar .sp + .lcBtn{margin-left:0}
 .labConsole .lc-warn .lcKind{color:var(--accent)}
 .labConsole .lc-load .lcKind{color:var(--ok)}
 .labConsole .lcCount{font:11px var(--mono);color:var(--dim);text-align:right}
+/* tabs in the title bar: the log and the page's own (window.LabConsole.addTab) */
+.labConsole .labWinTitle{flex:none}
+.labConsole .lcTabs{display:flex;gap:2px;margin-left:12px;margin-right:auto}
+.labConsole .lcTabs[hidden]{display:none}
+.labConsole .lcTab{padding:2px 9px;border:1px solid transparent;border-radius:6px;background:none;color:var(--dim);font:inherit;font-size:11.5px;cursor:pointer}
+.labConsole .lcTab:hover{color:var(--text);border-color:var(--line)}
+.labConsole .lcTab.on{color:var(--accent);border-color:var(--accent)}
+.labConsole .lcBody[hidden]{display:none}
 /* docked at the bottom between the side panels (Panels: ui/shell/windows.js) */
 .labConsole.lcDocked{left:var(--viewL,0px) !important;right:var(--viewR,0px) !important;top:auto !important;bottom:var(--footH);width:auto;height:30vh;
   min-height:140px;border-radius:0;border-width:1px 0 0;box-shadow:none;resize:vertical;z-index:18;background:var(--menuBg)}

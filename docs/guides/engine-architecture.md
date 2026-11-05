@@ -61,11 +61,12 @@ i edytor ją pokazują, AI ją zmienia.
 | UI i Debug | `ui/shell/` (okna, `LabPerf`, konsola, `LabLog`, karta ładowania) |
 | Jobs/Workers | wątki nauki w laboratoriach języka i obrazów |
 | Scene (dane) | `js/scene/scene-data.js` (format `gamelab-scene`), prefabrykaty `js/scene/prefabs.js` |
+| API dla AI | `js/scene/api.js` — polecenia JSON na scenie (zakładka API w konsoli edytora, `window.sceneApi`) |
 | Scripts w scenie | `js/scene/behaviors.js` — zachowania podpięte do prefabrykatów (okręt, lot), pole `behavior` obiektu |
 | Debug + Editor | edytor sceny `editor/` (hierarchia, właściwości, uchwyt, zapis do pliku, ▶ Graj) — [opis](../../editor/README.md) |
 
 Brakuje: jednej pętli silnika dla gier (edytor ma swoją, z trybem gry), laboratoriów na wspólnej scenie (dziś każde buduje własną
-scenę Three.js), warstwy Input, szyny zdarzeń, sieci i API dla AI.
+scenę Three.js), warstwy Input, szyny zdarzeń i sieci.
 
 ## Kolejność (propozycja, do decyzji właściciela)
 
@@ -73,7 +74,7 @@ scenę Three.js), warstwy Input, szyny zdarzeń, sieci i API dla AI.
    `js/scene/`; wspólna pętla dla gier — jeszcze nie)*
 2. Edytor sceny („Warsztat”): drzewo obiektów, właściwości, podgląd; wstawianie modeli z kitów, środowisk
    i zachowań z laboratoriów. *(pierwsza wersja: `editor/`, 0.1.0)*
-3. API dla AI na scenie jako danych.
+3. API dla AI na scenie jako danych. *(pierwsza wersja: `js/scene/api.js`, 0.33.0)*
 4. Input z akcjami, szyna zdarzeń, zapis.
 5. Sieć.
 

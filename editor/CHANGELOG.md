@@ -3,6 +3,14 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.4.0 — 2026-11-05 (API dla AI)
+
+### Dodane
+- Zakładka **API** w konsoli (`js/ui/api-console.js`): polecenie JSON albo lista poleceń, **Wykonaj** (Ctrl+Enter),
+  **Polecenia** (`{"cmd": "help"}`), wyniki najnowsze na górze (kliknięcie polecenia wstawia je z powrotem), każde
+  polecenie w dzienniku strony. Polecenia z `js/scene/api.js` działają na tym samym stanie co okna i uchwyt.
+- `window.sceneApi.run(polecenie)` — to samo dla AI sterującej przeglądarką.
+
 ## 0.3.0 — 2026-11-05 (zachowania i „Graj”)
 
 ### Dodane
