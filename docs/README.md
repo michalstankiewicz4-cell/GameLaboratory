@@ -55,6 +55,7 @@ Układ folderów jest taki sam jak w kodzie:
 - Renderowanie modeli ShipKit i BodyKit, niebo: [guides/rendering.md](guides/rendering.md)
 - Znane pułapki: [guides/gotchas.md](guides/gotchas.md)
 - Silnik — schemat i plan (scena w środku, moduły, co już mamy): [guides/engine-architecture.md](guides/engine-architecture.md)
+- Edytor sceny („Warsztat”): [../editor/README.md](../editor/README.md)
 
 ## Historia
 

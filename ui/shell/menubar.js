@@ -21,14 +21,15 @@ const APP_VERSION = V.app;
 const MENU_H = 32;
 const ROOT = (document.currentScript && document.currentScript.src || "").replace(/ui\/shell\/menubar\.js.*$/, "");
 const PARTS = location.pathname.split("/"), HERE = PARTS.pop() || "index.html", DIR = PARTS.pop() || "";
-const PAGE = (DIR === "labs" || DIR === "tools" ? DIR + "/" : "") + HERE;   // e.g. "labs/vehicles-space.html"
+const PAGE = (DIR === "labs" || DIR === "tools" || DIR === "editor" ? DIR + "/" : "") + HERE;   // e.g. "labs/vehicles-space.html", "editor/index.html"
 const START = PAGE === "index.html";
 const REPO = "https://github.com/michalstankiewicz4-cell/GameLaboratory/blob/main/";
 const DOCS = "https://github.com/michalstankiewicz4-cell/GameLaboratory/tree/main/docs";   // HELP → Documentation
 
 // LANGUAGE — English or Polish. Chosen in OPTIONS → Language (kept in this browser, gamelab.lang:
 // "auto" | "en" | "pl"); ?lang=pl / ?lang=en in the address wins (links for search engines);
-// "auto" = the browser's languages, and English when none of them is supported.
+// "auto" = the browser's languages, and English when none of them is supported — unless the page names its own
+// default (<html data-lang-default="en">: the scene editor starts in English until Polish is chosen).
 const LANGS = { en: "English", pl: "Polski" };
 const LANG_KEY = "gamelab.lang";
 function storedLang() { try { return localStorage.getItem(LANG_KEY) || "auto"; } catch (e) { return "auto"; } }
@@ -38,7 +39,8 @@ function browserLang() {
 }
 const URL_LANG = (new URLSearchParams(location.search).get("lang") || "").toLowerCase();
 const LANG_CHOICE = storedLang();
-const LANG = LANGS[URL_LANG] ? URL_LANG : LANGS[LANG_CHOICE] ? LANG_CHOICE : browserLang();
+const PAGE_DEFAULT = (document.documentElement.dataset.langDefault || "").toLowerCase();
+const LANG = LANGS[URL_LANG] ? URL_LANG : LANGS[LANG_CHOICE] ? LANG_CHOICE : LANGS[PAGE_DEFAULT] ? PAGE_DEFAULT : browserLang();
 // the start page is translated whole; a lab keeps its own language (its panels: <html lang>) and the bar gets LANG
 if (START) document.documentElement.lang = LANG;
 const PL = LANG === "pl";

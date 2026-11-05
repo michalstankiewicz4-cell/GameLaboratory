@@ -1,0 +1,87 @@
+# Edytor sceny („Warsztat”)
+
+Strona: `editor/index.html` · wersja: `ui/data/versions.js` (klucz `editor/index.html`) · zmiany: [`CHANGELOG.md`](CHANGELOG.md)
+· plan silnika: [`docs/guides/engine-architecture.md`](../docs/guides/engine-architecture.md).
+
+Scena złożona z modeli laboratoriów: okręty, samochody, czołg, autobus, tramwaj, pociąg, samolot, budowle, broń —
+na morzu albo na lądzie. Model dodaje się z listy, przesuwa, obraca i skaluje uchwytem albo liczbami, a zamienia
+na inny jednym wyborem z listy. Środowisko: powierzchnia (morze / ląd), światło (pora dnia i pogoda z laboratoriów
+wodnych) i wygląd kamery (profil z laboratorium filtrów). Szczegóły modelu robi się w jego laboratorium:
+„Otwórz w laboratorium” we Właściwościach. Edytor jest pierwszym krokiem do silnika: laboratoria będą się do niego
+dostosowywać (zasoby z nazwą, wspólne zachowania).
+
+## Obsługa
+
+- Okna: **Opis**, **Scena** (dodaj model, hierarchia), **Właściwości** (środowisko albo wybrany obiekt), **Kamera**,
+  **Wydajność**; OPCJE → Okna.
+- Pasek narzędzi: cofnij · domek · ponów, uchwyt **Przesuń / Obróć / Skaluj**, **Nowa**, **Zapisz plik**, **Otwórz plik**.
+- Klawisze: W / E / R — przesuń, obróć, skaluj; Delete — usuń; Ctrl+D — powiel; F — pokaż wybrany; Esc — środowisko;
+  H — chowa okna. Kliknięcie modelu wybiera go.
+- Scena zapisuje się sama w przeglądarce (`localStorage["gameLab.scene.v1"]`); plik: `nazwa.scene.json`.
+
+## Języki
+
+Angielski (domyślny) i polski. Język wybiera się w OPCJE → Język, tak jak na całej stronie; strona ma
+`<html data-lang-default="en">`, więc przy „Automatycznie” zostaje angielski. Teksty: `js/i18n/en.js` i `js/i18n/pl.js`
+(te same klucze; brakujący klucz pokazuje tekst angielski). W HTML: `data-i18n` (tekst), `data-i18n-tip` (podpowiedź),
+`data-i18n-win` (tytuł okna); w skryptach `EditorI18n.t('klucz', { zmienna })`. Nowy tekst = klucz w obu plikach.
+
+## Budowa
+
+```
+editor/
+  index.html            strona: paski, okna, kolejność skryptów
+  css/editor.css        hierarchia i odnośnik do laboratorium (reszta z ui/ui.css i ui/style/sea.css)
+  js/main.js            start: dane → świat → kamera i uchwyt → okna i pasek; budowa modeli z kartą ładowania
+  js/core/store.js      stan: scena jako dane i wybór; jedyne źródło prawdy, słuchacze, zapis w przeglądarce
+  js/world/world.js     świat 3D: renderer, scena bazowa, potok obrazu, modele z prefabrykatów, pętla
+  js/world/controls.js  kamera (orbita, kadrowanie), uchwyt (TransformControls), wybór kliknięciem
+  js/ui/panels.js       okna Scena i Właściwości
+  js/ui/toolbar.js      pasek narzędzi i klawisze
+  js/i18n/              en.js, pl.js, i18n.js (klasyczne skrypty przed ui/shell/windows.js)
+  README.md, CHANGELOG.md
+```
+
+Silnik (wspólny, poza folderem edytora — będą z niego korzystać też laboratoria i gry):
+
+| Plik | Co |
+|---|---|
+| `js/scene/scene-data.js` | scena jako dane: format, nowa scena, obiekt, sprawdzanie danych z pliku (`normalize`) |
+| `js/scene/prefabs.js` | prefabrykaty: każdy model z kitów, który da się postawić w scenie (id, nazwa, rodzina, gdzie stoi, laboratorium, budowa) |
+| `js/labs/shared/stage.js` | scena bazowa: niebo SkyKit, morze WaterKit albo płaski grunt, słońce z cieniem (wspólna z laboratorium filtrów) |
+| `vendor/three/addons/controls/TransformControls.js` | uchwyt z Three.js r186 (import przepisany na `../../three.module.js`) |
+
+Zasada: **dane są jedynym źródłem prawdy**. Okna, uchwyt i pliki zmieniają tylko dane (`store`); świat 3D je odbija
+(`syncObjects` — buduje i usuwa modele, `syncPlaces` — położenie, `syncEnv` — środowisko i obraz).
+
+## Format sceny (`gamelab-scene`, wersja 1)
+
+```json
+{
+  "format": "gamelab-scene", "version": 1, "name": "Harbour",
+  "env": { "surface": "sea", "light": "afternoon", "look": "" },
+  "objects": [
+    { "id": "o…", "name": "ORP Błyskawica", "prefab": "sea/blyskawica", "pos": [0, 0, 0], "rot": [0, 0, 0], "scale": 1 }
+  ]
+}
+```
+
+- `env.surface`: `sea` | `land`; `env.light`: `afternoon` | `noon` | `dusk` | `overcast`; `env.look`: nazwa profilu
+  z laboratorium filtrów (`gameLab.lookProfiles.v1`) albo `""`.
+- `pos` w metrach (Y w górę), `rot` w stopniach (kolejność YXZ: kurs, pochylenie, przechył), `scale` — mnożnik.
+- `prefab`: id z `js/scene/prefabs.js` (`sea/…`, `road/…`, `tram/…`, `train/…`, `air/…`, `structures/…`, `weapons/…`).
+- Zmiana formatu podnosi `version` w `scene-data.js`, a `normalize` przenosi starsze sceny.
+
+## Wersjonowanie
+
+- Edytor ma własną wersję `x.y.z` w `ui/data/versions.js` (`editor/index.html`): **y** — nowa funkcja, **z** — poprawka.
+- Każda zmiana: wpis w [`CHANGELOG.md`](CHANGELOG.md) tego folderu i krótki wpis w głównym `CHANGELOG.md`.
+- Zmiana silnika (`js/scene/`, `js/labs/shared/stage.js`) podnosi też wersję programu; zmiana formatu sceny — `version`
+  w `js/scene/scene-data.js`.
+
+## Na później (propozycje)
+
+- Modele ze Space (statki kosmiczne, łaziki, roboty morskie) — ich kity potrzebują `js/core/three-global.js`.
+- Ląd z laboratorium lądu i woda z laboratorium wody jako zasoby z nazwą.
+- Woda wycięta w kadłubie każdego okrętu (dziś WaterKit umie jeden kadłub w środku sceny).
+- Cofnij / ponów zmian w scenie, zachowania (ruch, fizyka) i przycisk „Graj”.

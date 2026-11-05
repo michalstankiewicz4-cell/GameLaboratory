@@ -4,7 +4,7 @@
 import '../../core/three-window.js';                      // pierwszy: TrainKit czyta window.THREE przy załadowaniu
 import * as THREE from '../../../vendor/three/three.module.js';
 import { LookPipeline, AutoResolution, LOOK_PRESETS, LOOK_DEFAULTS } from '../../render/sea/look.js';
-import { createStage, LIGHTS } from './stage.js';
+import { createStage, LIGHTS } from '../shared/stage.js';
 import { shipScene } from './scenes/ship.js';
 import { rigScene } from './scenes/rig.js';
 import { trainScene } from './scenes/train.js';

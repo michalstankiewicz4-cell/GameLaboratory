@@ -459,6 +459,22 @@ window.GameLabCatalog =
   ],
   "tools": [
     {
+      "file": "editor/index.html",
+      "name": "Scene editor",
+      "namePl": "Edytor sceny",
+      "doc": "editor/README.md",
+      "desc": "The workshop: a scene built from the labs' models — ships, cars, a tank, a bus, a tram, a train, an aircraft, structures — on the sea or on land. Move, turn and scale with a gizmo, swap a model in one click, choose the light and a camera look from the filters lab. The scene is plain JSON data.",
+      "descPl": "Warsztat: scena złożona z modeli laboratoriów — okręty, samochody, czołg, autobus, tramwaj, pociąg, samolot, budowle — na morzu albo na lądzie. Przesuwanie, obracanie i skalowanie uchwytem, zamiana modelu jednym kliknięciem, światło i wygląd kamery z laboratorium filtrów. Scena to zwykłe dane JSON.",
+      "kind": "tool",
+      "kit": "Scene · prefabs · StageKit",
+      "phrases": ["scena", "edytor", "pojazdy", "okręty", "woda", "ląd"],
+      "saved": ["gameLab.scene."],
+      "art": {
+        "bg": ["#1d2b33", "#0b1216"],
+        "svg": "<rect x=\"18\" y=\"18\" width=\"46\" height=\"64\" rx=\"4\" fill=\"none\" stroke=\"#9fb4ff\" stroke-width=\"2\" opacity=\".6\"/><path d=\"M25 30h30M31 40h24M31 50h24M25 60h30\" stroke=\"#9fb4ff\" stroke-width=\"2\" stroke-linecap=\"round\" opacity=\".55\"/><path d=\"M74 70 L120 70 L132 62 L170 62 L182 70 L74 70 Z\" fill=\"url(#g)\" opacity=\".95\"/><path d=\"M110 62 V48 H128 V62\" fill=\"#9fb4ff\" opacity=\".6\"/><path d=\"M70 78 Q100 74 130 78 T190 78\" stroke=\"#5be0ff\" stroke-width=\"2\" fill=\"none\" opacity=\".5\"/><path d=\"M150 30 v18 M150 30 l-5 7 M150 30 l5 7\" stroke=\"#f2b84b\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M150 48 h18 M168 48 l-7 -5 M168 48 l-7 5\" stroke=\"#e04b50\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/>"
+      }
+    },
+    {
       "file": "tools/doctor.html",
       "name": "Model doctor",
       "namePl": "Doktor modeli",
@@ -557,6 +573,8 @@ window.GameLabCatalog =
     "pod wodą": "underwater",
     "pogoda": "weather",
     "pojazdy": "vehicles",
+    "scena": "scene",
+    "edytor": "editor",
     "pora dnia": "time of day",
     "postać": "character",
     "proporcje": "proportions",

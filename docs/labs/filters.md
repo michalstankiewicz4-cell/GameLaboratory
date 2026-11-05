@@ -14,7 +14,7 @@ Grafika z Battle (preferowana, CLAUDE.md).
 - **Sceny** (`js/labs/filters/scenes/`): ORP Błyskawica, ORP Orzeł, platforma Super 300 (morze), pociąg na torze (ląd).
   Nowa scena: plik eksportujący `{ id, label, surface: 'sea' | 'land', build(stage) → { root, size, target, update?, dispose? } }`
   i wpis w `SCENES` w `filters.js`.
-- **Scena bazowa** (`js/labs/filters/stage.js`): niebo SkyKit z mapą otoczenia z tego samego nieba, słońce z cieniem,
+- **Scena bazowa** (`js/labs/shared/stage.js`): niebo SkyKit z mapą otoczenia z tego samego nieba, słońce z cieniem,
   morze WaterKit lub płaski grunt; oświetlenie: popołudnie, południe, zmierzch, zachmurzenie.
 - Pogoda i starzenie zostają w laboratorium wyglądu (`labs/look.html`).
 - Modele Space nie są jeszcze scenami: ich kity potrzebują `three-global.js`, który zmienia oświetlenie całej strony.

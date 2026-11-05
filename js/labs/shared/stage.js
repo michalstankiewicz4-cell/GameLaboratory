@@ -1,4 +1,4 @@
-// Laboratorium filtrów — scena bazowa z grafiką z Battle: niebo (SkyKit) z oświetleniem i mapą otoczenia z tego
+// Scena bazowa laboratoriów (filtry, scena) z grafiką z Battle: niebo (SkyKit) z oświetleniem i mapą otoczenia z tego
 // samego nieba, morze (WaterKit) albo płaski grunt. Sceny (scenes/*.js) stawiają na niej model.
 import * as THREE from '../../../vendor/three/three.module.js';
 import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment, sunAt } from '../../envs/sky/skykit.js';

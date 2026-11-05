@@ -60,9 +60,11 @@ i edytor ją pokazują, AI ją zmienia.
 | Audio | `js/audio/` (MusicKit) |
 | UI i Debug | `ui/shell/` (okna, `LabPerf`, konsola, `LabLog`, karta ładowania) |
 | Jobs/Workers | wątki nauki w laboratoriach języka i obrazów |
+| Scene (dane) | `js/scene/scene-data.js` (format `gamelab-scene`), prefabrykaty `js/scene/prefabs.js` |
+| Debug + Editor | edytor sceny `editor/` (hierarchia, właściwości, uchwyt, zapis do pliku) — [opis](../../editor/README.md) |
 
-Brakuje: wspólnej sceny jako danych (dziś każde laboratorium buduje własną scenę Three.js), jednej pętli silnika,
-warstwy Input, szyny zdarzeń, zapisu, sieci i edytora sceny z API dla AI.
+Brakuje: jednej pętli silnika dla gier (edytor ma swoją), laboratoriów na wspólnej scenie (dziś każde buduje własną
+scenę Three.js), warstwy Input, szyny zdarzeń, sieci i API dla AI.
 
 ## Kolejność (propozycja, do decyzji właściciela)
 

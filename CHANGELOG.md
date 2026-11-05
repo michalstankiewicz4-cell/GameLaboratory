@@ -3,6 +3,20 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.29.0 · edytor sceny 0.1.0 — 2026-11-05 (edytor sceny)
+
+### Dodane
+- **Edytor sceny** („Warsztat”) w osobnym folderze `editor/` — szczegóły: `editor/CHANGELOG.md`, opis: `editor/README.md`.
+  Scena z modeli laboratoriów na morzu albo lądzie, uchwyt przesuń / obróć / skaluj, zamiana modelu z listy,
+  światło i wygląd kamery z laboratorium filtrów, zapis w przeglądarce i do pliku. Angielski (domyślny) i polski.
+- Silnik: scena jako dane `js/scene/scene-data.js` (format `gamelab-scene` 1) i prefabrykaty z kitów `js/scene/prefabs.js`.
+- `vendor/three/addons/controls/TransformControls.js` (Three.js r186).
+
+### Zmienione
+- Scena bazowa laboratorium filtrów przeniesiona do `js/labs/shared/stage.js` (wspólna z edytorem).
+- Pasek menu: strony w `editor/` rozpoznawane jak laboratoria; strona może mieć własny język domyślny
+  (`<html data-lang-default="en">` — przy „Automatycznie” zamiast języka przeglądarki).
+
 ## Laboratorium obrazów 0.29.1 — 2026-11-05 (karta graficzna przy 64×40)
 
 ### Poprawione

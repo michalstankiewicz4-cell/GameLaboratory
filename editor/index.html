@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" data-lang-default="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Scene Editor — build a scene from the labs' models | GameLaboratory</title>
+<meta name="description" content="GameLaboratory scene editor: put the labs' models — warships, cars, a tank, a bus, a tram, a train, an aircraft, structures — on the sea or on land, move, turn and scale them, swap a model in one click, choose the light and the camera look; the scene is plain JSON data, saved in the browser and to a file.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/editor/index.html">
+<link rel="icon" type="image/png" href="../assets/favicon-32.png">
+<link rel="stylesheet" href="../ui/style/sea.css">
+<link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="css/editor.css">
+</head>
+<!-- Edytor sceny („Warsztat”) — opis: editor/README.md. Silnik (wspólny): scena jako dane js/scene/scene-data.js,
+     prefabrykaty js/scene/prefabs.js, scena bazowa js/labs/shared/stage.js. Edytor: editor/js/ (start: main.js). -->
+<body class="lab">
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/shell/menubar.js"></script>
+<div id="view"></div>
+<div class="bar">
+  <div class="seg" id="mode" role="group" aria-label="Gizmo">
+    <button type="button" data-m="translate" class="on" data-i18n="bar.move" data-i18n-tip="bar.move.tip">Move</button><button type="button" data-m="rotate" data-i18n="bar.rotate" data-i18n-tip="bar.rotate.tip">Rotate</button><button type="button" data-m="scale" data-i18n="bar.scale" data-i18n-tip="bar.scale.tip">Scale</button>
+  </div>
+  <button type="button" id="newScene" data-i18n="bar.new" data-i18n-tip="bar.new.tip">New</button>
+  <button type="button" id="saveFile" data-i18n="bar.save" data-i18n-tip="bar.save.tip">Save file</button>
+  <button type="button" id="loadFile" data-i18n="bar.open" data-i18n-tip="bar.open.tip">Open file</button>
+  <input type="file" id="fileIn" accept=".json,application/json" hidden>
+  <span class="dimtxt" id="status"></span>
+  <span class="sp"></span>
+</div>
+<div class="foot">
+  <span id="fps"></span>
+  <span class="sp"></span>
+  <span>GameLaboratory</span>
+</div>
+<div id="loading" class="labLoad"><div class="labLoadCard"><i class="labSpin"></i><b data-i18n="page.loading">Building the scene…</b>
+  <span class="labLoadStep"></span><span class="labLoadBar"><i></i></span></div></div>
+<script src="../ui/shell/loader.js"></script>
+<aside class="panel" data-std="info">
+  <h2 class="stdName" data-i18n="info.name">Scene editor</h2>
+  <p class="stdText" data-i18n="info.text"></p>
+  <p class="note" data-i18n="info.keys"></p>
+</aside>
+<aside class="panel" id="treeWin" data-window="tree" data-i18n-win="win.tree">
+  <h3 data-i18n="tree.add">Add a model</h3>
+  <div class="row"><span data-i18n="tree.model">Model</span><select id="addPrefab"></select><output></output></div>
+  <div class="btns"><button type="button" id="addBtn" data-i18n="tree.addBtn">Add</button></div>
+  <h3 data-i18n="tree.hierarchy">Hierarchy</h3>
+  <ul class="tree" id="tree"></ul>
+</aside>
+<aside class="panel" id="propsWin" data-window="props" data-side="right" data-i18n-win="win.props">
+  <div id="envProps">
+    <h3 data-i18n="env.title">Environment</h3>
+    <div class="row"><span data-i18n="env.surface">Surface</span><select id="surface"><option value="sea" data-i18n="env.sea">Sea</option><option value="land" data-i18n="env.land">Land (plain)</option></select><output></output></div>
+    <div class="row"><span data-i18n="env.light">Light</span><select id="light"></select><output></output></div>
+    <div class="row"><span data-i18n="env.look">Camera look</span><select id="look"></select><output></output></div>
+    <p class="note"><a href="../labs/filters.html" data-i18n="env.lookNote">Camera looks are the profiles saved in the filters lab.</a></p>
+  </div>
+  <div id="objProps" hidden>
+    <h3 data-i18n="obj.title">Object</h3>
+    <div class="row"><span data-i18n="obj.name">Name</span><input type="text" id="oName" maxlength="60"><output></output></div>
+    <div class="row"><span data-i18n="obj.model">Model</span><select id="oPrefab"></select><output></output></div>
+    <div class="row"><span data-i18n="obj.x">Position X</span><input type="number" id="pX" step="0.5"><output>m</output></div>
+    <div class="row"><span data-i18n="obj.y">Position Y</span><input type="number" id="pY" step="0.5"><output>m</output></div>
+    <div class="row"><span data-i18n="obj.z">Position Z</span><input type="number" id="pZ" step="0.5"><output>m</output></div>
+    <div class="row"><span data-i18n="obj.heading">Heading</span><input type="number" id="rY" step="5"><output>°</output></div>
+    <div class="row"><span data-i18n="obj.pitch">Pitch</span><input type="number" id="rX" step="5"><output>°</output></div>
+    <div class="row"><span data-i18n="obj.roll">Roll</span><input type="number" id="rZ" step="5"><output>°</output></div>
+    <div class="row"><span data-i18n="obj.scale">Scale</span><input type="number" id="sc" step="0.1" min="0.01"><output>×</output></div>
+    <div class="btns">
+      <button type="button" id="toGround" data-i18n="obj.toSurface" data-i18n-tip="obj.toSurface.tip">To the surface</button>
+      <button type="button" id="dupBtn" data-i18n="obj.dup">Duplicate</button>
+      <button type="button" id="delBtn" data-i18n="obj.del">Delete</button>
+    </div>
+    <div class="btns"><a class="labLink" id="openLab" href="#" data-i18n="obj.openLab">Open in its lab</a></div>
+  </div>
+</aside>
+<aside class="panel" data-std="camera">
+  <div class="btns"><button type="button" id="frame" data-i18n="cam.frame">Frame the selection</button><button type="button" id="frameAll" data-i18n="cam.all">Show the whole scene</button></div>
+  <p class="note" data-i18n="cam.note">Drag to orbit, right-drag to pan, wheel to zoom.</p>
+</aside>
+<aside class="panel" data-std="perf"></aside>
+<script src="js/i18n/en.js"></script>
+<script src="js/i18n/pl.js"></script>
+<script src="js/i18n/i18n.js"></script>
+<script src="../ui/shell/perf.js"></script>
+<script src="../ui/shell/labwin.js"></script>
+<script src="../ui/shell/windows.js"></script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
