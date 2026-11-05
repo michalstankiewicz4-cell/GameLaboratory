@@ -80,6 +80,12 @@
   <div class="btns"><button type="button" id="shells">Shell splashes</button><button type="button" id="torpedo">Torpedo track</button></div>
   <div class="btns"><button type="button" id="copyJson">Copy settings (JSON)</button><button type="button" id="reset">Reset variant</button></div>
   <p class="note" id="copied"></p>
+  <h3>Asset for the scene editor</h3>
+  <div class="row"><span>Name</span><input type="text" id="assetName" maxlength="40" placeholder="e.g. Baltic swell"><output></output></div>
+  <div class="btns"><button type="button" id="assetSave">Save the variant as a sea</button></div>
+  <div class="row"><span>Saved seas</span><select id="assetList"></select><output></output></div>
+  <div class="btns"><button type="button" id="assetLoad">Load into the variant</button><button type="button" id="assetDel">Delete</button></div>
+  <p class="note" id="assetNote">A saved sea (sea state and look of the water) is offered by the scene editor: Environment → Sea.</p>
 </aside>
 <aside class="panel" data-std="camera">
   <div class="btns" id="cams"></div>

@@ -9,6 +9,7 @@ import { createPlay } from './play/play.js';
 import { createApiConsole } from './ui/api-console.js';
 import { createSceneApi } from '../../js/scene/api.js';
 import { behaviorsFor } from '../../js/scene/behaviors.js';
+import { onAssetsChange, listAssets, ASSET_KINDS } from '../../js/scene/assets.js';
 import { emptyScene, makeObject } from '../../js/scene/scene-data.js';
 import { prefab, PREFABS } from '../../js/scene/prefabs.js';
 
@@ -27,7 +28,7 @@ function firstScene() {
 
 step(t('load.renderer'), 0.1);
 const store = createStore(firstScene);
-const world = createWorld($('view'), store, (id) => status(t('status.unknown', { id })));
+const world = createWorld($('view'), store, (id) => status(id.startsWith('sea:') ? t('status.noSea', { name: id.slice(4) }) : t('status.unknown', { id })));
 const controls = createControls(world, store);
 
 // budowa modeli trwa (okręty: kilka sekund): z kartą ładowania, kiedy jest co budować
@@ -59,7 +60,7 @@ actions.play = createPlay(store, world, controls, actions);
 const panels = createPanels(store, actions);
 // API dla AI (js/scene/api.js): polecenia JSON na tych samych danych; zakładka API w konsoli i window.sceneApi.run(…)
 const api = createSceneApi({
-  store, prefabs: PREFABS, behaviorsFor, lights: Object.keys(LIGHTS),
+  store, prefabs: PREFABS, behaviorsFor, lights: Object.keys(LIGHTS), assets: { kinds: Object.keys(ASSET_KINDS), list: listAssets },
   hooks: { build, group: (fn) => store.group(fn), play: () => actions.play.start(), stop: () => actions.play.stop(), playing: () => actions.play.playing },
 });
 createApiConsole(api);
@@ -76,6 +77,8 @@ $('frame').addEventListener('click', controls.frameSelection);
 $('frameAll').addEventListener('click', controls.frameAll);
 // profil zapisany w laboratorium filtrów (inna karta) od razu na liście
 addEventListener('storage', (e) => { if (e.key === PROFILES_KEY) { panels.renderProps(); world.syncEnv(); } });
+// zasób zapisany w laboratorium (np. morze z laboratorium wody) — od razu na liście i w scenie
+onAssetsChange(() => { panels.renderProps(); world.syncEnv(); });
 
 step(t('load.models'), 0.3);
 world.syncObjects(); world.syncEnv(); controls.attach(); panels.renderTree(); panels.renderProps(); controls.frameAll();

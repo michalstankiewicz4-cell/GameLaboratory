@@ -3,6 +3,14 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.6.0 — 2026-11-05 (morze z laboratorium wody)
+
+### Dodane
+- Właściwości → Środowisko → **Morze**: domyślne albo zasób zapisany w laboratorium wody (`js/scene/assets.js`).
+  Zapis w laboratorium w innej karcie od razu pojawia się na liście. Pole `env.sea` w scenie (nazwa zasobu).
+- Morze z nazwą, którego nie ma w tej przeglądarce: zostaje w scenie, widać domyślne i ostrzeżenie na pasku.
+- API: `assets` i `env` z `sea`. Okręty w grze kołyszą się na falach wybranego morza.
+
 ## 0.5.0 — 2026-11-05 (cofnij / ponów)
 
 ### Dodane

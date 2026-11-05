@@ -61,6 +61,7 @@ i edytor ją pokazują, AI ją zmienia.
 | UI i Debug | `ui/shell/` (okna, `LabPerf`, konsola, `LabLog`, karta ładowania) |
 | Jobs/Workers | wątki nauki w laboratoriach języka i obrazów |
 | Scene (dane) | `js/scene/scene-data.js` (format `gamelab-scene`), prefabrykaty `js/scene/prefabs.js` |
+| Zasoby z nazwą | `js/scene/assets.js` — ustawienia zapisane w laboratoriach pod nazwą (morze z laboratorium wody), scena trzyma nazwę |
 | API dla AI | `js/scene/api.js` — polecenia JSON na scenie (zakładka API w konsoli edytora, `window.sceneApi`) |
 | Scripts w scenie | `js/scene/behaviors.js` — zachowania podpięte do prefabrykatów (okręt, lot), pole `behavior` obiektu |
 | Debug + Editor | edytor sceny `editor/` (hierarchia, właściwości, uchwyt, zapis do pliku, ▶ Graj) — [opis](../../editor/README.md) |

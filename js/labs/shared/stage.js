@@ -24,9 +24,16 @@ export function createStage(renderer, scene) {
   const WU = Object.assign(waterUniforms(), skyU);
   const water = new THREE.Mesh(polarGrid(192, 160), waterMaterial(WU, { sky: '#define SKY_NO_STARS\n' + GLSL_SKY }));
   water.frustumCulled = false; water.renderOrder = 1; scene.add(water);
-  const waves = waveSet({ Hs: 1.2, Lp: 34, chop: 0.5, spread: 35, n: 12 }, 210, 7);
-  setWaves(WU, waves);
-  const L0 = LOOKS.atlantic; WU.uDeep.value.set(L0.deep); WU.uScatter.value.set(L0.scatter); WU.uRipples.value = L0.ripples; WU.uCrest.value = L0.crest;
+  // morze domyślne: umiarkowane, północny Atlantyk; setSea(zasób „morze” z laboratorium wody) zmienia je
+  const SEA0 = { Hs: 1.2, Lp: 34, chop: 0.5, spread: 35, n: 12, dir: 30 }, L0 = LOOKS.atlantic;
+  let waves = null, shine0 = L0.shine;
+  function setSea(p = {}) {
+    const q = { ...SEA0, ...L0, reflect: 1, ...p };
+    waves = waveSet({ Hs: q.Hs, Lp: q.Lp, chop: q.chop, spread: q.spread, n: q.n }, q.dir + 180, 7); setWaves(WU, waves);
+    WU.uDeep.value.set(q.deep); WU.uScatter.value.set(q.scatter); WU.uRipples.value = q.ripples; WU.uCrest.value = q.crest;
+    if (WU.uReflect) WU.uReflect.value = q.reflect;
+    shine0 = q.shine; WU.uShine.value = shine0 * 1.8; envDirty = true;
+  }
   WU.uShipFx.value.set(0, 0, 0, 0);
 
   // grunt (sceny lądowe)
@@ -34,8 +41,10 @@ export function createStage(renderer, scene) {
   ground.receiveShadow = true; ground.visible = false; scene.add(ground);
 
   let envRT = null, envDirty = true, envT = 0, t = 0, shift = 0, sunDir = new THREE.Vector3(0, 1, 0), sunSeen = 1;
+  setSea();
   const stage = {
-    skyU, WU, sun, hemi, water, ground, waves,
+    skyU, WU, sun, hemi, water, ground, setSea,
+    get waves() { return waves; },
     get sunDir() { return sunDir; }, get sunSeen() { return sunSeen; },
     // 'sea' | 'land' (groundY: wysokość gruntu)
     setSurface(kind, groundY = 0) { water.visible = kind === 'sea'; ground.visible = kind === 'land'; ground.position.y = groundY; },
@@ -54,7 +63,7 @@ export function createStage(renderer, scene) {
       scene.fog.color.copy(L.fog); scene.fog.density = L.fogDensity; WU.uFogDen.value = L.fogDensity;
       WU.uLight.value = 0.03 + 0.97 * L.day;
       WU.uSun.value.copy(L.sunDir); WU.uSunCol.value.copy(L.glitterColor).multiplyScalar(1.1 * (1 - w.coverage * w.density * 0.8) * L.sunSeen * L.sunSeen);
-      WU.uFogCol.value.copy(L.fog); WU.uFogFar.value = L.fogFar; WU.uShine.value = L0.shine * 1.8;
+      WU.uFogCol.value.copy(L.fog); WU.uFogFar.value = L.fogFar; WU.uShine.value = shine0 * 1.8;
       scene.environmentIntensity = 0.85 - w.coverage * w.density * 0.45;
       envDirty = true;
       return L;

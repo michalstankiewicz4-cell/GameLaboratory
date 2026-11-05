@@ -3,7 +3,8 @@
 //
 // {
 //   format: 'gamelab-scene', version: 1, name,
-//   env: { surface: 'sea' | 'land', light: 'afternoon' | 'noon' | 'dusk' | 'overcast', look: '' | nazwa profilu },
+//   env: { surface: 'sea' | 'land', light: 'afternoon' | 'noon' | 'dusk' | 'overcast', look: '' | nazwa profilu,
+//          sea: '' | nazwa zasobu „morze” (js/scene/assets.js; '' — morze domyślne) },
 //   objects: [{ id, name, prefab, pos: [x, y, z], rot: [x, y, z] (stopnie), scale, behavior? }]
 // }
 // prefab: id z js/scene/prefabs.js; behavior: id z js/scene/behaviors.js, '' = bez zachowania, brak pola = domyślne
@@ -12,7 +13,7 @@
 export const FORMAT = 'gamelab-scene', VERSION = 1;
 
 export function emptyScene(name = 'New scene') {
-  return { format: FORMAT, version: VERSION, name, env: { surface: 'sea', light: 'afternoon', look: '' }, objects: [] };
+  return { format: FORMAT, version: VERSION, name, env: { surface: 'sea', light: 'afternoon', look: '', sea: '' }, objects: [] };
 }
 
 let seq = 0;

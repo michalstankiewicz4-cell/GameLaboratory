@@ -3,6 +3,20 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.34.0 · edytor sceny 0.6.0 · laboratorium wody 1.3.0 — 2026-11-05 (zasoby z nazwą: morze)
+
+### Dodane
+- **Zasoby z nazwą** (`js/scene/assets.js`, silnik): ustawienia zapisane w laboratorium pod nazwą
+  (`localStorage["gameLab.assets.v1"]`), które edytor sceny i API wybierają z listy. Pierwszy rodzaj: **morze**
+  (stan morza i wygląd wody).
+- Laboratorium wody: sekcja **Asset for the scene editor** — zapis edytowanego wariantu jako morza pod nazwą,
+  wczytanie zapisanego do wariantu, usunięcie.
+- Edytor sceny: Właściwości → Środowisko → **Morze** (domyślne albo zapisane; lista odświeża się, gdy laboratorium wody
+  w innej karcie coś zapisze); pole `env.sea` w danych sceny. Morza, którego nie ma w tej przeglądarce, scena nie gubi:
+  widać morze domyślne i ostrzeżenie.
+- API: `{"cmd":"assets"}` (lista zasobów) i `env.sea`.
+- Scena bazowa (`js/labs/shared/stage.js`): `setSea(…)` — fale i wygląd wody z zasobu (laboratorium filtrów bez zmian).
+
 ## Edytor sceny 0.5.0 — 2026-11-05 (cofnij / ponów)
 
 ### Dodane

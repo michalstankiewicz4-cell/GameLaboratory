@@ -8,6 +8,7 @@ import { PostPipeline } from '../../render/sea/post.js';
 import { buildShip, SHIPS } from '../../models/ships-sea/index.js';
 import { SEAS, LOOKS, WATER_BODIES, waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, addWetHull, hullTexture, GLSL_SHIP } from '../../envs/water/waterkit.js';
 import { FoamMap, breaking } from '../../envs/water/foamkit.js';
+import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 import { generateWaterway, heightTexture, terrainMeshes, landUniforms, setLand, GLSL_LAND } from '../../envs/land/landkit.js';
 
 const $ = (id) => document.getElementById(id);
@@ -392,6 +393,27 @@ $('copyJson').onclick = async () => {
   const txt = JSON.stringify({ A: V.A, B: V.B, sun: +$('sun').value, sunBearing: +$('sunAz').value, exposure: +$('exp').value, waterMesh: $('grid').value, pixelNormals: $('pixN').checked }, null, 1);
   try { await navigator.clipboard.writeText(txt); $('copied').textContent = 'Copied. Paste it into the chat to keep a variant.'; } catch { $('copied').textContent = 'Clipboard blocked by the browser.'; }
 };
+// zasób „morze” dla edytora sceny (js/scene/assets.js): stan morza i wygląd wody edytowanego wariantu pod nazwą
+function fillAssets(sel) {
+  const names = listAssets('sea');
+  $('assetList').replaceChildren(...(names.length ? names.map((n) => el('option', { value: n, textContent: n })) : [el('option', { value: '', textContent: '(none yet)' })]));
+  if (sel && names.includes(sel)) $('assetList').value = sel;
+  $('assetLoad').disabled = $('assetDel').disabled = !names.length;
+}
+$('assetSave').onclick = () => {
+  const n = $('assetName').value.trim(); if (!n) { $('assetNote').textContent = 'Give the sea a name first.'; return; }
+  const ok = saveAsset('sea', n, V[edit]);
+  $('assetNote').textContent = ok ? `Saved "${n}" (variant ${edit}). The scene editor offers it in Environment → Sea.` : 'The browser did not let me save.';
+  fillAssets(n);
+};
+$('assetLoad').onclick = () => {
+  const n = $('assetList').value, a = n && getAsset('sea', n); if (!a) return;
+  Object.assign(V[edit], a, { sea: 'custom', look: 'custom' }); $('assetName').value = n; fillUI(); changed();
+  $('assetNote').textContent = `Loaded "${n}" into variant ${edit}.`;
+};
+$('assetDel').onclick = () => { const n = $('assetList').value; if (!n) return; removeAsset('sea', n); fillAssets(); $('assetNote').textContent = `Deleted "${n}".`; };
+fillAssets(); onAssetsChange(() => fillAssets($('assetList').value));
+
 const bindRange = (id, fmt, fn) => { const r = $(id), o = $(id + 'V'); const f = () => { o.textContent = fmt(+r.value); if (fn) fn(+r.value); }; r.addEventListener('input', f); f(); };
 bindRange('splitX', (x) => Math.round(x * 100) + '%');
 bindRange('sun', (x) => x + '°', () => setSun()); bindRange('sunAz', (x) => x + '°', () => setSun());

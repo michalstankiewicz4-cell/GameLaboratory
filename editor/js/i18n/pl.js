@@ -55,5 +55,10 @@
   'bar.undo.tip': "Cofnij ostatnią zmianę sceny (Ctrl+Z)",
   'bar.redo': "Ponów",
   'bar.redo.tip': "Ponów (Ctrl+Y albo Ctrl+Shift+Z)",
+  'env.seaAsset': "Morze",
+  'env.seaDefault': "Domyślne (umiarkowane, północny Atlantyk)",
+  'env.seaMissing': "{name} (nie ma w tej przeglądarce)",
+  'env.seaNote': "Morza to zasoby zapisane w laboratorium wody.",
+  'status.noSea': "Morza „{name}” nie ma w tej przeglądarce: widać morze domyślne.",
   'scene.newName': 'Nowa scena', 'scene.startName': 'Port',
 };

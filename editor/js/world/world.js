@@ -5,6 +5,7 @@ import * as THREE from '../../../vendor/three/three.module.js';
 import { LookPipeline, LOOK_DEFAULTS } from '../../../js/render/sea/look.js';
 import { createStage, LIGHTS } from '../../../js/labs/shared/stage.js';
 import { prefab } from '../../../js/scene/prefabs.js';
+import { getAsset } from '../../../js/scene/assets.js';
 
 export { LIGHTS };
 const D2R = Math.PI / 180;
@@ -50,10 +51,15 @@ export function createWorld(container, store, onWarn) {
     fitShadow();
   }
   function syncPlaces() { store.scene.objects.forEach(place); fitShadow(); }
+  let lastSea = 'null';
   function syncEnv() {
     const env = store.scene.env;
     stage.setSurface(env.surface === 'land' ? 'land' : 'sea');
     stage.setLight(LIGHTS[env.light] ? env.light : 'afternoon');
+    // morze: zasób z laboratorium wody (po nazwie) albo domyślne; brak zasobu w tej przeglądarce — domyślne i ostrzeżenie
+    const sea = env.sea ? getAsset('sea', env.sea) : null, seaKey = JSON.stringify(sea);
+    if (env.sea && !sea && onWarn) onWarn('sea:' + env.sea);
+    if (seaKey !== lastSea) { stage.setSea(sea || {}); lastSea = seaKey; }
     look.sunVisible = stage.sunSeen;
     const L = { ...LOOK_DEFAULTS, ...((env.look && readProfiles()[env.look]) || {}) };
     look.set(L, 'A'); look.set({ ...LOOK_DEFAULTS, exposure: L.exposure }, 'B');

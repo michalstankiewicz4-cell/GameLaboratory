@@ -5,7 +5,7 @@ Strona: `editor/index.html` · wersja: `ui/data/versions.js` (klucz `editor/inde
 
 Scena złożona z modeli laboratoriów: okręty, samochody, czołg, autobus, tramwaj, pociąg, samolot, budowle, broń —
 na morzu albo na lądzie. Model dodaje się z listy, przesuwa, obraca i skaluje uchwytem albo liczbami, a zamienia
-na inny jednym wyborem z listy. Środowisko: powierzchnia (morze / ląd), światło (pora dnia i pogoda z laboratoriów
+na inny jednym wyborem z listy. Środowisko: powierzchnia (morze / ląd), morze (zasób z laboratorium wody), światło (pora dnia i pogoda z laboratoriów
 wodnych) i wygląd kamery (profil z laboratorium filtrów). Szczegóły modelu robi się w jego laboratorium:
 „Otwórz w laboratorium” we Właściwościach. Edytor jest pierwszym krokiem do silnika: laboratoria będą się do niego
 dostosowywać (zasoby z nazwą, wspólne zachowania).
@@ -57,6 +57,7 @@ Silnik (wspólny, poza folderem edytora — będą z niego korzystać też labor
 |---|---|
 | `js/scene/scene-data.js` | scena jako dane: format, nowa scena, obiekt, sprawdzanie danych z pliku (`normalize`) |
 | `js/scene/prefabs.js` | prefabrykaty: każdy model z kitów, który da się postawić w scenie (id, nazwa, rodzina, gdzie stoi, laboratorium, budowa → `{ root, kit, dispose }`) |
+| `js/scene/assets.js` | zasoby z nazwą: ustawienia zapisane w laboratoriach pod nazwą (na razie morze z laboratorium wody) |
 | `js/scene/api.js` | API sceny: polecenia JSON na danych sceny (bez Three.js) |
 | `js/scene/behaviors.js` | zachowania w scenie: okręt na wodzie (`js/behaviors/water/ship.js`), lot (`js/behaviors/air/flight.js`); które pasują do modelu, domyślne |
 | `js/labs/shared/stage.js` | scena bazowa: niebo SkyKit, morze WaterKit albo płaski grunt, słońce z cieniem (wspólna z laboratorium filtrów) |
@@ -77,6 +78,7 @@ Zasada: **dane są jedynym źródłem prawdy**. Okna, uchwyt i pliki zmieniają 
 }
 ```
 
+- `env.sea`: nazwa zasobu „morze” z laboratorium wody (`js/scene/assets.js`) albo `""` — morze domyślne.
 - `env.surface`: `sea` | `land`; `env.light`: `afternoon` | `noon` | `dusk` | `overcast`; `env.look`: nazwa profilu
   z laboratorium filtrów (`gameLab.lookProfiles.v1`) albo `""`.
 - `pos` w metrach (Y w górę), `rot` w stopniach (kolejność YXZ: kurs, pochylenie, przechył), `scale` — mnożnik.
@@ -99,7 +101,8 @@ albo lista (po kolei); wynik `{ "ok": true, … }` albo `{ "ok": false, "error":
 | `set` | `id` albo `name`, potem `newName` (z `id` także `name`), `prefab`, `pos`, `rot`, `scale`, `behavior` | zmienia obiekt |
 | `move` | `id` albo `name`, `by: [dx, dy, dz]` | przesuwa o wektor |
 | `remove` | `id` albo `name` | usuwa |
-| `env` | `surface` (`sea` / `land`), `light`, `look` | środowisko |
+| `env` | `surface` (`sea` / `land`), `light`, `look`, `sea` (nazwa zasobu albo `""`) | środowisko |
+| `assets` | `[kind]` | zasoby z nazwą zapisane w laboratoriach (`sea` — laboratorium wody) |
 | `select` | `id` / `name` albo nic | wybór w edytorze |
 | `new` | `[name]` | pusta scena |
 | `load` | `scene` | cała scena z danych |
@@ -122,6 +125,6 @@ Jednostki: metry, stopnie; Y w górę, kurs 0 — wzdłuż +Z. W czasie gry pole
 ## Na później (propozycje)
 
 - Modele ze Space (statki kosmiczne, łaziki, roboty morskie) — ich kity potrzebują `js/core/three-global.js`.
-- Ląd z laboratorium lądu i woda z laboratorium wody jako zasoby z nazwą.
+- Ląd z laboratorium lądu jako zasób (scena bazowa ma dziś płaski grunt); brzegi, lód i prądy z laboratorium wody w morzu z zasobu.
 - Woda wycięta w kadłubie każdego okrętu (dziś WaterKit umie jeden kadłub w środku sceny).
 - Zachowania dla pozostałych modeli (koło na szynie dla tramwaju i pociągu — potrzebuje toru w scenie, pojazdy drogowe).

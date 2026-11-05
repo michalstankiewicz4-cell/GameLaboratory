@@ -127,3 +127,10 @@ A water body *Lava (molten rock)* and a *Lava* slider (0–1, WaterKit `uLava`):
 into plates by cracks of glowing melt, with patches where the crust has melted; the melt shines by itself (not by
 daylight), the crust is lit like rock. No foam, almost no reflection; slow, heavy swells (sea state *lava*). The cave
 lab's lava lakes are generic; their style is meant to come from here.
+
+## Zasób dla edytora sceny
+
+Sekcja **Asset for the scene editor**: edytowany wariant (stan morza: Hs, Lp, chop, spread, n, dir; wygląd wody: deep,
+scatter, shine, ripples, crest, reflect) zapisuje się pod nazwą jako zasób „morze” (`js/scene/assets.js`,
+`localStorage["gameLab.assets.v1"]`). Edytor sceny pokazuje go w Środowisko → Morze. Brzeg, lód, prąd, olej i lawa
+nie wchodzą do zasobu (scena bazowa edytora ma otwarte morze). Zapisany zasób można wczytać z powrotem do wariantu albo usunąć.

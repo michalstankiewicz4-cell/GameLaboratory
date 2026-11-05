@@ -2,6 +2,7 @@
 // Czytają dane ze store, zmiany wysyłają do store; świat 3D odbija je sam.
 import { PREFABS, FAMILIES, prefab } from '../../../js/scene/prefabs.js';
 import { LIGHTS, readProfiles } from '../world/world.js';
+import { listAssets } from '../../../js/scene/assets.js';
 import { BEHAVIORS, behaviorsFor, behaviorOf } from '../../../js/scene/behaviors.js';
 
 const $ = (id) => document.getElementById(id);
@@ -44,6 +45,12 @@ export function createPanels(store, actions) {
       const names = Object.keys(readProfiles());
       $('look').replaceChildren(el('option', { value: '', textContent: t('env.plain') }), ...names.map((n) => el('option', { value: n, textContent: n })));
       $('look').value = names.includes(S.env.look) ? S.env.look : '';
+      // morze: zasoby z laboratorium wody; nazwa ze sceny, której nie ma w tej przeglądarce, zostaje na liście (oznaczona)
+      const seas = listAssets('sea'), cur = S.env.sea || '';
+      $('seaAsset').replaceChildren(el('option', { value: '', textContent: t('env.seaDefault') }), ...seas.map((n) => el('option', { value: n, textContent: n })),
+        ...(cur && !seas.includes(cur) ? [el('option', { value: cur, textContent: t('env.seaMissing', { name: cur }) })] : []));
+      $('seaAsset').value = cur;
+      $('seaRow').hidden = $('seaNote').hidden = S.env.surface !== 'sea';
       return;
     }
     setVal('oName', o.name); $('oPrefab').value = o.prefab;
@@ -75,6 +82,7 @@ export function createPanels(store, actions) {
   });
   $('oBehavior').addEventListener('change', () => { const o = store.selected; if (o) store.update(o.id, { behavior: $('oBehavior').value }); });
   $('surface').addEventListener('change', () => store.setEnv({ surface: $('surface').value }));
+  $('seaAsset').addEventListener('change', () => store.setEnv({ sea: $('seaAsset').value }));
   $('light').addEventListener('change', () => store.setEnv({ light: $('light').value }));
   $('look').addEventListener('change', () => store.setEnv({ look: $('look').value }));
   $('toGround').addEventListener('click', () => { const o = store.selected; if (o) store.update(o.id, { pos: [o.pos[0], 0, o.pos[2]] }); });

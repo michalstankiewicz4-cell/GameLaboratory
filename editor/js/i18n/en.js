@@ -56,5 +56,10 @@
   'bar.undo.tip': "Undo the last change to the scene (Ctrl+Z)",
   'bar.redo': "Redo",
   'bar.redo.tip': "Redo (Ctrl+Y or Ctrl+Shift+Z)",
+  'env.seaAsset': "Sea",
+  'env.seaDefault': "Default (moderate, North Atlantic)",
+  'env.seaMissing': "{name} (not in this browser)",
+  'env.seaNote': "Seas are the assets saved in the water lab.",
+  'status.noSea': "Sea \"{name}\" is not saved in this browser: the default sea is shown.",
   'scene.newName': 'New scene', 'scene.startName': 'Harbour',
 };
