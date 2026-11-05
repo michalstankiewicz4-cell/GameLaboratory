@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.28.0 · doktor modeli 1.2.5 — 2026-11-05 (bomba 250 lb)
+
+### Dodane
+- WeaponKit: **bomba 250 lb GP Mk IV** (`js/models/weapons/bomb250.js`): korpus z profilu obrotowego, zapalnik, pas,
+  statecznik skrzynkowy, uchwyty podwieszenia (`docs/models/weapons/README.md`); w doktorze modeli automatycznie.
+
 ## Program 0.27.0 · laboratorium człowieka 1.2.0 · doktor modeli 1.2.4 — 2026-11-05 (zombie, broń, reflektor czołgu)
 
 ### Dodane

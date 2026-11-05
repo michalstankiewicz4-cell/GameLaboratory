@@ -609,5 +609,18 @@
    ],
    "triangles": 1548
   }
+ },
+ "weapons/bomb250": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 13,
+   "materials": 3,
+   "size": [
+    0.34,
+    0.34,
+    1.38
+   ],
+   "triangles": 1272
+  }
  }
 }

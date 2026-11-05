@@ -11,3 +11,8 @@ z muszką, rura gazowa, szczerbinka, hamulec wylotowy z otworami, składana kolb
 (`parts.flash`) pokazuje się na 0,05 s po `update(…, { fire: true })`.
 `info`: długość 0,943 m, lufa 0,457 m, masa 3,35 kg, szybkostrzelność 700/min, prędkość pocisku 920 m/s, magazynek 30;
 punkty `muzzleAt`, `stockAt`, `supportAt` (wylot, stopka kolby, łoże — do ułożenia w dłoniach).
+
+## Bomba 250 lb GP Mk IV (`bomb250`)
+Bomba burząca RAF: korpus z profilu obrotowego (ostrołukowy nos, walec, stożek ogonowy), zapalnik w nosie, pas malowania,
+statecznik skrzynkowy (4 lotki w ramce), dwa uchwyty podwieszenia. `info`: długość 1,37 m, średnica 0,26 m, masa 113 kg,
+promień zniszczeń `blast` 14 m (do gry), punkt podwieszenia `hangAt`. Początek w środku ciężkości, +z — nos.
