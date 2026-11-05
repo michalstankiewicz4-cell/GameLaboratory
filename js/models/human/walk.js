@@ -171,8 +171,8 @@ function addLayers(c, p, L, t) {
   k = w("aim");
   if (k) {
     // holding a long gun at the ready: the right hand at the grip by the chest, the left forward under the barrel
-    p.armRaise[1] -= 38 * D * k; p.upperArm[1][2] -= 18 * D * k; p.forearm[1][0] -= 95 * D * k; p.forearm[1][1] += 0.5 * k;
-    p.armRaise[0] -= 62 * D * k; p.upperArm[0][2] -= 22 * D * k; p.forearm[0][0] -= 40 * D * k;
+    p.armRaise[1] -= 18 * D * k; p.upperArm[1][2] -= 12 * D * k; p.forearm[1][0] -= 70 * D * k; p.forearm[1][1] += 0.35 * k;
+    p.armRaise[0] -= 42 * D * k; p.upperArm[0][2] -= 18 * D * k; p.forearm[0][0] -= 22 * D * k;
     p.chest[1] += 0.12 * k; p.armSwing *= 1 - k;
   }
   // a damped swing (sad, sneaking): scale the arms' forward swing
