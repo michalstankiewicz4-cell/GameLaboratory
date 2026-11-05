@@ -55,12 +55,12 @@ i edytor ją pokazują, AI ją zmienia.
 |---|---|
 | Assets | modele i kity: `js/models/` |
 | Scene (środowiska) | `js/envs/` (niebo, woda, ląd, prawa) |
-| Scripts | zachowania: `js/behaviors/` (koło na szynie, okręt na wodzie, lot) |
+| Scripts | zachowania: `js/behaviors/` (koło na szynie, okręt na wodzie, lot) — [opis](../behaviors/README.md) |
 | Graphics + FX | `js/render/` (wygląd kamery, filtry, widzenie) |
 | Audio | `js/audio/` (MusicKit) |
 | UI i Debug | `ui/shell/` (okna, `LabPerf`, konsola, `LabLog`, karta ładowania) |
 | Jobs/Workers | wątki nauki w laboratoriach języka i obrazów |
-| Scene (dane) | `js/scene/scene-data.js` (format `gamelab-scene`), prefabrykaty `js/scene/prefabs.js` |
+| Scene (dane) | `js/scene/scene-data.js` (format `gamelab-scene`), prefabrykaty `js/scene/prefabs.js` — [opis](../scene/README.md) |
 | Zasoby z nazwą | `js/scene/assets.js` — ustawienia zapisane w laboratoriach pod nazwą (morze z laboratorium wody), scena trzyma nazwę |
 | API dla AI | `js/scene/api.js` — polecenia JSON na scenie (zakładka API w konsoli edytora, `window.sceneApi`) |
 | Scripts w scenie | `js/scene/behaviors.js` — zachowania podpięte do prefabrykatów (okręt, lot), pole `behavior` obiektu |
@@ -74,9 +74,11 @@ scenę Three.js), warstwy Input, szyny zdarzeń i sieci.
 1. Scena jako dane (JSON: obiekty, składniki, środowisko) i jedna wspólna pętla. *(scena jako dane: zrobione w 0.29.0,
    `js/scene/`; wspólna pętla dla gier — jeszcze nie)*
 2. Edytor sceny („Warsztat”): drzewo obiektów, właściwości, podgląd; wstawianie modeli z kitów, środowisk
-   i zachowań z laboratoriów. *(pierwsza wersja: `editor/`, 0.1.0)*
+   i zachowań z laboratoriów. *(pierwsza wersja: `editor/`, 0.1.0; zachowania i ▶ Graj — 0.32.0; cofnij / ponów —
+   edytor 0.5.0; morze z laboratorium wody jako zasób — 0.34.0)*
 3. API dla AI na scenie jako danych. *(pierwsza wersja: `js/scene/api.js`, 0.33.0)*
-4. Input z akcjami, szyna zdarzeń, zapis.
+4. Input z akcjami, szyna zdarzeń, zapis. *(zapis zasobów z nazwą: `js/scene/assets.js`, 0.34.0; klawiatura gracza
+   jest na razie w edytorze, `editor/js/play/input.js`)*
 5. Sieć.
 
 ## Rola edytora i docelowy układ repozytorium (plan, 2026-11-05)

@@ -22,7 +22,9 @@ Powierzchnia 22,48 m², rozpiętość 11,23 m, cięciwa średnia 2,08 m, masa 27
 sprawność), współczynniki nośnej, oporu, przeciągnięcia, momentów i podwozia (koła ze sprężyną, tłumieniem, hamulcami).
 Czyta je zachowanie **„lot w atmosferze”** (`js/behaviors/air/flight.js`, środowisko ląd): bryła sztywna 6 stopni swobody,
 siły aerodynamiczne z kąta natarcia i ślizgu, ciąg z mocy, momenty stateczności i sterów, koła na sprężynach.
-Start, lot i lądowanie wynikają wyłącznie z sił.
+Start, lot i lądowanie wynikają wyłącznie z sił. W edytorze sceny (▶ Graj) Spitfire lata z tym zachowaniem
+([`../../behaviors/README.md`](../../behaviors/README.md)); na rozbiegu trzeba trzymać ster wysokości (↓), bo bez
+tego samolot z kółkiem ogonowym się rozbija.
 
 ## Plan AirKit
 - Śmigłowiec PZL W-3 Sokół (z własnym zachowaniem lotu wirnika).

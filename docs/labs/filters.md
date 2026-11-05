@@ -8,7 +8,8 @@ Grafika z Battle (preferowana, CLAUDE.md).
   krople i brud na obiektywie, flara słońca, wyostrzanie. Gotowe ustawienia: Game clean, Cinematic, Bodycam.
 - **Profile:** w oknie Kamera (sekcja Profiles) nazwa + Save profile / Delete profile; profil to cały wygląd (suwaki,
   tone mapping, automatyczna ekspozycja), zapisany w przeglądarce (`localStorage["gameLab.lookProfiles.v1"]`,
-  `{ nazwa: look }`). Zapisane profile wybiera się z listy na pasku narzędzi; zmiana suwaka odznacza profil.
+  `{ nazwa: look }`). Zapisane profile wybiera się z listy na pasku narzędzi; zmiana suwaka odznacza profil. Te same profile wybiera
+  edytor sceny (Środowisko → Wygląd kamery) i laboratorium skórek.
 - **Porównanie:** czysty obraz po lewej, przesuwany podział.
 - **Koszt:** każdy efekt wyłączany po kolei; ile milisekund dodaje do klatki.
 - **Sceny** (`js/labs/filters/scenes/`): ORP Błyskawica, ORP Orzeł, platforma Super 300 (morze), pociąg na torze (ląd).

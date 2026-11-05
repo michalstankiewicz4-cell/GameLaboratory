@@ -50,4 +50,4 @@ Coordinates: metres, x = starboard, y = up (0 = waterline), z = forward (0 = ami
 `js/behaviors/water/ship.js` (środowisko woda): `createShip(def, {x, z, th})` → `step(dt, {throttle, rudder}, waves, t, isWater)`.
 Ciąg z mocy (54 000 KM, sprawność 0,6), opór kadłuba dobrany do prędkości maksymalnej (39 w), ster działający
 z prędkością (promień cyrkulacji ≈ 3 długości), bezwładność obrotu; kołysanie za falami WaterKit (`heightAt`) jak
-w laboratorium wody; mielizna, gdy dziób, śródokręcie lub rufa są poza wodą. Używa go gra CityExplorer (Wisła).
+w laboratorium wody; mielizna, gdy dziób, śródokręcie lub rufa są poza wodą. Używa go gra CityExplorer (Wisła) i edytor sceny (▶ Graj: masa 2144 t, moc 54 000 KM, 39,5 w — `js/scene/behaviors.js`).

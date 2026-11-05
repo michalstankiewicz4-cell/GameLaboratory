@@ -24,7 +24,7 @@
 - `ui/` — całe UI (opis: `ui/README.md`): `ui/ui.css` (jedno wejście), `ui/style/` (tokeny, czcionki, kontrolki, motywy `space.css` i `sea.css`), `ui/shell/` (dziennik, pasek menu, paski, okna, okna standardowe, wydajność, konsola, karta ładowania, przełącznik środowiska), `ui/data/` (katalog, wersje), `ui/pages/` (style stron).
 - `js/render/`, `js/audio/`, `js/labkit/` — wspólne warstwy.
 - `tools/` — narzędzia (doktor modeli, kitcheck, `paths.py` — sprawdzanie ścieżek).
-- `docs/` — dokumentacja w układzie kodu (mapa: `docs/README.md`): `docs/labs/` (laboratoria), `docs/models/` (modele), `docs/tools/` (narzędzia), `docs/guides/` (przewodniki, renderowanie, pułapki), `docs/history/` (historia sprzed przeniesienia, wykonany remanent).
+- `docs/` — dokumentacja w układzie kodu (mapa: `docs/README.md`): `docs/labs/` (laboratoria), `docs/models/` (modele), `docs/scene/` (silnik sceny), `docs/behaviors/` (zachowania), `docs/tools/` (narzędzia), `docs/guides/` (przewodniki, renderowanie, pułapki), `docs/history/` (historia sprzed przeniesienia, wykonany remanent).
 - Nazwy plików i folderów małymi literami, słowa łączone myślnikiem (`solar-system.js`, `vehicles-water.html`); w kodzie nazwy mówią, co robią teraz (np. `LabKit.autoHideWindows`, nie dawne „hud”).
 
 ## Fizyka

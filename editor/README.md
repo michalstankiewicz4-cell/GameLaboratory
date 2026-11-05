@@ -1,7 +1,8 @@
 # Edytor sceny („Warsztat”)
 
 Strona: `editor/index.html` · wersja: `ui/data/versions.js` (klucz `editor/index.html`) · zmiany: [`CHANGELOG.md`](CHANGELOG.md)
-· plan silnika: [`docs/guides/engine-architecture.md`](../docs/guides/engine-architecture.md).
+· plan silnika: [`docs/guides/engine-architecture.md`](../docs/guides/engine-architecture.md)
+· silnik sceny: [`docs/scene/README.md`](../docs/scene/README.md) · zachowania: [`docs/behaviors/README.md`](../docs/behaviors/README.md).
 
 Scena złożona z modeli laboratoriów: okręty, samochody, czołg, autobus, tramwaj, pociąg, samolot, budowle, broń —
 na morzu albo na lądzie. Model dodaje się z listy, przesuwa, obraca i skaluje uchwytem albo liczbami, a zamienia
