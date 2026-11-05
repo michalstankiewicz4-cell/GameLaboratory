@@ -3,6 +3,15 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.31.0 · edytor sceny 0.2.0 — 2026-11-05 (prawdziwe panele)
+
+### Zmienione
+- **Panele** (przełącznik Okna | Panele, `ui/shell/windows.js`): zamiast okien ułożonych w kolumnach — prawdziwe panele
+  przy krawędziach, między paskami, z oknami jako sekcjami (tytuł jako nagłówek, cienka linia pod spodem), przewijane.
+- **Konsola** w Panelach dokuje się na dole pośrodku, między panelami (wysokość zmienia się, ciągnąc jej róg).
+- Wolny środek publikowany jako `--viewL`, `--viewR`, `--viewB` i `window.LabView`; strona z `body.viewFits` wstawia tam
+  swój widok 3D. Edytor sceny już tak robi; laboratoria mają na razie widok na całym ekranie pod panelami.
+
 ## Program 0.30.0 · edytor sceny 0.1.1 — 2026-11-05 (okno albo panel)
 
 ### Dodane

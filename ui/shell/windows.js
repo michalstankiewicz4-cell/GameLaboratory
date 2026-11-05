@@ -15,7 +15,10 @@
    so pages with a strict CSP work.
    Window or panel: the pin on a title bar docks that window in the panel on its side (a column between the bars,
    one window under another, scrolled), and back; the toolbar switch Windows | Panels does it for all of them.
-   Docked or not is kept with the window's place.
+   Docked or not is kept with the window's place. Panels (all docked): real panels flush with the edges, the console
+   (ui/shell/console.js) docked at the bottom between them, body.lmPanels; the free middle is published as --viewL,
+   --viewR, --viewB on <html> and through window.LabView (a page with body.viewFits puts its #view there and sizes its
+   renderer from it — the scene editor; other pages keep the view full size, under the panels).
    ======================================================================= */
 (function () {
 "use strict";
@@ -109,11 +112,31 @@ function setDocked(w, on, quiet) {
   pinTitle(w);
   if (!quiet) { (state[w.id] = state[w.id] || {}).docked = on; save(); }
 }
+// the free middle between the panels (and the console under it): CSS variables and LabView for the pages that fit their view
+const viewSubs = new Set();
+let viewKey = "";
+function layoutView() {
+  const vis = (side) => { const d = docks[side]; return d && getComputedStyle(d).display !== "none" ? d.getBoundingClientRect().width : 0; };
+  const con = document.querySelector(".labConsole.lcDocked:not([hidden])");
+  const L = Math.round(vis("left")), R = Math.round(vis("right")), B = con ? Math.round(con.getBoundingClientRect().height) : 0;
+  const root = document.documentElement.style;
+  root.setProperty("--viewL", L + "px"); root.setProperty("--viewR", R + "px"); root.setProperty("--viewB", B + "px");
+  const k = [L, R, B].join(","); if (k === viewKey) return; viewKey = k;
+  viewSubs.forEach((f) => { try { f(); } catch (e) { /* a page's listener */ } });
+}
+window.LabView = {
+  // the free middle in pixels: { left, right, bottom } taken by the panels and the console
+  insets: () => ({ left: parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--viewL")) || 0, right: parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--viewR")) || 0, bottom: parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--viewB")) || 0 }),
+  onChange: (f) => { viewSubs.add(f); return () => viewSubs.delete(f); },
+  update: () => { viewKey = ""; layoutView(); },
+};
 // the toolbar switch: Windows | Panels (all at once); neither lit when they are mixed
 let sw = null;
 function syncSwitch() {
-  if (!sw) return;
   const n = wins.filter((w) => w.docked).length;
+  document.body.classList.toggle("lmPanels", wins.length > 0 && n === wins.length);
+  layoutView();
+  if (!sw) return;
   sw.querySelector('[data-v="win"]').classList.toggle("on", n === 0);
   sw.querySelector('[data-v="dock"]').classList.toggle("on", n === wins.length);
 }
@@ -155,6 +178,9 @@ const fillAll = () => document.querySelectorAll(".labWin input[type=range], .lab
 function init() {
   document.querySelectorAll("[data-window]").forEach(make);
   toolbarSwitch();
+  syncSwitch();
+  addEventListener("resize", layoutView);
+  new MutationObserver(() => layoutView()).observe(document.body, { attributes: true, attributeFilter: ["class", "hidden"], subtree: true });
   document.addEventListener("input", (e) => { if (e.target.matches && e.target.matches("input[type=range]")) fill(e.target); }, true);
   requestAnimationFrame(stack); setTimeout(stack, 1200);   // again once the labs have filled their panels
   // titles from a heading: the labs fill their panels after loading

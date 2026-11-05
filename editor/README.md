@@ -13,7 +13,8 @@ dostosowywać (zasoby z nazwą, wspólne zachowania).
 ## Obsługa
 
 - Okna: **Opis**, **Scena** (dodaj model, hierarchia), **Właściwości** (środowisko albo wybrany obiekt), **Kamera**,
-  **Wydajność**; OPCJE → Okna.
+  **Wydajność**; OPCJE → Okna. **Okna | Panele** na pasku: w Panelach okna są panelami przy krawędziach, konsola na dole
+  pośrodku, a widok 3D zajmuje wolny środek (`body.viewFits`).
 - Pasek narzędzi: cofnij · domek · ponów, uchwyt **Przesuń / Obróć / Skaluj**, **Nowa**, **Zapisz plik**, **Otwórz plik**.
 - Klawisze: W / E / R — przesuń, obróć, skaluj; Delete — usuń; Ctrl+D — powiel; F — pokaż wybrany; Esc — środowisko;
   H — chowa okna. Kliknięcie modelu wybiera go.

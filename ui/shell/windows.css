@@ -15,17 +15,19 @@
 .labWinPin{width:26px;height:26px;border:0;border-radius:6px;background:none;color:var(--dim);font:14px var(--font);cursor:pointer}
 .labWinPin:hover{background:var(--field);color:var(--accent)}
 .labWin.docked .labWinPin{color:var(--accent)}
-/* the side panels (window or panel: ui/shell/windows.js): a column between the bars, windows one under another */
-.labDock{position:fixed;z-index:19;top:calc(var(--menuH) + var(--barH) + 8px);bottom:calc(var(--footH) + 8px);width:330px;
-  display:flex;flex-direction:column;gap:8px;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}
-.labDock.left{left:8px}
-.labDock.right{right:8px;width:300px}
-body.lmNoBar .labDock{top:calc(var(--menuH) + 8px)}
-body.lmNoFoot .labDock{bottom:8px}
+/* the side panels (window or panel: ui/shell/windows.js): real panels flush with the edges, between the bars;
+   a docked window is a section of the panel (its title a heading, a thin line under it), the panel scrolls */
+.labDock{position:fixed;z-index:19;top:calc(var(--menuH) + var(--barH));bottom:var(--footH);width:330px;
+  display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;background:var(--menuBg)}
+.labDock.left{left:0;border-right:1px solid var(--line)}
+.labDock.right{right:0;width:300px;border-left:1px solid var(--line)}
+body.lmNoBar .labDock{top:var(--menuH)}
+body.lmNoFoot .labDock{bottom:0}
 .labDock:not(:has(> .labWin:not([hidden]))){display:none}
-.labWin.docked{position:static;flex:none;width:auto;max-width:none;max-height:none;box-shadow:none;transform:none}
-.labWin.docked .labWinHead{cursor:default}
-.labWin.docked > .labWinBody{overflow:visible}
+.labWin.docked{position:static;flex:none;width:auto;max-width:none;max-height:none;background:none;border:0;border-bottom:1px solid var(--line);
+  border-radius:0;box-shadow:none;backdrop-filter:none;transform:none}
+.labWin.docked .labWinHead{cursor:default;border-bottom:0;height:32px}
+.labWin.docked > .labWinBody{overflow:visible;padding-top:4px}
 /* the lab's panel inside: no longer placed on its own */
 .labWin > .labWinBody{position:static !important;inset:auto !important;width:auto !important;max-height:none !important;flex:1;min-height:0;overflow:auto;
   margin:0;padding:12px 14px 16px;background:none;border:0;border-radius:0;backdrop-filter:none;box-shadow:none;transform:none;pointer-events:auto}
@@ -36,4 +38,7 @@ body.lmNoFoot .labDock{bottom:8px}
 .labWin:has(> :is(.idle, .labIdle)){opacity:.18}
 .labWin > :is(.idle, .labIdle){opacity:1}
 .labWin > .labIdle, .labWin > .labIdle *{pointer-events:auto !important}
+/* a page that fits its 3D view into the free middle (body.viewFits: the scene editor) */
+body.viewFits.lmPanels #view{left:var(--viewL,0px);right:var(--viewR,0px);bottom:calc(var(--footH) + var(--viewB,0px));top:calc(var(--menuH) + var(--barH));width:auto;height:auto}
+body.viewFits.lmPanels.lmNoBar #view{top:var(--menuH)}
 @media (max-width:640px){.labWin,.labWin.right{width:calc(100vw - 16px)}.labDock,.labDock.right{width:calc(100vw - 16px)}}

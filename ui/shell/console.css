@@ -19,3 +19,8 @@ body > .bar .sp + .lcBtn{margin-left:0}
 .labConsole .lc-warn .lcKind{color:var(--accent)}
 .labConsole .lc-load .lcKind{color:var(--ok)}
 .labConsole .lcCount{font:11px var(--mono);color:var(--dim);text-align:right}
+/* docked at the bottom between the side panels (Panels: ui/shell/windows.js) */
+.labConsole.lcDocked{left:var(--viewL,0px) !important;right:var(--viewR,0px) !important;top:auto !important;bottom:var(--footH);width:auto;height:30vh;
+  min-height:140px;border-radius:0;border-width:1px 0 0;box-shadow:none;resize:vertical;z-index:18;background:var(--menuBg)}
+body.lmNoFoot .labConsole.lcDocked{bottom:0}
+.labConsole.lcDocked .labWinHead{cursor:default}

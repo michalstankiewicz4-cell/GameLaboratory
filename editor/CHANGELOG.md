@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.2.0 — 2026-11-05 (widok między panelami)
+
+### Zmienione
+- W trybie Panele widok 3D zajmuje wolny środek między panelami i konsolą (`body.viewFits`), a renderer liczy się
+  z rozmiaru widoku, nie okna przeglądarki.
+
 ## 0.1.1 — 2026-11-05 (okna albo panele)
 
 ### Zmienione

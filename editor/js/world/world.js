@@ -69,8 +69,13 @@ export function createWorld(container, store, onWarn) {
     if (box.isEmpty()) { stage.fitShadow(new THREE.Vector3(), 60); return; }
     stage.fitShadow(box.getCenter(new THREE.Vector3()), Math.min(600, box.getSize(new THREE.Vector3()).length() * 0.6 + 10));
   }
-  function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); look.resize(innerWidth, innerHeight); }
+  // the view's own size: with Panels (ui/shell/windows.js) it is the free middle between the panels and the console
+  function resize() {
+    const w = Math.max(1, container.clientWidth || innerWidth), h = Math.max(1, container.clientHeight || innerHeight);
+    renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); look.resize(w, h);
+  }
   addEventListener('resize', resize); resize();
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(container);
 
   let last = performance.now(), before = null;
   function frame(now) {

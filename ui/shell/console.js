@@ -69,12 +69,16 @@ function build() {
     const x = Math.min(Math.max(st.x, 8 - 300), innerWidth - 80), y = Math.min(Math.max(st.y, 36), innerHeight - 40);
     win.style.left = x + "px"; win.style.top = y + "px"; win.style.right = "auto";
   };
-  const show = (on) => { st.open = on; win.hidden = !on; btn.classList.toggle("on", on); save(); if (on) { place(); render(); } };
+  const show = (on) => { st.open = on; win.hidden = !on; btn.classList.toggle("on", on); save(); if (on) { place(); render(); } if (window.LabView) window.LabView.update(); };
+  // panels (ui/shell/windows.js, body.lmPanels): the console docks at the bottom, between the side panels
+  const dockState = () => { win.classList.toggle("lcDocked", document.body.classList.contains("lmPanels")); if (window.LabView) window.LabView.update(); };
+  new MutationObserver(dockState).observe(document.body, { attributes: true, attributeFilter: ["class"] }); dockState();
+  if (window.ResizeObserver) new ResizeObserver(() => { if (window.LabView) window.LabView.update(); }).observe(win);   // dragging its top edge
   btn.onclick = () => show(win.hidden);
   close.onclick = () => show(false);
   show(st.open);
   head.addEventListener("pointerdown", (e) => {
-    if (e.target === close) return;
+    if (e.target === close || win.classList.contains("lcDocked")) return;
     const r = win.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
     head.setPointerCapture(e.pointerId); win.classList.add("dragging");
     const move = (ev) => { st.x = ev.clientX - dx; st.y = ev.clientY - dy; place(); };
