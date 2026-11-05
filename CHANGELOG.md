@@ -3,6 +3,17 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.27.0 · laboratorium człowieka 1.2.0 · doktor modeli 1.2.4 — 2026-11-05 (zombie, broń, reflektor czołgu)
+
+### Dodane
+- Człowiek (LifeKit): warstwy ruchu **zombie** (pochylony, głowa opadająca na bok, ręce wyciągnięte przed siebie,
+  powłóczona noga) i **atak** (wypad, ręce drapiące na zmianę); odcienie skóry „Zombie (grey-green)”, „Corpse (waxy)”,
+  ubranie „Torn and filthy”.
+- **WeaponKit** (`js/models/weapons/`) i karabinek **kbs wz. 96 Beryl** z błyskiem wylotowym (`docs/models/weapons/README.md`);
+  doktor modeli: źródło `tools/doctor/sources/weapons.js`.
+- M1A2 Abrams: opcjonalny **reflektor szperacz** przy armacie (`build({ searchlight: true })`, `update({ searchlight })`);
+  w doktorze modeli wariant „Abrams (reflektor)”.
+
 ## Program 0.26.0 — 2026-11-05 (zachowanie „okręt na wodzie”)
 
 ### Dodane

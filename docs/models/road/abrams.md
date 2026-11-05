@@ -38,3 +38,8 @@ Kadłub kołysze się na płaszczyźnie przez koła jezdne, przysiada przy rusza
 ## Doktor modeli
 
 Bez błędów i ostrzeżeń (zostaje 7 części z igłami — info). Ok. 71 tys. trójkątów.
+
+## Reflektor szperacz (opcja)
+`build({ searchlight: true })`: reflektor na wsporniku przy osłonie armaty (obudowa, obręcz, szyba, kratka), celuje
+razem z armatą; silna, wąska wiązka (`SpotLight`, 320 m). `update(…, { searchlight: true })` — włączony; uchwyt:
+`v.searchlight` (`group`, `beam`).

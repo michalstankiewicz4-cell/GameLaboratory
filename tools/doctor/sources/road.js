@@ -6,3 +6,6 @@ export const models = VEHICLE_IDS.map((id) => ({
   id: 'road/' + id, label: vehicleInfo(id).name, sub: 'land · RoadKit', family: 'road',
   build: () => { const v = buildVehicle(id, {}); return { root: v.group, measured: countDraw(v.group), opts: {} }; },
 }));
+// wariant z opcjami: Abrams z reflektorem szperaczem
+models.push({ id: 'road/abrams-searchlight', label: vehicleInfo('abrams').name + ' (reflektor)', sub: 'land · RoadKit', family: 'road',
+  build: () => { const v = buildVehicle('abrams', { searchlight: true }); return { root: v.group, measured: countDraw(v.group), opts: {} }; } });

@@ -45,7 +45,7 @@ Układ folderów jest taki sam jak w kodzie:
 
 | Narzędzie | Strona | Dokument |
 |---|---|---|
-| Doktor modeli | `tools/doctor.html` | [tools/doctor.md](tools/doctor.md) |
+| Doktor modeli | `tools/doctor.html` | [tools/doctor.md](tools/doctor.md) (broń ręczna: [models/weapons/README.md](models/weapons/README.md)) |
 | Kontrola kitów | `tools/kitcheck.html` | sprawdza modele kitów Space z wzorcem `tools/kitcheck.golden.json` |
 | Sprawdzenia (przy każdym wypchnięciu) | `tools/paths.py`, `tools/sitemap.py` | [../CLAUDE.md](../CLAUDE.md), „Strona startowa” |
 

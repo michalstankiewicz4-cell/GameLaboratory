@@ -30,7 +30,7 @@ const GAITS = {
   run: { speed: 3.6, hip: 38 * D, knee: 105 * D, load: 22 * D, arm: 34 * D, elbow: [80 * D, 20 * D], lean: 9 * D, yaw: 7 * D, drop: 4 * D, toeOff: 30 * D, heel: 6 * D, flight: 0.045 },
   tpose: { speed: 0 },
 };
-const LAYERS = ["sneak", "sad", "angry", "nod", "shake", "wave", "look"];
+const LAYERS = ["sneak", "sad", "angry", "nod", "shake", "wave", "look", "zombie", "attack"];
 const FADE = 0.35;
 const smooth = (x) => { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); };
 // a bump on the cycle (wraps around): 1 at c, falling off over w
@@ -75,7 +75,7 @@ const v3 = () => [0, 0, 0];
 function pose() {
   return { pelvis: v3(), pelvisX: 0, spine: v3(), chest: v3(), neck: v3(), head: v3(),
     upperArm: [v3(), v3()], forearm: [v3(), v3()], hand: [v3(), v3()],
-    legs: [{ hip: 0, knee: 0, pitch: 0 }, { hip: 0, knee: 0, pitch: 0 }], flight: 0, armSwing: 1 };
+    legs: [{ hip: 0, knee: 0, pitch: 0 }, { hip: 0, knee: 0, pitch: 0 }], flight: 0, armSwing: 1, armRaise: [0, 0] };
 }
 // a + (b − a)·w, every number
 function mix(a, b, w) {
@@ -153,8 +153,24 @@ function addLayers(c, p, L, t) {
     p.forearm[1][2] = (-28 * D + 0.45 * Math.sin(t * 9)) * k; p.forearm[1][0] *= 1 - k;
     p.hand[1][2] = 0.15 * Math.sin(t * 9 - 0.6) * k;
   }
+  k = w("zombie");
+  if (k) {
+    // the undead: stooped, the head lolling to one side, both arms held out in front, one leg dragged
+    p.spine[0] += 16 * D * k; p.chest[0] += 6 * D * k; p.neck[2] += (0.22 + 0.06 * Math.sin(t * 1.3)) * k; p.head[0] += 0.1 * k;
+    for (let i = 0; i < 2; i++) { p.armRaise[i] -= (72 + 6 * Math.sin(t * 1.9 + i * 2)) * D * k; p.upperArm[i][2] += side[i] * 6 * D * k; p.forearm[i][0] -= 12 * D * k; p.hand[i][0] += 0.3 * k; }
+    p.legs[1].hip *= 1 - 0.45 * k; p.legs[1].knee *= 1 - 0.5 * k;
+    p.armSwing *= 1 - 0.85 * k;
+  }
+  k = w("attack");
+  if (k) {
+    // clawing: lunging forward, the arms raking down in turn
+    p.spine[0] += 10 * D * k; p.chest[0] += 8 * D * k; p.neck[0] -= 6 * D * k;
+    for (let i = 0; i < 2; i++) { const s2 = Math.sin(t * 8 + i * Math.PI); p.armRaise[i] -= (95 + 35 * s2) * D * k; p.forearm[i][0] -= (25 + 30 * Math.max(0, -s2)) * D * k; }
+    p.armSwing *= 1 - k;
+  }
   // a damped swing (sad, sneaking): scale the arms' forward swing
   if (p.armSwing < 1) for (let i = 0; i < 2; i++) p.upperArm[i][0] *= p.armSwing;
+  for (let i = 0; i < 2; i++) p.upperArm[i][0] += p.armRaise[i];   // arms held up (zombie, attack): after the swing is damped
 }
 
 // ---------- the pose onto the skeleton ----------

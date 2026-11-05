@@ -29,6 +29,21 @@
    "triangles": 72000
   }
  },
+ "road/abrams-searchlight": {
+  "counts": {
+   "sliver": 7
+  },
+  "fingerprint": {
+   "drawCalls": 559,
+   "materials": 26,
+   "size": [
+    3.94,
+    5.03,
+    9.98
+   ],
+   "triangles": 72620
+  }
+ },
  "road/polonez": {
   "counts": {
    "seethrough": 2,
@@ -578,6 +593,21 @@
     30.57
    ],
    "triangles": 108410
+  }
+ },
+ "weapons/beryl": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 49,
+   "materials": 5,
+   "size": [
+    0.08,
+    0.32,
+    1.11
+   ],
+   "triangles": 1548
   }
  }
 }

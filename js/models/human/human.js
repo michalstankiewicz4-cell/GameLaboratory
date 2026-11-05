@@ -16,10 +16,10 @@
 "use strict";
 const LK = window.LifeKit, U = LK.util;
 const D = Math.PI / 180;
-const TONES = [["Very light", "#f1cfb1"], ["Light", "#e3b38d"], ["Medium", "#c58c63"], ["Olive", "#a8784e"], ["Brown", "#835537"], ["Dark", "#563524"]];
+const TONES = [["Very light", "#f1cfb1"], ["Light", "#e3b38d"], ["Medium", "#c58c63"], ["Olive", "#a8784e"], ["Brown", "#835537"], ["Dark", "#563524"], ["Zombie (grey-green)", "#8e9a7c"], ["Corpse (waxy)", "#b4ad96"]];
 const HAIRS = [["Black", "#17110d"], ["Dark brown", "#3a2416"], ["Brown", "#6a4226"], ["Auburn", "#843d1f"], ["Blond", "#c7a066"], ["Grey", "#a09a93"]];
 const EYES = [["Brown", "#5b3a1d"], ["Hazel", "#7b6234"], ["Green", "#4c7748"], ["Blue", "#4a74a6"], ["Grey", "#7a858e"]];
-const SUITS = [["Station blue", "#34465f"], ["Graphite", "#3a3d42"], ["Rust", "#7a4a32"], ["Sand", "#a89272"], ["Survey white", "#d9dbd6"]];
+const SUITS = [["Station blue", "#34465f"], ["Graphite", "#3a3d42"], ["Rust", "#7a4a32"], ["Sand", "#a89272"], ["Survey white", "#d9dbd6"], ["Torn and filthy", "#4a4136"]];
 const pct = (v) => Math.round(v * 100) + "%";
 
 const PARAMS = () => [

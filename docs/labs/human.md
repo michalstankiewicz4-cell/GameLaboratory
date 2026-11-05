@@ -52,7 +52,9 @@ pelvis's sway and flight) — and only `apply` touches the bones.
   bent, a lean, arms ready: the pelvis drops by itself), sad (the chest,
   the neck and the head down, a damped arm swing), angry (elbows out, the
   head forward), nod, shake, wave (the right arm up, the forearm waving),
-  look (around). The face takes the moods too (`face.update` reads
+  look (around), zombie (stooped, the head lolling, both arms held out in
+  front, one leg dragged), attack (lunging, the arms raking down in turn; the
+  raised arms are added after the swing is damped). The face takes the moods too (`face.update` reads
   `state.layers`).
 - The lab's **time** slider scales the clock (slow motion).
 

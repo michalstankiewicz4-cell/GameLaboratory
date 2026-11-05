@@ -29,7 +29,7 @@ const IDLER = { z: 3.08, y: 0.63, R: 0.33 }, SPROCKET = { z: -3.33, y: 0.80, R: 
 const DECK = 1.53, SPON = 1.27, BELLY = 0.48, HWL = 1.08, HWU = 1.75;
 const RING = 0.35, ROOF = 2.42;
 
-export function build({ paint = info.paints[0][1], detail = 1 } = {}) {
+export function build({ paint = info.paints[0][1], detail = 1, searchlight = false } = {}) {
   const M = roadMaterials(0x444444);
   const A = mattePaint(paint, { dirt: 0.16, rough: 0.86, seed: 5 });                  // pancerz
   const Ad = mattePaint(new THREE.Color(paint).multiplyScalar(0.84).getHex(), { dirt: 0.22, rough: 0.9, seed: 9 });   // ciemniejsze (osłony, kosze)
@@ -224,6 +224,20 @@ export function build({ paint = info.paints[0][1], detail = 1 } = {}) {
   const coax = add(gun, new THREE.CylinderGeometry(0.02, 0.02, 0.2, 8), grilleM, 'coaxial MG'); coax.rotation.x = Math.PI / 2; coax.position.set(0.25, 0.04, 0.45);
 
   // ---------- światło: reflektory ----------
+  // reflektor szperacz (opcja searchlight): na wsporniku przy osłonie armaty, celuje razem z nią; silna, wąska wiązka
+  let sl = null;
+  if (searchlight) {
+    const g = new THREE.Group(); g.name = 'searchlight'; g.userData.part = true; g.position.set(-0.62, 0.3, 0.05); gun.add(g);
+    add(g, new THREE.BoxGeometry(0.22, 0.05, 0.3), Ad, 'searchlight bracket').position.set(0.12, -0.2, -0.05);
+    const hs = add(g, new THREE.CylinderGeometry(0.2, 0.17, 0.34, 24, 1, true), Ad, 'searchlight housing'); hs.rotation.x = Math.PI / 2;
+    const back = add(g, new THREE.CircleGeometry(0.17, 24), Ad, 'searchlight back'); back.position.z = -0.17; back.rotation.y = Math.PI;
+    const rim = add(g, new THREE.TorusGeometry(0.195, 0.018, 8, 28), metal, 'searchlight rim'); rim.position.z = 0.17;
+    const glassM = new THREE.MeshStandardMaterial({ color: 0xcfd6dc, roughness: 0.05, metalness: 0.2, emissive: 0xfff6e6, emissiveIntensity: 0 });
+    const lens = add(g, new THREE.CircleGeometry(0.19, 28), glassM, 'searchlight lens'); lens.position.z = 0.16;
+    for (let i = -2; i <= 2; i++) { const bar = add(g, new THREE.BoxGeometry(0.3, 0.008, 0.008), metal, 'searchlight grille'); bar.position.set(0, i * 0.065, 0.2); }
+    const beam = new THREE.SpotLight(0xfff4e2, 0, 320, 0.13, 0.35, 1.6); beam.name = 'searchlight beam'; beam.position.set(0, 0, 0.2); beam.target.position.set(0, 0, 30); g.add(beam, beam.target);
+    sl = { group: g, lens: glassM, beam };
+  }
   const spot = new THREE.SpotLight(0xfff1d6, 0, 70, 0.55, 0.5, 1.5); spot.position.set(0, SPON + 0.15, 3.7); spot.target.position.set(0, 0, 22); spot.name = 'headlight beam'; body.add(spot, spot.target);
 
   // ---------- ruch: gąsienice, zawieszenie na podłożu, kołysanie kadłuba, wieża i armata, właz ----------
@@ -265,12 +279,13 @@ export function build({ paint = info.paints[0][1], detail = 1 } = {}) {
     st.hatch += ((opts.work ? 1 : 0) - st.hatch) * Math.min(1, 3 * dt); hatch.rotation.x = -1.9 * st.hatch * st.hatch * (3 - 2 * st.hatch);
     // światła
     lamp.emissiveIntensity = opts.lights ? 3 : 0; spot.intensity = opts.lights ? 50 : 0;
+    if (sl) { sl.lens.emissiveIntensity = opts.searchlight ? 8 : 0; sl.beam.intensity = opts.searchlight ? 40000 : 0; }
     tail.emissiveIntensity = opts.brake ? 3 : opts.lights ? 1 : 0.05;
   }
   update(0, 0.016, {});
   group.traverse((o) => { if (o.isMesh && o.geometry && !o.geometry.boundingSphere) o.geometry.computeBoundingSphere(); });
   return {
-    def: info, group, body, turret, gun, hatch, parts: { body, turret, gun, hatch, sides, tracks: sides },
+    def: info, group, body, turret, gun, hatch, searchlight: sl, parts: { body, turret, gun, hatch, sides, tracks: sides },
     materials: { armour: A, armourDark: Ad, nonskid }, update, rig: { state: st },
     setPaint(c) { for (const [m, k] of [[A, 1], [Ad, 0.84], [nonskid, 0.8]]) { const x = mattePaint(new THREE.Color(c).multiplyScalar(k).getHex(), { dirt: 0.18, rough: 0.86, seed: 5 }); m.map = x.map; m.needsUpdate = true; } },
     dispose() { group.traverse((o) => { if (o.isMesh) o.geometry.dispose(); }); },
