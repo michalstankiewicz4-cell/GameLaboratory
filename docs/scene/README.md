@@ -11,6 +11,7 @@ edytora: [`../../editor/README.md`](../../editor/README.md).
 | `behaviors.js` | zachowania w scenie: podpięcie zachowań z `js/behaviors/` do prefabrykatów | tak |
 | `api.js` | API sceny (dla AI): polecenia JSON na danych sceny | nie |
 | `assets.js` | zasoby z nazwą: ustawienia zapisane w laboratorium pod nazwą | nie |
+| `space.js` | kosmos: kity ze Space ładowane przy pierwszej potrzebie, gotowe tła nieba | nie (ładuje kity) |
 
 Zasada: **dane są jedynym źródłem prawdy.** Okna edytora, uchwyt, API i pliki zmieniają tylko dane (w edytorze:
 `editor/js/core/store.js`); świat 3D je odbija. Zachowania w trakcie gry ruszają modele, ale danych nie zmieniają.
@@ -27,7 +28,7 @@ Zasada: **dane są jedynym źródłem prawdy.** Okna edytora, uchwyt, API i plik
 }
 ```
 
-- `env.surface`: `sea` | `land`; `env.light`: `afternoon` | `noon` | `dusk` | `overcast` (oświetlenia sceny bazowej
+- `env.surface`: `sea` | `land` | `space`; `env.sky` (kosmos): `""` | `"preset:<id>"` | nazwa zasobu „niebo”; `env.light`: `afternoon` | `noon` | `dusk` | `overcast` (oświetlenia sceny bazowej
   `js/labs/shared/stage.js`); `env.look`: profil z laboratorium filtrów albo `""`; `env.sea`: zasób „morze” albo `""`.
 - `pos` w metrach (Y w górę), `rot` w stopniach (kolejność YXZ: kurs, pochylenie, przechył), `scale` — mnożnik.
 - `behavior` (nieobowiązkowe): id zachowania; bez pola — domyślne dla modelu, `""` — stoi w miejscu.
@@ -56,6 +57,7 @@ Wpis: `{ id, label, family, surface, lab, build() → { root, kit, dispose } }`.
 | id | Dla | Zachowanie | Sterowanie (`input`) |
 |---|---|---|---|
 | `ship` | `sea/*` | „okręt na wodzie” (`js/behaviors/water/ship.js`) na falach sceny bazowej (`world.waves`) | `throttle` −0,4…1, `rudder` −1…1 |
+| `thrust` | `space/codewing`, `space/scribe`, `space/swarmer` | „ciąg w próżni” (`js/behaviors/space/thrust.js`) | `throttle` −1…1, `elevator` (pochylenie), `aileron` (kurs), `rudder` (przechył) |
 | `flight` | `air/*` | „lot w atmosferze” (`js/behaviors/air/flight.js`), krok fizyki 1/240 s, grunt na wysokości 0 | `throttle` 0…1, `elevator`, `aileron`, `rudder`, `brake`, `gear`, `flaps` |
 
 - Okręty: liczby ruchu z `SHIP_NUMBERS` (masa, moc, prędkość maksymalna), reszta z modelu (`shipDef`: długość,
@@ -87,9 +89,19 @@ scena trzyma tylko nazwę. Inna karta widzi zmianę od razu (`onAssetsChange`).
 | Rodzaj | Laboratorium | Pola |
 |---|---|---|
 | `sea` | woda ([`../labs/water.md`](../labs/water.md)) | `Hs`, `Lp`, `chop`, `spread`, `n`, `dir`, `deep`, `scatter`, `shine`, `ripples`, `crest`, `reflect` |
+| `sky` | ciała niebieskie ([`../labs/bodies.md`](../labs/bodies.md)), Niebo | wszystkie liczby nieba BodyKit (mgławice, pas, pył, gwiazdy, barwy, ziarno) |
 
 - Funkcje: `listAssets(kind)`, `getAsset(kind, name)`, `saveAsset(kind, name, data)` (tylko pola rodzaju),
   `removeAsset`, `onAssetsChange(f)`.
 - Wygląd kamery (profile laboratorium filtrów) ma na razie własny klucz `gameLab.lookProfiles.v1`.
 - Zasoby są w tej przeglądarce: scena z nazwą zasobu, którego tu nie ma, pokazuje ustawienie domyślne i ostrzega.
 - Nowy rodzaj: wpis w `ASSET_KINDS` (pola, laboratorium), zapis w laboratorium, wybór w edytorze i w `env` API.
+
+## Kosmos (`space.js`)
+
+Kity ze Space (ShipKit, BodyKit z niebem, SystemKit z gotowymi tłami) są pisane pod globalne THREE, więc ładują się
+dopiero, gdy scena ich potrzebuje: `loadSpace()` importuje `js/core/three-global.js`, potem kity po kolei;
+`spaceReady()` mówi, czy są. Prefabrykat z `needs: 'space'` czeka na nie (edytor: karta ładowania), powierzchnia
+`space` tak samo. Gotowe tła: `skyPresets()` (z `SystemKit.SKIES`); w `env.sky` z przedrostkiem `preset:`.
+Statki ShipKit: jednostka = 1 m, dziób obrócony na +Z (`makeGameHolder` w skali 1); `tick(t, dt)` — światła
+i silniki na postoju. Liczby ruchu (`SPACE_NUMBERS` w `behaviors.js`) są założone.

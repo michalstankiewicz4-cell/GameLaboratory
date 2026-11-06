@@ -5,6 +5,7 @@
    Uses BodyKit's public API exclusively.
    ======================================================================= */
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
+import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from "../../scene/assets.js";
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 (() => {
 "use strict";
@@ -82,6 +83,7 @@ function loadBody(keepValues) {
   $("btnClouds").textContent = layers.clouds || "CLOUDS"; $("btnAtmo").textContent = layers.atmosphere || "ATMOSPHERE";
   if (!def) { state.values = null; buildParamSliders(); return; }
   backdrop.group.visible = g.id !== gameSky.groupId;       // the SKY tab shows its own sky
+  $("skyAssetBox").classList.toggle("hidden", g.id !== gameSky.groupId);   // a sky can be saved for the scene editor
   if (!keepValues || !state.values) state.values = BodyKit.defaultValues(g, def);
   // GAME BUILD: the detail the game uses for this body (the sky is built as is)
   const detail = state.gameBuild && g.id !== gameSky.groupId ? state.detail * BodyKit.GAME_DETAIL_SCALE : state.detail;
@@ -342,4 +344,28 @@ loadBody(false);
 applyQuality(state.quality);
 frame();
 window.LabLoad.done();   // the loading card (ui/shell/loader.js)
+// =====================================================================
+// The sky as a named asset for the scene editor (js/scene/assets.js, kind "sky"):
+// the sky's current values under a name; the editor offers it for a space scene.
+// =====================================================================
+function fillSkies(sel) {
+  const names = listAssets("sky");
+  $("skyList").replaceChildren(...(names.length ? names.map((n) => opt(n, n)) : [opt("", "(none yet)")]));
+  if (sel && names.includes(sel)) $("skyList").value = sel;
+  $("skyLoad").disabled = $("skyDel").disabled = !names.length;
+}
+$("skySave").addEventListener("click", () => {
+  const n = $("skyName").value.trim();
+  if (!n) { $("skyNote").textContent = "Give the sky a name first."; return; }
+  const ok = saveAsset("sky", n, state.values);
+  $("skyNote").textContent = ok ? `Saved "${n}". The scene editor offers it in Environment → Sky (surface Space).` : "The browser did not let me save.";
+  fillSkies(n);
+});
+$("skyLoad").addEventListener("click", () => {
+  const n = $("skyList").value, a = n && getAsset("sky", n); if (!a) return;
+  Object.assign(state.values, a); current.setValues(a); buildParamSliders(); queueMeasure();
+  $("skyName").value = n; $("skyNote").textContent = `Loaded "${n}".`;
+});
+$("skyDel").addEventListener("click", () => { const n = $("skyList").value; if (!n) return; removeAsset("sky", n); fillSkies(); $("skyNote").textContent = `Deleted "${n}".`; });
+fillSkies(); onAssetsChange(() => fillSkies($("skyList").value));
 })();

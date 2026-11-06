@@ -8,6 +8,7 @@
 import * as THREE from '../../vendor/three/three.module.js';
 import { createShip, shipDef } from '../behaviors/water/ship.js';
 import { createFlight } from '../behaviors/air/flight.js';
+import { createThrust } from '../behaviors/space/thrust.js';
 
 const D2R = Math.PI / 180;
 const quatOf = (q, o = new THREE.Quaternion()) => o.set(q[1], q[2], q[3], q[0]);   // [w, x, y, z] → THREE
@@ -16,6 +17,14 @@ const quatOf = (q, o = new THREE.Quaternion()) => o.set(q[1], q[2], q[3], q[0]);
 const SHIP_NUMBERS = {
   'sea/blyskawica': { mass: 2.14e6, power: 40.3e6, vmax: 20.3 },   // 2144 t, 54 000 shp, 39,5 w
   'sea/orzel': { mass: 1.1e6, power: 3.5e6, vmax: 10.2 },          // 1100 t na powierzchni, 2 × 2370 KM, 19,8 w
+};
+
+// liczby statków kosmicznych — ZAŁOŻONE (statki są wymyślone, nie mają danych): masa [kg], ciąg główny i wsteczny [N],
+// moment silniczków manewrowych [N·m], moment bezwładności [kg·m²]; Codewing ok. 2 g, dron zwinniejszy, rojowiec lżejszy
+const SPACE_NUMBERS = {
+  'space/codewing': { mass: 2.0e4, thrust: 4.0e5, reverse: 1.0e5, torque: 1.2e5, inertia: 4.0e5 },
+  'space/scribe': { mass: 2.0e3, thrust: 3.0e4, reverse: 1.5e4, torque: 1.0e4, inertia: 1.5e4 },
+  'space/swarmer': { mass: 6.0e3, thrust: 1.5e5, reverse: 4.0e4, torque: 4.0e4, inertia: 8.0e4 },
 };
 
 export const BEHAVIORS = {
@@ -67,6 +76,28 @@ export const BEHAVIORS = {
         // po „Stop”: części modelu jak na postoju (podwozie wypuszczone, klapy schowane, śmigło stoi)
         reset() { if (k.update) for (let i = 0; i < 200; i++) k.update(0, 0.05, { throttle: 0, gear: true, flaps: 0 }); },
         hud: () => ({ speed: s.ias * 3.6, unit: 'km/h', alt: s.p[1], throttle: thr, stall: s.stall, crashed: s.crashed, onGround: s.onGround }),
+      };
+    },
+  },
+  thrust: {
+    label: 'Thrust in vacuum', labelPl: 'Ciąg w próżni', env: 'space', throttle: [-1, 1],
+    fits: (prefabId) => !!SPACE_NUMBERS[prefabId],
+    keys: 'W / S: main engine / reverse (lever) · ↑ ↓: pitch · ← →: yaw · Q / E: roll · nothing pressed: thrusters stop the rotation',
+    keysPl: 'W / S: silnik główny / wsteczny (dźwignia) · ↑ ↓: pochylenie · ← →: kurs · Q / E: przechył · bez klawiszy: silniczki zatrzymują obrót',
+    create(obj, built) {
+      const k = built.kit || {}, sim = createThrust(SPACE_NUMBERS[obj.prefab], { p: [...obj.pos], yaw: obj.rot[1] * D2R, pitch: -obj.rot[0] * D2R });
+      const s = sim.state, root = built.root;
+      let tAcc = 0;
+      return {
+        state: s,
+        step(dt, c) {
+          const thr = c.throttle || 0;
+          sim.step(dt, { throttle: thr, pitch: c.elevator || 0, yaw: -(c.aileron || 0), roll: c.rudder || 0 });   // ↓ — nos w górę (jak w samolocie), → — kurs w prawo
+          root.position.fromArray(s.p); quatOf(s.q, root.quaternion);
+          tAcc += dt; if (k.update) k.update(tAcc, dt, { power: Math.max(0, thr) });   // płomienie silników
+        },
+        hud: () => ({ speed: s.speed, unit: 'm/s', throttle: s.thrust >= 0 ? s.thrust / sim.def.thrust : s.thrust / sim.def.reverse }),
+        reset() { if (k.update) k.update(0, 0.05, { power: 0 }); },
       };
     },
   },

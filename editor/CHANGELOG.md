@@ -3,6 +3,15 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.7.0 — 2026-11-06 (kosmos)
+
+### Dodane
+- Powierzchnia **Kosmos** i lista **Niebo** (gotowe tła i niebo zapisane w laboratorium ciał niebieskich).
+- Rodzina **Statki kosmiczne**: Codewing, Scribe (dron), Swarmer, Haven (stacja); na postoju świecą i pracują jak
+  w laboratorium (`tick`), w grze zachowanie **ciąg w próżni**: W / S silnik główny i wsteczny (dźwignia),
+  ↑ ↓ pochylenie, ← → kurs, Q / E przechył; bez klawiszy silniczki zatrzymują obrót.
+- Kity ze Space ładują się przy pierwszej potrzebie (karta ładowania „Ładowanie kitów kosmosu”).
+
 ## 0.6.0 — 2026-11-05 (morze z laboratorium wody)
 
 ### Dodane

@@ -20,7 +20,8 @@ dostosowywać (zasoby z nazwą, wspólne zachowania).
 - Klawisze: Ctrl+Z — cofnij, Ctrl+Y / Ctrl+Shift+Z — ponów; W / E / R — przesuń, obróć, skaluj; Delete — usuń; Ctrl+D — powiel; F — pokaż wybrany; Esc — środowisko;
   H — chowa okna. Kliknięcie modelu wybiera go.
 - **Graj** (P; Esc — Stop): zachowania ruszają modele (okręty płyną i kołyszą się na falach, samolot lata), gracz steruje
-  wybranym modelem (albo pierwszym z zachowaniem), kamera jedzie za nim. Okręt: W / S maszyny, A / D ster. Samolot:
+  wybranym modelem (albo pierwszym z zachowaniem), kamera jedzie za nim. Okręt: W / S maszyny, A / D ster. Statek kosmiczny: W / S silnik główny i wsteczny, ↑ ↓ pochylenie, ← → kurs,
+  Q / E przechył. Samolot:
   W / S gaz, ↑ ↓ ster wysokości (na rozbiegu trzymać ↓), ← → lotki, Q / E ster kierunku, B hamulce, G podwozie, F klapy.
   Edycja w tym czasie wyłączona; dane sceny się nie zmieniają, po Stop modele wracają na swoje miejsca.
 - **API** (zakładka w konsoli i `window.sceneApi.run(…)`): polecenia JSON na scenie — opis niżej, „API dla AI”.
@@ -58,6 +59,7 @@ Silnik (wspólny, poza folderem edytora — będą z niego korzystać też labor
 |---|---|
 | `js/scene/scene-data.js` | scena jako dane: format, nowa scena, obiekt, sprawdzanie danych z pliku (`normalize`) |
 | `js/scene/prefabs.js` | prefabrykaty: każdy model z kitów, który da się postawić w scenie (id, nazwa, rodzina, gdzie stoi, laboratorium, budowa → `{ root, kit, dispose }`) |
+| `js/scene/space.js` | kosmos: ładowanie kitów ze Space przy pierwszej potrzebie, gotowe tła nieba |
 | `js/scene/assets.js` | zasoby z nazwą: ustawienia zapisane w laboratoriach pod nazwą (na razie morze z laboratorium wody) |
 | `js/scene/api.js` | API sceny: polecenia JSON na danych sceny (bez Three.js) |
 | `js/scene/behaviors.js` | zachowania w scenie: okręt na wodzie (`js/behaviors/water/ship.js`), lot (`js/behaviors/air/flight.js`); które pasują do modelu, domyślne |
@@ -79,6 +81,8 @@ Zasada: **dane są jedynym źródłem prawdy**. Okna, uchwyt i pliki zmieniają 
 }
 ```
 
+- `env.surface`: także `space`; `env.sky` (kosmos): `""` — Deep field, `"preset:<id>"` — gotowe tło (`deep`, `quiet`,
+  `crimson`, `emerald`, `core`, `black`), albo nazwa nieba zapisanego w laboratorium ciał niebieskich.
 - `env.sea`: nazwa zasobu „morze” z laboratorium wody (`js/scene/assets.js`) albo `""` — morze domyślne.
 - `env.surface`: `sea` | `land`; `env.light`: `afternoon` | `noon` | `dusk` | `overcast`; `env.look`: nazwa profilu
   z laboratorium filtrów (`gameLab.lookProfiles.v1`) albo `""`.
@@ -102,8 +106,8 @@ albo lista (po kolei); wynik `{ "ok": true, … }` albo `{ "ok": false, "error":
 | `set` | `id` albo `name`, potem `newName` (z `id` także `name`), `prefab`, `pos`, `rot`, `scale`, `behavior` | zmienia obiekt |
 | `move` | `id` albo `name`, `by: [dx, dy, dz]` | przesuwa o wektor |
 | `remove` | `id` albo `name` | usuwa |
-| `env` | `surface` (`sea` / `land`), `light`, `look`, `sea` (nazwa zasobu albo `""`) | środowisko |
-| `assets` | `[kind]` | zasoby z nazwą zapisane w laboratoriach (`sea` — laboratorium wody) |
+| `env` | `surface` (`sea` / `land` / `space`), `light`, `look`, `sea`, `sky` | środowisko |
+| `assets` | `[kind]` | zasoby z nazwą (`sea` — laboratorium wody, `sky` — ciała niebieskie) i gotowe tła kosmosu |
 | `select` | `id` / `name` albo nic | wybór w edytorze |
 | `new` | `[name]` | pusta scena |
 | `load` | `scene` | cała scena z danych |
@@ -125,7 +129,7 @@ Jednostki: metry, stopnie; Y w górę, kurs 0 — wzdłuż +Z. W czasie gry pole
 
 ## Na później (propozycje)
 
-- Modele ze Space (statki kosmiczne, łaziki, roboty morskie) — ich kity potrzebują `js/core/three-global.js`.
+- Pozostałe modele ze Space (łaziki, budynki baz, roboty morskie) i ciała niebieskie w scenie kosmosu.
 - Ląd z laboratorium lądu jako zasób (scena bazowa ma dziś płaski grunt); brzegi, lód i prądy z laboratorium wody w morzu z zasobu.
 - Woda wycięta w kadłubie każdego okrętu (dziś WaterKit umie jeden kadłub w środku sceny).
 - Zachowania dla pozostałych modeli (koło na szynie dla tramwaju i pociągu — potrzebuje toru w scenie, pojazdy drogowe).

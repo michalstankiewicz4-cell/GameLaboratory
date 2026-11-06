@@ -41,13 +41,21 @@ export function createStage(renderer, scene) {
   ground.receiveShadow = true; ground.visible = false; scene.add(ground);
 
   let envRT = null, envDirty = true, envT = 0, t = 0, shift = 0, sunDir = new THREE.Vector3(0, 1, 0), sunSeen = 1;
+  let space = false, spaceEnv = null, lightId = 'afternoon';   // kosmos: bez nieba, wody, gruntu i mgły; tło i odbicia daje strona
   setSea();
   const stage = {
     skyU, WU, sun, hemi, water, ground, setSea,
     get waves() { return waves; },
     get sunDir() { return sunDir; }, get sunSeen() { return sunSeen; },
-    // 'sea' | 'land' (groundY: wysokość gruntu)
-    setSurface(kind, groundY = 0) { water.visible = kind === 'sea'; ground.visible = kind === 'land'; ground.position.y = groundY; },
+    // 'sea' | 'land' | 'space' (groundY: wysokość gruntu). Kosmos: czarne tło, słońce bez atmosfery (białe, pełne),
+    // bez mgły; tło (np. niebo BodyKit) i mapę odbić (setSpaceEnvironment) daje strona
+    setSurface(kind, groundY = 0) {
+      const was = space; space = kind === 'space';
+      water.visible = kind === 'sea'; ground.visible = kind === 'land'; ground.position.y = groundY; sky.visible = !space;
+      if (space !== was) { if (space) scene.environment = spaceEnv; else envDirty = true; stage.setLight(lightId); }
+    },
+    get space() { return space; },
+    setSpaceEnvironment(tex) { spaceEnv = tex; if (space) scene.environment = tex; },
     // kadłub wycięty z wody (statki z ShipKit morskiego)
     setShip(lines, beam) {
       if (!lines) { WU.uShipFx.value.set(0, 0, 0, 0); return; }
@@ -55,6 +63,7 @@ export function createStage(renderer, scene) {
       WU.uShip.value.set(4, lines.zBow, lines.zStern, beam / 2); WU.uShipFx.value.set(1, 1, 1, 0);
     },
     setLight(id) {
+      lightId = id;
       const p = LIGHTS[id] || LIGHTS.afternoon, w = { ...WEATHER[p.weather] }; delete w.label;
       const L = applySky(skyU, { ...w, ...sunAt(p.time) });
       sunDir = L.sunDir.clone(); sunSeen = Math.max(0, 1 - w.coverage * (0.4 + w.density * 0.6)) * L.sunSeen;
@@ -66,6 +75,11 @@ export function createStage(renderer, scene) {
       WU.uFogCol.value.copy(L.fog); WU.uFogFar.value = L.fogFar; WU.uShine.value = shine0 * 1.8;
       scene.environmentIntensity = 0.85 - w.coverage * w.density * 0.45;
       envDirty = true;
+      if (space) {   // w próżni: słońce białe i pełne (bez atmosfery i chmur), kierunek z pory dnia; prawie bez rozproszonego
+        sunSeen = 1; sun.color.setRGB(1, 0.97, 0.92); sun.intensity = 3.2;
+        hemi.intensity = 0.04; hemi.color.setRGB(0.6, 0.65, 0.8); hemi.groundColor.setRGB(0.05, 0.05, 0.07);
+        scene.fog.density = 0; scene.environmentIntensity = 0.5; envDirty = false;
+      }
       return L;
     },
     // sun shadow box around a model of size s (m)
@@ -80,7 +94,7 @@ export function createStage(renderer, scene) {
       skyU.uCloudOff.value.x += dt * 0.004; skyU.uCloudOff.value.y += dt * 0.002;
       sky.position.copy(camera.position);
       water.position.set(Math.round(camera.position.x / 2) * 2, 0, Math.round(camera.position.z / 2) * 2);
-      envT += dt; if (envDirty && envT > 0.3) { if (envRT) envRT.dispose(); envRT = skyEnvironment(renderer, skyU); scene.environment = envRT.texture; envDirty = false; envT = 0; }
+      envT += dt; if (envDirty && !space && envT > 0.3) { if (envRT) envRT.dispose(); envRT = skyEnvironment(renderer, skyU); scene.environment = envRT.texture; envDirty = false; envT = 0; }
       return t;
     },
   };

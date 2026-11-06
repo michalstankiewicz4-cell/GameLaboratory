@@ -67,6 +67,16 @@
         <button class="tBtn" id="btnReset">RESET</button>
       </div>
       <button class="tBtn wideBtn" id="btnCopy" title="Copies this body's entry for js/models/bodies/bodykit.js (values that differ from the defaults)">COPY VALUES</button>
+      <div id="skyAssetBox" class="hidden">
+        <div class="secHd">SKY FOR THE SCENE EDITOR</div>
+        <label class="sl"><span>Name</span></label>
+        <input type="text" id="skyName" maxlength="40" placeholder="e.g. Violet drift">
+        <button class="tBtn wideBtn" id="skySave" title="Saves this sky under the name; the scene editor offers it in Environment → Sky (space)">SAVE AS A SKY</button>
+        <label class="sl"><span>Saved skies</span></label>
+        <select id="skyList"></select>
+        <div class="twoBtns"><button class="tBtn" id="skyLoad">LOAD</button><button class="tBtn" id="skyDel">DELETE</button></div>
+        <div class="note" id="skyNote">A saved sky is offered by the scene editor: surface Space, Environment → Sky.</div>
+      </div>
     </div>
   </div>
 </div>

@@ -3,6 +3,7 @@
 import { PREFABS, FAMILIES, prefab } from '../../../js/scene/prefabs.js';
 import { LIGHTS, readProfiles } from '../world/world.js';
 import { listAssets } from '../../../js/scene/assets.js';
+import { skyPresets, SKY_PRESET } from '../../../js/scene/space.js';
 import { BEHAVIORS, behaviorsFor, behaviorOf } from '../../../js/scene/behaviors.js';
 
 const $ = (id) => document.getElementById(id);
@@ -31,7 +32,7 @@ export function createPanels(store, actions) {
         el('span', { className: 'tName', textContent: name }), el('span', { className: 'tSub', textContent: sub }));
       li.addEventListener('click', () => store.select(id)); ul.append(li);
     };
-    item(t('tree.env'), `${t(S.env.surface === 'land' ? 'env.land' : 'env.sea')} · ${lightName(S.env.light).toLowerCase()}`, null);
+    item(t('tree.env'), `${t(S.env.surface === 'land' ? 'env.land' : S.env.surface === 'space' ? 'env.space' : 'env.sea')} · ${lightName(S.env.light).toLowerCase()}`, null);
     S.objects.forEach((o) => { const p = prefab(o.prefab); item(o.name, p ? familyName(p.family).toLowerCase() : o.prefab, o.id); });
     if (!S.objects.length) ul.append(el('li', { className: 'note', textContent: t('tree.empty') }));
   }
@@ -51,6 +52,16 @@ export function createPanels(store, actions) {
         ...(cur && !seas.includes(cur) ? [el('option', { value: cur, textContent: t('env.seaMissing', { name: cur }) })] : []));
       $('seaAsset').value = cur;
       $('seaRow').hidden = $('seaNote').hidden = S.env.surface !== 'sea';
+      // niebo kosmosu: gotowe tła (SystemKit) i zasoby z laboratorium ciał niebieskich; lista po załadowaniu kitów
+      const skies = listAssets('sky'), presets = skyPresets(), curSky = S.env.sky || '';
+      const known = new Set(['', ...presets.map((p) => SKY_PRESET + p.id), ...skies]);
+      $('skyAsset').replaceChildren(
+        el('optgroup', { label: t('env.skyReady') }, el('option', { value: '', textContent: t('env.skyDefault') }),
+          ...presets.filter((p) => p.id !== 'deep').map((p) => el('option', { value: SKY_PRESET + p.id, textContent: p.name }))),
+        ...(skies.length ? [el('optgroup', { label: t('env.skySaved') }, ...skies.map((n) => el('option', { value: n, textContent: n })))] : []),
+        ...(known.has(curSky) ? [] : [el('option', { value: curSky, textContent: t('env.seaMissing', { name: curSky.replace(SKY_PRESET, '') }) })]));
+      $('skyAsset').value = curSky;
+      $('skyRow').hidden = $('skyNote').hidden = S.env.surface !== 'space';
       return;
     }
     setVal('oName', o.name); $('oPrefab').value = o.prefab;
@@ -82,6 +93,7 @@ export function createPanels(store, actions) {
   });
   $('oBehavior').addEventListener('change', () => { const o = store.selected; if (o) store.update(o.id, { behavior: $('oBehavior').value }); });
   $('surface').addEventListener('change', () => store.setEnv({ surface: $('surface').value }));
+  $('skyAsset').addEventListener('change', () => store.setEnv({ sky: $('skyAsset').value }));
   $('seaAsset').addEventListener('change', () => store.setEnv({ sea: $('seaAsset').value }));
   $('light').addEventListener('change', () => store.setEnv({ light: $('light').value }));
   $('look').addEventListener('change', () => store.setEnv({ look: $('look').value }));

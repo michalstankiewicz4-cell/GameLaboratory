@@ -486,3 +486,9 @@ windows are the standard ones (`ui/shell/labwin.js`) plus the lab's own:
   at 1–4 FPS, and the probe logs a harmless "GPU stall due to
   ReadPixels" warning. With `--use-angle=d3d11 --enable-gpu
   --ignore-gpu-blocklist` Playwright uses the real GPU.
+
+## Sky for the scene editor (1.5.0)
+
+With the Sky selected, the Parameters window has **Sky for the scene editor**: the sky's current values are saved under
+a name as a "sky" asset (`js/scene/assets.js`, `localStorage["gameLab.assets.v1"]`); the scene editor offers it for a
+space scene (Environment → Sky), next to the six ready skies of the systems lab. A saved sky can be loaded back or deleted.

@@ -10,7 +10,8 @@
 //   prefabs      — [{ id, label, family, surface }] (z js/scene/prefabs.js, bez budowania)
 //   behaviorsFor — (prefabId) → [id zachowań] (js/scene/behaviors.js)
 //   lights       — dozwolone oświetlenia (['afternoon', …])
-//   assets       — zasoby z nazwą: { kinds: ['sea', …], list(kind) → nazwy } (js/scene/assets.js)
+//   assets       — zasoby z nazwą: { kinds: ['sea', …], list(kind) → nazwy, skyPresets — id gotowych teł kosmosu }
+//                  (js/scene/assets.js, js/scene/space.js)
 //   hooks        — { build(fn) — zmiana, po której trzeba zbudować modele; group(fn) — lista poleceń jako jeden krok
 //                  historii (cofnij / ponów); play(), stop(), playing() } (nieobowiązkowe)
 import { normalize, clone } from './scene-data.js';
@@ -23,8 +24,8 @@ const COMMANDS = {
   set: { args: 'id | name, then any of: newName (with id also name), prefab, pos, rot, scale, behavior', does: 'changes an object' },
   move: { args: 'id | name, by [dx,dy,dz] m', does: 'moves an object by an offset' },
   remove: { args: 'id | name', does: 'removes an object' },
-  env: { args: 'any of: surface (sea | land), light, look, sea (a sea asset name, "" — the default sea)', does: 'changes the environment' },
-  assets: { args: '[kind]', does: 'named assets saved in the labs, by kind (sea — from the water lab)' },
+  env: { args: 'any of: surface (sea | land | space), light, look, sea (a sea asset name, "" — the default sea), sky (space: "" — Deep field, "preset:<id>" — a ready sky, or a sky asset name)', does: 'changes the environment' },
+  assets: { args: '[kind]', does: 'named assets saved in the labs, by kind (sea — the water lab, sky — the celestial bodies lab) and the ready skies' },
   select: { args: 'id | name, or nothing', does: 'selects an object in the editor (nothing: the environment)' },
   new: { args: '[name]', does: 'an empty scene' },
   load: { args: 'scene (format gamelab-scene)', does: 'replaces the whole scene' },
@@ -76,7 +77,7 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
     prefabs: (c) => ({ prefabs: prefabs.filter((p) => !c.family || p.family === c.family).map((p) => ({ id: p.id, name: p.label, family: p.family, stands: p.surface, behaviors: behaviorsFor(p.id) })) }),
     add: (c) => {
       const p = prefabOf(c.prefab), x = patch({ ...c, newName: null }, p.id);
-      const pos = x.pos || [0, p.surface === 'air' ? 30 : 0, 0];
+      const pos = x.pos || [0, p.surface === 'air' ? 30 : 0, 0];   // statek kosmiczny: na wysokości 0, jak inne
       let o; build(() => { o = store.add(p.id, c.name != null ? String(c.name).slice(0, 60) : p.label, pos); delete x.pos; if (Object.keys(x).length) store.update(o.id, x); });
       return { id: o.id, object: summary(o) };
     },
@@ -92,17 +93,22 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
     remove: (c) => { const o = target(c); store.remove(o.id); return { removed: o.id }; },
     env: (c) => {
       const e = {};
-      if (c.surface != null) e.surface = ['sea', 'land'].includes(c.surface) ? c.surface : fail('surface: sea | land');
+      if (c.surface != null) e.surface = ['sea', 'land', 'space'].includes(c.surface) ? c.surface : fail('surface: sea | land | space');
       if (c.light != null) e.light = lights.includes(c.light) ? c.light : fail('light: ' + lights.join(' | '));
       if (c.look != null) e.look = String(c.look);
       if (c.sea != null) { const n = String(c.sea), all = assets.list('sea'); e.sea = n === '' || all.includes(n) ? n : fail(`no sea asset "${n}" (seas: ${all.join(', ') || 'none yet — save one in the water lab'})`); }
-      if (!Object.keys(e).length) fail('nothing to change (surface, light, look, sea)');
+      if (c.sky != null) {
+        const n = String(c.sky), all = assets.list('sky'), ready = (assets.skyPresets || []).map((id) => 'preset:' + id);
+        e.sky = n === '' || all.includes(n) || ready.includes(n) || (n.startsWith('preset:') && !ready.length) ? n
+          : fail(`no sky "${n}" (ready: ${ready.join(', ') || 'preset:deep, preset:quiet, preset:crimson, preset:emerald, preset:core, preset:black'}; saved: ${all.join(', ') || 'none yet — save one in the celestial bodies lab'})`);
+      }
+      if (!Object.keys(e).length) fail('nothing to change (surface, light, look, sea, sky)');
       store.setEnv(e); return { env: clone(store.scene.env) };
     },
     assets: (c) => {
       const kinds = c.kind ? [c.kind] : assets.kinds;
       kinds.forEach((k) => { if (!assets.kinds.includes(k)) fail(`unknown asset kind "${k}" (kinds: ${assets.kinds.join(', ')})`); });
-      return { assets: Object.fromEntries(kinds.map((k) => [k, assets.list(k)])) };
+      return { assets: Object.fromEntries(kinds.map((k) => [k, assets.list(k)])), readySkies: (assets.skyPresets || []).map((id) => 'preset:' + id) };
     },
     select: (c) => { const o = c.id == null && c.name == null ? null : target(c); store.select(o ? o.id : null); return { selected: o ? o.id : null }; },
     new: (c) => { store.reset(String(c.name || 'New scene')); return { scene: store.scene.name }; },

@@ -16,6 +16,7 @@ export function createPlay(store, world, controls, actions) {
     runs = store.scene.objects.map((o) => {
       const id = behaviorOf(o), b = world.built.get(o.id); if (!id || !b) return null;
       const run = BEHAVIORS[id].create(o, b, env);
+      if (run) b.driven = true;   // ruch i części daje zachowanie (świat nie wywołuje tick)
       return run && { obj: o, id, b, run };
     }).filter(Boolean);
     if (!runs.length) { actions.status(t('play.none')); return; }
@@ -30,7 +31,7 @@ export function createPlay(store, world, controls, actions) {
   }
   function stop() {
     if (!runs.length) return;
-    runs.forEach((r) => r.run.reset && r.run.reset());
+    runs.forEach((r) => { if (r.run.reset) r.run.reset(); r.b.driven = false; });
     runs = []; me = null; input.release();
     controls.setPlaying(false); document.body.classList.remove('playing');
     world.syncPlaces(); controls.attach();

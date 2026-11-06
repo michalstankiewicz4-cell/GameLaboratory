@@ -6,6 +6,7 @@ import { LookPipeline, LOOK_DEFAULTS } from '../../../js/render/sea/look.js';
 import { createStage, LIGHTS } from '../../../js/labs/shared/stage.js';
 import { prefab } from '../../../js/scene/prefabs.js';
 import { getAsset } from '../../../js/scene/assets.js';
+import { spaceReady, loadSpace, SKY_PRESET } from '../../../js/scene/space.js';
 
 export { LIGHTS };
 const D2R = Math.PI / 180;
@@ -24,12 +25,16 @@ export function createWorld(container, store, onWarn) {
   const root = new THREE.Group(); root.name = 'scene objects'; scene.add(root);
   const built = new Map();                                   // id obiektu → { prefab, root, kit, dispose, size }
 
+  // kity ze Space ładują się dopiero, gdy są potrzebne: model czeka, a po załadowaniu świat dobudowuje brakujące
+  const later = () => loadSpace().then(() => { syncObjects(); syncEnv(); if (world.afterAsync) world.afterAsync(); })
+    .catch((e) => { if (window.LabLog) window.LabLog.add('error', 'Space kits: ' + e.message); });
   function build(o) {
     const p = prefab(o.prefab);
     if (!p) { onWarn && onWarn(o.prefab); return; }
+    if (p.needs === 'space' && !spaceReady()) { later(); return; }
     const b = p.build(), g = new THREE.Group(); g.userData.sceneId = o.id; g.add(b.root);
     g.traverse((m) => { if (m.isMesh && !(m.material && m.material.isMeshBasicMaterial)) { m.castShadow = true; m.receiveShadow = true; } });
-    built.set(o.id, { prefab: o.prefab, root: g, kit: b.kit || null, dispose: b.dispose, size: new THREE.Box3().setFromObject(b.root).getSize(new THREE.Vector3()).length() });
+    built.set(o.id, { prefab: o.prefab, root: g, kit: b.kit || null, tick: b.tick || null, driven: false, dispose: b.dispose, size: new THREE.Box3().setFromObject(b.root).getSize(new THREE.Vector3()).length() });
     root.add(g);
   }
   function drop(id) {
@@ -52,9 +57,37 @@ export function createWorld(container, store, onWarn) {
   }
   function syncPlaces() { store.scene.objects.forEach(place); fitShadow(); }
   let lastSea = 'null';
+  // kosmos: niebo BodyKit (gotowe tło z SystemKit albo zasób „sky” z laboratorium ciał niebieskich) i odbicia ShipKit
+  let skyBody = null, skyKey = '', spaceEnvSet = false;
+  function skyValues(name) {
+    const SK = window.SystemKit.SKIES;
+    if (!name) return SK.find((x) => x.id === 'deep').values || {};
+    if (name.startsWith(SKY_PRESET)) { const d = SK.find((x) => x.id === name.slice(SKY_PRESET.length)); if (d) return d.none ? null : d.values || {}; }
+    else { const a = getAsset('sky', name); if (a) return a; }
+    if (onWarn) onWarn('sky:' + name);
+    return SK.find((x) => x.id === 'deep').values || {};
+  }
+  function syncSpace(env) {
+    const on = env.surface === 'space';
+    if (!on) { if (skyBody) skyBody.group.visible = false; return; }
+    if (!spaceReady()) { later(); return; }
+    if (!spaceEnvSet) { stage.setSpaceEnvironment(window.ShipKit.makeEnvironment(renderer)); spaceEnvSet = true; }
+    const v = skyValues(env.sky || ''), key = JSON.stringify(v);
+    if (key !== skyKey) {
+      skyKey = key;
+      if (skyBody) { scene.remove(skyBody.group); window.BodyKit.disposeBody(skyBody); skyBody = null; }
+      if (v) {
+        const ref = window.BodyKit.GAME_KINDS.sky;
+        skyBody = window.BodyKit.buildBody(ref.groupId, ref.bodyId, { detail: 1, values: v });
+        skyBody.setRadius(4000); skyBody.setOctaves(window.BodyKit.QUALITY_OCTAVES[2]); scene.add(skyBody.group);
+      }
+    }
+    if (skyBody) skyBody.group.visible = true;
+  }
   function syncEnv() {
     const env = store.scene.env;
-    stage.setSurface(env.surface === 'land' ? 'land' : 'sea');
+    stage.setSurface(env.surface === 'land' || env.surface === 'space' ? env.surface : 'sea');
+    syncSpace(env);
     stage.setLight(LIGHTS[env.light] ? env.light : 'afternoon');
     // morze: zasób z laboratorium wody (po nazwie) albo domyślne; brak zasobu w tej przeglądarce — domyślne i ostrzeżenie
     const sea = env.sea ? getAsset('sea', env.sea) : null, seaKey = JSON.stringify(sea);
@@ -87,14 +120,18 @@ export function createWorld(container, store, onWarn) {
   function frame(now) {
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
     const t = stage.update(dt, camera); if (before) before(dt, t);
+    built.forEach((r) => { if (r.tick && !r.driven) r.tick(t, dt); });   // części na postoju (statki kosmiczne)
+    if (skyBody && skyBody.group.visible) skyBody.update(t, dt, { center: camera.position, renderer });
     look.sun(camera, stage.sunDir);
     window.LabPerf.begin(renderer); look.render(scene, camera); window.LabPerf.end(renderer);   // okno Wydajność i dolny pasek
     requestAnimationFrame(frame);
   }
-  return {
+  const world = {
     renderer, scene, camera, root, built, stage, pending, syncObjects, syncPlaces, syncEnv, bounds,
     objectRoot: (id) => (built.get(id) || {}).root || null,
     size: (id) => (built.get(id) || {}).size || 10,
     start(beforeFrame) { before = beforeFrame; requestAnimationFrame((t) => { last = t; frame(t); }); },
+    afterAsync: null,   // po dobudowaniu modeli, które czekały na kity (edytor: uchwyt, okna)
   };
+  return world;
 }

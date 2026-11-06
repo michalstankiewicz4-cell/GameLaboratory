@@ -12,6 +12,7 @@ import { behaviorsFor } from '../../js/scene/behaviors.js';
 import { onAssetsChange, listAssets, ASSET_KINDS } from '../../js/scene/assets.js';
 import { emptyScene, makeObject } from '../../js/scene/scene-data.js';
 import { prefab, PREFABS } from '../../js/scene/prefabs.js';
+import { loadSpace, spaceReady, skyPresets } from '../../js/scene/space.js';
 
 const { t } = window.EditorI18n;
 const $ = (id) => document.getElementById(id);
@@ -28,7 +29,8 @@ function firstScene() {
 
 step(t('load.renderer'), 0.1);
 const store = createStore(firstScene);
-const world = createWorld($('view'), store, (id) => status(id.startsWith('sea:') ? t('status.noSea', { name: id.slice(4) }) : t('status.unknown', { id })));
+const world = createWorld($('view'), store, (id) => status(id.startsWith('sea:') ? t('status.noSea', { name: id.slice(4) })
+  : id.startsWith('sky:') ? t('status.noSky', { name: id.slice(4) }) : t('status.unknown', { id })));
 const controls = createControls(world, store);
 
 // budowa modeli trwa (okręty: kilka sekund): z kartą ładowania, kiedy jest co budować
@@ -36,8 +38,10 @@ function build(fn) {
   fn();
   const need = world.pending();
   if (!need.length) return;
+  const space = need.some((o) => (prefab(o.prefab) || {}).needs === 'space') && !spaceReady();
   window.LabLoad.run(t('load.building', { names: need.map((o) => o.name).join(', ') }), async (st) => {
-    await st(t('load.models'), 0.2); world.syncObjects(); controls.attach(); await st(t('load.done'), 1);
+    if (space) { await st(t('load.space'), 0.1); await loadSpace(); }
+    await st(t('load.models'), 0.2); world.syncObjects(); world.syncEnv(); controls.attach(); await st(t('load.done'), 1);
   });
 }
 const actions = {
@@ -45,7 +49,7 @@ const actions = {
   add(id) {
     const p = prefab(id); if (!p) return;
     const tg = controls.orbit.target;
-    build(() => store.add(p.id, p.label, [+tg.x.toFixed(1), p.surface === 'air' ? 30 : 0, +tg.z.toFixed(1)]));
+    build(() => store.add(p.id, p.label, [+tg.x.toFixed(1), p.surface === 'air' ? 30 : p.surface === 'space' ? +tg.y.toFixed(1) : 0, +tg.z.toFixed(1)]));
   },
   duplicate() {
     const o = store.selected; if (!o) return;
@@ -58,9 +62,11 @@ const actions = {
 };
 actions.play = createPlay(store, world, controls, actions);
 const panels = createPanels(store, actions);
+// modele, które czekały na kity ze Space, są już zbudowane: uchwyt, hierarchia i okna od nowa
+world.afterAsync = () => { controls.attach(); panels.renderTree(); panels.renderProps(); };
 // API dla AI (js/scene/api.js): polecenia JSON na tych samych danych; zakładka API w konsoli i window.sceneApi.run(…)
 const api = createSceneApi({
-  store, prefabs: PREFABS, behaviorsFor, lights: Object.keys(LIGHTS), assets: { kinds: Object.keys(ASSET_KINDS), list: listAssets },
+  store, prefabs: PREFABS, behaviorsFor, lights: Object.keys(LIGHTS), assets: { kinds: Object.keys(ASSET_KINDS), list: listAssets, get skyPresets() { return skyPresets().map((p) => p.id); } },
   hooks: { build, group: (fn) => store.group(fn), play: () => actions.play.start(), stop: () => actions.play.stop(), playing: () => actions.play.playing },
 });
 createApiConsole(api);

@@ -8,6 +8,7 @@ Zasada (CLAUDE.md): fizyka jest prawdziwa — start, ruch, skręt i zatrzymanie 
 | Zachowanie | Plik | Środowisko | Gdzie używane |
 |---|---|---|---|
 | okręt na wodzie | `water/ship.js` | woda | edytor sceny (okręty), gra CityExplorer |
+| ciąg w próżni | `space/thrust.js` | kosmos | edytor sceny (statki kosmiczne, dron) |
 | lot w atmosferze | `air/flight.js` | ląd (powietrze nad lądem) | edytor sceny (Spitfire) |
 | koło na szynie — skład | `rail/physics.js`, `rail/rail.js` | ląd | laboratorium pojazdów — ląd (pociąg) |
 | koło na szynie — tramwaj | `rail/tram.js`, `rail/path.js` | ląd | jeszcze nigdzie (liczby w TramKit: `js/models/train/trams/swing.js`, `phys`) |
@@ -26,6 +27,18 @@ Zasada (CLAUDE.md): fizyka jest prawdziwa — start, ruch, skręt i zatrzymanie 
 - Stan: `x`, `z`, `th`, `vf` (prędkość naprzód, m/s), `vs`, `r`, `throttle`, `rudder` (z opóźnieniem maszyn i płetwy),
   `heave`, `pitch`, `roll`, `aground`.
 - Liczby Błyskawicy: [`../models/ships-sea/blyskawica.md`](../models/ships-sea/blyskawica.md), „Ruch”.
+
+## Ciąg w próżni (`space/thrust.js`)
+
+`createThrust(def, { p, yaw, pitch })` → `{ state, step(dt, c), qRot }`; `def`: `mass`, `thrust` (silnik główny),
+`reverse` (wsteczny), `torque` (silniczki manewrowe na oś), `inertia` (moment bezwładności).
+
+- Bryła sztywna bez oporu i grawitacji: prędkość i obrót zostają, dopóki siła ich nie zmieni.
+- Ciąg wzdłuż osi statku (`throttle` −1…1, ujemny — wsteczny); momenty silniczków (`pitch`, `yaw`, `roll` −1…1).
+- Stabilizacja (jak SAS): bez polecenia obrotu silniczki dają moment przeciwny do obrotu, najwyżej `torque` —
+  siła, nie zatrzymanie w kodzie; `stabilize: false` ją wyłącza.
+- Stan: `p`, `v`, `q` ([w, x, y, z]), `w` (prędkość kątowa w układzie statku), `speed`, `thrust`.
+- Układ statku: +z dziób, +y góra, +x lewa burta.
 
 ## Lot w atmosferze (`air/flight.js`)
 

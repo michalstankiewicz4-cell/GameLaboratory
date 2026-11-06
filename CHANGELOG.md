@@ -3,6 +3,23 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.36.0 · edytor sceny 0.7.0 · ciała niebieskie 1.5.0 — 2026-11-06 (kosmos w edytorze, skyboxy)
+
+### Dodane
+- **Kosmos w edytorze sceny**: Środowisko → Powierzchnia → **Kosmos** — czarne tło z niebem BodyKit, słońce bez
+  atmosfery, odbicia z ShipKit (`makeEnvironment`), bez wody, gruntu i mgły (scena bazowa `js/labs/shared/stage.js`:
+  `setSurface('space')`, `setSpaceEnvironment`).
+- **Skyboxy**: Środowisko → **Niebo** — gotowe tła z laboratorium układów (Deep field, Quiet sky, Crimson nebula,
+  Emerald nebula, Galactic core, Black) i własne, zapisane w laboratorium ciał niebieskich; pole `env.sky`.
+- **Laboratorium ciał niebieskich**: przy Niebie sekcja **Sky for the scene editor** — zapis nieba pod nazwą (zasób
+  `sky`, `js/scene/assets.js`), wczytanie, usunięcie.
+- **Statki kosmiczne jako prefabrykaty** (rodzina `space`): SP-01 Codewing, DR-01 Scribe (dron), SW-01 Swarmer,
+  ST-04 Haven (stacja). Kity ze Space ładują się dopiero, gdy scena ich potrzebuje (`js/scene/space.js`).
+- **Zachowanie „ciąg w próżni”** (`js/behaviors/space/thrust.js`): bryła sztywna bez oporu i grawitacji — ciąg
+  silnika głównego i wstecznego, silniczki manewrowe na trzy osie, stabilizacja obrotu ich momentem. Liczby statków
+  (masa, ciąg, moment) założone — statki są wymyślone.
+- API: `surface: "space"`, `sky`, gotowe tła w `assets`.
+
 ## Program 0.35.0 · 19 laboratoriów — 2026-11-05 (laboratoria w wolnym środku)
 
 ### Zmienione
