@@ -102,6 +102,8 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
    *(wybór nieba przy każdej powierzchni: 0.38.0; zostało: przeniesienie kodu nieba kosmosu, niebo ze zdjęcia)*
 3. **Zachowania z modeli:** jazda po lądzie siłami (nowe zachowanie lądu w `js/behaviors/`) zamiast `VehicleKit.drive`,
    pływanie MarineKit; potem pojazdy drogowe, łaziki i MarineKit jako prefabrykaty z zachowaniem.
+   *(jazda po lądzie siłami: 0.39.0 — łaziki i pojazdy drogowe w laboratorium, pojazdy drogowe w edytorze; zostało:
+   pływanie MarineKit i amfibia, tramwaj na torze, kołowanie samolotu, łaziki jako prefabrykaty)*
 4. **Wspólna scena bazowa w laboratoriach środowisk i pojazdów** (woda, ląd, wygląd, pojazdy) — laboratorium
    pokazuje swój zasób na tej samej scenie co edytor.
 5. **Reszta prefabrykatów:** moduły baz, rośliny, jaskinie, ciała niebieskie, ludzie i stwory (z chodem).

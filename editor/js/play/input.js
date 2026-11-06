@@ -1,9 +1,9 @@
 // Klawiatura gracza w trybie gry: z wciśniętych klawiszy sterowanie dla zachowań (js/scene/behaviors.js).
-// Maszyny / gaz (W / S) to dźwignia: zostaje, gdzie ją ustawić; stery wracają na środek po puszczeniu klawisza;
+// Maszyny / gaz (W / S) to dźwignia: zostaje, gdzie ją ustawić (pojazd lądowy: pedał — działa, póki wciśnięty); stery wracają na środek po puszczeniu klawisza;
 // podwozie (G) i klapy (F) przełączają. Zakres dźwigni podaje zachowanie (throttle: [min, max]).
 export function createInput() {
   const down = new Set();
-  let range = [0, 1], thr = 0, gear = true, flaps = false, on = false;
+  let range = [0, 1], thr = 0, gear = true, flaps = false, on = false, lever = true;   // lever: false — pedał (samochód)
   const PLAY_KEYS = ['w', 's', 'a', 'd', 'q', 'e', 'b', 'g', 'f', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'];
 
   addEventListener('keydown', (e) => {
@@ -19,10 +19,10 @@ export function createInput() {
   const axis = (plus, minus) => (down.has(plus) ? 1 : 0) - (down.has(minus) ? 1 : 0);
   return {
     // nowy gracz: dźwignia tam, gdzie stoi w modelu (na postoju zero), podwozie wypuszczone, klapy schowane
-    reset(b, thr0 = 0) { range = (b && b.throttle) || [0, 1]; thr = Math.max(range[0], Math.min(range[1], thr0)); gear = true; flaps = false; down.clear(); on = true; },
+    reset(b, thr0 = 0) { range = (b && b.throttle) || [0, 1]; lever = !b || b.lever !== false; thr = Math.max(range[0], Math.min(range[1], thr0)); gear = true; flaps = false; down.clear(); on = true; },
     release() { on = false; down.clear(); },
     read(dt) {
-      thr = Math.max(range[0], Math.min(range[1], thr + axis('w', 's') * 0.5 * dt));
+      thr = lever ? Math.max(range[0], Math.min(range[1], thr + axis('w', 's') * 0.5 * dt)) : axis('w', 's');   // dźwignia zostaje, pedał wraca
       return {
         throttle: thr,
         rudder: Math.max(-1, Math.min(1, axis('d', 'a') + axis('e', 'q'))),

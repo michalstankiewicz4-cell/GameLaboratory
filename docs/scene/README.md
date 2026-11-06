@@ -57,6 +57,7 @@ Wpis: `{ id, label, family, surface, lab, build() → { root, kit, dispose } }`.
 | id | Dla | Zachowanie | Sterowanie (`input`) |
 |---|---|---|---|
 | `ship` | `sea/*` | „okręt na wodzie” (`js/behaviors/water/ship.js`) na falach sceny bazowej (`world.waves`) | `throttle` −0,4…1, `rudder` −1…1 |
+| `drive` | `road/*` | „jazda po lądzie” (`js/behaviors/land/drive.js`), grunt i woda ze sceny bazowej | `throttle` −1…1 (pedał), `rudder` (skręt) |
 | `thrust` | `space/codewing`, `space/scribe`, `space/swarmer` | „ciąg w próżni” (`js/behaviors/space/thrust.js`) | `throttle` −1…1, `elevator` (pochylenie), `aileron` (kurs), `rudder` (przechył) |
 | `flight` | `air/*` | „lot w atmosferze” (`js/behaviors/air/flight.js`), krok fizyki 1/240 s, grunt na wysokości 0 | `throttle` 0…1, `elevator`, `aileron`, `rudder`, `brake`, `gear`, `flaps` |
 

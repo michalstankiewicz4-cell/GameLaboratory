@@ -3,6 +3,20 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.39.0 · edytor sceny 0.10.0 · pojazdy (ląd) 1.12.0 — 2026-11-06 (jazda po lądzie liczona siłami)
+
+### Dodane
+- **Zachowanie „jazda po lądzie”** (`js/behaviors/land/drive.js`): pojazd kołowy albo gąsienicowy liczony z sił —
+  moc silnika (F = P/v, z regulatorem prędkości maksymalnej), przyczepność μ·N, hamulce, opór toczenia i powietrza,
+  zbocza, opony w modelu jednośladowym (kąt znoszenia, poślizg), gąsienice (różnica sił, opór skrętu μt·N·l/4),
+  woda (opór i wyporność — pojazd lądowy staje w głębokiej wodzie sam). Zastępuje kinematyczne `VehicleKit.drive`.
+- Laboratorium pojazdów (ląd): łaziki VehicleKit i pojazdy drogowe RoadKit jeżdżą tym zachowaniem (koniec warunku
+  „stop przy wodzie”); amfibia, tramwaj i samolot na razie po staremu.
+- Dane modeli: moc silnika Poloneza (60 kW), Abramsa (1,12 MW) i Urbino 18 (235 kW); łaziki bez danych — moc
+  i masa wyprowadzone z przyspieszenia i wielkości (`driveDef`).
+- Edytor sceny: pojazdy drogowe mają zachowanie **jazda po lądzie** (W / S — gaz, hamulec i wstecz jak pedał,
+  A / D — skręt); grunt z płaskiego lądu albo terenu, na morzu dno głęboko. Scena bazowa: `terrainAt`, `waterLevel`.
+
 ## Program 0.38.0 · edytor sceny 0.9.0 — 2026-11-06 (niebo niezależne od powierzchni)
 
 ### Zmienione

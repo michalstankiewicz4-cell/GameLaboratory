@@ -12,7 +12,8 @@ export const info = {
   id: 'urbino18', name: 'Solaris Urbino 18 electric', role: 'Autobus przegubowy MZA · 4 pary drzwi · ok. 140 miejsc',
   kind: 'articulated',
   length: 18.0, width: 2.55, height: 3.3, wheelbase: 5.9, wheelbase2: 6.05, trackF: 2.1, trackR: 1.84,
-  maxSpeed: 70 / 3.6, accel: 1.1, turnRadius: 11.0, cargo: 0, mass: 19500, work: 'Drzwi',
+  maxSpeed: 70 / 3.6, accel: 1.1, turnRadius: 11.0, cargo: 0, mass: 19500, power: 235e3,   // ok. 320 KM
+  work: 'Drzwi',
   paints: [['MZA Warszawa', 0xf3c300], ['Biały (reklama)', 0xe9e9e6]],
   seat: { x: 0.75, y: 1.35, z: 4.75 },        // kierowca (lewa strona, przy przedniej szybie)
   doorAt: { x: -1.95, z: 4.75 },              // przednie drzwi (prawa strona)

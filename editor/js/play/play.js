@@ -12,7 +12,8 @@ export function createPlay(store, world, controls, actions) {
 
   function start() {
     if (runs.length) return;
-    const env = { get surface() { return store.scene.env.surface; }, get waves() { return world.stage.waves; }, isWater: (x, z) => world.stage.isWater(x, z), groundAt: (x, z) => world.stage.groundAt(x, z) };
+    const env = { get surface() { return store.scene.env.surface; }, get waves() { return world.stage.waves; }, isWater: (x, z) => world.stage.isWater(x, z), groundAt: (x, z) => world.stage.groundAt(x, z),
+      terrainAt: (x, z) => world.stage.terrainAt(x, z), waterLevel: (x, z) => world.stage.waterLevel(x, z) };   // pojazdy lądowe: grunt i dno, poziom wody
     runs = store.scene.objects.map((o) => {
       const id = behaviorOf(o), b = world.built.get(o.id); if (!id || !b) return null;
       const run = BEHAVIORS[id].create(o, b, env);

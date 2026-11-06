@@ -79,6 +79,10 @@ export function createStage(renderer, scene) {
     get land() { return land ? land.T : null; },
     // wysokość gruntu albo poziomu morza (samolot: koła, zderzenie z ziemią)
     groundAt: (x, z) => (land && surfaceKind === 'land' ? Math.max(0, sampleHeight(land.T, x, z)) : ground.visible ? ground.position.y : 0),
+    // grunt bez wody (pojazdy lądowe): teren, dno pod wodą ujemne; płaski grunt; morze — dno głęboko (30 m);
+    // kosmos — null (brak gruntu); waterLevel — poziom wody (0) albo null, gdzie wody nie ma
+    terrainAt: (x, z) => (surfaceKind === 'land' ? (land ? sampleHeight(land.T, x, z) : ground.position.y) : surfaceKind === 'sea' ? -30 : null),
+    waterLevel: (x, z) => (surfaceKind === 'sea' || (surfaceKind === 'land' && land) ? 0 : null),
     // woda pod punktem (okręty: mielizna, brzeg): morze — wszędzie, teren — tam, gdzie dno jest głębiej niż depth
     isWater: (x, z, depth = 2) => (surfaceKind === 'sea' ? true : surfaceKind === 'land' && land ? sampleHeight(land.T, x, z) < -depth : false),
     setSpaceEnvironment(tex) { spaceEnv = tex; if (space) scene.environment = tex; },

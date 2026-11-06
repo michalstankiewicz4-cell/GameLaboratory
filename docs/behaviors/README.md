@@ -8,6 +8,7 @@ Zasada (CLAUDE.md): fizyka jest prawdziwa — start, ruch, skręt i zatrzymanie 
 | Zachowanie | Plik | Środowisko | Gdzie używane |
 |---|---|---|---|
 | okręt na wodzie | `water/ship.js` | woda | edytor sceny (okręty), gra CityExplorer |
+| jazda po lądzie | `land/drive.js` | ląd | laboratorium pojazdów — ląd (łaziki, pojazdy drogowe), edytor sceny (pojazdy drogowe) |
 | ciąg w próżni | `space/thrust.js` | kosmos | edytor sceny (statki kosmiczne, dron) |
 | lot w atmosferze | `air/flight.js` | ląd (powietrze nad lądem) | edytor sceny (Spitfire) |
 | koło na szynie — skład | `rail/physics.js`, `rail/rail.js` | ląd | laboratorium pojazdów — ląd (pociąg) |
@@ -27,6 +28,24 @@ Zasada (CLAUDE.md): fizyka jest prawdziwa — start, ruch, skręt i zatrzymanie 
 - Stan: `x`, `z`, `th`, `vf` (prędkość naprzód, m/s), `vs`, `r`, `throttle`, `rudder` (z opóźnieniem maszyn i płetwy),
   `heave`, `pitch`, `roll`, `aground`.
 - Liczby Błyskawicy: [`../models/ships-sea/blyskawica.md`](../models/ships-sea/blyskawica.md), „Ruch”.
+
+## Jazda po lądzie (`land/drive.js`)
+
+`createDrive(def, { x, z, yaw })` → `{ state, step(dt, c, ground), def }`; `driveDef(info, extra)` — liczby z danych
+modelu (RoadKit, VehicleKit): `mass`, `power`, `maxSpeed`, `turnRadius` (0 — gąsienice), `wheelbase` (gąsienice:
+długość styku), `gauge`, wymiary; brakujące wyprowadzone (moc z `accel` i `maxSpeed`, masa ok. 450 kg/m² obrysu).
+
+- Napęd: F = η·P / max(v, v0), najwyżej μ·N, regulator tuż pod prędkością maksymalną; wsteczny 40 % mocy; hamulce do μ·N.
+- Opory: toczenia Crr·N (koła 0,015, gąsienice 0,045), powietrza ½ρ·CdA·v² (CdA z mocy i prędkości maksymalnej, najwyżej
+  1,1 × przekrój), zbocze m·g·sin θ (wysokość gruntu pod przodem i tyłem).
+- Koła — model jednośladowy: kąt znoszenia osi, siła boczna Cα·α (Cα ≈ 10 × nacisk osi), najwyżej μ·N osi (poślizg);
+  skręt kół do kąta z `turnRadius`, z ograniczoną szybkością.
+- Gąsienice: siła każdej z dźwigni ± skrętu, moment z różnicy minus opór skrętu μt·N·l/4 (μt 0,5), bez jazdy bokiem.
+- Woda: gdy grunt jest pod wodą — opór ½·ρw·Cd·A·v² i wyporność (mniejszy docisk, mniej przyczepności): pojazd lądowy
+  staje sam.
+- Sterowanie `c`: `throttle` −1…1, `steer` −1…1 (dodatni — w lewo), `brake`; `ground`: `height(x, z)`, `water(x, z)`.
+- Stan: `x`, `z`, `yaw`, `u` (naprzód), `v` (w bok), `r`, `speed`, `steer`, `slip`, `depth`.
+- Na postoju tarcie spoczynkowe zeruje resztki prędkości (poniżej 2 cm/s).
 
 ## Ciąg w próżni (`space/thrust.js`)
 

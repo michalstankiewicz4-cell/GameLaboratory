@@ -13,7 +13,8 @@ import { makeRig } from '../chassis.js';
 export const info = {
   id: 'polonez', name: 'FSO Polonez 1500', role: 'Liftback, 5 drzwi, 5 miejsc · FSO Warszawa, 1978',
   length: 4.272, width: 1.65, height: 1.379, wheelbase: 2.509, trackF: 1.314, trackR: 1.292,
-  maxSpeed: 155 / 3.6, accel: 1.9, turnRadius: 5.4, cargo: 0.4, mass: 1100, work: 'Drzwi kierowcy',
+  maxSpeed: 155 / 3.6, accel: 1.9, turnRadius: 5.4, cargo: 0.4, mass: 1100, power: 60e3,   // 1.5 l, 82 KM
+  work: 'Drzwi kierowcy',
   paints: [['Czerwony', 0x8e1c1a], ['Kość słoniowa', 0xd9cba6], ['Biały', 0xe4e2db], ['Niebieski', 0x274a7c], ['Zielony', 0x37503b], ['Brąz', 0x523523], ['Srebrny', 0xa9adb0]],
   seat: { x: 0.36, y: 0.62, z: -0.05 },   // miejsce kierowcy (wsiadanie)
   doorAt: { x: 1.25, z: 0.45 },           // gdzie stanąć, by wsiąść (lewa strona)

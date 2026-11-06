@@ -9,6 +9,7 @@ import * as THREE from '../../vendor/three/three.module.js';
 import { createShip, shipDef } from '../behaviors/water/ship.js';
 import { createFlight } from '../behaviors/air/flight.js';
 import { createThrust } from '../behaviors/space/thrust.js';
+import { createDrive, driveDef } from '../behaviors/land/drive.js';
 
 const D2R = Math.PI / 180;
 const quatOf = (q, o = new THREE.Quaternion()) => o.set(q[1], q[2], q[3], q[0]);   // [w, x, y, z] → THREE
@@ -77,6 +78,35 @@ export const BEHAVIORS = {
         // po „Stop”: części modelu jak na postoju (podwozie wypuszczone, klapy schowane, śmigło stoi)
         reset() { if (k.update) for (let i = 0; i < 200; i++) k.update(0, 0.05, { throttle: 0, gear: true, flaps: 0 }); },
         hud: () => ({ speed: s.ias * 3.6, unit: 'km/h', alt: s.p[1], throttle: thr, stall: s.stall, crashed: s.crashed, onGround: s.onGround }),
+      };
+    },
+  },
+  drive: {
+    label: 'Driving on land', labelPl: 'Jazda po lądzie', env: 'land', throttle: [-1, 1], lever: false,
+    fits: (prefabId) => prefabId.startsWith('road/'),
+    keys: 'W / S: accelerate / brake and reverse · A / D: steer',
+    keysPl: 'W / S: gaz / hamulec i wsteczny · A / D: skręt',
+    create(obj, built, world) {
+      const k = built.kit || {}, sim = createDrive(driveDef(k.def || {}), { x: obj.pos[0], z: obj.pos[2], yaw: obj.rot[1] * D2R });
+      const s = sim.state, root = built.root;
+      // grunt i woda ze sceny bazowej: teren z laboratorium lądu, płaski grunt; na morzu dno głęboko — auto tonie i staje
+      const ground = { height: (x, z) => { const h = world.terrainAt ? world.terrainAt(x, z) : 0; return h == null ? 0 : h; }, water: (x, z) => (world.waterLevel ? world.waterLevel(x, z) : null) };
+      let tAcc = 0, pedal = 0;
+      return {
+        state: s,
+        step(dt, c) {
+          const yaw0 = s.yaw, input = { throttle: c.throttle || 0, steer: -(c.rudder || 0) };   // D — w prawo
+          pedal = input.throttle;
+          sim.step(dt, input, ground);
+          const gy = ground.height(s.x, s.z);
+          root.position.set(s.x, gy, s.z); root.rotation.set(0, s.yaw, 0, 'YXZ');
+          const cy = Math.cos(s.yaw), sy = Math.sin(s.yaw);
+          tAcc += dt;
+          if (k.update) k.update(tAcc, dt, { speed: s.speed, steer: input.steer, turn: (s.yaw - yaw0) / Math.max(1e-4, dt),
+            contact: (x, z) => ground.height(s.x + x * cy + z * sy, s.z - x * sy + z * cy) - gy });   // koła, zawieszenie, światła hamowania
+        },
+        hud: () => ({ speed: s.speed * 3.6, unit: 'km/h', throttle: pedal, aground: s.depth > 0.5 }),   // aground: w wodzie
+        reset() { if (k.update) k.update(0, 0.05, { speed: 0, steer: 0, turn: 0 }); },
       };
     },
   },

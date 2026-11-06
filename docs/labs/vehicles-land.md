@@ -74,3 +74,10 @@ everything inside it in `update(t, dt, opts)`:
     `surf.groundAt` in the vehicle's tangent frame;
   - give the hauler a real load to carry between modules;
   - the sea vehicles lab: done, see [`marine.md`](../models/marine.md).
+
+## Driving by forces (1.12.0)
+
+The rovers and the road vehicles drive with the land behaviour `js/behaviors/land/drive.js` (engine power, grip,
+brakes, rolling and air drag, slopes, tyres or tracks, water drag and buoyancy) instead of VehicleKit's kinematic
+`drive`: on the land lab's ground a rover now stops in deep water by itself. The amphibian, the tram and the aircraft
+still use the old drive (their own behaviours come later — docs/guides/lab-breakdown.md).

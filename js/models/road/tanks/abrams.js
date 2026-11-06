@@ -12,7 +12,8 @@ export const info = {
   id: 'abrams', name: 'M1A2 Abrams', role: 'Czołg podstawowy · 4 załogi · armata 120 mm',
   kind: 'tracked',
   length: 9.77, hullLength: 7.93, width: 3.66, height: 2.44, wheelbase: 4.62, track: 2.8, gauge: 2.8,
-  maxSpeed: 67 / 3.6, accel: 1.4, turnRadius: 0, cargo: 0, mass: 62000, work: 'Właz dowódcy',
+  maxSpeed: 67 / 3.6, accel: 1.4, turnRadius: 0, cargo: 0, mass: 62000, power: 1.12e6,   // turbina 1500 KM
+  work: 'Właz dowódcy',
   paints: [['Zieleń ochronna (WP)', 0x4b5232], ['Piaskowy CARC', 0xb39a6c], ['Zieleń NATO', 0x3d4630]],
   seat: { x: -0.7, y: 2.2, z: 0.1 },     // dowódca (prawa strona wieży)
   doorAt: { x: 2.3, z: 1.2 },            // przy lewej burcie, przy przednim błotniku

@@ -3,6 +3,13 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.10.0 — 2026-11-06 (jazda po lądzie)
+
+### Dodane
+- Polonez, Abrams i Urbino 18 jeżdżą w grze (zachowanie „jazda po lądzie”, `js/behaviors/land/drive.js`):
+  W / S — gaz i hamulec / wsteczny (jak pedał, działa, póki wciśnięty), A / D — skręt. Koła, zawieszenie i światła
+  hamowania z modelu.
+
 ## 0.9.0 — 2026-11-06 (niebo przy każdej powierzchni)
 
 ### Zmienione
