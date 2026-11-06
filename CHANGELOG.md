@@ -3,6 +3,18 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.38.0 · edytor sceny 0.9.0 — 2026-11-06 (niebo niezależne od powierzchni)
+
+### Zmienione
+- **Niebo i powierzchnia to dwa osobne wybory** (jak w silnikach): Środowisko → **Niebo** jest przy każdej
+  powierzchni — domyślne dla powierzchni (morze i ląd: dzienne, kosmos: Deep field), **dzienne** (pora dnia i pogoda),
+  gotowe tła kosmosu i niebo zapisane w laboratorium ciał niebieskich. Morze albo ląd pod mgławicą, kosmos z niebem dziennym.
+- Scena bazowa (`js/labs/shared/stage.js`): `setSurface` ustawia tylko wodę i grunt, nowe `setSkyMode('day' | 'space')`
+  — światło, mgła i odbicia idą z nieba. Pod niebem kosmosu: słońce białe, bez mgły, woda odbija czerń i ostry
+  blask słońca, daleka woda gaśnie w czerń.
+- Dane: `env.sky` dla każdej powierzchni (`""`, `"day"`, `"preset:<id>"`, nazwa); stare sceny bez zmian. API: `sky: "day"`.
+- Edytor ładuje kity ze Space w tle chwilę po starcie (gotowe tła na liście Niebo także nad morzem i lądem).
+
 ## Program 0.37.0 · edytor sceny 0.8.0 · filtry 0.6.0 · wygląd 1.4.0 · ląd 1.4.0 · skórki 1.1.2 — 2026-11-06 (zasoby: wygląd kamery, pogoda i światło, ląd)
 
 ### Dodane

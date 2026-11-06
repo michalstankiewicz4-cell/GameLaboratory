@@ -3,7 +3,7 @@
 import { PREFABS, FAMILIES, prefab } from '../../../js/scene/prefabs.js';
 import { LIGHTS, readProfiles } from '../world/world.js';
 import { listAssets } from '../../../js/scene/assets.js';
-import { skyPresets, SKY_PRESET } from '../../../js/scene/space.js';
+import { skyPresets, SKY_PRESET, SKY_DAY } from '../../../js/scene/space.js';
 import { BEHAVIORS, behaviorsFor, behaviorOf } from '../../../js/scene/behaviors.js';
 
 const $ = (id) => document.getElementById(id);
@@ -64,16 +64,18 @@ export function createPanels(store, actions) {
         ...(curLand && !lands.includes(curLand) ? [el('option', { value: curLand, textContent: t('env.seaMissing', { name: curLand }) })] : []));
       $('landAsset').value = curLand;
       $('landRow').hidden = $('landNote').hidden = S.env.surface !== 'land';
-      // niebo kosmosu: gotowe tła (SystemKit) i zasoby z laboratorium ciał niebieskich; lista po załadowaniu kitów
+      // niebo (dla każdej powierzchni): domyślne dla powierzchni, dzienne, gotowe tła kosmosu (SystemKit, lista po
+      // załadowaniu kitów) i niebo zapisane w laboratorium ciał niebieskich
       const skies = listAssets('sky'), presets = skyPresets(), curSky = S.env.sky || '';
-      const known = new Set(['', ...presets.map((p) => SKY_PRESET + p.id), ...skies]);
+      const known = new Set(['', SKY_DAY, ...presets.map((p) => SKY_PRESET + p.id), ...skies]);
       $('skyAsset').replaceChildren(
-        el('optgroup', { label: t('env.skyReady') }, el('option', { value: '', textContent: t('env.skyDefault') }),
-          ...presets.filter((p) => p.id !== 'deep').map((p) => el('option', { value: SKY_PRESET + p.id, textContent: p.name }))),
+        el('option', { value: '', textContent: t(S.env.surface === 'space' ? 'env.skyDefaultSpace' : 'env.skyDefaultDay') }),
+        el('option', { value: SKY_DAY, textContent: t('env.skyDay') }),
+        ...(presets.length ? [el('optgroup', { label: t('env.skyReady') }, ...presets.map((p) => el('option', { value: SKY_PRESET + p.id, textContent: p.name })))] : []),
         ...(skies.length ? [el('optgroup', { label: t('env.skySaved') }, ...skies.map((n) => el('option', { value: n, textContent: n })))] : []),
-        ...(known.has(curSky) ? [] : [el('option', { value: curSky, textContent: t('env.seaMissing', { name: curSky.replace(SKY_PRESET, '') }) })]));
+        ...(known.has(curSky) ? [] : [el('option', { value: curSky, textContent: !presets.length && curSky.startsWith(SKY_PRESET) ? curSky.slice(SKY_PRESET.length) + ' …'   // kity jeszcze się ładują
+          : t('env.seaMissing', { name: curSky.replace(SKY_PRESET, '') }) })]));
       $('skyAsset').value = curSky;
-      $('skyRow').hidden = $('skyNote').hidden = S.env.surface !== 'space';
       return;
     }
     setVal('oName', o.name); $('oPrefab').value = o.prefab;

@@ -24,7 +24,7 @@ const COMMANDS = {
   set: { args: 'id | name, then any of: newName (with id also name), prefab, pos, rot, scale, behavior', does: 'changes an object' },
   move: { args: 'id | name, by [dx,dy,dz] m', does: 'moves an object by an offset' },
   remove: { args: 'id | name', does: 'removes an object' },
-  env: { args: 'any of: surface (sea | land | space), light (a ready light or a weather asset name), look, land (a land asset name, "" — the plain ground), sea (a sea asset name, "" — the default sea), sky (space: "" — Deep field, "preset:<id>" — a ready sky, or a sky asset name)', does: 'changes the environment' },
+  env: { args: 'any of: surface (sea | land | space), light (a ready light or a weather asset name), look, land (a land asset name, "" — the plain ground), sea (a sea asset name, "" — the default sea), sky (any surface: "" — the default for the surface, "day" — the day sky, "preset:<id>" — a ready space sky, or a sky asset name)', does: 'changes the environment' },
   assets: { args: '[kind]', does: 'named assets saved in the labs, by kind (sea — the water lab, sky — the celestial bodies lab, look — the filters lab, weather — the look lab, land — the land lab) and the ready skies' },
   select: { args: 'id | name, or nothing', does: 'selects an object in the editor (nothing: the environment)' },
   new: { args: '[name]', does: 'an empty scene' },
@@ -100,8 +100,8 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
       if (c.land != null) { const n = String(c.land), all = assets.list('land'); e.land = n === '' || all.includes(n) ? n : fail(`no land "${n}" (lands: ${all.join(', ') || 'none yet — save one in the land lab'}; "" — the plain ground)`); }
       if (c.sky != null) {
         const n = String(c.sky), all = assets.list('sky'), ready = (assets.skyPresets || []).map((id) => 'preset:' + id);
-        e.sky = n === '' || all.includes(n) || ready.includes(n) || (n.startsWith('preset:') && !ready.length) ? n
-          : fail(`no sky "${n}" (ready: ${ready.join(', ') || 'preset:deep, preset:quiet, preset:crimson, preset:emerald, preset:core, preset:black'}; saved: ${all.join(', ') || 'none yet — save one in the celestial bodies lab'})`);
+        e.sky = n === '' || n === 'day' || all.includes(n) || ready.includes(n) || (n.startsWith('preset:') && !ready.length) ? n
+          : fail(`no sky "${n}" ("day", ready: ${ready.join(', ') || 'preset:deep, preset:quiet, preset:crimson, preset:emerald, preset:core, preset:black'}; saved: ${all.join(', ') || 'none yet — save one in the celestial bodies lab'})`);
       }
       if (!Object.keys(e).length) fail('nothing to change (surface, light, look, land, sea, sky)');
       store.setEnv(e); return { env: clone(store.scene.env) };

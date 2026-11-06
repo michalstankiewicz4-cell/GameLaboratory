@@ -92,6 +92,8 @@ world.syncObjects(); world.syncEnv(); controls.attach(); panels.renderTree(); pa
 step(t('load.first'), 0.95);
 world.start((dt, time) => { actions.play.frame(dt, time); controls.update(); });
 requestAnimationFrame(() => window.LabLoad && window.LabLoad.done());
+// gotowe tła kosmosu na liście Niebo (też nad morzem i lądem): kity ze Space w tle, chwilę po starcie
+setTimeout(() => { if (!spaceReady()) loadSpace().then(() => panels.renderProps()).catch(() => {}); }, 2500);
 // do sprawdzania z konsoli i testów
 window.sceneEditor = { store, world, controls, play: actions.play };
 window.sceneApi = api;   // dla AI sterującej przeglądarką: window.sceneApi.run({ cmd: 'help' })

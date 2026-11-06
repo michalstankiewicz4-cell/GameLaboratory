@@ -83,7 +83,7 @@ scenę Three.js; widok w wolnym środku mają już wszystkie, 0.35.0), warstwy I
 
 Spis laboratoriów i tego, co z każdego idzie dokąd: [`lab-breakdown.md`](lab-breakdown.md).
 
-## Niebo niezależne od powierzchni (plan, 2026-11-06)
+## Niebo niezależne od powierzchni (plan, 2026-11-06; zrobione w 0.38.0 — bez nieba ze zdjęcia i bez przeniesienia kodu)
 
 Jak w silnikach (Unity, Godot): niebo to osobne ustawienie środowiska, nie część powierzchni — morze albo ląd pod
 mgławicą, kosmos bez powierzchni. Dziś niebo wynika z powierzchni (morze / ląd — niebo dzienne SkyKit, kosmos — niebo

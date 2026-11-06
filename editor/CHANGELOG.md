@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.9.0 — 2026-11-06 (niebo przy każdej powierzchni)
+
+### Zmienione
+- Lista **Niebo** przy każdej powierzchni: domyślne (morze i ląd — dzienne, kosmos — Deep field), dzienne, gotowe tła
+  kosmosu, zapisane. Kity ze Space ładują się w tle po starcie.
+
 ## 0.8.0 — 2026-11-06 (ląd, pogoda, wygląd kamery z laboratoriów)
 
 ### Dodane

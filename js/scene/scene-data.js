@@ -6,7 +6,8 @@
 //   env: { surface: 'sea' | 'land' | 'space', light: 'afternoon' | 'noon' | 'dusk' | 'overcast' | nazwa zasobu „weather”, look: '' | nazwa profilu,
 //          land: '' | nazwa zasobu „ląd” (teren z laboratorium lądu; '' — płaski grunt),
 //          sea: '' | nazwa zasobu „morze” (js/scene/assets.js; '' — morze domyślne),
-//          sky: '' | 'preset:<id>' | nazwa zasobu „niebo” (kosmos; '' — Deep field, js/scene/space.js) },
+//          sky: '' | 'day' | 'preset:<id>' | nazwa zasobu „niebo” (każda powierzchnia; '' — domyślne: morze i ląd —
+//          dzienne, kosmos — Deep field; js/scene/space.js) },
 //   objects: [{ id, name, prefab, pos: [x, y, z], rot: [x, y, z] (stopnie), scale, behavior? }]
 // }
 // prefab: id z js/scene/prefabs.js; behavior: id z js/scene/behaviors.js, '' = bez zachowania, brak pola = domyślne

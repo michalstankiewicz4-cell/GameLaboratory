@@ -6,7 +6,7 @@ import { LookPipeline, LOOK_DEFAULTS } from '../../../js/render/sea/look.js';
 import { createStage, LIGHTS } from '../../../js/labs/shared/stage.js';
 import { prefab } from '../../../js/scene/prefabs.js';
 import { getAsset, listAssets } from '../../../js/scene/assets.js';
-import { spaceReady, loadSpace, SKY_PRESET } from '../../../js/scene/space.js';
+import { spaceReady, loadSpace, SKY_PRESET, SKY_DAY } from '../../../js/scene/space.js';
 
 export { LIGHTS };
 const D2R = Math.PI / 180;
@@ -67,8 +67,12 @@ export function createWorld(container, store, onWarn) {
     if (onWarn) onWarn('sky:' + name);
     return SK.find((x) => x.id === 'deep').values || {};
   }
+  // niebo niezależne od powierzchni: env.sky '' — domyślne dla powierzchni (morze, ląd — dzienne; kosmos — Deep field),
+  // 'day' — dzienne (pora dnia i pogoda), 'preset:<id>' albo nazwa zasobu — niebo kosmosu (także nad morzem i lądem)
+  const skyIsSpace = (env) => (env.sky ? env.sky !== SKY_DAY : env.surface === 'space');
   function syncSpace(env) {
-    const on = env.surface === 'space';
+    const on = skyIsSpace(env);
+    stage.setSkyMode(on ? 'space' : 'day');
     if (!on) { if (skyBody) skyBody.group.visible = false; return; }
     if (!spaceReady()) { later(); return; }
     if (!spaceEnvSet) { stage.setSpaceEnvironment(window.ShipKit.makeEnvironment(renderer)); spaceEnvSet = true; }
@@ -91,7 +95,7 @@ export function createWorld(container, store, onWarn) {
     if (env.surface === 'land' && env.land && !landDef && onWarn) onWarn('land:' + env.land);
     if (landKey !== lastLand) { lastLand = landKey; stage.setLand(landDef); }
     stage.setSurface(env.surface === 'land' || env.surface === 'space' ? env.surface : 'sea');
-    syncSpace(env);
+    syncSpace(env);   // przed światłem: tryb nieba decyduje o słońcu, mgle i odbiciach
     // światło: gotowe (LIGHTS) albo zasób „weather” z laboratorium wyglądu; brak zasobu — popołudnie i ostrzeżenie
     let light = LIGHTS[env.light] ? env.light : env.light ? getAsset('weather', env.light) : null;
     if (!light) { if (env.light && onWarn) onWarn('light:' + env.light); light = 'afternoon'; }

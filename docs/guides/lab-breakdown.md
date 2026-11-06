@@ -99,6 +99,7 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
    ląd (laboratorium lądu, z terenem w scenie bazowej). *(zrobione w 0.37.0; zostały: deszcz i błyskawice w scenie
    bazowej, płycizny morza przy terenie)*
 2. **Niebo niezależne od powierzchni** (plan w `engine-architecture.md`) — przy tym niebo kosmosu do `js/envs/space/`.
+   *(wybór nieba przy każdej powierzchni: 0.38.0; zostało: przeniesienie kodu nieba kosmosu, niebo ze zdjęcia)*
 3. **Zachowania z modeli:** jazda po lądzie siłami (nowe zachowanie lądu w `js/behaviors/`) zamiast `VehicleKit.drive`,
    pływanie MarineKit; potem pojazdy drogowe, łaziki i MarineKit jako prefabrykaty z zachowaniem.
 4. **Wspólna scena bazowa w laboratoriach środowisk i pojazdów** (woda, ląd, wygląd, pojazdy) — laboratorium

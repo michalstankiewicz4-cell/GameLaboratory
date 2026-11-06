@@ -21,6 +21,7 @@ export function loadSpace() {
 }
 
 // tła: gotowe z SystemKit (id, np. "crimson") i niebo zapisane w laboratorium ciał niebieskich (zasób „sky”)
-// env.sky: '' — „Deep field”, 'preset:<id>' — gotowe tło, '<nazwa>' — zasób
-export const SKY_PRESET = 'preset:';
+// env.sky (dla każdej powierzchni): '' — domyślne dla powierzchni (morze, ląd — dzienne; kosmos — „Deep field”),
+// 'day' — niebo dzienne (pora dnia i pogoda), 'preset:<id>' — gotowe tło kosmosu, '<nazwa>' — zasób „sky”
+export const SKY_PRESET = 'preset:', SKY_DAY = 'day';
 export function skyPresets() { return spaceReady() ? window.SystemKit.SKIES.map((s) => ({ id: s.id, name: s.name, none: !!s.none, values: s.values })) : []; }

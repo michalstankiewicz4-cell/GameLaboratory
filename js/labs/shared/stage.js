@@ -43,6 +43,8 @@ export function createStage(renderer, scene) {
   ground.receiveShadow = true; ground.visible = false; scene.add(ground);
 
   let envRT = null, envDirty = true, envT = 0, t = 0, shift = 0, sunDir = new THREE.Vector3(0, 1, 0), sunSeen = 1;
+  // niebo i powierzchnia są niezależne: skyMode 'day' — niebo dzienne SkyKit (pora dnia, pogoda, mgła, odbicia z nieba),
+  // 'space' — niebo kosmosu (tło daje strona, np. BodyKit): słońce bez atmosfery, bez mgły, odbicia setSpaceEnvironment
   let space = false, spaceEnv = null, lightId = 'afternoon', surfaceKind = 'sea';
   let land = null;   // teren z laboratorium lądu (setLand): { T, tm } — mapa wysokości i siatki LandKit; morze wokół wysp   // kosmos: bez nieba, wody, gruntu i mgły; tło i odbicia daje strona
   setSea();
@@ -50,14 +52,18 @@ export function createStage(renderer, scene) {
     skyU, WU, sun, hemi, water, ground, setSea,
     get waves() { return waves; },
     get sunDir() { return sunDir; }, get sunSeen() { return sunSeen; },
-    // 'sea' | 'land' | 'space' (groundY: wysokość gruntu). Kosmos: czarne tło, słońce bez atmosfery (białe, pełne),
-    // bez mgły; tło (np. niebo BodyKit) i mapę odbić (setSpaceEnvironment) daje strona
+    // powierzchnia: 'sea' | 'land' | 'space' (brak — bez wody i gruntu); groundY: wysokość płaskiego gruntu.
+    // Niebo osobno (setSkyMode); bez drugiego argumentu kosmos dostaje niebo kosmosu, morze i ląd — dzienne
     setSurface(kind, groundY = 0) {
-      const was = space; space = kind === 'space'; surfaceKind = kind;
-      water.visible = kind === 'sea' || (kind === 'land' && !!land); ground.visible = kind === 'land' && !land; ground.position.y = groundY; sky.visible = !space;
+      surfaceKind = kind;
+      water.visible = kind === 'sea' || (kind === 'land' && !!land); ground.visible = kind === 'land' && !land; ground.position.y = groundY;
       if (land) land.tm.group.visible = kind === 'land';
+    },
+    setSkyMode(mode) {
+      const was = space; space = mode === 'space'; sky.visible = !space;
       if (space !== was) { if (space) scene.environment = spaceEnv; else envDirty = true; stage.setLight(lightId); }
     },
+    get skyMode() { return space ? 'space' : 'day'; },
     get space() { return space; },
     // ląd: teren z laboratorium lądu ({ map, water } — ustawienia LandKit i RegionKit, zasób „land”) albo null — płaski
     // grunt. Teren z wodami (morze, fiordy, jeziora) i biomami; morze sceny widać tam, gdzie teren jest pod wodą.
@@ -100,10 +106,15 @@ export function createStage(renderer, scene) {
       WU.uFogCol.value.copy(L.fog); WU.uFogFar.value = L.fogFar; WU.uShine.value = shine0 * 1.8;
       scene.environmentIntensity = 0.85 - w.coverage * w.density * 0.45;
       envDirty = true;
-      if (space) {   // w próżni: słońce białe i pełne (bez atmosfery i chmur), kierunek z pory dnia; prawie bez rozproszonego
+      if (space) {   // niebo kosmosu: słońce białe i pełne (bez atmosfery i chmur), kierunek z pory dnia; prawie bez rozproszonego
         sunSeen = 1; sun.color.setRGB(1, 0.97, 0.92); sun.intensity = 3.2;
         hemi.intensity = 0.04; hemi.color.setRGB(0.6, 0.65, 0.8); hemi.groundColor.setRGB(0.05, 0.05, 0.07);
         scene.fog.density = 0; scene.environmentIntensity = 0.5; envDirty = false;
+        // woda pod niebem kosmosu: odbija czarne niebo (niebo dzienne bez słońca, bez chmur i mgiełki) i ostry blask
+        // białego słońca; bez mgły nad wodą
+        applySky(skyU, { ...w, sunEl: -30, coverage: 0, haze: 0, rain: 0, vis: 25, moon: 0 });
+        WU.uFogDen.value = 0; WU.uFogCol.value.setRGB(0.002, 0.002, 0.004); WU.uFogFar.value = 6000; WU.uLight.value = 0.35;   // daleka woda gaśnie w czerń nieba
+        WU.uSun.value.copy(L.sunDir); WU.uSunCol.value.setRGB(1, 0.97, 0.92).multiplyScalar(0.55);
       }
       return L;
     },

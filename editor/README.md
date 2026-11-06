@@ -83,8 +83,9 @@ Zasada: **dane są jedynym źródłem prawdy**. Okna, uchwyt i pliki zmieniają 
 
 - `env.land` (ląd): `""` — płaski grunt albo nazwa terenu z laboratorium lądu; `env.light`: gotowe (`afternoon`,
   `noon`, `dusk`, `overcast`) albo nazwa pogody z laboratorium wyglądu; `env.look`: nazwa wyglądu kamery (laboratorium filtrów).
-- `env.surface`: także `space`; `env.sky` (kosmos): `""` — Deep field, `"preset:<id>"` — gotowe tło (`deep`, `quiet`,
-  `crimson`, `emerald`, `core`, `black`), albo nazwa nieba zapisanego w laboratorium ciał niebieskich.
+- `env.surface`: także `space`; `env.sky` (każda powierzchnia): `""` — domyślne (morze i ląd — dzienne, kosmos — Deep field),
+  `"day"` — dzienne, `"preset:<id>"` — gotowe tło kosmosu (`deep`, `quiet`, `crimson`, `emerald`, `core`, `black`),
+  albo nazwa nieba zapisanego w laboratorium ciał niebieskich.
 - `env.sea`: nazwa zasobu „morze” z laboratorium wody (`js/scene/assets.js`) albo `""` — morze domyślne.
 - `env.surface`: `sea` | `land`; `env.light`: `afternoon` | `noon` | `dusk` | `overcast`; `env.look`: nazwa profilu
   z laboratorium filtrów (zasób `look`, `gameLab.assets.v1`) albo `""`.
