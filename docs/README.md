@@ -20,6 +20,7 @@ Układ folderów jest taki sam jak w kodzie:
 | Co | Dokument |
 |---|---|
 | Plan silnika (schemat, rola edytora, kolejność) | [guides/engine-architecture.md](guides/engine-architecture.md) |
+| Rozbiór laboratoriów: co z każdego idzie do modeli, zachowań, środowisk i zasobów | [guides/lab-breakdown.md](guides/lab-breakdown.md) |
 | Edytor sceny („Warsztat”, `editor/index.html`): obsługa, budowa, format sceny, API dla AI | [../editor/README.md](../editor/README.md), zmiany: [../editor/CHANGELOG.md](../editor/CHANGELOG.md) |
 | Silnik sceny (`js/scene/`) | [scene/README.md](scene/README.md) |
 | Zachowania (`js/behaviors/`): okręt na wodzie, lot, koło na szynie | [behaviors/README.md](behaviors/README.md) |

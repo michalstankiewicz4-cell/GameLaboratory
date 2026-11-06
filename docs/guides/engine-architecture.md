@@ -81,6 +81,8 @@ scenę Three.js; widok w wolnym środku mają już wszystkie, 0.35.0), warstwy I
    jest na razie w edytorze, `editor/js/play/input.js`)*
 5. Sieć.
 
+Spis laboratoriów i tego, co z każdego idzie dokąd: [`lab-breakdown.md`](lab-breakdown.md).
+
 ## Niebo niezależne od powierzchni (plan, 2026-11-06)
 
 Jak w silnikach (Unity, Godot): niebo to osobne ustawienie środowiska, nie część powierzchni — morze albo ląd pod
