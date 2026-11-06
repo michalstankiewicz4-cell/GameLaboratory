@@ -4,10 +4,11 @@
 import * as THREE from '../../../vendor/three/three.module.js';
 import { buildShip, SHIPS } from '../../models/ships-sea/index.js';
 import { bakeWear, ageMaterials, ageUniforms } from '../../models/ships-sea/ageing.js';
-import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment, sunAt } from '../../envs/sky/skykit.js';
+import { WEATHER, sunAt } from '../../envs/sky/skykit.js';
 import { rainUniforms, rainMesh, lightning } from '../../envs/sky/rainkit.js';
 import { navLights, gunFlashes, signalLamp } from '../../models/ships-sea/lights.js';
-import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, hullTexture, LOOKS } from '../../envs/water/waterkit.js';
+import { heightAt, LOOKS } from '../../envs/water/waterkit.js';
+import { createStage } from '../shared/stage.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 import { LookPipeline, AutoResolution, LOOK_PRESETS, LOOK_DEFAULTS } from '../../render/sea/look.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
@@ -37,15 +38,10 @@ $('view').append(renderer.domElement);
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(S.cam.fov, 1, 0.3, 9000);
 const look = new LookPipeline(renderer);
-const skyU = skyUniforms();
-const sky = skyDome(skyU); scene.add(sky);
-scene.fog = new THREE.FogExp2(0xc9d7e2, 0.0005);
-const hemi = new THREE.HemisphereLight(0xdfe6ec, 0x2a3a46, 0.8);
-const sun = new THREE.DirectionalLight(0xfff0d8, 3);
-sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+// the shared base stage (js/labs/shared/stage.js): the same sky, light, fog and sea as the scene editor
+const stage = createStage(renderer, scene, { envEvery: 0.4 });
+const { skyU, WU, sun, hemi } = stage;
 Object.assign(sun.shadow.camera, { left: -65, right: 65, top: 35, bottom: -35, near: 1, far: 420 });
-sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.05;
-scene.add(hemi, sun, sun.target);
 
 /* ---------------- ship with ageing ---------------- */
 const model = buildShip('blyskawica', { detail: 1 });
@@ -62,19 +58,13 @@ ageMaterials(model.materials, AU);
 $('bake').textContent = `Baked occlusion and edges for ${bake.vertices.toLocaleString('en')} vertices in ${bake.ms} ms (voxel grid ${(bake.voxels / 1e6).toFixed(1)} M cells).`;
 
 /* ---------------- sea ---------------- */
-const WU = Object.assign(waterUniforms(), skyU);
-const hullTex = hullTexture(SHIPS.blyskawica.lines);
-WU.uHull.value = hullTex.tex; WU.uHullZ.value.set(hullTex.z0, hullTex.z1, hullTex.max, 0);
-WU.uShip.value.set(4, SHIPS.blyskawica.lines.zBow, SHIPS.blyskawica.lines.zStern, model.beam / 2);
-const water = new THREE.Mesh(polarGrid(192, 160), waterMaterial(WU, { sky: '#define SKY_NO_STARS\n' + GLSL_SKY })); water.frustumCulled = false; water.renderOrder = 1; scene.add(water);   // no stars in the sea: broken by the waves they only sparkle as noise
-let waves = [];
+stage.setShip(SHIPS.blyskawica.lines, model.beam);   // the hull cut out of the water
+// the sea from the wind (fully developed sea), as a "sea" setting of the stage
 function seaFromWind() {
   const U = Math.max(1.5, S.sky.wind), Hs = Math.min(6.5, 0.0246 * U * U), Lp = Math.min(200, Math.max(10, 0.83 * U * U));
   const look = S.sky.coverage > 0.93 ? LOOKS.storm : S.sky.coverage > 0.75 ? LOOKS.baltic : LOOKS.atlantic;
-  waves = waveSet({ Hs: S.sky.windSea ? Hs : 1.2, Lp: S.sky.windSea ? Lp : 34, chop: Math.min(0.9, 0.35 + U * 0.025), spread: 35, n: 12 }, 210, 7);
-  setWaves(WU, waves);
-  WU.uDeep.value.set(look.deep); WU.uScatter.value.set(look.scatter); WU.uShine.value = look.shine * 1.8; WU.uRipples.value = look.ripples; WU.uCrest.value = Math.min(1, look.crest + U * 0.015);
-  WU.uShipFx.value.set(1, 1, 1, 0);
+  stage.setSea({ Hs: S.sky.windSea ? Hs : 1.2, Lp: S.sky.windSea ? Lp : 34, chop: Math.min(0.9, 0.35 + U * 0.025), spread: 35, n: 12, dir: 30,
+    deep: look.deep, scatter: look.scatter, shine: look.shine, ripples: look.ripples, crest: Math.min(1, look.crest + U * 0.015) });
 }
 
 /* ---------------- rain ---------------- */
@@ -83,12 +73,8 @@ const bolts = lightning(scene);
 let rainNow = 0;                                                      // current rain amount (squalls make it come and go)
 
 /* ---------------- weather → light ---------------- */
-let envRT = null, envDirty = true, envT = 0;
 function updateSky() {
-  const L = applySky(skyU, S.sky);
-  sun.position.copy(L.sunDir).multiplyScalar(220); sun.color.copy(L.sunColor); sun.intensity = L.sunIntensity;
-  hemi.intensity = L.ambient; hemi.color.copy(L.sky); hemi.groundColor.copy(L.ground);
-  scene.fog.color.copy(L.fog); scene.fog.density = L.fogDensity; WU.uFogDen.value = L.fogDensity;
+  const L = stage.setLight(S.sky);   // sky, sun, ambient, fog, sea light, glitter and the sky environment
   RU.uRainCol.value.copy(L.fog).lerp(new THREE.Color(1, 1, 1), 0.25);
   visKm = L.visKm; dayNow = L.day;
   WU.uLight.value = 0.03 + 0.97 * L.day + 0.04 * S.sky.moon * L.night;
@@ -96,11 +82,8 @@ function updateSky() {
   nav.setOn(S.sky.navLights === 'on' ? 1 : S.sky.navLights === 'off' ? 0 : 1 - Math.min(1, Math.max(0, (S.sky.sunEl + 1) / 3)));   // auto: from sunset to sunrise
   bolts.S.rate = S.sky.lightning; bolts.S.sound = S.sky.thunder; bolts.S.fogK = L.fogDensity;
   applyLook();
-  WU.uSun.value.copy(L.sunDir); WU.uSunCol.value.copy(L.glitterColor).multiplyScalar(1.1 * (1 - S.sky.coverage * S.sky.density * 0.8) * L.sunSeen * L.sunSeen);   // glitter needs the sharp sun: fog and rain take it away faster than the light
-  WU.uFogCol.value.copy(L.fog); WU.uFogFar.value = L.fogFar;
-  look.sunVisible = Math.max(0, 1 - S.sky.coverage * (0.4 + S.sky.density * 0.6)) * L.sunSeen;
-  scene.environmentIntensity = 0.85 - S.sky.coverage * S.sky.density * 0.45;           // less sky light under heavy cloud
-  envDirty = true; seaFromWind();
+  look.sunVisible = stage.sunSeen;
+  seaFromWind();
   WU.uShine.value *= 1 - S.sky.rain * 0.6;                                    // rain roughens the surface: a duller, wider glitter
 }
 let visKm = 10, dayNow = 1;
@@ -275,7 +258,7 @@ let last = performance.now(), simT = 0, shift = 0, frames = 0, fpsT = last;
 const motion = { h: 0, p: 0, r: 0, vh: 0, vp: 0, vr: 0 };
 function frame(now) {
   const dtMs = now - last, dt = Math.min(0.05, dtMs / 1000); last = now; frameLog.push(dtMs); if (frameLog.length > 2000) frameLog.splice(0, 1000);
-  simT += dt; shift += 4 * dt;
+  stage.wind = S.sky.wind; simT = stage.tick(dt); shift = stage.shift;   // waves, clouds drifting with the wind
   rainFrame(simT);
   // lightning and gun flashes: light the sky, the sea and the ship for a moment
   bolts.S.sound = S.sky.thunder; const lb = bolts.update(dt, camera);
@@ -284,9 +267,8 @@ function frame(now) {
   const fp = flashes.update(dt);
   if (fp > 0) WU.uFlash.value.set(flashes.light.position.x, flashes.light.position.y, flashes.light.position.z, fp * 0.002);
   else if (lb.I > 0 && lb.at) WU.uFlash.value.set(lb.at.x, 600, lb.at.z, lb.I * 4e4); else WU.uFlash.value.w = 0;
-  WU.uTime.value = simT; WU.uShift.value = shift; skyU.uCloudOff.value.x += dt * S.sky.wind * 0.0012; skyU.uCloudOff.value.y += dt * S.sky.wind * 0.0006;
   // ship on the waves (heave, pitch, roll as damped springs)
-  const hb = heightAt(waves, 0, 40, simT, shift), hs = heightAt(waves, 0, -40, simT, shift), hp = heightAt(waves, -4.5, 0, simT, shift), hst = heightAt(waves, 4.5, 0, simT, shift);
+  const hb = heightAt(stage.waves, 0, 40, simT, shift), hs = heightAt(stage.waves, 0, -40, simT, shift), hp = heightAt(stage.waves, -4.5, 0, simT, shift), hst = heightAt(stage.waves, 4.5, 0, simT, shift);
   const sp = (x, v, tg, T, z) => { const w = 2 * Math.PI / T, a = w * w * (tg - x) - 2 * z * w * v; return [x + (v + a * dt) * dt, v + a * dt]; };
   [motion.h, motion.vh] = sp(motion.h, motion.vh, (hb + hs + hp + hst) / 4 - 0.05, 5.5, 0.55);
   [motion.p, motion.vp] = sp(motion.p, motion.vp, Math.atan((hb - hs) / 80), 4.8, 0.5);
@@ -300,7 +282,7 @@ function frame(now) {
   }
   const c = Math.cos(orbit.pitch);
   camera.position.set(orbit.target.x + Math.sin(orbit.yaw) * c * orbit.dist, orbit.target.y + Math.sin(orbit.pitch) * orbit.dist, orbit.target.z + Math.cos(orbit.yaw) * c * orbit.dist);
-  const minY = heightAt(waves, camera.position.x, camera.position.z, simT, shift) + 1.2; if (camera.position.y < minY) camera.position.y = minY;
+  const minY = heightAt(stage.waves, camera.position.x, camera.position.z, simT, shift) + 1.2; if (camera.position.y < minY) camera.position.y = minY;
   camera.lookAt(orbit.target);
   if (S.cam.shake > 0) {                                     // hand-held: slow sway plus a little jitter, as with a camera held on a rolling deck
     const s = S.cam.shake, t = simT;
@@ -308,9 +290,7 @@ function frame(now) {
     camera.rotateY((Math.sin(t * 0.7 + 0.5) * 0.6 + Math.sin(t * 1.9) * 0.3 + Math.sin(t * 11.0 + 2.0) * 0.04) * 0.012 * s);
     camera.rotateZ(Math.sin(t * 0.5) * 0.02 * s);
   }
-  sky.position.copy(camera.position);
-  water.position.set(Math.round(camera.position.x / 2) * 2, 0, Math.round(camera.position.z / 2) * 2);
-  envT += dt; if (envDirty && envT > 0.4) { if (envRT) envRT.dispose(); envRT = skyEnvironment(renderer, skyU); scene.environment = envRT.texture; envDirty = false; envT = 0; }
+  stage.follow(camera);
   if (S.perf.autoRes) { const s = autoRes.update(dtMs); if (s !== look.scale) { look.setScale(s); $('scale').value = s; $('scaleV').textContent = Math.round(s * 100) + '%'; } }
   look.split = $('splitOn').checked ? +splitR.value : 0;
   if (look.split) $('split').style.left = (look.split * 100) + '%';

@@ -109,3 +109,17 @@ dopiero, gdy scena ich potrzebuje: `loadSpace()` importuje `js/core/three-global
 `space` tak samo. Gotowe tła: `skyPresets()` (z `SystemKit.SKIES`); w `env.sky` z przedrostkiem `preset:`.
 MarineKit (roboty morskie, rodzina `marine`) i VehicleKit (łaziki, rodzina `rovers`) ładują się razem z kitami ze Space. Statki ShipKit: jednostka = 1 m, dziób obrócony na +Z (`makeGameHolder` w skali 1); `tick(t, dt)` — światła
 i silniki na postoju. Liczby ruchu (`SPACE_NUMBERS` w `behaviors.js`) są założone.
+
+## Scena bazowa laboratoriów (`js/labs/shared/stage.js`)
+
+Edytor i laboratoria (filtry, wygląd, ląd) stoją na tej samej scenie: niebo SkyKit, słońce i światło rozproszone,
+mgła, morze WaterKit, płaski grunt albo teren LandKit z wodami RegionKit, mapa otoczenia z nieba.
+
+- `createStage(renderer, scene, opts)`; `opts`: `envEvery` (odświeżanie mapy otoczenia, 0,3 s), `skyRadius` (4000 m),
+  `seaRadius` (6000 m), `clouds` (dryf chmur [x, y]), `shiftSpeed` (przesuwanie fal, 4 m/s), `fogHeight` (mgła rzednie
+  z wysokością kamery).
+- Powierzchnia `setSurface`, niebo `setSkyMode`, światło `setLight(id | pogoda)`, morze `setSea(zasób)`, ląd
+  `setLand({ map, water })` albo `setWorld(T)` (świat już wygenerowany), kadłub wycięty z wody `setShip`.
+- Morze przy terenie zna teren (płycizny, przybój, barwy i prądy wód, lód, olej); fale powtarzają się co rozmiar mapy.
+- Klatka: `update(dt, camera)` albo osobno `tick(dt)` (czas, fale, chmury) i `follow(camera)` (niebo i morze za
+  kamerą, teren, mgła, mapa otoczenia) — laboratorium z własną kamerą ustawia ją między nimi.

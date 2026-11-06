@@ -96,3 +96,10 @@ The Light and weather window's **Weather for the scene editor** saves the weathe
 rain, visibility, haze, lightning, time, sun height and bearing, moon) under a name as a "weather" asset
 (`js/scene/assets.js`); the scene editor offers it in Environment → Light, next to its four ready lights. The scene
 editor shows the sky, the light and the fog; rain and lightning stay in this lab for now.
+
+## Shared base stage (1.4.1)
+
+The lab stands on the base stage of the scene editor (`js/labs/shared/stage.js`): sky, sun, ambient light, fog, the
+sea and the sky environment come from it (`stage.setLight(weather)`, `stage.setSea`, `stage.setShip`), the lab adds
+only its own — rain and lightning, the ship's lights and ageing, the sea from the wind, the camera shots. The clouds
+drift with the wind (`stage.wind`). The picture is the same as before.

@@ -4,14 +4,15 @@
 // Water bodies are mixed by region (RegionKit): one body everywhere, hand-shaped layouts (river mouth, lake and canal,
 // fjord over its sill, harbour bay, ice edge) or mixed from the seed; the sea blends their looks, waves and currents.
 import * as THREE from '../../../vendor/three/three.module.js';
-import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment } from '../../envs/sky/skykit.js';
-import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, LOOKS } from '../../envs/water/waterkit.js';
-import { heightTexture, terrainMeshes, sampleHeight, barrierBuoys, SHAPES, TERRAIN_DEFAULTS, GLSL_LAND } from '../../envs/land/landkit.js';
-import { generateWorld, regionTextures, regionUniforms, setRegions, regionAt, GLSL_REGIONS, LAYOUTS, WORLD_DEFAULTS, BODY_ORDER, CHART, BIOMES, BIOME_ORDER, BIOME_CHART, biomeTexture, biomeAt } from '../../envs/land/regionkit.js';
+import { WEATHER } from '../../envs/sky/skykit.js';
+import { heightAt, LOOKS } from '../../envs/water/waterkit.js';
+import { sampleHeight, SHAPES, TERRAIN_DEFAULTS } from '../../envs/land/landkit.js';
+import { generateWorld, regionAt, LAYOUTS, WORLD_DEFAULTS, BODY_ORDER, CHART, BIOMES, BIOME_ORDER, BIOME_CHART, biomeTexture, biomeAt } from '../../envs/land/regionkit.js';
 import { WATER_BODIES } from '../../envs/water/waterkit.js';
 import { transformShip } from '../../models/ships-sea/transform.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
+import { createStage } from '../shared/stage.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -31,39 +32,23 @@ $('view').append(renderer.domElement);
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(50, 1, 0.5, 40000);
 const look = new LookPipeline(renderer); look.set(LOOK_PRESETS.clean);
-const skyU = skyUniforms(), sky = skyDome(skyU, 20000); sky.renderOrder = -1; scene.add(sky);
-scene.fog = new THREE.FogExp2(0xc9d7e2, 0.0003);
-const hemi = new THREE.HemisphereLight(0xdfe6ec, 0x2a3a46, 0.8), sun = new THREE.DirectionalLight(0xfff0d8, 3);
-sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+// the shared base stage (js/labs/shared/stage.js): the same sky, light, fog, sea and terrain as the scene editor —
+// here a far horizon (sky 20 km, sea 16 km), the waves standing (no drift), the haze thinning with the camera's height
+const stage = createStage(renderer, scene, { envEvery: 0.4, skyRadius: 20000, seaRadius: 16000, clouds: [0.008, 0], shiftSpeed: 0, fogHeight: true });
+const { skyU, WU, sun } = stage;
 Object.assign(sun.shadow.camera, { left: -260, right: 260, top: 260, bottom: -260, near: 1, far: 2400 });
 sun.shadow.bias = -0.0005; sun.shadow.normalBias = 0.4;
-scene.add(hemi, sun, sun.target);
 
 /* ---------------- terrain ---------------- */
-let T = generateWorld(S.map, S.water), tex = heightTexture(T), rtex = regionTextures(T);
-let btex = biomeTexture(T);
-const terrain = terrainMeshes(T, tex, { biome: btex }); scene.add(terrain.group);
-const RU = regionUniforms(rtex);
-let buoys = null;
+let T = generateWorld(S.map, S.water);
+stage.setWorld(T); stage.setSurface('land');   // terrain, water regions, biomes and the boundary buoys
 
-/* ---------------- sea (shares the land uniforms: shallows, surf, waves dying on the shore) ---------------- */
-const WU = Object.assign(waterUniforms(), skyU, terrain.uniforms, RU);
-const water = new THREE.Mesh(polarGrid(192, 160, 0.6, 16000), waterMaterial(WU, { sky: '#define SKY_NO_STARS\n' + GLSL_SKY, land: GLSL_LAND, regions: GLSL_REGIONS }));
-water.frustumCulled = false; water.renderOrder = 1; scene.add(water);
-WU.uShipFx.value.set(0, 0, 0, 0); WU.uWetOn.value = 0;
-let waves = [];
-function seaFor(wind) {
-  const U = Math.max(2, wind), Hs = Math.min(5, 0.0246 * U * U), Lp = Math.min(160, Math.max(12, 0.83 * U * U));
-  waves = waveSet({ Hs, Lp, chop: 0.45, spread: 35, n: 12 }, 230, 7);
-  // the waves repeat across the map too: every wave vector snapped to whole cycles over the map size
-  const K = 2 * Math.PI / T.size;
-  for (const w of waves) {
-    let kx = Math.round(w.k * w.dx / K) * K, kz = Math.round(w.k * w.dz / K) * K;
-    if (kx === 0 && kz === 0) kz = K;
-    w.k = Math.hypot(kx, kz); w.dx = kx / w.k; w.dz = kz / w.k; w.w = Math.sqrt(9.81 * w.k); w.L = 2 * Math.PI / w.k;
-  }
-  setWaves(WU, waves);
-  const lk = LOOKS.atlantic; WU.uDeep.value.set(lk.deep); WU.uScatter.value.set(lk.scatter); WU.uShine.value = lk.shine * 1.8; WU.uRipples.value = lk.ripples; WU.uCrest.value = Math.min(1, lk.crest + U * 0.012);
+/* ---------------- sea (knows the terrain: shallows, surf, waves dying on the shore) ---------------- */
+WU.uWetOn.value = 0;
+const waves = () => stage.waves;
+function seaFor(wind) {   // the sea from the wind; the stage makes the waves repeat across the map
+  const U = Math.max(2, wind), Hs = Math.min(5, 0.0246 * U * U), Lp = Math.min(160, Math.max(12, 0.83 * U * U)), lk = LOOKS.atlantic;
+  stage.setSea({ Hs, Lp, chop: 0.45, spread: 35, n: 12, dir: 50, ...lk, crest: Math.min(1, lk.crest + U * 0.012) });
 }
 
 /* ---------------- ship (game-ready, from the transformer) ---------------- */
@@ -104,22 +89,16 @@ const GEN_STAGES = [
 function generate() { for (const [, , f] of GEN_STAGES) f(); }
 const generateShown = () => window.LabLoad.run('Generating the world…', async (step) => { for (const [n, p, f] of GEN_STAGES) { await step(n, p); f(); } });
 function genTextures() {
-  if (tex) tex.dispose(); tex = heightTexture(T);
-  terrain.set(T, tex);
-  rtex.a.dispose(); rtex.b.dispose(); rtex = regionTextures(T); setRegions(WU, rtex);
-  btex.dispose(); btex = biomeTexture(T); terrain.setBiome(btex);
+  stage.setWorld(T);   // height, region and biome textures; ice, oil, buoys
 }
 function genRest() {
   const t0 = genT0;
   $('biomeBlend').disabled = S.water.biome !== 'zones';
   $('biomeShare').replaceChildren(...BIOME_ORDER.filter((b) => T.biomes.share[b] > 0.005).flatMap((b) => [el('span', { textContent: BIOMES[b].label.replace(/ \(.*/, '') }), el('b', { textContent: `${(T.biomes.share[b] * 100).toFixed(0)} %` })]));
   const sh = T.regions.share;
-  WU.uIce.value.set(sh.ice > 0.001 ? 1 : 0, 18, 0.35, 0); WU.uOil.value = sh.harbour > 0.001 ? 1 : 0;
   for (const k of ['shape', 'land', 'wrap']) $(k).disabled = !['single', 'mixed'].includes(S.water.layout);
   $('body').disabled = S.water.layout !== 'single'; $('rivers').disabled = $('ice').disabled = S.water.layout !== 'mixed';
   $('bodyShare').replaceChildren(...BODY_ORDER.filter((b) => sh[b] > 0.005).flatMap((b) => [el('span', { textContent: WATER_BODIES[b].label.replace(/ \(.*/, '') }), el('b', { textContent: `${(sh[b] * 100).toFixed(0)} %` })]));
-  if (buoys) { scene.remove(buoys); buoys.geometry.dispose(); buoys = null; }
-  if (!T.wrap && T.barrier === 'buoys') { buoys = barrierBuoys(T); scene.add(buoys); }
   seaFor(WEATHER[S.sky.weather]?.wind ?? 6);
   drawChartBase();
   const found = spawn();
@@ -185,19 +164,13 @@ mini.addEventListener('click', (e) => {
 });
 
 /* ---------------- light and weather ---------------- */
-let envRT = null, envDirty = true, envT = 0, fogBase = 0.0003;
 function updateSky() {
   const w = WEATHER[S.sky.weather] || WEATHER.fair;
-  const L = applySky(skyU, { ...w, sunEl: S.sky.sunEl, sunAz: S.sky.sunAz, moon: 0.8 });
-  sun.color.copy(L.sunColor); sun.intensity = L.sunIntensity; hemi.intensity = L.ambient; hemi.color.copy(L.sky); hemi.groundColor.copy(L.ground);
-  sun.userData.dir = L.sunDir.clone();
-  scene.fog.color.copy(L.fog); fogBase = L.fogDensity; WU.uFogCol.value.copy(L.fog); WU.uFogFar.value = L.fogFar;
-  WU.uSun.value.copy(L.sunDir); WU.uSunCol.value.copy(L.glitterColor).multiplyScalar(1.1 * (1 - w.coverage * w.density * 0.8) * L.sunSeen * L.sunSeen);
-  WU.uLight.value = 0.03 + 0.97 * L.day;
-  scene.environmentIntensity = (0.85 - w.coverage * w.density * 0.45) * (0.1 + 0.9 * L.day);
-  look.sunVisible = Math.max(0, 1 - w.coverage * (0.4 + w.density * 0.6)) * L.sunSeen;
+  const L = stage.setLight({ weather: S.sky.weather, sunEl: S.sky.sunEl, sunAz: S.sky.sunAz, moon: 0.8 });   // sky, sun, fog, sea light, sky environment
+  scene.environmentIntensity = (0.85 - w.coverage * w.density * 0.45) * (0.1 + 0.9 * L.day);   // and darker at night
+  look.sunVisible = stage.sunSeen;
   look.set({ exposure: LOOK_PRESETS.clean.exposure * (1 + 2.6 * (1 - L.day)) });
-  envDirty = true; seaFor(w.wind);
+  seaFor(w.wind);
 }
 
 /* ---------------- UI ---------------- */
@@ -327,7 +300,7 @@ function sailStep(dt) {
   const rg = regionAt(T, ship.x, ship.z); ship.rg = rg;
   if (clearAt(ship.x + rg.flow[0] * dt, ship.z + rg.flow[1] * dt, ship.hd)) { ship.x += rg.flow[0] * dt; ship.z += rg.flow[1] * dt; }
   const fx = Math.sin(ship.hd), fz = Math.cos(ship.hd);
-  const hb = heightAt(waves, ship.x + fx * 40, ship.z + fz * 40, simT) * rg.waves, hs = heightAt(waves, ship.x - fx * 40, ship.z - fz * 40, simT) * rg.waves;
+  const hb = heightAt(waves(), ship.x + fx * 40, ship.z + fz * 40, simT) * rg.waves, hs = heightAt(waves(), ship.x - fx * 40, ship.z - fz * 40, simT) * rg.waves;
   const sp = (x, v, tg, Tn, z) => { const w = 2 * Math.PI / Tn, a = w * w * (tg - x) - 2 * z * w * v; return [x + (v + a * dt) * dt, v + a * dt]; };
   [ship.h, ship.vh] = sp(ship.h, ship.vh, (hb + hs) / 2 - 0.05, 5.5, 0.55);
   [ship.p, ship.vp] = sp(ship.p, ship.vp, Math.atan((hb - hs) / 80), 4.8, 0.5);
@@ -365,24 +338,19 @@ function placeCamera(dt) {
   }
   const yaw = ship.hd + orbit.yaw, cp = Math.cos(orbit.pitch);
   camera.position.set(ship.x + Math.sin(yaw) * cp * orbit.dist, ship.h + 8 + Math.sin(orbit.pitch) * orbit.dist, ship.z + Math.cos(yaw) * cp * orbit.dist);
-  const ground = Math.max(sampleHeight(T, camera.position.x, camera.position.z), heightAt(waves, camera.position.x, camera.position.z, simT)) + 2;
+  const ground = Math.max(sampleHeight(T, camera.position.x, camera.position.z), heightAt(waves(), camera.position.x, camera.position.z, simT)) + 2;
   if (camera.position.y < ground) camera.position.y = ground;
   camera.lookAt(ship.x, ship.h + 8, ship.z);
 }
 function frame(now) {
   const dtMs = now - last, dt = Math.min(0.05, dtMs / 1000); last = now; simT += dt;
-  WU.uTime.value = simT; skyU.uCloudOff.value.x += dt * 0.008;
+  stage.tick(dt);
   sailStep(dt); placeCamera(dt);
-  terrain.update(camera);
-  sky.position.copy(camera.position);
-  // haze lies low: seen from high up the air below is thinner, so the fog thins with the camera's height
-  const fk = fogBase / (1 + Math.max(0, camera.position.y - 40) / 300); scene.fog.density = fk; WU.uFogDen.value = fk;
-  water.position.set(Math.round(camera.position.x / 2) * 2, 0, Math.round(camera.position.z / 2) * 2);
+  stage.follow(camera);   // sky and sea with the camera, the terrain grids, the haze thinning with height, the sky environment
   // the shadow box follows what the camera looks at
   const tgt = ship.on && S.sail && camMode !== 'Free flight' ? tmpV.set(ship.x, 0, ship.z) : tmpV.copy(camera.position).setY(0);
-  const sd = sun.userData.dir || new THREE.Vector3(0, 1, 0);
+  const sd = stage.sunDir;
   sun.target.position.copy(tgt); sun.position.copy(tgt).addScaledVector(sd, 1200);
-  envT += dt; if (envDirty && envT > 0.4) { if (envRT) envRT.dispose(); envRT = skyEnvironment(renderer, skyU); scene.environment = envRT.texture; envDirty = false; envT = 0; }
   look.sun(camera, skyU.uSkySun.value);
   window.LabPerf.begin(renderer);
   look.render(scene, camera);
@@ -390,7 +358,7 @@ function frame(now) {
   frames++;
   if (now - fpsT > 500) {
     frames = 0; fpsT = now;
-    $('stats').replaceChildren(...[['Terrain grid', terrain.triangles.toLocaleString('en')], ['Camera', `${Math.round(camera.position.y)} m up`]]
+    $('stats').replaceChildren(...[['Terrain grid', stage.terrain.triangles.toLocaleString('en')], ['Camera', `${Math.round(camera.position.y)} m up`]]
       .flatMap(([a, b]) => [el('span', { textContent: a }), el('b', { textContent: String(b) })]));
     drawChart();
   }

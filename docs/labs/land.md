@@ -109,3 +109,10 @@ The Map window's **Land for the scene editor** saves the map's settings (LandKit
 depth, roughness, erosion, size, resolution, edge; RegionKit waters and biome) under a name as a "land" asset
 (`js/scene/assets.js`). The scene editor builds the same terrain on its base stage for the surface Land
 (Environment → Land); its ships run aground on it. A saved land can be loaded back (the map is generated again) or deleted.
+
+## Shared base stage (1.4.1)
+
+The lab stands on the base stage of the scene editor (`js/labs/shared/stage.js`): sky, light, fog, the sea and the
+terrain come from it (`stage.setWorld(T)` builds the terrain, water regions, biomes and buoys from the generated
+world; the sea knows the terrain). The lab's options of the stage: a far horizon (sky 20 km, sea 16 km), standing
+waves, the haze thinning with the camera's height. So the scene editor shows a saved land exactly as here.

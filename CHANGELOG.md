@@ -3,6 +3,20 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.41.1 · edytor sceny 0.13.0 · wygląd 1.4.1 · ląd 1.4.1 — 2026-11-06 (wspólna scena bazowa w laboratoriach wyglądu i lądu)
+
+### Zmienione
+- **Laboratoria wyglądu i lądu stoją na wspólnej scenie bazowej** (`js/labs/shared/stage.js`) — tej samej co edytor
+  sceny: niebo, słońce, światło rozproszone, mgła, morze, teren i mapa otoczenia z nieba pochodzą z niej, laboratorium
+  dokłada tylko swoje (wygląd: deszcz, błyskawice, światła okrętu, morze z wiatru; ląd: statek, kamery, mapa). Wygląd
+  bez zmian (zrzuty przed i po: te same trójkąty i wywołania rysowania, różnica obrazu ≈ 0).
+- Scena bazowa: opcje dla laboratoriów (promień nieba, zasięg morza, dryf chmur, przesuwanie fal, mgła rzednąca
+  z wysokością kamery, co ile odświeżać mapę otoczenia), krok czasu rozdzielony na `tick` i `follow` (laboratorium
+  z własną kamerą), `setWorld(T)` — świat już wygenerowany.
+- Edytor sceny: **morze przy terenie z laboratorium lądu zna teren** — płycizny, przybój, fale gasnące przy brzegu,
+  barwy i prądy wód (rzeka, jezioro, fiord, port), lód i olej, boje na granicy mapy; fale powtarzają się co rozmiar
+  mapy — tak jak w laboratorium lądu.
+
 ## Program 0.41.0 · edytor sceny 0.12.0 · pojazdy (ląd) 1.15.1 · pojazdy (woda) 1.5.1 — 2026-11-06 (łaziki w edytorze, gąsienice, MarineKit tylko model)
 
 ### Dodane
