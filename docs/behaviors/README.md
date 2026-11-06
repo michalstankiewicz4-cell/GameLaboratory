@@ -9,7 +9,7 @@ Zasada (CLAUDE.md): fizyka jest prawdziwa — start, ruch, skręt i zatrzymanie 
 |---|---|---|---|
 | okręt na wodzie | `water/ship.js` | woda | edytor sceny (okręty), gra CityExplorer |
 | mała jednostka na wodzie | `water/craft.js` | woda (amfibia też ląd) | laboratoria pojazdów (roboty MarineKit, amfibia), edytor sceny (roboty morskie) |
-| jazda po lądzie | `land/drive.js` | ląd | laboratorium pojazdów — ląd (łaziki, pojazdy drogowe), edytor sceny (pojazdy drogowe) |
+| jazda po lądzie | `land/drive.js` | ląd | laboratorium pojazdów — ląd (łaziki, pojazdy drogowe), edytor sceny (pojazdy drogowe, łaziki) |
 | ciąg w próżni | `space/thrust.js` | kosmos | edytor sceny (statki kosmiczne, dron) |
 | lot w atmosferze | `air/flight.js` | ląd (powietrze nad lądem) | edytor sceny (Spitfire) |
 | koło na szynie — skład | `rail/physics.js`, `rail/rail.js` | ląd | laboratorium pojazdów — ląd (pociąg) |
@@ -46,7 +46,7 @@ masa bez danych — z pola wodnicy i zanurzenia (pojazd podwodny: wyporność ca
 - Amfibia: na gruncie koła (napęd do μ·N, regulator do prędkości maksymalnej, zbocze z normalnej gruntu), w wodzie śruby.
 - Sterowanie `c`: `throttle`, `steer` (dodatni — w lewo), `dive`; `env`: `surface(x, z)` (woda z falami), `floor(x, z)`.
 - Stan: `x`, `z`, `yaw`, `u`, `v`, `r`, `y`, `vy`, `pitch`, `roll`, `depth`, `lift`, `onLand`, `speed`. Model dostaje
-  pozę przez `MarineKit` `update(t, dt, { pose })`.
+  pozę przez `MarineKit` `update(t, dt, { pose })` (MarineKit nie ma już własnego pływania).
 
 ## Jazda po lądzie (`land/drive.js`)
 
@@ -59,7 +59,8 @@ długość styku), `gauge`, wymiary; brakujące wyprowadzone (moc z `accel` i `m
   1,1 × przekrój), zbocze m·g·sin θ (wysokość gruntu pod przodem i tyłem).
 - Koła — model jednośladowy: kąt znoszenia osi, siła boczna Cα·α (Cα ≈ 10 × nacisk osi), najwyżej μ·N osi (poślizg);
   skręt kół do kąta z `turnRadius`, z ograniczoną szybkością.
-- Gąsienice: siła każdej z dźwigni ± skrętu, moment z różnicy minus opór skrętu μt·N·l/4 (μt 0,5), bez jazdy bokiem.
+- Gąsienice: każda goni zadaną prędkość (dźwignia ± skręt) — napęd do mocy (połowa na stronę), hamowanie do przyczepności
+  (wewnętrzna hamuje); moment z różnicy sił minus opór skrętu μt·N·l/4 (μt 0,5), bez jazdy bokiem.
 - Woda: gdy grunt jest pod wodą — opór ½·ρw·Cd·A·v² i wyporność (mniejszy docisk, mniej przyczepności): pojazd lądowy
   staje sam.
 - Sterowanie `c`: `throttle` −1…1, `steer` −1…1 (dodatni — w lewo), `brake`; `ground`: `height(x, z)`, `water(x, z)`.

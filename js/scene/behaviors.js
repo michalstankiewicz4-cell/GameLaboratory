@@ -85,7 +85,7 @@ export const BEHAVIORS = {
   },
   drive: {
     label: 'Driving on land', labelPl: 'Jazda po lądzie', env: 'land', throttle: [-1, 1], lever: false,
-    fits: (prefabId) => prefabId.startsWith('road/'),
+    fits: (prefabId) => prefabId.startsWith('road/') || prefabId.startsWith('rovers/'),
     keys: 'W / S: accelerate / brake and reverse · A / D: steer',
     keysPl: 'W / S: gaz / hamulec i wsteczny · A / D: skręt',
     create(obj, built, world) {

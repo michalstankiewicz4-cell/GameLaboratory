@@ -3,6 +3,20 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.41.0 · edytor sceny 0.12.0 · pojazdy (ląd) 1.15.1 · pojazdy (woda) 1.5.1 — 2026-11-06 (łaziki w edytorze, gąsienice, MarineKit tylko model)
+
+### Dodane
+- Edytor sceny: rodzina **Łaziki** (zwiadowca, transporter, gąsienicowy, budowniczy; VehicleKit ładowany razem
+  z kitami ze Space) z zachowaniem „jazda po lądzie”.
+
+### Zmienione
+- Jazda po lądzie, gąsienice: każda gąsienica goni zadaną prędkość (dźwignia ± skręt) — napęd do mocy silnika,
+  hamowanie do przyczepności; wewnętrzna gąsienica hamuje, więc pojazd gąsienicowy skręca w ruchu i obraca się
+  w miejscu (wcześniej przy małej mocy nie skręcał).
+- **MarineKit to już tylko model**: usunięte jego własne morze (`makeSea`, `WAVES`, `waveHeight`, płatki pod wodą
+  `makeSnow` — nieużywane) i sprężyny pływania; pozę daje zachowanie `js/behaviors/water/craft.js`, bez niego
+  jednostka stoi równo na linii wodnej. Geometria bez zmian (doktor modeli OK).
+
 ## Program 0.40.1 · edytor sceny 0.11.1 · pojazdy (ląd) 1.15.0 — 2026-11-06 (kołowanie samolotu, kierunek lotek i steru)
 
 ### Zmienione

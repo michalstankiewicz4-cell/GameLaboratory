@@ -83,7 +83,7 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
    niezależnie od powierzchni ([plan](engine-architecture.md), „Niebo niezależne od powierzchni”).
 2. **Dwa systemy światła:** cztery stałe oświetlenia sceny bazowej (`LIGHTS`) i pogoda z porą dnia laboratorium
    wyglądu — połączyć w zasób **pogoda i światło**.
-3. **Dwa morza:** WaterKit (Battle) i `MarineKit.makeSea` (Space, nieużywane).
+3. **Dwa morza:** WaterKit (Battle) i `MarineKit.makeSea` (Space, nieużywane) — *morze MarineKit usunięte w 0.41.0*.
 4. **Zachowania w modelach:** `VehicleKit.drive` (kinematyczne), pływanie w `MarineKit.update`, chód w LifeKit, akcje
    w ShipKit, zejście i jazda w SurfaceKit — model ma tylko pokazywać; ruch → `js/behaviors/`.
 5. **Każde laboratorium ma własną scenę i pętlę** — docelowo wspólna scena bazowa (`js/labs/shared/stage.js` jest
@@ -103,8 +103,8 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
 3. **Zachowania z modeli:** jazda po lądzie siłami (nowe zachowanie lądu w `js/behaviors/`) zamiast `VehicleKit.drive`,
    pływanie MarineKit; potem pojazdy drogowe, łaziki i MarineKit jako prefabrykaty z zachowaniem.
    *(jazda po lądzie siłami: 0.39.0 — łaziki i pojazdy drogowe w laboratorium, pojazdy drogowe w edytorze; pływanie
-   MarineKit i amfibia: 0.40.0 — w laboratoriach i w edytorze; tramwaj na torze i kołowanie samolotu w laboratorium: 1.14.0–1.15.0; zostało: łaziki
-   jako prefabrykaty, usunięcie sprężyn i morza `makeSea` z MarineKit)*
+   MarineKit i amfibia: 0.40.0 — w laboratoriach i w edytorze; tramwaj na torze i kołowanie samolotu w laboratorium: 1.14.0–1.15.0; łaziki jako prefabrykaty
+   i MarineKit bez własnego morza i sprężyn: 0.41.0 — punkt zrobiony)*
 4. **Wspólna scena bazowa w laboratoriach środowisk i pojazdów** (woda, ląd, wygląd, pojazdy) — laboratorium
    pokazuje swój zasób na tej samej scenie co edytor.
 5. **Reszta prefabrykatów:** moduły baz, rośliny, jaskinie, ciała niebieskie, ludzie i stwory (z chodem).

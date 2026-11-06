@@ -8,7 +8,8 @@
 //   - zbocze: składowa ciężaru m·g·sin(nachylenie) wzdłuż pojazdu (z wysokości gruntu pod przodem i tyłem);
 //   - opony (koła): model jednośladowy — siła boczna osi z kąta znoszenia (sztywność Cα), najwyżej μ·N osi; skręt kół
 //     do kąta, przy którym promień zawracania = turnRadius;
-//   - gąsienice (turnRadius 0): siła każdej gąsienicy z dźwigni i skrętu (różnica), moment oporu skrętu μt·m·g·L/4,
+//   - gąsienice (turnRadius 0): każda gąsienica goni zadaną prędkość (dźwignia ± skręt) — napęd do mocy, hamowanie do
+//     przyczepności (wewnętrzna hamuje); moment z różnicy sił, opór skrętu μt·N·l/4,
 //     opór boczny (gąsienice nie jadą bokiem);
 //   - woda (gdy grunt pod pojazdem jest pod wodą): opór wody ½·ρw·Cd·A·v² i wyporność (mniej docisku → mniej
 //     przyczepności) — pojazd lądowy w głębokiej wodzie staje sam, bez warunku „stop przy wodzie”.
@@ -93,11 +94,15 @@ export function createDrive(def, { x = 0, z = 0, yaw = 0 } = {}) {
       Fl = Fyf * Math.cos(s.steer) + Fyr; M = a * Fyf * Math.cos(s.steer) - b * Fyr;
       Fx -= Fyf * Math.sin(s.steer);
     } else {
-      // gąsienice: lewa i prawa z dźwigni ± skrętu; każda do połowy przyczepności
+      // gąsienice: każda ma zadaną prędkość z dźwigni ± skrętu (jak przekładnia skrętu); goni ją siłą — napęd do mocy
+      // silnika (połowa na stronę), hamowanie do przyczepności (wewnętrzna gąsienica hamuje — tak skręca czołg)
       const st = clamp(c.steer || 0, -1, 1), left = clamp(thr - st, -1, 1), right = clamp(thr + st, -1, 1);
       const side = (k, vs) => {
-        if (k * vs < -0.3) return -Math.sign(vs) * grip / 2 * Math.abs(k);   // gąsienica hamuje
-        const P = D.power / 2 * (k < 0 ? D.reverse : 1); return k * Math.min(P / Math.max(Math.abs(vs), D.v0), grip / 2) * gov(vs);
+        const want = k * D.vmax * (k < 0 ? D.reverse : 1), F = clamp((want - vs) * D.mass * 1.5, -grip / 2, grip / 2);
+        if (F * vs > 0 || (Math.abs(vs) < 0.05 && F * want > 0)) {   // ciągnie w stronę ruchu — napęd, do mocy
+          const P = D.power / 2; return clamp(F, -P / Math.max(Math.abs(vs), D.v0), P / Math.max(Math.abs(vs), D.v0)) * gov(vs);
+        }
+        return F;                                                     // przeciw ruchowi — hamulec gąsienicy
       };
       const B = D.gauge, FlT = side(left, s.u - s.r * B / 2), FrT = side(right, s.u + s.r * B / 2);
       Fx = FlT + FrT;

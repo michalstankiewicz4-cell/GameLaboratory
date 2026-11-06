@@ -95,8 +95,9 @@ antifouling copy whose "deck" sits at the waterline.
 
 The vessels move and float with the behaviour `js/behaviors/water/craft.js` (docs/behaviors/README.md): thrust, drag,
 rudder, buoyancy, the skimmer's foils, the diver's vertical thrusters, the amphibian's wheels. `update(t, dt, { pose })`
-takes its pose (`y`, `pitch`, `roll`, `lift`, `depth`, `onLand`, `vd`) and only shows it; without `pose` the old springs
-still run (a vessel standing in the scene editor). The data for the behaviour sit in the definitions: `foils` (the
+takes its pose (`y`, `pitch`, `roll`, `lift`, `depth`, `onLand`, `vd`) and only shows it; without `pose` the vessel stands
+level at its waterline. The kit's own sea (`makeSea`, `WAVES`, `waveHeight`, `makeSnow`) and its floating springs were
+removed (2026-11-06) — the sections below about the sea are history. The data for the behaviour sit in the definitions: `foils` (the
 skimmer), `azimuth` (the barge), `wheels` (the amphibian). Used by both vehicle labs and the scene editor (family
 "Sea robots", loaded with the Space kits).
 

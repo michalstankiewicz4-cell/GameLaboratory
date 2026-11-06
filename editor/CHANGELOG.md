@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.12.0 — 2026-11-06 (łaziki)
+
+### Dodane
+- Rodzina **Łaziki** (Scout, Hauler, Crawler, Constructor) — w grze jazda po lądzie: W / S gaz i hamulec, A / D skręt
+  (gąsienicowy skręca hamując gąsienicę). Roboty morskie na postoju stoją równo na wodzie (bez sprężyn modelu).
+
 ## 0.11.1 — 2026-11-06
 
 ### Poprawione

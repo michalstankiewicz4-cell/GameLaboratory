@@ -26,6 +26,7 @@ export const FAMILIES = {
   weapons: { label: 'Weapons', labelPl: 'Broń' },
   space: { label: 'Spacecraft', labelPl: 'Statki kosmiczne' },
   marine: { label: 'Sea robots', labelPl: 'Roboty morskie' },
+  rovers: { label: 'Rovers', labelPl: 'Łaziki' },
 };
 
 const P = [];
@@ -57,6 +58,14 @@ function buildMarine(id) {
   return { root: v.group, kit: v, dispose: () => MK.disposeVessel(v), tick: (t, dt) => v.update(t, dt, {}) };
 }
 MARINE.forEach(([id, name]) => add('marine/' + id, name, 'marine', 'sea', 'labs/vehicles-water.html?ship=' + id, () => buildMarine(id), { needs: 'space' }));
+// łaziki (VehicleKit ze Space): zwiadowca, transporter, gąsienicowy, budowniczy; w grze — jazda po lądzie (siłami)
+const ROVERS = [['scout', 'Scout'], ['hauler', 'Hauler'], ['crawler', 'Crawler'], ['constructor', 'Constructor']];
+function buildRover(id) {
+  const VK = window.VehicleKit; if (!VK) throw new Error('VehicleKit is not loaded (js/scene/space.js loadSpace())');
+  const v = VK.buildVehicle(id, { detail: 1 });
+  return { root: v.group, kit: v, dispose: () => VK.disposeVehicle(v) };
+}
+ROVERS.forEach(([id, name]) => add('rovers/' + id, name, 'rovers', 'land', 'labs/vehicles-land.html', () => buildRover(id), { needs: 'space' }));
 
 export const PREFABS = P;
 export const prefab = (id) => P.find((p) => p.id === id) || null;

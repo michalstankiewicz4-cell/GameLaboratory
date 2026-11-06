@@ -5,7 +5,7 @@
 const SHIP_FILES = ['codewing', 'scribe', 'swarmer', 'haven'];
 let loading = null;
 
-export const spaceReady = () => !!(window.ShipKit && window.MarineKit && window.BodyKit && window.SystemKit && window.BodyKit.GAME_KINDS && window.BodyKit.GAME_KINDS.sky);
+export const spaceReady = () => !!(window.ShipKit && window.MarineKit && window.VehicleKit && window.BodyKit && window.SystemKit && window.BodyKit.GAME_KINDS && window.BodyKit.GAME_KINDS.sky);
 
 export function loadSpace() {
   if (!loading) loading = (async () => {
@@ -13,10 +13,11 @@ export function loadSpace() {
     await import('../models/ships-space/shipkit.js');
     for (const f of SHIP_FILES) await import(`../models/ships-space/ships/${f}.js`);
     await import('../models/marine/marinekit.js');   // roboty morskie (ślizgacz, barka, nurek, amfibia) — też globalne THREE
+    await import('../models/vehicles/vehiclekit.js'); // łaziki (zwiadowca, transporter, gąsienicowy, budowniczy)
     await import('../models/bodies/bodykit.js');
     await import('../models/bodies/kinds/sky.js');
     await import('../envs/space/systemkit/systemkit.js');
-    if (window.LabLog) window.LabLog.add('info', 'Space kits loaded (ShipKit, MarineKit, BodyKit sky, SystemKit)');
+    if (window.LabLog) window.LabLog.add('info', 'Space kits loaded (ShipKit, MarineKit, VehicleKit, BodyKit sky, SystemKit)');
   })();
   return loading;
 }
