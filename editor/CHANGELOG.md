@@ -3,6 +3,11 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.11.1 — 2026-11-06
+
+### Poprawione
+- Samolot: → i E obracają teraz w prawo (wcześniej odwrotnie).
+
 ## 0.11.0 — 2026-11-06 (roboty morskie)
 
 ### Dodane

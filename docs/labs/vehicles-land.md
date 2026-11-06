@@ -94,3 +94,9 @@ wheel-on-rail physics from aTrain (`js/behaviors/rail/tram.js`, track `js/behavi
 `js/models/structures/railway/path-track.js`). W sets the wanted speed (the traction controller follows it), S brakes;
 AUTO drives at most 30 km/h. Too fast into a curve and it derails (about 45 km/h on the 60 m curves) — choosing the
 tram again puts it back. The physics runs flat; the track and the sections get the ground's height.
+
+## The aircraft taxis by forces (1.15.0)
+
+The Spitfire on the ground moves with the flight behaviour (`js/behaviors/air/flight.js`: wheels on springs, brakes,
+the tail wheel steered with the rudder, the propeller's thrust): W / S move the throttle lever, A / D the rudder, S at
+idle brakes; AUTO taxis at low power. With full power and a long run it can lift off — the same forces as in flight.

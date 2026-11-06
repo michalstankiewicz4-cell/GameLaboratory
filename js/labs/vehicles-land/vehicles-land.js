@@ -8,6 +8,7 @@ import { createCraft, craftDef } from "../../behaviors/water/craft.js";
 import { createTramSim, tramPoses, H as RAIL_H } from "../../behaviors/rail/tram.js";
 import { pathTrack } from "../../behaviors/rail/path.js";
 import { buildPathTrack } from "../../models/structures/railway/path-track.js";
+import { createFlight } from "../../behaviors/air/flight.js";
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 (() => {
@@ -85,7 +86,7 @@ const drv = { x: 0, z: 0, yaw: 0, speed: 0 };
 let veh = null;
 // rovers and road vehicles drive by forces (js/behaviors/land/drive.js), the amphibian floats and drives by forces
 // (js/behaviors/water/craft.js), the tram runs on a track loop with the wheel-on-rail physics (js/behaviors/rail/tram.js);
-// the aircraft still on VehicleKit.drive (taxiing — later)
+// the aircraft taxis with the flight behaviour (js/behaviors/air/flight.js: wheels, brakes, tail wheel, propeller)
 let sim = null;
 // the tram's track: a loop (two 160 m straights, two 60 m curves, ~700 m) laid on the ground; built once, shown with the tram.
 // Too fast into a curve and it derails (the physics: about 45 km/h on 60 m) — AUTO drives at most 30 km/h
@@ -139,6 +140,11 @@ function load() {
     sim = createTramSim(tramTrack, def, 40); sim.ctrl.target = 0; tramAcc = 0;
   }
   if (tramRails) tramRails.visible = kit === "tram";
+  if (kit === "air" && def.flight) {
+    const gy0 = groundAt(drv.x, drv.z);
+    sim = createFlight(def.flight, def.mass, { p: [drv.x, gy0 + def.rest.y, drv.z], yaw: drv.yaw, pitch: -def.rest.pitch });
+    sim.lever = 0;
+  }
   if (sim) sim.kind = kit;
   scene.add(veh.group);
   $("hudTitle").textContent = def.name;
@@ -241,6 +247,18 @@ function frame() {
     const P = tramPose[0], fw = new THREE.Vector3(0, 0, 1).applyQuaternion(P.q);
     drv.x = P.x; drv.z = P.z; drv.yaw = Math.atan2(fw.x, fw.z); drv.speed = sim.st.speed;
     if (sim.broken || P.y - groundAt(P.x, P.z) < -0.2) $("role").textContent = "Derailed (too fast into the curve) — choose the tram again to put it back on the track.";
+  } else if (sim && sim.kind === "air") {
+    // the aircraft: W / S move the throttle lever (AUTO: taxiing power), A / D the rudder (it steers the tail wheel too),
+    // S at idle brakes; full power and enough speed and it flies — the same forces as in flight
+    sim.lever = Math.max(0, Math.min(1, state.auto ? 0.28 * state.autoSpeed / 0.5 : sim.lever + input.throttle * 0.5 * dt));
+    const c = { throttle: sim.lever, rudder: input.steer * (state.auto ? 0.4 : 1), elevator: 0,   // steer and rudder: positive = left (the flight physics' convention)
+      aileron: 0, flaps: 0, gear: 1, brake: !state.auto && input.throttle < 0 && sim.lever < 0.05 ? 1 : 0 };
+    const n = Math.max(1, Math.ceil(dt * 240)), h = dt / n;
+    for (let i = 0; i < n; i++) sim.step(h, c, groundAt);
+    const S = sim.state;
+    const q = S.q, fx = 2 * (q[1] * q[3] + q[0] * q[2]), fz = 1 - 2 * (q[1] * q[1] + q[2] * q[2]);   // nose (+z) in the world
+    drv.x = S.p[0]; drv.z = S.p[2]; drv.yaw = Math.atan2(fx, fz); drv.speed = S.V;
+    if (S.crashed) $("role").textContent = "Crashed — choose the aircraft again.";
   } else if (sim) {
     // forces: engine, brakes, tyres or tracks, slopes, and the land lab's water (drag and buoyancy stop a rover in it)
     if (sim.kind === "mk") sim.step(dt, input, { surface: world ? (x, z) => world.waterAt(x, z, t) : NO_WATER, floor: groundAt });   // the amphibian
@@ -251,7 +269,10 @@ function frame() {
   veh.group.position.set(drv.x, gy + (veh.def.rest ? veh.def.rest.y : 0), drv.z);
   veh.group.rotation.set(veh.def.rest ? veh.def.rest.pitch : 0, drv.yaw, 0, 'YXZ');   // samolot na ziemi: oparty na kole ogonowym
   const cy = Math.cos(drv.yaw), sy = Math.sin(drv.yaw);
-  if (veh.kit === "tram" && sim) {   // the tram: its sections where the physics puts them (on the track's rail heads)
+  if (veh.kit === "air" && sim) {   // the aircraft: where the flight physics puts it (on its wheels, or in the air)
+    const S = sim.state; veh.group.position.fromArray(S.p); veh.group.quaternion.set(S.q[1], S.q[2], S.q[3], S.q[0]);
+    veh.update(t, dt, { throttle: sim.lever, rudder: input.steer, gear: true, flaps: 0, speed: S.V, lights: state.night ? 1 : 0 });
+  } else if (veh.kit === "tram" && sim) {   // the tram: its sections where the physics puts them (on the track's rail heads)
     veh.group.position.set(0, 0, 0); veh.group.rotation.set(0, 0, 0);
     veh.update(t, dt, { speed: drv.speed, poses: tramPose, lights: state.night ? 1 : 0, work: state.work ? 1 : 0, brake: sim.ctrl.brake });
   } else if (veh.kit === "mk") {   // the amphibian: on its wheels on the ground (it would float where there is water)

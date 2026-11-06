@@ -3,6 +3,19 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.40.1 · edytor sceny 0.11.1 · pojazdy (ląd) 1.15.0 — 2026-11-06 (kołowanie samolotu, kierunek lotek i steru)
+
+### Zmienione
+- Laboratorium pojazdów (ląd): **Spitfire kołuje z fizyką lotu** (`js/behaviors/air/flight.js`: koła, hamulce,
+  kółko ogonowe, śmigło) zamiast przesuwania jak samochód: W / S dźwignia gazu, A / D ster kierunku (skręca też kółko
+  ogonowe), S na wolnych obrotach hamuje; AUTO kołuje na małym gazie. Pełny gaz i rozbieg — samolot może się wznieść.
+  Ostatnim pojazdem na `VehicleKit.drive` w laboratoriach lądowych już nic nie jeździ.
+
+### Poprawione
+- Edytor sceny: w samolocie strzałki ← → i Q / E działały odwrotnie — w fizyce lotu dodatnie lotki i ster
+  kierunku obracają w lewo (+x to lewe skrzydło), a opis mówił „w prawo”. Poprawione przypisanie klawiszy i opis
+  w `flight.js` (fizyka bez zmian).
+
 ## Pojazdy (ląd) 1.14.0 — 2026-11-06 (tramwaj na torze)
 
 ### Zmienione

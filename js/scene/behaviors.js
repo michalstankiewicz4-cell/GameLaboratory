@@ -69,7 +69,8 @@ export const BEHAVIORS = {
         state: s,
         step(dt, c) {
           if (c.throttle != null) thr = Math.max(0, Math.min(1, c.throttle));
-          const ctrl = { throttle: thr, elevator: c.elevator || 0, aileron: c.aileron || 0, rudder: c.rudder || 0, flaps: c.flaps ? 1 : 0, gear: c.gear === false ? 0 : 1, brake: c.brake || 0 };
+          const ctrl = { throttle: thr, elevator: c.elevator || 0, aileron: -(c.aileron || 0), rudder: -(c.rudder || 0),   // fizyka: dodatnie w lewo; klawisze: → i E w prawo
+            flaps: c.flaps ? 1 : 0, gear: c.gear === false ? 0 : 1, brake: c.brake || 0 };
           const n = Math.max(1, Math.ceil(dt / (1 / 240))), h = dt / n;   // stały mały krok fizyki
           const gh = world.groundAt || (() => 0);   // teren z laboratorium lądu albo poziom 0
           for (let i = 0; i < n; i++) sim.step(h, ctrl, gh);

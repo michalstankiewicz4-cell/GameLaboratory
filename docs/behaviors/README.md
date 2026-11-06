@@ -86,8 +86,8 @@ modelu AirKit (np. [`../models/air/spitfire.md`](../models/air/spitfire.md), „
 - Bryła sztywna, 6 stopni swobody; siły aerodynamiczne z prędkości względem powietrza (nośna z kąta natarcia do
   przeciągnięcia, opór profilowy, indukowany, podwozia i klap, siła boczna ze ślizgu), ciąg śmigła z mocy, momenty
   stateczności, wzniosu, tłumienia i sterów; koła na sprężynach z tłumieniem, hamulce, kółko ogonowe skręcane sterem.
-- Sterowanie `c`: `throttle` 0…1, `elevator`, `aileron`, `rudder` −1…1 (dodatnie: nos w górę, przechył w prawo, nos
-  w prawo), `flaps` 0/1, `gear` 0/1, `brake` 0…1. `groundH(x, z)` — wysokość podłoża; `wind` — wiatr [x, y, z].
+- Sterowanie `c`: `throttle` 0…1, `elevator`, `aileron`, `rudder` −1…1 (dodatnie: nos w górę, przechył w lewo, nos
+  w lewo — +x to lewe skrzydło), `flaps` 0/1, `gear` 0/1, `brake` 0…1. `groundH(x, z)` — wysokość podłoża; `wind` — wiatr [x, y, z].
 - Stan: `p`, `v`, `q` ([w, x, y, z]), `w`, `V`, `ias`, `alpha`, `beta`, `stall`, `onGround`, `gear`, `flap`, `crashed`
   (środek masy pod ziemią).
 - Krok fizyki powinien być mały (w scenie 1/240 s, kilka kroków na klatkę).

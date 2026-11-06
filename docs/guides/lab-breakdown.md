@@ -103,7 +103,7 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
 3. **Zachowania z modeli:** jazda po lądzie siłami (nowe zachowanie lądu w `js/behaviors/`) zamiast `VehicleKit.drive`,
    pływanie MarineKit; potem pojazdy drogowe, łaziki i MarineKit jako prefabrykaty z zachowaniem.
    *(jazda po lądzie siłami: 0.39.0 — łaziki i pojazdy drogowe w laboratorium, pojazdy drogowe w edytorze; pływanie
-   MarineKit i amfibia: 0.40.0 — w laboratoriach i w edytorze; tramwaj na torze w laboratorium: 1.14.0; zostało: kołowanie samolotu, łaziki
+   MarineKit i amfibia: 0.40.0 — w laboratoriach i w edytorze; tramwaj na torze i kołowanie samolotu w laboratorium: 1.14.0–1.15.0; zostało: łaziki
    jako prefabrykaty, usunięcie sprężyn i morza `makeSea` z MarineKit)*
 4. **Wspólna scena bazowa w laboratoriach środowisk i pojazdów** (woda, ląd, wygląd, pojazdy) — laboratorium
    pokazuje swój zasób na tej samej scenie co edytor.

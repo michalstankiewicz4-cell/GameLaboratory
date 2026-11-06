@@ -29,7 +29,7 @@ export function createFlight(def, mass, { p = [0, 2, 0], yaw = 0, pitch = 0 } = 
   };
   const I = [F.I[2], F.I[1], F.I[0]];   // względem osi ciała x (pochylenie), y (odchylenie), z (przechylenie)
 
-  // c: { throttle 0..1, elevator, aileron, rudder −1..1 (dodatnie: nos w górę, przechył w prawo, nos w prawo), flaps 0/1, gear 0/1, brake 0..1 }
+  // c: { throttle 0..1, elevator, aileron, rudder −1..1 (dodatnie: nos w górę, przechył w lewo, nos w lewo — +x to lewe skrzydło), flaps 0/1, gear 0/1, brake 0..1 }
   // groundH(x, z) → wysokość podłoża; wind: [x, y, z] m/s
   function step(dt, c = {}, groundH = () => 0, wind = [0, 0, 0]) {
     if (s.crashed) return s;
