@@ -106,7 +106,7 @@ const dlg = el("div"); dlg.id = "lmDialog"; dlg.lang = LANG;
 const box = el("div", "lmBox"); dlg.appendChild(box);
 dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.classList.remove("open"); });
 function dialog(title, rows, note) {
-  box.textContent = "";
+  box.textContent = ""; box.classList.remove("lmWide");
   box.appendChild(el("h3", null, title));
   if (rows && rows.length) {
     const t = el("table");
@@ -114,6 +114,48 @@ function dialog(title, rows, note) {
     box.appendChild(t);
   }
   if (note) box.appendChild(el("p", null, note));
+  const ok = el("button", null, t("Close", "Zamknij")); ok.addEventListener("click", () => dlg.classList.remove("open"));
+  box.appendChild(ok);
+  dlg.classList.add("open");
+}
+
+// the engine's diagram (docs/guides/engine-architecture.md, "Zasada: scena w środku") drawn with boxes instead of ASCII
+function engineMap() {
+  box.textContent = ""; box.classList.add("lmWide");
+  box.appendChild(el("h3", null, t("How the engine is built", "Schemat silnika")));
+  const m = el("div", "emMap");
+  const node = (cls, name, note) => { const n = el("div", "emNode " + (cls || "")); n.appendChild(el("b", null, name)); if (note) n.appendChild(el("span", null, note)); return n; };
+  const arrow = (txt, cls) => el("div", "emArrow " + (cls || ""), txt);
+  // input → the engine
+  const top = el("div", "emTop");
+  top.append(node("emInput", t("Input", "Wejście"), t("keyboard, mouse, pad, touch, Pointer Lock", "klawiatura, mysz, pad, dotyk, Pointer Lock")), arrow(t("events ▶", "zdarzenia ▶")));
+  const eng = el("div", "emEngine");
+  eng.appendChild(el("div", "emTitle", t("ENGINE: loop, time, life cycle", "ENGINE: pętla, czas, cykl życia")));
+  const pipe = el("div", "emPipe");
+  [[t("Scripts", "Scripts"), t("behaviours", "zachowania")], [t("Physics", "Physics"), t("fixed step", "stały krok")], [t("Animation", "Animacje")], ["Render"], ["Post-FX"], [t("screen", "ekran")]]
+    .forEach(([a, b], i) => { if (i) pipe.appendChild(arrow("▶")); pipe.appendChild(node(i === 5 ? "emScreen" : "", a, b)); });
+  eng.appendChild(pipe);
+  eng.appendChild(el("div", "emSide", t("Post-FX ▶ Audio, UI", "Post-FX ▶ Audio, UI")));
+  eng.appendChild(el("div", "emFlow", t("▼ scripts, physics and animation change the scene · render draws it ▲", "▼ zachowania, fizyka i animacje zmieniają scenę · render ją rysuje ▲")));
+  const scene = node("emScene", t("SCENE", "SCENA"));
+  scene.append(el("span", null, t("objects: position + components (mesh, light, camera, collision, behaviour, sound source, particles)", "obiekty: położenie + składniki (siatka, światło, kamera, kolizja, zachowanie, źródło dźwięku, cząsteczki)")),
+    el("span", null, t("environment: sky, water, land, weather, laws", "środowisko: niebo, woda, ląd, pogoda, prawa")));
+  eng.appendChild(scene);
+  top.appendChild(eng);
+  m.appendChild(top);
+  // the modules around the scene
+  m.appendChild(el("div", "emBus"));
+  const mods = el("div", "emMods");
+  [["Assets", t("kits, textures, sounds, prefabs, loading progress", "kity, tekstury, dźwięki, prefabrykaty, postęp ładowania")],
+    ["Events", t("messages: “hit” → audio + UI + network", "wiadomości: „trafienie” → audio + UI + sieć")],
+    ["Network", t("scene state, events (WebRTC, Supabase…)", "stan sceny, zdarzenia (WebRTC, Supabase…)")],
+    ["Save/Load", t("scene as data (JSON) → IndexedDB / LocalStorage", "scena jako dane (JSON) → IndexedDB / LocalStorage")],
+    ["Jobs/Workers", t("physics, AI, terrain generation, network training", "fizyka, AI, generowanie terenu, nauka sieci")],
+    [t("Debug + Editor + API for AI", "Debug + Editor + API dla AI"), t("hierarchy, attributes, stats, console; AI builds and changes the scene through the API", "hierarchia, atrybuty, statystyki, konsola; AI buduje i zmienia scenę przez API")]]
+    .forEach(([a, b]) => mods.appendChild(node("emMod", a, b)));
+  m.appendChild(mods);
+  box.appendChild(m);
+  box.appendChild(el("p", null, t("The scene is the middle of the engine: every module works on the same scene.", "Scena jest środkiem silnika: wszystkie moduły pracują na tej samej scenie.")));
   const ok = el("button", null, t("Close", "Zamknij")); ok.addEventListener("click", () => dlg.classList.remove("open"));
   box.appendChild(ok);
   dlg.classList.add("open");
@@ -181,6 +223,7 @@ function help() {
     link(t("What's new", "Co nowego"), REPO + "CHANGELOG.md", { blank: true }),
     link(t("Repository (GitHub)", "Repozytorium (GitHub)"), "https://github.com/michalstankiewicz4-cell/GameLaboratory", { blank: true }),
     el("div", "lmSep"),
+    action(t("Engine diagram", "Schemat silnika"), engineMap),
     action(t("About the labs", "O laboratoriach"), () => dialog("GameLaboratory", [[t("What", "Co to"), t("an engine for AI in the browser: laboratories of models and worlds — space, land and water", "silnik dla AI w przeglądarce: laboratoria modeli i światów — kosmos, ląd i woda")],
       [t("Program", "Program"), "v" + APP_VERSION], ...(me && V.labs[me.file] ? [[isTool ? t("This tool", "To narzędzie") : t("This lab", "To laboratorium"), "v" + V.labs[me.file]]] : []), [t("Code", "Kod"), "MIT, github.com/michalstankiewicz4-cell/GameLaboratory"]],
       t("Every lab has its own version; the program has one too.", "Każde laboratorium ma własną wersję; program też ma swoją."))),

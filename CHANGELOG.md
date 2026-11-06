@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.42.0 — 2026-11-06 (schemat silnika w menu Pomoc)
+
+### Dodane
+- **Pomoc → Schemat silnika** (na każdej stronie): schemat z `docs/guides/engine-architecture.md` („Zasada: scena
+  w środku”) narysowany ramkami zamiast ASCII — wejście, pętla silnika (Scripts → Physics → Animacje → Render →
+  Post-FX → ekran), scena w środku i moduły wokół niej (Assets, Events, Network, Save/Load, Jobs/Workers, Debug +
+  Editor + API dla AI); po angielsku i po polsku, na wąskim ekranie w jednej kolumnie.
+
 ## Program 0.41.1 · edytor sceny 0.13.0 · wygląd 1.4.1 · ląd 1.4.1 — 2026-11-06 (wspólna scena bazowa w laboratoriach wyglądu i lądu)
 
 ### Zmienione

@@ -30,6 +30,8 @@ i edytor ją pokazują, AI ją zmienia.
   postęp ładowania                   Supabase…)     LocalStorage    sieci            scenę przez API
 ```
 
+Ten schemat narysowany ramkami: menu **Pomoc → Schemat silnika** na każdej stronie (`ui/shell/menubar.js`, `engineMap`).
+
 ## Moduły
 
 | Moduł | Co robi | Uwagi |
