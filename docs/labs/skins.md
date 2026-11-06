@@ -26,7 +26,7 @@ Contents:
 - The drop-down on the bar (or **1** / **2**) switches TERMINAL / SYNTAX.
   The choice is remembered per browser (`localStorage["gameLab.skins"]`).
 - Screen effects: a profile saved in the filters lab (the second drop-down
-  on the bar; `localStorage["gameLab.lookProfiles.v1"]`, the choice in
+  on the bar; the "look" assets `localStorage["gameLab.assets.v1"]` (before 1.1.2: `gameLab.lookProfiles.v1`), the choice in
   `gameLab.skins.profile`). The page is HTML, so the look is approximated
   with CSS: exposure, contrast, saturation + vibrance, glow (a filter on
   `#stage`), temperature and tint (soft-light colour layers), vignette and

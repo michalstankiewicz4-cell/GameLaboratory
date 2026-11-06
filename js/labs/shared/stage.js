@@ -2,6 +2,8 @@
 // samego nieba, morze (WaterKit) albo płaski grunt. Sceny (scenes/*.js) stawiają na niej model.
 import * as THREE from '../../../vendor/three/three.module.js';
 import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment, sunAt } from '../../envs/sky/skykit.js';
+import { heightTexture, terrainMeshes, sampleHeight } from '../../envs/land/landkit.js';
+import { generateWorld, biomeTexture } from '../../envs/land/regionkit.js';
 import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, hullTexture, LOOKS } from '../../envs/water/waterkit.js';
 
 // oświetlenie do sprawdzania filtrów: pogoda z SkyKit + pora dnia (55° N, koniec października, jak w laboratorium wyglądu)
@@ -41,7 +43,8 @@ export function createStage(renderer, scene) {
   ground.receiveShadow = true; ground.visible = false; scene.add(ground);
 
   let envRT = null, envDirty = true, envT = 0, t = 0, shift = 0, sunDir = new THREE.Vector3(0, 1, 0), sunSeen = 1;
-  let space = false, spaceEnv = null, lightId = 'afternoon';   // kosmos: bez nieba, wody, gruntu i mgły; tło i odbicia daje strona
+  let space = false, spaceEnv = null, lightId = 'afternoon', surfaceKind = 'sea';
+  let land = null;   // teren z laboratorium lądu (setLand): { T, tm } — mapa wysokości i siatki LandKit; morze wokół wysp   // kosmos: bez nieba, wody, gruntu i mgły; tło i odbicia daje strona
   setSea();
   const stage = {
     skyU, WU, sun, hemi, water, ground, setSea,
@@ -50,11 +53,28 @@ export function createStage(renderer, scene) {
     // 'sea' | 'land' | 'space' (groundY: wysokość gruntu). Kosmos: czarne tło, słońce bez atmosfery (białe, pełne),
     // bez mgły; tło (np. niebo BodyKit) i mapę odbić (setSpaceEnvironment) daje strona
     setSurface(kind, groundY = 0) {
-      const was = space; space = kind === 'space';
-      water.visible = kind === 'sea'; ground.visible = kind === 'land'; ground.position.y = groundY; sky.visible = !space;
+      const was = space; space = kind === 'space'; surfaceKind = kind;
+      water.visible = kind === 'sea' || (kind === 'land' && !!land); ground.visible = kind === 'land' && !land; ground.position.y = groundY; sky.visible = !space;
+      if (land) land.tm.group.visible = kind === 'land';
       if (space !== was) { if (space) scene.environment = spaceEnv; else envDirty = true; stage.setLight(lightId); }
     },
     get space() { return space; },
+    // ląd: teren z laboratorium lądu ({ map, water } — ustawienia LandKit i RegionKit, zasób „land”) albo null — płaski
+    // grunt. Teren z wodami (morze, fiordy, jeziora) i biomami; morze sceny widać tam, gdzie teren jest pod wodą.
+    // Generowanie trwa (siatka 512² — około sekundy).
+    setLand(def) {
+      if (land) { scene.remove(land.tm.group); land.tm.group.traverse((m) => { if (m.isMesh) { m.geometry.dispose(); m.material.dispose(); } }); land = null; }
+      if (def) {
+        const T = generateWorld(def.map || {}, def.water || {}), tex = heightTexture(T);
+        const tm = terrainMeshes(T, tex, { biome: biomeTexture(T) }); scene.add(tm.group); land = { T, tm };
+      }
+      stage.setSurface(surfaceKind);
+    },
+    get land() { return land ? land.T : null; },
+    // wysokość gruntu albo poziomu morza (samolot: koła, zderzenie z ziemią)
+    groundAt: (x, z) => (land && surfaceKind === 'land' ? Math.max(0, sampleHeight(land.T, x, z)) : ground.visible ? ground.position.y : 0),
+    // woda pod punktem (okręty: mielizna, brzeg): morze — wszędzie, teren — tam, gdzie dno jest głębiej niż depth
+    isWater: (x, z, depth = 2) => (surfaceKind === 'sea' ? true : surfaceKind === 'land' && land ? sampleHeight(land.T, x, z) < -depth : false),
     setSpaceEnvironment(tex) { spaceEnv = tex; if (space) scene.environment = tex; },
     // kadłub wycięty z wody (statki z ShipKit morskiego)
     setShip(lines, beam) {
@@ -62,10 +82,15 @@ export function createStage(renderer, scene) {
       const h = hullTexture(lines); WU.uHull.value = h.tex; WU.uHullZ.value.set(h.z0, h.z1, h.max, 0);
       WU.uShip.value.set(4, lines.zBow, lines.zStern, beam / 2); WU.uShipFx.value.set(1, 1, 1, 0);
     },
+    // światło: id z LIGHTS albo pogoda wprost — { coverage, density, haze, rain, vis, sunEl, sunAz, moon, … } (zasób
+    // „weather” z laboratorium wyglądu, js/scene/assets.js); sama pogoda bez słońca bierze je z pory dnia (time)
     setLight(id) {
       lightId = id;
-      const p = LIGHTS[id] || LIGHTS.afternoon, w = { ...WEATHER[p.weather] }; delete w.label;
-      const L = applySky(skyU, { ...w, ...sunAt(p.time) });
+      let w;
+      if (id && typeof id === 'object') { w = { ...(WEATHER[id.weather] || WEATHER.fair), ...id }; if (w.sunEl == null || w.sunAz == null) Object.assign(w, sunAt(w.time ?? 15.2)); }
+      else { const p = LIGHTS[id] || LIGHTS.afternoon; w = { ...WEATHER[p.weather], ...sunAt(p.time) }; }
+      delete w.label;
+      const L = applySky(skyU, w);
       sunDir = L.sunDir.clone(); sunSeen = Math.max(0, 1 - w.coverage * (0.4 + w.density * 0.6)) * L.sunSeen;
       sun.position.copy(L.sunDir).multiplyScalar(220); sun.color.copy(L.sunColor); sun.intensity = L.sunIntensity;
       hemi.intensity = L.ambient; hemi.color.copy(L.sky); hemi.groundColor.copy(L.ground);
@@ -87,13 +112,17 @@ export function createStage(renderer, scene) {
       Object.assign(sun.shadow.camera, { left: -s, right: s, top: s, bottom: -s, near: 1, far: 420 + s * 2 }); sun.shadow.camera.updateProjectionMatrix();
       sun.target.position.copy(center); sun.position.copy(center).addScaledVector(sunDir, 220 + s);
     },
-    heightAt: (x, z) => (water.visible ? heightAt(waves, x, z, t, shift) : ground.position.y),
+    heightAt: (x, z) => {
+      if (land && surfaceKind === 'land') { const g = sampleHeight(land.T, x, z); return g > 0 ? g : heightAt(waves, x, z, t, shift); }
+      return water.visible ? heightAt(waves, x, z, t, shift) : ground.position.y;
+    },
     update(dt, camera) {
       t += dt; shift += 4 * dt;
       WU.uTime.value = t; WU.uShift.value = shift;
       skyU.uCloudOff.value.x += dt * 0.004; skyU.uCloudOff.value.y += dt * 0.002;
       sky.position.copy(camera.position);
       water.position.set(Math.round(camera.position.x / 2) * 2, 0, Math.round(camera.position.z / 2) * 2);
+      if (land && land.tm.group.visible) land.tm.update(camera);
       envT += dt; if (envDirty && !space && envT > 0.3) { if (envRT) envRT.dispose(); envRT = skyEnvironment(renderer, skyU); scene.environment = envRT.texture; envDirty = false; envT = 0; }
       return t;
     },

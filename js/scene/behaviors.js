@@ -40,7 +40,7 @@ export const BEHAVIORS = {
       return {
         state: s,
         step(dt, c, t) {
-          sim.step(dt, { throttle: c.throttle || 0, rudder: c.rudder || 0 }, world.waves, t, () => world.surface === 'sea');
+          sim.step(dt, { throttle: c.throttle || 0, rudder: c.rudder || 0 }, world.waves, t, (x, z) => (world.isWater ? world.isWater(x, z) : world.surface === 'sea'));   // teren z laboratorium lądu: mielizny i brzeg
           root.position.set(s.x, s.heave + obj.pos[1], s.z);
           root.rotation.set(-s.pitch, s.th, s.roll, 'YXZ');
         },
@@ -69,7 +69,8 @@ export const BEHAVIORS = {
           if (c.throttle != null) thr = Math.max(0, Math.min(1, c.throttle));
           const ctrl = { throttle: thr, elevator: c.elevator || 0, aileron: c.aileron || 0, rudder: c.rudder || 0, flaps: c.flaps ? 1 : 0, gear: c.gear === false ? 0 : 1, brake: c.brake || 0 };
           const n = Math.max(1, Math.ceil(dt / (1 / 240))), h = dt / n;   // stały mały krok fizyki
-          for (let i = 0; i < n; i++) sim.step(h, ctrl, () => 0);
+          const gh = world.groundAt || (() => 0);   // teren z laboratorium lądu albo poziom 0
+          for (let i = 0; i < n; i++) sim.step(h, ctrl, gh);
           root.position.fromArray(s.p); quatOf(s.q, root.quaternion);
           tAcc += dt; if (k.update) k.update(tAcc, dt, { ...ctrl, gear: ctrl.gear === 1, speed: s.V });   // śmigło, stery, podwozie
         },

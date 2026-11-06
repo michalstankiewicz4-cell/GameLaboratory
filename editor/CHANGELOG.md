@@ -3,6 +3,15 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.8.0 — 2026-11-06 (ląd, pogoda, wygląd kamery z laboratoriów)
+
+### Dodane
+- Powierzchnia **Ląd** z listą **Ląd**: płaski grunt albo teren zapisany w laboratorium lądu (`env.land`); morze
+  wokół terenu (lista Morze działa i tu). „Na powierzchnię” i nowy model stają na terenie.
+- **Światło**: cztery gotowe i pogoda zapisana w laboratorium wyglądu.
+- **Wygląd kamery** z zasobów (profile laboratorium filtrów przeniesione do `gameLab.assets.v1`).
+- W grze okręty wchodzą na mielizny terenu, samolot ląduje i rozbija się na jego wysokości.
+
 ## 0.7.0 — 2026-11-06 (kosmos)
 
 ### Dodane

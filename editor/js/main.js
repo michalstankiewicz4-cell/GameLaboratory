@@ -1,7 +1,7 @@
 // Edytor sceny · start: dane (core/store.js) → świat 3D (world/world.js) → kamera i uchwyt (world/controls.js)
 // → gra (play/play.js) → API (js/scene/api.js, zakładka w konsoli) → okna (ui/panels.js) i pasek narzędzi (ui/toolbar.js). Opis: editor/README.md.
 import { createStore } from './core/store.js';
-import { createWorld, PROFILES_KEY, LIGHTS } from './world/world.js';
+import { createWorld, LIGHTS } from './world/world.js';
 import { createControls } from './world/controls.js';
 import { createPanels } from './ui/panels.js';
 import { createToolbar } from './ui/toolbar.js';
@@ -30,7 +30,8 @@ function firstScene() {
 step(t('load.renderer'), 0.1);
 const store = createStore(firstScene);
 const world = createWorld($('view'), store, (id) => status(id.startsWith('sea:') ? t('status.noSea', { name: id.slice(4) })
-  : id.startsWith('sky:') ? t('status.noSky', { name: id.slice(4) }) : t('status.unknown', { id })));
+  : id.startsWith('sky:') ? t('status.noSky', { name: id.slice(4) }) : id.startsWith('land:') ? t('status.noLand', { name: id.slice(5) }) : id.startsWith('light:') ? t('status.noLight', { name: id.slice(6) })
+  : t('status.unknown', { id })));
 const controls = createControls(world, store);
 
 // budowa modeli trwa (okręty: kilka sekund): z kartą ładowania, kiedy jest co budować
@@ -46,10 +47,12 @@ function build(fn) {
 }
 const actions = {
   status, build,
+  groundAt: (x, z) => world.stage.groundAt(x, z),
   add(id) {
     const p = prefab(id); if (!p) return;
     const tg = controls.orbit.target;
-    build(() => store.add(p.id, p.label, [+tg.x.toFixed(1), p.surface === 'air' ? 30 : p.surface === 'space' ? +tg.y.toFixed(1) : 0, +tg.z.toFixed(1)]));
+    const gy = world.stage.groundAt(tg.x, tg.z);   // na terenie: na gruncie albo na wodzie
+    build(() => store.add(p.id, p.label, [+tg.x.toFixed(1), p.surface === 'air' ? gy + 30 : p.surface === 'space' ? +tg.y.toFixed(1) : +gy.toFixed(2), +tg.z.toFixed(1)]));
   },
   duplicate() {
     const o = store.selected; if (!o) return;
@@ -81,9 +84,7 @@ store.on((what) => {
 });
 $('frame').addEventListener('click', controls.frameSelection);
 $('frameAll').addEventListener('click', controls.frameAll);
-// profil zapisany w laboratorium filtrów (inna karta) od razu na liście
-addEventListener('storage', (e) => { if (e.key === PROFILES_KEY) { panels.renderProps(); world.syncEnv(); } });
-// zasób zapisany w laboratorium (np. morze z laboratorium wody) — od razu na liście i w scenie
+// zasób zapisany w laboratorium (morze, niebo, wygląd kamery…) — od razu na liście i w scenie
 onAssetsChange(() => { panels.renderProps(); world.syncEnv(); });
 
 step(t('load.models'), 0.3);

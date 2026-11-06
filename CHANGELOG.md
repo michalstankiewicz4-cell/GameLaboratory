@@ -3,6 +3,25 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.37.0 · edytor sceny 0.8.0 · filtry 0.6.0 · wygląd 1.4.0 · ląd 1.4.0 · skórki 1.1.2 — 2026-11-06 (zasoby: wygląd kamery, pogoda i światło, ląd)
+
+### Dodane
+- **Ląd jako zasób** (`land`): laboratorium lądu zapisuje teren pod nazwą (ustawienia mapy LandKit i wód RegionKit —
+  sekcja „Land for the scene editor”: zapis, wczytanie, usunięcie). Scena bazowa (`js/labs/shared/stage.js`) ma
+  teren: `setLand({ map, water })` — siatki LandKit z biomami, morze wokół; `groundAt(x, z)` i `isWater(x, z)`.
+  Edytor: Powierzchnia **Ląd** → **Ląd** (płaski grunt albo zapisany teren), pole `env.land`; „Na powierzchnię”
+  i nowy model stają na terenie; okręty w grze mają mielizny i brzeg terenu, samolot — jego wysokość.
+- **Pogoda i światło jako zasób** (`weather`): laboratorium wyglądu zapisuje pogodę i porę dnia (chmury, wiatr,
+  deszcz, widzialność, mgiełka, słońce, księżyc) — sekcja „Weather for the scene editor”. Edytor: Środowisko →
+  **Światło** — cztery gotowe i zapisane (`env.light`: id albo nazwa). Scena bazowa: `setLight({ …pogoda })`.
+- **Wygląd kamery jako zasób** (`look`): profile laboratorium filtrów są teraz zasobami (`gameLab.assets.v1`);
+  dawny klucz `gameLab.lookProfiles.v1` przenosi się sam przy pierwszym odczycie. Filtry, skórki i edytor czytają
+  z jednego miejsca.
+- API: `env` z `land`, `light` (także nazwa pogody) i sprawdzanym `look`; `assets` wypisuje wszystkie rodzaje.
+
+### Bez zmian (do zrobienia)
+- Deszcz i błyskawice z zapisanej pogody nie padają w edytorze (scena bazowa ma tylko niebo, światło i mgłę).
+
 ## Program 0.36.0 · edytor sceny 0.7.0 · ciała niebieskie 1.5.0 — 2026-11-06 (kosmos w edytorze, skyboxy)
 
 ### Dodane

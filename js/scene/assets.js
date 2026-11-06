@@ -8,15 +8,33 @@
 //         ripples, crest, reflect)
 //   sky — niebo kosmosu (skybox) z laboratorium ciał niebieskich: wartości ciała „niebo” BodyKit (mgławice, pas
 //         Drogi Mlecznej, pył, gwiazdy, barwy, ziarno); wszystkie liczby z suwaków
-// (wygląd kamery — profile laboratorium filtrów — ma na razie własny klucz: gameLab.lookProfiles.v1)
+//   land — ląd z laboratorium lądu: { map — ustawienia terenu LandKit (ziarno, kształt, ląd, rzeźba, głębia, erozja,
+//         rozmiar, rozdzielczość, brzeg mapy), water — wody i biomy RegionKit (układ, akwen, rzeki, lód, biom) }
+//   weather — pogoda i światło z laboratorium wyglądu: chmury, wiatr, deszcz, widzialność, mgiełka, pora dnia, słońce
+//         (wysokość i kierunek), księżyc
+//   look — wygląd kamery z laboratorium filtrów (profil potoku js/render/sea/look.js: ekspozycja, tonowanie, kolor,
+//         poświata, winieta, ziarno, obiektyw); dawniej własny klucz gameLab.lookProfiles.v1 — przenoszony tu sam
+//         przy pierwszym odczycie
 export const KEY = 'gameLab.assets.v1';
 
 export const ASSET_KINDS = {
   sea: { label: 'Sea', labelPl: 'Morze', lab: 'labs/water.html', keys: ['Hs', 'Lp', 'chop', 'spread', 'n', 'dir', 'deep', 'scatter', 'shine', 'ripples', 'crest', 'reflect'] },
+  land: { label: 'Land', labelPl: 'Ląd', lab: 'labs/land.html', keys: ['map', 'water'] },
+  weather: { label: 'Weather and light', labelPl: 'Pogoda i światło', lab: 'labs/look.html', keys: ['weather', 'coverage', 'density', 'scale', 'haze', 'wind', 'rain', 'vis', 'lightning', 'time', 'sunEl', 'sunAz', 'moon'] },
+  look: { label: 'Camera look', labelPl: 'Wygląd kamery', lab: 'labs/filters.html', keys: ['exposure', 'autoExposure', 'autoTarget', 'tone', 'contrast', 'saturation', 'vibrance', 'temperature', 'tint', 'bloom', 'vignette', 'grain', 'ca', 'distortion', 'droplets', 'dirt', 'glare', 'sharpen'] },
   sky: { label: 'Space sky', labelPl: 'Niebo kosmosu', lab: 'labs/bodies.html', keys: null },   // null: każda liczba
 };
 
-function readAll() { try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch { return {}; } }
+// profile wyglądu kamery sprzed zasobów (laboratorium filtrów do 0.4) — przeniesione raz do rodzaju look
+const OLD_LOOK_KEY = 'gameLab.lookProfiles.v1';
+function readAll() {
+  let all; try { all = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch { return {}; }
+  try {
+    const old = localStorage.getItem(OLD_LOOK_KEY);
+    if (old) { all.look = { ...(JSON.parse(old) || {}), ...(all.look || {}) }; localStorage.setItem(KEY, JSON.stringify(all)); localStorage.removeItem(OLD_LOOK_KEY); }
+  } catch { /* zostaje stary klucz */ }
+  return all;
+}
 function writeAll(all) { try { localStorage.setItem(KEY, JSON.stringify(all)); return true; } catch { return false; } }
 const kindOf = (kind) => ASSET_KINDS[kind] || (() => { throw new Error(`unknown asset kind "${kind}"`); })();
 

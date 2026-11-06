@@ -302,11 +302,11 @@
     requestAnimationFrame(frame);
   }
 
-  // ---------- screen effects: a look profile saved in the filters lab (gameLab.lookProfiles.v1) ----------
+  // ---------- screen effects: a look saved in the filters lab ("look" assets, gameLab.assets.v1; js/scene/assets.js) ----------
   // The filters lab's look runs on a 3D render; this page is HTML, so the profile is approximated with CSS: exposure,
   // contrast, saturation + vibrance, glow (filter on the stage), temperature and tint (colour layers), vignette and grain
   // (layers on top). Tone mapping, automatic exposure and the lens effects have nothing to act on here.
-  const PKEY = "gameLab.lookProfiles.v1", SEL_KEY = "gameLab.skins.profile";
+  const PKEY = "gameLab.assets.v1", OLD_KEY = "gameLab.lookProfiles.v1", SEL_KEY = "gameLab.skins.profile";
   const fx = document.createElement("div"); fx.id = "fx";
   const fxTemp = document.createElement("i"), fxTint = document.createElement("i"), fxVig = document.createElement("i"), fxGrain = document.createElement("i");
   fx.append(fxTemp, fxTint, fxVig, fxGrain); stageEl.appendChild(fx);
@@ -315,7 +315,13 @@
     for (let i = 0; i < d.data.length; i += 4){ const v = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
     g.putImageData(d, 0, 0); fxGrain.style.backgroundImage = "url(" + c.toDataURL() + ")";
   })();
-  function readProfiles(){ try{ return JSON.parse(localStorage.getItem(PKEY) || "{}") || {}; }catch(e){ return {}; } }
+  // the looks; profiles from before the assets (old key) count too until a page with js/scene/assets.js moves them
+  function readProfiles(){
+    let a = {}, o = {};
+    try{ a = (JSON.parse(localStorage.getItem(PKEY) || "{}") || {}).look || {}; }catch(e){}
+    try{ o = JSON.parse(localStorage.getItem(OLD_KEY) || "{}") || {}; }catch(e){}
+    return Object.assign({}, o, a);
+  }
   let profileName = ""; try{ profileName = localStorage.getItem(SEL_KEY) || ""; }catch(e){}
   function applyProfile(){
     const p = readProfiles()[profileName];
@@ -342,7 +348,7 @@
     profileName = e.target.value; try{ localStorage.setItem(SEL_KEY, profileName); }catch(err){} applyProfile();
   });
   // a profile saved in the filters lab (another tab, or coming back with Back) shows up here
-  window.addEventListener("storage", function(e){ if(e.key === PKEY) fillProfileSel(); });
+  window.addEventListener("storage", function(e){ if(e.key === PKEY || e.key === OLD_KEY) fillProfileSel(); });
   window.addEventListener("pageshow", fillProfileSel);
   fillProfileSel();
   let grainT = 0;

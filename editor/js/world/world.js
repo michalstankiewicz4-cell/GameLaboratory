@@ -5,13 +5,13 @@ import * as THREE from '../../../vendor/three/three.module.js';
 import { LookPipeline, LOOK_DEFAULTS } from '../../../js/render/sea/look.js';
 import { createStage, LIGHTS } from '../../../js/labs/shared/stage.js';
 import { prefab } from '../../../js/scene/prefabs.js';
-import { getAsset } from '../../../js/scene/assets.js';
+import { getAsset, listAssets } from '../../../js/scene/assets.js';
 import { spaceReady, loadSpace, SKY_PRESET } from '../../../js/scene/space.js';
 
 export { LIGHTS };
 const D2R = Math.PI / 180;
-export const PROFILES_KEY = 'gameLab.lookProfiles.v1';      // profile z laboratorium filtrów
-export function readProfiles() { try { return JSON.parse(localStorage.getItem(PROFILES_KEY) || '{}') || {}; } catch { return {}; } }
+// wygląd kamery: zasoby „look” z laboratorium filtrów (js/scene/assets.js)
+export function readProfiles() { return Object.fromEntries(listAssets('look').map((n) => [n, getAsset('look', n)])); }
 
 export function createWorld(container, store, onWarn) {
   const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
@@ -56,7 +56,7 @@ export function createWorld(container, store, onWarn) {
     fitShadow();
   }
   function syncPlaces() { store.scene.objects.forEach(place); fitShadow(); }
-  let lastSea = 'null';
+  let lastSea = 'null', lastLand = 'null';
   // kosmos: niebo BodyKit (gotowe tło z SystemKit albo zasób „sky” z laboratorium ciał niebieskich) i odbicia ShipKit
   let skyBody = null, skyKey = '', spaceEnvSet = false;
   function skyValues(name) {
@@ -86,9 +86,16 @@ export function createWorld(container, store, onWarn) {
   }
   function syncEnv() {
     const env = store.scene.env;
+    // ląd: teren z laboratorium lądu (zasób „land”) albo płaski grunt; generowanie tylko po zmianie zasobu
+    const landDef = env.surface === 'land' && env.land ? getAsset('land', env.land) : null, landKey = JSON.stringify(landDef);
+    if (env.surface === 'land' && env.land && !landDef && onWarn) onWarn('land:' + env.land);
+    if (landKey !== lastLand) { lastLand = landKey; stage.setLand(landDef); }
     stage.setSurface(env.surface === 'land' || env.surface === 'space' ? env.surface : 'sea');
     syncSpace(env);
-    stage.setLight(LIGHTS[env.light] ? env.light : 'afternoon');
+    // światło: gotowe (LIGHTS) albo zasób „weather” z laboratorium wyglądu; brak zasobu — popołudnie i ostrzeżenie
+    let light = LIGHTS[env.light] ? env.light : env.light ? getAsset('weather', env.light) : null;
+    if (!light) { if (env.light && onWarn) onWarn('light:' + env.light); light = 'afternoon'; }
+    stage.setLight(light);
     // morze: zasób z laboratorium wody (po nazwie) albo domyślne; brak zasobu w tej przeglądarce — domyślne i ostrzeżenie
     const sea = env.sea ? getAsset('sea', env.sea) : null, seaKey = JSON.stringify(sea);
     if (env.sea && !sea && onWarn) onWarn('sea:' + env.sea);

@@ -89,3 +89,10 @@ stays the default.
 `py tools/lab-check.py` loads the page, goes through every weather (rain and fog included), every look preset, the split compare and every
 camera, and screenshots `tools/out/lab-look.png`. Performance on a real GPU has not been measured yet ("Measure the
 cost of each effect" in the lab does it on the user's machine).
+
+## Weather for the scene editor (1.4.0)
+
+The Light and weather window's **Weather for the scene editor** saves the weather and the time of day (clouds, wind,
+rain, visibility, haze, lightning, time, sun height and bearing, moon) under a name as a "weather" asset
+(`js/scene/assets.js`); the scene editor offers it in Environment → Light, next to its four ready lights. The scene
+editor shows the sky, the light and the fog; rain and lightning stay in this lab for now.

@@ -90,6 +90,12 @@
   <div class="row"><span>Moon</span><input type="range" id="moon" min="0" max="1" step="0.05"><output id="moonV"></output></div>
   <div class="row"><span>Sun height</span><input type="range" id="sunEl" min="-18" max="70" step="0.1" value="14"><output id="sunElV"></output></div>
   <div class="row"><span>Sun bearing</span><input type="range" id="sunAz" min="0" max="360" value="60"><output id="sunAzV"></output></div>
+  <h3>Weather for the scene editor</h3>
+  <div class="row"><span>Name</span><input type="text" id="wxName" maxlength="40" placeholder="e.g. North Sea squall"><output></output></div>
+  <div class="btns"><button type="button" id="wxSave">Save the weather and light</button></div>
+  <div class="row"><span>Saved</span><select id="wxList"></select><output></output></div>
+  <div class="btns"><button type="button" id="wxLoad">Load</button><button type="button" id="wxDel">Delete</button></div>
+  <p class="note" id="wxNote">The clouds, wind, rain, visibility, haze, time of day, sun and moon go to the scene editor: Environment → Light.</p>
 </aside>
 <aside class="panel" id="rightPanel" data-std="perf">
   <h3>Quality</h3>

@@ -4,6 +4,7 @@
 import '../../core/three-window.js';                      // pierwszy: TrainKit czyta window.THREE przy załadowaniu
 import * as THREE from '../../../vendor/three/three.module.js';
 import { LookPipeline, AutoResolution, LOOK_PRESETS, LOOK_DEFAULTS } from '../../render/sea/look.js';
+import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 import { createStage, LIGHTS } from '../shared/stage.js';
 import { shipScene } from './scenes/ship.js';
 import { rigScene } from './scenes/rig.js';
@@ -28,10 +29,10 @@ let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null');
 const S = { scene: SCENES[0].id, light: 'afternoon', look: pick(LOOK_PRESETS.cinematic), preset: 'cinematic', fov: 40, perf: { scale: 1, autoRes: false, aa: true, shadows: true }, ...(saved || {}) };
 S.look = { ...LOOK_DEFAULTS, ...S.look };
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { /* prywatny tryb */ } };
-// profiles: named looks kept in this browser (gameLab.lookProfiles.v1 — { name: look }), chosen in the bar
-const PKEY = 'gameLab.lookProfiles.v1';
-let profiles = {}; try { profiles = JSON.parse(localStorage.getItem(PKEY) || '{}') || {}; } catch { profiles = {}; }
-const saveProfiles = () => { try { localStorage.setItem(PKEY, JSON.stringify(profiles)); } catch { /* prywatny tryb */ } };
+// profiles: named looks — "look" assets (js/scene/assets.js), chosen in the bar here, in the scene editor and the skins lab
+let profiles = {};
+const readLooks = () => { profiles = Object.fromEntries(listAssets('look').map((n) => [n, getAsset('look', n)])); };
+readLooks();
 
 /* ---------------- renderer, scena ---------------- */
 const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
@@ -83,6 +84,8 @@ const markPreset = () => {
   [...$('presets').children].forEach((b) => b.classList.toggle('on', b.dataset.k === S.preset));
   $('profile').value = S.profile && profiles[S.profile] && S.preset === 'profile' ? S.profile : '';
 };
+// a look saved in another tab (or the scene editor's list) — the bar's list follows
+onAssetsChange(() => { readLooks(); fillProfiles(); });
 function fillProfiles() {
   const names = Object.keys(profiles).sort((a, b) => a.localeCompare(b));
   $('profile').replaceChildren(el('option', { value: '', textContent: names.length ? 'Profile…' : 'No profiles yet' }), ...names.map((n) => el('option', { value: n, textContent: n })));
@@ -97,14 +100,14 @@ $('profile').onchange = () => { if ($('profile').value) useProfile($('profile').
 $('profSave').onclick = () => {
   const name = $('profName').value.trim();
   if (!name) { $('profNote').textContent = 'Give the profile a name first.'; $('profName').focus(); return; }
-  const had = !!profiles[name]; profiles[name] = { ...S.look }; saveProfiles();
+  const had = !!profiles[name]; saveAsset('look', name, S.look); readLooks();
   S.preset = 'profile'; S.profile = name; save(); fillProfiles(); markPreset();
   $('profNote').textContent = had ? `Profile “${name}” updated.` : `Profile “${name}” saved — pick it in the bar.`;
 };
 $('profDel').onclick = () => {
   const name = $('profName').value.trim() || S.profile;
   if (!name || !profiles[name]) { $('profNote').textContent = 'No profile of that name.'; return; }
-  delete profiles[name]; saveProfiles(); if (S.profile === name) S.profile = ''; save(); fillProfiles(); markPreset();
+  removeAsset('look', name); readLooks(); if (S.profile === name) S.profile = ''; save(); fillProfiles(); markPreset();
   $('profNote').textContent = `Profile “${name}” deleted.`;
 };
 for (const [k, p] of Object.entries(LOOK_PRESETS)) {

@@ -10,7 +10,7 @@ const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
 const { t, lang } = window.EditorI18n;
 const familyName = (f) => (lang === 'pl' ? FAMILIES[f].labelPl : FAMILIES[f].label);
-const lightName = (id) => t('light.' + (LIGHTS[id] ? id : 'afternoon'));
+const lightName = (id) => (LIGHTS[id] ? t('light.' + id) : id || t('light.afternoon'));   // gotowe albo nazwa zasobu „weather”
 
 // lista modeli pogrupowana rodzinami
 export function fillPrefabs(select) {
@@ -23,7 +23,6 @@ export function fillPrefabs(select) {
 
 export function createPanels(store, actions) {
   fillPrefabs($('addPrefab')); fillPrefabs($('oPrefab'));
-  Object.keys(LIGHTS).forEach((k) => $('light').append(el('option', { value: k, textContent: lightName(k) })));
 
   function renderTree() {
     const ul = $('tree'), S = store.scene; ul.replaceChildren();
@@ -42,7 +41,14 @@ export function createPanels(store, actions) {
     const o = store.selected, S = store.scene;
     $('envProps').hidden = !!o; $('objProps').hidden = !o;
     if (!o) {
-      $('surface').value = S.env.surface; $('light').value = LIGHTS[S.env.light] ? S.env.light : 'afternoon';
+      $('surface').value = S.env.surface;
+      // światło: cztery gotowe i pogoda zapisana w laboratorium wyglądu (zasób „weather”)
+      const wx = listAssets('weather'), curL = S.env.light || 'afternoon', knownL = new Set([...Object.keys(LIGHTS), ...wx]);
+      $('light').replaceChildren(
+        el('optgroup', { label: t('env.lightReady') }, ...Object.keys(LIGHTS).map((k) => el('option', { value: k, textContent: lightName(k) }))),
+        ...(wx.length ? [el('optgroup', { label: t('env.lightSaved') }, ...wx.map((n) => el('option', { value: n, textContent: n })))] : []),
+        ...(knownL.has(curL) ? [] : [el('option', { value: curL, textContent: t('env.seaMissing', { name: curL }) })]));
+      $('light').value = curL;
       const names = Object.keys(readProfiles());
       $('look').replaceChildren(el('option', { value: '', textContent: t('env.plain') }), ...names.map((n) => el('option', { value: n, textContent: n })));
       $('look').value = names.includes(S.env.look) ? S.env.look : '';
@@ -51,7 +57,13 @@ export function createPanels(store, actions) {
       $('seaAsset').replaceChildren(el('option', { value: '', textContent: t('env.seaDefault') }), ...seas.map((n) => el('option', { value: n, textContent: n })),
         ...(cur && !seas.includes(cur) ? [el('option', { value: cur, textContent: t('env.seaMissing', { name: cur }) })] : []));
       $('seaAsset').value = cur;
-      $('seaRow').hidden = $('seaNote').hidden = S.env.surface !== 'sea';
+      $('seaRow').hidden = $('seaNote').hidden = S.env.surface === 'space' || (S.env.surface === 'land' && !S.env.land);   // morze: też wokół terenu
+      // ląd: płaski grunt albo teren z laboratorium lądu
+      const lands = listAssets('land'), curLand = S.env.land || '';
+      $('landAsset').replaceChildren(el('option', { value: '', textContent: t('env.landPlain') }), ...lands.map((n) => el('option', { value: n, textContent: n })),
+        ...(curLand && !lands.includes(curLand) ? [el('option', { value: curLand, textContent: t('env.seaMissing', { name: curLand }) })] : []));
+      $('landAsset').value = curLand;
+      $('landRow').hidden = $('landNote').hidden = S.env.surface !== 'land';
       // niebo kosmosu: gotowe tła (SystemKit) i zasoby z laboratorium ciał niebieskich; lista po załadowaniu kitów
       const skies = listAssets('sky'), presets = skyPresets(), curSky = S.env.sky || '';
       const known = new Set(['', ...presets.map((p) => SKY_PRESET + p.id), ...skies]);
@@ -93,11 +105,12 @@ export function createPanels(store, actions) {
   });
   $('oBehavior').addEventListener('change', () => { const o = store.selected; if (o) store.update(o.id, { behavior: $('oBehavior').value }); });
   $('surface').addEventListener('change', () => store.setEnv({ surface: $('surface').value }));
+  $('landAsset').addEventListener('change', () => actions.build(() => store.setEnv({ land: $('landAsset').value })));
   $('skyAsset').addEventListener('change', () => store.setEnv({ sky: $('skyAsset').value }));
   $('seaAsset').addEventListener('change', () => store.setEnv({ sea: $('seaAsset').value }));
   $('light').addEventListener('change', () => store.setEnv({ light: $('light').value }));
   $('look').addEventListener('change', () => store.setEnv({ look: $('look').value }));
-  $('toGround').addEventListener('click', () => { const o = store.selected; if (o) store.update(o.id, { pos: [o.pos[0], 0, o.pos[2]] }); });
+  $('toGround').addEventListener('click', () => { const o = store.selected; if (o) store.update(o.id, { pos: [o.pos[0], +actions.groundAt(o.pos[0], o.pos[2]).toFixed(2), o.pos[2]] }); });   // teren z laboratorium lądu albo 0
   $('dupBtn').addEventListener('click', actions.duplicate);
   $('delBtn').addEventListener('click', actions.remove);
   $('addBtn').addEventListener('click', () => actions.add($('addPrefab').value));

@@ -81,11 +81,13 @@ Zasada: **dane są jedynym źródłem prawdy**. Okna, uchwyt i pliki zmieniają 
 }
 ```
 
+- `env.land` (ląd): `""` — płaski grunt albo nazwa terenu z laboratorium lądu; `env.light`: gotowe (`afternoon`,
+  `noon`, `dusk`, `overcast`) albo nazwa pogody z laboratorium wyglądu; `env.look`: nazwa wyglądu kamery (laboratorium filtrów).
 - `env.surface`: także `space`; `env.sky` (kosmos): `""` — Deep field, `"preset:<id>"` — gotowe tło (`deep`, `quiet`,
   `crimson`, `emerald`, `core`, `black`), albo nazwa nieba zapisanego w laboratorium ciał niebieskich.
 - `env.sea`: nazwa zasobu „morze” z laboratorium wody (`js/scene/assets.js`) albo `""` — morze domyślne.
 - `env.surface`: `sea` | `land`; `env.light`: `afternoon` | `noon` | `dusk` | `overcast`; `env.look`: nazwa profilu
-  z laboratorium filtrów (`gameLab.lookProfiles.v1`) albo `""`.
+  z laboratorium filtrów (zasób `look`, `gameLab.assets.v1`) albo `""`.
 - `pos` w metrach (Y w górę), `rot` w stopniach (kolejność YXZ: kurs, pochylenie, przechył), `scale` — mnożnik.
 - `prefab`: id z `js/scene/prefabs.js` (`sea/…`, `road/…`, `tram/…`, `train/…`, `air/…`, `structures/…`, `weapons/…`).
 - `behavior` (nieobowiązkowe): id z `js/scene/behaviors.js` (`ship`, `flight`); bez pola — domyślne dla modelu, `""` — stoi w miejscu.
@@ -106,8 +108,8 @@ albo lista (po kolei); wynik `{ "ok": true, … }` albo `{ "ok": false, "error":
 | `set` | `id` albo `name`, potem `newName` (z `id` także `name`), `prefab`, `pos`, `rot`, `scale`, `behavior` | zmienia obiekt |
 | `move` | `id` albo `name`, `by: [dx, dy, dz]` | przesuwa o wektor |
 | `remove` | `id` albo `name` | usuwa |
-| `env` | `surface` (`sea` / `land` / `space`), `light`, `look`, `sea`, `sky` | środowisko |
-| `assets` | `[kind]` | zasoby z nazwą (`sea` — laboratorium wody, `sky` — ciała niebieskie) i gotowe tła kosmosu |
+| `env` | `surface` (`sea` / `land` / `space`), `light`, `look`, `land`, `sea`, `sky` | środowisko |
+| `assets` | `[kind]` | zasoby z nazwą (`sea` — woda, `land` — ląd, `weather` — wygląd, `look` — filtry, `sky` — ciała niebieskie) i gotowe tła kosmosu |
 | `select` | `id` / `name` albo nic | wybór w edytorze |
 | `new` | `[name]` | pusta scena |
 | `load` | `scene` | cała scena z danych |
@@ -130,6 +132,6 @@ Jednostki: metry, stopnie; Y w górę, kurs 0 — wzdłuż +Z. W czasie gry pole
 ## Na później (propozycje)
 
 - Pozostałe modele ze Space (łaziki, budynki baz, roboty morskie) i ciała niebieskie w scenie kosmosu.
-- Ląd z laboratorium lądu jako zasób (scena bazowa ma dziś płaski grunt); brzegi, lód i prądy z laboratorium wody w morzu z zasobu.
+- Brzegi, lód i prądy z laboratorium wody w morzu z zasobu; deszcz i błyskawice z zapisanej pogody; morze z płyciznami przy terenie (dziś woda sceny bazowej nie zna terenu).
 - Woda wycięta w kadłubie każdego okrętu (dziś WaterKit umie jeden kadłub w środku sceny).
 - Zachowania dla pozostałych modeli (koło na szynie dla tramwaju i pociągu — potrzebuje toru w scenie, pojazdy drogowe).

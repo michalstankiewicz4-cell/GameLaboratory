@@ -58,7 +58,9 @@
 <aside class="panel" id="propsWin" data-window="props" data-side="right" data-i18n-win="win.props">
   <div id="envProps">
     <h3 data-i18n="env.title">Environment</h3>
-    <div class="row"><span data-i18n="env.surface">Surface</span><select id="surface"><option value="sea" data-i18n="env.sea">Sea</option><option value="land" data-i18n="env.land">Land (plain)</option><option value="space" data-i18n="env.space">Space</option></select><output></output></div>
+    <div class="row"><span data-i18n="env.surface">Surface</span><select id="surface"><option value="sea" data-i18n="env.sea">Sea</option><option value="land" data-i18n="env.land">Land</option><option value="space" data-i18n="env.space">Space</option></select><output></output></div>
+    <div class="row" id="landRow"><span data-i18n="env.landAsset">Land</span><select id="landAsset"></select><output></output></div>
+    <p class="note" id="landNote"><a href="../labs/land.html" data-i18n="env.landNote">Terrains are saved in the land lab.</a></p>
     <div class="row" id="seaRow"><span data-i18n="env.seaAsset">Sea</span><select id="seaAsset"></select><output></output></div>
     <p class="note" id="seaNote"><a href="../labs/water.html" data-i18n="env.seaNote">Seas are the assets saved in the water lab.</a></p>
     <div class="row" id="skyRow"><span data-i18n="env.sky">Sky</span><select id="skyAsset"></select><output></output></div>

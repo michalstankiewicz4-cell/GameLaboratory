@@ -10,6 +10,7 @@ import { heightTexture, terrainMeshes, sampleHeight, barrierBuoys, SHAPES, TERRA
 import { generateWorld, regionTextures, regionUniforms, setRegions, regionAt, GLSL_REGIONS, LAYOUTS, WORLD_DEFAULTS, BODY_ORDER, CHART, BIOMES, BIOME_ORDER, BIOME_CHART, biomeTexture, biomeAt } from '../../envs/land/regionkit.js';
 import { WATER_BODIES } from '../../envs/water/waterkit.js';
 import { transformShip } from '../../models/ships-sea/transform.js';
+import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
@@ -237,6 +238,32 @@ $('wrap').value = S.map.wrap ? '1' : '0'; $('wrap').onchange = () => { S.map.wra
 $('sail').checked = S.sail; $('sail').onchange = () => { S.sail = $('sail').checked; ship.obj.visible = ship.on && S.sail; if (!S.sail && camMode !== 'Overview') setCam('Free flight'); else if (S.sail) setCam('Chase'); save(); };
 $('weather').value = S.sky.weather; $('weather').onchange = () => { S.sky.weather = $('weather').value; updateSky(); save(); };
 for (const k of ['sunEl', 'sunAz']) { $(k).value = S.sky[k]; $(k + 'V').textContent = S.sky[k] + '°'; $(k).addEventListener('input', () => { S.sky[k] = +$(k).value; $(k + 'V').textContent = S.sky[k] + '°'; updateSky(); save(); }); }
+// ląd jako zasób dla edytora sceny (js/scene/assets.js, rodzaj „land”): ustawienia mapy i wód
+function fillLand(sel) {
+  const names = listAssets('land');
+  $('landList').replaceChildren(...(names.length ? names.map((n) => el('option', { value: n, textContent: n })) : [el('option', { value: '', textContent: '(none yet)' })]));
+  if (sel && names.includes(sel)) $('landList').value = sel;
+  $('landLoad').disabled = $('landDel').disabled = !names.length;
+}
+$('landSave').onclick = () => {
+  const n = $('landName').value.trim(); if (!n) { $('landNote').textContent = 'Give the land a name first.'; return; }
+  const ok = saveAsset('land', n, { map: { ...S.map }, water: { ...S.water } });
+  $('landNote').textContent = ok ? `Saved "${n}". The scene editor offers it for the surface Land.` : 'The browser did not let me save.';
+  fillLand(n);
+};
+$('landLoad').onclick = () => {
+  const n = $('landList').value, a = n && getAsset('land', n); if (!a) return;
+  S.map = { ...TERRAIN_DEFAULTS, ...a.map }; S.water = { ...WORLD_DEFAULTS, ...a.water };
+  for (const [k, f] of Object.entries(fmts)) { $(k).value = S.map[k]; $(k + 'V').textContent = f(S.map[k]); }
+  for (const [k, f] of Object.entries(wfmt)) { $(k).value = S.water[k]; $(k + 'V').textContent = f(S.water[k]); }
+  for (const k of ['shape', 'size', 'res', 'barrier']) $(k).value = String(S.map[k]);
+  $('wrap').value = S.map.wrap ? '1' : '0'; $('seed').value = S.map.seed;
+  $('layout').value = S.water.layout; $('body').value = S.water.body; $('biome').value = S.water.biome; showNote();
+  $('landName').value = n; generateShown(); save();
+  $('landNote').textContent = `Loaded "${n}".`;
+};
+$('landDel').onclick = () => { const n = $('landList').value; if (!n) return; removeAsset('land', n); fillLand(); $('landNote').textContent = `Deleted "${n}".`; };
+fillLand(); onAssetsChange(() => fillLand($('landList').value));
 $('copy').onclick = async () => { try { await navigator.clipboard.writeText(JSON.stringify(S.map, null, 1)); $('copied').textContent = 'Copied. Paste it into the chat to keep this map.'; } catch { $('copied').textContent = 'Clipboard blocked by the browser.'; } };
 
 /* ---------------- cameras ---------------- */

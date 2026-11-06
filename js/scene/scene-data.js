@@ -3,18 +3,19 @@
 //
 // {
 //   format: 'gamelab-scene', version: 1, name,
-//   env: { surface: 'sea' | 'land' | 'space', light: 'afternoon' | 'noon' | 'dusk' | 'overcast', look: '' | nazwa profilu,
+//   env: { surface: 'sea' | 'land' | 'space', light: 'afternoon' | 'noon' | 'dusk' | 'overcast' | nazwa zasobu „weather”, look: '' | nazwa profilu,
+//          land: '' | nazwa zasobu „ląd” (teren z laboratorium lądu; '' — płaski grunt),
 //          sea: '' | nazwa zasobu „morze” (js/scene/assets.js; '' — morze domyślne),
 //          sky: '' | 'preset:<id>' | nazwa zasobu „niebo” (kosmos; '' — Deep field, js/scene/space.js) },
 //   objects: [{ id, name, prefab, pos: [x, y, z], rot: [x, y, z] (stopnie), scale, behavior? }]
 // }
 // prefab: id z js/scene/prefabs.js; behavior: id z js/scene/behaviors.js, '' = bez zachowania, brak pola = domyślne
-// dla prefabrykatu; look: profil z laboratorium filtrów (gameLab.lookProfiles.v1), '' = zwykły obraz.
+// dla prefabrykatu; look: wygląd kamery — zasób „look” z laboratorium filtrów (js/scene/assets.js), '' = zwykły obraz.
 
 export const FORMAT = 'gamelab-scene', VERSION = 1;
 
 export function emptyScene(name = 'New scene') {
-  return { format: FORMAT, version: VERSION, name, env: { surface: 'sea', light: 'afternoon', look: '', sea: '', sky: '' }, objects: [] };
+  return { format: FORMAT, version: VERSION, name, env: { surface: 'sea', light: 'afternoon', look: '', sea: '', sky: '', land: '' }, objects: [] };
 }
 
 let seq = 0;

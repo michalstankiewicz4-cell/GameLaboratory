@@ -102,3 +102,10 @@ and changing by less than 0.12 per texel, the river carries a current with small
 lakes and ice; then the wrap seam is no rougher than the inside of the map, the land share
 matches the request (60 %), 100 % land leaves no ship, the mountain barrier stands at the edge of a bounded map, and
 positions wrap; screenshot `tools/out/lab-land.png`.
+
+## Land for the scene editor (1.4.0)
+
+The Map window's **Land for the scene editor** saves the map's settings (LandKit terrain: seed, shape, land, relief,
+depth, roughness, erosion, size, resolution, edge; RegionKit waters and biome) under a name as a "land" asset
+(`js/scene/assets.js`). The scene editor builds the same terrain on its base stage for the surface Land
+(Environment → Land); its ships run aground on it. A saved land can be loaded back (the map is generated again) or deleted.

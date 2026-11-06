@@ -65,6 +65,12 @@
   <p class="note" id="edgeNote"></p>
   <div class="btns"><button type="button" id="copy">Copy settings (JSON)</button></div>
   <p class="note" id="copied">Same seed and settings always give the same map.</p>
+  <h3>Land for the scene editor</h3>
+  <div class="row"><span>Name</span><input type="text" id="landName" maxlength="40" placeholder="e.g. Skerry coast"><output></output></div>
+  <div class="btns"><button type="button" id="landSave">Save the land</button></div>
+  <div class="row"><span>Saved</span><select id="landList"></select><output></output></div>
+  <div class="btns"><button type="button" id="landLoad">Load</button><button type="button" id="landDel">Delete</button></div>
+  <p class="note" id="landNote">The terrain, the water bodies and the biome (the seed and every setting above) go to the scene editor: surface Land, Environment → Land.</p>
 </aside>
 <aside class="panel" data-window="chart" data-side="right" data-title="Chart and ship" data-title-pl="Mapa morska i okręt">
   <canvas id="mini" class="minimap" width="256" height="256"></canvas>

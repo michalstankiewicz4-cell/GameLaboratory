@@ -19,3 +19,9 @@ Grafika z Battle (preferowana, CLAUDE.md).
   morze WaterKit lub płaski grunt; oświetlenie: popołudnie, południe, zmierzch, zachmurzenie.
 - Pogoda i starzenie zostają w laboratorium wyglądu (`labs/look.html`).
 - Modele Space nie są jeszcze scenami: ich kity potrzebują `three-global.js`, który zmienia oświetlenie całej strony.
+
+## Profiles are assets (0.6.0)
+
+The profiles are "look" assets (`js/scene/assets.js`, `localStorage["gameLab.assets.v1"]`); the old key
+`gameLab.lookProfiles.v1` moves there by itself the first time a page reads the assets. The scene editor and the skins
+lab read the same list.

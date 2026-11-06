@@ -8,6 +8,7 @@ import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment, sunA
 import { rainUniforms, rainMesh, lightning } from '../../envs/sky/rainkit.js';
 import { navLights, gunFlashes, signalLamp } from '../../models/ships-sea/lights.js';
 import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, hullTexture, LOOKS } from '../../envs/water/waterkit.js';
+import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 import { LookPipeline, AutoResolution, LOOK_PRESETS, LOOK_DEFAULTS } from '../../render/sea/look.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
@@ -144,6 +145,29 @@ $('lightning').value = S.sky.lightning; $('lightningV').textContent = fmtSky.lig
 $('lightning').addEventListener('input', () => { S.sky.lightning = +$('lightning').value; $('lightningV').textContent = fmtSky.lightning(S.sky.lightning); bolts.S.rate = S.sky.lightning; save(); });
 $('strike').onclick = () => bolts.strikeNow(camera);
 $('thunder').addEventListener('change', () => { if ($('thunder').checked) bolts.unlock(); });
+// pogoda i światło jako zasób dla edytora sceny (js/scene/assets.js, rodzaj „weather”)
+const WX_KEYS = ['weather', 'coverage', 'density', 'scale', 'haze', 'wind', 'rain', 'vis', 'lightning', 'time', 'sunEl', 'sunAz', 'moon'];
+function fillWx(sel) {
+  const names = listAssets('weather');
+  $('wxList').replaceChildren(...(names.length ? names.map((n) => el('option', { value: n, textContent: n })) : [el('option', { value: '', textContent: '(none yet)' })]));
+  if (sel && names.includes(sel)) $('wxList').value = sel;
+  $('wxLoad').disabled = $('wxDel').disabled = !names.length;
+}
+$('wxSave').onclick = () => {
+  const n = $('wxName').value.trim(); if (!n) { $('wxNote').textContent = 'Give the weather a name first.'; return; }
+  const ok = saveAsset('weather', n, S.sky);
+  $('wxNote').textContent = ok ? `Saved "${n}". The scene editor offers it in Environment → Light.` : 'The browser did not let me save.';
+  fillWx(n);
+};
+$('wxLoad').onclick = () => {
+  const n = $('wxList').value, a = n && getAsset('weather', n); if (!a) return;
+  Object.assign(S.sky, a); $('weather').value = WEATHER[S.sky.weather] ? S.sky.weather : 'custom';
+  for (const k of WX_KEYS) if ($(k) && k !== 'weather') { $(k).value = S.sky[k]; const o = $(k + 'V'); if (o) o.textContent = k === 'time' ? fmtTime(S.sky[k]) : fmtSky[k] ? fmtSky[k](S.sky[k]) : S.sky[k]; }
+  bolts.S.rate = S.sky.lightning; $('wxName').value = n; updateSky(); save();
+  $('wxNote').textContent = `Loaded "${n}".`;
+};
+$('wxDel').onclick = () => { const n = $('wxList').value; if (!n) return; removeAsset('weather', n); fillWx(); $('wxNote').textContent = `Deleted "${n}".`; };
+fillWx(); onAssetsChange(() => fillWx($('wxList').value));
 $('navLights').value = S.sky.navLights; $('navLights').onchange = () => { S.sky.navLights = $('navLights').value; updateSky(); save(); };
 // broadside: main guns trained to one side within their arcs, a little elevation, then all fire together
 function trainTo(side) {
