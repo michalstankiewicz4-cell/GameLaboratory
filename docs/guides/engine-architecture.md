@@ -81,6 +81,22 @@ scenę Three.js; widok w wolnym środku mają już wszystkie, 0.35.0), warstwy I
    jest na razie w edytorze, `editor/js/play/input.js`)*
 5. Sieć.
 
+## Niebo niezależne od powierzchni (plan, 2026-11-06)
+
+Jak w silnikach (Unity, Godot): niebo to osobne ustawienie środowiska, nie część powierzchni — morze albo ląd pod
+mgławicą, kosmos bez powierzchni. Dziś niebo wynika z powierzchni (morze / ląd — niebo dzienne SkyKit, kosmos — niebo
+BodyKit).
+
+- **Dwa niezależne wybory** w Środowisku: **powierzchnia** (morze, ląd, brak = kosmos) i **niebo**: dzienne (pora dnia
+  i pogoda, SkyKit — domyślne dla morza i lądu), kosmosu (gotowe tła SystemKit i zasoby „sky” z laboratorium ciał
+  niebieskich), później ze zdjęcia (panorama HDRI wczytana z pliku).
+- **Światło z nieba:** niebo daje kolor słońca, światło rozproszone, mgłę i mapę odbić. Pod niebem kosmosu: słońce
+  białe, bez mgły, woda odbija mgławicę; fale i fizyka okrętów bez zmian.
+- **Dane:** `env.sky` dla każdej powierzchni (`""` — domyślne dla powierzchni); stare sceny działają jak dotąd;
+  w API to samo polecenie `env`.
+- **Kod:** niebo kosmosu przenieść z `js/models/bodies/` (dziś „ciało” BodyKit) do środowisk, obok `js/envs/sky/`
+  (niebo dzienne) — wszystkie nieba w jednej szufladzie środowisk; laboratorium ciał niebieskich zostaje edytorem nieba.
+
 ## Rola edytora i docelowy układ repozytorium (plan, 2026-11-05)
 
 **Edytor sceny jest głównym, docelowym programem**: w nim składa się grę. Właściciel potwierdził ten kierunek
