@@ -10,6 +10,7 @@ import { createShip, shipDef } from '../behaviors/water/ship.js';
 import { createFlight } from '../behaviors/air/flight.js';
 import { createThrust } from '../behaviors/space/thrust.js';
 import { createDrive, driveDef } from '../behaviors/land/drive.js';
+import { createCraft, craftDef } from '../behaviors/water/craft.js';
 
 const D2R = Math.PI / 180;
 const quatOf = (q, o = new THREE.Quaternion()) => o.set(q[1], q[2], q[3], q[0]);   // [w, x, y, z] → THREE
@@ -107,6 +108,35 @@ export const BEHAVIORS = {
         },
         hud: () => ({ speed: s.speed * 3.6, unit: 'km/h', throttle: pedal, aground: s.depth > 0.5 }),   // aground: w wodzie
         reset() { if (k.update) k.update(0, 0.05, { speed: 0, steer: 0, turn: 0 }); },
+      };
+    },
+  },
+  craft: {
+    label: 'Small craft on water', labelPl: 'Mała jednostka na wodzie', env: 'water', throttle: [-1, 1],
+    fits: (prefabId) => prefabId.startsWith('marine/'),
+    keys: 'W / S: throttle (lever) · A / D: rudder · ↓ ↑: dive deeper / shallower (the diver)',
+    keysPl: 'W / S: maszyny (dźwignia) · A / D: ster · ↓ ↑: głębiej / płycej (nurek)',
+    create(obj, built, world) {
+      const k = built.kit || {}, def = k.def || {};
+      const sim = createCraft(craftDef(def), { x: obj.pos[0], z: obj.pos[2], yaw: obj.rot[1] * D2R, y: obj.pos[1] });
+      const s = sim.state, root = built.root;
+      // woda (z falami) i grunt / dno ze sceny bazowej; bez wody — sam grunt (amfibia jedzie, reszta leży)
+      const env = { surface: (x, z) => { const w = world.waterAt ? world.waterAt(x, z) : 0; return w == null ? -1e9 : w; },
+        floor: (x, z) => { const g = world.terrainAt ? world.terrainAt(x, z) : -30; return g == null ? -1e9 : g; } };
+      let tAcc = 0, dive = 0, lever = 0;
+      return {
+        state: s,
+        step(dt, c) {
+          if (def.maxDepth) dive = Math.max(0, Math.min(def.maxDepth, dive + (c.elevator || 0) * 4 * dt));
+          const input = { throttle: c.throttle || 0, steer: -(c.rudder || 0), dive }; lever = input.throttle;
+          sim.step(dt, input, env);
+          root.position.set(s.x, 0, s.z); root.rotation.set(0, s.yaw, 0);
+          tAcc += dt;
+          if (k.update) k.update(tAcc, dt, { pose: { y: s.y, pitch: s.pitch, roll: s.roll, lift: s.lift, depth: s.depth, onLand: s.onLand, vd: -s.vy },
+            speed: s.speed, steer: input.steer, dive });
+        },
+        hud: () => ({ speed: s.speed * 1.94384, unit: 'kn', throttle: lever, alt: def.maxDepth ? -s.depth : undefined, aground: s.onLand > 0.5 }),   // nurek: wysokość = −głębokość
+        reset() { if (k.update) k.update(0, 0.05, {}); },
       };
     },
   },

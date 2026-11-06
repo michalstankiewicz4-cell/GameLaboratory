@@ -57,6 +57,7 @@ Wpis: `{ id, label, family, surface, lab, build() → { root, kit, dispose } }`.
 | id | Dla | Zachowanie | Sterowanie (`input`) |
 |---|---|---|---|
 | `ship` | `sea/*` | „okręt na wodzie” (`js/behaviors/water/ship.js`) na falach sceny bazowej (`world.waves`) | `throttle` −0,4…1, `rudder` −1…1 |
+| `craft` | `marine/*` | „mała jednostka na wodzie” (`js/behaviors/water/craft.js`), woda z falami i dno ze sceny bazowej | `throttle` (dźwignia), `rudder` (ster), `elevator` (głębokość nurka) |
 | `drive` | `road/*` | „jazda po lądzie” (`js/behaviors/land/drive.js`), grunt i woda ze sceny bazowej | `throttle` −1…1 (pedał), `rudder` (skręt) |
 | `thrust` | `space/codewing`, `space/scribe`, `space/swarmer` | „ciąg w próżni” (`js/behaviors/space/thrust.js`) | `throttle` −1…1, `elevator` (pochylenie), `aileron` (kurs), `rudder` (przechył) |
 | `flight` | `air/*` | „lot w atmosferze” (`js/behaviors/air/flight.js`), krok fizyki 1/240 s, grunt na wysokości 0 | `throttle` 0…1, `elevator`, `aileron`, `rudder`, `brake`, `gear`, `flaps` |
@@ -106,5 +107,5 @@ Kity ze Space (ShipKit, BodyKit z niebem, SystemKit z gotowymi tłami) są pisan
 dopiero, gdy scena ich potrzebuje: `loadSpace()` importuje `js/core/three-global.js`, potem kity po kolei;
 `spaceReady()` mówi, czy są. Prefabrykat z `needs: 'space'` czeka na nie (edytor: karta ładowania), powierzchnia
 `space` tak samo. Gotowe tła: `skyPresets()` (z `SystemKit.SKIES`); w `env.sky` z przedrostkiem `preset:`.
-Statki ShipKit: jednostka = 1 m, dziób obrócony na +Z (`makeGameHolder` w skali 1); `tick(t, dt)` — światła
+MarineKit (roboty morskie, rodzina `marine`) ładuje się razem z kitami ze Space. Statki ShipKit: jednostka = 1 m, dziób obrócony na +Z (`makeGameHolder` w skali 1); `tick(t, dt)` — światła
 i silniki na postoju. Liczby ruchu (`SPACE_NUMBERS` w `behaviors.js`) są założone.

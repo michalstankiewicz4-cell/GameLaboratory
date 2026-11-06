@@ -1,21 +1,22 @@
-// Kosmos w scenie: kity ze Space (ShipKit — statki, dron, stacja; BodyKit — niebo; SystemKit — gotowe tła) ładowane
+// Kity ze Space w scenie (ShipKit — statki, dron, stacja; MarineKit — roboty morskie; BodyKit — niebo; SystemKit — gotowe tła) ładowane
 // dopiero wtedy, gdy scena ich potrzebuje (powierzchnia „kosmos” albo model z rodziny space). Kity są pisane pod
 // globalne THREE: najpierw js/core/three-global.js (window.THREE z pomocnikami LIGHT_SCALE i srgbColor — kity
 // z Battle i TrainKit, które czytają window.THREE przy załadowaniu, są już wtedy załadowane), potem kity w kolejności.
 const SHIP_FILES = ['codewing', 'scribe', 'swarmer', 'haven'];
 let loading = null;
 
-export const spaceReady = () => !!(window.ShipKit && window.BodyKit && window.SystemKit && window.BodyKit.GAME_KINDS && window.BodyKit.GAME_KINDS.sky);
+export const spaceReady = () => !!(window.ShipKit && window.MarineKit && window.BodyKit && window.SystemKit && window.BodyKit.GAME_KINDS && window.BodyKit.GAME_KINDS.sky);
 
 export function loadSpace() {
   if (!loading) loading = (async () => {
     await import('../core/three-global.js');
     await import('../models/ships-space/shipkit.js');
     for (const f of SHIP_FILES) await import(`../models/ships-space/ships/${f}.js`);
+    await import('../models/marine/marinekit.js');   // roboty morskie (ślizgacz, barka, nurek, amfibia) — też globalne THREE
     await import('../models/bodies/bodykit.js');
     await import('../models/bodies/kinds/sky.js');
     await import('../envs/space/systemkit/systemkit.js');
-    if (window.LabLog) window.LabLog.add('info', 'Space kits loaded (ShipKit, BodyKit sky, SystemKit)');
+    if (window.LabLog) window.LabLog.add('info', 'Space kits loaded (ShipKit, MarineKit, BodyKit sky, SystemKit)');
   })();
   return loading;
 }

@@ -4,6 +4,7 @@
 // wheels; where there is water it floats) and RoadKit's real-world road vehicles (js/models/road, the FSO Polonez…).
 // The train is another family (js/labs/vehicles-land/train.js).
 import { createDrive, driveDef } from "../../behaviors/land/drive.js";
+import { createCraft, craftDef } from "../../behaviors/water/craft.js";
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 (() => {
@@ -79,8 +80,8 @@ function rebuildGround() {
 const state = { index: 0, auto: true, autoSpeed: 0.5, night: false, dust: true, work: false, keys: {} };
 const drv = { x: 0, z: 0, yaw: 0, speed: 0 };
 let veh = null;
-// rovers and road vehicles drive by forces (js/behaviors/land/drive.js); the amphibian, the tram and the aircraft
-// still on VehicleKit.drive (their behaviours: floating, wheel on rail, flight — the breakdown plan)
+// rovers and road vehicles drive by forces (js/behaviors/land/drive.js), the amphibian floats and drives by forces
+// (js/behaviors/water/craft.js); the tram and the aircraft still on VehicleKit.drive (wheel on rail, taxiing — later)
 let sim = null;
 const dust = VK.makeDust(0xc9a27c); scene.add(dust.points);
 // other model families (e.g. the train, js/labs/vehicles-land/train.js) show here instead
@@ -113,7 +114,9 @@ function load() {
   const { def, kit } = LIST[state.index];
   veh = kit === "mk" ? MK.buildVessel(def.id, { detail: 1 }) : kit === "rk" ? RK.buildVehicle(def.id, {}) : kit === "tram" ? TK.buildTram(def.id, {}) : kit === "air" ? AK.buildAircraft(def.id, {}) : VK.buildVehicle(def.id, { detail: 1 });
   veh.kit = kit;
-  sim = kit === "vk" || kit === "rk" ? createDrive(driveDef(def), { x: drv.x, z: drv.z, yaw: drv.yaw }) : null;
+  sim = kit === "vk" || kit === "rk" ? createDrive(driveDef(def), { x: drv.x, z: drv.z, yaw: drv.yaw })
+    : kit === "mk" ? createCraft(craftDef(def), { x: drv.x, z: drv.z, yaw: drv.yaw, y: groundAt(drv.x, drv.z) + 1.5 }) : null;
+  if (sim) sim.kind = kit;
   scene.add(veh.group);
   $("hudTitle").textContent = def.name;
   $("role").textContent = def.role;
@@ -204,7 +207,8 @@ function frame() {
   const yaw0 = drv.yaw;
   if (sim) {
     // forces: engine, brakes, tyres or tracks, slopes, and the land lab's water (drag and buoyancy stop a rover in it)
-    sim.step(dt, input, { height: groundAt, water: world ? (x, z) => world.waterAt(x, z, t) : null });
+    if (sim.kind === "mk") sim.step(dt, input, { surface: world ? (x, z) => world.waterAt(x, z, t) : NO_WATER, floor: groundAt });   // the amphibian
+    else sim.step(dt, input, { height: groundAt, water: world ? (x, z) => world.waterAt(x, z, t) : null });
     const S = sim.state; drv.x = S.x; drv.z = S.z; drv.yaw = S.yaw; drv.speed = S.speed;
   } else VK.drive(drv, input, def, dt);
   const gy = groundAt(drv.x, drv.z);
@@ -213,8 +217,8 @@ function frame() {
   const cy = Math.cos(drv.yaw), sy = Math.sin(drv.yaw);
   if (veh.kit === "mk") {   // the amphibian: on its wheels on the ground (it would float where there is water)
     veh.group.position.y = 0;
-    const wx = (x, z) => drv.x + x * cy + z * sy, wz = (x, z) => drv.z - x * sy + z * cy;
-    veh.update(t, dt, { speed: drv.speed, steer: input.steer, surface: world ? (x, z) => world.waterAt(wx(x, z), wz(x, z), t) : NO_WATER,
+    const wx = (x, z) => drv.x + x * cy + z * sy, wz = (x, z) => drv.z - x * sy + z * cy, S = sim.state;
+    veh.update(t, dt, { pose: { y: S.y, pitch: S.pitch, roll: S.roll, onLand: S.onLand }, speed: drv.speed, steer: input.steer, surface: world ? (x, z) => world.waterAt(wx(x, z), wz(x, z), t) : NO_WATER,
       floor: (x, z) => groundAt(wx(x, z), wz(x, z)), lights: state.night ? 1 : 0, work: state.work ? 1 : 0 });
   } else veh.update(t, dt, {
     speed: drv.speed, steer: input.steer, turn: Math.atan2(Math.sin(drv.yaw - yaw0), Math.cos(drv.yaw - yaw0)) / Math.max(1e-4, dt),

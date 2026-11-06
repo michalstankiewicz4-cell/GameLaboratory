@@ -10,6 +10,7 @@ import { SHIP_IDS, buildShip, shipInfo, shipView } from '../../models/ships-sea/
 import { signalLamp } from '../../models/ships-sea/lights.js';
 import { SEAS, LOOKS, waveSet, heightAt as waveHeight, waterUniforms, setWaves, polarGrid, waterMaterial } from '../../envs/water/waterkit.js';
 import { heightTexture, landUniforms, GLSL_LAND } from '../../envs/land/landkit.js';
+import { createCraft, craftDef } from '../../behaviors/water/craft.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -312,6 +313,8 @@ addEventListener('keydown', (e) => {
 // the sea lab's drive, moved here: AUTO wanders and turns back toward the middle; W/A/S/D steer; Q/E dive (the diver)
 const rs = { auto: true, speed: 0.6, dive: 0, night: false, wake: true, work: false, keys: {} };
 const drv = { x: 0, z: 0, yaw: 0, speed: 0 };
+// the robots float and move by forces (js/behaviors/water/craft.js): thrust, drag, rudder, buoyancy, foils, thrusters
+let craft = null;
 const wake = MK.makeWake(); scene.add(wake.points);
 const anchor = new THREE.Vector3(), lastAnchor = new THREE.Vector3();
 let wander = 0;
@@ -330,6 +333,7 @@ function setRobot(id) {
   buildMs = performance.now() - t0;
   scene.add(robot.group);
   Object.assign(drv, { x: 0, z: 0, yaw: 0, speed: 0 });
+  craft = createCraft(craftDef(robot.def), { x: 0, z: 0, yaw: 0 });
   const d = robot.def, st = MK.modelStats(robot.group);
   $('robotName').textContent = d.name; $('robotRole').textContent = d.role;
   $('rWork').textContent = d.work; $('rDive').disabled = !d.maxDepth;
@@ -359,10 +363,12 @@ function updateRobot(dt, t) {
     input = { throttle: (k.KeyW ? 1 : 0) - (k.KeyS ? 1 : 0), steer: (k.KeyA ? 1 : 0) - (k.KeyD ? 1 : 0) };
     if (def.maxDepth && (k.KeyQ || k.KeyE)) { rs.dive = Math.max(0, Math.min(45, rs.dive + ((k.KeyQ ? 1 : 0) - (k.KeyE ? 1 : 0)) * 4 * dt)); $('rDive').value = rs.dive; $('rDive').oninput(); }
   }
-  VK.drive(drv, input, def, dt);
+  const S = craft.step(dt, { ...input, dive: rs.dive }, { surface: (x, z) => waterAt(x, z, t) });
+  drv.x = S.x; drv.z = S.z; drv.yaw = S.yaw; drv.speed = S.speed;
   robot.group.position.set(drv.x, 0, drv.z); robot.group.rotation.y = drv.yaw;
   const cy = Math.cos(drv.yaw), sy = Math.sin(drv.yaw);
   robot.update(t, dt, {
+    pose: { y: S.y, pitch: S.pitch, roll: S.roll, lift: S.lift, depth: S.depth, onLand: S.onLand, vd: -S.vy },
     speed: drv.speed, steer: input.steer, dive: rs.dive, surface: (x, z) => waterAt(drv.x + x * cy + z * sy, drv.z - x * sy + z * cy, t),
     lights: rs.night ? 1 : (robot.depth > 6 ? 1 : 0), work: rs.work ? 1 : 0, wake: rs.wake && $('sea').checked ? wake : null,
   });

@@ -25,6 +25,7 @@ export const FAMILIES = {
   structures: { label: 'Structures', labelPl: 'Budowle' },
   weapons: { label: 'Weapons', labelPl: 'Broń' },
   space: { label: 'Spacecraft', labelPl: 'Statki kosmiczne' },
+  marine: { label: 'Sea robots', labelPl: 'Roboty morskie' },
 };
 
 const P = [];
@@ -47,6 +48,15 @@ function buildSpace(id) {
   return { root: holder, kit: m, dispose: () => SK.disposeShipModel(m), tick: (t, dt) => m.update(t, dt, { power: 0 }) };
 }
 SPACE.forEach(([id, name]) => add('space/' + id, name, 'space', 'space', 'labs/vehicles-space.html', () => buildSpace(id), { needs: 'space' }));
+// roboty morskie (MarineKit ze Space, ładowany jak ShipKit): ślizgacz, barka, nurek, amfibia; na postoju unoszą się
+// na płaskiej wodzie (sprężyny modelu), w grze — zachowanie „mała jednostka na wodzie” (pozę daje zachowanie)
+const MARINE = [['skimmer', 'Skimmer'], ['barge', 'Barge'], ['diver', 'Diver'], ['amphibian', 'Amphibian']];
+function buildMarine(id) {
+  const MK = window.MarineKit; if (!MK) throw new Error('MarineKit is not loaded (js/scene/space.js loadSpace())');
+  const v = MK.buildVessel(id, { detail: 1 });
+  return { root: v.group, kit: v, dispose: () => MK.disposeVessel(v), tick: (t, dt) => v.update(t, dt, {}) };
+}
+MARINE.forEach(([id, name]) => add('marine/' + id, name, 'marine', 'sea', 'labs/vehicles-water.html?ship=' + id, () => buildMarine(id), { needs: 'space' }));
 
 export const PREFABS = P;
 export const prefab = (id) => P.find((p) => p.id === id) || null;

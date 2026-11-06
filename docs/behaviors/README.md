@@ -8,6 +8,7 @@ Zasada (CLAUDE.md): fizyka jest prawdziwa — start, ruch, skręt i zatrzymanie 
 | Zachowanie | Plik | Środowisko | Gdzie używane |
 |---|---|---|---|
 | okręt na wodzie | `water/ship.js` | woda | edytor sceny (okręty), gra CityExplorer |
+| mała jednostka na wodzie | `water/craft.js` | woda (amfibia też ląd) | laboratoria pojazdów (roboty MarineKit, amfibia), edytor sceny (roboty morskie) |
 | jazda po lądzie | `land/drive.js` | ląd | laboratorium pojazdów — ląd (łaziki, pojazdy drogowe), edytor sceny (pojazdy drogowe) |
 | ciąg w próżni | `space/thrust.js` | kosmos | edytor sceny (statki kosmiczne, dron) |
 | lot w atmosferze | `air/flight.js` | ląd (powietrze nad lądem) | edytor sceny (Spitfire) |
@@ -28,6 +29,24 @@ Zasada (CLAUDE.md): fizyka jest prawdziwa — start, ruch, skręt i zatrzymanie 
 - Stan: `x`, `z`, `th`, `vf` (prędkość naprzód, m/s), `vs`, `r`, `throttle`, `rudder` (z opóźnieniem maszyn i płetwy),
   `heave`, `pitch`, `roll`, `aground`.
 - Liczby Błyskawicy: [`../models/ships-sea/blyskawica.md`](../models/ships-sea/blyskawica.md), „Ruch”.
+
+## Mała jednostka na wodzie (`water/craft.js`)
+
+`createCraft(def, { x, z, yaw, y })` → `{ state, step(dt, c, env), def }`; `craftDef(info, extra)` — z danych MarineKit
+(`length`, `width`, `height`, `maxSpeed`, `accel`, `turnRadius`, `maxDepth`, `float`, `foils`, `azimuth`, `wheels`);
+masa bez danych — z pola wodnicy i zanurzenia (pojazd podwodny: wyporność całego kadłuba o 3 % większa niż ciężar).
+
+- Płaszczyzna: ciąg śrub η·P / max(v, v0) (η 0,6), opór K·v² (na prędkości maksymalnej równy ciągowi; z płatami —
+  większy, dopóki kadłub jest w wodzie), opór boczny, ster — moment ∝ v² do promienia `turnRadius`, pędniki
+  azymutalne — także w miejscu, tłumienie obrotu.
+- Pion: wyporność ρ·g·A·zanurzenie, tłumienie; płaty — nośność ½ρ·CL·A·v², dopóki są w wodzie (równowaga na płatach
+  sama); nurek — pędniki pionowe do zadanej głębokości (najwyżej 30 % ciężaru); grunt i dno — kontakt (sprężyna, tłumik).
+- Przegłębienie i przechył: momenty prostujące wodnicy ρ·g·I do płaszczyzny fali pod kadłubem (na gruncie — do
+  płaszczyzny gruntu pod kołami), dziób unosi się pod parą.
+- Amfibia: na gruncie koła (napęd do μ·N, regulator do prędkości maksymalnej, zbocze z normalnej gruntu), w wodzie śruby.
+- Sterowanie `c`: `throttle`, `steer` (dodatni — w lewo), `dive`; `env`: `surface(x, z)` (woda z falami), `floor(x, z)`.
+- Stan: `x`, `z`, `yaw`, `u`, `v`, `r`, `y`, `vy`, `pitch`, `roll`, `depth`, `lift`, `onLand`, `speed`. Model dostaje
+  pozę przez `MarineKit` `update(t, dt, { pose })`.
 
 ## Jazda po lądzie (`land/drive.js`)
 

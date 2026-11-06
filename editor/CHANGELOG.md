@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.11.0 — 2026-11-06 (roboty morskie)
+
+### Dodane
+- Rodzina **Roboty morskie**: ślizgacz, barka, nurek, amfibia; w grze zachowanie „mała jednostka na wodzie”
+  (`js/behaviors/water/craft.js`) — W / S maszyny, A / D ster, ↓ ↑ głębiej / płycej (nurek; na pasku stanu głębokość).
+
 ## 0.10.0 — 2026-11-06 (jazda po lądzie)
 
 ### Dodane

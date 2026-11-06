@@ -22,6 +22,7 @@
      - floating: a plane fitted through the hull's float points on the
        waves (heave, pitch, roll) on springs, the bow lifting with speed;
      - the skimmer rises on its foils above ~8 m/s;
+     (opts.pose: the pose from a behaviour — js/behaviors/water/craft.js — instead of the springs below)
      - the submersible dives to opts.dive (metres), the waves fading out
        below a couple of metres;
      - the amphibian rests on whichever is higher: the water or the ground
@@ -309,6 +310,7 @@ const lampAt = (g, m, x, y, z) => { const l = box(0.3, 0.14, 0.06, m.lamp, x, y,
 const VESSELS = [
   { id: "skimmer", name: "SKIMMER", role: "A fast scout over open water: twin hulls, rising onto foils at speed.",
     length: 8, width: 3.6, height: 2.6, maxSpeed: 24, accel: 4, turnRadius: 16, cargo: 0.5, work: "Scan",
+    foils: { speed: 9, height: 1.05 },   // lifts off at ~9 m/s; the foils hang 1.05 m under the hull
     float: [[1.3, 3], [-1.3, 3], [1.3, -3], [-1.3, -3]],
     make(b, m, seg) {
       for (const s of [-1, 1]) { const h = hull(7.6, 0.95, 0.55, 0.55, 1, m); h.position.x = s * 1.3; b.add(h); }
@@ -333,6 +335,7 @@ const VESSELS = [
     } },
   { id: "barge", name: "BARGE", role: "Moves materials by sea: containers on deck, azimuth thrusters, a bow ramp for vehicles.",
     length: 20, width: 6.2, height: 5.5, maxSpeed: 7, accel: 0.8, turnRadius: 40, cargo: 240, work: "Lower the ramp",
+    azimuth: true,                       // azimuth thrusters: it turns on the spot too
     float: [[2.4, 7.5], [-2.4, 7.5], [2.4, -8.5], [-2.4, -8.5], [0, 0]],
     make(b, m, seg) {
       b.add(hull(20, 6.2, 1.7, 1.4, 0.15, m));
@@ -402,6 +405,7 @@ const VESSELS = [
     } },
   { id: "amphibian", name: "AMPHIBIAN", role: "Drives into the sea and out again: six wheels, two shrouded propellers, a sealed hull.",
     length: 6.6, width: 3.0, height: 2.7, maxSpeed: 12, accel: 2.2, turnRadius: 7, cargo: 3, work: "Scan",
+    wheels: true,                        // six wheels: it drives out of the sea
     float: [[1, 2.4], [-1, 2.4], [1, -2.4], [-1, -2.4]],
     make(b, m, seg) {
       b.add(hull(6.2, 2.6, 0.55, 1.0, 0.1, m));
@@ -455,6 +459,13 @@ function buildVessel(id, { detail = 1 } = {}) {
     update(t, dt, opts = {}) {
       dt = Math.min(dt, 0.05);
       const speed = opts.speed || 0, steer = opts.steer || 0, surf = opts.surface || (() => 0);
+      // the pose from a behaviour (js/behaviors/water/craft.js — forces: buoyancy, foils, thrusters, wheels):
+      // { y, pitch, roll, lift, depth, onLand, vd } — then the model only shows it (no springs of its own)
+      const P = opts.pose;
+      if (P) {
+        st.y = P.y; st.pitch = P.pitch; st.roll = P.roll; st.lift = P.lift || 0; st.depth = P.depth || 0; st.onLand = P.onLand || 0; st.vd = P.vd || 0;
+        body.position.y = st.y; body.rotation.set(st.pitch, 0, st.roll);
+      } else {
       // the water under the hull
       let pl = fit(def.float, def.float.map(([x, z]) => surf(x, z)));
       let y = pl.a, pitch = -Math.atan(pl.c), roll = Math.atan(pl.b);
@@ -485,6 +496,7 @@ function buildVessel(id, { detail = 1 } = {}) {
       [st.pitch, st.vp] = spring(st.pitch, st.vp, pitch, def.length > 12 ? 1.6 : 2.6, dt);
       [st.roll, st.vr] = spring(st.roll, st.vr, roll, def.length > 12 ? 1.6 : 2.6, dt);
       body.position.y = st.y; body.rotation.set(st.pitch, 0, st.roll);
+      }
       // propellers, wheels, lamps, the beacon
       parts.props.forEach((p, i) => { p.rotation.z += (speed * 2.5 + (def.maxDepth ? st.vd * 6 : 0) + 1.5) * dt * (i % 2 ? -1 : 1); });
       if (parts.wheels) parts.wheels.forEach((w) => { w.spin.rotation.x += speed / w.r * dt * (st.onLand > 0.5 ? 1 : 0.3); w.pivot.rotation.y = w.steer * steer * 0.4; });

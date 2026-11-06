@@ -81,3 +81,8 @@ The rovers and the road vehicles drive with the land behaviour `js/behaviors/lan
 brakes, rolling and air drag, slopes, tyres or tracks, water drag and buoyancy) instead of VehicleKit's kinematic
 `drive`: on the land lab's ground a rover now stops in deep water by itself. The amphibian, the tram and the aircraft
 still use the old drive (their own behaviours come later — docs/guides/lab-breakdown.md).
+
+## The amphibian by forces (1.13.0)
+
+The amphibian floats and drives with the water behaviour `js/behaviors/water/craft.js` (buoyancy, propellers, rudder,
+wheels on the ground with traction and slope); MarineKit only shows the pose (`update(…, { pose })`).

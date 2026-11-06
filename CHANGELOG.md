@@ -3,6 +3,21 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.40.0 · edytor sceny 0.11.0 · pojazdy (woda) 1.5.0 · pojazdy (ląd) 1.13.0 — 2026-11-06 (małe jednostki na wodzie liczone siłami)
+
+### Dodane
+- **Zachowanie „mała jednostka na wodzie”** (`js/behaviors/water/craft.js`): łódź, barka, ślizgacz, pojazd podwodny
+  i amfibia liczone z sił — śruby (moc), opór wody ∝ v², opór boczny, ster (moment ∝ v²) i pędniki azymutalne,
+  wyporność z pola wodnicy, momenty prostujące do płaszczyzny fali, płaty nośne (ślizgacz wychodzi z wody przy
+  prędkości i schodzi, gdy zwalnia), pędniki pionowe nurka, koła amfibii na gruncie (kontakt, napęd, zbocze).
+- MarineKit: `update(…, { pose })` — model pokazuje pozę z zachowania (bez własnych sprężyn); dane do zachowania:
+  płaty ślizgacza, pędniki azymutalne barki, koła amfibii.
+- Laboratorium pojazdów (woda): roboty MarineKit pływają tym zachowaniem (zamiast `VehicleKit.drive` i sprężyn
+  modelu); laboratorium pojazdów (ląd): amfibia też (wjeżdża do wody i wyjeżdża siłami).
+- Edytor sceny: rodzina **Roboty morskie** (ślizgacz, barka, nurek, amfibia; MarineKit ładowany razem z kitami ze
+  Space) z zachowaniem „mała jednostka na wodzie”: W / S maszyny (dźwignia), A / D ster, ↓ ↑ głębiej / płycej (nurek).
+  Scena bazowa: `waterAt(x, z)` — powierzchnia wody z falami.
+
 ## Program 0.39.0 · edytor sceny 0.10.0 · pojazdy (ląd) 1.12.0 — 2026-11-06 (jazda po lądzie liczona siłami)
 
 ### Dodane

@@ -20,7 +20,7 @@ dostosowywać (zasoby z nazwą, wspólne zachowania).
 - Klawisze: Ctrl+Z — cofnij, Ctrl+Y / Ctrl+Shift+Z — ponów; W / E / R — przesuń, obróć, skaluj; Delete — usuń; Ctrl+D — powiel; F — pokaż wybrany; Esc — środowisko;
   H — chowa okna. Kliknięcie modelu wybiera go.
 - **Graj** (P; Esc — Stop): zachowania ruszają modele (okręty płyną i kołyszą się na falach, samolot lata), gracz steruje
-  wybranym modelem (albo pierwszym z zachowaniem), kamera jedzie za nim. Okręt: W / S maszyny, A / D ster. Pojazd drogowy: W / S gaz i hamulec / wstecz (pedał), A / D skręt. Statek kosmiczny: W / S silnik główny i wsteczny, ↑ ↓ pochylenie, ← → kurs,
+  wybranym modelem (albo pierwszym z zachowaniem), kamera jedzie za nim. Okręt: W / S maszyny, A / D ster. Pojazd drogowy: W / S gaz i hamulec / wstecz (pedał), A / D skręt. Robot morski: W / S maszyny, A / D ster, ↓ ↑ głębiej / płycej (nurek). Statek kosmiczny: W / S silnik główny i wsteczny, ↑ ↓ pochylenie, ← → kurs,
   Q / E przechył. Samolot:
   W / S gaz, ↑ ↓ ster wysokości (na rozbiegu trzymać ↓), ← → lotki, Q / E ster kierunku, B hamulce, G podwozie, F klapy.
   Edycja w tym czasie wyłączona; dane sceny się nie zmieniają, po Stop modele wracają na swoje miejsca.
