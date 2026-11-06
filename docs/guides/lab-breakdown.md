@@ -87,7 +87,7 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
 4. **Zachowania w modelach:** `VehicleKit.drive` (kinematyczne), pływanie w `MarineKit.update`, chód w LifeKit, akcje
    w ShipKit, zejście i jazda w SurfaceKit — model ma tylko pokazywać; ruch → `js/behaviors/`.
 5. **Każde laboratorium ma własną scenę i pętlę** — docelowo wspólna scena bazowa (`js/labs/shared/stage.js` jest
-   zaczątkiem; korzystają z niej filtry, wygląd, ląd i edytor).
+   zaczątkiem; korzystają z niej filtry, wygląd, ląd, woda, pojazdy · woda i edytor).
 6. **Dwa sposoby ładowania Three.js:** moduły (Battle) i globalne `THREE` (Space, `three-global.js`) — kity ze Space
    można ładować w edytorze przy pierwszej potrzebie (`js/scene/space.js`); docelowo moduły wszędzie.
 7. **Dwa potoki obrazu:** LookPipeline / PostPipeline (Battle) i LabKit + PostKit (Space).
@@ -107,7 +107,8 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
    i MarineKit bez własnego morza i sprężyn: 0.41.0 — punkt zrobiony)*
 4. **Wspólna scena bazowa w laboratoriach środowisk i pojazdów** (woda, ląd, wygląd, pojazdy) — laboratorium
    pokazuje swój zasób na tej samej scenie co edytor.
-   *(wygląd i ląd: 0.41.1 — bez zmiany obrazu; morze edytora zna teren. Zostały woda i pojazdy · woda: mają własne,
-   prostsze niebo (gradient) i mgłę liniową, więc przejście na scenę bazową zmieni ich wygląd — do decyzji)*
+   *(wygląd i ląd: 0.41.1 — bez zmiany obrazu; morze edytora zna teren. Woda i pojazdy · woda: 0.42.1 — niebo SkyKit
+   zamiast gradientu, wygląd do dopracowania. Zostały: pojazdy · ląd (własny teren z szumu) i pojazdy · kosmos
+   (własne niebo kosmosu))*
 5. **Reszta prefabrykatów:** moduły baz, rośliny, jaskinie, ciała niebieskie, ludzie i stwory (z chodem).
 6. **Kosmos dalej:** orbity (układy), powierzchnia planety, akcje statków jako zdarzenia.

@@ -35,7 +35,7 @@ barge, diver); pick one in the top bar. The environment switch next to it goes t
 
 - **Camera** presets per ship (Błyskawica: Bow ¾, Bridge, Funnel & tubes, Quarterdeck…; Orzeł: Conning tower, Deck gun,
   40 mm well, Bow and net cutter, Stern and screws…); **F** frames the whole ship; double-click focuses.
-- **View** (Controls window): sea or dry dock, the water (plain, or the water lab's variant A), dimensions, 10 m grid,
+- **View** (Controls window): sea or dry dock, the water (plain, or the water lab's variant A as the base stage's sea), under the base stage's SkyKit sky, dimensions, 10 m grid,
   wireframe; auto-rotate and exposure are in Camera, the sun in Light and weather.
 - **Parts**: switch hull, superstructure, guns, AA, torpedo tubes, fittings on and off.
 - **Armament**: train and elevate all mounts, **Action stations** (they sweep), **Stow**.

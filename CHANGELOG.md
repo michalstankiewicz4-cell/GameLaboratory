@@ -3,6 +3,19 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.42.1 · woda 1.5.0 · pojazdy (woda) 1.6.0 — 2026-11-07 (wspólna scena bazowa w laboratorium wody i pojazdów · woda)
+
+### Zmienione
+- **Laboratorium wody i laboratorium pojazdów (woda) stoją na wspólnej scenie bazowej** (`js/labs/shared/stage.js`),
+  tej samej co edytor sceny i laboratoria wyglądu i lądu. Zamiast własnego nieba (gradient ze słońcem) i mgły liniowej
+  mają niebo SkyKit z chmurami, słońce, światło rozproszone i mgłę z pogody (domyślne oświetlenie sceny bazowej, pogoda
+  „fair”; wysokość i kierunek słońca z suwaków) i odbicia z tego nieba. **Wygląd się zmienił** — do dopracowania.
+- Woda: oba warianty morza (A i B) odbijają niebo SkyKit i biorą światło, blask i mgłę ze sceny bazowej; połysk
+  (`shine`) liczony jak w edytorze (× 1,8), więc zasób „morze” wygląda tu i w edytorze tak samo.
+- Pojazdy · woda: woda „z laboratorium wody” to morze sceny bazowej (wariant A: fale, wygląd, prąd, olej, lawa, lód);
+  roboty pływają po jego falach. Woda zwykła (błyszcząca tafla) została, większa (12 km — bez krawędzi pod nowym
+  niebem). NOC robota: słońce pod horyzontem (nocne niebo). Kamera widzi do 9 km.
+
 ## Program 0.42.0 — 2026-11-06 (schemat silnika w menu Pomoc)
 
 ### Dodane

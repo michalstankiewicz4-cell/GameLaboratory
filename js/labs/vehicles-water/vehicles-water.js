@@ -8,8 +8,8 @@ import * as THREE from '../../../vendor/three/three.module.js';
 import { PostPipeline } from '../../render/sea/post.js';
 import { SHIP_IDS, buildShip, shipInfo, shipView } from '../../models/ships-sea/index.js';
 import { signalLamp } from '../../models/ships-sea/lights.js';
-import { SEAS, LOOKS, waveSet, heightAt as waveHeight, waterUniforms, setWaves, polarGrid, waterMaterial } from '../../envs/water/waterkit.js';
-import { heightTexture, landUniforms, GLSL_LAND } from '../../envs/land/landkit.js';
+import { SEAS, LOOKS } from '../../envs/water/waterkit.js';
+import { createStage } from '../shared/stage.js';
 import { createCraft, craftDef } from '../../behaviors/water/craft.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
@@ -23,35 +23,17 @@ renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
 $('view').append(renderer.domElement);
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(38, 1, 0.2, 4000);
+const camera = new THREE.PerspectiveCamera(38, 1, 0.2, 9000);
 const post = new PostPipeline(renderer);
 
-// sky dome (gradient + sun glow) — also the source of the reflection environment
-const skyMat = new THREE.ShaderMaterial({
-  side: THREE.BackSide, depthWrite: false, fog: false,
-  uniforms: { uH: { value: new THREE.Color(0xcad9e4) }, uZ: { value: new THREE.Color(0x3f6f9e) }, uSun: { value: new THREE.Vector3(0, 1, 0) }, uSea: { value: new THREE.Color(0x24465e) } },
-  vertexShader: 'varying vec3 vD;void main(){vD=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-  fragmentShader: `uniform vec3 uH,uZ,uSun,uSea;varying vec3 vD;void main(){
-    float h=vD.y;vec3 c=h>0.?mix(uH,uZ,pow(h,.5)):mix(uH,uSea,clamp(-h*6.,0.,1.));
-    float s=max(dot(vD,uSun),0.);c+=vec3(1.,.92,.75)*(pow(s,900.)*6.+pow(s,10.)*.25);gl_FragColor=vec4(c,1.);}`,
-});
-const sky = new THREE.Mesh(new THREE.SphereGeometry(1500, 48, 24), skyMat);
-scene.add(sky);
-scene.fog = new THREE.Fog(0xcad9e4, 600, 1500);
-const hemi = new THREE.HemisphereLight(0xcfe0ee, 0x3a4a56, 0.9);
-const sun = new THREE.DirectionalLight(0xfff0d8, 3.2);
-sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096);
+// the shared base stage (js/labs/shared/stage.js): the same sky (SkyKit), light, fog, sea and sky environment as the
+// scene editor; the plain glossy water below is the lab's own
+const stage = createStage(renderer, scene);
+const { sun } = stage;
+stage.setSurface('none');   // plain water first (applySea)
+sun.shadow.mapSize.set(4096, 4096);
 Object.assign(sun.shadow.camera, { left: -70, right: 70, top: 40, bottom: -40, near: 1, far: 400 });
-sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.04;
-scene.add(hemi, sun, sun.target);
-const pmrem = new THREE.PMREMGenerator(renderer);
-function updateEnvironment() {
-  const envScene = new THREE.Scene();
-  envScene.add(new THREE.Mesh(new THREE.SphereGeometry(10, 32, 16), skyMat));
-  const rt = pmrem.fromScene(envScene, 0.02);
-  if (scene.environment) scene.environment.dispose();
-  scene.environment = rt.texture;
-}
+sun.shadow.normalBias = 0.04;
 
 // sea: glossy water with a scrolling normal map (fine ripples) — slightly translucent near the hull
 function rippleTexture() {
@@ -68,56 +50,41 @@ function rippleTexture() {
     img.data[i] = 128 + dx * 160; img.data[i + 1] = 128 + dy * 160; img.data[i + 2] = 255; img.data[i + 3] = 255;
   }
   g.putImageData(img, 0, 0);
-  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(60, 60);
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(240, 240);
   return t;
 }
 const seaNormal = rippleTexture();
-const sea = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), new THREE.MeshStandardMaterial({
+const sea = new THREE.Mesh(new THREE.PlaneGeometry(12000, 12000), new THREE.MeshStandardMaterial({
   color: 0x0e3a52, roughness: 0.12, metalness: 0.05, normalMap: seaNormal, normalScale: new THREE.Vector2(0.35, 0.35), transparent: true, opacity: 0.93,
 }));
 sea.rotation.x = -Math.PI / 2; sea.receiveShadow = true;
 scene.add(sea);
 // the water: plain (the glossy sheet above), or the water lab's (WaterKit, its variant A as saved in this browser:
-// waves, look, current, oil, lava, ice; open water, no shore). Robot vessels ride its waves.
-const OPEN = { size: 1000, res: 1, wrap: true, depth: 1000, relief: 0, barrier: 'none', h: new Float32Array([-1000]) };
+// waves, look, current, oil, lava, ice; open water, no shore) as the stage's sea. Robot vessels ride its waves.
 const pick = (o) => { const r = { ...o }; delete r.label; return r; };
-let labSea = null, waterSrc = 'plain';
+let waterSrc = 'plain';
 function waterLabSettings() {
   let saved = null; try { saved = JSON.parse(localStorage.getItem('gameLab.water.v1') || 'null'); } catch { saved = null; }
   return { sea: 'moderate', ...pick(SEAS.moderate), dir: 30, look: 'atlantic', ...pick(LOOKS.atlantic), reflect: 1, clear: false,
     current: 0, oil: 0, lava: 0, iceCover: 0, floe: 18, freeboard: 0.35, ...(saved && saved.A) };
 }
-function buildLabSea() {
-  const p = waterLabSettings(), u = Object.assign(waterUniforms(), landUniforms(OPEN, heightTexture(OPEN)));
-  const waves = waveSet({ Hs: p.Hs, Lp: p.Lp, chop: p.chop, spread: p.spread, n: p.n }, p.dir + 180, 7);
-  setWaves(u, waves); u.uShipFx.value.set(0, 0, 0, 0);
-  u.uDeep.value.set(p.deep); u.uScatter.value.set(p.scatter); u.uShine.value = p.shine; u.uRipples.value = p.ripples; u.uCrest.value = p.crest;
-  u.uReflect.value = p.reflect; u.uPlanar.value = 0; u.uAlpha.value = p.clear ? 0.78 : 1; u.uPixelN.value = 1;
-  u.uCurrent.value = p.current || 0; u.uOil.value = p.oil || 0; u.uLava.value = p.lava || 0; u.uIce.value.set(p.iceCover || 0, p.floe || 18, p.freeboard ?? 0.35, 1);
-  const mesh = new THREE.Mesh(polarGrid(192, 160), waterMaterial(u, { land: GLSL_LAND })); mesh.frustumCulled = false; mesh.renderOrder = 1;
-  return { mesh, u, waves };
-}
 function setWater(src) {
   waterSrc = src;
   if (src === 'lab') {   // read again each time: the water lab may have changed it
-    if (labSea) { scene.remove(labSea.mesh); labSea.mesh.geometry.dispose(); labSea.mesh.material.dispose(); }
-    labSea = buildLabSea(); scene.add(labSea.mesh); labSky();
+    const p = waterLabSettings(), u = stage.WU;
+    stage.setSea(p);
+    u.uAlpha.value = p.clear ? 0.78 : 1; u.uCurrent.value = p.current || 0; u.uOil.value = p.oil || 0; u.uLava.value = p.lava || 0;
+    u.uIce.value.set(p.iceCover || 0, p.floe || 18, p.freeboard ?? 0.35, 1);
   }
   applySea();
 }
 function applySea() {
   const on = $('sea').checked;
-  sea.visible = on && waterSrc === 'plain'; if (labSea) labSea.mesh.visible = on && waterSrc === 'lab';
+  sea.visible = on && waterSrc === 'plain'; stage.setSurface(on && waterSrc === 'lab' ? 'sea' : 'none');
   dock.visible = blocks.visible = !on;
 }
-function labSky() {
-  if (!labSea) return;
-  const u = labSea.u; u.uSun.value.copy(sunDir); u.uSunCol.value.copy(sun.color).multiplyScalar(1.1);
-  u.uSkyH.value.copy(skyMat.uniforms.uH.value); u.uSkyZ.value.copy(skyMat.uniforms.uZ.value); u.uSkySea.value.copy(skyMat.uniforms.uSea.value);
-  u.uFogCol.value.copy(skyMat.uniforms.uH.value); u.uFogFar.value = 1500;
-}
-// the water's height where a robot floats (world x, z)
-const waterAt = (x, z, t) => (labSea && labSea.mesh.visible ? waveHeight(labSea.waves, x, z, t) : 0);
+// the water's height where a robot floats (world x, z): the stage's sea with its waves, or the plain water at 0
+const waterAt = (x, z) => stage.waterAt(x, z) ?? 0;
 // dry dock floor (when the sea is off)
 const dock = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.MeshStandardMaterial({ color: 0x6f7377, roughness: 0.95 }));
 dock.rotation.x = -Math.PI / 2; dock.position.y = -6.5; dock.receiveShadow = true; dock.visible = false;
@@ -211,21 +178,13 @@ function rebuild() {
 
 /* ---------------- controls ---------------- */
 const bindRange = (id, fmt, fn) => { const i = $(id), o = $(id + 'V'); const up = () => { if (o) o.textContent = fmt(+i.value); fn(+i.value); }; i.oninput = up; up(); };
+// the sun from the two sliders, the weather of the stage's default light (fair); a robot's NIGHT: the sun below the
+// horizon (night sky), its lamps on
 const sunDir = new THREE.Vector3(0, 1, 0);
 function setSun() {
-  const el_ = +$('sun').value * Math.PI / 180, az = +$('sunAz').value * Math.PI / 180;
-  const dir = new THREE.Vector3(Math.sin(az) * Math.cos(el_), Math.sin(el_), Math.cos(az) * Math.cos(el_));
-  sunDir.copy(dir); sun.position.copy(dir).multiplyScalar(200); sun.target.position.set(0, 0, 0);
-  skyMat.uniforms.uSun.value.copy(dir);
-  const low = 1 - Math.min(1, el_ / 0.5);                      // warmer and dimmer near the horizon
-  const night = robot && rs.night ? 1 : 0;                      // a robot's NIGHT: the sun and the sky nearly out, its lamps on
-  sun.color.setRGB(1, 0.94 - low * 0.25, 0.85 - low * 0.45); sun.intensity = (1.4 + 2.0 * Math.min(1, el_ / 0.45)) * (night ? 0.03 : 1);
-  hemi.intensity = night ? 0.06 : 0.9;
-  skyMat.uniforms.uH.value.setRGB(0.79 + low * 0.12, 0.85 - low * 0.08, 0.89 - low * 0.25).multiplyScalar(night ? 0.03 : 1);
-  skyMat.uniforms.uZ.value.set(0x3f6f9e).multiplyScalar(night ? 0.03 : 1);
-  scene.fog.color.copy(skyMat.uniforms.uH.value);
-  labSky();
-  updateEnvironment();
+  const night = robot && rs.night;
+  stage.setLight({ weather: 'fair', sunEl: night ? -14 : +$('sun').value, sunAz: +$('sunAz').value });
+  sunDir.copy(stage.sunDir); sun.position.copy(sunDir).multiplyScalar(200); sun.target.position.set(0, 0, 0);
 }
 bindRange('sun', (v) => v + '°', setSun);
 bindRange('sunAz', (v) => v + '°', setSun);
@@ -363,16 +322,16 @@ function updateRobot(dt, t) {
     input = { throttle: (k.KeyW ? 1 : 0) - (k.KeyS ? 1 : 0), steer: (k.KeyA ? 1 : 0) - (k.KeyD ? 1 : 0) };
     if (def.maxDepth && (k.KeyQ || k.KeyE)) { rs.dive = Math.max(0, Math.min(45, rs.dive + ((k.KeyQ ? 1 : 0) - (k.KeyE ? 1 : 0)) * 4 * dt)); $('rDive').value = rs.dive; $('rDive').oninput(); }
   }
-  const S = craft.step(dt, { ...input, dive: rs.dive }, { surface: (x, z) => waterAt(x, z, t) });
+  const S = craft.step(dt, { ...input, dive: rs.dive }, { surface: (x, z) => waterAt(x, z) });
   drv.x = S.x; drv.z = S.z; drv.yaw = S.yaw; drv.speed = S.speed;
   robot.group.position.set(drv.x, 0, drv.z); robot.group.rotation.y = drv.yaw;
   const cy = Math.cos(drv.yaw), sy = Math.sin(drv.yaw);
   robot.update(t, dt, {
     pose: { y: S.y, pitch: S.pitch, roll: S.roll, lift: S.lift, depth: S.depth, onLand: S.onLand, vd: -S.vy },
-    speed: drv.speed, steer: input.steer, dive: rs.dive, surface: (x, z) => waterAt(drv.x + x * cy + z * sy, drv.z - x * sy + z * cy, t),
+    speed: drv.speed, steer: input.steer, dive: rs.dive, surface: (x, z) => waterAt(drv.x + x * cy + z * sy, drv.z - x * sy + z * cy),
     lights: rs.night ? 1 : (robot.depth > 6 ? 1 : 0), work: rs.work ? 1 : 0, wake: rs.wake && $('sea').checked ? wake : null,
   });
-  wake.update(dt, (x, z) => waterAt(x, z, t));
+  wake.update(dt, (x, z) => waterAt(x, z));
   wake.material.uniforms.uLight.value = rs.night ? 0.15 : 1;
   // the camera rides along (the diver too, down); the sun's shadows follow
   robot.body.getWorldPosition(anchor);
@@ -445,6 +404,7 @@ addEventListener('resize', resize);
 let last = performance.now(), frames = 0, fpsT = last;
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  stage.tick(dt);   // waves and clouds
   idleT += dt; if (idleT > 5 && !panels.some((p) => p.matches(':hover'))) panels.forEach((p) => p.classList.add('idle'));
   if ($('spin').checked && !drag) orbit.yaw += dt * 0.12;
   if (orbit.want) {
@@ -454,9 +414,8 @@ function frame(now) {
     if (orbit.target.distanceTo(w.target) < 0.05 && Math.abs(w.dist - orbit.dist) < 0.05) orbit.want = null;
   }
   applyCamera();
-  sky.position.copy(camera.position);
+  stage.follow(camera);   // the sky and the sea with the camera, the sky environment
   seaNormal.offset.x = (now / 1000) * 0.004; seaNormal.offset.y = (now / 1000) * 0.0025;
-  if (labSea && labSea.mesh.visible) { labSea.u.uTime.value = now / 1000; labSea.mesh.position.set(Math.round(camera.position.x / 2) * 2, 0, Math.round(camera.position.z / 2) * 2); }
   if (action) applyGuns(now / 1000);
   if (robot) updateRobot(dt, now / 1000);
   if (signal) signal.update(dt, camera, 0.1);

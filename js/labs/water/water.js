@@ -10,6 +10,8 @@ import { SEAS, LOOKS, WATER_BODIES, waveSet, heightAt, waterUniforms, setWaves, 
 import { FoamMap, breaking } from '../../envs/water/foamkit.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 import { generateWaterway, heightTexture, terrainMeshes, landUniforms, setLand, GLSL_LAND } from '../../envs/land/landkit.js';
+import { GLSL_SKY } from '../../envs/sky/skykit.js';
+import { createStage } from '../shared/stage.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -25,31 +27,15 @@ $('view').append(renderer.domElement);
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(40, 1, 0.3, 9000);
 const post = new PostPipeline(renderer);
-const SKY = { h: new THREE.Color(0xc9d7e2), z: new THREE.Color(0x3d6c9a), sea: new THREE.Color(0x1d3a4c) };
-const skyMat = new THREE.ShaderMaterial({
-  side: THREE.BackSide, depthWrite: false, fog: false,
-  uniforms: { uH: { value: SKY.h }, uZ: { value: SKY.z }, uSun: { value: new THREE.Vector3(0, 1, 0) }, uSea: { value: SKY.sea } },
-  vertexShader: 'varying vec3 vD;void main(){vD=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-  fragmentShader: `uniform vec3 uH,uZ,uSun,uSea;varying vec3 vD;void main(){
-    float h=vD.y;vec3 c=h>0.?mix(uH,uZ,pow(h,.5)):mix(uH,uSea,clamp(-h*6.,0.,1.));
-    float s=max(dot(vD,uSun),0.);c+=vec3(1.,.92,.75)*(pow(s,900.)*6.+pow(s,10.)*.25);gl_FragColor=vec4(c,1.);}`,
-});
-const sky = new THREE.Mesh(new THREE.SphereGeometry(4000, 48, 24), skyMat);
-scene.add(sky);
-scene.fog = new THREE.Fog(SKY.h, 900, 3200);
-const hemi = new THREE.HemisphereLight(0xcfe0ee, 0x2a3e4c, 0.85);
-const sun = new THREE.DirectionalLight(0xfff0d8, 3.2);
-sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096);
+// the shared base stage (js/labs/shared/stage.js): the same sky (SkyKit), light, fog and sky environment as the scene
+// editor; the sea is the lab's own (two variants with banks, foam, spray, planar reflections), so the stage's sea is off
+const stage = createStage(renderer, scene);
+stage.setSurface('none');
+const { sun, hemi } = stage;
+sun.shadow.mapSize.set(4096, 4096);
 Object.assign(sun.shadow.camera, { left: -70, right: 70, top: 40, bottom: -40, near: 1, far: 400 });
-sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.04;
-scene.add(hemi, sun, sun.target);
-const pmrem = new THREE.PMREMGenerator(renderer);
-function updateEnvironment() {
-  const s = new THREE.Scene(); s.add(new THREE.Mesh(new THREE.SphereGeometry(10, 32, 16), skyMat));
-  const rt = pmrem.fromScene(s, 0.02);
-  if (scene.environment) scene.environment.dispose();
-  scene.environment = rt.texture;
-}
+sun.shadow.normalBias = 0.04;
+const SEA_SKY = '#define SKY_NO_STARS\n' + GLSL_SKY;   // the sea reflects the same sky as the dome
 
 /* ---------------- ship ---------------- */
 const S = SHIPS.blyskawica;
@@ -78,10 +64,10 @@ const save = () => { try { localStorage.setItem(KEY, JSON.stringify(V)); } catch
 
 const geo = { current: null };
 function makeVariant(id) {
-  const u = Object.assign(waterUniforms(), landUniforms(OPEN, openTex));
+  const u = Object.assign(waterUniforms(), stage.skyU, landUniforms(OPEN, openTex));
   u.uHull.value = hullTex.tex; u.uHullZ.value.set(hullTex.z0, hullTex.z1, hullTex.max, 0);
   u.uShip.value.set(0, S.lines.zBow, S.lines.zStern, model.beam / 2);
-  const mesh = new THREE.Mesh(geo.current, waterMaterial(u, { land: GLSL_LAND })); mesh.frustumCulled = false; mesh.renderOrder = 1;
+  const mesh = new THREE.Mesh(geo.current, waterMaterial(u, { land: GLSL_LAND, sky: SEA_SKY })); mesh.frustumCulled = false; mesh.renderOrder = 1;
   scene.add(mesh);
   const spray = makeSpray(); scene.add(spray.points);
   const splash = makeSpray(2600, 0.55); scene.add(splash.points);
@@ -113,7 +99,7 @@ function applyVariant(id) {
   v.waves = waveSet({ Hs: p.Hs, Lp: p.Lp, chop: p.chop, spread: p.spread, n: p.n }, p.dir + 180, id === 'A' ? 7 : 7);
   setWaves(u, v.waves); v.brk = breaking(v.waves, p.Hs, p.crest);
   u.uDeep.value.set(p.deep); u.uScatter.value.set(p.scatter);
-  u.uShine.value = p.shine; u.uRipples.value = p.ripples; u.uCrest.value = p.crest; u.uReflect.value = p.reflect;
+  u.uShine.value = p.shine * 1.8; u.uRipples.value = p.ripples; u.uCrest.value = p.crest; u.uReflect.value = p.reflect;
   u.uPlanar.value = p.planar ? 1 : 0; u.uAlpha.value = p.clear ? 0.78 : 1;
   u.uShipFx.value.set(p.bowWave ? 1 : 0, p.wake ? 1 : 0, p.hullFoam ? 1 : 0, p.foamMap ? 1 : 0);
   if (!p.foamMap) { v.foam.clear(); u.uFoamWin.value.w = 0; }
@@ -432,18 +418,17 @@ $('torpedo').onclick = () => { for (const v of Object.values(vars)) torpedoRun(v
 $('splitOn').onchange = () => { $('split').hidden = !$('splitOn').checked; seaText(); };
 addEventListener('keydown', (e) => { if (e.code === 'KeyH' && !e.target.closest('input,select')) document.querySelectorAll('[data-window]').forEach((p) => p.classList.toggle('hidden-panel')); });
 
+// the sun from the two sliders, the weather of the stage's default light (fair): sky, sun, fog and the sky environment;
+// the variants' seas take the same light as the stage's sea
 function setSun() {
-  const el_ = THREE.MathUtils.degToRad(+$('sun').value), az = THREE.MathUtils.degToRad(+$('sunAz').value);
-  const d = new THREE.Vector3(Math.cos(el_) * Math.sin(az), Math.sin(el_), Math.cos(el_) * Math.cos(az));
-  sun.position.copy(d).multiplyScalar(200); sun.target.position.set(0, 0, 0);
-  const low = 1 - Math.min(1, el_ / 0.5);
-  sun.color.setRGB(1, 0.93 - low * 0.25, 0.84 - low * 0.45); sun.intensity = 3.2 * (0.35 + 0.65 * Math.min(1, el_ / 0.35));
-  skyMat.uniforms.uSun.value.copy(d);
+  stage.setLight({ weather: 'fair', sunEl: +$('sun').value, sunAz: +$('sunAz').value });
+  sun.position.copy(stage.sunDir).multiplyScalar(200); sun.target.position.set(0, 0, 0);
+  const w = stage.WU;
   for (const v of Object.values(vars)) {
-    const u = v.u; u.uSun.value.copy(d); u.uSunCol.value.copy(sun.color).multiplyScalar(1.1);
-    u.uSkyH.value.copy(SKY.h); u.uSkyZ.value.copy(SKY.z); u.uSkySea.value.copy(SKY.sea); u.uFogCol.value.copy(SKY.h); u.uFogFar.value = 3000;
+    const u = v.u;
+    u.uSun.value.copy(w.uSun.value); u.uSunCol.value.copy(w.uSunCol.value); u.uFogCol.value.copy(w.uFogCol.value);
+    u.uFogFar.value = w.uFogFar.value; u.uFogDen.value = w.uFogDen.value; u.uLight.value = w.uLight.value;
   }
-  updateEnvironment();
 }
 
 /* ---------------- measuring ---------------- */
@@ -521,7 +506,7 @@ function frame(now) {
   const split = $('splitOn').checked, cur = split ? vars.A : vars[edit];
   for (const v of Object.values(vars)) if (split || v === cur) prepare(v, dt);
   poseShip(cur); placeCamera(dtR, cur);
-  sky.position.copy(camera.position);
+  stage.tick(dtR); stage.follow(camera);   // clouds, the sky with the camera, the sky environment
   // scene passes into the post target, then the post pass to the screen
   const u = post.mat.uniforms, pp = post.params;
   u.bright.value = pp.bright / 1.2; u.bloom.value = pp.bloom ? 1 : 0; u.time.value = now / 1000;

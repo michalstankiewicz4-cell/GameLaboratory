@@ -5,7 +5,7 @@ The sea, and the vehicles that sail it and go under it. Started 2026-10-03 as a 
 
 The owner's call (2026-11-02): one **vehicle lab** with the environment switch — space (`ship.html`), water
 (`warship.html`), land (`vehicles.html`). The sea lab is gone: the skimmer, the barge and the diver are on the water
-page's list next to the warships (on its plain water: drive, dive, night, wake, work), the amphibian on the land page
+page's list next to the warships (on its plain water or the base stage's sea: drive, dive, night, wake, work), the amphibian on the land page
 (it drives on the ground; where there is water it floats). MarineKit's own sea (`makeSea`, the view under water,
 marine snow) is used by no lab now; it stays in the kit — the water lab's sea from Battle is the one in use.
 

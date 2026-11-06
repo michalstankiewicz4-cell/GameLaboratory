@@ -29,7 +29,7 @@ Settings are remembered in the browser (localStorage) and "Copy settings (JSON)"
   so the ship floats on what is drawn.
 - **Surface**: a polar grid centred under the camera (rings grow geometrically: dense near, sparse to 6 km), displaced
   in the vertex shader; normals analytic (per vertex or per pixel), plus two scrolling ripple normal maps.
-- **Shading**: Fresnel mix of the water body and the sky (same gradient and sun as the sky dome) or the planar
+- **Shading**: Fresnel mix of the water body and the sky (the SkyKit sky of the base stage, clouds and sun) or the planar
   reflection (the ship rendered mirrored in the waterline into a half-resolution target, distorted by the normals);
   subsurface tint through crests towards the sun; sun glitter; crest foam from the Gerstner fold; fog to the horizon.
 - **Ship interaction**: hull half-breadth at the waterline from ShipKit lines in a 1-D texture; bow wave crest along the
@@ -135,3 +135,12 @@ look of the water: deep, scatter, shine, ripples, crest, reflect) under a name a
 `localStorage["gameLab.assets.v1"]`). The scene editor offers it in Environment → Sea. Shores, ice, current, oil and
 lava are not part of the asset (the editor's base stage is the open sea). A saved sea can be loaded back into the
 variant or deleted.
+
+## Shared base stage (1.5.0)
+
+The lab stands on the base stage of the scene editor (`js/labs/shared/stage.js`): the SkyKit sky with clouds, the sun,
+ambient light, fog and the sky environment come from it (`stage.setLight({ weather: 'fair', sunEl, sunAz })` from the
+two sun sliders). The sea stays the lab's own — the two variants (banks, foam, spray, planar reflections) — with the
+stage's sea switched off; each variant reflects the same sky and takes the stage's light, glitter and fog. The shine is
+scaled as on the stage (× 1.8), so a saved "sea" looks the same here and in the scene editor. Until 1.4.0 the lab had
+its own gradient sky and linear fog.
