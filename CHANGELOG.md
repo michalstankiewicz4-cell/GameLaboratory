@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Pojazdy (ląd) 1.14.0 — 2026-11-06 (tramwaj na torze)
+
+### Zmienione
+- **Tramwaj Swing jeździ po torze** z fizyką koło–szyna z aTrain (`js/behaviors/rail/tram.js`): pętla ok. 700 m
+  (dwie proste po 160 m, dwa łuki R 60 m) ułożona na gruncie, szyny i podkłady (`buildPathTrack`). Nastawnik zadaje
+  prędkość (W), S hamuje; AUTO jedzie najwyżej 30 km/h. Za szybko w łuk — wykoleja się (fizyka: ok. 45 km/h na R 60),
+  ponowny wybór tramwaju stawia go na torze. Wcześniej tramwaj jeździł swobodnie jak samochód (`VehicleKit.drive`).
+
 ## Program 0.40.0 · edytor sceny 0.11.0 · pojazdy (woda) 1.5.0 · pojazdy (ląd) 1.13.0 — 2026-11-06 (małe jednostki na wodzie liczone siłami)
 
 ### Dodane

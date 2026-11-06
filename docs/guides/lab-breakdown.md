@@ -56,7 +56,7 @@ dla edytora; **priorytet** — 1 teraz (edytor tego potrzebuje), 2 potem, 3 kied
 | Laboratorium | W szufladach | Pomieszane | Dokąd | Zasób | Prio. |
 |---|---|---|---|---|---|
 | **Pojazdy · woda** (`labs/vehicles-water.html`, 475 l.) | okręty (ships-sea), MarineKit, WaterKit | MarineKit ma **własne morze** (`makeSea`, nieużywane) i **pływanie w `update()` modelu** (unoszenie na falach, płaty, zanurzenie) — zachowanie w modelu | pływanie MarineKit → `js/behaviors/water/` (obok okrętu); morze MarineKit → usunąć albo połączyć z WaterKit | **wariant okrętu** (wyposażenie, wiek, światła) | 1 |
-| **Pojazdy · ląd** (`labs/vehicles-land.html`, 469 l.) | VehicleKit, RoadKit, TramKit, TrainKit, AirKit, koło na szynie, sieć torowa | **jazda `VehicleKit.drive` jest kinematyczna** (prędkość dąży do celu, skręt bez sił) — wbrew zasadzie prawdziwej fizyki; **własny teren** (szum `heightAt`) zamiast LandKit; tramwaj ma fizykę (`rail/tram.js`), ale laboratorium jej nie używa | jazda → nowe zachowanie „jazda” w `js/behaviors/` (folder lądu; opony, tarcie, napęd — siłami); teren → LandKit / scena bazowa; tramwaj → zachowanie w scenie | **wariant pojazdu**; **tor** (sieć torowa) | 1 |
+| **Pojazdy · ląd** (`labs/vehicles-land.html`, 469 l.) | VehicleKit, RoadKit, TramKit, TrainKit, AirKit, koło na szynie, sieć torowa | **jazda `VehicleKit.drive` jest kinematyczna** (prędkość dąży do celu, skręt bez sił) — wbrew zasadzie prawdziwej fizyki; **własny teren** (szum `heightAt`) zamiast LandKit; tramwaj ma fizykę (`rail/tram.js`) — od 1.14.0 laboratorium jej używa | jazda → nowe zachowanie „jazda” w `js/behaviors/` (folder lądu; opony, tarcie, napęd — siłami); teren → LandKit / scena bazowa; tramwaj → zachowanie w scenie | **wariant pojazdu**; **tor** (sieć torowa) | 1 |
 | **Pojazdy · kosmos** (`labs/vehicles-space.html`, 425 l.) | ShipKit | akcje statków (strzał, skan, zniszczenie) w ShipKit; własne niebo (`makeSpaceSky`) — czwarte niebo | akcje → zachowania / zdarzenia; niebo → wspólne niebo kosmosu | **wariant statku** (nazwy, szczegółowość, uszkodzenia) | 2 |
 | **Transformator** (`labs/transform.html`, 209 l.) | `models/ships-sea/transform.js`, PostPipeline | poziomy szczegółów, strefy trafień, zniszczenia — wspólne dla gier, ale tylko dla okrętów | → `js/render/` (poziomy szczegółów) i silnik (trafienia, zniszczenia) dla każdego modelu | — | 2 |
 
@@ -103,7 +103,7 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
 3. **Zachowania z modeli:** jazda po lądzie siłami (nowe zachowanie lądu w `js/behaviors/`) zamiast `VehicleKit.drive`,
    pływanie MarineKit; potem pojazdy drogowe, łaziki i MarineKit jako prefabrykaty z zachowaniem.
    *(jazda po lądzie siłami: 0.39.0 — łaziki i pojazdy drogowe w laboratorium, pojazdy drogowe w edytorze; pływanie
-   MarineKit i amfibia: 0.40.0 — w laboratoriach i w edytorze; zostało: tramwaj na torze, kołowanie samolotu, łaziki
+   MarineKit i amfibia: 0.40.0 — w laboratoriach i w edytorze; tramwaj na torze w laboratorium: 1.14.0; zostało: kołowanie samolotu, łaziki
    jako prefabrykaty, usunięcie sprężyn i morza `makeSea` z MarineKit)*
 4. **Wspólna scena bazowa w laboratoriach środowisk i pojazdów** (woda, ląd, wygląd, pojazdy) — laboratorium
    pokazuje swój zasób na tej samej scenie co edytor.

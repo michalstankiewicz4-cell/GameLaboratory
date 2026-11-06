@@ -86,3 +86,11 @@ still use the old drive (their own behaviours come later — docs/guides/lab-bre
 
 The amphibian floats and drives with the water behaviour `js/behaviors/water/craft.js` (buoyancy, propellers, rudder,
 wheels on the ground with traction and slope); MarineKit only shows the pose (`update(…, { pose })`).
+
+## The tram on a track (1.14.0)
+
+The PESA Swing runs on a track loop (~700 m: two 160 m straights, two 60 m curves) laid on the ground, with the
+wheel-on-rail physics from aTrain (`js/behaviors/rail/tram.js`, track `js/behaviors/rail/path.js`, rails and sleepers
+`js/models/structures/railway/path-track.js`). W sets the wanted speed (the traction controller follows it), S brakes;
+AUTO drives at most 30 km/h. Too fast into a curve and it derails (about 45 km/h on the 60 m curves) — choosing the
+tram again puts it back. The physics runs flat; the track and the sections get the ground's height.

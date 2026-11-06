@@ -14,7 +14,7 @@
     "labs/skins.html": "1.1.2",
     "labs/surface.html": "1.4.0",
     "labs/buildings.html": "1.4.0",
-    "labs/vehicles-land.html": "1.13.0",
+    "labs/vehicles-land.html": "1.14.0",
     "labs/sound.html": "1.2.0",
     "labs/creator.html": "1.4.0",
     "labs/life.html": "1.5.0",

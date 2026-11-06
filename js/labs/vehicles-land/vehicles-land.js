@@ -5,6 +5,9 @@
 // The train is another family (js/labs/vehicles-land/train.js).
 import { createDrive, driveDef } from "../../behaviors/land/drive.js";
 import { createCraft, craftDef } from "../../behaviors/water/craft.js";
+import { createTramSim, tramPoses, H as RAIL_H } from "../../behaviors/rail/tram.js";
+import { pathTrack } from "../../behaviors/rail/path.js";
+import { buildPathTrack } from "../../models/structures/railway/path-track.js";
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 (() => {
@@ -81,8 +84,20 @@ const state = { index: 0, auto: true, autoSpeed: 0.5, night: false, dust: true, 
 const drv = { x: 0, z: 0, yaw: 0, speed: 0 };
 let veh = null;
 // rovers and road vehicles drive by forces (js/behaviors/land/drive.js), the amphibian floats and drives by forces
-// (js/behaviors/water/craft.js); the tram and the aircraft still on VehicleKit.drive (wheel on rail, taxiing — later)
+// (js/behaviors/water/craft.js), the tram runs on a track loop with the wheel-on-rail physics (js/behaviors/rail/tram.js);
+// the aircraft still on VehicleKit.drive (taxiing — later)
 let sim = null;
+// the tram's track: a loop (two 160 m straights, two 60 m curves, ~700 m) laid on the ground; built once, shown with the tram.
+// Too fast into a curve and it derails (the physics: about 45 km/h on 60 m) — AUTO drives at most 30 km/h
+let tramTrack = null, tramRails = null;
+const TRAM_LOOP = (() => { const pts = [], R = 60, Lh = 80, n = 32;
+  for (let i = 0; i <= 10; i++) pts.push([-R, -Lh + 2 * Lh * i / 10]);
+  for (let i = 1; i <= n; i++) { const a = Math.PI * i / n; pts.push([-R * Math.cos(a), Lh + R * Math.sin(a)]); }
+  for (let i = 1; i <= 10; i++) pts.push([R, Lh - 2 * Lh * i / 10]);
+  for (let i = 1; i <= n; i++) { const a = Math.PI * i / n; pts.push([R * Math.cos(a), -Lh - R * Math.sin(a)]); }
+  return pts; })();
+const tramPose = [];
+let tramAcc = 0;
 const dust = VK.makeDust(0xc9a27c); scene.add(dust.points);
 // other model families (e.g. the train, js/labs/vehicles-land/train.js) show here instead
 // of a VehicleKit vehicle: { name, role, build(scene) → group, rows(), target, camera,
@@ -116,6 +131,14 @@ function load() {
   veh.kit = kit;
   sim = kit === "vk" || kit === "rk" ? createDrive(driveDef(def), { x: drv.x, z: drv.z, yaw: drv.yaw })
     : kit === "mk" ? createCraft(craftDef(def), { x: drv.x, z: drv.z, yaw: drv.yaw, y: groundAt(drv.x, drv.z) + 1.5 }) : null;
+  if (kit === "tram") {
+    // the track follows the ground as it is now (heights along the loop); the physics runs flat, the poses get the height
+    if (tramRails) { scene.remove(tramRails); tramRails.traverse((o) => { if (o.geometry) o.geometry.dispose(); }); }
+    tramTrack = pathTrack(TRAM_LOOP.map(([x, z]) => [x, z, groundAt(x, z)]), { step: 2, smooth: 2 });
+    tramRails = buildPathTrack(tramTrack, { sleepers: true }); scene.add(tramRails);
+    sim = createTramSim(tramTrack, def, 40); sim.ctrl.target = 0; tramAcc = 0;
+  }
+  if (tramRails) tramRails.visible = kit === "tram";
   if (sim) sim.kind = kit;
   scene.add(veh.group);
   $("hudTitle").textContent = def.name;
@@ -205,7 +228,20 @@ function frame() {
   }
   prev.set(drv.x, 0, drv.z);
   const yaw0 = drv.yaw;
-  if (sim) {
+  if (sim && sim.kind === "tram") {
+    // the tram: the driver's controller sets the wanted speed (the physics' traction controller follows it), S below 0 brakes;
+    // the wheels hold the rails by contact forces only (aTrain); steps of 1/2400 s, at most 140 a frame
+    const vmax = def.maxSpeed || 19.4;
+    sim.ctrl.target = Math.max(0, input.throttle) * (state.auto ? Math.min(vmax, 30 / 3.6) : vmax); sim.ctrl.brake = input.throttle < -0.1;
+    tramAcc += Math.min(dt, 1 / 20); let n = 0;
+    if (!sim.broken) while (tramAcc >= RAIL_H && n < 140) { sim.step(); tramAcc -= RAIL_H; n++; if (sim.broken) break; }
+    if (n >= 140) tramAcc = 0;
+    sim.events.length = 0;
+    tramPoses(sim, groundAt, tramPose, THREE);
+    const P = tramPose[0], fw = new THREE.Vector3(0, 0, 1).applyQuaternion(P.q);
+    drv.x = P.x; drv.z = P.z; drv.yaw = Math.atan2(fw.x, fw.z); drv.speed = sim.st.speed;
+    if (sim.broken || P.y - groundAt(P.x, P.z) < -0.2) $("role").textContent = "Derailed (too fast into the curve) — choose the tram again to put it back on the track.";
+  } else if (sim) {
     // forces: engine, brakes, tyres or tracks, slopes, and the land lab's water (drag and buoyancy stop a rover in it)
     if (sim.kind === "mk") sim.step(dt, input, { surface: world ? (x, z) => world.waterAt(x, z, t) : NO_WATER, floor: groundAt });   // the amphibian
     else sim.step(dt, input, { height: groundAt, water: world ? (x, z) => world.waterAt(x, z, t) : null });
@@ -215,7 +251,10 @@ function frame() {
   veh.group.position.set(drv.x, gy + (veh.def.rest ? veh.def.rest.y : 0), drv.z);
   veh.group.rotation.set(veh.def.rest ? veh.def.rest.pitch : 0, drv.yaw, 0, 'YXZ');   // samolot na ziemi: oparty na kole ogonowym
   const cy = Math.cos(drv.yaw), sy = Math.sin(drv.yaw);
-  if (veh.kit === "mk") {   // the amphibian: on its wheels on the ground (it would float where there is water)
+  if (veh.kit === "tram" && sim) {   // the tram: its sections where the physics puts them (on the track's rail heads)
+    veh.group.position.set(0, 0, 0); veh.group.rotation.set(0, 0, 0);
+    veh.update(t, dt, { speed: drv.speed, poses: tramPose, lights: state.night ? 1 : 0, work: state.work ? 1 : 0, brake: sim.ctrl.brake });
+  } else if (veh.kit === "mk") {   // the amphibian: on its wheels on the ground (it would float where there is water)
     veh.group.position.y = 0;
     const wx = (x, z) => drv.x + x * cy + z * sy, wz = (x, z) => drv.z - x * sy + z * cy, S = sim.state;
     veh.update(t, dt, { pose: { y: S.y, pitch: S.pitch, roll: S.roll, onLand: S.onLand }, speed: drv.speed, steer: input.steer, surface: world ? (x, z) => world.waterAt(wx(x, z), wz(x, z), t) : NO_WATER,
