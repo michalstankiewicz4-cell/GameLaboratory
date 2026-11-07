@@ -6,7 +6,7 @@
 // Kosmos (rodzina space): ShipKit ze Space, ładowany dopiero, gdy scena go potrzebuje (js/scene/space.js) — wpis ma
 // needs: 'space', a build() działa po loadSpace(). Jednostka ShipKit = 1 m (Codewing 12 m); dziób obrócony na +Z.
 // tick(t, dt) — ruch części na postoju (światła, płomienie silników); w grze zamiast niego zachowanie.
-// Pozostałe kity ze Space (BaseKit, VehicleKit, MarineKit) jeszcze nie.
+// Rośliny (PlantKit) i jaskinia (CaveKit) — modele z laboratoriów roślin i jaskiń. BaseKit jeszcze nie.
 import '../core/three-window.js';                         // TrainKit czyta window.THREE przy załadowaniu
 import { SHIPS, buildShip } from '../models/ships-sea/index.js';
 import { VEHICLE_IDS, vehicleInfo, buildVehicle as buildRoad } from '../models/road/roadkit.js';
@@ -15,6 +15,9 @@ import { AIRCRAFT_IDS, aircraftInfo, buildAircraft } from '../models/air/airkit.
 import { WEAPON_IDS, weaponInfo, buildWeapon } from '../models/weapons/weaponkit.js';
 import { STRUCTURE_IDS, structureInfo, buildStructure } from '../models/structures/index.js';
 import { BODIES, DEFAULT_TRAIN, buildVehicle as buildRail } from '../models/train/trainkit.js';
+import * as THREE from '../../vendor/three/three.module.js';
+import { SPECIES, SPECIES_IDS, growPlant, plantMaterials, windUniforms } from '../models/plants/plantkit.js';
+import { buildCave } from '../models/caves/cavekit.js';
 
 // family: grupa na liście; surface: gdzie stoi ('sea' — na wodzie, 'land' — na gruncie, 'air' — w powietrzu)
 export const FAMILIES = {
@@ -27,6 +30,8 @@ export const FAMILIES = {
   space: { label: 'Spacecraft', labelPl: 'Statki kosmiczne' },
   marine: { label: 'Sea robots', labelPl: 'Roboty morskie' },
   rovers: { label: 'Rovers', labelPl: 'Łaziki' },
+  plants: { label: 'Plants', labelPl: 'Rośliny' },
+  caves: { label: 'Caves', labelPl: 'Jaskinie' },
 };
 
 const P = [];
@@ -40,6 +45,23 @@ DEFAULT_TRAIN.forEach((c) => add('train/' + c.body, BODIES[c.body].name, 'rail',
 AIRCRAFT_IDS.forEach((id) => add('air/' + id, aircraftInfo(id).name, 'air', 'air', 'labs/vehicles-land.html', () => g(buildAircraft(id, {}))));
 STRUCTURE_IDS.forEach((id) => add('structures/' + id, structureInfo(id).name, 'structures', id === 'super300' ? 'sea' : 'land', 'labs/structures.html', () => g(buildStructure(id, { detail: 1 }))));
 WEAPON_IDS.forEach((id) => add('weapons/' + id, weaponInfo(id).name, 'weapons', 'land', 'labs/human.html', () => g(buildWeapon(id, {}))));
+
+// rośliny (PlantKit): jedna roślina gatunku (ziarno 1, wielkość 1 — jak w laboratorium roślin na starcie), z wiatrem
+// w shaderze (tick przesuwa czas wiatru); podstawa w punkcie obiektu
+function buildPlant(id) {
+  const wind = windUniforms(), pl = growPlant(id, { seed: 1, size: 1, detail: 1 }), mats = plantMaterials(id, wind);
+  const root = new THREE.Group();
+  for (const [geo, m, dm] of [[pl.bark, mats.bark, mats.barkDepth], [pl.leaf, mats.leaf, mats.leafDepth]]) {
+    if (!geo) continue;
+    const mesh = new THREE.Mesh(geo, m); mesh.customDepthMaterial = dm; mesh.castShadow = mesh.receiveShadow = true; root.add(mesh);
+  }
+  return { root, kit: pl, tick: (t) => { wind.uTime.value = t; },
+    dispose: () => { for (const x of [pl.bark, pl.leaf]) if (x) x.dispose(); for (const m of Object.values(mats)) { if (m.map) m.map.dispose(); m.dispose(); } } };
+}
+SPECIES_IDS.forEach((id) => add('plants/' + id, SPECIES[id].name, 'plants', 'land', 'labs/plants.html', () => buildPlant(id)));
+// jaskinia (CaveKit) z ustawień domyślnych laboratorium jaskiń (CAVE_DEFAULTS): korytarze, komory, nacieki, jeziorka;
+// budowa trwa (pole odległości, ok. sekundy)
+add('caves/cave', 'Cave', 'caves', 'land', 'labs/caves.html', () => { const c = buildCave({}); return { root: c.group, kit: c, dispose: () => c.dispose() }; });
 
 // statki kosmiczne, dron i stacja (ShipKit); nazwy jak w ShipKit (SHIP_DEFS), żeby lista była bez ładowania kitu
 const SPACE = [['codewing', 'SP-01 Codewing'], ['scribe', 'DR-01 Scribe (drone)'], ['swarmer', 'SW-01 Swarmer'], ['haven', 'ST-04 Haven (station)']];

@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.43.0 · edytor sceny 0.14.0 — 2026-11-07 (prefabrykaty: rośliny i jaskinie)
+
+### Dodane
+- **Prefabrykaty roślin i jaskiń** (`js/scene/prefabs.js`, punkt 5 planu rozbioru): rodzina „Rośliny” — każdy gatunek
+  PlantKit (`plants/<gatunek>`, jedna roślina: ziarno 1, wielkość 1, wiatr w shaderze przesuwany przez `tick`) i rodzina
+  „Jaskinie” — `caves/cave`, jaskinia CaveKit z ustawień domyślnych laboratorium jaskiń. Do postawienia w edytorze
+  i przez API (`add`).
+
 ## Program 0.42.2 · pojazdy (ląd) 1.16.0 · pojazdy (kosmos) 1.8.0 — 2026-11-07 (wspólna scena bazowa w pojazdach · ląd i kosmos)
 
 ### Zmienione

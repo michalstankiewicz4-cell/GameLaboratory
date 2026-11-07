@@ -3,6 +3,19 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.14.0 — 2026-11-07 (rośliny i jaskinie)
+
+### Dodane
+- Rodzina **Rośliny** (8 gatunków z laboratorium roślin: świerk, sosna, brzoza, dąb, palma daktylowa, akacja,
+  jałowiec, łoboda) — jedna roślina gatunku, z wiatrem w liściach; rodzina **Jaskinie** (jaskinia z ustawień
+  domyślnych laboratorium jaskiń: korytarze, komory, nacieki, jeziorka).
+
+## 0.13.0 — 2026-11-06 (morze zna teren)
+
+### Zmienione
+- Morze przy terenie z laboratorium lądu zna teren: płycizny, przybój, barwy i prądy wód, lód, olej, boje na granicy
+  mapy (wspólna scena bazowa, jak w laboratorium lądu).
+
 ## 0.12.0 — 2026-11-06 (łaziki)
 
 ### Dodane

@@ -111,4 +111,5 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
    zamiast gradientu, wygląd do dopracowania. Pojazdy · ląd i kosmos: 0.42.2 — punkt zrobiony; wygląd do
    dopracowania)*
 5. **Reszta prefabrykatów:** moduły baz, rośliny, jaskinie, ciała niebieskie, ludzie i stwory (z chodem).
+   *(rośliny i jaskinie: 0.43.0)*
 6. **Kosmos dalej:** orbity (układy), powierzchnia planety, akcje statków jako zdarzenia.

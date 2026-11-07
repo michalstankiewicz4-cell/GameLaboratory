@@ -46,8 +46,11 @@ Wpis: `{ id, label, family, surface, lab, build() → { root, kit, dispose } }`.
 - `lab`: laboratorium, w którym model się robi („Otwórz w laboratorium”).
 - `build()`: `root` — grupa Three.js; `kit` — obiekt zwrócony przez kit (wymiary, linie kadłuba, `update` ruchomych
   części), z niego korzystają zachowania; `dispose` — zwolnienie geometrii.
-- Nowy model: wpis tutaj (jedna linia na kit); kity ze Space (ShipKit, BaseKit, VehicleKit, MarineKit) jeszcze nie, bo
-  potrzebują `js/core/three-global.js`.
+- Rośliny: `plants/<gatunek>` (PlantKit, `SPECIES`) — jedna roślina gatunku (ziarno 1, wielkość 1), `tick` przesuwa czas
+  wiatru; jaskinia: `caves/cave` (CaveKit, `CAVE_DEFAULTS`; budowa ok. sekundy; ściany patrzą do środka — z zewnątrz
+  widać wnętrze).
+- Nowy model: wpis tutaj (jedna linia na kit); kity ze Space (ShipKit, VehicleKit, MarineKit) ładuje `space.js`; BaseKit
+  jeszcze nie.
 
 ## Zachowania w scenie (`behaviors.js`)
 
