@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.15.0 — 2026-11-07 (moduły bazy)
+
+### Dodane
+- Rodzina **Moduły bazy** (BaseKit z laboratorium budynków): lądowisko, habitat, panele słoneczne, kopalnia, rafineria,
+  magazyn — gotowe, z pracującymi światłami i wiertłem; ładowane z kitami ze Space przy pierwszej potrzebie.
+
 ## 0.14.0 — 2026-11-07 (rośliny i jaskinie)
 
 ### Dodane

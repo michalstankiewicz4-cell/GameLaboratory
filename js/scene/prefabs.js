@@ -6,7 +6,7 @@
 // Kosmos (rodzina space): ShipKit ze Space, ładowany dopiero, gdy scena go potrzebuje (js/scene/space.js) — wpis ma
 // needs: 'space', a build() działa po loadSpace(). Jednostka ShipKit = 1 m (Codewing 12 m); dziób obrócony na +Z.
 // tick(t, dt) — ruch części na postoju (światła, płomienie silników); w grze zamiast niego zachowanie.
-// Rośliny (PlantKit) i jaskinia (CaveKit) — modele z laboratoriów roślin i jaskiń. BaseKit jeszcze nie.
+// Rośliny (PlantKit) i jaskinia (CaveKit) — modele z laboratoriów roślin i jaskiń; moduły bazy (BaseKit) — przez space.js.
 import '../core/three-window.js';                         // TrainKit czyta window.THREE przy załadowaniu
 import { SHIPS, buildShip } from '../models/ships-sea/index.js';
 import { VEHICLE_IDS, vehicleInfo, buildVehicle as buildRoad } from '../models/road/roadkit.js';
@@ -32,6 +32,7 @@ export const FAMILIES = {
   rovers: { label: 'Rovers', labelPl: 'Łaziki' },
   plants: { label: 'Plants', labelPl: 'Rośliny' },
   caves: { label: 'Caves', labelPl: 'Jaskinie' },
+  base: { label: 'Base modules', labelPl: 'Moduły bazy' },
 };
 
 const P = [];
@@ -88,6 +89,15 @@ function buildRover(id) {
   return { root: v.group, kit: v, dispose: () => VK.disposeVehicle(v) };
 }
 ROVERS.forEach(([id, name]) => add('rovers/' + id, name, 'rovers', 'land', 'labs/vehicles-land.html', () => buildRover(id), { needs: 'space' }));
+// moduły bazy planetarnej (BaseKit ze Space, ładowany jak ShipKit): gotowe (budowa 1), bez hologramu; tick — światła,
+// wiertło i obracające się części; nazwy jak w BaseKit.MODULES
+const BASE = [['pad', 'Landing pad'], ['hab', 'Habitat'], ['solar', 'Solar array'], ['drill', 'Mine'], ['refinery', 'Refinery'], ['depot', 'Depot']];
+function buildBase(id) {
+  const BK = window.BaseKit; if (!BK) throw new Error('BaseKit is not loaded (js/scene/space.js loadSpace())');
+  const m = BK.buildModule(id, { detail: 1 }); m.setProgress(1);
+  return { root: m.group, kit: m, dispose: () => BK.disposeModule(m), tick: (t, dt) => m.update(t, dt) };
+}
+BASE.forEach(([id, name]) => add('base/' + id, name, 'base', 'land', 'labs/buildings.html', () => buildBase(id), { needs: 'space' }));
 
 export const PREFABS = P;
 export const prefab = (id) => P.find((p) => p.id === id) || null;

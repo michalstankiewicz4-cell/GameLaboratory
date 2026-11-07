@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.44.0 · edytor sceny 0.15.0 — 2026-11-07 (prefabrykaty: moduły bazy)
+
+### Dodane
+- **Prefabrykaty modułów bazy** (`base/<moduł>`, BaseKit): lądowisko, habitat, panele słoneczne, kopalnia, rafineria,
+  magazyn — gotowe (budowa 1), `tick` porusza światła i części. BaseKit ładuje się z kitami ze Space (`js/scene/space.js`).
+
 ## Program 0.43.0 · edytor sceny 0.14.0 — 2026-11-07 (prefabrykaty: rośliny i jaskinie)
 
 ### Dodane

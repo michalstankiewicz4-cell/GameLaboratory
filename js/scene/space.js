@@ -14,6 +14,7 @@ export function loadSpace() {
     for (const f of SHIP_FILES) await import(`../models/ships-space/ships/${f}.js`);
     await import('../models/marine/marinekit.js');   // roboty morskie (ślizgacz, barka, nurek, amfibia) — też globalne THREE
     await import('../models/vehicles/vehiclekit.js'); // łaziki (zwiadowca, transporter, gąsienicowy, budowniczy)
+    await import('../models/base/basekit.js');        // moduły bazy planetarnej (lądowisko, habitat, panele, kopalnia…)
     await import('../models/bodies/bodykit.js');
     await import('../models/bodies/kinds/sky.js');
     await import('../envs/space/systemkit/systemkit.js');

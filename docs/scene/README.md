@@ -49,8 +49,9 @@ Wpis: `{ id, label, family, surface, lab, build() → { root, kit, dispose } }`.
 - Rośliny: `plants/<gatunek>` (PlantKit, `SPECIES`) — jedna roślina gatunku (ziarno 1, wielkość 1), `tick` przesuwa czas
   wiatru; jaskinia: `caves/cave` (CaveKit, `CAVE_DEFAULTS`; budowa ok. sekundy; ściany patrzą do środka — z zewnątrz
   widać wnętrze).
-- Nowy model: wpis tutaj (jedna linia na kit); kity ze Space (ShipKit, VehicleKit, MarineKit) ładuje `space.js`; BaseKit
-  jeszcze nie.
+- Nowy model: wpis tutaj (jedna linia na kit); kity ze Space (ShipKit, VehicleKit, MarineKit, BaseKit) ładuje `space.js`.
+- Moduły bazy: `base/<moduł>` (BaseKit, `MODULES`: `pad`, `hab`, `solar`, `drill`, `refinery`, `depot`) — gotowe
+  (`setProgress(1)`), `tick` — światła i ruchome części.
 
 ## Zachowania w scenie (`behaviors.js`)
 
@@ -110,7 +111,7 @@ Kity ze Space (ShipKit, BodyKit z niebem, SystemKit z gotowymi tłami) są pisan
 dopiero, gdy scena ich potrzebuje: `loadSpace()` importuje `js/core/three-global.js`, potem kity po kolei;
 `spaceReady()` mówi, czy są. Prefabrykat z `needs: 'space'` czeka na nie (edytor: karta ładowania), powierzchnia
 `space` tak samo. Gotowe tła: `skyPresets()` (z `SystemKit.SKIES`); w `env.sky` z przedrostkiem `preset:`.
-MarineKit (roboty morskie, rodzina `marine`) i VehicleKit (łaziki, rodzina `rovers`) ładują się razem z kitami ze Space. Statki ShipKit: jednostka = 1 m, dziób obrócony na +Z (`makeGameHolder` w skali 1); `tick(t, dt)` — światła
+MarineKit (roboty morskie, rodzina `marine`), VehicleKit (łaziki, rodzina `rovers`) i BaseKit (moduły bazy, rodzina `base`) ładują się razem z kitami ze Space. Statki ShipKit: jednostka = 1 m, dziób obrócony na +Z (`makeGameHolder` w skali 1); `tick(t, dt)` — światła
 i silniki na postoju. Liczby ruchu (`SPACE_NUMBERS` w `behaviors.js`) są założone.
 
 ## Scena bazowa laboratoriów (`js/labs/shared/stage.js`)
