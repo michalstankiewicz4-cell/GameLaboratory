@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.16.0 — 2026-11-07 (dodawanie modelu: zakładki z ikonkami)
+
+### Zmienione
+- **Dodawanie modelu** w oknie Scena: zamiast jednej długiej listy — zakładki kategorii z ikonkami (podpowiedź: nazwa
+  kategorii i liczba modeli), pod nimi modele kategorii, każdy z przyciskiem + (albo dwuklik).
+
 ## 0.15.0 — 2026-11-07 (moduły bazy)
 
 ### Dodane

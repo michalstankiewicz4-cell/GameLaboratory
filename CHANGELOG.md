@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Edytor sceny 0.16.0 — 2026-11-07 (dodawanie modelu: zakładki z ikonkami)
+
+### Zmienione
+- Edytor sceny: dodawanie modelu przez zakładki kategorii z ikonkami i podpowiedzią, pod nimi modele z przyciskiem +.
+- Plan rozbioru (`docs/guides/lab-breakdown.md`): punkt 7 — lekarz sceny.
+
 ## Program 0.44.0 · edytor sceny 0.15.0 — 2026-11-07 (prefabrykaty: moduły bazy)
 
 ### Dodane

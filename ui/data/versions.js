@@ -30,7 +30,7 @@
     "labs/transform.html": "1.3.0",
     "tools/kitcheck.html": "1.0.6",
     "labs/filters.html": "0.6.0",
-    "editor/index.html": "0.15.0",
+    "editor/index.html": "0.16.0",
     "labs/vehicles-water.html": "1.6.0",
     "labs/morgue.html": "1.1.0",
     "labs/walkers.html": "0.23.5",

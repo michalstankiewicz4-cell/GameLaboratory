@@ -12,6 +12,27 @@ const { t, lang } = window.EditorI18n;
 const familyName = (f) => (lang === 'pl' ? FAMILIES[f].labelPl : FAMILIES[f].label);
 const lightName = (id) => (LIGHTS[id] ? t('light.' + id) : id || t('light.afternoon'));   // gotowe albo nazwa zasobu „weather”
 
+// ikonki rodzin (SVG 24×24, linia w kolorze tekstu) dla zakładek dodawania modelu
+const ICONS = {
+  sea: 'M3 15h18l-3 4H6zM6 15V11h9l2 4M9 11V7h3v4M16 9v2',
+  road: 'M3 15v-3l2-4h10l3 4h3v3zM7 18a1.5 1.5 0 1 0 0-3a1.5 1.5 0 1 0 0 3M17 18a1.5 1.5 0 1 0 0-3a1.5 1.5 0 1 0 0 3M6 12h12',
+  rail: 'M6 4h12v12H6zM6 10h12M9 16l-2 4M15 16l2 4M10 2h4',
+  air: 'M12 3v18M3 12l9-2l9 2M8 20h8M12 3l1 3h-2z',
+  structures: 'M4 21V9l8-5l8 5v12M9 21v-6h6v6M4 21h16',
+  weapons: 'M12 3v4M12 17v4M3 12h4M17 12h4M12 16a4 4 0 1 0 0-8a4 4 0 1 0 0 8',
+  space: 'M12 2c3 3 4 7 3 12H9C8 9 9 5 12 2zM9 14l-3 4h3M15 14l3 4h-3M11 18h2v3h-2z',
+  marine: 'M3 13c2-3 6-4 10-4h3l4 3l-4 3h-3c-4 0-8-1-10-2zM13 9V6h3M8 18c1 1 2 1 3 0s2-1 3 0',
+  rovers: 'M4 14h16v-4H4zM7 10V7h6v3M6 19a2 2 0 1 0 0-4a2 2 0 1 0 0 4M12 19a2 2 0 1 0 0-4a2 2 0 1 0 0 4M18 19a2 2 0 1 0 0-4a2 2 0 1 0 0 4',
+  plants: 'M12 21v-7M12 14l-6 0l6-11l6 11zM8 21h8',
+  caves: 'M3 20c0-9 4-15 9-15s9 6 9 15zM9 20c0-4 1-7 3-7s3 3 3 7',
+  base: 'M3 18h18M5 18a7 7 0 0 1 14 0M12 11v-4M10 7h4',
+};
+function familyIcon(f) {
+  const NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg'), path = document.createElementNS(NS, 'path');
+  svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('aria-hidden', 'true');
+  path.setAttribute('d', ICONS[f] || 'M4 4h16v16H4z'); svg.append(path); return svg;
+}
+
 // lista modeli pogrupowana rodzinami
 export function fillPrefabs(select) {
   select.replaceChildren();
@@ -22,7 +43,25 @@ export function fillPrefabs(select) {
 }
 
 export function createPanels(store, actions) {
-  fillPrefabs($('addPrefab')); fillPrefabs($('oPrefab'));
+  fillPrefabs($('oPrefab'));
+
+  // dodawanie modelu: zakładki kategorii (rodzin) z ikonkami i podpowiedzią, pod nimi modele kategorii, każdy z +
+  let fam = Object.keys(FAMILIES).find((f) => PREFABS.some((p) => p.family === f));
+  function renderPick() {
+    $('pickFam').replaceChildren(...Object.keys(FAMILIES).filter((f) => PREFABS.some((p) => p.family === f)).map((f) => {
+      const n = PREFABS.filter((p) => p.family === f).length;
+      const b = el('button', { type: 'button', className: 'pickTab' + (f === fam ? ' on' : ''), title: `${familyName(f)} (${n})` }, familyIcon(f));
+      b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', f === fam ? 'true' : 'false'); b.setAttribute('aria-label', familyName(f));
+      b.addEventListener('click', () => { fam = f; renderPick(); }); return b;
+    }));
+    $('pickList').replaceChildren(el('li', { className: 'pickHead', textContent: familyName(fam) }), ...PREFABS.filter((p) => p.family === fam).map((p) => {
+      const add = el('button', { type: 'button', className: 'pickAdd', textContent: '+', title: t('tree.addOne', { name: p.label }) });
+      add.addEventListener('click', () => actions.add(p.id));
+      const li = el('li', { className: 'pickItem', title: p.label }, el('span', { className: 'pName', textContent: p.label }), add);
+      li.addEventListener('dblclick', () => actions.add(p.id)); return li;
+    }));
+  }
+  renderPick();
 
   function renderTree() {
     const ul = $('tree'), S = store.scene; ul.replaceChildren();
@@ -115,7 +154,6 @@ export function createPanels(store, actions) {
   $('toGround').addEventListener('click', () => { const o = store.selected; if (o) store.update(o.id, { pos: [o.pos[0], +actions.groundAt(o.pos[0], o.pos[2]).toFixed(2), o.pos[2]] }); });   // teren z laboratorium lądu albo 0
   $('dupBtn').addEventListener('click', actions.duplicate);
   $('delBtn').addEventListener('click', actions.remove);
-  $('addBtn').addEventListener('click', () => actions.add($('addPrefab').value));
 
   return { renderTree, renderProps };
 }

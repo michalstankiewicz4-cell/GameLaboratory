@@ -5,7 +5,7 @@ Strona: `editor/index.html` · wersja: `ui/data/versions.js` (klucz `editor/inde
 · silnik sceny: [`docs/scene/README.md`](../docs/scene/README.md) · zachowania: [`docs/behaviors/README.md`](../docs/behaviors/README.md).
 
 Scena złożona z modeli laboratoriów: okręty, samochody, czołg, autobus, tramwaj, pociąg, samolot, budowle, broń —
-na morzu albo na lądzie. Model dodaje się z listy, przesuwa, obraca i skaluje uchwytem albo liczbami, a zamienia
+na morzu albo na lądzie. Model dodaje się w oknie Scena: po lewej kategoria, po prawej modele kategorii — przycisk + (albo dwuklik) stawia model w scenie; przesuwa, obraca i skaluje uchwytem albo liczbami, a zamienia
 na inny jednym wyborem z listy. Środowisko: powierzchnia (morze / ląd), morze (zasób z laboratorium wody), światło (pora dnia i pogoda z laboratoriów
 wodnych) i wygląd kamery (profil z laboratorium filtrów). Szczegóły modelu robi się w jego laboratorium:
 „Otwórz w laboratorium” we Właściwościach. Edytor jest pierwszym krokiem do silnika: laboratoria będą się do niego

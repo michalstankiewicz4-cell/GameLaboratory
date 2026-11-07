@@ -113,3 +113,8 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
 5. **Reszta prefabrykatów:** moduły baz, rośliny, jaskinie, ciała niebieskie, ludzie i stwory (z chodem).
    *(rośliny i jaskinie: 0.43.0; moduły bazy: 0.44.0)*
 6. **Kosmos dalej:** orbity (układy), powierzchnia planety, akcje statków jako zdarzenia.
+7. **Lekarz sceny** (na końcu, gdy są prefabrykaty i zachowania): sprawdza układ sceny, czego nie widać w pojedynczym
+   modelu — obiekt w złym środowisku (drzewo na morzu, okręt na lądzie, łazik w kosmosie), pod gruntem albo
+   w powietrzu, obiekty wchodzące jeden w drugi, brakujące zasoby z nazwą, zachowanie niepasujące do modelu albo
+   środowiska, koszt sceny (trójkąty, wywołania rysowania) względem budżetu. Jak doktor modeli: uniwersalny, zgłasza
+   i proponuje poprawki, niczego nie przestawia po cichu; w API polecenie `check` (lista problemów dla AI).

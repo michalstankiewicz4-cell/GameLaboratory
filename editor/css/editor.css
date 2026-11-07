@@ -24,3 +24,15 @@
 .apiCmd{font:11.5px var(--mono);color:var(--accent);cursor:pointer;white-space:pre-wrap;word-break:break-word}
 .apiItem.bad .apiCmd{color:var(--err)}
 .apiRes{margin:2px 0 0;font:11px/1.4 var(--mono);color:var(--text);white-space:pre-wrap;word-break:break-word;max-height:220px;overflow:auto}
+/* dodawanie modelu (Scena): zakładki kategorii z ikonkami (podpowiedź z nazwą), pod nimi modele z przyciskiem + */
+.pick{margin-bottom:10px}
+.pickFam{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px}
+.pickTab{width:30px;height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+.pickTab svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.pickTab.on{border-color:var(--accent);color:var(--accent)}
+.pickList{list-style:none;margin:0;padding:3px;max-height:230px;overflow:auto;border:1px solid var(--line);border-radius:7px;background:var(--field)}
+.pickHead{padding:3px 7px 4px;font-size:11.5px;color:var(--accent);letter-spacing:.04em}
+.pickItem{display:flex;align-items:center;gap:6px;padding:4px 7px;border:1px solid transparent;border-radius:6px;font-size:12.5px;color:var(--text)}
+.pickItem:hover{border-color:var(--line)}
+.pickItem .pName{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--head)}
+.pickAdd{flex:none;width:22px;height:22px;padding:0;line-height:1;font-size:15px}
