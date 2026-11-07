@@ -71,6 +71,7 @@ Wpis: `{ id, label, family, surface, lab, build() → { root, kit, dispose } }`.
 | `drive` | `road/*`, `rovers/*` | „jazda po lądzie” (`js/behaviors/land/drive.js`), grunt i woda ze sceny bazowej | `throttle` −1…1 (pedał), `rudder` (skręt) |
 | `thrust` | `space/codewing`, `space/scribe`, `space/swarmer` | „ciąg w próżni” (`js/behaviors/space/thrust.js`) | `throttle` −1…1, `elevator` (pochylenie), `aileron` (kurs), `rudder` (przechył) |
 | `lander` | `space/codewing`, `space/scribe`, `space/swarmer` | „lądowanie” (`js/behaviors/land/lander.js`): grawitacja i powietrze ze sceny bazowej (`gravity`, `airDensity` — z planety) | `lift` (spacja), `throttle`, `elevator`, `aileron`, `rudder` |
+| `construct` | `base/*` | „budowa”: moduł rośnie od gruntu przez czas budowy BaseKit (`MODULES[].build`, `setProgress`) | — |
 | `orbit` | `bodies/*` | „orbita” (`js/behaviors/space/orbit.js`): środek `orbit.around` (id) albo najbliższe cięższe ciało (`bodyRank`: czarna dziura 4, słońce i pulsar 3, olbrzym i pierścienie 2, planeta 1, księżyc, planetoida, kometa 0), okres `orbit.period` (s, domyślnie 60) | — (ciało krąży samo) |
 | `flight` | `air/*` | „lot w atmosferze” (`js/behaviors/air/flight.js`), krok fizyki 1/240 s, grunt na wysokości 0 | `throttle` 0…1, `elevator`, `aileron`, `rudder`, `brake`, `gear`, `flaps` |
 

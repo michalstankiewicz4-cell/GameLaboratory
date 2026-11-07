@@ -16,6 +16,7 @@ export function readProfiles() { return Object.fromEntries(listAssets('look').ma
 
 export function createWorld(container, store, onWarn) {
   const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
+  renderer.localClippingEnabled = true;   // budowa modułów bazy (BaseKit setProgress: płaszczyzna odcięcia)
   renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
   container.append(renderer.domElement);

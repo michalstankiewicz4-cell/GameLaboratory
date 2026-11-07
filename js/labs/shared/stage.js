@@ -88,7 +88,8 @@ export function createStage(renderer, scene, opts = {}) {
     // Niebo osobno (setSkyMode); bez drugiego argumentu kosmos dostaje niebo kosmosu, morze i ląd — dzienne
     setSurface(kind, groundY = 0) {
       surfaceKind = kind;
-      water.visible = kind === 'sea' || (kind === 'land' && !!land && !land.T.noSea);   // planeta bez mórz: bez wody wokół wycinka ground.visible = kind === 'land' && !land; ground.position.y = groundY;
+      water.visible = kind === 'sea' || (kind === 'land' && !!land && !land.T.noSea);   // planeta bez mórz: bez wody wokół wycinka
+      ground.visible = kind === 'land' && !land; ground.position.y = groundY;
       if (land) { land.tm.group.visible = kind === 'land'; if (land.buoys) land.buoys.visible = kind === 'land'; }
     },
     setSkyMode(mode) {
@@ -140,6 +141,7 @@ export function createStage(renderer, scene, opts = {}) {
     get terrain() { return land ? land.tm : null; },
     // prawa lądu: grawitacja [m/s²] i gęstość powietrza [kg/m³] — z planety (ląd z planety) albo ziemskie
     get gravity() { return land && land.T.gravity != null ? land.T.gravity : 9.81; },
+    get lava() { return WU.uLava.value > 0; },   // morze lawy (planeta lawowa)
     get airDensity() { return land && land.T.air != null ? land.T.air : 1.225; },
     get airless() { return !!(land && land.T.atmo && land.T.atmo.airless); },   // ląd z planety bez atmosfery: strona daje niebo kosmosu   // siatki terenu LandKit (trójkąty, update)
     // wysokość gruntu albo poziomu morza (samolot: koła, zderzenie z ziemią)

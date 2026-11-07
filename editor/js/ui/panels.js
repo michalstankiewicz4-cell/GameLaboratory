@@ -58,11 +58,13 @@ export function createPanels(store, actions) {
       b.addEventListener('click', () => { fam = f; renderPick(); }); return b;
     }));
     $('pickList').replaceChildren(el('li', { className: 'pickHead', textContent: familyName(fam) }), ...PREFABS.filter((p) => p.family === fam).map((p) => {
-      const add = el('button', { type: 'button', className: 'pickAdd', textContent: '+', title: t('tree.addOne', { name: p.label }) });
-      add.addEventListener('click', () => actions.add(p.id));
+      // moduły bazy: + to budowa — hologram pod kursorem, kliknięcie stawia (editor/js/world/placer.js)
+      const base = p.family === 'base';
+      const add = el('button', { type: 'button', className: 'pickAdd', textContent: '+', title: base ? t('tree.placeOne', { name: p.label }) : t('tree.addOne', { name: p.label }) });
+      add.addEventListener('click', () => (base ? actions.place(p.id) : actions.add(p.id)));
       const li = el('li', { className: 'pickItem', title: p.label }, el('span', { className: 'pName', textContent: p.label }), add);
       li.addEventListener('mousedown', (e) => { if (e.detail > 1) e.preventDefault(); });   // dwuklik nie zaznacza tekstu
-      li.addEventListener('dblclick', () => actions.add(p.id)); return li;
+      li.addEventListener('dblclick', () => (base ? actions.place(p.id) : actions.add(p.id))); return li;
     }));
   }
   renderPick();

@@ -191,6 +191,24 @@ export const BEHAVIORS = {
       };
     },
   },
+  construct: {
+    label: 'Construction', labelPl: 'Budowa', env: 'land', throttle: [0, 0],
+    fits: (prefabId) => prefabId.startsWith('base/'),
+    keys: 'the module builds itself (BaseKit build time)', keysPl: 'moduł buduje się sam (czas budowy z BaseKit)',
+    // moduł bazy rośnie od gruntu przez czas budowy (BaseKit MODULES[].build, s): bryła odcięta płaszczyzną, hologram
+    // reszty, świecący pierścień na froncie prac; po zatrzymaniu gry — gotowy
+    create(obj, built) {
+      const m = built.kit, BK = window.BaseKit; if (!m || !m.setProgress || !BK) return null;
+      const T = (BK.MODULES.find((d) => 'base/' + d.id === obj.prefab) || {}).build || 60;
+      let p = 0, tAcc = 0; m.setProgress(0);
+      return {
+        state: {},
+        step(dt) { p = Math.min(1, p + dt / T); m.setProgress(p); tAcc += dt; m.update(tAcc, dt); },
+        hud: () => ({ speed: 0, unit: '', throttle: 0, progress: p }),
+        reset() { m.setProgress(1); },
+      };
+    },
+  },
   orbit: {
     label: 'Orbit', labelPl: 'Orbita', env: 'space', throttle: [0, 0],
     fits: (prefabId) => prefabId.startsWith('bodies/'),

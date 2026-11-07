@@ -3,6 +3,23 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.53.0 · edytor sceny 0.22.0 — 2026-11-07 (budowa bazy)
+
+### Dodane
+- **Budowa bazy w edytorze sceny** (`editor/js/world/placer.js`, punkt 6 planu rozbioru): w zakładce Moduły bazy +
+  (albo dwuklik) nie stawia modułu na środku, tylko daje hologram pod kursorem — turkusowy, gdy moduł pasuje,
+  czerwony, gdy nie (linia stanu mówi dlaczego): za stromo (`maxSlope` modułu), na wodzie albo lawie (moduł „wet” może
+  stać na płyciźnie do 1,5 m), za blisko innego modułu (obrysy `footprint`), poza lądem. Kliknięcie stawia moduł
+  i zostaje się w budowie (następny obok), R obraca o 45°, Esc albo prawy przycisk kończy. Zasady jak w laboratorium
+  powierzchni.
+- **Zachowanie „budowa”** (moduły bazy, domyślne): w grze (▶) moduł rośnie od gruntu przez czas budowy z BaseKit
+  (40–150 s) — bryła odcinana płaszczyzną, hologram reszty, świecący pierścień; linia stanu: ile zbudowano. Po
+  zatrzymaniu gry — gotowy.
+
+### Poprawione
+- Scena bazowa: zwykły grunt (powierzchnia ląd bez terenu z laboratorium) znów widoczny — od 0.50.0 jego linia była
+  przez pomyłkę w komentarzu i zamiast gruntu było widać pustkę pod niebem.
+
 ## Program 0.52.0 · pojazdy (ląd) 1.17.0 · edytor sceny 0.21.0 — 2026-11-07 (lądowanie)
 
 ### Dodane

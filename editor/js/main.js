@@ -3,6 +3,7 @@
 import { createStore } from './core/store.js';
 import { createWorld, LIGHTS } from './world/world.js';
 import { createControls } from './world/controls.js';
+import { createPlacer } from './world/placer.js';
 import { createPanels } from './ui/panels.js';
 import { createToolbar } from './ui/toolbar.js';
 import { createPlay } from './play/play.js';
@@ -49,6 +50,12 @@ function build(fn) {
 const actions = {
   status, build,
   groundAt: (x, z) => world.stage.groundAt(x, z),
+  // budowa bazy: moduł bazy jako hologram pod kursorem (editor/js/world/placer.js); najpierw kity ze Space
+  place(id) {
+    const p = prefab(id); if (!p) return;
+    if (spaceReady()) placer.start(p);
+    else window.LabLoad.run(t('load.space'), async (st) => { await st(t('load.space'), 0.1); await loadSpace(); placer.start(p); });
+  },
   add(id) {
     const p = prefab(id); if (!p) return;
     const tg = controls.orbit.target;
@@ -66,6 +73,7 @@ const actions = {
 };
 // szyna zdarzeń (js/core/events.js): akcje statków w grze i z API; każde zdarzenie także do dziennika konsoli
 const events = createEvents({ log: (name, d) => window.LabLog && window.LabLog.add('info', `Event ${name}: ${d.name || d.object || ''}${d.action ? ' — ' + d.action + (d.on != null ? (d.on ? ' on' : ' off') : '') : ''}`) });
+const placer = createPlacer(world, store, actions, { t });
 actions.play = createPlay(store, world, controls, actions, events);
 const panels = createPanels(store, actions);
 // modele, które czekały na kity ze Space, są już zbudowane: uchwyt, hierarchia i okna od nowa
@@ -94,7 +102,7 @@ onAssetsChange(() => { panels.renderProps(); world.syncEnv(); });
 step(t('load.models'), 0.3);
 world.syncObjects(); world.syncEnv(); controls.attach(); panels.renderTree(); panels.renderProps(); controls.frameAll();
 step(t('load.first'), 0.95);
-world.start((dt, time) => { actions.play.frame(dt, time); controls.update(); });
+world.start((dt, time) => { actions.play.frame(dt, time); placer.frame(dt); controls.update(); });
 requestAnimationFrame(() => window.LabLoad && window.LabLoad.done());
 // gotowe tła kosmosu na liście Niebo (też nad morzem i lądem): kity ze Space w tle, chwilę po starcie
 setTimeout(() => { if (!spaceReady()) loadSpace().then(() => panels.renderProps()).catch(() => {}); }, 2500);

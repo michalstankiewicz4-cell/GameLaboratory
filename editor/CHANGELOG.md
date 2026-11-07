@@ -3,6 +3,15 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.22.0 — 2026-11-07 (budowa bazy)
+
+### Dodane
+- **Budowa bazy**: moduł bazy jako hologram pod kursorem (turkusowy — pasuje, czerwony — nie, z powodem w linii stanu),
+  kliknięcie stawia, R obraca, Esc kończy; zachowanie **Budowa** — w grze moduł rośnie przez czas budowy.
+
+### Poprawione
+- Zwykły grunt (ląd bez terenu) znów widoczny.
+
 ## 0.21.0 — 2026-11-07 (lądowanie)
 
 ### Dodane

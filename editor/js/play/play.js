@@ -73,7 +73,8 @@ export function createPlay(store, world, controls, actions, events) {
     if ((hudT -= dt) <= 0) { hudT = 0.2; actions.status(hudText(me.run.hud())); }
   }
   function hudText(h) {
-    const parts = [me.obj.name, `${t('play.speed')} ${h.speed.toFixed(h.unit === 'kn' ? 1 : 0)} ${h.unit}`, `${t('play.throttle')} ${Math.round(h.throttle * 100)}%`];
+    const parts = h.progress != null ? [me.obj.name, `${t('play.build')} ${Math.round(h.progress * 100)}%`]
+      : [me.obj.name, `${t('play.speed')} ${h.speed.toFixed(h.unit === 'kn' ? 1 : 0)} ${h.unit}`, `${t('play.throttle')} ${Math.round(h.throttle * 100)}%`];
     if (h.alt != null) parts.push(`${t('play.alt')} ${h.alt.toFixed(0)} m`);
     if (h.vs != null) parts.push(`${t('play.vs')} ${h.vs.toFixed(1)} m/s`);
     if (h.landed) parts.push(t('play.landed'));
