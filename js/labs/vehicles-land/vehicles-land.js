@@ -9,6 +9,11 @@ import { createTramSim, tramPoses, H as RAIL_H } from "../../behaviors/rail/tram
 import { pathTrack } from "../../behaviors/rail/path.js";
 import { buildPathTrack } from "../../models/structures/railway/path-track.js";
 import { createFlight } from "../../behaviors/air/flight.js";
+import { createStage } from "../shared/stage.js";
+import { WEATHER } from "../../envs/sky/skykit.js";
+import { LOOKS } from "../../envs/water/waterkit.js";
+import { sampleHeight, TERRAIN_DEFAULTS } from "../../envs/land/landkit.js";
+import { WORLD_DEFAULTS } from "../../envs/land/regionkit.js";
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 (() => {
@@ -25,20 +30,16 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1;
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
 const scene = new THREE.Scene();
-const env = ShipKit.makeEnvironment(renderer);
-scene.environment = env;
-const DAY_BG = new THREE.Color(0x9a7a62), NIGHT_BG = new THREE.Color(0x03050b);
-scene.background = DAY_BG.clone();
-scene.fog = new THREE.Fog(DAY_BG.clone(), 90, 260);
-const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 1200);
+// the shared base stage (js/labs/shared/stage.js): the same sky, light, fog, sea and terrain as the scene editor and the
+// land lab (its far horizon: sky 20 km, sea 16 km, standing waves, haze thinning with height)
+const stage = createStage(renderer, scene, { envEvery: 0.4, skyRadius: 20000, seaRadius: 16000, clouds: [0.008, 0], shiftSpeed: 0, fogHeight: true });
+stage.setSurface("none");   // the plain ground below is the lab's own
+const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 40000);
 camera.position.set(9, 4.5, -10);
 const controls = new THREE.OrbitControls(camera, view);
 controls.enableDamping = true; controls.maxPolarAngle = 1.45; controls.minDistance = 5; controls.maxDistance = 80;
-const sun = new THREE.DirectionalLight(0xfff1dc, 2.2 * THREE.LIGHT_SCALE);
-sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+const { sun } = stage;
 Object.assign(sun.shadow.camera, { left: -20, right: 20, top: 20, bottom: -20, near: 1, far: 160 });
-const hemi = new THREE.HemisphereLight(0xcfa98a, 0x2a1d14, 0.55 * THREE.LIGHT_SCALE);
-scene.add(sun, sun.target, hemi);
 
 // ---------- the ground: hills + bumps, the same function for the mesh and the wheels ----------
 function hash(x, z) { const s = Math.sin(x * 127.1 + z * 311.7) * 43758.5453; return s - Math.floor(s); }
@@ -57,10 +58,10 @@ function heightAt(x, z) {
   h += Math.max(0, rk - 0.55) * 1.6 * G.bumps;
   return h;
 }
-// the ground can come from the land lab instead (OPTIONS: Ground → Land lab; js/labs/vehicles-land/land-source.js): its
-// terrain, its sea and its weather; the amphibian floats where there is water, the rovers stop at it
-let world = null;
-const groundAt = (x, z) => (world ? world.heightAt(x, z) : heightAt(x, z));
+// the ground can come from the land lab instead (OPTIONS: Ground → Land lab): its map and weather as saved in this
+// browser, built by the base stage (terrain, sea, regions); the amphibian floats where there is water, the rovers stop at it
+let world = null;   // { T, sky } while the land lab's world is on
+const groundAt = (x, z) => (world ? sampleHeight(world.T, x, z) : heightAt(x, z));
 const home = { x: 0, z: 0 };             // where AUTO turns back to
 const groundTex = (() => {
   const S = 512, [c, ctx] = ShipKit.util.canvas(S, S), r = ShipKit.util.rng(5);
@@ -70,14 +71,31 @@ const groundTex = (() => {
   for (let k = 0; k <= 4; k++) { ctx.beginPath(); ctx.moveTo(k * S / 4, 0); ctx.lineTo(k * S / 4, S); ctx.moveTo(0, k * S / 4); ctx.lineTo(S, k * S / 4); ctx.stroke(); }
   const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(40, 40); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
 })();
+// the plain ground: a fine 400 m grid (hills and bumps) and a coarse 4 km grid around it (hills only, a little lower, to
+// the horizon of the stage's sky); both follow the vehicle on a 40 m step (a whole number of texture tiles, 10 m each)
 const groundGeo = new THREE.PlaneGeometry(400, 400, 320, 320);
 groundGeo.rotateX(-Math.PI / 2);
-const ground = new THREE.Mesh(groundGeo, new THREE.MeshStandardMaterial({ map: groundTex, roughness: 0.95 }));
-ground.receiveShadow = true; scene.add(ground);
+const ground = new THREE.Group(); scene.add(ground);
+const groundMat = new THREE.MeshStandardMaterial({ map: groundTex, roughness: 0.95 });
+const nearGround = new THREE.Mesh(groundGeo, groundMat); nearGround.receiveShadow = true; ground.add(nearGround);
+const farGeo = new THREE.PlaneGeometry(4000, 4000, 200, 200); farGeo.rotateX(-Math.PI / 2);
+const farTex = groundTex.clone(); farTex.repeat.set(400, 400); farTex.needsUpdate = true;
+const farGround = new THREE.Mesh(farGeo, new THREE.MeshStandardMaterial({ map: farTex, roughness: 0.95 })); ground.add(farGround);
+const hillsAt = (x, z) => (vnoise(x / 60, z / 60) * 6 + vnoise(x / 25 + 7, z / 25) * 2.5) * G.hills;
+const groundCentre = { x: 0, z: 0 };
 function rebuildGround() {
-  const p = groundGeo.attributes.position;
-  for (let i = 0; i < p.count; i++) p.setY(i, heightAt(p.getX(i), p.getZ(i)));
+  const cx = groundCentre.x, cz = groundCentre.z;
+  nearGround.position.set(cx, 0, cz); farGround.position.set(cx, 0, cz);
+  let p = groundGeo.attributes.position;
+  for (let i = 0; i < p.count; i++) p.setY(i, heightAt(p.getX(i) + cx, p.getZ(i) + cz));
   p.needsUpdate = true; groundGeo.computeVertexNormals();
+  p = farGeo.attributes.position;
+  for (let i = 0; i < p.count; i++) p.setY(i, hillsAt(p.getX(i) + cx, p.getZ(i) + cz) - 0.8);
+  p.needsUpdate = true; farGeo.computeVertexNormals();
+}
+function followGround(x, z) {
+  const cx = Math.round(x / 40) * 40, cz = Math.round(z / 40) * 40;
+  if (Math.abs(cx - groundCentre.x) > 40 || Math.abs(cz - groundCentre.z) > 40) { groundCentre.x = cx; groundCentre.z = cz; rebuildGround(); }
 }
 
 // ---------- the vehicle ----------
@@ -109,7 +127,7 @@ function setMode(m) {
   if (mode && mode.group) mode.group.visible = false;
   mode = m;
   const on = !!m;
-  ground.visible = !on && !world; if (world) world.group.visible = !on; dust.points.visible = !on; if (veh) veh.group.visible = !on;
+  ground.visible = !on && !world; if (world) stage.setSurface(on ? "none" : "land"); dust.points.visible = !on; if (veh) veh.group.visible = !on;
   $("vkPanel").classList.toggle("hidden", on);
   for (const x of modes) if (x.panel) x.panel.classList.toggle("hidden", x !== m);
   if (!m) return;
@@ -190,14 +208,14 @@ window.addEventListener("keydown", (e) => {
   if (["KeyW", "KeyA", "KeyS", "KeyD"].includes(e.code) && state.auto) $("dKeys").click();
 });
 window.addEventListener("keyup", (e) => { state.keys[e.code] = false; });
+// the stage's light: the land lab's weather with its world, otherwise the stage's default (afternoon); NIGHT — the
+// sun below the horizon (night sky), the vehicle's lamps on
 function applyLight() {
   const n = state.night, W = world && world.sky;
-  scene.background.copy(n ? NIGHT_BG : W ? W.fog : DAY_BG); scene.fog.color.copy(scene.background);
-  scene.fog.near = W ? 300 : 90; scene.fog.far = W ? 3200 : 260;
-  sun.color.set(0xfff1dc); hemi.color.set(0xcfa98a); hemi.groundColor.set(0x2a1d14);
-  if (W && !n) { sun.color.copy(W.sunColor); hemi.color.copy(W.sky); hemi.groundColor.copy(W.ground); }
-  sun.intensity = n ? 0.05 * THREE.LIGHT_SCALE : W ? W.sunIntensity : 2.2 * THREE.LIGHT_SCALE;
-  hemi.intensity = n ? 0.06 * THREE.LIGHT_SCALE : W ? W.ambient : 0.55 * THREE.LIGHT_SCALE;
+  if (W) stage.setLight({ ...W, sunEl: n ? -14 : W.sunEl, moon: 0.8 });
+  else if (n) stage.setLight({ weather: "fair", sunEl: -14, sunAz: 210 });
+  else stage.setLight("afternoon");
+  if (W) { const w = WEATHER[W.weather] || WEATHER.fair; scene.environmentIntensity = (0.85 - w.coverage * w.density * 0.45) * (0.1 + 0.9 * (n ? 0 : 1)); }
   dust.material.uniforms.uLight.value = n ? 0.15 : 1;
 }
 
@@ -213,9 +231,10 @@ const clock = new THREE.Timer(), prev = new THREE.Vector3(), delta = new THREE.V
 let wander = 0;
 function frame() {
   const t0 = performance.now(), dt = Math.min(clock.update().getDelta(), 0.05), t = clock.getElapsed();
+  stage.tick(dt);   // the stage's waves and clouds
   if (mode) {   // another family: its own behaviour, if it has one
     if (mode.update) mode.update(dt, t);
-    controls.update();
+    controls.update(); stage.follow(camera);
     renderer.info.reset(); LabKit.render(renderer, scene, camera);
     LabPerf.end(renderer, performance.now() - t0);   // the Performance window (ui/shell/perf.js)
     requestAnimationFrame(frame); return;
@@ -261,8 +280,8 @@ function frame() {
     if (S.crashed) $("role").textContent = "Crashed — choose the aircraft again.";
   } else if (sim) {
     // forces: engine, brakes, tyres or tracks, slopes, and the land lab's water (drag and buoyancy stop a rover in it)
-    if (sim.kind === "mk") sim.step(dt, input, { surface: world ? (x, z) => world.waterAt(x, z, t) : NO_WATER, floor: groundAt });   // the amphibian
-    else sim.step(dt, input, { height: groundAt, water: world ? (x, z) => world.waterAt(x, z, t) : null });
+    if (sim.kind === "mk") sim.step(dt, input, { surface: world ? (x, z) => (stage.waterAt(x, z) ?? NO_WATER()) : NO_WATER, floor: groundAt });   // the amphibian
+    else sim.step(dt, input, { height: groundAt, water: world ? (x, z) => (stage.waterAt(x, z) ?? NO_WATER()) : null });
     const S = sim.state; drv.x = S.x; drv.z = S.z; drv.yaw = S.yaw; drv.speed = S.speed;
   } else VK.drive(drv, input, def, dt);
   const gy = groundAt(drv.x, drv.z);
@@ -278,7 +297,7 @@ function frame() {
   } else if (veh.kit === "mk") {   // the amphibian: on its wheels on the ground (it would float where there is water)
     veh.group.position.y = 0;
     const wx = (x, z) => drv.x + x * cy + z * sy, wz = (x, z) => drv.z - x * sy + z * cy, S = sim.state;
-    veh.update(t, dt, { pose: { y: S.y, pitch: S.pitch, roll: S.roll, onLand: S.onLand }, speed: drv.speed, steer: input.steer, surface: world ? (x, z) => world.waterAt(wx(x, z), wz(x, z), t) : NO_WATER,
+    veh.update(t, dt, { pose: { y: S.y, pitch: S.pitch, roll: S.roll, onLand: S.onLand }, speed: drv.speed, steer: input.steer, surface: world ? (x, z) => (stage.waterAt(wx(x, z), wz(x, z)) ?? NO_WATER()) : NO_WATER,
       floor: (x, z) => groundAt(wx(x, z), wz(x, z)), lights: state.night ? 1 : 0, work: state.work ? 1 : 0 });
   } else veh.update(t, dt, {
     speed: drv.speed, steer: input.steer, turn: Math.atan2(Math.sin(drv.yaw - yaw0), Math.cos(drv.yaw - yaw0)) / Math.max(1e-4, dt),
@@ -291,8 +310,9 @@ function frame() {
   delta.set(drv.x, vy, drv.z).sub(prev.set(controls.target.x, controls.target.y - 1.5, controls.target.z));
   camera.position.add(delta); controls.target.add(delta);
   controls.update();
-  if (world) { world.update(t, camera); sun.position.set(drv.x, vy, drv.z).addScaledVector(world.sky.sunDir, 60); }
-  else sun.position.set(drv.x + 30, vy + 40, drv.z + 20);
+  if (!world && ground.visible) followGround(drv.x, drv.z);
+  stage.follow(camera);   // the sky and the sea with the camera, the terrain grids, the haze, the sky environment
+  sun.position.set(drv.x, vy, drv.z).addScaledVector(stage.sunDir, 60);
   sun.target.position.set(drv.x, vy, drv.z);
   $("nowSpeed").textContent = Math.round(Math.abs(drv.speed) * 3.6) + " km/h";
   $("nowTilt").textContent = Math.round(-veh.body.rotation.x * 57.3) + "° / " + Math.round(veh.body.rotation.z * 57.3) + "°";
@@ -301,10 +321,41 @@ function frame() {
   LabPerf.end(renderer, performance.now() - t0);   // the Performance window (ui/shell/perf.js)
   requestAnimationFrame(frame);
 }
-async function setGround(src, step) {
-  if (world) { scene.remove(world.group); world.dispose(); world = null; }
-  if (src === "lab" && window.LandLabWorld) { world = await window.LandLabWorld(step); scene.add(world.group); [home.x, home.z] = world.start; }
-  else { home.x = home.z = 0; }
+// the land lab's settings saved in this browser (gameLab.land.v1: map, water, weather; its defaults if nothing is saved)
+function landLabSaved() {
+  let saved = null; try { saved = JSON.parse(localStorage.getItem("gameLab.land.v1") || "null"); } catch { saved = null; }
+  return { map: { ...TERRAIN_DEFAULTS, ...(saved && saved.map) }, water: { ...WORLD_DEFAULTS, ...(saved && saved.water) },
+    sky: { weather: "fair", sunEl: 24, sunAz: 210, ...(saved && saved.sky) } };
+}
+// where to start on the land lab's map: land 0.5–6 m above the sea, by the water, nearest the middle (a spiral search)
+function startSpot(T) {
+  const h = (x, z) => sampleHeight(T, x, z);
+  for (let r = 0, st = T.cell * 2; r < T.size * 0.7; r += st) {
+    const n = Math.max(1, Math.round((2 * Math.PI * r) / st));
+    for (let k = 0; k < n; k++) {
+      const a = (k / n) * Math.PI * 2, x = T.size / 2 + Math.cos(a) * r, z = T.size / 2 + Math.sin(a) * r, y = h(x, z);
+      if (y > 0.5 && y < 6 && [[25, 0], [-25, 0], [0, 25], [0, -25]].some(([dx, dz]) => h(x + dx, z + dz) < -1)) return [x, z];
+    }
+  }
+  return [T.size / 2, T.size / 2];
+}
+async function setGround(src, step = async () => {}) {
+  if (src === "lab") {
+    const S = landLabSaved();
+    await step("Heightmap, rivers, water regions and biomes", 0.05);
+    stage.setLand({ map: S.map, water: S.water });
+    await step("The sea and the weather", 0.85);
+    // the sea from the weather's wind, as in the land lab (land.js seaFor)
+    const U = Math.max(2, (WEATHER[S.sky.weather] || WEATHER.fair).wind ?? 6), lk = LOOKS.atlantic;
+    stage.setSea({ Hs: Math.min(5, 0.0246 * U * U), Lp: Math.min(160, Math.max(12, 0.83 * U * U)), chop: 0.45, spread: 35, n: 12, dir: 50, ...lk, crest: Math.min(1, lk.crest + U * 0.012) });
+    stage.WU.uWetOn.value = 0;
+    world = { T: stage.land, sky: S.sky };
+    await step("A place to start, by the water", 0.92);
+    [home.x, home.z] = startSpot(world.T);
+  } else {
+    world = null; stage.setLand(null); home.x = home.z = 0;
+  }
+  stage.setSurface(world && !mode ? "land" : "none");
   ground.visible = !world && !mode;
   $("hSlider").disabled = $("bSlider").disabled = !!world;
   Object.assign(drv, { x: home.x, z: home.z, speed: 0 });
@@ -317,7 +368,7 @@ $("groundSrc").addEventListener("change", () => {
   const src = $("groundSrc").value;
   if (src === "lab") LabLoad.run("Building the land lab's world…", (step) => setGround(src, step)); else setGround(src);
 });
-rebuildGround(); resize(); load();
+rebuildGround(); applyLight(); resize(); load();
 controls.target.set(0, heightAt(0, 0) + 1.5, 0);
 frame();
 window.vehicleLab = { state, drv, G, heightAt, groundAt, setGround, get world() { return world; }, load, get veh() { return veh; }, camera, controls, applyLight, scene, sun, addMode, setMode, modes, row };

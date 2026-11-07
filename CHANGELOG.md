@@ -3,6 +3,22 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.42.2 · pojazdy (ląd) 1.16.0 · pojazdy (kosmos) 1.8.0 — 2026-11-07 (wspólna scena bazowa w pojazdach · ląd i kosmos)
+
+### Zmienione
+- **Laboratorium pojazdów (ląd i kosmos) stoi na wspólnej scenie bazowej** (`js/labs/shared/stage.js`) — punkt 4
+  planu rozbioru zrobiony: wszystkie laboratoria środowisk i pojazdów mają scenę edytora. Wygląd się zmienił — do
+  dopracowania.
+- Pojazdy · ląd: niebo SkyKit, światło, mgła i odbicia ze sceny bazowej (domyślne popołudnie; z gruntem z laboratorium
+  lądu — jego pogoda), daleki horyzont jak w laboratorium lądu (niebo 20 km, morze 16 km, kamera do 40 km). Grunt
+  „z laboratorium lądu” buduje scena bazowa (teren, morze ze znajomością terenu, regiony wód, boje) — dawny
+  `land-source.js` usunięty. Zwykły grunt (wzgórza i nierówności) został; dookoła niego zgrubna siatka 4 km z samymi
+  wzgórzami (do horyzontu), obie przesuwają się za pojazdem co 40 m. NOC: słońce pod horyzontem (nocne niebo).
+- Pojazdy · kosmos: niebo kosmosu jak w edytorze — ciało nieba BodyKit („Deep field”, ładowane przez
+  `js/scene/space.js`), odbicia z mapy otoczenia ShipKit (jak w grze), słońce sceny bazowej (bez atmosfery) od strony,
+  z której świeciło dawne światło główne; dawne niebo ShipKit i światło konturowe usunięte. Oświetlenie z gry (przycisk)
+  bez zmian.
+
 ## Program 0.42.1 · woda 1.5.0 · pojazdy (woda) 1.6.0 — 2026-11-07 (wspólna scena bazowa w laboratorium wody i pojazdów · woda)
 
 ### Zmienione

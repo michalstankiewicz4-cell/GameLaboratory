@@ -4,14 +4,12 @@
    THE LAB — the page's own script.
    Uses ShipKit's public API exclusively.
    ======================================================================= */
+import { createStage } from "../shared/stage.js";
+import { loadSpace } from "../../scene/space.js";
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 (() => {
 "use strict";
-
-// The nebula sky (also the reflection environment) comes from ShipKit, shared
-// with the game's environment map.
-const makeSky = () => ShipKit.makeSpaceSky();
 
 // =====================================================================
 // Renderer, scene, camera, controls
@@ -27,7 +25,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFShadowMap;
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(38, VS().w / VS().h, 0.1, 500);
+const camera = new THREE.PerspectiveCamera(38, VS().w / VS().h, 0.1, 9000);
 camera.position.set(9.5, 4.2, 11.5);
 
 const controls = new THREE.OrbitControls(camera, view);
@@ -39,31 +37,24 @@ controls.maxDistance = 40;
 controls.autoRotate = true;
 controls.autoRotateSpeed = 0.6;
 
-// Sky dome + image-based lighting from the same generated sky.
-const skyTex = makeSky();
-const skyDome = new THREE.Mesh(
-  new THREE.SphereGeometry(200, 64, 32),
-  new THREE.MeshBasicMaterial({ map: skyTex, side: THREE.BackSide, depthWrite: false })
-);
-skyTex.mapping = THREE.UVMapping; // dome uses plain UVs…
-scene.add(skyDome);
-// reflections: exactly the game's environment map (the same sky, the same size)
-scene.environment = ShipKit.makeEnvironment(renderer);
-
-// Lights: warm key (casts shadows), cool rim, soft hemisphere fill.
-const key = new THREE.DirectionalLight(0xffe2b8, 2.6);
-key.position.set(-8, 10, 6);
-key.castShadow = true;
+// the shared base stage (js/labs/shared/stage.js), as the scene editor's space: no surface, the space sky — BodyKit's
+// sky body (Deep field, SystemKit.SKIES, loaded with js/scene/space.js), reflections from ShipKit's environment map
+// (the game's), the sun of the stage's light (no atmosphere) and its faint fill
+const stage = createStage(renderer, scene);
+stage.setSurface("space"); stage.setSkyMode("space");
+stage.setSpaceEnvironment(ShipKit.makeEnvironment(renderer));
+stage.setLight({ weather: "fair", sunEl: 45, sunAz: 307 });   // the sun from where the studio key light was (−8, 10, 6)
+const key = stage.sun, hemi = stage.hemi;
+key.position.copy(stage.sunDir).multiplyScalar(20); key.target.position.set(0, 0, 0);   // close: the shadow box is small
 key.shadow.mapSize.set(2048, 2048);
-Object.assign(key.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near: 1, far: 40 });
+Object.assign(key.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near: 1, far: 60 });
 key.shadow.bias = -0.0004;
 key.shadow.normalBias = 0.02;
-scene.add(key);
-const rim = new THREE.DirectionalLight(0x7f95ff, 1.6);
-rim.position.set(7, -2, -9);
-scene.add(rim);
-const hemi = new THREE.HemisphereLight(0x9fb2ff, 0x1a1020, 0.35);
-scene.add(hemi);
+loadSpace().then(() => {
+  const ref = BodyKit.GAME_KINDS.sky, deep = SystemKit.SKIES.find((x) => x.id === "deep");
+  const sky = BodyKit.buildBody(ref.groupId, ref.bodyId, { detail: 1, values: (deep && deep.values) || {} });
+  sky.setRadius(4000); sky.setOctaves(BodyKit.QUALITY_OCTAVES[2]); scene.add(sky.group);
+});
 // GAME LIGHTING: the game's own scene lights instead of the studio's
 // (scene/setup.js: an ambient, a cool light from above, a warm rim; no
 // shadows — the Sun body's light doesn't reach past the inner orbits). The
@@ -76,8 +67,8 @@ const BATTLE = window.GameLabGraphics === "battle";
 // grafika Battle (js/core/three-global.js): kolory już przeliczane z sRGB, a światła fizyczne — te same światła
 // świecą ×π słabiej niż w trybie legacy r128, więc ich moc ×π
 gameLights.forEach((l) => { if (!BATTLE) l.color.convertSRGBToLinear(); l.visible = false; scene.add(l); });
-[key, rim, hemi, ...gameLights].forEach((l) => { l.intensity *= THREE.LIGHT_SCALE; });   // moce pod r128: ×π w trybie Battle
-const studioLights = [key, rim, hemi];
+gameLights.forEach((l) => { l.intensity *= THREE.LIGHT_SCALE; });   // moce pod r128: ×π w trybie Battle
+const studioLights = [key, hemi];   // the stage's lights
 
 // =====================================================================
 // Viewer: current ship, rebuild on detail change, disposal
@@ -388,6 +379,7 @@ let bob = 1;
 function frame() {
   const t0 = performance.now();
   const dt = Math.min(clock.update().getDelta(), 0.05), t = clock.getElapsed();
+  stage.tick(dt);
   power += ((state.engines ? 1 : 0) - power) * Math.min(1, dt * 3);
 
   // idle drift of the whole ship (the lab only): STOP ANIMATIONS eases it
@@ -402,6 +394,7 @@ function frame() {
   current.update(t, state.freeze ? 0 : dt, { power, particles: QUALITY[state.quality].particles });
 
   controls.update();
+  stage.follow(camera);
   renderer.info.reset();
   fx.render(controls.target, 3.2);
   LabPerf.end(renderer, performance.now() - t0);   // the Performance window (ui/shell/perf.js)

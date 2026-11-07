@@ -5,16 +5,16 @@
 (function () {
   "use strict";
   const V = {
-  app: "0.42.1",
+  app: "0.42.2",
   labs: {
-    "labs/vehicles-space.html": "1.7.0",
+    "labs/vehicles-space.html": "1.8.0",
     "labs/bodies.html": "1.5.0",
     "labs/systems.html": "1.4.0",
     "labs/scale.html": "1.1.9",
     "labs/skins.html": "1.1.2",
     "labs/surface.html": "1.4.0",
     "labs/buildings.html": "1.4.0",
-    "labs/vehicles-land.html": "1.15.1",
+    "labs/vehicles-land.html": "1.16.0",
     "labs/sound.html": "1.2.0",
     "labs/creator.html": "1.4.0",
     "labs/life.html": "1.5.0",

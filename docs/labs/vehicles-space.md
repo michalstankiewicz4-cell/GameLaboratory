@@ -310,9 +310,10 @@ top bar goes between them). The top bar: the ship list and the environment switc
   - **Geometry detail** (20–200%) rebuilds the model live through `buildShipModel(id, { detail })`, at most once per
     animation frame while the slider is dragged.
   - **FIGURES**: how many of each figure type the ship is made of.
-- **Scene**: a generated equirectangular nebula sky is used both as the sky dome and, through `PMREMGenerator`, as
-  `scene.environment` (reflections on the metal). A warm key light casts shadows, with a cool rim light and a
-  hemisphere fill.
+- **Scene** (since 1.8.0): the shared base stage (`js/labs/shared/stage.js`) in space, as in the scene editor —
+  BodyKit's sky body ("Deep field", loaded through `js/scene/space.js`), reflections from ShipKit's environment map
+  (the game's `scene.environment`), the stage's sun (no atmosphere, casting shadows, from where the old key light was)
+  and its faint fill. GAME LIGHTING still swaps in the game's own lights.
 
 ## Building blocks (reuse, don't re-write)
 

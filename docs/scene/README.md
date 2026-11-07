@@ -112,7 +112,7 @@ i silniki na postoju. Liczby ruchu (`SPACE_NUMBERS` w `behaviors.js`) są zało�
 
 ## Scena bazowa laboratoriów (`js/labs/shared/stage.js`)
 
-Edytor i laboratoria (filtry, wygląd, ląd, woda, pojazdy · woda) stoją na tej samej scenie: niebo SkyKit, słońce i światło rozproszone,
+Edytor i laboratoria (filtry, wygląd, ląd, woda, pojazdy: kosmos, woda, ląd) stoją na tej samej scenie: niebo SkyKit, słońce i światło rozproszone,
 mgła, morze WaterKit, płaski grunt albo teren LandKit z wodami RegionKit, mapa otoczenia z nieba.
 
 - `createStage(renderer, scene, opts)`; `opts`: `envEvery` (odświeżanie mapy otoczenia, 0,3 s), `skyRadius` (4000 m),
@@ -121,7 +121,9 @@ mgła, morze WaterKit, płaski grunt albo teren LandKit z wodami RegionKit, mapa
 - Powierzchnia `setSurface`, niebo `setSkyMode`, światło `setLight(id | pogoda)`, morze `setSea(zasób)`, ląd
   `setLand({ map, water })` albo `setWorld(T)` (świat już wygenerowany), kadłub wycięty z wody `setShip`.
 - Morze przy terenie zna teren (płycizny, przybój, barwy i prądy wód, lód, olej); fale powtarzają się co rozmiar mapy.
-- Laboratorium z własną wodą (woda: warianty A i B; pojazdy · woda: zwykła tafla) wyłącza morze sceny
+- Kosmos: `setSurface('space')` i `setSkyMode('space')`, odbicia `setSpaceEnvironment` (mapa ShipKit), niebo daje
+  strona (ciało nieba BodyKit — edytor, pojazdy · kosmos).
+- Laboratorium z własną wodą albo gruntem (woda: warianty A i B; pojazdy · woda: zwykła tafla; pojazdy · ląd: zwykły grunt) wyłącza morze sceny
   (`setSurface('none')`) i bierze z niej tylko niebo, światło i mgłę.
 - Klatka: `update(dt, camera)` albo osobno `tick(dt)` (czas, fale, chmury) i `follow(camera)` (niebo i morze za
   kamerą, teren, mgła, mapa otoczenia) — laboratorium z własną kamerą ustawia ją między nimi.

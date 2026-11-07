@@ -100,3 +100,13 @@ tram again puts it back. The physics runs flat; the track and the sections get t
 The Spitfire on the ground moves with the flight behaviour (`js/behaviors/air/flight.js`: wheels on springs, brakes,
 the tail wheel steered with the rudder, the propeller's thrust): W / S move the throttle lever, A / D the rudder, S at
 idle brakes; AUTO taxis at low power. With full power and a long run it can lift off — the same forces as in flight.
+
+## Shared base stage (1.16.0)
+
+The page stands on the base stage of the scene editor (`js/labs/shared/stage.js`): the SkyKit sky, light, fog and sky
+environment come from it (the stage's afternoon; with the land lab's ground — its saved weather), with the land lab's
+far horizon (sky 20 km, sea 16 km, the camera to 40 km). **Ground → Land lab** is built by the stage (`stage.setLand`
+from what the land lab saved, `gameLab.land.v1`): terrain, a sea that knows the terrain, water regions, buoys; the
+amphibian floats on the stage's waves. The plain ground (hills and bumps, the same function for the mesh and the
+wheels) stays: a fine 400 m grid and a coarse 4 km grid of the hills around it reach the horizon, both following the
+vehicle on a 40 m step. NIGHT: the sun below the horizon (the night sky), the lamps on.
