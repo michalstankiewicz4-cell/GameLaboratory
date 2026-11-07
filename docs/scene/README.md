@@ -32,6 +32,7 @@ Zasada: **dane są jedynym źródłem prawdy.** Okna edytora, uchwyt, API i plik
   `js/labs/shared/stage.js`); `env.look`: profil z laboratorium filtrów albo `""`; `env.sea`: zasób „morze” albo `""`.
 - `pos` w metrach (Y w górę), `rot` w stopniach (kolejność YXZ: kurs, pochylenie, przechył), `scale` — mnożnik.
 - `behavior` (nieobowiązkowe): id zachowania; bez pola — domyślne dla modelu, `""` — stoi w miejscu.
+- `orbit` (nieobowiązkowe, zachowanie „orbita”): `{ around: id obiektu, period: s }`.
 - Zmiana formatu podnosi `VERSION`, a `normalize` przenosi starsze sceny. Nowe nieobowiązkowe pole (jak `behavior`,
   `env.sea`) wersji nie zmienia.
 
@@ -69,6 +70,7 @@ Wpis: `{ id, label, family, surface, lab, build() → { root, kit, dispose } }`.
 | `craft` | `marine/*` | „mała jednostka na wodzie” (`js/behaviors/water/craft.js`), woda z falami i dno ze sceny bazowej | `throttle` (dźwignia), `rudder` (ster), `elevator` (głębokość nurka) |
 | `drive` | `road/*`, `rovers/*` | „jazda po lądzie” (`js/behaviors/land/drive.js`), grunt i woda ze sceny bazowej | `throttle` −1…1 (pedał), `rudder` (skręt) |
 | `thrust` | `space/codewing`, `space/scribe`, `space/swarmer` | „ciąg w próżni” (`js/behaviors/space/thrust.js`) | `throttle` −1…1, `elevator` (pochylenie), `aileron` (kurs), `rudder` (przechył) |
+| `orbit` | `bodies/*` | „orbita” (`js/behaviors/space/orbit.js`): środek `orbit.around` (id) albo najbliższe cięższe ciało (`bodyRank`: czarna dziura 4, słońce i pulsar 3, olbrzym i pierścienie 2, planeta 1, księżyc, planetoida, kometa 0), okres `orbit.period` (s, domyślnie 60) | — (ciało krąży samo) |
 | `flight` | `air/*` | „lot w atmosferze” (`js/behaviors/air/flight.js`), krok fizyki 1/240 s, grunt na wysokości 0 | `throttle` 0…1, `elevator`, `aileron`, `rudder`, `brake`, `gear`, `flaps` |
 
 - Okręty: liczby ruchu z `SHIP_NUMBERS` (masa, moc, prędkość maksymalna), reszta z modelu (`shipDef`: długość,

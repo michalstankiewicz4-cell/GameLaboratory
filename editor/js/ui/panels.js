@@ -4,7 +4,7 @@ import { PREFABS, FAMILIES, prefab } from '../../../js/scene/prefabs.js';
 import { LIGHTS, readProfiles } from '../world/world.js';
 import { listAssets } from '../../../js/scene/assets.js';
 import { skyPresets, SKY_PRESET, SKY_DAY } from '../../../js/scene/space.js';
-import { BEHAVIORS, behaviorsFor, behaviorOf } from '../../../js/scene/behaviors.js';
+import { BEHAVIORS, behaviorsFor, behaviorOf, ORBIT_PERIOD } from '../../../js/scene/behaviors.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
@@ -127,6 +127,14 @@ export function createPanels(store, actions) {
     $('oBehavior').replaceChildren(el('option', { value: '', textContent: t('obj.noBehavior') }),
       ...fit.map((id) => el('option', { value: id, textContent: lang === 'pl' ? BEHAVIORS[id].labelPl : BEHAVIORS[id].label })));
     $('oBehavior').value = behaviorOf(o); $('oBehavior').disabled = !fit.length || document.body.classList.contains('playing');
+    // orbita: wokół czego (samo — najbliższe cięższe ciało) i okres
+    const orb = behaviorOf(o) === 'orbit'; $('orbitAroundRow').hidden = $('orbitPeriodRow').hidden = !orb;
+    if (orb) {
+      const others = S.objects.filter((q) => q.id !== o.id && q.prefab.startsWith('bodies/'));
+      $('orbitAround').replaceChildren(el('option', { value: '', textContent: t('obj.orbitAuto') }), ...others.map((q) => el('option', { value: q.id, textContent: q.name })));
+      $('orbitAround').value = o.orbit && others.some((q) => q.id === o.orbit.around) ? o.orbit.around : '';
+      setVal('orbitPeriod', (o.orbit && o.orbit.period) || ORBIT_PERIOD);
+    }
     setVal('pX', o.pos[0]); setVal('pY', o.pos[1]); setVal('pZ', o.pos[2]);
     setVal('rY', o.rot[1]); setVal('rX', o.rot[0]); setVal('rZ', o.rot[2]); setVal('sc', o.scale);
     const p = prefab(o.prefab), lab = p && labName(p.lab);
@@ -149,6 +157,8 @@ export function createPanels(store, actions) {
     actions.build(() => store.update(o.id, { prefab: nu.id, name: old && o.name === old.label ? nu.label : o.name }));   // nazwa domyślna idzie za modelem
   });
   $('oBehavior').addEventListener('change', () => { const o = store.selected; if (o) store.update(o.id, { behavior: $('oBehavior').value }); });
+  $('orbitAround').addEventListener('change', () => { const o = store.selected; if (o) store.update(o.id, { orbit: { ...(o.orbit || {}), around: $('orbitAround').value } }); });
+  $('orbitPeriod').addEventListener('input', () => { const o = store.selected, v = parseFloat($('orbitPeriod').value); if (o && v > 0) store.update(o.id, { orbit: { ...(o.orbit || {}), period: v } }); });
   $('surface').addEventListener('change', () => store.setEnv({ surface: $('surface').value }));
   $('landAsset').addEventListener('change', () => actions.build(() => store.setEnv({ land: $('landAsset').value })));
   $('skyAsset').addEventListener('change', () => store.setEnv({ sky: $('skyAsset').value }));

@@ -16,7 +16,7 @@
   'env.title': 'Środowisko', 'env.surface': 'Powierzchnia', 'env.sea': 'Morze', 'env.land': 'Ląd',
   'env.light': 'Światło', 'env.look': 'Wygląd kamery', 'env.plain': 'Zwykły (bez profilu)',
   'env.lookNote': 'Wygląd kamery to profile zapisane w laboratorium filtrów.',
-  'obj.title': 'Obiekt', 'obj.name': 'Nazwa', 'obj.model': 'Model',
+  'obj.title': 'Obiekt', 'obj.orbitAround': 'Krąży wokół', 'obj.orbitAuto': 'Najbliższego cięższego ciała', 'obj.orbitPeriod': 'Okres', 'obj.name': 'Nazwa', 'obj.model': 'Model',
   'obj.x': 'Położenie X', 'obj.y': 'Położenie Y', 'obj.z': 'Położenie Z',
   'obj.heading': 'Kurs', 'obj.pitch': 'Pochylenie', 'obj.roll': 'Przechył', 'obj.scale': 'Skala',
   'obj.toSurface': 'Na powierzchnię', 'obj.toSurface.tip': 'Y = 0: na wodzie albo na gruncie',

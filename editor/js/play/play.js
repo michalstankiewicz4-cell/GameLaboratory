@@ -1,7 +1,7 @@
 // Gra w edytorze („Graj” / „Stop”): zachowania z js/scene/behaviors.js ruszają modele sceny, gracz steruje jednym z nich
 // klawiaturą (play/input.js), kamera jedzie za nim (orbita zostaje: można się obracać wokół). Dane sceny się nie
 // zmieniają — zachowania ustawiają tylko modele w świecie 3D; po „Stop” modele wracają na miejsca z danych.
-import { BEHAVIORS, behaviorOf } from '../../../js/scene/behaviors.js';
+import { BEHAVIORS, behaviorOf, bodyRank } from '../../../js/scene/behaviors.js';
 import { createInput } from './input.js';
 
 const { t, lang } = window.EditorI18n;
@@ -13,13 +13,17 @@ export function createPlay(store, world, controls, actions) {
   function start() {
     if (runs.length) return;
     const env = { get surface() { return store.scene.env.surface; }, get waves() { return world.stage.waves; }, isWater: (x, z) => world.stage.isWater(x, z), groundAt: (x, z) => world.stage.groundAt(x, z),
-      terrainAt: (x, z) => world.stage.terrainAt(x, z), waterLevel: (x, z) => world.stage.waterLevel(x, z), waterAt: (x, z) => world.stage.waterAt(x, z) };   // pojazdy lądowe: grunt i dno, poziom wody
+      terrainAt: (x, z) => world.stage.terrainAt(x, z), waterLevel: (x, z) => world.stage.waterLevel(x, z), waterAt: (x, z) => world.stage.waterAt(x, z),   // pojazdy lądowe: grunt i dno, poziom wody
+      // orbita: inne obiekty sceny i ich bieżące położenie, kierunek słońca, kamera
+      objects: store.scene.objects, objectPos: (id) => { const b = world.built.get(id); return b ? b.root.position.toArray() : null; },
+      get sunDir() { return world.stage.sunDir; }, get cameraPos() { return world.camera.position; } };
     runs = store.scene.objects.map((o) => {
       const id = behaviorOf(o), b = world.built.get(o.id); if (!id || !b) return null;
       const run = BEHAVIORS[id].create(o, b, env);
       if (run) b.driven = true;   // ruch i części daje zachowanie (świat nie wywołuje tick)
       return run && { obj: o, id, b, run };
     }).filter(Boolean);
+    runs.sort((a, b) => bodyRank(b.obj.prefab) - bodyRank(a.obj.prefab));   // środki orbit przed ciałami, które wokół nich krążą
     if (!runs.length) { actions.status(t('play.none')); return; }
     // gracz steruje wybranym (gdy ma zachowanie), inaczej pierwszym
     me = runs.find((r) => r.obj.id === store.selectedId) || runs[0];

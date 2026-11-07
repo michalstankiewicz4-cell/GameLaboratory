@@ -3,6 +3,15 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.47.0 · edytor sceny 0.19.0 — 2026-11-07 (zachowanie „orbita”)
+
+### Dodane
+- **Zachowanie „orbita”** (`js/behaviors/space/orbit.js`, kosmos; punkt 6 planu rozbioru — orbity): ciało krąży pod
+  grawitacją środka a = −μ·r/|r|³ (całkowanie prędkością Verleta, krok 1/240 s, we współrzędnych względem środka, który
+  sam może się ruszać); μ z okresu orbity kołowej (μ = 4π²r³/T²). Start — prędkość orbity kołowej; elipsa wynika z sił.
+  W scenie: adapter `orbit` (`js/scene/behaviors.js`) dla ciał niebieskich, środek z `orbit.around` albo najbliższe
+  cięższe ciało (`bodyRank`), okres `orbit.period`; pole `orbit` w danych sceny i w poleceniu API `set`.
+
 ## Program 0.46.0 · edytor sceny 0.18.0 — 2026-11-07 (prefabrykaty: ludzie i stwory)
 
 ### Dodane

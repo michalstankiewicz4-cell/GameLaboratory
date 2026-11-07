@@ -106,7 +106,7 @@ albo lista (po kolei); wynik `{ "ok": true, … }` albo `{ "ok": false, "error":
 | `describe` | — | cała scena (dane) i krótki opis |
 | `prefabs` | `[family]` | modele do dodania: id, nazwa, rodzina, gdzie stoi, zachowania |
 | `add` | `prefab`, `[name]`, `[pos]`, `[rot]`, `[scale]`, `[behavior]` | dodaje model, zwraca `id` |
-| `set` | `id` albo `name`, potem `newName` (z `id` także `name`), `prefab`, `pos`, `rot`, `scale`, `behavior` | zmienia obiekt |
+| `set` | `id` albo `name`, potem `newName` (z `id` także `name`), `prefab`, `pos`, `rot`, `scale`, `behavior`, `orbit` (`{ around, period }` — zachowanie „orbita”) | zmienia obiekt |
 | `move` | `id` albo `name`, `by: [dx, dy, dz]` | przesuwa o wektor |
 | `remove` | `id` albo `name` | usuwa |
 | `env` | `surface` (`sea` / `land` / `space`), `light`, `look`, `land`, `sea`, `sky` | środowisko |
@@ -119,6 +119,17 @@ albo lista (po kolei); wynik `{ "ok": true, … }` albo `{ "ok": false, "error":
 ```json
 [{ "cmd": "add", "prefab": "sea/orzel", "name": "Orzeł 2", "pos": [60, 0, -20], "rot": [0, 45, 0] },
  { "cmd": "env", "light": "dusk" }]
+```
+
+Układ z orbitami (▶ — ciała krążą pod grawitacją; Luna wokół Terry, Terra wokół słońca):
+
+```json
+[{ "cmd": "env", "surface": "space" },
+ { "cmd": "add", "prefab": "bodies/sol", "name": "Sol" },
+ { "cmd": "add", "prefab": "bodies/terra", "name": "Terra", "pos": [300, 0, 0], "scale": 0.4 },
+ { "cmd": "set", "name": "Terra", "orbit": { "around": "Sol", "period": 20 } },
+ { "cmd": "add", "prefab": "bodies/luna", "name": "Luna", "pos": [340, 0, 0], "scale": 0.15 },
+ { "cmd": "set", "name": "Luna", "orbit": { "period": 5 } }]
 ```
 
 Jednostki: metry, stopnie; Y w górę, kurs 0 — wzdłuż +Z. W czasie gry polecenia zmieniające scenę są odrzucane.

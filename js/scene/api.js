@@ -21,7 +21,7 @@ const COMMANDS = {
   describe: { args: '', does: 'the whole scene as data (format gamelab-scene) and a short summary' },
   prefabs: { args: '[family]', does: 'the models that can be added: id, name, family, where it stands, behaviours' },
   add: { args: 'prefab, [name], [pos [x,y,z] m], [rot [pitch,heading,roll] °], [scale], [behavior]', does: 'adds a model; returns its id' },
-  set: { args: 'id | name, then any of: newName (with id also name), prefab, pos, rot, scale, behavior', does: 'changes an object' },
+  set: { args: 'id | name, then any of: newName (with id also name), prefab, pos, rot, scale, behavior, orbit { around: id | name ("" — the nearest heavier body), period: s } (the orbit behaviour)', does: 'changes an object' },
   move: { args: 'id | name, by [dx,dy,dz] m', does: 'moves an object by an offset' },
   remove: { args: 'id | name', does: 'removes an object' },
   env: { args: 'any of: surface (sea | land | space), light (a ready light or a weather asset name), look, land (a land asset name, "" — the plain ground), sea (a sea asset name, "" — the default sea), sky (any surface: "" — the default for the surface, "day" — the day sky, "preset:<id>" — a ready space sky, or a sky asset name)', does: 'changes the environment' },
@@ -64,9 +64,15 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
     if (c.rot != null) p.rot = vec3(c.rot, 'rot');
     if (c.scale != null) { p.scale = num(c.scale, 'scale'); if (!(p.scale > 0)) fail('scale must be > 0'); }
     const b = behavior(prefabId, c.behavior); if (b !== undefined) p.behavior = b;
+    if (c.orbit != null) {   // zachowanie „orbita”: { around: id albo nazwa obiektu ("" — sam wybiera), period: s }
+      const o = c.orbit, x = {};
+      if (o.around != null) x.around = o.around === '' ? '' : target(typeof o.around === 'string' && !store.scene.objects.some((q) => q.id === o.around) ? { name: o.around } : { id: o.around }).id;
+      if (o.period != null) { x.period = num(o.period, 'orbit.period'); if (!(x.period > 0)) fail('orbit.period must be > 0 (seconds)'); }
+      p.orbit = x;
+    }
     return p;
   }
-  const summary = (o) => ({ id: o.id, name: o.name, prefab: o.prefab, pos: o.pos, rot: o.rot, scale: o.scale, ...(o.behavior != null ? { behavior: o.behavior } : {}) });
+  const summary = (o) => ({ id: o.id, name: o.name, prefab: o.prefab, pos: o.pos, rot: o.rot, scale: o.scale, ...(o.behavior != null ? { behavior: o.behavior } : {}), ...(o.orbit ? { orbit: o.orbit } : {}) });
 
   const run1 = {
     help: () => ({ commands: COMMANDS, notes: 'Units: metres, degrees. Y is up; heading 0 looks along +Z. An object is named by "id" or "name". A list of commands runs in order.' }),
@@ -85,6 +91,7 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
       const o = target(c), pf = c.prefab != null ? prefabOf(c.prefab).id : o.prefab;
       const x = patch({ ...c, newName: c.newName ?? (c.id != null ? c.name : undefined) }, pf);   // z id: "name" to nowa nazwa
       if (pf !== o.prefab) x.prefab = pf;
+      if (x.orbit) x.orbit = { ...(o.orbit || {}), ...x.orbit };
       if (!Object.keys(x).length) fail('nothing to change');
       build(() => store.update(o.id, x));
       return { object: summary(o) };

@@ -8,7 +8,7 @@
 //          sea: '' | nazwa zasobu „morze” (js/scene/assets.js; '' — morze domyślne),
 //          sky: '' | 'day' | 'preset:<id>' | nazwa zasobu „niebo” (każda powierzchnia; '' — domyślne: morze i ląd —
 //          dzienne, kosmos — Deep field; js/scene/space.js) },
-//   objects: [{ id, name, prefab, pos: [x, y, z], rot: [x, y, z] (stopnie), scale, behavior? }]
+//   objects: [{ id, name, prefab, pos: [x, y, z], rot: [x, y, z] (stopnie), scale, behavior?, orbit? { around, period } }]
 // }
 // prefab: id z js/scene/prefabs.js; behavior: id z js/scene/behaviors.js, '' = bez zachowania, brak pola = domyślne
 // dla prefabrykatu; look: wygląd kamery — zasób „look” z laboratorium filtrów (js/scene/assets.js), '' = zwykły obraz.
@@ -36,6 +36,7 @@ export function normalize(d) {
     id: String(o.id || newId()), name: String(o.name || o.prefab), prefab: o.prefab,
     pos: num3(o.pos, [0, 0, 0]), rot: num3(o.rot, [0, 0, 0]), scale: Number.isFinite(+o.scale) && +o.scale > 0 ? +o.scale : 1,
     ...(typeof o.behavior === 'string' ? { behavior: o.behavior } : {}),
+    ...(o.orbit && typeof o.orbit === 'object' ? { orbit: { ...(typeof o.orbit.around === 'string' ? { around: o.orbit.around } : {}), ...(+o.orbit.period > 0 ? { period: +o.orbit.period } : {}) } } : {}),
   }));
   return s;
 }

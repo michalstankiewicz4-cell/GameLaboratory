@@ -11,6 +11,7 @@ Zasada (CLAUDE.md): fizyka jest prawdziwa — start, ruch, skręt i zatrzymanie 
 | mała jednostka na wodzie | `water/craft.js` | woda (amfibia też ląd) | laboratoria pojazdów (roboty MarineKit, amfibia), edytor sceny (roboty morskie) |
 | jazda po lądzie | `land/drive.js` | ląd | laboratorium pojazdów — ląd (łaziki, pojazdy drogowe), edytor sceny (pojazdy drogowe, łaziki) |
 | ciąg w próżni | `space/thrust.js` | kosmos | edytor sceny (statki kosmiczne, dron) |
+| orbita | `space/orbit.js` | kosmos | edytor sceny (ciała niebieskie) |
 | lot w atmosferze | `air/flight.js` | ląd (powietrze nad lądem) | edytor sceny (Spitfire) |
 | koło na szynie — skład | `rail/physics.js`, `rail/rail.js` | ląd | laboratorium pojazdów — ląd (pociąg) |
 | koło na szynie — tramwaj | `rail/tram.js`, `rail/path.js` | ląd | laboratorium pojazdów — ląd (Swing na pętli toru; liczby w TramKit: `js/models/train/trams/swing.js`, `phys`) |
@@ -78,6 +79,17 @@ długość styku), `gauge`, wymiary; brakujące wyprowadzone (moc z `accel` i `m
   siła, nie zatrzymanie w kodzie; `stabilize: false` ją wyłącza.
 - Stan: `p`, `v`, `q` ([w, x, y, z]), `w` (prędkość kątowa w układzie statku), `speed`, `thrust`.
 - Układ statku: +z dziób, +y góra, +x lewa burta.
+
+## Orbita (`space/orbit.js`)
+
+`createOrbit({ mu }, { rel, vel })` → `{ state, step(dt) }`; `orbitMu(r, period)` — μ = 4π²·r³ / T² (orbita kołowa
+o promieniu r ma okres T; model, nie prawdziwa skala); `circularVelocity(rel, mu)` — prędkość orbity kołowej √(μ/r),
+prostopadle do r i do pionu.
+
+- Siła: grawitacja środka a = −μ·r / |r|³; całkowanie prędkością Verleta (krok 1/240 s) we współrzędnych względem środka
+  — środek może się ruszać (księżyc wokół planety, która krąży wokół słońca).
+- Prędkość startowa inna niż kołowa daje elipsę albo ucieczkę — z sił, bez toru w kodzie.
+- Stan: `rel`, `vel`, `r`, `speed`, `period` (z energii: okres orbity eliptycznej, ∞ gdy ciało ucieka).
 
 ## Lot w atmosferze (`air/flight.js`)
 

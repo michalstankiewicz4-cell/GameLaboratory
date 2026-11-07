@@ -11,6 +11,7 @@ import { createFlight } from '../behaviors/air/flight.js';
 import { createThrust } from '../behaviors/space/thrust.js';
 import { createDrive, driveDef } from '../behaviors/land/drive.js';
 import { createCraft, craftDef } from '../behaviors/water/craft.js';
+import { createOrbit, orbitMu, circularVelocity } from '../behaviors/space/orbit.js';
 
 const D2R = Math.PI / 180;
 const quatOf = (q, o = new THREE.Quaternion()) => o.set(q[1], q[2], q[3], q[0]);   // [w, x, y, z] → THREE
@@ -163,7 +164,52 @@ export const BEHAVIORS = {
       };
     },
   },
+  orbit: {
+    label: 'Orbit', labelPl: 'Orbita', env: 'space', throttle: [0, 0],
+    fits: (prefabId) => prefabId.startsWith('bodies/'),
+    keys: 'the body orbits by itself (gravity); the camera follows it',
+    keysPl: 'ciało krąży samo (grawitacja); kamera za nim',
+    // środek: obj.orbit.around (id obiektu) albo najbliższe ciało wyższej rangi (czarna dziura > słońce, pulsar > olbrzym
+    // > planeta > księżyc, planetoida, kometa); bez środka — stoi. Okres: obj.orbit.period (s), domyślnie 60
+    create(obj, built, world) {
+      const others = (world.objects || []).filter((o) => o.id !== obj.id);
+      const want = obj.orbit && obj.orbit.around, my = bodyRank(obj.prefab);
+      let ctr = want ? others.find((o) => o.id === want) : null;
+      if (!ctr) {
+        let best = Infinity;
+        for (const o of others) { if (bodyRank(o.prefab) <= my) continue; const d = dist(o.pos, obj.pos); if (d < best) { best = d; ctr = o; } }
+      }
+      if (!ctr) return null;
+      const rel = obj.pos.map((v, i) => v - ctr.pos[i]), r = Math.hypot(...rel); if (r < 1e-3) return null;
+      const T = (obj.orbit && obj.orbit.period > 0 ? obj.orbit.period : ORBIT_PERIOD), mu = orbitMu(r, T);
+      const sim = createOrbit({ mu }, { rel, vel: circularVelocity(rel, mu) }), s = sim.state, root = built.root;
+      const at = () => (world.objectPos ? world.objectPos(ctr.id) : null) || ctr.pos;
+      let tAcc = 0;
+      return {
+        state: s, center: ctr.id,
+        step(dt) {
+          sim.step(dt); const c = at();
+          root.position.set(c[0] + s.rel[0], c[1] + s.rel[1], c[2] + s.rel[2]);
+          tAcc += dt; if (built.tick) built.tick(tAcc, dt, { sunDir: world.sunDir, center: world.cameraPos });   // obrót i światło ciała
+        },
+        hud: () => ({ speed: s.speed, unit: 'm/s', throttle: 0 }),
+        reset() {},
+      };
+    },
+  },
 };
+export const ORBIT_PERIOD = 60;
+const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+// ranga ciała niebieskiego (do wyboru środka orbity); inne modele — −1 (nie są środkiem)
+const RANKS = { blackholes: 4, suns: 3, pulsars: 3, giants: 2, rings: 2 };
+const BODY_GROUP = { cinder: 'lava', magma: 'lava', terra: 'p', pelagia: 'p', rime: 'p', glacies: 'p', mars: 'p', venus: 'p', mercury: 'p',
+  jupiter: 'giants', saturn: 'giants', uranus: 'giants', neptune: 'giants', halo: 'rings', filament: 'rings', gossamer: 'rings', shards: 'rings',
+  metronome: 'pulsars', sol: 'suns', abyss: 'blackholes', luna: 'm', comet: 'm', ferrum: 'm' };
+export function bodyRank(prefabId) {
+  if (!prefabId.startsWith('bodies/')) return -1;
+  const g = BODY_GROUP[prefabId.slice(7)];
+  return RANKS[g] ?? (g === 'm' ? 0 : 1);
+}
 
 // zachowania, które pasują do prefabrykatu (lista w oknie Właściwości)
 export const behaviorsFor = (prefabId) => Object.entries(BEHAVIORS).filter(([, b]) => b.fits(prefabId)).map(([id]) => id);

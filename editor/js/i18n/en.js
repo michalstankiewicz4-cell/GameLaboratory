@@ -17,7 +17,7 @@
   'env.title': 'Environment', 'env.surface': 'Surface', 'env.sea': 'Sea', 'env.land': 'Land',
   'env.light': 'Light', 'env.look': 'Camera look', 'env.plain': 'Plain (no profile)',
   'env.lookNote': 'Camera looks are the profiles saved in the filters lab.',
-  'obj.title': 'Object', 'obj.name': 'Name', 'obj.model': 'Model',
+  'obj.title': 'Object', 'obj.orbitAround': 'Orbits', 'obj.orbitAuto': 'Nearest heavier body', 'obj.orbitPeriod': 'Period', 'obj.name': 'Name', 'obj.model': 'Model',
   'obj.x': 'Position X', 'obj.y': 'Position Y', 'obj.z': 'Position Z',
   'obj.heading': 'Heading', 'obj.pitch': 'Pitch', 'obj.roll': 'Roll', 'obj.scale': 'Scale',
   'obj.toSurface': 'To the surface', 'obj.toSurface.tip': 'Y = 0: on the water or the ground',

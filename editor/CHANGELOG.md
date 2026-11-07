@@ -3,6 +3,13 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.19.0 — 2026-11-07 (orbity)
+
+### Dodane
+- Zachowanie **Orbita** dla ciał niebieskich: w grze (▶) ciało krąży pod grawitacją środka — wybranego we
+  Właściwościach („Krąży wokół”) albo najbliższego cięższego ciała (czarna dziura > słońce, pulsar > olbrzym > planeta >
+  księżyc, planetoida, kometa); okres w sekundach (domyślnie 60). Księżyc wokół planety, która krąży wokół słońca.
+
 ## 0.18.0 — 2026-11-07 (ludzie i stwory)
 
 ### Dodane
