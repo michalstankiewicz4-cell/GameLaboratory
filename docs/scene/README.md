@@ -145,6 +145,8 @@ mgła, morze WaterKit, płaski grunt albo teren LandKit z wodami RegionKit, mapa
 - Powierzchnia `setSurface`, niebo `setSkyMode`, światło `setLight(id | pogoda)`, morze `setSea(zasób)`, ląd
   `setLand({ map, water })` albo `setWorld(T)` (świat już wygenerowany), kadłub wycięty z wody `setShip`.
 - Morze przy terenie zna teren (płycizny, przybój, barwy i prądy wód, lód, olej); fale powtarzają się co rozmiar mapy.
+- Ląd z planety (`T.atmo`): niebo dzienne w odcieniu jej atmosfery (`tintAtmosphere` w `setLight`); bez atmosfery
+  `stage.airless` — strona daje niebo kosmosu; planeta bez mórz (`T.noSea`) — bez wody wokół wycinka.
 - Kosmos: `setSurface('space')` i `setSkyMode('space')`, odbicia `setSpaceEnvironment` (mapa ShipKit), niebo daje
   strona (ciało nieba BodyKit — edytor, pojazdy · kosmos).
 - Laboratorium z własną wodą albo gruntem (woda: warianty A i B; pojazdy · woda: zwykła tafla; pojazdy · ląd: zwykły grunt) wyłącza morze sceny

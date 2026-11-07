@@ -3,6 +3,11 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.20.2 — 2026-11-07
+
+### Zmienione
+- Ląd z planety bez atmosfery (Luna, Mercury): domyślne niebo — kosmosu; z atmosferą — niebo dzienne w jej odcieniu.
+
 ## 0.20.1 — 2026-11-07
 
 ### Zmienione

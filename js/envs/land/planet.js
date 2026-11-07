@@ -6,7 +6,9 @@
 // (brzeg: map.barrier). Potrzebuje window.BodyKit (js/scene/space.js loadSpace()).
 //
 //   PLANET_GROUPS                    grupy BodyKit z gruntem (planety, księżyce)
-//   PLANETS                          [{ ref: 'grupa/ciało', label }] — planety i księżyce z gruntem
+//   PLANETS                          [{ ref: 'grupa/ciało', label, airless }] — planety i księżyce z gruntem
+//   planetAirless(ref)               bez atmosfery (niebo kosmosu nad gruntem)
+//   świat z planety ma T.atmo { airless, density, hue } — scena bazowa barwi nim niebo (js/labs/shared/stage.js)
 //   planetBiome(ref)                 biom RegionKit, który najlepiej pasuje do grupy planety
 //   worldFor(renderer, map, water)   świat RegionKit: z planety (map.planet = 'grupa/ciało') albo z generatora
 import { generateWorld } from './regionkit.js';
@@ -16,8 +18,9 @@ const M_PER_SIZE = 8000, DETAIL_WAVE = 140;   // jak w SurfaceKit (js/envs/land/
 
 // planety i księżyce z gruntem (BodyKit.GROUPS, grupy PLANET_GROUPS) — lista bez ładowania kitu
 export const PLANETS = [['lava/cinder', 'Cinder'], ['lava/magma', 'Magma'], ['earthlike/terra', 'Terra-1'], ['earthlike/pelagia', 'Pelagia'],
-  ['icy/rime', 'Rime'], ['icy/glacies', 'Glacies'], ['desert/mars', 'Mars'], ['clouded/venus', 'Venus'], ['moons/luna', 'Luna'], ['airless/mercury', 'Mercury']]
-  .map(([ref, label]) => ({ ref, label }));
+  ['icy/rime', 'Rime'], ['icy/glacies', 'Glacies'], ['desert/mars', 'Mars'], ['clouded/venus', 'Venus'], ['moons/luna', 'Luna', true], ['airless/mercury', 'Mercury', true]]
+  .map(([ref, label, airless]) => ({ ref, label, airless: !!airless }));   // airless: bez atmosfery — niebo kosmosu
+export const planetAirless = (ref) => !!(PLANETS.find((p) => p.ref === ref) || {}).airless;
 export const planetBiome = (ref) => (/^(earthlike|icy)\//.test(ref || '') ? 'temperate' : 'desert');
 
 // wysokości wycinka planety [m] (pod morzem ujemne), maska lodu; null — ciało bez gruntu albo brak BodyKit
@@ -38,7 +41,7 @@ function planetHeights(renderer, ref, values, size, res) {
     // powierzchnią; świat bez morza: sam grunt (najniżej 0,5 m nad zerem)
     h[k] = seaWorld && s.sea[k] ? Math.min(-0.5, up) : Math.max(0.5, up + s.d[k] * detailM);
   }
-  return { h, ice: s.ice, R };
+  return { h, ice: s.ice, R, noSea: !seaWorld, atmo: { airless: (v.airless || 0) >= 0.5 || (v.atmosphere || 0) < 0.02, density: v.atmosphere || 0, hue: v.atmoHue ?? 205 } };
 }
 
 export function worldFor(renderer, map = {}, water = {}) {
@@ -48,5 +51,5 @@ export function worldFor(renderer, map = {}, water = {}) {
   if (!p) throw new Error(`"${map.planet}" has no ground (a planet or a moon: ${PLANET_GROUPS.join(', ')})`);
   let hi = 0, lo = 0; for (const y of p.h) { if (y > hi) hi = y; if (y < lo) lo = y; }
   // wysokość szczytów i głębokość morza z planety (barwy gruntu: śnieg na szczytach, skała; brzeg mapy)
-  return generateWorld({ ...map, size, res, relief: Math.max(50, hi), depth: Math.max(8, -lo), heights: p }, { ...water, layout: 'planet', biome: planetBiome(map.planet) });
+  return generateWorld({ ...map, size, res, relief: Math.max(50, hi), depth: Math.max(8, -lo), heights: p, atmo: p.atmo, noSea: p.noSea }, { ...water, layout: 'planet', biome: planetBiome(map.planet) });
 }

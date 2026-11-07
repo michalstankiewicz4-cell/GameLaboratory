@@ -6,6 +6,7 @@ import { LookPipeline, LOOK_DEFAULTS } from '../../../js/render/sea/look.js';
 import { createStage, LIGHTS } from '../../../js/labs/shared/stage.js';
 import { prefab } from '../../../js/scene/prefabs.js';
 import { getAsset, listAssets } from '../../../js/scene/assets.js';
+import { planetAirless } from '../../../js/envs/land/planet.js';
 import { spaceReady, loadSpace, SKY_PRESET, SKY_DAY } from '../../../js/scene/space.js';
 
 export { LIGHTS };
@@ -69,7 +70,9 @@ export function createWorld(container, store, onWarn) {
   }
   // niebo niezależne od powierzchni: env.sky '' — domyślne dla powierzchni (morze, ląd — dzienne; kosmos — Deep field),
   // 'day' — dzienne (pora dnia i pogoda), 'preset:<id>' albo nazwa zasobu — niebo kosmosu (także nad morzem i lądem)
-  const skyIsSpace = (env) => (env.sky ? env.sky !== SKY_DAY : env.surface === 'space');
+  // niebo kosmosu: wybrane, kosmos albo ląd z planety bez atmosfery (Luna, Mercury)
+  const airlessLand = (env) => { const d = env.surface === 'land' && env.land ? getAsset('land', env.land) : null; return !!(d && d.map && d.map.planet && planetAirless(d.map.planet)); };
+  const skyIsSpace = (env) => (env.sky ? env.sky !== SKY_DAY : env.surface === 'space' || airlessLand(env));
   function syncSpace(env) {
     const on = skyIsSpace(env);
     stage.setSkyMode(on ? 'space' : 'day');

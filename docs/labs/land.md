@@ -126,5 +126,8 @@ place its globe and the surface lab show; scale as in SurfaceKit (a planet of si
 mountains × R metres of relief). The water is open sea, frozen where the planet's sea is ice (RegionKit layout
 `planet`); the biome follows the planet (Earth-like and icy — northern, the rest — desert). Size, detail and the map
 edge apply; the generator's settings are switched off. A saved land with a planet goes to the scene editor like any
-other (`map.planet`). Not yet: the planet's own sky, lava as lava (a lava sea shows as water), a cut elsewhere than the
+other (`map.planet`). The sky follows the planet (since 1.6.0): the base stage tints the day sky, the ambient light and the haze with the
+planet's atmosphere hue (BodyKit `atmoHue`, Earth 205°), paler, darker and with less haze the thinner the air
+(`atmosphere`); an airless world (Luna, Mercury) gets the space sky (BodyKit's Deep field, ShipKit reflections), as in
+the scene editor. A world without seas has no water around the cut. Not yet: lava as lava (a lava sea shows as water), a cut elsewhere than the
 equator.

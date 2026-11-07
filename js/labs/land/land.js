@@ -96,7 +96,25 @@ const generateShown = () => window.LabLoad.run('Generating the world…', async 
 function genTextures() {
   stage.setWorld(T);   // height, region and biome textures; ice, oil, buoys
 }
+// planeta bez atmosfery (Luna, Mercury): niebo kosmosu — ciało nieba BodyKit („Deep field”) i odbicia ShipKit, jak
+// w edytorze sceny; z atmosferą scena bazowa barwi niebo dzienne jej odcieniem (stage.js, tintAtmosphere)
+let spaceSky = null, spaceEnvSet = false;
+function planetSky() {
+  const airless = stage.airless;
+  stage.setSkyMode(airless ? 'space' : 'day');
+  if (airless && window.BodyKit) {
+    if (!spaceEnvSet && window.ShipKit) { stage.setSpaceEnvironment(window.ShipKit.makeEnvironment(renderer)); spaceEnvSet = true; }
+    if (!spaceSky) {
+      const BK = window.BodyKit, ref = BK.GAME_KINDS.sky, deep = window.SystemKit && window.SystemKit.SKIES.find((x) => x.id === 'deep');
+      spaceSky = BK.buildBody(ref.groupId, ref.bodyId, { detail: 1, values: (deep && deep.values) || {} });
+      spaceSky.setRadius(18000); spaceSky.setOctaves(BK.QUALITY_OCTAVES[2]); scene.add(spaceSky.group);
+    }
+  }
+  if (spaceSky) spaceSky.group.visible = airless;
+  updateSky();
+}
 function genRest() {
+  planetSky();
   const t0 = genT0;
   $('biomeBlend').disabled = S.water.biome !== 'zones';
   $('biomeShare').replaceChildren(...BIOME_ORDER.filter((b) => T.biomes.share[b] > 0.005).flatMap((b) => [el('span', { textContent: BIOMES[b].label.replace(/ \(.*/, '') }), el('b', { textContent: `${(T.biomes.share[b] * 100).toFixed(0)} %` })]));
@@ -357,6 +375,7 @@ function frame(now) {
   const dtMs = now - last, dt = Math.min(0.05, dtMs / 1000); last = now; simT += dt;
   stage.tick(dt);
   sailStep(dt); placeCamera(dt);
+  if (spaceSky && spaceSky.group.visible) spaceSky.update(simT, dt, { center: camera.position, renderer });
   stage.follow(camera);   // sky and sea with the camera, the terrain grids, the haze thinning with height, the sky environment
   // the shadow box follows what the camera looks at
   const tgt = ship.on && S.sail && camMode !== 'Free flight' ? tmpV.set(ship.x, 0, ship.z) : tmpV.copy(camera.position).setY(0);

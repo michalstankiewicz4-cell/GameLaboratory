@@ -65,6 +65,16 @@ export function createStage(renderer, scene, opts = {}) {
   let space = false, spaceEnv = null, lightId = 'afternoon', surfaceKind = 'sea';
   let land = null;   // teren (setLand / setWorld): { T, tm, tex, btex, rtex, buoys } — mapa, siatki LandKit, tekstury; morze zna teren
   setSea();
+  // atmosfera planety (ląd z planety, T.atmo): niebo dzienne przebarwione na odcień jej atmosfery (Ziemia 205°), tym
+  // bledsze i ciemniejsze, im rzadsza atmosfera; bez atmosfery — niebo kosmosu (tryb nieba ustawia strona)
+  let atmo = null;
+  const EARTH_HUE = 205, hsl = {};
+  function tintAtmosphere(a) {
+    const dh = (a.hue - EARTH_HUE) / 360, k = Math.min(1, a.density / 0.6), thin = 0.35 + 0.65 * k;
+    const tint = (c) => { c.getHSL(hsl); c.setHSL((hsl.h + dh + 1) % 1, hsl.s * (0.4 + 0.6 * k), hsl.l * thin); };
+    for (const c of [skyU.uSkyHor.value, skyU.uSkyZen.value, skyU.uSkyLow.value, hemi.color, scene.fog.color, WU.uFogCol.value]) tint(c);
+    scene.fog.density *= 0.3 + 0.7 * k; fogBase = scene.fog.density; WU.uFogDen.value = fogBase;   // rzadka atmosfera — mniej mgiełki
+  }
   const stage = {
     skyU, WU, sun, hemi, water, ground, setSea,
     // wiatr [m/s] dla dryfu chmur (null — stały, wolny dryf)
@@ -76,7 +86,7 @@ export function createStage(renderer, scene, opts = {}) {
     // Niebo osobno (setSkyMode); bez drugiego argumentu kosmos dostaje niebo kosmosu, morze i ląd — dzienne
     setSurface(kind, groundY = 0) {
       surfaceKind = kind;
-      water.visible = kind === 'sea' || (kind === 'land' && !!land); ground.visible = kind === 'land' && !land; ground.position.y = groundY;
+      water.visible = kind === 'sea' || (kind === 'land' && !!land && !land.T.noSea);   // planeta bez mórz: bez wody wokół wycinka ground.visible = kind === 'land' && !land; ground.position.y = groundY;
       if (land) { land.tm.group.visible = kind === 'land'; if (land.buoys) land.buoys.visible = kind === 'land'; }
     },
     setSkyMode(mode) {
@@ -118,10 +128,13 @@ export function createStage(renderer, scene, opts = {}) {
         if (!T.wrap && T.barrier === 'buoys') { land.buoys = barrierBuoys(T); scene.add(land.buoys); }
       } else { WU.uIce.value.set(0, 18, 0.35, 1); WU.uOil.value = 0; }
       setSea(seaDef);   // fale zawinięte z mapą albo nie
+      const was = atmo; atmo = land && land.T.atmo && !land.T.atmo.airless ? land.T.atmo : null;
       stage.setSurface(surfaceKind);
+      if (was !== atmo) stage.setLight(lightId);
     },
     get land() { return land ? land.T : null; },
-    get terrain() { return land ? land.tm : null; },   // siatki terenu LandKit (trójkąty, update)
+    get terrain() { return land ? land.tm : null; },
+    get airless() { return !!(land && land.T.atmo && land.T.atmo.airless); },   // ląd z planety bez atmosfery: strona daje niebo kosmosu   // siatki terenu LandKit (trójkąty, update)
     // wysokość gruntu albo poziomu morza (samolot: koła, zderzenie z ziemią)
     groundAt: (x, z) => (land && surfaceKind === 'land' ? Math.max(0, sampleHeight(land.T, x, z)) : ground.visible ? ground.position.y : 0),
     // grunt bez wody (pojazdy lądowe): teren, dno pod wodą ujemne; płaski grunt; morze — dno głęboko (30 m);
@@ -156,6 +169,7 @@ export function createStage(renderer, scene, opts = {}) {
       WU.uFogCol.value.copy(L.fog); WU.uFogFar.value = L.fogFar; WU.uShine.value = shine0 * 1.8;
       scene.environmentIntensity = 0.85 - w.coverage * w.density * 0.45;
       envDirty = true;
+      if (atmo && !space && surfaceKind === 'land') tintAtmosphere(atmo);   // niebo planety: barwa i gęstość jej atmosfery
       if (space) {   // niebo kosmosu: słońce białe i pełne (bez atmosfery i chmur), kierunek z pory dnia; prawie bez rozproszonego
         sunSeen = 1; sun.color.setRGB(1, 0.97, 0.92); sun.intensity = 3.2;
         hemi.intensity = 0.04; hemi.color.setRGB(0.6, 0.65, 0.8); hemi.groundColor.setRGB(0.05, 0.05, 0.07);

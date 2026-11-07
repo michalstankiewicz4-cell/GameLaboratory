@@ -3,6 +3,15 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.50.0 · ląd 1.6.0 · edytor sceny 0.20.2 — 2026-11-07 (niebo planety)
+
+### Dodane
+- **Niebo planety** nad lądem z planety: scena bazowa barwi niebo dzienne, światło rozproszone i mgłę odcieniem
+  atmosfery planety (BodyKit `atmoHue`; Ziemia 205°), bledsze, ciemniejsze i z rzadszą mgiełką, im rzadsza atmosfera
+  (`atmosphere`) — Mars różowo-szary, Wenus żółtawa. Planeta bez atmosfery (Luna, Mercury): niebo kosmosu (ciało nieba
+  BodyKit „Deep field”, odbicia ShipKit) — w laboratorium lądu i w edytorze sceny.
+- Planeta bez mórz (Mars, Luna, Mercury…): bez wody wokół wycinka.
+
 ## Program 0.49.0 · ląd 1.5.0 · edytor sceny 0.20.1 — 2026-11-07 (ląd z planety)
 
 ### Dodane
