@@ -129,5 +129,7 @@ edge apply; the generator's settings are switched off. A saved land with a plane
 other (`map.planet`). The sky follows the planet (since 1.6.0): the base stage tints the day sky, the ambient light and the haze with the
 planet's atmosphere hue (BodyKit `atmoHue`, Earth 205°), paler, darker and with less haze the thinner the air
 (`atmosphere`); an airless world (Luna, Mercury) gets the space sky (BodyKit's Deep field, ShipKit reflections), as in
-the scene editor. A world without seas has no water around the cut. Not yet: lava as lava (a lava sea shows as water), a cut elsewhere than the
-equator.
+the scene editor. A world without seas has no water around the cut. The ground takes the planet's rock colour (since 1.7.0, LandKit `uGround` from `T.ground`): grey
+regolith on airless worlds, red-brown on rusty ones (Mars, Venus), dark basalt on lava worlds — the same brightness and
+pattern, another colour; Earth-like and icy worlds keep the biomes. A lava world's sea is lava (WaterKit `uLava`, the
+lava waves and look) whatever sea is chosen. Not yet: a cut elsewhere than the equator.

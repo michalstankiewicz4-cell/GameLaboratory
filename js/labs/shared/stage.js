@@ -5,7 +5,7 @@ import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment, sunA
 import { heightTexture, terrainMeshes, sampleHeight, barrierBuoys, GLSL_LAND } from '../../envs/land/landkit.js';
 import { worldFor } from '../../envs/land/planet.js';
 import { generateWorld, biomeTexture, regionTextures, regionUniforms, setRegions, GLSL_REGIONS } from '../../envs/land/regionkit.js';
-import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, hullTexture, LOOKS } from '../../envs/water/waterkit.js';
+import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, hullTexture, LOOKS, SEAS } from '../../envs/water/waterkit.js';
 
 // oświetlenie do sprawdzania filtrów: pogoda z SkyKit + pora dnia (55° N, koniec października, jak w laboratorium wyglądu)
 export const LIGHTS = {
@@ -38,8 +38,10 @@ export function createStage(renderer, scene, opts = {}) {
   const SEA0 = { Hs: 1.2, Lp: 34, chop: 0.5, spread: 35, n: 12, dir: 30 }, L0 = LOOKS.atlantic;
   let waves = null, shine0 = L0.shine, seaDef = {};
   function setSea(p = {}) {
+    seaDef = p;
+    if (land && land.T.lavaSea) p = { ...SEAS.lava, ...LOOKS.lava, dir: 30 };   // morze lawy planety: zawsze lawa
     const q = { ...SEA0, ...L0, reflect: 1, ...p };
-    seaDef = p; waves = waveSet({ Hs: q.Hs, Lp: q.Lp, chop: q.chop, spread: q.spread, n: q.n }, q.dir + 180, 7);
+    waves = waveSet({ Hs: q.Hs, Lp: q.Lp, chop: q.chop, spread: q.spread, n: q.n }, q.dir + 180, 7);
     if (land) {   // teren: fale powtarzają się co rozmiar mapy (świat zawinięty bez szwu) — wektor każdej fali na całe okresy mapy
       const K = 2 * Math.PI / land.T.size;
       for (const w of waves) {
@@ -128,6 +130,8 @@ export function createStage(renderer, scene, opts = {}) {
         if (!T.wrap && T.barrier === 'buoys') { land.buoys = barrierBuoys(T); scene.add(land.buoys); }
       } else { WU.uIce.value.set(0, 18, 0.35, 1); WU.uOil.value = 0; }
       setSea(seaDef);   // fale zawinięte z mapą albo nie
+      // planeta z morzem lawy (Cinder, Magma): morze — lawa (WaterKit uLava, fale i wygląd lawy)
+      WU.uLava.value = land && land.T.lavaSea ? 1 : 0;
       const was = atmo; atmo = land && land.T.atmo && !land.T.atmo.airless ? land.T.atmo : null;
       stage.setSurface(surfaceKind);
       if (was !== atmo) stage.setLight(lightId);

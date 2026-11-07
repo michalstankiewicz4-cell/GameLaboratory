@@ -23,6 +23,14 @@ export const PLANETS = [['lava/cinder', 'Cinder'], ['lava/magma', 'Magma'], ['ea
 export const planetAirless = (ref) => !!(PLANETS.find((p) => p.ref === ref) || {}).airless;
 export const planetBiome = (ref) => (/^(earthlike|icy)\//.test(ref || '') ? 'temperate' : 'desert');
 
+// barwa skały planety [r, g, b, ile] dla gruntu LandKit (uGround): bez atmosfery — szary regolit, rdza — czerwonobrązowa,
+// lawa — ciemny bazalt; Ziemia i planety lodowe — bez zmian (ziemskie biomy)
+function groundOf(ref, v) {
+  if ((v.airless || 0) >= 0.5 || /^(moons|airless)\//.test(ref)) return [0.5, 0.49, 0.47, 1];
+  if ((v.lava || 0) >= 0.5) return [0.23, 0.2, 0.19, 0.9];
+  if ((v.rust || 0) >= 0.3) return [0.66, 0.4, 0.26, 0.75];
+  return null;
+}
 // wysokości wycinka planety [m] (pod morzem ujemne), maska lodu; null — ciało bez gruntu albo brak BodyKit
 function planetHeights(renderer, ref, values, size, res) {
   const BK = window.BodyKit, THREE = window.THREE; if (!BK || !THREE) throw new Error('BodyKit is not loaded (js/scene/space.js loadSpace())');
@@ -41,7 +49,7 @@ function planetHeights(renderer, ref, values, size, res) {
     // powierzchnią; świat bez morza: sam grunt (najniżej 0,5 m nad zerem)
     h[k] = seaWorld && s.sea[k] ? Math.min(-0.5, up) : Math.max(0.5, up + s.d[k] * detailM);
   }
-  return { h, ice: s.ice, R, noSea: !seaWorld, atmo: { airless: (v.airless || 0) >= 0.5 || (v.atmosphere || 0) < 0.02, density: v.atmosphere || 0, hue: v.atmoHue ?? 205 } };
+  return { h, ice: s.ice, R, noSea: !seaWorld, lavaSea: seaWorld && (v.lava || 0) >= 0.5, ground: groundOf(ref, v), atmo: { airless: (v.airless || 0) >= 0.5 || (v.atmosphere || 0) < 0.02, density: v.atmosphere || 0, hue: v.atmoHue ?? 205 } };
 }
 
 export function worldFor(renderer, map = {}, water = {}) {
@@ -51,5 +59,5 @@ export function worldFor(renderer, map = {}, water = {}) {
   if (!p) throw new Error(`"${map.planet}" has no ground (a planet or a moon: ${PLANET_GROUPS.join(', ')})`);
   let hi = 0, lo = 0; for (const y of p.h) { if (y > hi) hi = y; if (y < lo) lo = y; }
   // wysokość szczytów i głębokość morza z planety (barwy gruntu: śnieg na szczytach, skała; brzeg mapy)
-  return generateWorld({ ...map, size, res, relief: Math.max(50, hi), depth: Math.max(8, -lo), heights: p, atmo: p.atmo, noSea: p.noSea }, { ...water, layout: 'planet', biome: planetBiome(map.planet) });
+  return generateWorld({ ...map, size, res, relief: Math.max(50, hi), depth: Math.max(8, -lo), heights: p, atmo: p.atmo, noSea: p.noSea, lavaSea: p.lavaSea, ground: p.ground }, { ...water, layout: 'planet', biome: planetBiome(map.planet) });
 }

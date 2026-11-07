@@ -3,6 +3,15 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.51.0 · ląd 1.7.0 · edytor sceny 0.20.3 — 2026-11-07 (grunt i lawa planety)
+
+### Dodane
+- **Barwa gruntu planety** (LandKit `uGround`, `T.ground`): grunt z planety ma barwę jej skały zamiast ziemskiego
+  biomu, z tą samą jasnością i wzorem — planety bez atmosfery (Luna, Mercury) szary regolit, rdzawe (Mars, Venus)
+  czerwonobrązowy, lawowe ciemny bazalt; Ziemia i planety lodowe bez zmian.
+- **Morze lawy** (Cinder, Magma): morze sceny bazowej to lawa (WaterKit `uLava`: skorupa z pęknięciami świecącej
+  lawy, fale i wygląd lawy) — zawsze, jakiekolwiek morze wybrano.
+
 ## Program 0.50.0 · ląd 1.6.0 · edytor sceny 0.20.2 — 2026-11-07 (niebo planety)
 
 ### Dodane

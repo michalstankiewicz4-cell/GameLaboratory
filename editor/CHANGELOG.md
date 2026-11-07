@@ -3,6 +3,11 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.20.3 — 2026-11-07
+
+### Zmienione
+- Ląd z planety: barwa gruntu planety (regolit, rdza, bazalt) i morze lawy na planetach lawowych.
+
 ## 0.20.2 — 2026-11-07
 
 ### Zmienione

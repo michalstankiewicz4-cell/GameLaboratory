@@ -237,7 +237,7 @@ const TERRAIN_VERT_NORMAL = /* glsl */`
 `;
 const TERRAIN_FRAG_HEAD = /* glsl */`
 uniform vec3 uHole; uniform float uRelief, uTime;
-uniform vec4 uLand; uniform sampler2D tBiome; uniform float uBiomeOn;   // map size; biome weights (temperate, plains, desert, -) over the map (RegionKit)
+uniform vec4 uLand; uniform sampler2D tBiome; uniform float uBiomeOn; uniform vec4 uGround;   // map size; biome weights (temperate, plains, desert, -) over the map (RegionKit)
 varying vec3 vLandP; varying vec3 vLandN; varying vec2 vLandQ;
 float lnHash(vec2 p) { p = fract(p * vec2(233.34, 851.73)); p += dot(p, p + 23.45); return fract(p.x * p.y); }
 float lnNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
@@ -307,6 +307,8 @@ const TERRAIN_FRAG_COLOR = /* glsl */`
       c = (c * bw.r + cp * bw.g + cd * bw.b) / bs;
     }
   }
+  // grunt innej planety (T.ground): barwa jej skały (regolit, rdza, bazalt) w miejsce ziemskiej, ta sama jasność i wzór
+  if (uGround.w > 0.0) c = mix(c, uGround.rgb * dot(c, vec3(0.3, 0.59, 0.11)) / 0.42, uGround.w);
   diffuseColor.rgb = c;
 `;
 
@@ -345,7 +347,8 @@ export function terrainMeshes(T, tex, opt = {}) {
   const n = opt.n || 256, nf = opt.nFar || 192;
   const lu = opt.uniforms || landUniforms(T, tex);      // pass the sea's land uniforms to share them
   if (opt.uniforms) setLand(lu, T, tex);
-  const common = { uRelief: { value: T.relief }, uTime: { value: 0 }, tBiome: { value: opt.biome || NO_BIOME() }, uBiomeOn: { value: opt.biome ? 1 : 0 } };
+  const groundV = (T2) => (T2.ground ? new THREE.Vector4(...T2.ground) : new THREE.Vector4(0, 0, 0, 0));   // T.ground [r, g, b, ile] — grunt innej planety
+  const common = { uRelief: { value: T.relief }, uTime: { value: 0 }, tBiome: { value: opt.biome || NO_BIOME() }, uBiomeOn: { value: opt.biome ? 1 : 0 }, uGround: { value: groundV(T) } };
   const mk = (cells, cell, drop, hole) => {
     const g = new THREE.PlaneGeometry(cells * cell, cells * cell, cells, cells); g.rotateX(-Math.PI / 2);
     const extra = { ...common, uDrop: { value: drop }, uHole: { value: hole } };
@@ -364,7 +367,7 @@ export function terrainMeshes(T, tex, opt = {}) {
     fine = mk(n, c, 0, new THREE.Vector3(0, 0, 0));
     far = mk(nf, c * 4, 0.6, new THREE.Vector3(0, 0, (n / 2 - 6) * c));
     group.add(fine, far);
-    common.uRelief.value = T2.relief;
+    common.uRelief.value = T2.relief; common.uGround.value = groundV(T2);
   }
   build(T);
   return {
