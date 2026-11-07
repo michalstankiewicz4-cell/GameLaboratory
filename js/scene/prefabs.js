@@ -34,6 +34,8 @@ export const FAMILIES = {
   caves: { label: 'Caves', labelPl: 'Jaskinie' },
   base: { label: 'Base modules', labelPl: 'Moduły bazy' },
   bodies: { label: 'Celestial bodies', labelPl: 'Ciała niebieskie' },
+  humans: { label: 'Humans', labelPl: 'Ludzie' },
+  creatures: { label: 'Creatures', labelPl: 'Stwory' },
 };
 
 const P = [];
@@ -114,6 +116,15 @@ function buildBody(groupId, bodyId) {
   return { root: b.group, kit: b, dispose: () => BK.disposeBody(b), tick: (t, dt, at = {}) => b.update(t, dt, { sunDir: at.sunDir, center: at.center }) };
 }
 BODY_LIST.forEach(([g, id, name]) => add('bodies/' + id, name, 'bodies', 'space', 'labs/bodies.html', () => buildBody(g, id), { needs: 'space' }));
+// ludzie i stwory (LifeKit ze Space, ładowany jak ShipKit): parametry domyślne kreatury (jak na starcie laboratorium);
+// na postoju — chód „idle” (oddech, rozglądanie); chodzenie jako zachowanie — później
+function buildLife(id) {
+  const LK = window.LifeKit; if (!LK) throw new Error('LifeKit is not loaded (js/scene/space.js loadSpace())');
+  const c = LK.build(id, {}, { detail: 1 });
+  return { root: c.group, kit: c, dispose: () => c.dispose(), tick: (t, dt) => c.animate(t, dt, { gait: 'idle', speed: 0, lively: true, layers: {} }) };
+}
+[['humanBust', 'Human I'], ['humanHead', 'Human II']].forEach(([id, name]) => add('humans/' + id, name, 'humans', 'land', 'labs/human.html', () => buildLife(id), { needs: 'space' }));
+[['strider', 'Plains strider']].forEach(([id, name]) => add('creatures/' + id, name, 'creatures', 'land', 'labs/life.html', () => buildLife(id), { needs: 'space' }));
 
 export const PREFABS = P;
 export const prefab = (id) => P.find((p) => p.id === id) || null;

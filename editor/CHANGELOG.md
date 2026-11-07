@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.18.0 — 2026-11-07 (ludzie i stwory)
+
+### Dodane
+- Rodziny **Ludzie** (Human I, Human II z laboratorium ludzi) i **Stwory** (Plains strider z laboratorium życia) —
+  parametry domyślne, na postoju oddychają i się rozglądają (chód „idle”); chodzenie jako zachowanie — później.
+
 ## 0.17.0 — 2026-11-07 (ciała niebieskie)
 
 ### Dodane

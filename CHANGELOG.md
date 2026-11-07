@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.46.0 · edytor sceny 0.18.0 — 2026-11-07 (prefabrykaty: ludzie i stwory)
+
+### Dodane
+- **Prefabrykaty ludzi i stworów** (`humans/<id>`, `creatures/<id>`, LifeKit): Human I, Human II, Plains strider —
+  parametry domyślne kreatury, `tick` — chód „idle” (oddech, rozglądanie). `js/scene/space.js` ładuje LifeKit
+  z ludźmi i stworami. Punkt 5 planu rozbioru zrobiony (bez chodu jako zachowania).
+
 ## Program 0.45.0 · edytor sceny 0.17.0 — 2026-11-07 (prefabrykaty: ciała niebieskie)
 
 ### Dodane

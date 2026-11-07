@@ -111,7 +111,8 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
    zamiast gradientu, wygląd do dopracowania. Pojazdy · ląd i kosmos: 0.42.2 — punkt zrobiony; wygląd do
    dopracowania)*
 5. **Reszta prefabrykatów:** moduły baz, rośliny, jaskinie, ciała niebieskie, ludzie i stwory (z chodem).
-   *(rośliny i jaskinie: 0.43.0; moduły bazy: 0.44.0; ciała niebieskie: 0.45.0)*
+   *(rośliny i jaskinie: 0.43.0; moduły bazy: 0.44.0; ciała niebieskie: 0.45.0; ludzie i stwory: 0.46.0 — stoją,
+   chód jako zachowanie później. Do rozważenia (pytanie użytkownika): laboratorium animacji)*
 6. **Kosmos dalej:** orbity (układy), powierzchnia planety, akcje statków jako zdarzenia.
 7. **Lekarz sceny** (na końcu, gdy są prefabrykaty i zachowania): sprawdza układ sceny, czego nie widać w pojedynczym
    modelu — obiekt w złym środowisku (drzewo na morzu, okręt na lądzie, łazik w kosmosie), pod gruntem albo

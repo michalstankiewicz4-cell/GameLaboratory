@@ -53,6 +53,8 @@ Wpis: `{ id, label, family, surface, lab, build() → { root, kit, dispose } }`.
 - Ciała niebieskie: `bodies/<ciało>` (BodyKit, wszystkie grupy poza niebem: planety, olbrzymy, pierścienie, pulsar,
   słońce, kometa, planetoida, czarna dziura) — promień 50 m (model, nie prawdziwa skala); `tick(t, dt, { sunDir, center })`
   — oświetlenie od słońca sceny, obrót, błyski pulsara (edytor podaje kierunek słońca i kamerę).
+- Ludzie i stwory: `humans/humanBust`, `humans/humanHead`, `creatures/strider` (LifeKit) — parametry domyślne,
+  `tick` — chód „idle”; chodzenie jako zachowanie — później.
 - Moduły bazy: `base/<moduł>` (BaseKit, `MODULES`: `pad`, `hab`, `solar`, `drill`, `refinery`, `depot`) — gotowe
   (`setProgress(1)`), `tick` — światła i ruchome części.
 
