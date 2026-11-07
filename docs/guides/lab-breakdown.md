@@ -27,7 +27,7 @@ Kod się przy tym spisie nie zmienia. Plan silnika: [`engine-architecture.md`](e
 | modele | kity okrętów, pojazdów drogowych, tramwaju, pociągu, samolotu, budowli, broni, statków kosmicznych, ciał niebieskich, życia, ludzi, roślin, jaskiń, przedmiotów, baz | — (modele są) |
 | zachowania | okręt na wodzie, lot, koło na szynie (skład, tramwaj), ciąg w próżni | jazda po lądzie (siłami), pływanie małych jednostek MarineKit, chód (LifeKit), zanurzenie |
 | środowiska | woda (WaterKit), ląd (LandKit, RegionKit), niebo dzienne (SkyKit, RainKit), powierzchnia planety (SurfaceKit), układy (SystemKit) | jedno niebo kosmosu w środowiskach; trzy osobne nieba do połączenia (niżej) |
-| obraz | potok kamery (LookPipeline), filtry, PostPipeline, widzenie | jeden potok dla laboratoriów ze Space (dziś LabKit + PostKit) |
+| obraz | potok kamery (LookPipeline), filtry, PostPipeline, widzenie | jeden potok — zrobione (0.56.0) |
 | zasoby z nazwą | morze (laboratorium wody), niebo kosmosu (ciała niebieskie) | wygląd kamery (osobny klucz), ląd, pogoda i światło, roślinność, wariant modelu |
 | prefabrykaty | okręty, drogowe, tramwaj, pociąg, Spitfire, budowle, broń, statki kosmiczne | MarineKit, łaziki VehicleKit, moduły baz, ciała niebieskie, rośliny, jaskinie, przedmioty, ludzie i zwierzęta |
 
@@ -93,8 +93,7 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
 7. **Dwa potoki obrazu:** LookPipeline / PostPipeline (Battle) i LabKit + PostKit (Space).
    *(0.54.0: efekty kosmosu PostKit — soczewkowanie, flara, promienie — także w LookPipeline, `js/render/space-fx.js`;
    0.55.0: laboratoria ze Space już
-   rysowały przez LookPipeline (panel `js/labkit/look-panel.js`), teraz z efektami kosmosu — jeden potok. PostKit został tylko
-   jako kod zapasowy — do usunięcia (propozycja))*
+   rysowały przez LookPipeline (panel `js/labkit/look-panel.js`), teraz z efektami kosmosu — jeden potok. PostKit usunięty: 0.56.0)*
 8. **Wygląd kamery pod osobnym kluczem** — do zasobów z nazwą.
 
 ## Kolejność (propozycja)

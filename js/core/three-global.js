@@ -21,11 +21,6 @@
    ======================================================================= */
 import * as T from "../../vendor/three/three.module.js";
 import { OrbitControls } from "../../vendor/three/addons/controls/OrbitControls.js";
-import { Pass, FullScreenQuad } from "../../vendor/three/addons/postprocessing/Pass.js";
-import { UnrealBloomPass } from "../../vendor/three/addons/postprocessing/UnrealBloomPass.js";
-import { CopyShader } from "../../vendor/three/addons/shaders/CopyShader.js";
-import { LuminosityHighPassShader } from "../../vendor/three/addons/shaders/LuminosityHighPassShader.js";
-import { FXAAShader } from "../../vendor/three/addons/shaders/FXAAShader.js";
 
 window.GameLabGraphics = "battle";   // read by LabKit (js/labkit/labkit.js) and the ship lab
 
@@ -40,8 +35,7 @@ class ShaderMaterial extends T.ShaderMaterial {
   }
 }
 
-const THREE = Object.assign({}, T, { ShaderMaterial, OrbitControls, Pass, FullScreenQuad, UnrealBloomPass, CopyShader, LuminosityHighPassShader, FXAAShader });
-THREE.Pass.FullScreenQuad = FullScreenQuad;
+const THREE = Object.assign({}, T, { ShaderMaterial, OrbitControls });
 THREE.LIGHT_SCALE = Math.PI;
 THREE.srgbColor = (c) => new T.Color(c);
 window.THREE = THREE;

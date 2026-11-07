@@ -11,8 +11,6 @@
        2. js/labkit/labkit.js            – what the Space labs share around the model
        3. js/models/bodies/…             – THE BODIES (window.BodyKit): groups, parameter schemas, shaders;
                                            see bodykit.js's header for the API
-       4. js/render/postkit/postkit.js   – the IMAGE EFFECTS: post-processing (bloom, FXAA, MSAA, filter, depth of
-                                           field, sharpening, sun flare and light rays, black-hole lensing)
        5. js/labs/bodies/bodies.js              – the lab (sky, camera, the windows, sliders, counters)
      Styles: ui/ui.css, ui/style/space.css, ui/pages/bodies.css. Needs a local server (ES modules). -->
 <link rel="stylesheet" href="../ui/ui.css">
@@ -104,8 +102,6 @@
 <script src="../ui/shell/labwin.js"></script>
 <script src="../ui/shell/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
-<!-- PostKit: the IMAGE EFFECTS panel's post-processing -->
-<script type="module" src="../js/render/postkit/postkit.js"></script>
 <script type="module" src="../js/labkit/labkit.js"></script>
 <script type="module" id="bodykit" src="../js/models/bodies/bodykit.js"></script>
 <script type="module" src="../js/models/bodies/kinds/planets.js"></script>

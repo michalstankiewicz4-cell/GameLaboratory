@@ -1,6 +1,6 @@
 // Efekty kosmosu dla potoku kamery Battle (LookPipeline, js/render/sea/look.js): soczewkowanie grawitacyjne czarnej
-// dziury, flara słońca i promienie światła — te same algorytmy co w PostKit (js/render/postkit/postkit.js, potok laboratoriów
-// ze Space), tu jako kroki przed obróbką kamery, żeby edytor sceny i laboratoria Battle pokazywały je tak samo.
+// dziury, flara słońca i promienie światła — algorytmy z PostKit (dawny potok laboratoriów ze Space, usunięty w 0.56.0),
+// tu jako kroki przed obróbką kamery, żeby edytor sceny i laboratoria Battle pokazywały je tak samo.
 // Działa na liniowym obrazie sceny (przed mapowaniem tonów potoku kamery).
 //
 // createSpaceFx(renderer) → { render(scene, camera, rt, opts) → tekstura po efektach albo null (nic do zrobienia) }

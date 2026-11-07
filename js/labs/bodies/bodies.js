@@ -268,7 +268,7 @@ const qSlider = $("qSlider"), dSlider = $("dSlider");
 qSlider.addEventListener("input", () => { state.quality = +qSlider.value; paintSlider(qSlider); applyQuality(state.quality); fx.markCustom(); });
 
 // =====================================================================
-// IMAGE EFFECTS (LabKit + PostKit, shared with the game): the camera's
+// IMAGE EFFECTS (LabKit: the camera look with the space effects): the camera's
 // picture, not part of the body; a preset also sets the render quality.
 // =====================================================================
 const fx = LabKit.imageEffects({ renderer, scene, camera, panel: $("fxPanel"),

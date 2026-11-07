@@ -426,7 +426,7 @@ windows are the standard ones (`ui/shell/labwin.js`) plus the lab's own:
     only the values that differ from the group defaults, plus the seed; `damage` left out) — paste it over the body's
     line in `bodykit.js` to make the change permanent (then the usual version bump). Also printed to the console, in
     case the clipboard is blocked.
-- **Camera**: auto-rotate and the IMAGE EFFECTS — PostKit's lab panel, as on the ship page, plus SUN FLARE and LIGHT
+- **Camera**: auto-rotate and the IMAGE EFFECTS — the camera look panel, as on the ship page, with SUN FLARE and LIGHT
   RAYS (the SUNS group's sun, else the light sprite; both fade out when the sun fills the view) and LENSING (the BLACK
   HOLES group's hole: hidden while the scene renders, drawn over the warped picture). The camera's picture, not part
   of the body. The camera distance: a group's `view`, or a body's own `view` (SATURN: its rings need more room),

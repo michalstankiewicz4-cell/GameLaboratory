@@ -46,7 +46,8 @@ flat colour, or `gradientUnits="userSpaceOnUse"` with coordinates.
 
 ## Post-processing and shading lessons (v2.23–v2.25)
 
-Found while building the image effects (`js/render/postkit/postkit.js`, and the game's
+Found while building the image effects (PostKit — removed in 0.56.0; its lensing, flare and rays live on in
+`js/render/space-fx.js` — and the game's
 eclipse lighting):
 
 - **Bloom works on the tone-mapped LDR picture.** The Sun and a sunlit

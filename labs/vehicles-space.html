@@ -8,8 +8,6 @@
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <!-- Ship lab: procedural spaceships (ShipKit, from the game Space). Scripts, in order (modules):
        1. js/core/three-global.js        – Three.js r186 as the global THREE (graphics of the labs from Battle)
-       2. js/render/postkit/postkit.js   – the IMAGE EFFECTS: post-processing (bloom, FXAA, MSAA, filter, depth
-                                           of field, sharpening), apart from the model's own controls
        3. js/labkit/labkit.js            – what the Space labs share around the model (sliders, toggles,
                                            performance counters, the IMAGE EFFECTS render, the camera look)
        4. js/models/ships-space/…        – THE SHIP MODELS (window.ShipKit); see shipkit.js's header for the API
@@ -90,8 +88,6 @@
 <script src="../ui/shell/labwin.js"></script>
 <script src="../ui/shell/windows.js"></script>
 <script type="module" src="../js/core/three-global.js"></script>
-<!-- PostKit: the IMAGE EFFECTS panel's post-processing -->
-<script type="module" src="../js/render/postkit/postkit.js"></script>
 <script type="module" src="../js/labkit/labkit.js"></script>
 <script type="module" id="shipkit" src="../js/models/ships-space/shipkit.js"></script>
 <script type="module" src="../js/models/ships-space/ships/codewing.js"></script>

@@ -1,7 +1,7 @@
 /* =======================================================================
    LabKit — what the labs from Space share around their models: slider
    fills, toggle buttons, the performance counters, the IMAGE EFFECTS
-   render (PostKit), the windows fading out when idle and the camera look
+   render (LookPipeline with the space effects), the windows fading out when idle and the camera look
    panel (look-panel.js). window.LabKit, loaded as a module after
    js/core/three-global.js. Styles: ui/style/space.css.
    ======================================================================= */
@@ -31,43 +31,20 @@ function makeGlow(inner = "rgba(255,255,255,1)", mid = "rgba(255,200,120,0.5)") 
   return new THREE.CanvasTexture(c);
 }
 
-// IMAGE EFFECTS (PostKit, shared with the game): the camera's picture, not
-// part of the model. PostKit's lab panel owns the switches and presets (a
-// preset also sets the render quality: setQuality). render() replaces
-// renderer.render; `extra(options)` adds per-lab steps (a sun's flare, a
-// black hole's lensing). renderer.info is reset by the caller once a frame
-// (several passes are counted together).
+// IMAGE EFFECTS: the camera's picture, not part of the model — the camera look of the water labs (LookPipeline,
+// look-panel.js) with the space effects (js/render/space-fx.js). render(focusPos, focusRadius, extra) replaces
+// renderer.render; `extra(options)` adds per-lab steps (a sun's flare, a black hole's lensing). (PostKit, the
+// Space game's post-processing, was removed in 0.56.0.)
 // Render sceny: w trybie grafiki Battle przez potok kamery z laboratoriów wodnych (ustawienie „Game clean”, jeden na
 // renderer), inaczej zwykłe renderer.render — dla laboratoriów bez panelu obrazu.
 function render(renderer, scene, camera) {
-  if (window.GameLabGraphics !== "battle" || !window.LabLook) { renderer.render(scene, camera); return; }
+  if (!window.LabLook) { renderer.render(scene, camera); return; }
   (renderer.__labLook || (renderer.__labLook = window.LabLook.cleanPipeline(renderer))).render(scene, camera);
 }
 
-function imageEffects({ renderer, scene, camera, panel, effects, setQuality }) {
-  // strona w trybie grafiki Battle: potok kamery z laboratoriów wodnych zamiast PostKit (to samo API)
-  if (window.GameLabGraphics === "battle" && window.LabLook) return window.LabLook.battleImageEffects({ renderer, scene, camera, panel });
-  const pipe = PostKit.create(renderer);
-  renderer.info.autoReset = false;
-  const fx = PostKit.labPanel(panel, { effects, setQuality });
-  const size = new THREE.Vector3();
-  return {
-    markCustom: () => fx.markCustom(),
-    render(focusPos, focusRadius, extra) {
-      fx.tick(performance.now());
-      const o = fx.options();
-      if (!(o.bloom || o.fxaa || o.filter || o.dof || o.flare || o.lens || o.sharpen || o.rays || o.msaa !== 4)) { renderer.render(scene, camera); return; }
-      const dofOn = o.dof && PostKit.sphereOnScreen(camera, focusPos, focusRadius, size, 0.5);
-      pipe.render(scene, camera, Object.assign({
-        msaa: o.msaa,
-        bloom: o.bloom ? { strength: 0.7, threshold: 0.93 } : null,
-        fxaa: o.fxaa,
-        dof: dofOn ? { amount: 1, size: size.z, strength: 1 } : null,
-        filter: o.filter ? { vignette: 0.4, grain: 0.25, aberration: 0.35 } : null,
-        sharpen: o.sharpen ? o.sharpenAmount : 0,               // the game's per preset
-      }, extra ? extra(o) : null));
-    },
-  };
+function imageEffects({ renderer, scene, camera, panel }) {
+  // potok kamery z laboratoriów wodnych (LookPipeline, js/labkit/look-panel.js) z efektami kosmosu (js/render/space-fx.js)
+  return window.LabLook.battleImageEffects({ renderer, scene, camera, panel });
 }
 
 // Every window of the page (data-window, ui/shell/windows.js) fades out after `seconds` without a mouse move, click,

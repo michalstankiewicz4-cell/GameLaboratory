@@ -5,11 +5,11 @@
 (function () {
   "use strict";
   const V = {
-  app: "0.55.0",
+  app: "0.56.0",
   labs: {
-    "labs/vehicles-space.html": "1.8.0",
-    "labs/bodies.html": "1.5.1",
-    "labs/systems.html": "1.4.1",
+    "labs/vehicles-space.html": "1.8.1",
+    "labs/bodies.html": "1.5.2",
+    "labs/systems.html": "1.4.2",
     "labs/scale.html": "1.1.9",
     "labs/skins.html": "1.1.2",
     "labs/surface.html": "1.4.0",

@@ -3,6 +3,15 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.56.0 — 2026-11-07 (sprzątanie: PostKit usunięty)
+
+### Usunięte
+- **PostKit** (`js/render/postkit/postkit.js`) — dawny potok obrazu laboratoriów ze Space, od grafiki Battle tylko kod
+  zapasowy: plik, jego skrypty w stronach (pojazdy · kosmos, ciała niebieskie, układy), gałąź w
+  `LabKit.imageEffects` i dodatki Three.js, których używał tylko on (`Pass`, `UnrealBloomPass`, `CopyShader`,
+  `LuminosityHighPassShader`, `FXAAShader` w `js/core/three-global.js`). Jego soczewkowanie, flara i promienie żyją
+  w `js/render/space-fx.js`. Wygląd laboratoriów bez zmian.
+
 ## Program 0.55.0 · ciała niebieskie 1.5.1 · układy 1.4.1 — 2026-11-07 (efekty kosmosu wróciły do laboratoriów ze Space)
 
 ### Poprawione

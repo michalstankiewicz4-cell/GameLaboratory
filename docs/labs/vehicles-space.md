@@ -23,7 +23,6 @@ repository, then `http://localhost:8000/labs/ship.html`.
 | Script | What it is |
 |---|---|
 | 1. `js/core/three-global.js` | Three.js r186 (`vendor/three/`) as the global `THREE`, with OrbitControls and the post-processing passes, in the graphics of the labs from Battle (CLAUDE.md, "Grafika") |
-| 2. `js/render/postkit/postkit.js` | The IMAGE EFFECTS: post-processing |
 | 3. `js/labkit/labkit.js` | What the Space labs share around the model (`window.LabKit`): slider fills, toggles, the IMAGE EFFECTS render, the camera look panel and the windows fading out after 5 idle seconds (`autoHideWindows`). Styles: `ui/style/space.css` + `ui/pages/vehicles-space.css` |
 | 4. `js/models/ships-space/shipkit.js` | **ShipKit's core**: texture generators, materials, shaders, shared effects, the building blocks, SHAPING, the model build, public API (`window.ShipKit`), and `ShipKit._`: the internals the ship files build with (not a public API) |
 | 4b. `js/models/ships-space/ships/codewing.js`, `scribe.js`, `swarmer.js`, `haven.js` | **One file per ship**. Each pushes its definition into `ShipKit.SHIP_DEFS` and takes what it uses from `ShipKit._`; they load after the core, in the lab's order |
@@ -288,10 +287,11 @@ top bar goes between them). The top bar: the ship list and the environment switc
     pointer: the part's name, its pieces and triangles. Each lit material is a cached copy with a teal emissive. Not
     while dragging the view, not for the effects part, not in GAME BUILD (the parts are merged there). A rebuilt model
     clears it (`partTipClear` in `loadShip`).
-- **Camera**: auto-rotate and the IMAGE EFFECTS — PostKit's lab panel (`js/render/postkit/postkit.js#labPanel`): bloom,
-  FXAA, sharpening, robot-eyes filter, depth of field, MSAA ×0–8, with presets AUTO / MIN / NORMAL / MAX (a preset
-  also sets the render quality; AUTO steps by frame rate, not in the first 6 s). The camera's picture, **not part of
-  the ship** — kept apart from the model's toggles on purpose (user's call).
+- **Camera**: auto-rotate and the IMAGE EFFECTS — the camera look of the water labs (`js/labkit/look-panel.js`,
+  LookPipeline): presets, tone mapping, exposure, colour, glow, vignette, grain, aberration, sun glare, sharpening, and
+  the space effects (LENSING, SUN FLARE, LIGHT RAYS, `js/render/space-fx.js`). The camera's picture, **not part of
+  the ship** — kept apart from the model's toggles on purpose (user's call). (Until 0.56.0 PostKit, the Space game's
+  post-processing, stood here.)
 - **Light and weather**: GAME LIGHTING (the game's ambient and two scene lights, no shadows).
 - **Performance**: the standard numbers (`ui/shell/perf.js`), the ship's own Model rows (objects, meshes, instanced
   groups, glow sprites, wire and particle systems, triangles, vertices, figure types, materials and shaders, textures,
