@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.45.0 · edytor sceny 0.17.0 — 2026-11-07 (prefabrykaty: ciała niebieskie)
+
+### Dodane
+- **Prefabrykaty ciał niebieskich** (`bodies/<ciało>`, BodyKit): wszystkie 23 ciała z grup laboratorium ciał
+  niebieskich (bez nieba) jako obiekty sceny kosmosu — promień 50 m (model, nie prawdziwa skala), `tick` dostaje
+  kierunek słońca sceny i kamerę (oświetlenie, obrót, błyski pulsara). `js/scene/space.js` ładuje wszystkie rodzaje
+  ciał BodyKit; edytor przekazuje `tick(t, dt, { sunDir, center })`.
+
 ## Edytor sceny 0.16.1 — 2026-11-07
 
 ### Poprawione

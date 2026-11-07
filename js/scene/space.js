@@ -16,7 +16,7 @@ export function loadSpace() {
     await import('../models/vehicles/vehiclekit.js'); // łaziki (zwiadowca, transporter, gąsienicowy, budowniczy)
     await import('../models/base/basekit.js');        // moduły bazy planetarnej (lądowisko, habitat, panele, kopalnia…)
     await import('../models/bodies/bodykit.js');
-    await import('../models/bodies/kinds/sky.js');
+    for (const k of ['planets', 'giants', 'pulsars', 'suns', 'rocks', 'holes', 'sky']) await import(`../models/bodies/kinds/${k}.js`);   // kolejność jak w laboratorium ciał niebieskich
     await import('../envs/space/systemkit/systemkit.js');
     if (window.LabLog) window.LabLog.add('info', 'Space kits loaded (ShipKit, MarineKit, VehicleKit, BodyKit sky, SystemKit)');
   })();

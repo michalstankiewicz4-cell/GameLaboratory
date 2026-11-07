@@ -131,7 +131,8 @@ export function createWorld(container, store, onWarn) {
   function frame(now) {
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
     const t = stage.update(dt, camera); if (before) before(dt, t);
-    built.forEach((r) => { if (r.tick && !r.driven) r.tick(t, dt); });   // części na postoju (statki kosmiczne)
+    const at = { sunDir: stage.sunDir, center: camera.position };   // dla ciał niebieskich: kierunek słońca, kamera
+    built.forEach((r) => { if (r.tick && !r.driven) r.tick(t, dt, at); });   // części na postoju (statki kosmiczne, ciała niebieskie)
     if (skyBody && skyBody.group.visible) skyBody.update(t, dt, { center: camera.position, renderer });
     look.sun(camera, stage.sunDir);
     window.LabPerf.begin(renderer); look.render(scene, camera); window.LabPerf.end(renderer);   // okno Wydajność i dolny pasek

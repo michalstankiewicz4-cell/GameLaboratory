@@ -33,6 +33,7 @@ export const FAMILIES = {
   plants: { label: 'Plants', labelPl: 'Rośliny' },
   caves: { label: 'Caves', labelPl: 'Jaskinie' },
   base: { label: 'Base modules', labelPl: 'Moduły bazy' },
+  bodies: { label: 'Celestial bodies', labelPl: 'Ciała niebieskie' },
 };
 
 const P = [];
@@ -98,6 +99,21 @@ function buildBase(id) {
   return { root: m.group, kit: m, dispose: () => BK.disposeModule(m), tick: (t, dt) => m.update(t, dt) };
 }
 BASE.forEach(([id, name]) => add('base/' + id, name, 'base', 'land', 'labs/buildings.html', () => buildBase(id), { needs: 'space' }));
+// ciała niebieskie (BodyKit ze Space, ładowany jak ShipKit): każde ciało z grup laboratorium ciał niebieskich (bez nieba).
+// Model, nie prawdziwa skala: promień 50 m (wielkość — skalą obiektu); tick(t, dt, { sunDir, center }) — oświetlenie od
+// słońca sceny, obrót, błyski pulsara w stronę kamery. Lista jak BodyKit.GROUPS (bez ładowania kitu).
+const BODY_LIST = [['lava', 'cinder', 'Cinder'], ['lava', 'magma', 'Magma'], ['earthlike', 'terra', 'Terra-1'], ['earthlike', 'pelagia', 'Pelagia'],
+  ['icy', 'rime', 'Rime'], ['icy', 'glacies', 'Glacies'], ['desert', 'mars', 'Mars'], ['clouded', 'venus', 'Venus'], ['moons', 'luna', 'Luna'],
+  ['airless', 'mercury', 'Mercury'], ['giants', 'jupiter', 'Jupiter'], ['giants', 'saturn', 'Saturn'], ['giants', 'uranus', 'Uranus'],
+  ['giants', 'neptune', 'Neptune'], ['rings', 'halo', 'Halo (rings)'], ['rings', 'filament', 'Filament (rings)'], ['rings', 'gossamer', 'Gossamer (rings)'],
+  ['rings', 'shards', 'Shard belt'], ['pulsars', 'metronome', 'Metronome (pulsar)'], ['suns', 'sol', 'Sol (sun)'], ['comets', 'comet', 'Comet'],
+  ['rocks', 'ferrum', 'Ferrum (asteroid)'], ['blackholes', 'abyss', 'Abyss (black hole)']];
+function buildBody(groupId, bodyId) {
+  const BK = window.BodyKit; if (!BK) throw new Error('BodyKit is not loaded (js/scene/space.js loadSpace())');
+  const b = BK.buildBody(groupId, bodyId, { detail: 1 }); b.setRadius(50);
+  return { root: b.group, kit: b, dispose: () => BK.disposeBody(b), tick: (t, dt, at = {}) => b.update(t, dt, { sunDir: at.sunDir, center: at.center }) };
+}
+BODY_LIST.forEach(([g, id, name]) => add('bodies/' + id, name, 'bodies', 'space', 'labs/bodies.html', () => buildBody(g, id), { needs: 'space' }));
 
 export const PREFABS = P;
 export const prefab = (id) => P.find((p) => p.id === id) || null;

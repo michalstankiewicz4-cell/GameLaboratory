@@ -3,6 +3,13 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.17.0 — 2026-11-07 (ciała niebieskie)
+
+### Dodane
+- Rodzina **Ciała niebieskie** (23 ciała z laboratorium ciał niebieskich: planety lawowe, ziemiopodobne, lodowe,
+  pustynne, w chmurach, księżyce, bez atmosfery, gazowe olbrzymy, pierścienie, pulsar, słońce, kometa, planetoida,
+  czarna dziura) — model o promieniu 50 m (wielkość skalą obiektu), oświetlony słońcem sceny, obraca się.
+
 ## 0.16.1 — 2026-11-07
 
 ### Poprawione

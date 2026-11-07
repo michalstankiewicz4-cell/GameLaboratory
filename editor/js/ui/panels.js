@@ -26,6 +26,7 @@ const ICONS = {
   plants: 'M12 21v-7M12 14l-6 0l6-11l6 11zM8 21h8',
   caves: 'M3 20c0-9 4-15 9-15s9 6 9 15zM9 20c0-4 1-7 3-7s3 3 3 7',
   base: 'M3 18h18M5 18a7 7 0 0 1 14 0M12 11v-4M10 7h4',
+  bodies: 'M12 18a6 6 0 1 0 0-12a6 6 0 1 0 0 12M3 15c2 2 8 1 13-2s7-6 5-7',
 };
 function familyIcon(f) {
   const NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg'), path = document.createElementNS(NS, 'path');
