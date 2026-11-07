@@ -127,3 +127,14 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
    w powietrzu, obiekty wchodzące jeden w drugi, brakujące zasoby z nazwą, zachowanie niepasujące do modelu albo
    środowiska, koszt sceny (trójkąty, wywołania rysowania) względem budżetu. Jak doktor modeli: uniwersalny, zgłasza
    i proponuje poprawki, niczego nie przestawia po cichu; w API polecenie `check` (lista problemów dla AI).
+8. **Materiał z Hive Hunger** (repozytorium `michalstankiewicz4-cell/Hive-Hunger`; przeniesienie **z historią**, jak
+   Space, Battle i aTrain), po lekarzu sceny, w tej kolejności:
+   1. **laboratorium bloków (wokseli)** — z edytora wokseli (`tools/voxel-editor.html`) i `js/three` (`liquidShader.js`,
+      `Liquids.js`, `Gases.js`): bloki stałe w różnych kolorach i rodzajach (skała, żelazo…) jako model (kit bloków
+      w `js/models/`), ciecze (woda, lawa) i gazy jako zachowania w kosmosie (spójność kropel, kłęby, odbicia od
+      bloków); w edytorze sceny — bryły z bloków (budowa poziomów);
+   2. **statki roju** (`tools/ship-editor.html`) — kolejna rodzina w laboratorium pojazdów — kosmos;
+   3. **laboratorium efektów** (`js/three/effects`): strzały, wybuchy, cząsteczki — odpowiedź na zdarzenia (np. akcja
+      `fire`);
+   4. **drzewka technologiczne** (`tools/tree-editor.html`) — później: dane gry jako zasób z nazwą i narzędzie do ich
+      edycji.
