@@ -3,6 +3,18 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.55.0 · ciała niebieskie 1.5.1 · układy 1.4.1 — 2026-11-07 (efekty kosmosu wróciły do laboratoriów ze Space)
+
+### Poprawione
+- **Soczewkowanie, flara słońca i promienie światła znów działają w laboratoriach ze Space** (ciała niebieskie,
+  układy): od przejścia na grafikę Battle (0.12.0) ich panel obrazu (`js/labkit/look-panel.js`, potok kamery
+  LookPipeline) pomijał kroki laboratorium (`extra`) — teraz idą do efektów kosmosu potoku (`js/render/space-fx.js`).
+  Panel ma przełączniki **LENSING**, **SUN FLARE**, **LIGHT RAYS** (domyślnie włączone).
+
+### Zmienione
+- Jeden potok obrazu: laboratoria ze Space, laboratoria Battle i edytor sceny rysują przez LookPipeline z efektami
+  kosmosu; PostKit (`js/render/postkit/postkit.js`) jest już tylko kodem zapasowym spoza grafiki Battle.
+
 ## Program 0.54.0 · edytor sceny 0.23.0 — 2026-11-07 (efekty kosmosu w potoku kamery, słońce jako źródło światła)
 
 ### Dodane

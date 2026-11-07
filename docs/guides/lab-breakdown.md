@@ -92,7 +92,9 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
    można ładować w edytorze przy pierwszej potrzebie (`js/scene/space.js`); docelowo moduły wszędzie.
 7. **Dwa potoki obrazu:** LookPipeline / PostPipeline (Battle) i LabKit + PostKit (Space).
    *(0.54.0: efekty kosmosu PostKit — soczewkowanie, flara, promienie — także w LookPipeline, `js/render/space-fx.js`;
-   dalej: laboratoria ze Space na LookPipeline, PostKit na wspólnym module)*
+   0.55.0: laboratoria ze Space już
+   rysowały przez LookPipeline (panel `js/labkit/look-panel.js`), teraz z efektami kosmosu — jeden potok. PostKit został tylko
+   jako kod zapasowy — do usunięcia (propozycja))*
 8. **Wygląd kamery pod osobnym kluczem** — do zasobów z nazwą.
 
 ## Kolejność (propozycja)

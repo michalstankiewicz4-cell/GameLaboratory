@@ -13,7 +13,7 @@ const pick = (o) => { const r = { ...o }; delete r.label; return r; };
 export function battleImageEffects({ renderer, scene, camera, panel, sunDir, preset = 'clean' }) {
   const THREE = window.THREE;
   const look = new LookPipeline(renderer);
-  const S = { preset, look: { ...LOOK_DEFAULTS, ...pick(LOOK_PRESETS[preset] || LOOK_PRESETS.clean) } };
+  const S = { preset, look: { ...LOOK_DEFAULTS, ...pick(LOOK_PRESETS[preset] || LOOK_PRESETS.clean) }, fx: { lens: true, flare: true, rays: true } };
   const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
   const paint = (r) => (window.LabKit ? window.LabKit.paintSlider(r) : null);
 
@@ -37,6 +37,14 @@ export function battleImageEffects({ renderer, scene, camera, panel, sunDir, pre
     r.addEventListener('input', () => { S.look[k] = +r.value; b.textContent = (+r.value).toFixed(2); paint(r); custom(); apply(); });
     ranges[k] = [r, b]; box.append(l, r);
   }
+  // efekty kosmosu (js/render/space-fx.js, jak w PostKit): laboratorium podaje je przez extra(o) w render()
+  const fxRow = el('div', 'pkRow'), fxBtns = {};
+  for (const [k, label] of [['lens', 'LENSING'], ['flare', 'SUN FLARE'], ['rays', 'LIGHT RAYS']]) {
+    const b = el('button', 'tBtn on', label); b.title = { lens: 'A black hole bends the light behind it', flare: 'The sun\'s lens flare', rays: 'Light rays from the sun' }[k];
+    b.addEventListener('click', () => { S.fx[k] = !S.fx[k]; b.classList.toggle('on', S.fx[k]); });
+    fxBtns[k] = b; fxRow.append(b);
+  }
+  box.append(el('div', 'secHd', 'SPACE EFFECTS'), fxRow);
   panel.append(box);
 
   function custom() { S.preset = 'custom'; mark(); }
@@ -50,9 +58,13 @@ export function battleImageEffects({ renderer, scene, camera, panel, sunDir, pre
   return {
     pipeline: look, state: S,
     markCustom() { custom(); },
-    render() {
+    // extra(o) — kroki laboratorium (jak w PostKit): { lens: { object, position, radius }, flare: { position, radius,
+    // strength, rays } }; o — przełączniki panelu (lens, flare, rays)
+    render(focusPos, focusRadius, extra) {
       renderer.getSize(size);
       if (look.w !== size.x || look.h !== size.y) look.resize(size.x, size.y);
+      const ex = extra ? extra({ ...S.fx }) : null;
+      look.space = ex && (ex.lens || ex.flare) ? { lens: S.fx.lens ? ex.lens || null : null, flare: ex.flare && (S.fx.flare || S.fx.rays) ? { ...ex.flare, strength: S.fx.flare ? ex.flare.strength ?? 1 : 0, rays: S.fx.rays ? ex.flare.rays ?? 1 : 0 } : null } : null;
       if (sunDir) look.sun(camera, sun.copy(typeof sunDir === 'function' ? sunDir() : sunDir).normalize());
       renderer.info.reset();
       look.render(scene, camera);
