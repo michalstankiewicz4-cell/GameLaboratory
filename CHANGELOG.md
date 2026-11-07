@@ -3,6 +3,11 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Edytor sceny 0.16.1 — 2026-11-07
+
+### Poprawione
+- Edytor sceny: dwuklik w wiersz modelu nie zaznacza tekstu.
+
 ## Edytor sceny 0.16.0 — 2026-11-07 (dodawanie modelu: zakładki z ikonkami)
 
 ### Zmienione

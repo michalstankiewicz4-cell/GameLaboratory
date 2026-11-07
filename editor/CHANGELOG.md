@@ -3,6 +3,11 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.16.1 — 2026-11-07
+
+### Poprawione
+- Dwuklik w wiersz modelu (dodawanie modelu) nie zaznacza już tekstu.
+
 ## 0.16.0 — 2026-11-07 (dodawanie modelu: zakładki z ikonkami)
 
 ### Zmienione

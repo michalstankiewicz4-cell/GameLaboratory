@@ -58,6 +58,7 @@ export function createPanels(store, actions) {
       const add = el('button', { type: 'button', className: 'pickAdd', textContent: '+', title: t('tree.addOne', { name: p.label }) });
       add.addEventListener('click', () => actions.add(p.id));
       const li = el('li', { className: 'pickItem', title: p.label }, el('span', { className: 'pName', textContent: p.label }), add);
+      li.addEventListener('mousedown', (e) => { if (e.detail > 1) e.preventDefault(); });   // dwuklik nie zaznacza tekstu
       li.addEventListener('dblclick', () => actions.add(p.id)); return li;
     }));
   }

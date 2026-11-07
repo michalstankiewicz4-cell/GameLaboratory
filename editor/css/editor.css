@@ -32,7 +32,7 @@
 .pickTab.on{border-color:var(--accent);color:var(--accent)}
 .pickList{list-style:none;margin:0;padding:3px;max-height:230px;overflow:auto;border:1px solid var(--line);border-radius:7px;background:var(--field)}
 .pickHead{padding:3px 7px 4px;font-size:11.5px;color:var(--accent);letter-spacing:.04em}
-.pickItem{display:flex;align-items:center;gap:6px;padding:4px 7px;border:1px solid transparent;border-radius:6px;font-size:12.5px;color:var(--text)}
+.pickItem{display:flex;align-items:center;gap:6px;user-select:none;-webkit-user-select:none;padding:4px 7px;border:1px solid transparent;border-radius:6px;font-size:12.5px;color:var(--text)}
 .pickItem:hover{border-color:var(--line)}
 .pickItem .pName{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--head)}
 .pickAdd{flex:none;width:22px;height:22px;padding:0;line-height:1;font-size:15px}
