@@ -115,8 +115,8 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
    chód jako zachowanie później. Do rozważenia (pytanie użytkownika): laboratorium animacji)*
 6. **Kosmos dalej:** orbity (układy), powierzchnia planety, akcje statków jako zdarzenia.
    *(orbity: 0.47.0 — zachowanie „orbita”; akcje statków jako zdarzenia: 0.48.0 — szyna `js/core/events.js`. Ląd z planety:
-   0.49.0 — teren z planety jako drugie źródło lądu, `js/envs/land/planet.js`. Niebo planety: 0.50.0. Grunt i lawa planety: 0.51.0. Lądowanie: 0.52.0 (zachowanie, laboratorium pojazdów — ląd). Budowa bazy: 0.53.0 (narzędzie edytora `editor/js/world/placer.js`, zachowanie „budowa”). Skok skreślony (wraca z okrągłą planetą). Dalej: jazda,
-   skok jako zachowania, budowa bazy jako narzędzie edytora)*
+   0.49.0 — teren z planety jako drugie źródło lądu, `js/envs/land/planet.js`. Niebo planety: 0.50.0. Grunt i lawa planety: 0.51.0. Lądowanie: 0.52.0 (zachowanie, laboratorium pojazdów — ląd). Budowa bazy: 0.53.0 (narzędzie edytora `editor/js/world/placer.js`, zachowanie „budowa”). Jazda — „jazda po lądzie” łazików. Skok
+   skreślony (wraca z okrągłą planetą). Punkt zrobiony)*
    Później (pomysły użytkownika): przełącznik **Okrągła** w laboratorium lądu (generator lądu na kuli — zastąpi
    drugie źródło) i widok mapy zawiniętej jako **torus** (kształt, nie tylko topologia).
 7. **Lekarz sceny** (na końcu, gdy są prefabrykaty i zachowania): sprawdza układ sceny, czego nie widać w pojedynczym
