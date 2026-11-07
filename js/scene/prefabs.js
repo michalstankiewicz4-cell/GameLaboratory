@@ -113,7 +113,7 @@ const BODY_LIST = [['lava', 'cinder', 'Cinder'], ['lava', 'magma', 'Magma'], ['e
 function buildBody(groupId, bodyId) {
   const BK = window.BodyKit; if (!BK) throw new Error('BodyKit is not loaded (js/scene/space.js loadSpace())');
   const b = BK.buildBody(groupId, bodyId, { detail: 1 }); b.setRadius(50);
-  return { root: b.group, kit: b, dispose: () => BK.disposeBody(b), tick: (t, dt, at = {}) => b.update(t, dt, { sunDir: at.sunDir, center: at.center }) };
+  return { root: b.group, kit: b, dispose: () => BK.disposeBody(b), tick: (t, dt, at = {}) => b.update(t, dt, at.sunPos ? { sunPosition: at.sunPos, center: at.center } : { sunDir: at.sunDir, center: at.center }) };
 }
 BODY_LIST.forEach(([g, id, name]) => add('bodies/' + id, name, 'bodies', 'space', 'labs/bodies.html', () => buildBody(g, id), { needs: 'space' }));
 // ludzie i stwory (LifeKit ze Space, ładowany jak ShipKit): parametry domyślne kreatury (jak na starcie laboratorium);

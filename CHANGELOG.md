@@ -3,6 +3,17 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.54.0 · edytor sceny 0.23.0 — 2026-11-07 (efekty kosmosu w potoku kamery, słońce jako źródło światła)
+
+### Dodane
+- **Efekty kosmosu w potoku kamery Battle** (`js/render/space-fx.js`, LookPipeline `space = { lens, flare }`):
+  soczewkowanie grawitacyjne czarnej dziury i flara słońca z promieniami światła — te same algorytmy co w PostKit
+  (potok laboratoriów ze Space), jako kroki przed obróbką kamery. Pierwszy krok do jednego potoku obrazu (plan
+  rozbioru, problem 7).
+- Edytor sceny, kosmos: **słońce w scenie jest źródłem światła** — ciała niebieskie oświetla jego położenie (BodyKit
+  `sunPosition`), statki światło sceny z jego kierunku (`stage.aimSun`); czarna dziura w scenie zagina obraz za sobą,
+  słońce ma flarę i promienie.
+
 ## Program 0.53.0 · edytor sceny 0.22.0 — 2026-11-07 (budowa bazy)
 
 ### Dodane

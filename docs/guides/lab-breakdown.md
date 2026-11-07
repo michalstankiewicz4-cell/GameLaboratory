@@ -91,6 +91,8 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
 6. **Dwa sposoby ładowania Three.js:** moduły (Battle) i globalne `THREE` (Space, `three-global.js`) — kity ze Space
    można ładować w edytorze przy pierwszej potrzebie (`js/scene/space.js`); docelowo moduły wszędzie.
 7. **Dwa potoki obrazu:** LookPipeline / PostPipeline (Battle) i LabKit + PostKit (Space).
+   *(0.54.0: efekty kosmosu PostKit — soczewkowanie, flara, promienie — także w LookPipeline, `js/render/space-fx.js`;
+   dalej: laboratoria ze Space na LookPipeline, PostKit na wspólnym module)*
 8. **Wygląd kamery pod osobnym kluczem** — do zasobów z nazwą.
 
 ## Kolejność (propozycja)

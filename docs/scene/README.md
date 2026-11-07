@@ -150,6 +150,8 @@ mgła, morze WaterKit, płaski grunt albo teren LandKit z wodami RegionKit, mapa
 - Morze przy terenie zna teren (płycizny, przybój, barwy i prądy wód, lód, olej); fale powtarzają się co rozmiar mapy.
 - Ląd z planety (`T.atmo`): niebo dzienne w odcieniu jej atmosfery (`tintAtmosphere` w `setLight`); bez atmosfery
   `stage.airless` — strona daje niebo kosmosu; planeta bez mórz (`T.noSea`) — bez wody wokół wycinka.
+- Kosmos: słońce w scenie (`bodies/sol`) jest źródłem światła — `stage.aimSun(dir)`, ciała dostają `sunPos`
+  (`tick(t, dt, { sunPos })`); czarna dziura i słońce — efekty kosmosu potoku kamery (`js/render/space-fx.js`).
 - Kosmos: `setSurface('space')` i `setSkyMode('space')`, odbicia `setSpaceEnvironment` (mapa ShipKit), niebo daje
   strona (ciało nieba BodyKit — edytor, pojazdy · kosmos).
 - Laboratorium z własną wodą albo gruntem (woda: warianty A i B; pojazdy · woda: zwykła tafla; pojazdy · ląd: zwykły grunt) wyłącza morze sceny

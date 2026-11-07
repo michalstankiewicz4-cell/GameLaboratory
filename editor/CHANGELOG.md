@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.23.0 — 2026-11-07 (słońce i czarna dziura w kosmosie)
+
+### Dodane
+- Kosmos: słońce postawione w scenie oświetla planety i statki; czarna dziura soczewkuje obraz; słońce ma flarę
+  i promienie światła.
+
 ## 0.22.0 — 2026-11-07 (budowa bazy)
 
 ### Dodane

@@ -141,6 +141,8 @@ export function createStage(renderer, scene, opts = {}) {
     get terrain() { return land ? land.tm : null; },
     // prawa lądu: grawitacja [m/s²] i gęstość powietrza [kg/m³] — z planety (ląd z planety) albo ziemskie
     get gravity() { return land && land.T.gravity != null ? land.T.gravity : 9.81; },
+    // słońce sceny z kierunku (kosmos: ciało „słońce” w scenie): światło kierunkowe, blask na wodzie
+    aimSun(dir) { sunDir.copy(dir); sun.position.copy(dir).multiplyScalar(220); WU.uSun.value.copy(dir); },
     get lava() { return WU.uLava.value > 0; },   // morze lawy (planeta lawowa)
     get airDensity() { return land && land.T.air != null ? land.T.air : 1.225; },
     get airless() { return !!(land && land.T.atmo && land.T.atmo.airless); },   // ląd z planety bez atmosfery: strona daje niebo kosmosu   // siatki terenu LandKit (trójkąty, update)

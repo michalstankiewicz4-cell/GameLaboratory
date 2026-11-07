@@ -10,6 +10,7 @@
 // render scale in small steps when frames are slow and raises it again when they are fast, with hysteresis.
 import * as THREE from '../../../vendor/three/three.module.js';
 
+import { createSpaceFx } from '../space-fx.js';
 export const LOOK_DEFAULTS = {
   exposure: 1.1, autoExposure: 0, autoTarget: 0.22, tone: 0, contrast: 1.0, saturation: 1.0, vibrance: 0, temperature: 0, tint: 0,
   bloom: 0.5, vignette: 0.3, grain: 0.15, ca: 0, distortion: 0, droplets: 0, dirt: 0, glare: 0, sharpen: 0,
@@ -161,7 +162,15 @@ export class LookPipeline {
   // target: where the finished picture goes (null: the screen) — e.g. a render target for a pass after this one
   render(scene, camera, target = null) {
     const t = performance.now() / 1000; this.mat.uniforms.time.value = t; this.matB.uniforms.time.value = t;
-    this.r.setRenderTarget(this.rt); this.r.render(scene, camera); this.r.setRenderTarget(target);
+    // efekty kosmosu (js/render/space-fx.js): soczewkowanie czarnej dziury, flara słońca — this.space = { lens, flare }
+    const sp = this.space && (this.space.lens || this.space.flare) ? this.space : null;
+    if (sp && !this.fx) this.fx = createSpaceFx(this.r);
+    const lensOn = sp ? this.fx.lensOn(camera, sp.lens) : false;
+    if (lensOn) sp.lens.object.visible = false;
+    this.r.setRenderTarget(this.rt); this.r.render(scene, camera);
+    const tex = (sp && this.fx.render(scene, camera, this.rt, { lens: sp.lens, lensOn, flare: sp.flare })) || this.rt.texture;
+    for (const m of [this.mat, this.matB]) m.uniforms.tColor.value = tex;
+    this.r.setRenderTarget(target);
     const sz = this.r.getSize(new THREE.Vector2()), W = sz.x, H = sz.y;            // CSS pixels, as setScissor expects
     if (this.split > 0) {
       const x = Math.round(W * this.split);

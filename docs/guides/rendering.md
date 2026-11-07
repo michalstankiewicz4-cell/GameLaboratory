@@ -94,3 +94,11 @@ how the labs draw today (Three.js r186, the graphics of the labs from Battle): C
   lab sky (brighter than this black sky, which keeps the metal ships
   readable).
 
+
+## Efekty kosmosu w potoku kamery (0.54.0)
+
+`js/render/space-fx.js` — soczewkowanie grawitacyjne (czarna dziura: obiekt ukryty, obraz zagięty wokół niej,
+obiekt narysowany na wierzchu), flara słońca i promienie światła; algorytmy z PostKit. LookPipeline
+(`js/render/sea/look.js`) wykonuje je, gdy ma `space = { lens: { object, position, radius }, flare: { position, radius,
+strength, rays } }`, na liniowym obrazie sceny przed obróbką kamery (jasność do progów flary ściśnięta x / (1 + x)).
+Edytor sceny ustawia je w kosmosie z ciał „Abyss” i „Sol” w scenie.

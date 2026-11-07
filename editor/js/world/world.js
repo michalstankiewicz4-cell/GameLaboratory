@@ -138,9 +138,20 @@ export function createWorld(container, store, onWarn) {
   function frame(now) {
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
     const t = stage.update(dt, camera); if (before) before(dt, t);
-    const at = { sunDir: stage.sunDir, center: camera.position };   // dla ciał niebieskich: kierunek słońca, kamera
+    // kosmos: słońce w scenie (ciało „Sol”) jest źródłem światła — ciała niebieskie oświetla jego położenie, statki
+    // światło sceny z jego kierunku (od środka kadru); czarna dziura w scenie — soczewkowanie, słońce — flara i promienie
+    // (efekty kosmosu potoku kamery, js/render/space-fx.js)
+    let sunB = null, holeB = null;
+    if (stage.space) built.forEach((r) => { if (!sunB && r.prefab === 'bodies/sol') sunB = r; if (!holeB && r.prefab === 'bodies/abyss') holeB = r; });
+    if (sunB) stage.aimSun(sunB.root.position.clone().sub(camera.position).normalize());   // światło od słońca w scenie
+    const at = { sunDir: stage.sunDir, sunPos: sunB ? sunB.root.position : null, center: camera.position };   // dla ciał niebieskich: światło, kamera
     built.forEach((r) => { if (r.tick && !r.driven) r.tick(t, dt, at); });   // części na postoju (statki kosmiczne, ciała niebieskie)
     if (skyBody && skyBody.group.visible) skyBody.update(t, dt, { center: camera.position, renderer });
+    const rad = (r) => (r.kit && r.kit.radius ? r.kit.radius : 50) * r.root.scale.x;
+    look.space = stage.space && (sunB || holeB) ? {
+      lens: holeB ? { object: holeB.root, position: holeB.root.position, radius: rad(holeB) } : null,
+      flare: sunB ? { position: sunB.root.position, radius: rad(sunB), strength: 1, rays: 1 } : null,
+    } : null;
     look.sun(camera, stage.sunDir);
     window.LabPerf.begin(renderer); look.render(scene, camera); window.LabPerf.end(renderer);   // okno Wydajność i dolny pasek
     requestAnimationFrame(frame);
