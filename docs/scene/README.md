@@ -92,7 +92,20 @@ Polecenia (`help`, `describe`, `prefabs`, `assets`, `add`, `set`, `move`, `remov
 - Sprawdza: model istnieje, zachowanie pasuje do modelu, liczby, oświetlenie, nazwa zasobu; obiekt po `id` albo
   jednoznacznej `name`.
 - Lista poleceń to jeden krok cofania (`hooks.group`); w czasie gry polecenia zmieniające scenę są odrzucane.
-- `hooks`: `build(fn)` (zmiana, po której trzeba zbudować modele), `group(fn)`, `play()`, `stop()`, `playing()`.
+- `hooks`: `build(fn)` (zmiana, po której trzeba zbudować modele), `group(fn)`, `play()`, `stop()`, `playing()`,
+  `act(obj, action, on)`, `actionsOf(obj)`, `events(n)` (szyna zdarzeń).
+
+## Zdarzenia (`js/core/events.js`)
+
+Szyna zdarzeń silnika: `createEvents({ log })` → `on(name, fn)` (zwraca wypisanie), `once`, `emit(name, data)`,
+`history(n)`; `'*'` — każde zdarzenie. Moduły nie wołają się nawzajem: jeden wysyła, inne słuchają.
+
+| Zdarzenie | Dane | Kto wysyła | Kto słucha |
+|---|---|---|---|
+| `action` | `{ object, name, action, on? }` | gra w edytorze (klawisze 1…9), API `act` | zachowanie obiektu (`run.act`: model ShipKit `act`), dziennik konsoli |
+
+Zachowanie z akcjami podaje `actions()` → `[{ id, label, kind: 'trigger' | 'toggle', on }]` i `act(id, on)`; dziś
+„ciąg w próżni” (akcje ShipKit: ogień, skan, druk, wyłączenie, zniszczenie i własne statku).
 
 ## Zasoby z nazwą (`assets.js`)
 

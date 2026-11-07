@@ -45,7 +45,7 @@ Ten schemat narysowany ramkami: menu **Pomoc → Schemat silnika** na każdej st
 | **UI** | menu, HUD, pasek postępu, okna | czyta stan sceny i zdarzenia |
 | **Input** | klawiatura, mysz, pad, dotyk, Pointer Lock → akcje („skok”, „strzał”) | akcje, nie klawisze, żeby dało się zmieniać sterowanie |
 | **Assets** | ładowanie, pamięć podręczna, postęp; prefabrykaty (gotowe obiekty z kitów) | |
-| **Events** | szyna wiadomości („trafienie” → audio + UI + sieć) | moduły nie wołają się nawzajem |
+| **Events** | szyna wiadomości („trafienie” → audio + UI + sieć) | moduły nie wołają się nawzajem; jest: `js/core/events.js` (zdarzenie „action” — akcje statków) |
 | **Network** | synchronizacja stanu sceny i zdarzeń; kto liczy (gospodarz czy każdy), wygładzanie ruchu innych graczy | WebRTC (dane), Supabase / Firebase (lobby, łączenie), Cloudflare (pośrednik) |
 | **Save/Load** | scena zapisana jako dane → IndexedDB / LocalStorage | nie jest częścią Workers |
 | **Jobs/Workers** | ciężkie zadania w tle: fizyka, generowanie terenu, ścieżki, nauka sieci | |

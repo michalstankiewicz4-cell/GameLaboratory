@@ -149,7 +149,7 @@ export const BEHAVIORS = {
     keysPl: 'W / S: silnik główny / wsteczny (dźwignia) · ↑ ↓: pochylenie · ← →: kurs · Q / E: przechył · bez klawiszy: silniczki zatrzymują obrót',
     create(obj, built) {
       const k = built.kit || {}, sim = createThrust(SPACE_NUMBERS[obj.prefab], { p: [...obj.pos], yaw: obj.rot[1] * D2R, pitch: -obj.rot[0] * D2R });
-      const s = sim.state, root = built.root;
+      const s = sim.state, root = built.root, toggles = {};
       let tAcc = 0;
       return {
         state: s,
@@ -160,7 +160,10 @@ export const BEHAVIORS = {
           tAcc += dt; if (k.update) k.update(tAcc, dt, { power: Math.max(0, thr) });   // płomienie silników
         },
         hud: () => ({ speed: s.speed, unit: 'm/s', throttle: s.thrust >= 0 ? s.thrust / sim.def.thrust : s.thrust / sim.def.reverse }),
-        reset() { if (k.update) k.update(0, 0.05, { power: 0 }); },
+        // akcje modelu ShipKit (ogień, skan, druk, wyłączenie, zniszczenie i własne statku): zdarzenie „action” → k.act
+        actions: () => (k.actions || []).filter((a) => a.enabled).map((a) => ({ id: a.id, label: a.label, kind: a.kind, on: !!toggles[a.id] })),
+        act(id, on) { if (!k.act) return; const a = (k.actions || []).find((x) => x.id === id); if (!a) return; if (a.kind === 'toggle') { toggles[id] = on != null ? !!on : !toggles[id]; k.act(id, toggles[id]); } else k.act(id); },
+        reset() { for (const id of Object.keys(toggles)) if (toggles[id] && k.act) k.act(id, false); if (k.update) k.update(0, 0.05, { power: 0 }); },
       };
     },
   },

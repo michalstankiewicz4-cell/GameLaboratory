@@ -3,6 +3,15 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.48.0 · edytor sceny 0.20.0 — 2026-11-07 (szyna zdarzeń, akcje statków)
+
+### Dodane
+- **Szyna zdarzeń** `js/core/events.js` (moduł Events ze schematu silnika): `on`, `once`, `emit`, `history`; moduły nie
+  wołają się nawzajem — jeden wysyła zdarzenie, inne słuchają.
+- **Akcje statków jako zdarzenia** (punkt 6 planu rozbioru): zachowanie „ciąg w próżni” podaje akcje modelu ShipKit
+  (`actions()`, `act(id, on)`); w grze klawisze 1…9 i polecenie API `act` wysyłają zdarzenie „action”, którego słucha
+  zachowanie obiektu (model strzela, skanuje, gaśnie, wybucha) i dziennik konsoli. API: `act`, `actions`, `events`.
+
 ## Program 0.47.0 · edytor sceny 0.19.0 — 2026-11-07 (zachowanie „orbita”)
 
 ### Dodane

@@ -3,6 +3,13 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.20.0 — 2026-11-07 (akcje statków jako zdarzenia)
+
+### Dodane
+- **Akcje statków kosmicznych w grze**: klawisze 1…9 (lista w linii stanu po ▶) — ogień, skan, druk, wyłączenie,
+  zniszczenie i własne akcje statku. Każda akcja to zdarzenie „action” na szynie zdarzeń (zapis w dzienniku konsoli).
+- API: `act` (akcja obiektu w czasie gry), `actions` (lista akcji), `events` (ostatnie zdarzenia).
+
 ## 0.19.0 — 2026-11-07 (orbity)
 
 ### Dodane

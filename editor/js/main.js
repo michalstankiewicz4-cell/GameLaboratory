@@ -6,6 +6,7 @@ import { createControls } from './world/controls.js';
 import { createPanels } from './ui/panels.js';
 import { createToolbar } from './ui/toolbar.js';
 import { createPlay } from './play/play.js';
+import { createEvents } from '../../js/core/events.js';
 import { createApiConsole } from './ui/api-console.js';
 import { createSceneApi } from '../../js/scene/api.js';
 import { behaviorsFor } from '../../js/scene/behaviors.js';
@@ -63,14 +64,17 @@ const actions = {
   undo() { if (store.canUndo) build(() => store.undo()); },
   redo() { if (store.canRedo) build(() => store.redo()); },
 };
-actions.play = createPlay(store, world, controls, actions);
+// szyna zdarzeń (js/core/events.js): akcje statków w grze i z API; każde zdarzenie także do dziennika konsoli
+const events = createEvents({ log: (name, d) => window.LabLog && window.LabLog.add('info', `Event ${name}: ${d.name || d.object || ''}${d.action ? ' — ' + d.action + (d.on != null ? (d.on ? ' on' : ' off') : '') : ''}`) });
+actions.play = createPlay(store, world, controls, actions, events);
 const panels = createPanels(store, actions);
 // modele, które czekały na kity ze Space, są już zbudowane: uchwyt, hierarchia i okna od nowa
 world.afterAsync = () => { controls.attach(); panels.renderTree(); panels.renderProps(); };
 // API dla AI (js/scene/api.js): polecenia JSON na tych samych danych; zakładka API w konsoli i window.sceneApi.run(…)
 const api = createSceneApi({
   store, prefabs: PREFABS, behaviorsFor, lights: Object.keys(LIGHTS), assets: { kinds: Object.keys(ASSET_KINDS), list: listAssets, get skyPresets() { return skyPresets().map((p) => p.id); } },
-  hooks: { build, group: (fn) => store.group(fn), play: () => actions.play.start(), stop: () => actions.play.stop(), playing: () => actions.play.playing },
+  hooks: { build, group: (fn) => store.group(fn), play: () => actions.play.start(), stop: () => actions.play.stop(), playing: () => actions.play.playing,
+    act: (o, action, on) => actions.play.act(o.id, action, on), actionsOf: (o) => actions.play.actionsOf(o.id), events: (n) => events.history(n) },
 });
 createApiConsole(api);
 createToolbar(store, controls, actions);

@@ -6,8 +6,26 @@ import { createInput } from './input.js';
 
 const { t, lang } = window.EditorI18n;
 
-export function createPlay(store, world, controls, actions) {
+export function createPlay(store, world, controls, actions, events) {
   const input = createInput();
+  // akcje modelu (statki kosmiczne: ogień, skan, druk, wyłączenie, zniszczenie) — zdarzenie „action” na szynie; słucha
+  // go zachowanie obiektu (run.act), dziennik i później dźwięk, interfejs, sieć
+  if (events) events.on('action', (e) => { const r = runs.find((x) => x.obj.id === e.object); if (r && r.run.act) r.run.act(e.action, e.on); });
+  function act(id, action, on) {
+    const r = runs.find((x) => x.obj.id === id); if (!r || !r.run.actions) return { ok: false, error: 'no actions' };
+    const a = r.run.actions().find((x) => x.id === action);
+    if (!a) return { ok: false, error: `no action "${action}" (actions: ${r.run.actions().map((x) => x.id).join(', ')})` };
+    const st = a.kind === 'toggle' ? (on != null ? !!on : !a.on) : undefined;
+    if (events) events.emit('action', { object: id, name: r.obj.name, action, ...(st != null ? { on: st } : {}) });
+    return { ok: true, action, ...(st != null ? { on: st } : {}) };
+  }
+  // klawisze 1…9: akcje gracza po kolei (lista w linii stanu po starcie)
+  addEventListener('keydown', (e) => {
+    if (!runs.length || !me || !me.run.actions || e.repeat || (e.target.closest && e.target.closest('input, select, textarea'))) return;
+    const n = +e.key; if (!(n >= 1 && n <= 9)) return;
+    const a = me.run.actions()[n - 1]; if (!a) return;
+    e.preventDefault(); act(me.obj.id, a.id);
+  });
   let runs = [], me = null, last = null, hudT = 0;
 
   function start() {
@@ -30,7 +48,8 @@ export function createPlay(store, world, controls, actions) {
     input.reset(BEHAVIORS[me.id], me.run.hud().throttle);
     last = me.b.root.position.clone(); hudT = 4;   // przez pierwsze sekundy linia stanu pokazuje klawisze
     controls.setPlaying(true); document.body.classList.add('playing');
-    actions.status(t('play.on', { name: me.obj.name, keys: lang === 'pl' ? BEHAVIORS[me.id].keysPl : BEHAVIORS[me.id].keys }));
+    const acts = me.run.actions ? me.run.actions().map((a, i) => `${i + 1}: ${a.label.toLowerCase()}`).join(' · ') : '';
+    actions.status(t('play.on', { name: me.obj.name, keys: (lang === 'pl' ? BEHAVIORS[me.id].keysPl : BEHAVIORS[me.id].keys) + (acts ? ' · ' + acts : '') }));
     if (window.LabLog) window.LabLog.add('info', 'Play: ' + runs.length + ' object(s), controlling ' + me.obj.name);
     changed();
   }
@@ -61,7 +80,8 @@ export function createPlay(store, world, controls, actions) {
   }
   const subs = new Set(), changed = () => subs.forEach((f) => f(!!runs.length));
   return {
-    start, stop, frame,
+    start, stop, frame, act,
+    actionsOf: (id) => { const r = runs.find((x) => x.obj.id === id); return r && r.run.actions ? r.run.actions() : []; },
     toggle: () => (runs.length ? stop() : start()),
     get playing() { return runs.length > 0; },
     get controlled() { return me ? me.obj.id : null; },

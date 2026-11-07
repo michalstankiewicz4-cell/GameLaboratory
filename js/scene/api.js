@@ -29,6 +29,9 @@ const COMMANDS = {
   select: { args: 'id | name, or nothing', does: 'selects an object in the editor (nothing: the environment)' },
   new: { args: '[name]', does: 'an empty scene' },
   load: { args: 'scene (format gamelab-scene)', does: 'replaces the whole scene' },
+  act: { args: 'id | name, action (from "actions"), [on] (a toggle: true / false; without — switches)', does: 'during play: the object does an action (a spaceship: fire, scan, print, offline, destroy) — an "action" event' },
+  actions: { args: 'id | name', does: 'during play: the object\'s actions' },
+  events: { args: '[n]', does: 'the last n events (default 20)' },
   play: { args: '', does: 'runs the behaviours (like ▶ Play)' },
   stop: { args: '', does: 'back to editing' },
 };
@@ -123,6 +126,16 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
     load: (c) => { const s = normalize(c.scene); build(() => store.load(s)); return { objects: s.objects.length }; },
     play: () => { if (!hooks.play) fail('play is not available here'); hooks.play(); return { playing: !!(hooks.playing && hooks.playing()) }; },
     stop: () => { if (hooks.stop) hooks.stop(); return { playing: false }; },
+    act: (c) => {
+      if (!hooks.act || !(hooks.playing && hooks.playing())) fail('not playing: {"cmd":"play"} first');
+      const o = target(c); if (c.action == null) fail('action: one of {"cmd":"actions"}');
+      const r = hooks.act(o, String(c.action), c.on); if (!r.ok) fail(r.error); return { object: o.id, ...r };
+    },
+    actions: (c) => {
+      if (!hooks.actionsOf || !(hooks.playing && hooks.playing())) fail('not playing: {"cmd":"play"} first');
+      const o = target(c); return { object: o.id, actions: hooks.actionsOf(o) };
+    },
+    events: (c) => ({ events: hooks.events ? hooks.events(c.n > 0 ? Math.min(200, +c.n) : 20) : [] }),
   };
 
   function exec(c) {

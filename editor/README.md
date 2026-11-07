@@ -115,6 +115,9 @@ albo lista (po kolei); wynik `{ "ok": true, … }` albo `{ "ok": false, "error":
 | `new` | `[name]` | pusta scena |
 | `load` | `scene` | cała scena z danych |
 | `play`, `stop` | — | jak ▶ Graj / ■ Stop |
+| `act` | `id` albo `name`, `action`, `[on]` (przełącznik) | w czasie gry: akcja obiektu (statek kosmiczny: `fire`, `scan`, `print`, `offline`, `destroy`, własne) — zdarzenie „action” |
+| `actions` | `id` albo `name` | w czasie gry: akcje obiektu |
+| `events` | `[n]` | ostatnie zdarzenia szyny (domyślnie 20) |
 
 ```json
 [{ "cmd": "add", "prefab": "sea/orzel", "name": "Orzeł 2", "pos": [60, 0, -20], "rot": [0, 45, 0] },
