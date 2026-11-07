@@ -138,3 +138,13 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
       `fire`);
    4. **drzewka technologiczne** (`tools/tree-editor.html`) — później: dane gry jako zasób z nazwą i narzędzie do ich
       edycji.
+9. **Materiał z PatientZero** (repozytorium `michalstankiewicz4-cell/PatientZero`; przeniesienie **z historią**), po
+   Hive Hunger:
+   1. **środowisko „organizm”** — czwarte obok kosmosu, wody i lądu, ze swoimi prawami: przepływ płynów (krew, chłonka,
+      bijące serce — `js/flow.js`), dyfuzja, odpowiedź odpornościowa;
+   2. **laboratorium tkanek** — narządy i tkanki (serce, wątroba, nerka — `js/render/tissue.js`, `cells.js`,
+      `biome.js`) jako teren tego środowiska, zapis pod nazwą (jak ląd);
+   3. **laboratorium patogenów** — bakterie, wirusy, grzyb, nowotwór jako modele z zachowaniami (ruch z przepływem,
+      kolonie, rozmnażanie, mutacje);
+   plansze to płaska scena oglądana z góry (kamera ortograficzna) w tym samym silniku Three.js — bez osobnej sceny
+   2D na canvasie (canvas 2D tylko w interfejsie, jak w grze).
