@@ -12,16 +12,16 @@ scenie: grafika ją rysuje, fizyka ją przesuwa, audio z niej gra, sieć ją syn
 i edytor ją pokazują, AI ją zmienia.
 
 ```
-                         ┌──────────────── ENGINE: pętla, czas, cykl życia ────────────────┐
- [Input] ──► zdarzenia ─►│  Scripts ─► Physics ─► Animacje ─► Render ─► Post-FX ─► ekran   │
- klawiatura, mysz, pad,  │  (zachowania) (stały krok)   │         ▲        └─► Audio, UI     │
- dotyk, Pointer Lock     │        │         │           ▼         │                          │
-                         │        └─────────┴──────► [SCENE] ─────┘                          │
-                         │                   obiekty: położenie + składniki                   │
-                         │                   (siatka, światło, kamera, kolizja,               │
-                         │                    zachowanie, źródło dźwięku, cząsteczki)         │
-                         │                   środowisko: niebo, woda, ląd, pogoda, prawa      │
-                         └──────────────────────────────┬────────────────────────────────────┘
+                         ┌────────────────────── ENGINE: pętla, czas, cykl życia ───────────────────────┐
+ [Input] ──► zdarzenia ─►│  Rules ─► Scripts ─► Physics ─► Animacje ─► Render ─► Post-FX ─► ekran       │
+ klawiatura, mysz, pad,  │ (reguły (zachowania) (stały krok)   │         ▲      └─► Audio, UI           │
+ dotyk, Pointer Lock     │  gry)                               ▼         │                              │
+                         │   └───────┴──────────┴───────► [SCENE] ──────┘                               │
+                         │                   obiekty: położenie + składniki                             │
+                         │                   (siatka, światło, kamera, kolizja,                         │
+                         │                    zachowanie, źródło dźwięku, cząsteczki)                   │
+                         │                   środowisko: niebo, woda, ląd, pogoda, prawa                │
+                         └──────────────────────────────┬───────────────────────────────────────────────┘
       ┌────────────────┬──────────────────┬─────────────┼──────────────┬──────────────────┐
   [Assets]        [Events]           [Network]      [Save/Load]     [Jobs/Workers]   [Debug + Editor + API dla AI]
   kity, tekstury, wiadomości         stan sceny,    scena jako      fizyka, AI,      hierarchia, atrybuty,
@@ -40,6 +40,7 @@ Ten schemat narysowany ramkami: menu **Pomoc → Schemat silnika** na każdej st
 | **Scene** | drzewo obiektów; obiekt = położenie + składniki (siatka, światło, kamera, kolizja, zachowanie, źródło dźwięku, cząsteczki, sprite); środowisko (niebo, woda, ląd, pogoda, prawa fizyki) | scena jako dane (JSON): z niej zapis, edytor, sieć i API dla AI |
 | **Graphics** | rysuje scenę: 3D (Three.js r186, WebGL; później renderer WebGPU z Three), 2D (Canvas), post-FX (wygląd kamery, filtry) | efekty, cząsteczki i sprite'y są obiektami sceny, nie wyjściem grafiki |
 | **Physics** | stały krok, prawa środowiska: próżnia, woda, ląd | osobno od skryptów |
+| **Rules** | reguły gry: stan rozgrywki (lobby, misja, wygrana, przegrana), cele, punkty, role graczy (np. patogen i lekarz), warunki końca rundy | dotyczą całej gry, nie jednego obiektu; słuchają zdarzeń i zmieniają scenę |
 | **Scripts** | zachowania podpinane do obiektów (strzelanie, sterowanie, AI przeciwników) | korzystają z fizyki i zdarzeń |
 | **Audio** | Web Audio: muzyka, efekty, dźwięk przestrzenny ze źródeł w scenie | słuchacz = kamera |
 | **UI** | menu, HUD, pasek postępu, okna | czyta stan sceny i zdarzenia |

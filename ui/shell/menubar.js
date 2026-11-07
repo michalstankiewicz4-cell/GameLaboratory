@@ -132,11 +132,11 @@ function engineMap() {
   const eng = el("div", "emEngine");
   eng.appendChild(el("div", "emTitle", t("ENGINE: loop, time, life cycle", "ENGINE: pętla, czas, cykl życia")));
   const pipe = el("div", "emPipe");
-  [[t("Scripts", "Scripts"), t("behaviours", "zachowania")], [t("Physics", "Physics"), t("fixed step", "stały krok")], [t("Animation", "Animacje")], ["Render"], ["Post-FX"], [t("screen", "ekran")]]
-    .forEach(([a, b], i) => { if (i) pipe.appendChild(arrow("▶")); pipe.appendChild(node(i === 5 ? "emScreen" : "", a, b)); });
+  [["Rules", t("game rules", "reguły gry")], [t("Scripts", "Scripts"), t("behaviours", "zachowania")], [t("Physics", "Physics"), t("fixed step", "stały krok")], [t("Animation", "Animacje")], ["Render"], ["Post-FX"], [t("screen", "ekran")]]
+    .forEach(([a, b], i, all) => { if (i) pipe.appendChild(arrow("▶")); pipe.appendChild(node(i === all.length - 1 ? "emScreen" : "", a, b)); });
   eng.appendChild(pipe);
   eng.appendChild(el("div", "emSide", t("Post-FX ▶ Audio, UI", "Post-FX ▶ Audio, UI")));
-  eng.appendChild(el("div", "emFlow", t("▼ scripts, physics and animation change the scene · render draws it ▲", "▼ zachowania, fizyka i animacje zmieniają scenę · render ją rysuje ▲")));
+  eng.appendChild(el("div", "emFlow", t("▼ rules, scripts, physics and animation change the scene · render draws it ▲", "▼ reguły, zachowania, fizyka i animacje zmieniają scenę · render ją rysuje ▲")));
   const scene = node("emScene", t("SCENE", "SCENA"));
   scene.append(el("span", null, t("objects: position + components (mesh, light, camera, collision, behaviour, sound source, particles)", "obiekty: położenie + składniki (siatka, światło, kamera, kolizja, zachowanie, źródło dźwięku, cząsteczki)")),
     el("span", null, t("environment: sky, water, land, weather, laws", "środowisko: niebo, woda, ląd, pogoda, prawa")));

@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.56.1 — 2026-11-07 (schemat silnika: reguły gry)
+
+### Zmienione
+- Schemat silnika (`docs/guides/engine-architecture.md` i Pomoc → Schemat silnika): nowe pole **Rules** (reguły gry) przed
+  Scripts — stan rozgrywki, cele, punkty, role graczy, warunki końca rundy; dotyczą całej gry, nie jednego obiektu.
+
 ## Program 0.56.0 — 2026-11-07 (sprzątanie: PostKit usunięty)
 
 ### Usunięte
