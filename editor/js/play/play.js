@@ -34,9 +34,10 @@ export function createPlay(store, world, controls, actions, events) {
       terrainAt: (x, z) => world.stage.terrainAt(x, z), waterLevel: (x, z) => world.stage.waterLevel(x, z), waterAt: (x, z) => world.stage.waterAt(x, z),   // pojazdy lądowe: grunt i dno, poziom wody
       // orbita: inne obiekty sceny i ich bieżące położenie, kierunek słońca, kamera
       objects: store.scene.objects, objectPos: (id) => { const b = world.built.get(id); return b ? b.root.position.toArray() : null; },
+      get gravity() { return world.stage.gravity; }, get airDensity() { return world.stage.airDensity; },   // lądowanie: prawa planety
       get sunDir() { return world.stage.sunDir; }, get cameraPos() { return world.camera.position; } };
     runs = store.scene.objects.map((o) => {
-      const id = behaviorOf(o), b = world.built.get(o.id); if (!id || !b) return null;
+      const id = behaviorOf(o, store.scene.env.surface), b = world.built.get(o.id); if (!id || !b) return null;
       const run = BEHAVIORS[id].create(o, b, env);
       if (run) b.driven = true;   // ruch i części daje zachowanie (świat nie wywołuje tick)
       return run && { obj: o, id, b, run };
@@ -74,6 +75,8 @@ export function createPlay(store, world, controls, actions, events) {
   function hudText(h) {
     const parts = [me.obj.name, `${t('play.speed')} ${h.speed.toFixed(h.unit === 'kn' ? 1 : 0)} ${h.unit}`, `${t('play.throttle')} ${Math.round(h.throttle * 100)}%`];
     if (h.alt != null) parts.push(`${t('play.alt')} ${h.alt.toFixed(0)} m`);
+    if (h.vs != null) parts.push(`${t('play.vs')} ${h.vs.toFixed(1)} m/s`);
+    if (h.landed) parts.push(t('play.landed'));
     if (h.crashed) parts.push(t('play.crashed')); else if (h.stall) parts.push(t('play.stall'));
     if (h.aground) parts.push(t('play.aground'));
     return parts.join(' · ');

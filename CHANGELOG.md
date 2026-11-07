@@ -3,6 +3,19 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.52.0 · pojazdy (ląd) 1.17.0 · edytor sceny 0.21.0 — 2026-11-07 (lądowanie)
+
+### Dodane
+- **Zachowanie „lądowanie”** (`js/behaviors/land/lander.js`, ląd): statek kosmiczny nad gruntem — bryła sztywna pod
+  grawitacją planety, w jej atmosferze (opór ½ρ·CdA·v²), z silnikiem głównym, silnikami podnośnymi pod brzuchem
+  (1,5 × ciężar na Ziemi — założone) i czterema podporami (sprężyna z tłumikiem, tarcie, moment). Przyziemienie
+  szybciej niż 5 m/s w pionie — rozbity. Grawitacja i gęstość powietrza z planety (`T.gravity`, `T.air` z
+  `js/envs/land/planet.js`; scena bazowa `gravity`, `airDensity`), na zwykłym lądzie — ziemskie.
+- Laboratorium pojazdów — ląd: statki kosmiczne (Codewing, Scribe, Swarmer) na liście; startują 40 m nad gruntem;
+  AUTO schodzi 1,5 m/s i siada, ręcznie: spacja — silniki podnośne, W / S — silnik główny, A / D — kurs.
+- Edytor sceny: statek kosmiczny nad lądem dostaje domyślnie „lądowanie” (w kosmosie — „ciąg w próżni”); spacja —
+  silniki podnośne; linia stanu: wysokość, prędkość pionowa, „wylądował” / „rozbity”.
+
 ## Program 0.51.0 · ląd 1.7.0 · edytor sceny 0.20.3 — 2026-11-07 (grunt i lawa planety)
 
 ### Dodane

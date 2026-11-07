@@ -38,7 +38,7 @@
   'play.off': 'Stop: powrót do edycji.',
   'play.speed': 'prędkość',
   'play.throttle': 'maszyny',
-  'play.alt': 'wysokość',
+  'play.vs': 'pion', 'play.landed': 'wylądował', 'play.alt': 'wysokość',
   'play.crashed': 'ROZBITY',
   'play.stall': 'przeciągnięcie',
   'play.aground': 'na mieliźnie',

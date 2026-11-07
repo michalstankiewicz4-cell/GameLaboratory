@@ -110,3 +110,11 @@ from what the land lab saved, `gameLab.land.v1`): terrain, a sea that knows the 
 amphibian floats on the stage's waves. The plain ground (hills and bumps, the same function for the mesh and the
 wheels) stays: a fine 400 m grid and a coarse 4 km grid of the hills around it reach the horizon, both following the
 vehicle on a 40 m step. NIGHT: the sun below the horizon (the night sky), the lamps on.
+
+## Spacecraft landing (1.17.0)
+
+The ShipKit spacecraft with motion numbers (Codewing, Scribe, Swarmer) are on the list with the landing behaviour
+(`js/behaviors/land/lander.js`): gravity and air from the ground — the plain ground is Earth's, a land lab ground from a
+planet brings the planet's (Luna: weak gravity, no air). The ship starts 40 m up with the lift thrusters off. AUTO is a
+controller that holds 1.5 m/s down and sets it on its four landing pads; by hand: Space — lift thrusters, W / S — the
+main engine, A / D — yaw. Touching down faster than 5 m/s breaks it.

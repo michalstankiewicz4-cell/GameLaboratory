@@ -39,7 +39,7 @@
   'play.off': 'Stopped: back to editing.',
   'play.speed': 'speed',
   'play.throttle': 'throttle',
-  'play.alt': 'altitude',
+  'play.vs': 'vertical', 'play.landed': 'landed', 'play.alt': 'altitude',
   'play.crashed': 'CRASHED',
   'play.stall': 'stall',
   'play.aground': 'aground',

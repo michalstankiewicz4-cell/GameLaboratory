@@ -12,6 +12,7 @@ import { createThrust } from '../behaviors/space/thrust.js';
 import { createDrive, driveDef } from '../behaviors/land/drive.js';
 import { createCraft, craftDef } from '../behaviors/water/craft.js';
 import { createOrbit, orbitMu, circularVelocity } from '../behaviors/space/orbit.js';
+import { createLander, landerDef } from '../behaviors/land/lander.js';
 
 const D2R = Math.PI / 180;
 const quatOf = (q, o = new THREE.Quaternion()) => o.set(q[1], q[2], q[3], q[0]);   // [w, x, y, z] → THREE
@@ -24,7 +25,7 @@ const SHIP_NUMBERS = {
 
 // liczby statków kosmicznych — ZAŁOŻONE (statki są wymyślone, nie mają danych): masa [kg], ciąg główny i wsteczny [N],
 // moment silniczków manewrowych [N·m], moment bezwładności [kg·m²]; Codewing ok. 2 g, dron zwinniejszy, rojowiec lżejszy
-const SPACE_NUMBERS = {
+export const SPACE_NUMBERS = {
   'space/codewing': { mass: 2.0e4, thrust: 4.0e5, reverse: 1.0e5, torque: 1.2e5, inertia: 4.0e5 },
   'space/scribe': { mass: 2.0e3, thrust: 3.0e4, reverse: 1.5e4, torque: 1.0e4, inertia: 1.5e4 },
   'space/swarmer': { mass: 6.0e3, thrust: 1.5e5, reverse: 4.0e4, torque: 4.0e4, inertia: 8.0e4 },
@@ -167,6 +168,29 @@ export const BEHAVIORS = {
       };
     },
   },
+  lander: {
+    label: 'Landing', labelPl: 'Lądowanie', env: 'land', throttle: [-1, 1],
+    fits: (prefabId) => !!SPACE_NUMBERS[prefabId],
+    keys: 'Space: lift thrusters (hold) · W / S: main engine / reverse (lever) · ↑ ↓: pitch · ← →: yaw · Q / E: roll · touch down under 5 m/s',
+    keysPl: 'spacja: silniki podnośne (trzymaj) · W / S: silnik główny / wsteczny (dźwignia) · ↑ ↓: pochylenie · ← →: kurs · Q / E: przechył · przyziemienie poniżej 5 m/s',
+    create(obj, built, world) {
+      const k = built.kit || {}, root = built.root, def = landerDef(SPACE_NUMBERS[obj.prefab], localBox(root));
+      const sim = createLander(def, { p: [...obj.pos], yaw: obj.rot[1] * D2R, pitch: -obj.rot[0] * D2R }), s = sim.state;
+      const env = { get g() { return world.gravity ?? 9.81; }, get rho() { return world.airDensity ?? 1.225; }, ground: (x, z) => (world.terrainAt ? world.terrainAt(x, z) ?? 0 : 0) };
+      let tAcc = 0, lever = 0;
+      return {
+        state: s,
+        step(dt, c) {
+          const thr = c.throttle || 0; lever = thr;
+          sim.step(dt, { throttle: thr, lift: c.lift || 0, pitch: c.elevator || 0, yaw: -(c.aileron || 0), roll: c.rudder || 0 }, env);
+          root.position.fromArray(s.p); quatOf(s.q, root.quaternion);
+          tAcc += dt; if (k.update) k.update(tAcc, dt, { power: Math.max(0, thr, c.lift || 0) });
+        },
+        hud: () => ({ speed: s.speed, unit: 'm/s', throttle: lever, alt: s.alt, vs: s.vs, crashed: s.crashed, landed: s.onGround && !s.crashed }),
+        reset() { if (k.update) k.update(0, 0.05, { power: 0 }); },
+      };
+    },
+  },
   orbit: {
     label: 'Orbit', labelPl: 'Orbita', env: 'space', throttle: [0, 0],
     fits: (prefabId) => prefabId.startsWith('bodies/'),
@@ -202,6 +226,14 @@ export const BEHAVIORS = {
   },
 };
 export const ORBIT_PERIOD = 60;
+// obrys modelu w jego układzie (bez położenia i obrotu, ze skalą) — podpory i przekrój lądującego statku
+function localBox(root) {
+  const p = root.position.clone(), q = root.quaternion.clone();
+  root.position.set(0, 0, 0); root.quaternion.identity(); root.updateMatrixWorld(true);
+  const b = new THREE.Box3().setFromObject(root);
+  root.position.copy(p); root.quaternion.copy(q); root.updateMatrixWorld(true);
+  return { min: b.min.toArray(), max: b.max.toArray() };
+}
 const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 // ranga ciała niebieskiego (do wyboru środka orbity); inne modele — −1 (nie są środkiem)
 const RANKS = { blackholes: 4, suns: 3, pulsars: 3, giants: 2, rings: 2 };
@@ -219,7 +251,11 @@ export const behaviorsFor = (prefabId) => Object.entries(BEHAVIORS).filter(([, b
 // zachowanie domyślne nowego obiektu: pierwsze pasujące albo żadne
 export const defaultBehavior = (prefabId) => behaviorsFor(prefabId)[0] || '';
 // zachowanie obiektu w grze: pole behavior albo domyślne; tylko takie, które pasuje do prefabrykatu
-export function behaviorOf(obj) {
-  const id = obj.behavior == null ? defaultBehavior(obj.prefab) : obj.behavior;
+// surface (nieobowiązkowe): bez wybranego zachowania — pierwsze pasujące, które działa w tym środowisku (statek nad
+// lądem: lądowanie, w kosmosie: ciąg w próżni)
+export function behaviorOf(obj, surface) {
+  const envOf = { sea: 'water', land: 'land', space: 'space' }[surface];
+  const fit = envOf && obj.behavior == null ? behaviorsFor(obj.prefab).find((id) => BEHAVIORS[id].env === envOf) : null;
+  const id = obj.behavior == null ? fit || defaultBehavior(obj.prefab) : obj.behavior;
   return id && BEHAVIORS[id] && BEHAVIORS[id].fits(obj.prefab) ? id : '';
 }

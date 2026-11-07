@@ -10,6 +10,8 @@ import { pathTrack } from "../../behaviors/rail/path.js";
 import { buildPathTrack } from "../../models/structures/railway/path-track.js";
 import { createFlight } from "../../behaviors/air/flight.js";
 import { createStage } from "../shared/stage.js";
+import { createLander, landerDef } from "../../behaviors/land/lander.js";
+import { SPACE_NUMBERS } from "../../scene/behaviors.js";
 import { WEATHER } from "../../envs/sky/skykit.js";
 import { LOOKS } from "../../envs/water/waterkit.js";
 import { sampleHeight, TERRAIN_DEFAULTS } from "../../envs/land/landkit.js";
@@ -21,7 +23,9 @@ const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() 
 const $ = (id) => document.getElementById(id);
 const VK = window.VehicleKit, MK = window.MarineKit, RK = window.RoadKit, TK = window.TramKit, AK = window.AirKit;
 const LIST = VK.VEHICLES.map((def) => ({ def, kit: "vk" })).concat(MK ? MK.VESSELS.filter((d) => d.id === "amphibian").map((def) => ({ def, kit: "mk" })) : [])
-  .concat(RK ? RK.list.map((def) => ({ def, kit: "rk" })) : []).concat(TK ? TK.list.map((def) => ({ def, kit: "tram" })) : []).concat(AK ? AK.list.map((def) => ({ def, kit: "air" })) : []);
+  .concat(RK ? RK.list.map((def) => ({ def, kit: "rk" })) : []).concat(TK ? TK.list.map((def) => ({ def, kit: "tram" })) : []).concat(AK ? AK.list.map((def) => ({ def, kit: "air" })) : [])
+  // statki kosmiczne ShipKit z liczbami ruchu: zachowanie „lądowanie” (js/behaviors/land/lander.js) — przylatują z kosmosu, siadają
+  .concat(window.ShipKit ? window.ShipKit.SHIP_DEFS.filter((d) => SPACE_NUMBERS["space/" + d.id]).map((d) => ({ def: { id: d.id, name: d.name, role: "Spacecraft — landing: lift thrusters (Space), main engine (W / S), turn (A / D); AUTO lands it", work: "Lights", numbers: SPACE_NUMBERS["space/" + d.id] }, kit: "ship" })) : []);
 const NO_WATER = () => -1e9;   // the water's height where there is none
 const view = $("viewCanvas");
 const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
@@ -144,9 +148,9 @@ function addMode(m) {
 }
 function load() {
   setMode(null);
-  if (veh) { if (veh.kit === "mk") MK.disposeVessel(veh); else if (veh.kit === "rk") RK.disposeVehicle(veh); else if (veh.kit === "tram") TK.disposeTram(veh); else if (veh.kit === "air") AK.disposeAircraft(veh); else VK.disposeVehicle(veh); }
+  if (veh) { if (veh.kit === "mk") MK.disposeVessel(veh); else if (veh.kit === "rk") RK.disposeVehicle(veh); else if (veh.kit === "tram") TK.disposeTram(veh); else if (veh.kit === "air") AK.disposeAircraft(veh); else if (veh.kit === "ship") { scene.remove(veh.group); ShipKit.disposeShipModel(veh.m); } else VK.disposeVehicle(veh); }
   const { def, kit } = LIST[state.index];
-  veh = kit === "mk" ? MK.buildVessel(def.id, { detail: 1 }) : kit === "rk" ? RK.buildVehicle(def.id, {}) : kit === "tram" ? TK.buildTram(def.id, {}) : kit === "air" ? AK.buildAircraft(def.id, {}) : VK.buildVehicle(def.id, { detail: 1 });
+  veh = kit === "ship" ? shipVehicle(def) : kit === "mk" ? MK.buildVessel(def.id, { detail: 1 }) : kit === "rk" ? RK.buildVehicle(def.id, {}) : kit === "tram" ? TK.buildTram(def.id, {}) : kit === "air" ? AK.buildAircraft(def.id, {}) : VK.buildVehicle(def.id, { detail: 1 });
   veh.kit = kit;
   sim = kit === "vk" || kit === "rk" ? createDrive(driveDef(def), { x: drv.x, z: drv.z, yaw: drv.yaw })
     : kit === "mk" ? createCraft(craftDef(def), { x: drv.x, z: drv.z, yaw: drv.yaw, y: groundAt(drv.x, drv.z) + 1.5 }) : null;
@@ -163,6 +167,10 @@ function load() {
     sim = createFlight(def.flight, def.mass, { p: [drv.x, gy0 + def.rest.y, drv.z], yaw: drv.yaw, pitch: -def.rest.pitch });
     sim.lever = 0;
   }
+  if (kit === "ship") {   // 40 m nad gruntem, silniki podnośne wyłączone — zejście zaczyna się od spadania
+    const box = new THREE.Box3().setFromObject(veh.group);
+    sim = createLander(landerDef(def.numbers, { min: box.min.toArray(), max: box.max.toArray() }), { p: [drv.x, Math.max(groundAt(drv.x, drv.z), 0) + 40, drv.z], yaw: drv.yaw });
+  }
   if (sim) sim.kind = kit;
   scene.add(veh.group);
   $("hudTitle").textContent = def.name;
@@ -174,12 +182,18 @@ function load() {
   $("vehicle").value = "v:" + state.index;
   const rows = [["Length × width × height", def.length + " × " + def.width + " × " + def.height + " m"], ["Top speed", Math.round(def.maxSpeed * 3.6) + " km/h"],
     ["Turns", def.turnRadius ? "in " + def.turnRadius + " m" : "on the spot"], ["Cargo", def.cargo + " t"],
-    ["Wheels", veh.parts.tracks ? "2 tracks" : veh.kit === "tram" ? "3 bogies, 6 wheelsets" : veh.kit === "air" ? "2 + tail wheel" : (veh.wheels || veh.parts.wheels).length]];
+    ["Wheels", !veh.parts ? "—" : veh.parts.tracks ? "2 tracks" : veh.kit === "tram" ? "3 bogies, 6 wheelsets" : veh.kit === "air" ? "2 + tail wheel" : (veh.wheels || veh.parts.wheels).length]];
+  if (kit === "ship") { const N = def.numbers, D = sim.def; rows.length = 0; rows.push(["Mass", N.mass + " kg"], ["Main engine", Math.round(N.thrust / 1000) + " kN"], ["Lift thrusters", Math.round(D.lift / 1000) + " kN (1.5 × its weight on Earth)"], ["Gravity · air", stage.gravity.toFixed(2) + " m/s² · " + stage.airDensity.toFixed(2) + " kg/m³"]); }
   if (kit === "air") rows.splice(0, 5, ["Length · span · height", def.length + " · " + def.span + " · " + def.height + " m"], ["Top speed", Math.round(def.maxSpeed * 3.6) + " km/h"], ["Wing area", def.wingArea + " m²"], ["Mass", def.mass + " kg"]);
   if (kit === "tram") rows.splice(3, 2, ["Sections · bogies", def.sections.length + " · " + def.sections.filter((x) => x.bogie != null).length], ["Mass", def.mass + " kg"]);
   if (kit === "rk") rows.splice(3, 1, def.kind === "tracked" ? ["Track contact · gauge", def.wheelbase + " m · " + def.gauge + " m"] : ["Wheelbase · track", def.wheelbase + " m · " + def.trackF + " / " + def.trackR + " m"], ["Mass", def.mass + " kg"]);
   window.LabPerf.model(veh.group);   // the Performance window's Model section (ui/shell/labwin.js)
   $("vehRows").textContent = ""; rows.forEach(([k, v]) => $("vehRows").appendChild(row(k, v)));
+}
+// statek ShipKit jako „pojazd” strony: model w uchwycie gry (dziób na +Z, skala 1)
+function shipVehicle(def) {
+  const m = ShipKit.buildShipModel(def.id, { detail: 1 }), holder = ShipKit.makeGameHolder(m, m.size.x);
+  return { group: holder, body: holder, m, def: { ...def, rest: null }, update: (t, dt, o) => m.update(t, dt, { power: o.power || 0 }) };
 }
 function row(k, v) { const r = document.createElement("div"); r.className = "row"; const s = document.createElement("span"); s.textContent = k; const b = document.createElement("b"); b.textContent = v; r.append(s, b); return r; }
 // the list in the top bar: the vehicles, then the other families (the train) as they register (addMode)
@@ -266,6 +280,15 @@ function frame() {
     const P = tramPose[0], fw = new THREE.Vector3(0, 0, 1).applyQuaternion(P.q);
     drv.x = P.x; drv.z = P.z; drv.yaw = Math.atan2(fw.x, fw.z); drv.speed = sim.st.speed;
     if (sim.broken || P.y - groundAt(P.x, P.z) < -0.2) $("role").textContent = "Derailed (too fast into the curve) — choose the tram again to put it back on the track.";
+  } else if (sim && sim.kind === "ship") {
+    // lądowanie: spacja — silniki podnośne, W / S — silnik główny, A / D — kurs; AUTO: regulator schodzi 1,5 m/s i siada
+    const S0 = sim.state, hover = sim.def.mass * stage.gravity / sim.def.lift;
+    const c = state.auto ? { lift: S0.onGround ? 0 : Math.max(0, Math.min(1, hover + (-1.5 - S0.vs) * 0.3)) }
+      : { lift: state.keys.Space ? 1 : 0, throttle: input.throttle, yaw: input.steer };
+    sim.step(dt, c, { g: stage.gravity, rho: stage.airDensity, ground: groundAt });
+    const S = sim.state, q = S.q, fx = 2 * (q[1] * q[3] + q[0] * q[2]), fz = 1 - 2 * (q[1] * q[1] + q[2] * q[2]);
+    drv.x = S.p[0]; drv.z = S.p[2]; drv.yaw = Math.atan2(fx, fz); drv.speed = S.speed; sim.power = Math.max(c.lift || 0, c.throttle || 0);
+    $("role").textContent = S.crashed ? "Crashed — touched down faster than 5 m/s. Choose the ship again." : S.onGround ? "Landed." : `Altitude ${S.alt.toFixed(0)} m · vertical ${S.vs.toFixed(1)} m/s`;
   } else if (sim && sim.kind === "air") {
     // the aircraft: W / S move the throttle lever (AUTO: taxiing power), A / D the rudder (it steers the tail wheel too),
     // S at idle brakes; full power and enough speed and it flies — the same forces as in flight
@@ -288,7 +311,10 @@ function frame() {
   veh.group.position.set(drv.x, gy + (veh.def.rest ? veh.def.rest.y : 0), drv.z);
   veh.group.rotation.set(veh.def.rest ? veh.def.rest.pitch : 0, drv.yaw, 0, 'YXZ');   // samolot na ziemi: oparty na kole ogonowym
   const cy = Math.cos(drv.yaw), sy = Math.sin(drv.yaw);
-  if (veh.kit === "air" && sim) {   // the aircraft: where the flight physics puts it (on its wheels, or in the air)
+  if (veh.kit === "ship" && sim) {   // statek: tam, gdzie stawia go fizyka lądowania
+    const S = sim.state; veh.group.position.fromArray(S.p); veh.group.quaternion.set(S.q[1], S.q[2], S.q[3], S.q[0]);
+    veh.update(t, dt, { power: sim.power });
+  } else if (veh.kit === "air" && sim) {   // the aircraft: where the flight physics puts it (on its wheels, or in the air)
     const S = sim.state; veh.group.position.fromArray(S.p); veh.group.quaternion.set(S.q[1], S.q[2], S.q[3], S.q[0]);
     veh.update(t, dt, { throttle: sim.lever, rudder: input.steer, gear: true, flaps: 0, speed: S.V, lights: state.night ? 1 : 0 });
   } else if (veh.kit === "tram" && sim) {   // the tram: its sections where the physics puts them (on the track's rail heads)
@@ -306,7 +332,7 @@ function frame() {
   });
   dust.update(dt);
   // the camera rides along (the amphibian afloat: at its hull, not at the sea floor)
-  const vy = veh.kit === "mk" ? veh.body.position.y : gy;
+  const vy = veh.kit === "mk" ? veh.body.position.y : veh.kit === "ship" && sim ? sim.state.p[1] : gy;
   delta.set(drv.x, vy, drv.z).sub(prev.set(controls.target.x, controls.target.y - 1.5, controls.target.z));
   camera.position.add(delta); controls.target.add(delta);
   controls.update();

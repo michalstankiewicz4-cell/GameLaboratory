@@ -4,7 +4,7 @@
 export function createInput() {
   const down = new Set();
   let range = [0, 1], thr = 0, gear = true, flaps = false, on = false, lever = true;   // lever: false — pedał (samochód)
-  const PLAY_KEYS = ['w', 's', 'a', 'd', 'q', 'e', 'b', 'g', 'f', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'];
+  const PLAY_KEYS = ['w', 's', 'a', 'd', 'q', 'e', 'b', 'g', 'f', ' ', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'];   // spacja: silniki podnośne (lądowanie)
 
   addEventListener('keydown', (e) => {
     if (!on || (e.target.closest && e.target.closest('input, select, textarea'))) return;
@@ -29,6 +29,7 @@ export function createInput() {
         elevator: axis('arrowdown', 'arrowup'),
         aileron: axis('arrowright', 'arrowleft'),
         brake: down.has('b') ? 1 : 0,
+        lift: down.has(' ') ? 1 : 0,
         gear, flaps,
       };
     },

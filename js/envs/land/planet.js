@@ -49,7 +49,9 @@ function planetHeights(renderer, ref, values, size, res) {
     // powierzchnią; świat bez morza: sam grunt (najniżej 0,5 m nad zerem)
     h[k] = seaWorld && s.sea[k] ? Math.min(-0.5, up) : Math.max(0.5, up + s.d[k] * detailM);
   }
-  return { h, ice: s.ice, R, noSea: !seaWorld, lavaSea: seaWorld && (v.lava || 0) >= 0.5, ground: groundOf(ref, v), atmo: { airless: (v.airless || 0) >= 0.5 || (v.atmosphere || 0) < 0.02, density: v.atmosphere || 0, hue: v.atmoHue ?? 205 } };
+  // grawitacja z wielkości (gęstość jak Ziemi: g ∝ R), gęstość powietrza z atmosfery (Ziemia: atmosphere 0,6 → 1,225 kg/m³)
+  const airless = (v.airless || 0) >= 0.5 || (v.atmosphere || 0) < 0.02;
+  return { h, ice: s.ice, R, gravity: 9.81 * R / M_PER_SIZE, air: airless ? 0 : 1.225 * (v.atmosphere || 0) / 0.6, noSea: !seaWorld, lavaSea: seaWorld && (v.lava || 0) >= 0.5, ground: groundOf(ref, v), atmo: { airless: (v.airless || 0) >= 0.5 || (v.atmosphere || 0) < 0.02, density: v.atmosphere || 0, hue: v.atmoHue ?? 205 } };
 }
 
 export function worldFor(renderer, map = {}, water = {}) {
@@ -59,5 +61,5 @@ export function worldFor(renderer, map = {}, water = {}) {
   if (!p) throw new Error(`"${map.planet}" has no ground (a planet or a moon: ${PLANET_GROUPS.join(', ')})`);
   let hi = 0, lo = 0; for (const y of p.h) { if (y > hi) hi = y; if (y < lo) lo = y; }
   // wysokość szczytów i głębokość morza z planety (barwy gruntu: śnieg na szczytach, skała; brzeg mapy)
-  return generateWorld({ ...map, size, res, relief: Math.max(50, hi), depth: Math.max(8, -lo), heights: p, atmo: p.atmo, noSea: p.noSea, lavaSea: p.lavaSea, ground: p.ground }, { ...water, layout: 'planet', biome: planetBiome(map.planet) });
+  return generateWorld({ ...map, size, res, relief: Math.max(50, hi), depth: Math.max(8, -lo), heights: p, atmo: p.atmo, gravity: p.gravity, air: p.air, noSea: p.noSea, lavaSea: p.lavaSea, ground: p.ground }, { ...water, layout: 'planet', biome: planetBiome(map.planet) });
 }

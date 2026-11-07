@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.21.0 — 2026-11-07 (lądowanie)
+
+### Dodane
+- Zachowanie **Lądowanie** dla statków kosmicznych nad lądem (domyślne na lądzie): spacja — silniki podnośne, W / S —
+  silnik główny, strzałki — pochylenie i kurs, Q / E — przechył; w linii stanu wysokość i prędkość pionowa.
+
 ## 0.20.3 — 2026-11-07
 
 ### Zmienione

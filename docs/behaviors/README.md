@@ -12,6 +12,7 @@ Zasada (CLAUDE.md): fizyka jest prawdziwa — start, ruch, skręt i zatrzymanie 
 | jazda po lądzie | `land/drive.js` | ląd | laboratorium pojazdów — ląd (łaziki, pojazdy drogowe), edytor sceny (pojazdy drogowe, łaziki) |
 | ciąg w próżni | `space/thrust.js` | kosmos | edytor sceny (statki kosmiczne, dron) |
 | orbita | `space/orbit.js` | kosmos | edytor sceny (ciała niebieskie) |
+| lądowanie | `land/lander.js` | ląd | laboratorium pojazdów — ląd (statki kosmiczne), edytor sceny (statki kosmiczne nad lądem) |
 | lot w atmosferze | `air/flight.js` | ląd (powietrze nad lądem) | edytor sceny (Spitfire) |
 | koło na szynie — skład | `rail/physics.js`, `rail/rail.js` | ląd | laboratorium pojazdów — ląd (pociąg) |
 | koło na szynie — tramwaj | `rail/tram.js`, `rail/path.js` | ląd | laboratorium pojazdów — ląd (Swing na pętli toru; liczby w TramKit: `js/models/train/trams/swing.js`, `phys`) |
@@ -79,6 +80,18 @@ długość styku), `gauge`, wymiary; brakujące wyprowadzone (moc z `accel` i `m
   siła, nie zatrzymanie w kodzie; `stabilize: false` ją wyłącza.
 - Stan: `p`, `v`, `q` ([w, x, y, z]), `w` (prędkość kątowa w układzie statku), `speed`, `thrust`.
 - Układ statku: +z dziób, +y góra, +x lewa burta.
+
+## Lądowanie (`land/lander.js`)
+
+`createLander(def, { p, yaw, pitch })` → `{ state, step(dt, c, env), def }`; `landerDef(numbers, box)` — z liczb statku
+(`SPACE_NUMBERS`) i obrysu modelu: cztery podpory w rogach spodu, CdA z przekroju, silniki podnośne 1,5 × ciężar na
+Ziemi (założone).
+
+- Siły: grawitacja m·g, silnik główny (+z statku), silniki podnośne (+y statku, 0…1), opór atmosfery ½ρ·CdA·|v|·v,
+  podpory — sprężyna (ugięcie ok. 0,15 m pod ciężarem na Ziemi) z tłumikiem, tarcie μ·N, moment z ramienia; silniczki
+  manewrowe ze stabilizacją jak w „ciągu w próżni”. Krok 1/240 s.
+- `env`: `g`, `rho`, `ground(x, z)`; sterowanie `c`: `throttle`, `lift`, `pitch`, `yaw`, `roll`.
+- Stan: `p`, `v`, `q`, `w`, `speed`, `vs`, `alt`, `onGround`, `crashed` (przyziemienie szybsze niż `crashSpeed`, 5 m/s).
 
 ## Orbita (`space/orbit.js`)
 
