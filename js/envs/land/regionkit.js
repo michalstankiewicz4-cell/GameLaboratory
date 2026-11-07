@@ -380,10 +380,19 @@ export function biomeAt(T, x, z) {
 
 /* ---------------- the world ---------------- */
 // map: LandKit terrain options (seed, size, res, relief, depth, shape, land, wrap, barrier…); water: WORLD_DEFAULTS
+// (layout 'planet' with map.heights { h, ice } — the ground of a planet, js/envs/land/planet.js)
 export function generateWorld(map, water = {}) {
   const o = { ...WORLD_DEFAULTS, ...water }, t0 = performance.now();
   let T, R;
-  if (o.layout === 'single' || o.layout === 'mixed' || !LAYOUT_FN[o.layout]) {
+  if (o.layout === 'planet' && map.heights) {
+    // ląd z planety (js/envs/land/planet.js): wysokości gotowe; morze otwarte, gdzie zamarznięte — lód; bez rzek
+    const N = map.res | 0, S = map.size, { heights, ...rest } = map;
+    T = { ...rest, wrap: false, barrier: map.barrier === 'mountains' ? 'wall' : map.barrier || 'buoys', shape: 'planet', h: heights.h, res: N, cell: S / N };
+    T.biomes = applyBiomes(T, o);
+    const w = new Float32Array(N * N * NB), oc = BODY_ORDER.indexOf('ocean'), ic = BODY_ORDER.indexOf('ice');
+    for (let k = 0; k < N * N; k++) w[k * NB + (heights.ice && heights.ice[k] ? ic : oc)] = 1;
+    R = { w, flow: new Float32Array(N * N * 2), labels: [] };
+  } else if (o.layout === 'single' || o.layout === 'mixed' || !LAYOUT_FN[o.layout]) {
     T = generateTerrain(map);
     T.biomes = applyBiomes(T, o);
     if (o.layout === 'mixed') R = mixed(T, { ...o, seed: map.seed | 0 });

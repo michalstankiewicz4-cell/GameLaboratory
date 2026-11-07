@@ -3,6 +3,17 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.49.0 · ląd 1.5.0 · edytor sceny 0.20.1 — 2026-11-07 (ląd z planety)
+
+### Dodane
+- **Ląd z planety** (`js/envs/land/planet.js`, punkt 6 planu rozbioru — powierzchnia planety): drugie źródło terenu
+  środowiska „ląd” obok generatora — płaski wycinek gruntu planety BodyKit (wysokości, morza i lód z shadera planety,
+  ten sam teren co na jej globusie i w laboratorium powierzchni; skala jak w SurfaceKit), na równiku, 1:1. RegionKit:
+  układ wód `planet` (morze otwarte, lód tam, gdzie zamarznięte); biom z grupy planety.
+- Laboratorium lądu: **Grunt — generator albo planeta** (Terra-1, Pelagia, Rime, Glacies, Mars, Venus, Cinder, Magma,
+  Luna, Mercury); przy planecie ustawienia generatora są wyłączone, działają wielkość, szczegółowość i brzeg. Zapisany
+  ląd idzie do edytora sceny jak każdy inny (edytor czeka na kity BodyKit).
+
 ## Program 0.48.0 · edytor sceny 0.20.0 — 2026-11-07 (szyna zdarzeń, akcje statków)
 
 ### Dodane

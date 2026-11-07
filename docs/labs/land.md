@@ -116,3 +116,15 @@ The lab stands on the base stage of the scene editor (`js/labs/shared/stage.js`)
 terrain come from it (`stage.setWorld(T)` builds the terrain, water regions, biomes and buoys from the generated
 world; the sea knows the terrain). The lab's options of the stage: a far horizon (sky 20 km, sea 16 km), standing
 waves, the haze thinning with the camera's height. So the scene editor shows a saved land exactly as here.
+
+## Ground from a planet (1.5.0)
+
+**Ground** (Map window, first row): the generator (everything below) or a planet of BodyKit — Terra-1, Pelagia, Rime,
+Glacies, Mars, Venus, Cinder, Magma, Luna, Mercury. A planet's ground is a flat 1:1 cut at its equator
+(`js/envs/land/planet.js`): heights, seas and ice from the planet's own shader (`BodyKit.planetTerrain`), the same
+place its globe and the surface lab show; scale as in SurfaceKit (a planet of size 1 is 8 km in radius on the ground,
+mountains × R metres of relief). The water is open sea, frozen where the planet's sea is ice (RegionKit layout
+`planet`); the biome follows the planet (Earth-like and icy — northern, the rest — desert). Size, detail and the map
+edge apply; the generator's settings are switched off. A saved land with a planet goes to the scene editor like any
+other (`map.planet`). Not yet: the planet's own sky, lava as lava (a lava sea shows as water), a cut elsewhere than the
+equator.

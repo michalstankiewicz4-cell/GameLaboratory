@@ -93,7 +93,10 @@ export function createWorld(container, store, onWarn) {
     // ląd: teren z laboratorium lądu (zasób „land”) albo płaski grunt; generowanie tylko po zmianie zasobu
     const landDef = env.surface === 'land' && env.land ? getAsset('land', env.land) : null, landKey = JSON.stringify(landDef);
     if (env.surface === 'land' && env.land && !landDef && onWarn) onWarn('land:' + env.land);
-    if (landKey !== lastLand) { lastLand = landKey; stage.setLand(landDef); }
+    if (landKey !== lastLand) {
+      if (landDef && landDef.map && landDef.map.planet && !spaceReady()) { later(); return; }   // ląd z planety: najpierw BodyKit
+      lastLand = landKey; stage.setLand(landDef);
+    }
     stage.setSurface(env.surface === 'land' || env.surface === 'space' ? env.surface : 'sea');
     syncSpace(env);   // przed światłem: tryb nieba decyduje o słońcu, mgle i odbiciach
     // światło: gotowe (LIGHTS) albo zasób „weather” z laboratorium wyglądu; brak zasobu — popołudnie i ostrzeżenie

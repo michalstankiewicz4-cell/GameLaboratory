@@ -36,6 +36,8 @@
 </aside>
 <aside class="panel" id="leftPanel" data-window="map" data-title="Map" data-title-pl="Mapa">
   <h3>Map</h3>
+  <div class="row"><span>Ground</span><select id="planet"></select><output></output></div>
+  <p class="note" id="planetNote" hidden>The ground of a planet (BodyKit): its own heights, seas and ice, as on its globe and in the surface lab — a 1:1 cut at the equator. Size, detail and the edge apply; the generator's settings don't.</p>
   <div class="row"><span>Seed</span><input type="number" id="seed" min="0" max="999999" step="1"><output></output></div>
   <div class="btns"><button type="button" id="random">New random map</button><button type="button" id="gen">Generate</button></div>
   <div class="row"><span>Shape</span><select id="shape"></select><output></output></div>

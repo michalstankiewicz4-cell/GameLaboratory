@@ -13,6 +13,8 @@ import { transformShip } from '../../models/ships-sea/transform.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
 import { createStage } from '../shared/stage.js';
+import { worldFor, PLANETS } from '../../envs/land/planet.js';
+import { loadSpace, spaceReady } from '../../scene/space.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -82,12 +84,15 @@ function clearAt(x, z, hd, minDepth = DRAUGHT + 0.5) {
 // the world in three stages, so the loading card can show each (generateShown); generate() runs them at once
 let genT0 = 0;
 const GEN_STAGES = [
-  ['Heightmap, rivers and water regions', 0.05, () => { genT0 = performance.now(); T = generateWorld(S.map, S.water); }],
+  ['Heightmap, rivers and water regions', 0.05, () => { genT0 = performance.now(); T = worldFor(renderer, S.map, S.water); }],   // generator albo grunt planety
   ['Terrain, regions and biomes', 0.7, genTextures],
   ['Chart, sea and the ship', 0.85, genRest],
 ];
 function generate() { for (const [, , f] of GEN_STAGES) f(); }
-const generateShown = () => window.LabLoad.run('Generating the world…', async (step) => { for (const [n, p, f] of GEN_STAGES) { await step(n, p); f(); } });
+const generateShown = () => window.LabLoad.run('Generating the world…', async (step) => {
+  if (S.map.planet && !spaceReady()) { await step('The planet kits (BodyKit)', 0.01); await loadSpace(); }   // grunt planety: najpierw BodyKit
+  for (const [n, p, f] of GEN_STAGES) { await step(n, p); f(); }
+});
 function genTextures() {
   stage.setWorld(T);   // height, region and biome textures; ice, oil, buoys
 }
@@ -98,6 +103,10 @@ function genRest() {
   const sh = T.regions.share;
   for (const k of ['shape', 'land', 'wrap']) $(k).disabled = !['single', 'mixed'].includes(S.water.layout);
   $('body').disabled = S.water.layout !== 'single'; $('rivers').disabled = $('ice').disabled = S.water.layout !== 'mixed';
+  // grunt planety: ustawienia generatora nie działają (wysokości, wody i biom daje planeta)
+  const pl = !!S.map.planet; $('planetNote').hidden = !pl;
+  if (pl) for (const k of ['seed', 'random', 'shape', 'land', 'relief', 'depth', 'rough', 'erosion', 'biome', 'biomeBlend', 'layout', 'body', 'blend', 'rivers', 'ice', 'wrap']) $(k).disabled = true;
+  else for (const k of ['seed', 'random', 'relief', 'depth', 'rough', 'erosion', 'biome', 'layout', 'blend']) $(k).disabled = false;
   $('bodyShare').replaceChildren(...BODY_ORDER.filter((b) => sh[b] > 0.005).flatMap((b) => [el('span', { textContent: WATER_BODIES[b].label.replace(/ \(.*/, '') }), el('b', { textContent: `${(sh[b] * 100).toFixed(0)} %` })]));
   seaFor(WEATHER[S.sky.weather]?.wind ?? 6);
   drawChartBase();
@@ -110,8 +119,10 @@ function genRest() {
     ['Grid', `${T.res}² · ${T.cell.toFixed(1)} m`], ['Ship', ship.on ? 'afloat' : 'no water deep enough']].flatMap(([a, b]) => [el('span', { textContent: a }), el('b', { textContent: b })]));
   $('edgeNote').textContent = T.wrap ? 'Wrap-around: sail out of one edge and you come in at the opposite one — land, sea and waves continue without a seam.' : ({ buoys: 'Bounded by a line of buoys 60 m inside the edge; the ship stops at it.', mountains: 'Bounded by a mountain range along the edge.', wall: 'Bounded by an invisible wall 60 m inside the edge.' })[T.barrier];
   $('barrier').disabled = T.wrap;
-  const lay = S.water.layout, what = lay === 'single' ? `${SHAPES[T.shape].label}, ${WATER_BODIES[S.water.body].label.replace(/ \(.*/, '').toLowerCase()}` : lay === 'mixed' ? `Mixed (${SHAPES[T.shape].label})` : LAYOUTS[lay].label.replace(/:.*/, '');
-  $('status').textContent = $('landSub').textContent = `${what} · ${(T.landShare * 100).toFixed(0)} % land · ${T.size / 1000} km ${T.wrap ? 'wrap-around' : 'bounded'} map · seed ${T.seed}`;
+  const lay = S.water.layout, what = lay === 'single' ? `${(SHAPES[T.shape] || { label: T.shape }).label}, ${WATER_BODIES[S.water.body].label.replace(/ \(.*/, '').toLowerCase()}` : lay === 'mixed' ? `Mixed (${(SHAPES[T.shape] || { label: T.shape }).label})` : LAYOUTS[lay].label.replace(/:.*/, '');
+  const planet = T.planet && PLANETS.find((p) => p.ref === T.planet);
+  $('status').textContent = $('landSub').textContent = planet ? `Planet ${planet.label} · ${(T.landShare * 100).toFixed(0)} % land · ${T.size / 1000} km cut at the equator`
+    : `${what} · ${(T.landShare * 100).toFixed(0)} % land · ${T.size / 1000} km ${T.wrap ? 'wrap-around' : 'bounded'} map · seed ${T.seed}`;
   window.__landGenMs = performance.now() - t0;
 }
 
@@ -230,7 +241,7 @@ $('landLoad').onclick = () => {
   for (const [k, f] of Object.entries(fmts)) { $(k).value = S.map[k]; $(k + 'V').textContent = f(S.map[k]); }
   for (const [k, f] of Object.entries(wfmt)) { $(k).value = S.water[k]; $(k + 'V').textContent = f(S.water[k]); }
   for (const k of ['shape', 'size', 'res', 'barrier']) $(k).value = String(S.map[k]);
-  $('wrap').value = S.map.wrap ? '1' : '0'; $('seed').value = S.map.seed;
+  $('wrap').value = S.map.wrap ? '1' : '0'; $('seed').value = S.map.seed; $('planet').value = S.map.planet || '';
   $('layout').value = S.water.layout; $('body').value = S.water.body; $('biome').value = S.water.biome; showNote();
   $('landName').value = n; generateShown(); save();
   $('landNote').textContent = `Loaded "${n}".`;
@@ -365,6 +376,11 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 
-generate(); updateSky(); setCam(ship.on && S.sail ? (S.cam === 'Free flight' ? 'Chase' : S.cam || 'Chase') : 'Overview'); resize();
+// grunt: generator albo planeta (js/envs/land/planet.js)
+$('planet').append(el('option', { value: '', textContent: 'Generator (the settings below)' }), ...PLANETS.map((p) => el('option', { value: p.ref, textContent: 'Planet: ' + p.label })));
+$('planet').value = S.map.planet || '';
+$('planet').onchange = () => { S.map.planet = $('planet').value || undefined; generateShown(); save(); };
+if (S.map.planet && !spaceReady()) { const p = S.map.planet; S.map.planet = undefined; generate(); S.map.planet = p; generateShown(); } else generate();
+updateSky(); setCam(ship.on && S.sail ? (S.cam === 'Free flight' ? 'Chase' : S.cam || 'Chase') : 'Overview'); resize();
 window.__land = { S, get T() { return T; }, regionAt: (x, z) => regionAt(T, x, z), ship, camera, orbit, free, generate, setCam, sampleHeight: (x, z) => sampleHeight(T, x, z), clearAt, wrapC, sailStep };
 requestAnimationFrame(frame);

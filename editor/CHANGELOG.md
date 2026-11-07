@@ -3,6 +3,11 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.20.1 — 2026-11-07
+
+### Zmienione
+- Ląd z planety (zasób „ląd” z laboratorium lądu z gruntem planety): edytor najpierw ładuje kity BodyKit.
+
 ## 0.20.0 — 2026-11-07 (akcje statków jako zdarzenia)
 
 ### Dodane

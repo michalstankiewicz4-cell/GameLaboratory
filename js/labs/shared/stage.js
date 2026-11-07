@@ -3,6 +3,7 @@
 import * as THREE from '../../../vendor/three/three.module.js';
 import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment, sunAt } from '../../envs/sky/skykit.js';
 import { heightTexture, terrainMeshes, sampleHeight, barrierBuoys, GLSL_LAND } from '../../envs/land/landkit.js';
+import { worldFor } from '../../envs/land/planet.js';
 import { generateWorld, biomeTexture, regionTextures, regionUniforms, setRegions, GLSL_REGIONS } from '../../envs/land/regionkit.js';
 import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, hullTexture, LOOKS } from '../../envs/water/waterkit.js';
 
@@ -87,7 +88,8 @@ export function createStage(renderer, scene, opts = {}) {
     // ląd: teren z laboratorium lądu ({ map, water } — ustawienia LandKit i RegionKit, zasób „land”) albo null — płaski
     // grunt. Teren z wodami (morze, fiordy, jeziora, rzeki) i biomami; morze sceny zna teren (płycizny, przybój, fale
     // gasnące przy brzegu, barwy i prądy wód RegionKit, lód, olej). Generowanie trwa (siatka 512² — około sekundy).
-    setLand(def) { stage.setWorld(def ? generateWorld(def.map || {}, def.water || {}) : null); },
+    // ląd z planety (def.map.planet = 'grupa/ciało', js/envs/land/planet.js) — potrzebuje BodyKit (loadSpace())
+    setLand(def) { stage.setWorld(def ? worldFor(renderer, def.map || {}, def.water || {}) : null); },
     // świat już wygenerowany (generateWorld z RegionKit) albo null; ten sam świat ponownie — tylko odświeżenie tekstur
     setWorld(T) {
       if (!T) {

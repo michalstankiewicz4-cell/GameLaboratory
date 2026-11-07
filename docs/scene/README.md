@@ -115,7 +115,7 @@ scena trzyma tylko nazwę. Inna karta widzi zmianę od razu (`onAssetsChange`).
 | Rodzaj | Laboratorium | Pola |
 |---|---|---|
 | `sea` | woda ([`../labs/water.md`](../labs/water.md)) | `Hs`, `Lp`, `chop`, `spread`, `n`, `dir`, `deep`, `scatter`, `shine`, `ripples`, `crest`, `reflect` |
-| `land` | ląd ([`../labs/land.md`](../labs/land.md)) | `map` (ustawienia terenu LandKit), `water` (wody i biomy RegionKit) |
+| `land` | ląd ([`../labs/land.md`](../labs/land.md)) | `map` (ustawienia terenu LandKit; `map.planet` — grunt planety BodyKit, `js/envs/land/planet.js`), `water` (wody i biomy RegionKit) |
 | `weather` | wygląd ([`../labs/look.md`](../labs/look.md)) | `weather`, `coverage`, `density`, `scale`, `haze`, `wind`, `rain`, `vis`, `lightning`, `time`, `sunEl`, `sunAz`, `moon` |
 | `look` | filtry ([`../labs/filters.md`](../labs/filters.md)) | profil potoku kamery (`LOOK_DEFAULTS` w `js/render/sea/look.js`); dawny klucz `gameLab.lookProfiles.v1` przenosi się sam |
 | `sky` | ciała niebieskie ([`../labs/bodies.md`](../labs/bodies.md)), Niebo | wszystkie liczby nieba BodyKit (mgławice, pas, pył, gwiazdy, barwy, ziarno) |

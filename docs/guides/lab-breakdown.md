@@ -114,8 +114,11 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
    *(rośliny i jaskinie: 0.43.0; moduły bazy: 0.44.0; ciała niebieskie: 0.45.0; ludzie i stwory: 0.46.0 — stoją,
    chód jako zachowanie później. Do rozważenia (pytanie użytkownika): laboratorium animacji)*
 6. **Kosmos dalej:** orbity (układy), powierzchnia planety, akcje statków jako zdarzenia.
-   *(orbity: 0.47.0 — zachowanie „orbita”; akcje statków jako zdarzenia: 0.48.0 — szyna `js/core/events.js`. Została
-   powierzchnia planety)*
+   *(orbity: 0.47.0 — zachowanie „orbita”; akcje statków jako zdarzenia: 0.48.0 — szyna `js/core/events.js`. Ląd z planety:
+   0.49.0 — teren z planety jako drugie źródło lądu, `js/envs/land/planet.js`. Dalej: niebo planety, zejście, jazda,
+   skok jako zachowania, budowa bazy jako narzędzie edytora)*
+   Później (pomysły użytkownika): przełącznik **Okrągła** w laboratorium lądu (generator lądu na kuli — zastąpi
+   drugie źródło) i widok mapy zawiniętej jako **torus** (kształt, nie tylko topologia).
 7. **Lekarz sceny** (na końcu, gdy są prefabrykaty i zachowania): sprawdza układ sceny, czego nie widać w pojedynczym
    modelu — obiekt w złym środowisku (drzewo na morzu, okręt na lądzie, łazik w kosmosie), pod gruntem albo
    w powietrzu, obiekty wchodzące jeden w drugi, brakujące zasoby z nazwą, zachowanie niepasujące do modelu albo
