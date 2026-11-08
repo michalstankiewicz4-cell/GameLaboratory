@@ -76,10 +76,6 @@ function drawNoteFront(x,p){x.fillStyle='#efe8d8';x.fillRect(0,0,W,H);
  if(p.t.watermark&&p.m.watermark==='printed'){x.globalAlpha=.22;wmShape(x,false,'flat');x.globalAlpha=1}
  if(p.t.uv&&p.m.uv==='fake')fibers(x,p,false);
  x.fillStyle='#efe8d8';x.fillRect(HOLO[0],0,HOLO[2],H)}
-function embossFrom(hm,src){const hb=mk(IW,IH),hbx=hb.getContext('2d');hbx.filter='blur(1.2px)';hbx.drawImage(hm,0,0);
- const hd=hbx.getImageData(0,0,IW,IH).data,sd=src.getContext('2d').getImageData(0,0,IW,IH).data,out=mk(IW,IH),x=out.getContext('2d'),id=x.createImageData(IW,IH),d=id.data;
- for(let y=1;y<IH-1;y++)for(let X=1;X<IW-1;X++){const i=y*IW+X,i4=i*4,gx=hd[(i-1)*4]-hd[(i+1)*4],gy=hd[(i-IW)*4]-hd[(i+IW)*4],v=lumOf(sd,i4)*0.35+100+(gx*1.6+gy*0.8)*1.6;d[i4]=v*1.03;d[i4+1]=v*0.98;d[i4+2]=v*0.9;d[i4+3]=255}
- x.putImageData(id,0,0);return out}
 function noteView(p,v){if(p.views[v])return p.views[v];let c=mk(IW,IH),x=c.getContext('2d');
  if(v==='normal'){x.scale(S,S);drawNoteFront(x,p)}
  else if(v==='trans'){x.scale(S,S);x.fillStyle='#d8c493';x.fillRect(0,0,W,H);x.globalAlpha=.32;x.drawImage(noteView(p,'normal'),0,0,W,H);
