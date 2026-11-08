@@ -18,7 +18,7 @@ js/data/              dane (pigmenty, artyści)
 js/paint/             silnik obrazów: sceny, widoki (UV, IR, RTG…), obserwacje, próbki
 js/core/kinds.js      rejestr obiektów 2D + wspólne nachylenie i tworzenie partii
 js/kinds/             rodzaje obiektów 2D (banknot, moneta, znaczek, rękopis…)
-js/modes/             tryby gry o własnej mechanice (fragment, rzeźby 3D, pamięć…)
+js/modes/             tryby gry o własnej mechanice (fragment, pamięć, rzeźby 3D + warianty materiału: marble.js)
 js/main.js            start – ładowany jako ostatni
 docs/                 dokumentacja
 ```
