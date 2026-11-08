@@ -46,10 +46,11 @@ function why3(q,id){return({xrf:()=>({si:'Brąz krzemowy – stop wprowadzony ok
  prov:()=>q.m.prov==='attic'?'„Znaleziony na strychu” – brak historii.':'Historia od 1998 r., brak w katalogu i księgach odlewni.',cert:()=>q.m.cert==='dims'?'Wysokość w certyfikacie niezgodna z rzeźbą.':'Certyfikat od podmiotu bez uprawnień.'}[id]||(()=>''))()}
 let T3=null,THREE_P=null;
 function loadThree(){if(window.THREE)return Promise.resolve();if(THREE_P)return THREE_P;THREE_P=new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s)});return THREE_P}
-function newSculpt(r){const list=[{orig:true,profile:null,t:{}}];shuffle(Object.keys(SPROF),r).slice(0,4).forEach(k=>list.push({orig:false,profile:k,t:rollTells(SPROF[k],r)}));shuffle(list,r);
- P=list.map((q,i)=>{const pr=q.profile?SPROF[q.profile]:{},t=q.t,qr=rng((r()*1e9)|0);q.letter='ABCDE'[i];q.seed=(qr()*1e9)|0;q.notes={};q.samples=[];q.umark='';
-  q.hcm=t.dims?pr.hcm:52.0;q.kg=t.weight?3.1:8.4+(qr()-.5)*0.12;q.xrf=t.xrf?pr.xrf:'bronze';q.patina=t.patina?'chem':'natural';q.uv=t.uv?'resin':'wax';q.tool=t.tool?pr.tool:'chase';
-  q.xray=t.xray?(pr.xray||'lost'):'sand';q.mark=t.mark?(pr.mark||'none'):'ok';q.m={prov:pr.prov||pick(['attic','noCR'],qr),cert:pr.cert||pick(['dims','issuer'],qr)};q.cold=q.profile==='cold';return q})}
+function newSculpt(r){const PR=SV.profiles,list=[{orig:true,profile:null,t:{}}];shuffle(Object.keys(PR),r).slice(0,4).forEach(k=>list.push({orig:false,profile:k,t:rollTells(PR[k],r)}));shuffle(list,r);
+ P=list.map((q,i)=>{const pr=q.profile?PR[q.profile]:{},t=q.t,qr=rng((r()*1e9)|0);q.letter='ABCDE'[i];q.seed=(qr()*1e9)|0;q.notes={};q.samples=[];q.umark='';
+  SV.initQ(q,pr,t,qr);q.m={prov:pr.prov||pick(['attic','noCR'],qr),cert:pr.cert||pick(['dims','issuer'],qr)};return q})}
+function bronzeInitQ(q,pr,t,qr){q.hcm=t.dims?pr.hcm:52.0;q.kg=t.weight?3.1:8.4+(qr()-.5)*0.12;q.xrf=t.xrf?pr.xrf:'bronze';q.patina=t.patina?'chem':'natural';q.uv=t.uv?'resin':'wax';q.tool=t.tool?pr.tool:'chase';
+ q.xray=t.xray?(pr.xray||'lost'):'sand';q.mark=t.mark?(pr.mark||'none'):'ok';q.cold=q.profile==='cold'}
 function texCanvas(fn,w=1024,h=1024){const c=mk(w,h);fn(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;return t}
 function bumpTex(mode,seed){const r=rng(seed);return texCanvas((x,w,h)=>{x.fillStyle='#808080';x.fillRect(0,0,w,h);
  if(mode!=='smooth'){x.lineCap='round';for(let i=0;i<5200;i++){const X=r()*w,Y=r()*h,a=r()*6.28,l=4+r()*9;x.strokeStyle=r()<.5?`rgba(0,0,0,${.18+r()*.2})`:`rgba(255,255,255,${.15+r()*.2})`;x.lineWidth=1+r()*1.6;x.beginPath();x.moveTo(X,Y);x.lineTo(X+Math.cos(a)*l,Y+Math.sin(a)*l);x.stroke()}
@@ -87,21 +88,16 @@ function markTex(mode){return texCanvas((x,w,h)=>{x.clearRect(0,0,w,h);const dra
  if(mode==='none'){x.font='italic 62px Georgia';x.textAlign='center';x.strokeStyle='rgba(235,220,190,.95)';x.lineWidth=2.2;x.strokeText('S. Rudnicki 1888',w/2,180)}},1024,280)}
 function spriteText(lines,w,h,bg){const c=mk(w,h),x=c.getContext('2d');if(bg){x.fillStyle=bg;x.beginPath();x.roundRect?x.roundRect(4,4,w-8,h-8,18):x.rect(4,4,w-8,h-8);x.fill()}
  x.textAlign='center';lines.forEach(([t,f,col,y])=>{x.font=f;x.fillStyle=col;x.fillText(t,w/2,y)});const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false,transparent:true}));return s}
-function buildBust(q,i,forPhoto){const grp=new THREE.Group(),gs=bustGeoms(q),mode=q.patina,seed=q.seed%1000;gs.forEach(g=>colorize(g,mode,seed));
- const bt=bumpTex(q.tool,q.seed),pt=patTex(q.seed+1);bt.repeat.set(7,7);pt.repeat.set(2,2);
- const mat=new THREE.MeshStandardMaterial({vertexColors:true,map:pt,bumpMap:bt,bumpScale:0.012,metalness:q.cold?0.45:0.82,roughness:q.cold?0.6:0.46});
- const uvMat=new THREE.MeshStandardMaterial({color:0x0c0812,emissive:q.uv==='resin'?0x4f9a3c:0x23301f,roughness:.9,metalness:0});
- const xMat=new THREE.MeshBasicMaterial({color:q.xray==='resin'?0x6a8a70:0xa8c4dc,transparent:true,opacity:q.xray==='resin'?0.05:0.08,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide});
+function bronzeSurface(q,gs){gs.forEach(g=>colorize(g,q.patina,q.seed%1000));const bt=bumpTex(q.tool,q.seed),pt=patTex(q.seed+1);bt.repeat.set(7,7);pt.repeat.set(2,2);
+ return{mat:new THREE.MeshStandardMaterial({vertexColors:true,map:pt,bumpMap:bt,bumpScale:0.012,metalness:q.cold?0.45:0.82,roughness:q.cold?0.6:0.46}),
+  uvMat:new THREE.MeshStandardMaterial({color:0x0c0812,emissive:q.uv==='resin'?0x4f9a3c:0x23301f,roughness:.9,metalness:0}),
+  xMat:new THREE.MeshBasicMaterial({color:q.xray==='resin'?0x6a8a70:0xa8c4dc,transparent:true,opacity:q.xray==='resin'?0.05:0.08,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide})}}
+function buildBust(q,i,forPhoto){const grp=new THREE.Group(),gs=bustGeoms(q),{mat,uvMat,xMat}=SV.surface(q,gs);
  const outer=[];gs.forEach(g=>{const m=new THREE.Mesh(g,mat);m.userData.q=q;outer.push(m);grp.add(m)});
  if(q.t.seam)for(const s of[-1,1]){const m=new THREE.Mesh(seamGeo(s),mat);m.userData.q=q;outer.push(m);grp.add(m)}
- const decal=new THREE.Mesh(new THREE.PlaneGeometry(9.5,2.6),new THREE.MeshStandardMaterial({map:markTex(q.mark),transparent:true,metalness:.5,roughness:.6,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2}));
+ const decal=new THREE.Mesh(new THREE.PlaneGeometry(9.5,2.6),new THREE.MeshStandardMaterial({map:SV.markTex(q),transparent:true,metalness:.5,roughness:.6,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2}));
  decal.position.set(0,4.6,-9.32);decal.rotation.y=Math.PI;grp.add(decal);
- const inner=new THREE.Group();inner.visible=false;
- if(q.xray!=='resin'){const im=new THREE.MeshBasicMaterial({color:0x9fb4c8,transparent:true,opacity:.07,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide});
-  bustGeoms(q).forEach(g=>{const m=new THREE.Mesh(g,im);if(q.xray==='sand'){m.scale.set(0.84,0.96,0.84);m.position.set(0.5,0.7,0.4)}else m.scale.set(0.94,0.985,0.94);inner.add(m)});
-  if(q.xray==='sand'){const pm=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.6,blending:THREE.AdditiveBlending,depthWrite:false});
-   [[42,'x'],[42,'z'],[18,'x'],[33,'z']].forEach(([y,ax])=>{const c=new THREE.Mesh(new THREE.CylinderGeometry(0.28,0.28,ax==='x'?15:12,8),pm);c.position.y=y;c.rotation[ax==='x'?'z':'x']=Math.PI/2;inner.add(c)});
-   const cm=new THREE.MeshBasicMaterial({color:0x8a9a90,transparent:true,opacity:.18,blending:THREE.AdditiveBlending,depthWrite:false});[[1,43,1,3],[-2,40,-1,2.4],[0,22,0,4]].forEach(([x,y,z,r])=>{const s=new THREE.Mesh(new THREE.SphereGeometry(r,16,12),cm);s.position.set(x,y,z);inner.add(s)})}}
+ const inner=SV.inner(q);inner.visible=false;
  grp.add(inner);const k=q.hcm/52*0.01;grp.scale.setScalar(k);
  const root=new THREE.Group();root.add(grp);if(forPhoto)return root;
  const X=(i-2)*0.95;root.position.set(X,1.0,0);
@@ -111,6 +107,13 @@ function buildBust(q,i,forPhoto){const grp=new THREE.Group(),gs=bustGeoms(q),mod
  [0,top].forEach(y=>line.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0.12,y,0),new THREE.Vector3(0.2,y,0)]),lm)));
  const ls=spriteText([[`${fmt(q.hcm.toFixed(1))} cm`,'bold 46px system-ui','#ffd27a',72]],256,100,'rgba(0,0,0,.6)');ls.scale.set(0.06,0.024,1);ls.position.set(0.21,top/2,0);line.add(ls);line.visible=false;root.add(line);
  return{q,root,grp,outer,mat,uvMat,xMat,inner,plinth,decal,line,center:new THREE.Vector3(X,1.0+0.26,0),label:null,markers:new THREE.Group()}}
+function bronzeInner(q){const inner=new THREE.Group();
+ if(q.xray!=='resin'){const im=new THREE.MeshBasicMaterial({color:0x9fb4c8,transparent:true,opacity:.07,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide});
+  bustGeoms(q).forEach(g=>{const m=new THREE.Mesh(g,im);if(q.xray==='sand'){m.scale.set(0.84,0.96,0.84);m.position.set(0.5,0.7,0.4)}else m.scale.set(0.94,0.985,0.94);inner.add(m)});
+  if(q.xray==='sand'){const pm=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.6,blending:THREE.AdditiveBlending,depthWrite:false});
+   [[42,'x'],[42,'z'],[18,'x'],[33,'z']].forEach(([y,ax])=>{const c=new THREE.Mesh(new THREE.CylinderGeometry(0.28,0.28,ax==='x'?15:12,8),pm);c.position.y=y;c.rotation[ax==='x'?'z':'x']=Math.PI/2;inner.add(c)});
+   const cm=new THREE.MeshBasicMaterial({color:0x8a9a90,transparent:true,opacity:.18,blending:THREE.AdditiveBlending,depthWrite:false});[[1,43,1,3],[-2,40,-1,2.4],[0,22,0,4]].forEach(([x,y,z,r])=>{const s=new THREE.Mesh(new THREE.SphereGeometry(r,16,12),cm);s.position.set(x,y,z);inner.add(s)})}}
+ return inner}
 function init3D(){if(T3)return;const el=document.getElementById('three');const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputEncoding=THREE.sRGBEncoding;el.appendChild(renderer.domElement);
  const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(40,1,0.01,60);
  const hemi=new THREE.HemisphereLight(0xe8dcc8,0x1a1612,0.75),dir=new THREE.DirectionalLight(0xfff0dc,1.15),fill=new THREE.DirectionalLight(0x9fb4d8,0.4);dir.position.set(2.5,4,3);fill.position.set(-3,2,-1);scene.add(hemi,dir,fill);
@@ -149,7 +152,7 @@ const AZTXT={front:'na wprost rzeźby',back:'z tyłu rzeźby',side:'z boku rzeź
 function gate3Status(q,T){const g=T.gate3;if(!g)return null;const txt=`Warunek: odległość ≤ ${Math.round(g.d*100)} cm`+(g.az?`, ${AZTXT[g.az]}`:'')+(g.click?' (kliknij powierzchnię)':'');if(!q)return{txt,ok:false};
  const b=T3.busts.find(b=>b.q===q),r=camRel(b);return{txt:txt+` · teraz ${Math.round(r.d*100)} cm`,ok:r.d<=g.d&&azOK(g.az,r.az)}}
 function check3Gates(){if(MODE!=='sculpt'||!T3)return;const T=tool&&TB[tool];let ch=false;
- if(T&&T.gate3&&!T.gate3.click)for(const b of T3.busts){const r=camRel(b);if(r.d<=T.gate3.d&&azOK(T.gate3.az,r.az)&&!b.q.notes[tool]){note(b.q,tool,obs3(b.q,tool));ch=true;toast(`Zapisano: rzeźba ${b.q.letter} – ${T.name}`)}}
+ if(T&&T.gate3&&!T.gate3.click)for(const b of T3.busts){const r=camRel(b);if(r.d<=T.gate3.d&&azOK(T.gate3.az,r.az)&&!b.q.notes[tool]){note(b.q,tool,SV.obs(b.q,tool));ch=true;toast(`Zapisano: rzeźba ${b.q.letter} – ${T.name}`)}}
  if(ch)onChange();else if(tool)updatePanel()}
 function apply3View(){if(!T3)return;const v=curView();T3.busts.forEach(b=>{b.outer.forEach(m=>m.material=v==='uv'?b.uvMat:v==='xray'?b.xMat:b.mat);b.inner.visible=v==='xray';b.decal.visible=v==='normal';b.plinth.visible=v!=='xray'});
  T3.scene.background=new THREE.Color(v==='uv'?0x05030a:v==='xray'?0x000000:0x15110e);T3.hemi.intensity=v==='normal'?0.75:0.05;T3.dir.intensity=v==='normal'?1.15:0.05;T3.fill.intensity=v==='normal'?0.4:0;T3.floor.visible=T3.wall.visible=v!=='xray';
@@ -157,18 +160,28 @@ function apply3View(){if(!T3)return;const v=curView();T3.busts.forEach(b=>{b.out
 function updateLabel(b){if(b.label){T3.scene.remove(b.label)}const q=b.q,col=q.umark==='excl'?'#e0584f':q.umark==='susp'?'#f0a030':'#cbb894';
  const s=spriteText([[q.letter,'bold 64px Georgia',sel===q?'#ffd27a':col,72],[q.umark==='excl'?'wykluczona':q.umark==='susp'?'podejrzana':'','24px system-ui',col,108]],160,124,'rgba(0,0,0,.55)');s.scale.set(0.16,0.124,1);s.position.set(b.center.x,1.72,0);T3.scene.add(s);b.label=s;mark3Dirty()}
 function build3Scene(){T3.busts.forEach(b=>{T3.scene.remove(b.root,b.plinth,b.markers);if(b.label)T3.scene.remove(b.label)});T3.busts=P.map((q,i)=>{const b=buildBust(q,i);T3.scene.add(b.root,b.plinth,b.markers);return b});
- const ref={t:{},seed:P[0].seed+7,hcm:52,patina:'natural',tool:'chase',mark:'ok',xray:'sand',uv:'wax'},s=new THREE.Scene(),cam=new THREE.PerspectiveCamera(30,1,0.01,10);
+ const ref=SV.refQ(P[0].seed+7),s=new THREE.Scene(),cam=new THREE.PerspectiveCamera(30,1,0.01,10);
  s.add(new THREE.HemisphereLight(0xffffff,0x222222,0.9));const dl=new THREE.DirectionalLight(0xffffff,1.1);dl.position.set(1,1.5,2);s.add(dl);s.background=new THREE.Color(0xdcd4c4);
  const r=buildBust(ref,0,true);s.add(r);cam.position.set(0,0.3,1.25);cam.lookAt(0,0.27,0);const R=T3.renderer,sz=R.getSize(new THREE.Vector2());R.setSize(400,460,false);cam.aspect=400/460;cam.updateProjectionMatrix();R.render(s,cam);T3.photo=R.domElement.toDataURL('image/jpeg',0.85);R.setSize(sz.x,sz.y,false);
  T3.cam={t:new THREE.Vector3(0,1.15,0),dist:5.6,az:0,el:0.16};apply3View()}
 function panel3(q){let h='';if(tool==='xrf'){const v=q.notes.xrf;h+=v?`<div class="obs">${v.map(s=>`<div>${s}</div>`).join('')}</div>`:''}
  else if(tool==='weight')h+=`<button class="btn" id="weigh">Połóż na wadze</button>`;
- else if(tool==='style')h+=`<div class="cap">Fotografia z katalogu raisonné (Rudnicki, 2011, nr 76):</div><img src="${T3.photo}" style="filter:sepia(.75) contrast(1.05)">`;
- else if(tool==='prov'){h+=!q.t.prov?`<ul class="tl"><li><b>1888</b> – odlew w odlewni J. Bracławskiego (księga zamówień, poz. 412)</li><li><b>1890</b> – wystawa TZSP, Warszawa, kat. nr 58</li><li><b>1891</b> – zakup: kolekcja Ludwika Krasnodębskiego</li><li><b>1937</b> – spadek: rodzina Orliczów</li><li><b>1975</b> – aukcja, Dom Aukcyjny „Nowy Świat”</li><li><b>2026</b> – zgłoszona do ekspertyzy</li></ul><div class="obs"><b>Katalog raisonné</b> (2011), nr 76: brąz, wys. 52,0 cm, 8,4 kg; znak odlewni i sygnatura z tyłu cokołu; fotografia.</div>`
-  :q.m.prov==='attic'?`<ul class="tl"><li><b>2025</b> – „znaleziona na strychu” (oświadczenie sprzedającego)</li><li><b>2026</b> – oferowana prywatnie</li></ul><div class="obs">Katalog raisonné: brak wpisu.</div>`:`<ul class="tl"><li><b>1998</b> – zakup na targu staroci w Pradze</li><li><b>2014</b> – kolekcja prywatna</li><li><b>2026</b> – oferowana do sprzedaży</li></ul><div class="obs">Katalog raisonné i księgi odlewni: brak wpisu.</div>`}
- else if(tool==='cert'){const bad=q.t.cert,iss=bad&&q.m.cert==='issuer';const rows=[['Artysta','Stanisław Rudnicki (1840–1905)'],['Tytuł','Popiersie Heleny'],['Materiał',iss?'—':'brąz patynowany'],['Wysokość',bad&&q.m.cert==='dims'?'49,5 cm':'52,0 cm'],['Masa','8,4 kg'],['Odlewnia','J. Bracławski, Warszawa'],['Data',iss?'—':'1888']];
-  h+=`<div class="doc"><h4>CERTYFIKAT AUTENTYCZNOŚCI</h4>${rows.map(r=>`<div class="row"><b>${r[0]}:</b><span>${r[1]}</span></div>`).join('')}<div class="stamp">${iss?'Wystawił: Art-Expert24 s.c. (brak na liście rzeczoznawców)<br>Podpis: nadruk':'Wystawił: dr hab. Jan Orlicz, rzeczoznawca<br>Podpis: odręczny atrament, pieczęć tłoczona'}</div></div>`}
+ else if(tool==='style')h+=`<div class="cap">${SV.photoCaption}</div><img src="${T3.photo}" style="filter:sepia(.75) contrast(1.05)">`;
+ else if(tool==='prov')h+=SV.prov(q);else if(tool==='cert')h+=SV.cert(q);
  const T=TB[tool];if(tool!=='xrf'&&q.notes[tool])h+=`<div class="obs"><b>Obserwacja:</b> ${q.notes[tool]}</div>`;
  else if(T.gate3&&!T.gate3.click)h+=`<div class="obs" style="color:var(--mut)">Spełnij warunek powyżej – obserwacja zapisze się automatycznie.</div>`;
- else if(['prov','cert'].includes(tool)){note(q,tool,obs3(q,tool));h+=`<div class="obs"><b>Obserwacja:</b> ${q.notes[tool]}</div>`}return h}
-function after3(q){const b=document.getElementById('weigh');if(b)b.onclick=()=>{note(q,'weight',obs3(q,'weight'));toast(`Rzeźba ${q.letter}: ${fmt(q.kg.toFixed(1))} kg`);onChange()}}
+ else if(['prov','cert'].includes(tool)){note(q,tool,SV.obs(q,tool));h+=`<div class="obs"><b>Obserwacja:</b> ${q.notes[tool]}</div>`}return h}
+function after3(q){const b=document.getElementById('weigh');if(b)b.onclick=()=>{note(q,'weight',SV.obs(q,'weight'));toast(`Rzeźba ${q.letter}: ${fmt(q.kg.toFixed(1))} kg`);onChange()}}
+function bronzeProv(q){return !q.t.prov?`<ul class="tl"><li><b>1888</b> – odlew w odlewni J. Bracławskiego (księga zamówień, poz. 412)</li><li><b>1890</b> – wystawa TZSP, Warszawa, kat. nr 58</li><li><b>1891</b> – zakup: kolekcja Ludwika Krasnodębskiego</li><li><b>1937</b> – spadek: rodzina Orliczów</li><li><b>1975</b> – aukcja, Dom Aukcyjny „Nowy Świat”</li><li><b>2026</b> – zgłoszona do ekspertyzy</li></ul><div class="obs"><b>Katalog raisonné</b> (2011), nr 76: brąz, wys. 52,0 cm, 8,4 kg; znak odlewni i sygnatura z tyłu cokołu; fotografia.</div>`
+  :q.m.prov==='attic'?`<ul class="tl"><li><b>2025</b> – „znaleziona na strychu” (oświadczenie sprzedającego)</li><li><b>2026</b> – oferowana prywatnie</li></ul><div class="obs">Katalog raisonné: brak wpisu.</div>`:`<ul class="tl"><li><b>1998</b> – zakup na targu staroci w Pradze</li><li><b>2014</b> – kolekcja prywatna</li><li><b>2026</b> – oferowana do sprzedaży</li></ul><div class="obs">Katalog raisonné i księgi odlewni: brak wpisu.</div>`}
+function bronzeCert(q){const bad=q.t.cert,iss=bad&&q.m.cert==='issuer';const rows=[['Artysta','Stanisław Rudnicki (1840–1905)'],['Tytuł','Popiersie Heleny'],['Materiał',iss?'—':'brąz patynowany'],['Wysokość',bad&&q.m.cert==='dims'?'49,5 cm':'52,0 cm'],['Masa','8,4 kg'],['Odlewnia','J. Bracławski, Warszawa'],['Data',iss?'—':'1888']];
+  return`<div class="doc"><h4>CERTYFIKAT AUTENTYCZNOŚCI</h4>${rows.map(r=>`<div class="row"><b>${r[0]}:</b><span>${r[1]}</span></div>`).join('')}<div class="stamp">${iss?'Wystawił: Art-Expert24 s.c. (brak na liście rzeczoznawców)<br>Podpis: nadruk':'Wystawił: dr hab. Jan Orlicz, rzeczoznawca<br>Podpis: odręczny atrament, pieczęć tłoczona'}</div></div>`}
+/* =====================================================================
+   WARIANTY RZEŹB – każdy materiał rejestruje się w SCULPT_VARIANTS (brąz tutaj, marmur w js/modes/marble.js)
+   ===================================================================== */
+const SCULPT_VARIANTS={};let SV=null;
+SCULPT_VARIANTS.sculpt={id:'sculpt',label:'Znajdź oryginał – rzeźby z brązu',noun:'rzeźba',profiles:SPROF,defs:DEF3,sets:SET3,obs:obs3,why:why3,initQ:bronzeInitQ,
+ surface:bronzeSurface,inner:bronzeInner,markTex:q=>markTex(q.mark),refQ:seed=>({t:{},seed,hcm:52,patina:'natural',tool:'chase',mark:'ok',xray:'sand',uv:'wax'}),
+ prov:bronzeProv,cert:bronzeCert,photoCaption:'Fotografia z katalogu raisonné (Rudnicki, 2011, nr 76):',
+ intro:'Na postumentach stoi 5 brązowych popiersi: jeden oryginał i cztery kopie. Obracaj kamerę i podchodź blisko – wiele badań działa tylko z bliska albo z określonej strony. Oznaczaj odlewy i wskaż oryginał.',
+ caseText:()=>'Sprawa: „Popiersie Heleny”, Stanisław Rudnicki (1840–1905), 1888, brąz, wys. 52 cm. Na postumentach 5 odlewów – jeden jest oryginałem. (Artyści i dzieła są fikcyjne.)'};
