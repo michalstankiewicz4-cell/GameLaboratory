@@ -16,7 +16,9 @@ js/core/              rdzeń niezależny od trybu
   game.js             oznaczenia, werdykt, nowa partia, przyciski
 js/data/              dane (pigmenty, artyści)
 js/paint/             silnik obrazów: sceny, widoki (UV, IR, RTG…), obserwacje, próbki
-js/modes/             tryby gry (fragment, rzeźby 3D, banknoty, pamięć…)
+js/core/kinds.js      rejestr obiektów 2D + wspólne nachylenie i tworzenie partii
+js/kinds/             rodzaje obiektów 2D (banknot, moneta, znaczek, rękopis…)
+js/modes/             tryby gry o własnej mechanice (fragment, rzeźby 3D, pamięć…)
 js/main.js            start – ładowany jako ostatni
 docs/                 dokumentacja
 ```
@@ -31,4 +33,28 @@ docs/                 dokumentacja
 1. Utwórz plik w `js/modes/` z danymi, profilami, funkcją tworzącą partię i obserwacjami.
 2. Dopisz `<script>` w `index.html` przed `js/core/game.js`.
 3. Dodaj pozycję w menu trybów i wpis w `CHANGELOG.md`, podbij `js/version.js`.
-Szczegóły rejestru trybów – patrz sekcja „Rejestr obiektów 2D” (od wersji 1.2.0).
+Menu buduje `js/main.js` (stała `MENU`); rodzaje z rejestru trafiają do grupy „Obiekty” automatycznie.
+
+## Rejestr obiektów 2D
+Obiekt, przy którym gracz klasyfikuje każdy egzemplarz (prawdziwy / falsyfikat), dodaje się jednym plikiem w `js/kinds/`:
+
+```js
+registerKind({
+  id:'coin', label:'Weryfikacja monet', noun:'Moneta',
+  W:640, H:320, wcm:12.8,          // rozmiar w jednostkach planszy i szerokość w cm (skala 1 cm)
+  tilt:false, focusLabel:'Rant',   // suwak nachylenia; nazwa przycisku przybliżenia
+  defs:{...}, sets:[[grupa,[id…]]],// narzędzia (name, view, gate:{z,area,tilt}, probe, hint)
+  profiles:{ id:{name, core:[…], opt:[…], modes:{…}} },
+  newGame(r){ kindBatch(this, r, p => {/* pola egzemplarza */}) },
+  view(p,v)   → canvas IW×IH dla widoku v (użyj kView do buforowania),
+  live(p)     → (opcj.) rysowanie na żywo w widoku „normal”, np. przy dużym zoomie,
+  area(p,area,v) → czy środek widoku leży w obszarze bramki,
+  obs(p,id), why(p,id) → obserwacja i wyjaśnienie zdrady,
+  probe(p,lx,ly,id) → (opcj.) kliknięcie sondą, panel(p,id) → (opcj.) HTML w panelu,
+  focus(p) → [x,y,w,h] dla przycisku przybliżenia, intro, caseText()
+});
+```
+Potem dopisz `<script src="js/kinds/…">` w `index.html` (przed `js/core/game.js`).
+
+## Planowane tryby (wkrótce)
+Aukcja, Śledztwo i Konserwator są w menu jako nieaktywne. Każdy będzie osobnym plikiem w `js/modes/` – opis w `docs/ROADMAPA.md`.

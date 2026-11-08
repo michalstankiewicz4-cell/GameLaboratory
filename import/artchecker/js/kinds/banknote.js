@@ -3,7 +3,6 @@
    BANKNOTY (fikcyjna waluta: 100 florenów Banku Narodowego Arkadii)
    ===================================================================== */
 const THX=455,HOLO=[560,0,40,360],OVI=[540,295,140,50],LAT=[468,316,68,22],REGC=[140,58];
-const TILT={v:0,lo:true,hi:false,tool:null};
 const NOTE_PROF={
  inkjet:{name:'Wydruk z drukarki atramentowej na zwykłym papierze',core:['paper','print','uv','watermark','thread','holo','ovi','intaglio','mag'],opt:['ir','latent','micro'],modes:{paper:'thin',print:'inkjet',uv:'glow',watermark:'printed',thread:'printed',holo:'paint',ovi:'static',intaglio:'flat',mag:'none',ir:'all',latent:'none',micro:'blur'}},
  laser:{name:'Kolorowa kopia z drukarki laserowej',core:['print','uv','holo','ovi','intaglio','micro'],opt:['watermark','thread','ir','paper','mag'],modes:{print:'laser',uv:'glow',holo:'paint',ovi:'static',intaglio:'flat',micro:'blur',watermark:'none',thread:'printed',ir:'all',paper:'thin',mag:'none'}},
@@ -123,14 +122,8 @@ function noteArea(p,area,v){const lx=v.cx-p.x,ly=v.cy-p.y,inN=lx>=0&&lx<=W&&ly>=
  switch(area){case'note':return true;case'motif':return(lx>290&&lx<440&&ly>85&&ly<330)||(lx>20&&lx<60&&ly>290&&ly<330);case'wm':return lx<190&&ly>90&&ly<320;case'thread':return Math.abs(lx-THX)<14;
   case'reg':return Math.hypot(lx-REGC[0],ly-REGC[1])<26;case'holo':return lx>=HOLO[0]-6&&lx<=HOLO[0]+HOLO[2]+6;case'ovi':return lx>OVI[0]&&ly>OVI[1]-10;
   case'latent':return lx>LAT[0]-8&&lx<LAT[0]+LAT[2]+8&&ly>LAT[1]-8&&ly<LAT[1]+LAT[3]+8;case'micro':return(Math.abs(ly-15.5)<6||Math.abs(ly-(H-15.5))<6)&&lx>24&&lx<676;case'serial':return lx>596&&lx<700&&ly>22&&ly<50}return false}
-const tiltOK=g=>!g||!g.tilt||(g.tilt==='both'?TILT.lo&&TILT.hi:TILT.v>65);
-function newNotes(r){ART={wcm:14,hcm:7.2,name:'Bank Narodowy Arkadii'};SC=null;C=null;W=700;H=360;IW=W*S;IH=H*S;
- const nG=1+Math.floor(r()*3),list=[];for(let i=0;i<nG;i++)list.push({orig:true,profile:null,t:{}});
- shuffle(Object.keys(NOTE_PROF),r).slice(0,5-nG).forEach(k=>list.push({orig:false,profile:k,t:rollTells(NOTE_PROF[k],r)}));shuffle(list,r);
- P=list.map((p,i)=>{p.note=true;p.letter='ABCDE'[i];p.seed=(r()*1e9)|0;p.m=Object.assign({},p.profile?NOTE_PROF[p.profile].modes:{});p.views={};p.samples=[];p.notes={};p.umark='';
-  const sr=serialFor(r);p.serialH=p.serialV=sr;p.goodCheck=checkDigit(sr);
-  if(p.t.serial){if(p.m.serial==='mismatch')p.serialV=sr.slice(0,5)+((+sr[5]+1)%10)+sr.slice(6);else p.serialH=p.serialV=sr.slice(0,9)+((+sr[9]+3)%10)}
-  p.x=i<3?G+i*(W+G):G+(W+G)/2+(i-3)*(W+G);p.y=i<3?G:G*2+H;return p});BW=3*W+4*G;BH=2*H+3*G;TILT.v=0;TILT.lo=true;TILT.hi=false;const ti=document.getElementById('tilt');if(ti){ti.value=0;document.getElementById('tiltv').textContent='0°'}}
+function newNotes(r){kindBatch(KINDS.notes,r,p=>{const sr=serialFor(r);p.serialH=p.serialV=sr;
+ if(p.t.serial){if(p.m.serial==='mismatch')p.serialV=sr.slice(0,5)+((+sr[5]+1)%10)+sr.slice(6);else p.serialH=p.serialV=sr.slice(0,9)+((+sr[9]+3)%10)}})}
 function obsN(p,id){const t=p.t,m=p.m;switch(id){
  case'paper':return t.paper?`Wymiary ${p.profile==='laser'?'139 × 71':'140 × 72'} mm, grubość 0,085 mm. Papier celulozowy – miękki, gładki, nie szeleści.`:'Wymiary 140 × 72 mm, grubość 0,105 mm. Papier bawełniany – sztywny, charakterystycznie szeleszczący.';
  case'intaglio':return t.intaglio?'Powierzchnia całkowicie płaska – brak wypukłego druku, znaki dla niewidomych niewyczuwalne.':'Wyraźny relief: motyw główny, tytuł, nominał i znaki dla niewidomych są wypukłe i wyczuwalne pod palcem.';
@@ -153,3 +146,12 @@ function whyN(p,id){const m=p.m;return({paper:()=>'Papier celulozowy, cieńszy (
  micro:()=>m.micro==='blur'?'Mikrodruk nieczytelny – druk zbyt mało precyzyjny.':'Błąd w mikrodruku („ARKADA”).',print:()=>m.print==='laser'?'Grudki tonera – kopia laserowa.':'Raster drukarki atramentowej.',
  serial:()=>m.serial==='mismatch'?'Numer poziomy różni się od pionowego.':`Zła cyfra kontrolna – zgodnie z regułą powinna być ${checkDigit(p.serialH)}.`,
  uv:()=>m.uv==='glow'?'Papier z wybielaczami optycznymi – świeci w UV.':'Nadrukowane imitacje włókien, brak nadruków fluorescencyjnych.',ir:()=>m.ir==='all'?'Cały wzór widoczny w IR – zwykłe farby drukarskie.':'Brak farb aktywnych w IR – numery niewidoczne.',mag:()=>'Brak farby magnetycznej.'}[id]||(()=>''))()}
+registerKind({id:'notes',label:'Weryfikacja banknotów',noun:'Banknot',W:700,H:360,wcm:14,hcm:7.2,tilt:true,focusLabel:'Numer',
+ defs:DEFN,sets:SETN,profiles:NOTE_PROF,newGame:newNotes,view:noteView,live:noteLive,area:noteArea,obs:obsN,why:whyN,
+ focus:p=>[p.x+598,p.y+26,100,22],
+ probe(p,lx,ly,id){if(id!=='mag')return;const inMag=(lx>596&&ly>22&&ly<50)||(lx>194&&lx<214&&ly>236&&ly<336)||(lx>290&&lx<440&&ly>85&&ly<330);
+  if(!inMag)toast('Brak sygnału w tym miejscu – przyłóż czujnik do numeru seryjnego lub motywu głównego.');else if(note(p,'mag',obsN(p,'mag')))toast(`Banknot ${p.letter}: ${obsN(p,'mag')}`)},
+ panel(p,id){if(id==='serial')return`<div class="obs"><b>Reguła cyfry kontrolnej:</b> (suma pierwszych 7 cyfr + pozycje obu liter w alfabecie, A=1 … Z=26) mod 10 = ostatnia cyfra.</div>`;
+  if(id==='mag'&&p.notes.mag)return`<div class="obs"><b>Odczyt:</b> ${p.notes.mag}</div>`},
+ intro:'Na stole leży 5 banknotów 100 florenów (waluta fikcyjna). Część jest prawdziwa, część fałszywa – każdy fałszywy powstał inną metodą. Sprawdź zabezpieczenia: pod światło, przechylając suwakiem „Nachylenie”, pod lupą, w UV, IR i detektorem. Oznacz każdy banknot jako prawdziwy lub falsyfikat i zakończ ekspertyzę.',
+ caseText:()=>'Weryfikacja banknotów: 100 florenów Banku Narodowego Arkadii (waluta fikcyjna). Na stole 5 banknotów – część prawdziwa, część fałszywa. Sprawdź wszystkie zabezpieczenia i oznacz każdy banknot.'});

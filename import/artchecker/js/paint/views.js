@@ -77,7 +77,7 @@ function makeBack(p){const out=mk(IW,IH),x=out.getContext('2d'),r=rng(p.seed+61)
   x.fillStyle='#3a2c1a';x.font='bold 10px Georgia,serif';x.fillText('TOW. ZACHĘTY SZTUK PIĘKNYCH',12,20);x.font='10px Georgia,serif';x.fillText('Wystawa, Warszawa '+(ART.year+2),12,36);x.fillText('Nr kat. '+(ART.crn%150+12),12,50);
   x.font='italic 10px Georgia,serif';x.fillText(ART.name.split(' ').pop()+' – '+ART.title.slice(0,24),12,64);x.restore()}
  return out}
-function getView(p,v){if(p.note)return noteView(p,v);if(p.views[v])return p.views[v];let c,x;
+function getView(p,v){if(p.kind)return p.kind.view(p,v);if(p.views[v])return p.views[v];let c,x;
  switch(v){
   case'base':{const flat=mk(IW,IH),fx=flat.getContext('2d');fx.scale(S,S);drawShapes(fx,p.shapes,rng(C.sd));c=mk(IW,IH);x=c.getContext('2d');painterly(x,flat,p);x.scale(S,S);
    if(p.frag)for(const l of p.frag.losses){x.beginPath();l.pts.forEach((q,i)=>i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]));x.closePath();x.fillStyle=GROUND_COL[p.ground];x.fill();x.strokeStyle='rgba(50,32,15,.55)';x.lineWidth=0.8;x.stroke()}break}
