@@ -380,6 +380,22 @@ window.GameLabCatalog =
       }
     },
     {
+      "file": "labs/art.html",
+      "name": "Art Lab",
+      "namePl": "Laboratorium sztuki",
+      "doc": "docs/labs/art.md",
+      "desc": "2D pictures on a canvas: a subject painted in oil (brush strokes, impasto), watercolour, pencil, ballpoint, ink with a stick, charcoal, pastel, marker, pointillism or engraving, on canvas, paper, wood, parchment or metal lit from the side; conversions and formats (postage stamp, frame). Zoom to the bristles. Every picture is a JSON spec — for games and AI.",
+      "descPl": "Obrazy 2D na płótnie: temat malowany olejem (pociągnięcia pędzla, impast), akwarelą, ołówkiem, długopisem, tuszem patyczkiem, węglem, pastelem, flamastrem, puentylizmem albo rytownictwem, na płótnie, papierze, drewnie, pergaminie lub metalu w świetle bocznym; konwersje i formaty (znaczek pocztowy, rama). Zoom do włosia pędzla. Każdy obraz to spec JSON — dla gier i AI.",
+      "kind": "lab",
+      "kit": "ArtKit",
+      "phrases": ["sztuka", "malarstwo", "obraz", "2D", "znaczki", "tekstura", "paleta"],
+      "saved": ["gameLab.art."],
+      "art": {
+        "bg": ["#2b2117", "#120d08"],
+        "svg": "<rect x=\"58\" y=\"14\" width=\"84\" height=\"66\" rx=\"2\" fill=\"#d9c7a4\" stroke=\"#d6b25e\" stroke-width=\"4\"/><path d=\"M62 62 Q80 44 98 56 T138 50 V76 H62 Z\" fill=\"#4f6b3a\"/><circle cx=\"120\" cy=\"32\" r=\"8\" fill=\"#f2b84b\"/><path d=\"M66 40 q14 -6 28 0\" stroke=\"#2f5a85\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M150 84 L172 60\" stroke=\"#a0522d\" stroke-width=\"4\" stroke-linecap=\"round\"/><path d=\"M146 88 l6 -6 l4 4 z\" fill=\"#e8e1cf\"/>"
+      }
+    },
+    {
       "file": "labs/zombies.html",
       "name": "Zombie Generator",
       "namePl": "Generator zombie",
@@ -520,6 +536,9 @@ window.GameLabCatalog =
   ],
   "phraseEn": {
     "2D": "2D",
+    "sztuka": "art",
+    "malarstwo": "painting",
+    "znaczki": "stamps",
     "GIF": "GIF",
     "LOD": "LOD",
     "Orzeł": "Orzeł",

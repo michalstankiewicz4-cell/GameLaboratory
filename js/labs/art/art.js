@@ -1,0 +1,161 @@
+// Art Lab (labs/art.html): ArtKit (js/render/art/artkit.js) with a viewer — zoom up to 32× (wheel around the cursor,
+// drag to pan, double click to fit) so brush strokes and the support can be seen — controls bound to the spec,
+// an ordered list of conversions, PNG export and the spec as JSON. For an AI: window.ArtApi and a console tab.
+import { SUBJECTS, TECHNIQUES, SURFACES, CONVERSIONS, FORMATS, PALETTES, DEFAULTS, normalize, render } from '../../render/art/artkit.js';
+
+const $ = (id) => document.getElementById(id);
+const KEY = 'gameLab.art.v1';
+// one main number per conversion: [field, min, max, step, default, label]
+const CV_PARAM = {
+  posterize: ['levels', 2, 12, 1, 5, 'Levels'], halftone: ['size', 3, 32, 1, 8, 'Dot size'], pixelate: ['size', 2, 64, 1, 8, 'Pixel size'],
+  blur: ['radius', 0.5, 16, 0.5, 2, 'Radius'], sharpen: ['amount', 0, 2, 0.05, 0.6, 'Amount'], contrast: ['contrast', 0.3, 2.5, 0.05, 1.2, 'Contrast'],
+  edges: ['strength', 0.5, 4, 0.1, 1.5, 'Strength'], quantize: null, gray: null, sepia: null, duotone: null, invert: null,
+};
+let spec = (() => { try { return normalize(JSON.parse(localStorage.getItem(KEY) || 'null') || DEFAULTS); } catch { return normalize(DEFAULTS); } })();
+let image = null, pic = null;
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(spec)); } catch { /* private mode */ } };
+
+/* ---------------- controls ---------------- */
+const fill = (sel, map) => { for (const [k, v] of Object.entries(map)) sel.append(new Option(v, k)); };
+fill($('subject'), SUBJECTS); fill($('technique'), TECHNIQUES); fill($('surface'), SURFACES); fill($('format'), FORMATS); fill($('cvKind'), CONVERSIONS);
+fill($('palette'), Object.fromEntries(Object.keys(PALETTES).map((k) => [k, k[0].toUpperCase() + k.slice(1)])));
+const FIELDS = ['subject', 'palette', 'seed', 'technique', 'stroke', 'detail', 'size', 'aspect', 'surface', 'relief', 'light', 'varnish', 'cracks', 'age', 'format', 'text'];
+const NUM = new Set(['seed', 'stroke', 'detail', 'size', 'aspect', 'relief', 'light', 'varnish', 'cracks', 'age']);
+const fmt = { light: (v) => v + '°', stroke: (v) => (+v).toFixed(2) + '×', detail: (v) => (+v).toFixed(2) + '×' };
+function show() {
+  for (const f of FIELDS) {
+    const e = $(f); e.value = String(spec[f]);
+    if (e.tagName === 'SELECT' && e.value !== String(spec[f])) { e.append(new Option(String(spec[f]), String(spec[f]))); e.value = String(spec[f]); }
+    const o = $(f + 'V'); if (o) o.textContent = (fmt[f] || ((v) => (+v).toFixed(2)))(spec[f]);
+  }
+  $('imgRow').hidden = $('imgNote').hidden = spec.subject !== 'image';
+  showConversions();
+}
+for (const f of FIELDS) {
+  const e = $(f), ev = e.type === 'range' ? 'input' : 'change';
+  e.addEventListener(ev, () => {
+    spec[f] = NUM.has(f) ? +e.value : e.value; const o = $(f + 'V'); if (o) o.textContent = (fmt[f] || ((v) => (+v).toFixed(2)))(spec[f]);
+    if (f === 'subject') show();
+    paintSoon(e.type === 'range' ? 350 : 0);
+  });
+}
+$('newSeed').onclick = () => { spec.seed = 1 + Math.floor(Math.random() * 99998); show(); paintSoon(0); };
+$('redraw').onclick = () => paintSoon(0);
+
+// conversions: an ordered list, each with ↑ (earlier) and ✕, and its main number
+function showConversions() {
+  const box = $('cvList'); box.replaceChildren();
+  spec.convert.forEach((cv, i) => {
+    const item = document.createElement('div'); item.className = 'cvItem';
+    const head = document.createElement('div'); head.className = 'cvHead';
+    const name = document.createElement('span'); name.textContent = `${i + 1}. ${CONVERSIONS[cv.kind]}`;
+    const up = document.createElement('button'); up.type = 'button'; up.textContent = '↑'; up.title = 'Earlier'; up.disabled = i === 0;
+    up.onclick = () => { [spec.convert[i - 1], spec.convert[i]] = [spec.convert[i], spec.convert[i - 1]]; showConversions(); paintSoon(0); };
+    const del = document.createElement('button'); del.type = 'button'; del.textContent = '✕'; del.title = 'Remove';
+    del.onclick = () => { spec.convert.splice(i, 1); showConversions(); paintSoon(0); };
+    head.append(name, up, del); item.append(head);
+    const P = CV_PARAM[cv.kind];
+    if (P) {
+      const [field, min, max, step, def, label] = P, row = document.createElement('div'); row.className = 'row';
+      const l = document.createElement('span'), inp = document.createElement('input'), out = document.createElement('output');
+      l.textContent = label; Object.assign(inp, { type: 'range', min, max, step, value: cv[field] ?? def }); out.textContent = inp.value;
+      inp.oninput = () => { cv[field] = +inp.value; out.textContent = inp.value; paintSoon(350); };
+      row.append(l, inp, out); item.append(row);
+    }
+    if (cv.kind === 'quantize') {
+      const row = document.createElement('div'); row.className = 'row';
+      const l = document.createElement('span'), sel = document.createElement('select'); l.textContent = 'Dither';
+      for (const [k, v] of [['floyd', 'Error diffusion'], ['bayer', 'Ordered 4×4'], ['none', 'None']]) sel.append(new Option(v, k));
+      sel.value = cv.dither || 'floyd'; sel.onchange = () => { cv.dither = sel.value; paintSoon(0); };
+      row.append(l, sel, document.createElement('output')); item.append(row);
+    }
+    box.append(item);
+  });
+}
+$('cvAdd').onclick = () => { const kind = $('cvKind').value, P = CV_PARAM[kind], cv = { kind }; if (P) cv[P[0]] = P[4]; if (kind === 'quantize') cv.paletteName = spec.palette; spec.convert.push(cv); showConversions(); paintSoon(0); };
+$('cvClear').onclick = () => { spec.convert = []; showConversions(); paintSoon(0); };
+
+// own image: a file or a paste
+async function takeImage(blob) { try { image = await createImageBitmap(blob); spec.subject = 'image'; show(); paintSoon(0); } catch (e) { $('status').textContent = 'That image cannot be read: ' + e.message; } }
+$('file').onchange = () => { const f = $('file').files[0]; if (f) takeImage(f); };
+addEventListener('paste', (e) => { if (e.target.closest && e.target.closest('textarea, input')) return; const it = [...(e.clipboardData?.items || [])].find((i) => i.type.startsWith('image/')); if (it) { e.preventDefault(); takeImage(it.getAsFile()); } });
+
+/* ---------------- painting ---------------- */
+let timer = 0, painting = null;
+function paintSoon(ms) { clearTimeout(timer); timer = setTimeout(paint, ms); }
+async function paint() {
+  if (painting) { await painting; }
+  painting = (async () => {
+    let s; try { s = normalize(spec); } catch (e) { $('status').textContent = e.message; return; }
+    if (s.subject === 'image' && !image) { $('status').textContent = 'Choose or paste an image first'; return; }
+    $('status').textContent = 'painting…';
+    const t0 = performance.now(), work = async () => render(s, { image });
+    const out = window.LabLoad && s.size >= 2048 ? await window.LabLoad.run('Painting the picture…', work) : await work();
+    pic = out.canvas; spec = out.spec; save();
+    const ms = performance.now() - t0, c = $('pic'); c.width = pic.width; c.height = pic.height; c.getContext('2d').drawImage(pic, 0, 0);
+    $('status').textContent = `${pic.width} × ${pic.height} px · painted in ${(ms / 1000).toFixed(2)} s`;
+    $('specText').value = JSON.stringify(spec, null, 1);
+    if (!fitted) { fit(); fitted = true; } else place();
+  })();
+  try { await painting; } catch (e) { $('status').textContent = 'Error: ' + e.message; if (window.LabLog) window.LabLog.add('error', e.stack || e.message); } finally { painting = null; }
+}
+
+/* ---------------- viewer: zoom and pan ---------------- */
+const view = $('view'), cv = $('pic'), MAXZ = 32;
+let zoom = 1, ox = 0, oy = 0, fitted = false;
+function place() {
+  cv.style.transform = `translate(${ox}px, ${oy}px) scale(${zoom})`;
+  cv.classList.toggle('px', $('sharp').checked && zoom >= 3);
+  $('zoomV').textContent = `zoom ${zoom >= 10 ? zoom.toFixed(0) : zoom.toFixed(2)}×`;
+}
+function zoomAt(z, px, py) { z = Math.max(0.05, Math.min(MAXZ, z)); ox = px - (px - ox) * z / zoom; oy = py - (py - oy) * z / zoom; zoom = z; place(); }
+function fit() {
+  const r = view.getBoundingClientRect(); if (!cv.width) return;
+  zoom = Math.min((r.width - 24) / cv.width, (r.height - 24) / cv.height); ox = (r.width - cv.width * zoom) / 2; oy = (r.height - cv.height * zoom) / 2; place();
+}
+view.addEventListener('wheel', (e) => { e.preventDefault(); const r = view.getBoundingClientRect(); zoomAt(zoom * Math.exp(-e.deltaY * 0.0015), e.clientX - r.left, e.clientY - r.top); }, { passive: false });
+let drag = null;
+view.addEventListener('pointerdown', (e) => { if (e.button !== 0) return; drag = [e.clientX - ox, e.clientY - oy]; view.setPointerCapture(e.pointerId); view.classList.add('grab'); });
+view.addEventListener('pointermove', (e) => { if (!drag) return; ox = e.clientX - drag[0]; oy = e.clientY - drag[1]; place(); });
+view.addEventListener('pointerup', () => { drag = null; view.classList.remove('grab'); });
+view.addEventListener('dblclick', fit);
+$('zooms').addEventListener('click', (e) => {
+  const z = e.target.dataset && e.target.dataset.zoom; if (!z) return;
+  if (z === 'fit') { fit(); return; }
+  const r = view.getBoundingClientRect(); zoomAt(+z, r.width / 2, r.height / 2);
+});
+$('sharp').onchange = place;
+addEventListener('resize', () => { if (fitted) place(); });
+
+/* ---------------- export and spec ---------------- */
+$('png').onclick = () => {
+  if (!pic) return;
+  pic.toBlob((b) => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `art-${spec.subject}-${spec.technique}-${spec.seed}.png`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }, 'image/png');
+};
+$('specCopy').onclick = async () => { $('specText').value = JSON.stringify(spec, null, 1); try { await navigator.clipboard.writeText($('specText').value); $('specMsg').textContent = 'Copied.'; } catch { $('specMsg').textContent = 'Copy it from the box.'; } };
+$('specApply').onclick = () => { try { spec = normalize(JSON.parse($('specText').value)); show(); paintSoon(0); $('specMsg').textContent = 'Applied.'; } catch (e) { $('specMsg').textContent = 'Not a valid spec: ' + e.message; } };
+$('specReset').onclick = () => { spec = normalize(DEFAULTS); show(); paintSoon(0); };
+
+/* ---------------- for an AI ---------------- */
+// ArtApi.render(spec) → PNG as a data URL (and shows it); ArtApi.spec() — the current spec; ArtApi.lists — what can be chosen
+window.ArtApi = {
+  lists: { subjects: Object.keys(SUBJECTS), techniques: Object.keys(TECHNIQUES), surfaces: Object.keys(SURFACES), conversions: Object.keys(CONVERSIONS), formats: Object.keys(FORMATS), palettes: Object.keys(PALETTES) },
+  defaults: { ...DEFAULTS },
+  spec: () => JSON.parse(JSON.stringify(spec)),
+  async render(s = {}) { spec = normalize({ ...DEFAULTS, ...s }); show(); await paint(); return pic ? pic.toDataURL('image/png') : null; },
+};
+function apiTab() {
+  if (!window.LabConsole) return;
+  const el = document.createElement('div'); el.className = 'artApi';
+  const ta = document.createElement('textarea'); ta.className = 'mono'; ta.rows = 6; ta.spellcheck = false;
+  ta.value = JSON.stringify({ subject: 'stampmotif', technique: 'engraving', surface: 'paper', format: 'stamp', text: '50', seed: 3 });
+  const go = document.createElement('button'); go.type = 'button'; go.textContent = 'Paint (ArtApi.render)';
+  const msg = document.createElement('p'); msg.className = 'note';
+  msg.textContent = 'A spec as JSON; missing fields take the defaults. Lists: ' + Object.entries(window.ArtApi.lists).map(([k, v]) => `${k}: ${v.join(', ')}`).join(' · ');
+  go.onclick = async () => { try { await window.ArtApi.render(JSON.parse(ta.value)); } catch (e) { msg.textContent = e.message; } };
+  el.append(ta, go, msg);
+  window.LabConsole.addTab({ id: 'artapi', title: 'API', titlePl: 'API', el });
+}
+if (window.LabConsole) apiTab(); else addEventListener('load', apiTab);
+
+show(); paint();

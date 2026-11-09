@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Art Lab — 2D pictures: drawing techniques, surfaces and image conversions</title>
+<meta name="description" content="Art Lab: 2D pictures on a canvas — a subject painted in oil with visible brush strokes, watercolour, pencil, ballpoint, ink with a stick, charcoal, pastel, marker, pointillism or engraving, on canvas, paper, wood, parchment or metal, lit from the side; conversions (halftone, palette and dither, edges, duotone…) and formats (postage stamp, frame). Every picture is a JSON spec, so an AI can order one.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/art.html">
+<link rel="icon" type="image/png" href="../assets/favicon-32.png">
+<link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="../ui/style/sea.css">
+<link rel="stylesheet" href="../ui/pages/art.css">
+</head>
+<body class="lab art viewFits">
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/menubar.js"></script>
+<div class="labLoad" data-auto><div class="labLoadCard"><i class="labSpin"></i><b>Painting the picture…</b><span class="labLoadStep"></span><span class="labLoadBar"><i></i></span></div></div>
+<script src="../ui/shell/loader.js"></script>
+<div class="foot"><span id="zoomV" class="mono"></span><span class="sp"></span><span id="fps" data-auto></span><span>GameLaboratory</span></div>
+<script src="../ui/shell/bars.js"></script>
+<div class="bar">
+  <div class="btns" id="zooms">
+    <button type="button" data-zoom="fit" title="Fit the picture in the view (double click)">Fit</button>
+    <button type="button" data-zoom="1" title="One picture pixel per screen pixel">1:1</button>
+    <button type="button" data-zoom="4" title="4× — brush strokes">4×</button>
+    <button type="button" data-zoom="16" title="16× — bristles and the weave of the support">16×</button>
+  </div>
+  <label class="chk" title="Show pixels sharp when zoomed in (otherwise smoothed)"><input type="checkbox" id="sharp" checked> Sharp pixels</label>
+  <span class="sp"></span>
+  <span class="dimtxt" id="status"></span>
+</div>
+<main id="view"><canvas id="pic"></canvas></main>
+<aside class="panel" data-std="info">
+  <h2 class="stdName">Art Lab</h2>
+  <p class="stdText">2D pictures on a canvas: a subject, painted in a technique, on a surface lit from the side, then converted and given a format. Zoom in (wheel, up to 32×) to see the brush strokes and the support. Every picture is a JSON spec with a seed — the same spec gives the same picture, so a game or an AI can order one (ArtApi in the console).</p>
+</aside>
+<aside class="panel" data-window="paint" data-title="Subject and technique" data-title-pl="Temat i technika">
+  <h3>Subject</h3>
+  <div class="row"><span>Subject</span><select id="subject"></select><output></output></div>
+  <div class="row" id="imgRow"><span>Image</span><input type="file" id="file" accept="image/*"><output></output></div>
+  <p class="note" id="imgNote">Choose a file, or paste an image (Ctrl+V) anywhere on the page.</p>
+  <div class="row"><span>Palette</span><select id="palette"></select><output></output></div>
+  <div class="row"><span>Seed</span><input type="number" id="seed" min="1" max="99999" step="1"><output></output></div>
+  <div class="btns"><button type="button" id="newSeed">Another one</button></div>
+  <h3>Technique</h3>
+  <div class="row"><span>Technique</span><select id="technique"></select><output></output></div>
+  <div class="row"><span>Stroke size</span><input type="range" id="stroke" min="0.3" max="4" step="0.05"><output id="strokeV"></output></div>
+  <div class="row"><span>Detail</span><input type="range" id="detail" min="0.2" max="3" step="0.05"><output id="detailV"></output></div>
+  <h3>Size</h3>
+  <div class="row"><span>Long side</span><select id="size"><option value="512">512 px</option><option value="768">768 px</option><option value="1024">1024 px</option><option value="1536">1536 px</option><option value="2048">2048 px</option><option value="4096">4096 px</option></select><output></output></div>
+  <div class="row"><span>Aspect</span><select id="aspect"><option value="1">1 : 1</option><option value="1.25">5 : 4 (landscape)</option><option value="1.5">3 : 2 (landscape)</option><option value="1.7778">16 : 9</option><option value="0.8">4 : 5 (portrait)</option><option value="0.6667">2 : 3 (portrait)</option></select><output></output></div>
+</aside>
+<aside class="panel" data-window="surface" data-title="Surface" data-title-pl="Powierzchnia">
+  <h3>Support</h3>
+  <div class="row"><span>Surface</span><select id="surface"></select><output></output></div>
+  <div class="row"><span>Relief</span><input type="range" id="relief" min="0" max="2" step="0.05"><output id="reliefV"></output></div>
+  <div class="row"><span>Light from</span><input type="range" id="light" min="0" max="360" step="5"><output id="lightV"></output></div>
+  <p class="note">Relief: the height of the paint and of the support (impasto, bristle marks, the weave), lit from the side — raking light shows the strokes.</p>
+  <h3>Ageing</h3>
+  <div class="row"><span>Varnish</span><input type="range" id="varnish" min="0" max="1" step="0.05"><output id="varnishV"></output></div>
+  <div class="row"><span>Cracks</span><input type="range" id="cracks" min="0" max="1" step="0.05"><output id="cracksV"></output></div>
+  <div class="row"><span>Age</span><input type="range" id="age" min="0" max="1" step="0.05"><output id="ageV"></output></div>
+</aside>
+<aside class="panel" data-window="convert" data-title="Conversions" data-title-pl="Konwersje">
+  <div class="row"><span>Add</span><select id="cvKind"></select><output></output></div>
+  <div class="btns"><button type="button" id="cvAdd">Add conversion</button><button type="button" id="cvClear">Remove all</button></div>
+  <div id="cvList"></div>
+  <p class="note">Applied in order, on the finished picture (after the surface).</p>
+</aside>
+<aside class="panel" data-window="output" data-side="right" data-title="Format and export" data-title-pl="Format i eksport">
+  <h3>Format</h3>
+  <div class="row"><span>Format</span><select id="format"></select><output></output></div>
+  <div class="row"><span>Text</span><input type="text" id="text" maxlength="24" placeholder="value on a stamp, e.g. 50"><output></output></div>
+  <h3>Export</h3>
+  <div class="btns"><button type="button" id="png">Save PNG</button><button type="button" id="redraw">Paint again</button></div>
+  <h3>Spec (JSON)</h3>
+  <div class="btns"><button type="button" id="specCopy">Copy spec</button><button type="button" id="specApply">Apply pasted spec</button><button type="button" id="specReset">Reset</button></div>
+  <textarea id="specText" class="mono" rows="8" spellcheck="false"></textarea>
+  <p class="note" id="specMsg">The same spec and seed give the same picture. For an AI: ArtApi.render(spec) in the console.</p>
+</aside>
+<script src="../ui/shell/labwin.js"></script>
+<script src="../ui/shell/windows.js"></script>
+<script type="module" src="../js/labs/art/art.js"></script>
+</body>
+</html>

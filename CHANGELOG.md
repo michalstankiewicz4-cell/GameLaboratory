@@ -3,6 +3,17 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.57.0 · sztuka 1.0.0 — 2026-11-09 (laboratorium sztuki)
+
+### Dodane
+- **Laboratorium sztuki** (`labs/art.html`, ArtKit `js/render/art/artkit.js`, opis `docs/labs/art.md`): obrazy 2D na
+  płótnie — temat (pejzaż, martwa natura, portret, abstrakcja, motyw znaczka, własny obraz), technika (olej z widocznymi
+  pociągnięciami i impastem, akwarela, ołówek, tusz, tusz patyczkiem, długopis, węgiel, pastel, flamaster, puentylizm,
+  rytownictwo), powierzchnia (płótno, papier, drewno, pergamin, metal; relief w świetle bocznym, werniks, spękania,
+  wiek), konwersje (półtony, paleta z ditheringiem, krawędzie, duotone, sepia, posteryzacja, pikseloza…) i formaty
+  (znaczek pocztowy, rama, passe-partout). Zoom do 32× (pociągnięcia, włosie, splot). Każdy obraz to spec JSON z
+  ziarnem — `ArtApi.render(spec)` i zakładka API w konsoli, dla gier i AI. Eksport PNG.
+
 ## Program 0.56.1 — 2026-11-07 (schemat silnika: reguły gry)
 
 ### Zmienione

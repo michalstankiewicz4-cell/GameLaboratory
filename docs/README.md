@@ -50,6 +50,7 @@ Układ folderów jest taki sam jak w kodzie:
 | Filtry | `labs/filters.html` | [labs/filters.md](labs/filters.md) |
 | Transformator | `labs/transform.html` | [labs/transform.md](labs/transform.md) |
 | Pixel Studio, generator zombie | `labs/pixel.html`, `labs/zombies.html` | [labs/pixel/README.md](labs/pixel/README.md), [labs/pixel/zombies.md](labs/pixel/zombies.md) |
+| Sztuka (obrazy 2D) | `labs/art.html` | [labs/art.md](labs/art.md) |
 | Kostnica SDF | `labs/morgue.html` | [labs/morgue.md](labs/morgue.md) |
 | SDF Walkers, laboratorium języka, laboratorium obrazów | `labs/walkers.html`, `labs/lang.html`, `labs/img.html` | [labs/walkers/README.md](labs/walkers/README.md), [labs/walkers/ROADMAP.md](labs/walkers/ROADMAP.md), [labs/walkers/notatki/](labs/walkers/notatki/README.md) |
 

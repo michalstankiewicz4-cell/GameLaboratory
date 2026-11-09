@@ -1,0 +1,14 @@
+/* Art Lab (labs/art.html): on top of ui/ui.css and ui/style/sea.css. The view sits in the free middle (body.viewFits). */
+.art #view{position:fixed;overflow:hidden;cursor:grab;touch-action:none;background:var(--bg)}
+.art #view.grab{cursor:grabbing}
+body.viewFits.art #view > canvas{position:absolute;left:0;top:0;width:auto;height:auto;transform-origin:0 0;box-shadow:0 6px 30px rgba(0,0,0,.55)}
+.art #view > canvas.px{image-rendering:pixelated}
+.art textarea{width:100%;background:var(--field);border:1px solid var(--line);border-radius:6px;color:inherit;font-size:11px;resize:vertical}
+.art input[type=text]{min-width:0}
+.cvItem{border:1px solid var(--line);border-radius:6px;padding:4px 6px;margin:6px 0}
+.cvHead{display:flex;align-items:center;gap:6px}
+.cvHead span{flex:1;color:var(--head)}
+.cvHead button{padding:1px 7px}
+.artApi{display:flex;flex-direction:column;gap:6px;padding:8px}
+.artApi textarea{width:100%;background:var(--field);border:1px solid var(--line);border-radius:6px;color:inherit;font-size:11px}
+.artApi button{align-self:flex-start}
