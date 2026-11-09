@@ -14,6 +14,7 @@ js/core/              rdzeń niezależny od trybu
   tools.js            definicje narzędzi obrazów i zestawy narzędzi trybów
   panel.js            prawy panel: narzędzie, notatnik, checklista
   board2d.js          plansza 2D: render, zoom/pan, bramki zoomu, warstwa mikrodetali
+  layout.js           układ stanowiska: zakładki prawego okna, dok obiektów, zwijane zlecenie
   game.js             oznaczenia, werdykt, nowa partia, przyciski
   home.js             ekran główny: kategorie, podgląd trybu, postęp (localStorage), loader
   homefx.js           efekty menu: artefakty JPG, ziarno, aberracja, migotanie paneli, paralaksa
