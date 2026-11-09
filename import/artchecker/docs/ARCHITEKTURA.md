@@ -17,9 +17,9 @@ js/core/              rdzeń niezależny od trybu
   layout.js           układ stanowiska: zakładki prawego okna, dok obiektów, zwijane zlecenie
   game.js             oznaczenia, werdykt, nowa partia, przyciski
   home.js             ekran główny: kategorie, podgląd trybu, postęp (localStorage), loader
-  homefx.js           efekty menu: artefakty JPG, ziarno, aberracja, migotanie paneli, paralaksa
-  wiki.js             wiki eksperta: artykuły z danych trybów + słowniczek (GLOSS)
-js/data/              dane (pigmenty, artyści)
+  homefx.js           efekty menu: ziarno, pasmowanie tła (JPG), paralaksa
+  wiki.js             wiki eksperta: artykuły z danych trybów + słowniczek (GLOSS), ilustracje generowane w piaskownicy
+js/data/              dane (pigmenty, artyści, wikitexts.js – rozszerzone teksty wiki)
 js/paint/             silnik obrazów: sceny, widoki (UV, IR, RTG…), obserwacje, próbki
 js/core/kinds.js      rejestr obiektów 2D + wspólne nachylenie i tworzenie partii
 js/kinds/             rodzaje obiektów 2D (banknot, moneta, znaczek, rękopis…)
