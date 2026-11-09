@@ -22,6 +22,10 @@
 <div class="foot"><span id="zoomV" class="mono"></span><span class="sp"></span><span id="fps" data-auto></span><span>GameLaboratory</span></div>
 <script src="../ui/shell/bars.js"></script>
 <div class="bar">
+  <div class="btns" id="modes">
+    <button type="button" data-mode="paint" title="Paint a picture (ArtKit)">Paint</button>
+    <button type="button" data-mode="exam" title="Examine an object: original or forgery, under UV, infrared, X-ray, raking light">Examine</button>
+  </div>
   <div class="btns" id="zooms">
     <button type="button" data-zoom="fit" title="Fit the picture in the view (double click)">Fit</button>
     <button type="button" data-zoom="1" title="One picture pixel per screen pixel">1:1</button>
@@ -59,6 +63,8 @@
   <div class="row"><span>Relief</span><input type="range" id="relief" min="0" max="2" step="0.05"><output id="reliefV"></output></div>
   <div class="row"><span>Light from</span><input type="range" id="light" min="0" max="360" step="5"><output id="lightV"></output></div>
   <p class="note">Relief: the height of the paint and of the support (impasto, bristle marks, the weave), lit from the side — raking light shows the strokes.</p>
+  <h3>Under the lamp</h3>
+  <div class="row"><span>View</span><select id="lamp"></select><output></output></div>
   <h3>Ageing</h3>
   <div class="row"><span>Varnish</span><input type="range" id="varnish" min="0" max="1" step="0.05"><output id="varnishV"></output></div>
   <div class="row"><span>Cracks</span><input type="range" id="cracks" min="0" max="1" step="0.05"><output id="cracksV"></output></div>
@@ -69,6 +75,22 @@
   <div class="btns"><button type="button" id="cvAdd">Add conversion</button><button type="button" id="cvClear">Remove all</button></div>
   <div id="cvList"></div>
   <p class="note">Applied in order, on the finished picture (after the surface).</p>
+</aside>
+<aside class="panel" data-window="exam" data-title="Examination" data-title-pl="Ekspertyza">
+  <h3>Object</h3>
+  <div class="row"><span>Object</span><select id="exKind"></select><output></output></div>
+  <div class="row" id="exArtistRow"><span>Artist</span><select id="exArtist"></select><output></output></div>
+  <div class="row"><span>Seed</span><input type="number" id="exSeed" min="1" max="999999999" step="1"><output></output></div>
+  <div class="btns"><button type="button" id="exNew">Another one</button></div>
+  <h3>Original or forgery</h3>
+  <div class="row"><span>Made as</span><select id="exProfile"></select><output></output></div>
+  <div id="exTells"></div>
+  <p class="note" id="exAbout"></p>
+  <h3>Views</h3>
+  <div class="btns" id="exViews"></div>
+  <label class="chk" id="exMicroRow"><input type="checkbox" id="exMicroOn"> Microscope: click the painting</label>
+  <canvas id="exMicro" hidden></canvas>
+  <p class="note">The objects, their forgery methods and views come from the art examination game (artchecker, moved here with its history). Forgeries give themselves away only in some views — the tells listed above.</p>
 </aside>
 <aside class="panel" data-window="output" data-side="right" data-title="Format and export" data-title-pl="Format i eksport">
   <h3>Format</h3>

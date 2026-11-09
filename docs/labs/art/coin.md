@@ -1,9 +1,9 @@
 # Weryfikacja monet
 
-Plik: `js/kinds/coin.js` · rodzaj w rejestrze: `coin`
+Plik: `js/render/art/exam/kinds/coin.js` (z gry artchecker, przeniesiony z historią; w laboratorium sztuki: Examine) · rodzaj w rejestrze: `coin`
 
 **Obiekt:** 5 talarów Królestwa Arkadii, 1867 (moneta fikcyjna). Katalog: srebro próby 900, 25,00 g, Ø 37,0 mm, rant ząbkowany.
-Na stole leży 5 monet (awers i rewers każdej), z czego 1–3 są prawdziwe.
+Na stole leży 5 monet (awers i rewers każdej), z czego 1–3 są prawdziwe. W laboratorium sztuki — jeden egzemplarz zamówiony specem (oryginał albo profil fałszerstwa).
 
 ## Narzędzia
 | Narzędzie | Widok | Warunek | Co pokazuje |

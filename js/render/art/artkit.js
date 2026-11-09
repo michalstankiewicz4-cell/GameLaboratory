@@ -24,6 +24,8 @@ export const CONVERSIONS = {
   gray: 'Greyscale', sepia: 'Sepia', duotone: 'Duotone', invert: 'Invert', posterize: 'Posterize', quantize: 'Palette + dither',
   halftone: 'Halftone dots', edges: 'Edges (line art)', pixelate: 'Pixelate', blur: 'Blur', sharpen: 'Sharpen', contrast: 'Contrast and brightness',
 };
+// widoki badawcze (jak w ekspertyzie: js/render/art/exam/views.js) — ten sam obraz pod inną lampą
+export const VIEWS = { normal: 'Normal light', raking: 'Raking light (relief only)', uv: 'UV (varnish fluorescence)', ir: 'Infrared (underdrawing)', xray: 'X-ray (paint density)' };
 export const FORMATS = { none: 'None', stamp: 'Postage stamp (perforations, value)', frame: 'Gilded frame', mount: 'Paper mount' };
 export const PALETTES = {
   natural: ['#25331f', '#4f6b3a', '#8aa35a', '#d9c98c', '#7aa6c9', '#2f5a85', '#e8e1cf', '#a0522d'],
@@ -35,7 +37,7 @@ export const PALETTES = {
 export const DEFAULTS = {
   size: 1024, aspect: 1.25, seed: 7, subject: 'landscape', palette: 'natural',
   technique: 'oil', stroke: 1, detail: 1, surface: 'canvas', relief: 0.6, light: 135,
-  varnish: 0.15, cracks: 0, age: 0, convert: [], format: 'none', text: '',
+  varnish: 0.15, cracks: 0, age: 0, view: 'normal', convert: [], format: 'none', text: '',
 };
 
 /* ---------------- tools ---------------- */
@@ -316,14 +318,14 @@ function pointillism(col, hgt, S, W, H, spec, r) {
 }
 
 /* ---------------- surface finish: support, relief light, varnish, cracks, age ---------------- */
-function finish(col, hgt, W, H, spec, r) {
+function finish(col, hgt, W, H, spec, r, S) {
   const c = col.getContext('2d'), img = c.getImageData(0, 0, W, H), d = img.data, hd = hgt.getContext('2d').getImageData(0, 0, W, H).data;
-  const sf = surfaceAt(spec.surface, spec.seed), Hgt = new Float32Array(W * H);
+  const sf = surfaceAt(spec.surface, spec.seed), Hgt = new Float32Array(W * H), V = spec.view, Cv = V !== 'normal' ? new Float32Array(W * H) : null, Sh = Cv && new Float32Array(W * H);
   const cr = spec.cracks > 0 ? crackField(W, H, spec.seed, spec.cracks) : null, n = valueNoise(spec.seed + 77);
   for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i++) {
     const s = sf(x, y), paint = hd[i * 4] / 255, a = d[i * 4 + 3] / 255, cover = clamp(a + paint * 0.5);
     for (let k = 0; k < 3; k++) d[i * 4 + k] = (d[i * 4 + k] / 255 * cover + s.c[k] * (1 - cover)) * 255;   // podłoże prześwituje przez cienką farbę
-    d[i * 4 + 3] = 255;
+    d[i * 4 + 3] = 255; if (Cv) { Cv[i] = Math.max(cover, paint); Sh[i] = s.h; }
     Hgt[i] = paint * 2.2 + s.h * (1 - Math.min(1, paint * 1.3)) * 0.8 - (cr ? cr[i] * 1.5 : 0);
   }
   // światło boczne: normalne z wysokości, cieniowanie lambertowskie z kierunku `light` (stopnie) pod niskim kątem
@@ -337,9 +339,30 @@ function finish(col, hgt, W, H, spec, r) {
     if (cr && cr[i] > 0) { const q = 1 - cr[i] * 0.55; R *= q; G *= q; B *= q; }
     if (spec.varnish > 0) { const v = spec.varnish; R = R * (1 - v * 0.08) + v * 0.06; G = G * (1 - v * 0.15) + v * 0.04; B = B * (1 - v * 0.4); }   // werniks żółknie
     if (spec.age > 0) { const m = fbm(n, x / 120, y / 120), v = spec.age * (0.4 + m * 0.6), e = Math.hypot(x / W - 0.5, y / H - 0.5); const f = 1 - v * 0.25 - e * e * v * 0.9; R = R * f + v * 0.05; G = G * f + v * 0.03; B *= f; }
+    if (Cv) [R, G, B] = examView(V, d[i * 4] / 255, d[i * 4 + 1] / 255, d[i * 4 + 2] / 255, sh, Cv[i], Hgt[i], Sh[i], cr ? cr[i] : 0, spec, S, x, y);
     d[i * 4] = clamp(R) * 255; d[i * 4 + 1] = clamp(G) * 255; d[i * 4 + 2] = clamp(B) * 255;
   }
   c.putImageData(img, 0, 0);
+}
+// widok badawczy jednego piksela (barwa przed światłem i werniksem, sh — oświetlenie reliefu, cover — farba)
+// raking — sama faktura w świetle bocznym; uv — stary werniks świeci zielonkawo, bez werniksu ciemny fiolet (jak w
+// ekspertyzie); ir — farba przezroczysta w podczerwieni, widać rysunek pod nią (krawędzie tematu, lekko przesunięte —
+// poprawki autora); xray — gęstość: jasne, kryjące farby (biel ołowiowa) i metalowe podłoże jasne, spękania ciemne
+function examView(V, r0, g0, b0, sh, cover, h, sh0, crack, spec, S, x, y) {
+  const l = lum(r0, g0, b0);
+  if (V === 'raking') { const v = 0.18 + 0.3 * l + 0.55 * sh - crack * 0.4; return [v * 1.03, v * 0.98, v * 0.88]; }
+  if (V === 'uv') {
+    const old = clamp(spec.varnish * 1.4 + spec.age * 0.6), L = l * 255, f = [(L * 0.18 + 22) / 255, (L * 0.08 + 10) / 255, (L * 0.32 + 48) / 255], o = [(L * 0.16 + 38) / 255, (L * 0.34 + 52) / 255, (L * 0.24 + 50) / 255];
+    const c = mix(f, o, old); return c.map((q) => q * (1 - crack * 0.6));
+  }
+  if (V === 'ir') {
+    let v = (150 + (l * 255 - 128) * 0.3) / 255;
+    if (S && spec.subject !== 'image') { const k = spec.size / 1024, ox = 1.5 * k, gx = S.L(x + 1 - ox, y + 1) - S.L(x - 1 - ox, y + 1), gy = S.L(x - ox, y + 2) - S.L(x - ox, y); const g = Math.hypot(gx, gy); if (g > 0.08) v -= clamp((g - 0.08) * 3) * 0.45; }
+    return [v, v, v];
+  }
+  // xray
+  const base = spec.surface === 'metal' ? 0.85 : spec.surface === 'wood' ? 0.28 + sh0 * 0.15 : 0.12 + sh0 * 0.08;
+  const v = clamp(base + cover * (0.12 + 0.55 * l * l) + h * 0.06 - crack * 0.35); return [v, v, v];
 }
 // krakelura: sieć spękań — krawędzie komórek Woronoja z drobnymi odnogami
 function crackField(W, H, seed, amount) {
@@ -447,7 +470,7 @@ export function normalize(spec = {}) {
   const s = { ...DEFAULTS, ...spec };
   s.size = clamp(Math.round(+s.size || 1024), 128, 4096); s.aspect = clamp(+s.aspect || 1, 0.25, 4);
   s.seed = Math.max(1, Math.round(+s.seed || 1)); s.stroke = clamp(+s.stroke || 1, 0.3, 4); s.detail = clamp(+s.detail || 1, 0.2, 3);
-  for (const [k, list] of [['subject', SUBJECTS], ['technique', TECHNIQUES], ['surface', SURFACES], ['format', FORMATS]]) if (!list[s[k]]) throw new Error(`${k}: one of ${Object.keys(list).join(', ')}`);
+  for (const [k, list] of [['subject', SUBJECTS], ['technique', TECHNIQUES], ['surface', SURFACES], ['view', VIEWS], ['format', FORMATS]]) if (!list[s[k]]) throw new Error(`${k}: one of ${Object.keys(list).join(', ')}`);
   if (!PALETTES[s.palette]) throw new Error(`palette: one of ${Object.keys(PALETTES).join(', ')}`);
   s.convert = (s.convert || []).map((c) => { const o = typeof c === 'string' ? { kind: c } : { ...c }; if (!CONVERSIONS[o.kind]) throw new Error(`convert: one of ${Object.keys(CONVERSIONS).join(', ')}`); return o; });
   return s;
@@ -468,7 +491,7 @@ export function render(spec0, { image } = {}) {
   else if (spec.technique === 'charcoal' || spec.technique === 'pastel') dry(col, hgt, S, W, H, spec, r, spec.technique);
   else if (spec.technique === 'marker') marker(col, hgt, S, W, H, spec, r);
   else hatch(col, hgt, S, W, H, spec, r, spec.technique);
-  finish(col, hgt, W, H, spec, r);
+  finish(col, hgt, W, H, spec, r, S);
   for (const cv of spec.convert) convert(col, W, H, cv, spec.seed);
   return { canvas: format(col, spec), spec };
 }

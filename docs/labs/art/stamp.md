@@ -1,6 +1,6 @@
 # Weryfikacja znaczków
 
-Plik: `js/kinds/stamp.js` · rodzaj w rejestrze: `stamp`
+Plik: `js/render/art/exam/kinds/stamp.js` (z gry artchecker, przeniesiony z historią; w laboratorium sztuki: Examine) · rodzaj w rejestrze: `stamp`
 
 **Obiekt:** Poczta Arkadii 1898, 10 halerzy, z przedrukiem „5 hal. 1899” (znaczek fikcyjny).
 Katalog: ząbkowanie 12½, znak wodny – powtarzająca się korona, druk typograficzny, guma żółtawa matowa, przedruk typograficzny czarną farbą, krój szeryfowy.

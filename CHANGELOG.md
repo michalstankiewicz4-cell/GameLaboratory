@@ -3,6 +3,21 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.58.0 · sztuka 1.1.0 — 2026-11-09 (ekspertyza z artchecker)
+
+### Dodane
+- **Silnik ekspertyzy z gry artchecker, przeniesiony z historią** (`js/render/art/exam/`, opis `docs/labs/art.md`,
+  obiekty `docs/labs/art/`, historia `docs/history/artchecker.md`): obraz olejny fikcyjnego artysty z regionami
+  (pigmenty z datami, kierunek pędzla, gęstość), banknot, moneta, znaczek i rękopis — każdy jako oryginał albo
+  fałszerstwo jedną z metod (profile) ze zdradami widocznymi tylko w niektórych widokach: światło boczne, UV,
+  podczerwień, RTG, spękania, odwrocie, światło przechodzące, rant, kąpiel znaku wodnego, mikroskop.
+- Laboratorium sztuki: tryby **Paint** i **Examine** na pasku, okno Examination, `ArtApi.exam(spec)` i
+  `ArtApi.examInfo()` dla AI.
+- ArtKit: **pod lampą** (`view`) — namalowany obraz w świetle bocznym, UV, podczerwieni i RTG.
+
+### Poprawione
+- Lista widoków miała ten sam identyfikator co obszar podglądu (`#view`) — opcje trafiały do podglądu.
+
 ## Program 0.57.0 · sztuka 1.0.0 — 2026-11-09 (laboratorium sztuki)
 
 ### Dodane

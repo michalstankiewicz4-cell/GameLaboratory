@@ -1,6 +1,6 @@
 # Weryfikacja rękopisów
 
-Plik: `js/kinds/manuscript.js` · rodzaj w rejestrze: `manuscript`
+Plik: `js/render/art/exam/kinds/manuscript.js` (z gry artchecker, przeniesiony z historią; w laboratorium sztuki: Examine) · rodzaj w rejestrze: `manuscript`
 
 **Obiekt:** list Jana z Wierzbna do rady miasta Arkadii, 1712 (dokument fikcyjny).
 Katalog: papier czerpany ze znakiem wodnym (tarcza z trzema wieżami, kontrmarka „I W”), atrament żelazowo-galasowy, pismo gęsim piórem, pieczęć lakowa z herbem.
