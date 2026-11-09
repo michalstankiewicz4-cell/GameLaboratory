@@ -1,7 +1,8 @@
 "use strict";
 /* ---------- fragment ---------- */
-function newFrag(r){setupScene(r);const genuine=r()<0.5,t={};
- if(!genuine)shuffle(['pigment','back','uv','crack','texture','sig','style','ir','xray','micro'],r).slice(0,3+Math.floor(r()*2)).forEach(k=>t[k]=true);
+function newFrag(r){setupScene(r);const f=typeof FORCE!=='undefined'&&FORCE;const genuine=f?!f.profile:r()<0.5,t={};
+ if(!genuine){if(f&&f.tells)f.tells.forEach(k=>t[k]=true);/* laboratorium sztuki: zdrady zamówione specem */
+  else shuffle(['pigment','back','uv','crack','texture','sig','style','ir','xray','micro'],r).slice(0,3+Math.floor(r()*2)).forEach(k=>t[k]=true)}
  const anRegs=shuffle(Object.keys(SC.REG).filter(k=>SC.REG[k].an),r).slice(0,3);
  const p={letter:'F',orig:genuine,t,seed:(r()*1e9)|0,descRegs:anRegs};basePainting(p,r);const q=rng(p.seed+7);
  p.m.pigKind=pick(['alt','an'],q);p.m.uvKind=pick(['fresh','none'],q);p.m.backKind=pick(['thread','ground','both'],q);

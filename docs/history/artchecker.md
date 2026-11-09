@@ -3,8 +3,8 @@
 Opis z gry **artchecker** („Pracownia ekspertyz”, repozytorium `michalstankiewicz4-cell/artchecker`) sprzed
 przeniesienia. Do GameLaboratory przeszedł z historią silnik obiektów (obraz z regionami, widoki badawcze, pigmenty,
 artyści, profile fałszerstw, znaczek, moneta, banknot, rękopis) — dziś `js/render/art/exam/`, opis w
-`docs/labs/art.md` („Examine”). Plansza, narzędzia gry, notatnik, wiki i tryby rzeźby, marmuru, pamięci i fragmentu
-zostały w grze. Ścieżki poniżej są ścieżkami gry.
+`docs/labs/art.md` („Examine”). Drugi import (z historią): fragment obrazu, rzeźby 3D z brązu i marmuru. Plansza, narzędzia gry, notatnik,
+wiki i tryb pamięci zostały w grze. Ścieżki poniżej są ścieżkami gry.
 
 ## Architektura (w grze)
 

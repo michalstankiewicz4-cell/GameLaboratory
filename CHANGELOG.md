@@ -3,6 +3,22 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.59.0 · sztuka 1.2.0 — 2026-11-09 (wszystkie obiekty ekspertyzy)
+
+### Dodane
+- **Reszta obiektów z artchecker, przeniesiona z historią**: fragment obrazu (oddarty róg, ubytki), popiersie z brązu
+  i popiersie z marmuru w 3D (`js/render/art/exam/fragment.js`, `sculpture3d.js`, `marble.js`, opis
+  `docs/labs/art/marble.md`) — w Examine; rzeźby obraca się przeciąganiem, przybliża kółkiem; widoki dzienny, UV, RTG.
+- Banknot: suwak **Tilt** — hologram, farba zmienna optycznie i obraz utajony zależne od przechylenia (w grze rysowała
+  je plansza).
+- ArtKit: spękania z podwiniętymi brzegami wysepek farby (cupping) — relief zależny od kierunku światła.
+- Pomysły w planie (`docs/guides/lab-breakdown.md`): wiki w menu Pomoc z ilustracjami z laboratoriów; tryb 3D
+  laboratorium sztuki (obraz z mapą normalnych, światło, rama ze złoceniem).
+
+### Poprawione
+- Rękopis: korozja atramentu na odwrociu rysowana jak w grze 1.11.1 (poprawka z artchecker).
+- Fragment obrazu bez odcięcia oddartej części (w grze odcinała ją plansza) — widok odcina ją sam.
+
 ## Program 0.58.0 · sztuka 1.1.0 — 2026-11-09 (ekspertyza z artchecker)
 
 ### Dodane

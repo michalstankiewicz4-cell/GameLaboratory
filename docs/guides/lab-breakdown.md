@@ -148,3 +148,13 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
       kolonie, rozmnażanie, mutacje);
    plansze to płaska scena oglądana z góry (kamera ortograficzna) w tym samym silniku Three.js — bez osobnej sceny
    2D na canvasie (canvas 2D tylko w interfejsie, jak w grze).
+
+## Pomysły na później (laboratoria)
+
+- **Wiki w menu Pomoc** (pomysł użytkownika): artykuły o laboratoriach, modelach, środowiskach i zjawiskach (np.
+  metody ekspertyzy, techniki malarskie), z ilustracjami generowanymi w laboratoriach (laboratorium sztuki: `ArtApi`) —
+  małe obrazki, bez wysokiej rozdzielczości i efektów, chyba że ilustracja tego wymaga. Wzór: wiki eksperta w grze
+  artchecker (ilustracje generowane w piaskownicy).
+- **Laboratorium sztuki — tryb 3D** (propozycja przyjęta na później, opis: [../labs/art.md](../labs/art.md),
+  „Pomysły”): obraz jako płaszczyzna 3D z mapą normalnych z wysokości farby ArtKit i mapą szorstkości, obracanie
+  obrazu i ruchome światło, nierówny barwnik w pociągnięciu, rama 3D (profil listwy, UV wzdłuż listwy) ze złoceniem.

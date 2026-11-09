@@ -46,7 +46,9 @@ function why3(q,id){return({xrf:()=>({si:'Brąz krzemowy – stop wprowadzony ok
  prov:()=>q.m.prov==='attic'?'„Znaleziony na strychu” – brak historii.':'Historia od 1998 r., brak w katalogu i księgach odlewni.',cert:()=>q.m.cert==='dims'?'Wysokość w certyfikacie niezgodna z rzeźbą.':'Certyfikat od podmiotu bez uprawnień.'}[id]||(()=>''))()}
 let T3=null,THREE_P=null;
 function loadThree(){if(window.THREE)return Promise.resolve();if(THREE_P)return THREE_P;THREE_P=new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s)});return THREE_P}
-function newSculpt(r){const PR=SV.profiles,list=[{orig:true,profile:null,t:{}}];shuffle(Object.keys(PR),r).slice(0,4).forEach(k=>list.push({orig:false,profile:k,t:rollTells(PR[k],r)}));shuffle(list,r);
+function newSculpt(r){const PR=SV.profiles;let list=[{orig:true,profile:null,t:{}}];
+ if(typeof FORCE!=='undefined'&&FORCE){/* laboratorium sztuki (GameLaboratory): jeden egzemplarz zamówiony specem */const f=FORCE;list=[{orig:!f.profile,profile:f.profile||null,t:f.profile?(f.tells?Object.fromEntries(f.tells.map(a=>[a,true])):rollTells(PR[f.profile],r)):{}}]}
+ else{shuffle(Object.keys(PR),r).slice(0,4).forEach(k=>list.push({orig:false,profile:k,t:rollTells(PR[k],r)}));shuffle(list,r)}
  P=list.map((q,i)=>{const pr=q.profile?PR[q.profile]:{},t=q.t,qr=rng((r()*1e9)|0);q.letter='ABCDE'[i];q.seed=(qr()*1e9)|0;q.notes={};q.samples=[];q.umark='';
   SV.initQ(q,pr,t,qr);q.m={prov:pr.prov||pick(['attic','noCR'],qr),cert:pr.cert||pick(['dims','issuer'],qr)};return q})}
 function bronzeInitQ(q,pr,t,qr){q.hcm=t.dims?pr.hcm:52.0;q.kg=t.weight?3.1:8.4+(qr()-.5)*0.12;q.xrf=t.xrf?pr.xrf:'bronze';q.patina=t.patina?'chem':'natural';q.uv=t.uv?'resin':'wax';q.tool=t.tool?pr.tool:'chase';

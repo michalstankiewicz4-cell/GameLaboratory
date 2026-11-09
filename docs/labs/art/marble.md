@@ -1,9 +1,9 @@
 # Rzeźby z marmuru (3D)
 
-Pliki: `js/modes/marble.js` (wariant) + `js/modes/sculpture3d.js` (wspólny silnik 3D) · wariant: `marble`
+Pliki: `js/render/art/exam/marble.js` (wariant) + `js/render/art/exam/sculpture3d.js` (wspólny silnik 3D; z gry artchecker, przeniesione z historią; w laboratorium sztuki: Examine, obiekt `marble`) · wariant: `marble`
 
 **Obiekt:** Aleksander Królikowski (1835–1898), „Popiersie Zofii”, 1879, marmur karraryjski, wys. 54,0 cm, 31,5 kg (fikcyjne).
-Na postumentach stoi 5 popiersi: 1 oryginał i 4 kopie. Warunki badań zależą od **odległości kamery** i **strony**, z której patrzysz.
+Na postumentach stoi 5 popiersi: 1 oryginał i 4 kopie (w grze; w laboratorium — jedno popiersie zamówione specem). Warunki badań zależą od **odległości kamery** i **strony**, z której patrzysz.
 
 ## Narzędzia
 | Narzędzie | Warunek | Co pokazuje |
@@ -27,4 +27,4 @@ Na postumentach stoi 5 popiersi: 1 oryginał i 4 kopie. Warunki badań zależą 
 | Kopia z podrobioną dokumentacją | proweniencja, certyfikat | patyna, sygnatura |
 
 ## Jak dodać kolejny materiał rzeźby
-Utwórz plik w `js/modes/` i zarejestruj wariant w `SCULPT_VARIANTS` (wzór: `marble.js`): profile, narzędzia (`gate3: {d, az}`), `initQ`, `surface` (materiały Three.js), `inner` (wnętrze w RTG), `markTex`, `refQ`, teksty obserwacji. Wariant sam pojawi się w menu w grupie „Rzeźby 3D”.
+Utwórz plik w `js/render/art/exam/` (i dopisz go do `ArtExam.SCRIPTS`) i zarejestruj wariant w `SCULPT_VARIANTS` (wzór: `marble.js`): profile, narzędzia (`gate3: {d, az}`), `initQ`, `surface` (materiały Three.js), `inner` (wnętrze w RTG), `markTex`, `refQ`, teksty obserwacji. Wariant sam pojawi się w menu w grupie „Rzeźby 3D”.

@@ -61,7 +61,8 @@ function msView(p,v){
  if(v==='back')return kView(p,v,x=>{const r=rng(p.seed+11),vm=p.t.verso?p.m.verso:'corr';msPaper(x,p,false);if(vm==='clean'){x.fillStyle='rgba(250,246,235,.6)';x.fillRect(0,0,W,H)}
   x.save();x.translate(W,0);x.scale(-1,1);
   if(vm!=='clean')msStrokes(x,p,{alpha:vm==='tea'||vm==='none'?.08:.2});
-  if(vm==='corr'){x.save();x.filter='blur(1.2px)';msStrokes(x,{...p,t:{},m:{}},{col:'rgba(125,80,30,.3)',wide:3.2});x.restore();
+  if(vm==='corr'){const t=mk(IW,IH),tx=t.getContext('2d');tx.scale(S,S);tx.translate(W,0);tx.scale(-1,1);msStrokes(tx,{...p,t:{},m:{}},{col:'rgba(125,80,30,.3)',wide:3.2});
+   x.save();x.setTransform(1,0,0,1,0,0);x.filter='blur(1.2px)';x.drawImage(t,0,0);x.restore();
    for(const s of MS.strokes){if(r()<0.18&&msInk(p,s.li)==='iron'){const q=s.pts[Math.floor(r()*s.pts.length)];x.fillStyle='#1c130a';x.beginPath();x.ellipse(q[0],q[1],0.8+r()*1.2,0.6+r(),r()*3,0,7);x.fill()}}}
   x.restore()});
  return msView(p,'normal')}

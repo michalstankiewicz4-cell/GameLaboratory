@@ -121,11 +121,11 @@ function fit() {
   const r = view.getBoundingClientRect(); if (!cv.width) return;
   zoom = Math.min((r.width - 24) / cv.width, (r.height - 24) / cv.height); ox = (r.width - cv.width * zoom) / 2; oy = (r.height - cv.height * zoom) / 2; place();
 }
-view.addEventListener('wheel', (e) => { e.preventDefault(); const r = view.getBoundingClientRect(); zoomAt(zoom * Math.exp(-e.deltaY * 0.0015), e.clientX - r.left, e.clientY - r.top); }, { passive: false });
+view.addEventListener('wheel', (e) => { e.preventDefault(); if (is3d()) { window.ArtExam.orbit(0, 0, Math.exp(e.deltaY * 0.0012)); exShow(); return; } const r = view.getBoundingClientRect(); zoomAt(zoom * Math.exp(-e.deltaY * 0.0015), e.clientX - r.left, e.clientY - r.top); }, { passive: false });
 let drag = null;
 let down = null;
 view.addEventListener('pointerdown', (e) => { if (e.button !== 0) return; down = [e.clientX, e.clientY]; drag = [e.clientX - ox, e.clientY - oy]; view.setPointerCapture(e.pointerId); view.classList.add('grab'); });
-view.addEventListener('pointermove', (e) => { if (!drag) return; ox = e.clientX - drag[0]; oy = e.clientY - drag[1]; place(); });
+view.addEventListener('pointermove', (e) => { if (!drag) return; if (is3d()) { const dx = e.clientX - ox - drag[0], dy = e.clientY - oy - drag[1]; drag = [e.clientX - ox, e.clientY - oy]; window.ArtExam.orbit(-dx * 0.008, dy * 0.006, 1); show3dSoon(); return; } ox = e.clientX - drag[0]; oy = e.clientY - drag[1]; place(); });
 view.addEventListener('pointerup', (e) => {
   drag = null; view.classList.remove('grab');
   if (down && Math.hypot(e.clientX - down[0], e.clientY - down[1]) < 4) { const r = view.getBoundingClientRect(); clickAt((e.clientX - r.left - ox) / zoom, (e.clientY - r.top - oy) / zoom); }
@@ -157,9 +157,9 @@ window.ArtApi = {
   defaults: { ...DEFAULTS },
   spec: () => JSON.parse(JSON.stringify(spec)),
   async render(s = {}) { setMode('paint'); spec = normalize({ ...DEFAULTS, ...s }); show(); await paint(); return pic ? pic.toDataURL('image/png') : null; },
-  // exam({ kind, seed, artist, profile, tells, views }) → { object, views: { view: PNG data URL } } — all views unless listed
+  // exam({ kind, seed, artist, profile, tells, views, tilt }) → { object, views: { view: PNG data URL } } — all views unless listed
   async exam(s = {}) {
-    await loadExam(); await setMode('exam'); ex = { ...EX0, ...s, view: (s.views && s.views[0]) || 'normal' }; delete ex.views;
+    await loadExam(); await setMode('exam'); ex = { ...EX0, ...s, view: (s.views && s.views[0]) || 'normal' }; delete ex.views; if (s.tilt != null) { window.ArtExam.tilt = +s.tilt; $('exTilt').value = s.tilt; $('exTiltV').textContent = s.tilt + '°'; } delete ex.tilt;
     const o = exMake(), out = {};
     for (const v of s.views || o.views) out[v] = window.ArtExam.view(v).toDataURL('image/png');
     exShow(); return { object: o, views: out };
@@ -181,6 +181,9 @@ function apiTab() {
 if (window.LabConsole) apiTab(); else addEventListener('load', apiTab);
 
 /* ---------------- Examine (js/render/art/exam/) ---------------- */
+// rzeźby 3D: przeciąganie obraca kamerę wokół popiersia, kółko — odległość (widok rysuje ArtExam, tu tylko obraz)
+const is3d = () => mode === 'exam' && exObj && exObj.three;
+let raf3 = 0; function show3dSoon() { if (!raf3) raf3 = requestAnimationFrame(() => { raf3 = 0; exShow(); }); }
 const EX0 = { kind: 'painting', seed: 1, artist: '', profile: '', tells: null, view: 'normal' };
 let mode = 'paint', ex = (() => { try { return { ...EX0, ...JSON.parse(localStorage.getItem(KEY + '.exam') || 'null') }; } catch { return { ...EX0 }; } })(), exObj = null, examReady = null;
 const exSave = () => { try { localStorage.setItem(KEY + '.exam', JSON.stringify(ex)); localStorage.setItem(KEY + '.mode', mode); } catch { /* private mode */ } };
@@ -188,7 +191,7 @@ function loadExam() {
   if (examReady) return examReady;
   const base = new URL('../js/render/art/exam/', location.href).href;
   const one = (f) => new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = base + f; sc.onload = ok; sc.onerror = () => no(new Error('cannot load ' + f)); document.body.append(sc); });
-  examReady = (async () => { await one('exam.js'); for (const f of window.ArtExam.SCRIPTS) if (f !== 'exam.js') await one(f); })();
+  examReady = (async () => { await import('../../core/three-global.js'); await one('exam.js'); for (const f of window.ArtExam.SCRIPTS) if (f !== 'exam.js') await one(f); })();
   return examReady;
 }
 const VIEW_NAMES = { normal: 'Normal', raking: 'Raking light', uv: 'UV', ir: 'Infrared', xray: 'X-ray', crackview: 'Craquelure', back: 'Back', trans: 'Transmitted light', edge: 'Edge', wmbath: 'Watermark bath' };
@@ -197,7 +200,7 @@ function exMake() {
   exObj = A.make({ kind: ex.kind, seed: ex.seed, artist: ex.artist || undefined, profile: ex.profile || undefined, tells: ex.tells || undefined });
   if (!exObj.views.includes(ex.view)) ex.view = 'normal';
   // controls
-  $('exArtistRow').hidden = ex.kind !== 'painting'; $('exMicroRow').hidden = ex.kind !== 'painting';
+  const paintLike = ex.kind === 'painting' || ex.kind === 'fragment'; $('exArtistRow').hidden = !paintLike; $('exMicroRow').hidden = !paintLike; $('exMicro').hidden = true; $('exTiltRow').hidden = ex.kind !== 'notes';
   $('exProfile').replaceChildren(new Option('Original (authentic)', ''), ...Object.entries(info.profiles).map(([k, v]) => new Option('Forgery: ' + v, k))); $('exProfile').value = ex.profile || '';
   const box = $('exTells'); box.replaceChildren();
   if (ex.profile) for (const t of info.tells) {
@@ -205,7 +208,7 @@ function exMake() {
     c.onchange = () => { ex.tells = [...box.querySelectorAll('input')].map((q, i) => (q.checked ? info.tells[i].id : null)).filter(Boolean); exMake(); };
     l.append(c, ' ' + t.name); box.append(l);
   }
-  $('exAbout').textContent = (exObj.title ? `${exObj.artistName}, “${exObj.title}”, ${exObj.year}. ` : '') + (exObj.orig ? 'Authentic — every examination agrees.' : `Forgery: ${exObj.profileName}. Gives itself away in: ${exObj.tells.length} examination(s) ticked above.`);
+  $('exAbout').textContent = (exObj.three ? 'Drag to walk around the bust, wheel to come closer. ' : '') + (exObj.measure ? `Measured: ${exObj.measure.hcm} cm, ${exObj.measure.kg} kg. ` : '') + (exObj.title ? `${exObj.artistName}, “${exObj.title}”, ${exObj.year}. ` : '') + (exObj.orig ? 'Authentic — every examination agrees.' : `Forgery: ${exObj.profileName}. Gives itself away in: ${exObj.tells.length} examination(s) ticked above.`);
   $('exViews').replaceChildren(...exObj.views.map((v) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = VIEW_NAMES[v] || v; b.dataset.v = v; b.onclick = () => { ex.view = v; exShow(); }; return b; }));
   exSave(); exShow(); return exObj;
 }
@@ -225,13 +228,14 @@ async function examInit() {
     $('exArtist').onchange = () => { ex.artist = $('exArtist').value; exMake(); };
     $('exSeed').onchange = () => { ex.seed = Math.max(1, +$('exSeed').value || 1); exMake(); };
     $('exNew').onclick = () => { ex.seed = 1 + Math.floor(Math.random() * 999999); $('exSeed').value = ex.seed; ex.tells = null; exMake(); };
+    $('exTilt').oninput = () => { window.ArtExam.tilt = +$('exTilt').value; $('exTiltV').textContent = $('exTilt').value + '°'; show3dSoon(); };
     $('exProfile').onchange = () => { ex.profile = $('exProfile').value; ex.tells = null; exMake(); };
   }
   $('exKind').value = ex.kind; $('exArtist').value = ex.artist || ''; $('exSeed').value = ex.seed;
   exMake();
 }
 function clickAt(px, py) {
-  if (mode !== 'exam' || !$('exMicroOn').checked || ex.kind !== 'painting' || !exObj) return;
+  if (mode !== 'exam' || !$('exMicroOn').checked || !(ex.kind === 'painting' || ex.kind === 'fragment') || !exObj) return;
   const k = exObj.W / $('pic').width, x = px * k, y = py * k; if (x < 0 || y < 0 || x > exObj.W || y > exObj.H) return;
   const m = window.ArtExam.micro(x, y), c = $('exMicro'); c.width = m.width; c.height = m.height; c.getContext('2d').drawImage(m, 0, 0); c.hidden = false;
 }

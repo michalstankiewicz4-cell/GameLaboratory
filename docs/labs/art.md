@@ -27,6 +27,8 @@ boczne (`relief`, `light` w stopniach) — przy powiększeniu widać pociągnię
   wyostrzenie, kontrast i jasność.
 - **Formaty:** znaczek pocztowy (margines, ząbkowanie, wartość z pola `text`), złocona rama, passe-partout.
 
+- **Spękania** (`cracks`): rowek pęknięcia i podwinięte brzegi wysepek farby (cupping) — w świetle bocznym jedna
+  strona rowka jaśnieje, druga ciemnieje, zależnie od kierunku światła.
 - **Pod lampą** (`view`): ten sam obraz w świetle dziennym, bocznym (sam relief), UV (stary werniks świeci
   zielonkawo, bez werniksu — ciemny fiolet), podczerwieni (farba przezroczysta, widać rysunek pod spodem, lekko
   przesunięty — poprawki autora) i RTG (gęstość: kryjące farby i metalowe podłoże jasne, spękania ciemne).
@@ -47,7 +49,10 @@ fałszerstwa (profil), która zostawia **zdrady** — widać je tylko w niektór
 | Obiekt | Widoki | Profile fałszerstw | Opis |
 |---|---|---|---|
 | obraz olejny (fikcyjni artyści, sceny z regionami: pigmenty, kierunek pędzla, gęstość) | dzienne, boczne, UV, IR, RTG, spękania, odwrocie; mikroskop (klik) | giclée, współczesna kopia, stare płótno, siatka, podrobione papiery | niżej |
-| banknot (`notes`) | dzienne, boczne, przechodzące, UV, IR | inkjet, laser, offset, wybielony, hq | [art/banknote.md](art/banknote.md) |
+| fragment obrazu (`fragment`) — oddarty róg, ubytki farby | jak obraz | fałszerstwo z wybranymi zdradami (pigment, odwrocie, UV, spękania, faktura, sygnatura, styl, IR, RTG, mikroskop) | niżej |
+| popiersie z brązu (`sculpt`, 3D) | dzienne, UV, RTG (wnętrze odlewu) | surmoulage, cold cast (żywica), współczesny odlew, odlew z epoki, papiery | pomiary w `object.measure` |
+| popiersie z marmuru (`marble`, 3D) | dzienne, UV, RTG | CNC postarzane kwasem, odlew z żywicy, kopia warsztatowa, papiery | [art/marble.md](art/marble.md) |
+| banknot (`notes`) — z przechyleniem (hologram, farba zmienna optycznie, obraz utajony) | dzienne, boczne, przechodzące (znak wodny, nitka, recto-verso), UV, IR | inkjet, laser, offset, wybielony, hq | [art/banknote.md](art/banknote.md) |
 | moneta (`coin`) | dzienne, rant, boczne | odlew, bita, stalowa, galwaniczna | [art/coin.md](art/coin.md) |
 | znaczek (`stamp`) | dzienne, kąpiel znaku wodnego, odwrocie | faksymile, podgumowany, fałszywy przedruk, litografia | [art/stamp.md](art/stamp.md) |
 | rękopis (`manuscript`) | dzienne, przechodzące, odwrocie | współczesny atrament, herbata, faksymile, dopisek | [art/manuscript.md](art/manuscript.md) |
@@ -56,6 +61,11 @@ Obraz: pigmenty mają daty (`js/render/art/exam/pigments.js`; np. biel tytanowa 
 1935) — pigment młodszy niż obraz to anachronizm. RTG liczy jasność z gęstości pigmentów regionu (biel ołowiowa
 najjaśniejsza), podczerwień pokazuje rysunek pod farbą (u kopii z siatki — siatkę), światło boczne — fakturę pociągnięć
 w kierunku regionu (u kopii płaską albo pod złym kątem), spękania — naturalne nieregularne albo sztuczną siatkę.
+
+Rzeźby 3D: popiersie na postumencie w scenie Three.js (r186, globalne `THREE` z `js/core/three-global.js`; w grze
+r128 z sieci); przeciąganie obraca kamerę wokół popiersia, kółko przybliża (`ArtExam.cam`, `ArtExam.orbit`). Ślady
+obróbki, patyna i sygnatura z tyłu cokołu widać po podejściu i obejściu rzeźby. Banknot: suwak **Tilt** (0–90°,
+`ArtExam.tilt`, w API `tilt`).
 
 Okno **Examination**: obiekt, artysta (obraz), ziarno, „Made as” (oryginał albo profil), zdrady do zaznaczenia (bez
 zaznaczenia — losowane z profilu: główne zawsze, dodatkowe czasem), przyciski widoków, mikroskop.
@@ -78,8 +88,21 @@ Każdy obraz to spec — ten sam spec z tym samym ziarnem daje ten sam obraz:
 - W kodzie: `import { render } from 'js/render/art/artkit.js'` → `render(spec, { image })` → `{ canvas, spec }`.
 - Na stronie: `window.ArtApi.render(spec)` → PNG (data URL), `ArtApi.spec()`, `ArtApi.lists` (tematy, techniki,
   powierzchnie, konwersje, formaty, palety), zakładka **API** w konsoli.
-- Ekspertyza: `await ArtApi.exam({ kind, seed, artist, profile, tells, views })` → `{ object, views: { widok: PNG } }`
+- Ekspertyza: `await ArtApi.exam({ kind, seed, artist, profile, tells, views, tilt })` → `{ object, views: { widok: PNG } }`
   (bez `profile` — oryginał; bez `views` — wszystkie widoki), `await ArtApi.examInfo()` — obiekty,
   `ArtApi.examInfo(kind)` — profile, zdrady, widoki (i artyści dla obrazu). W kodzie: `window.ArtExam.make(spec)`,
   `ArtExam.view(v)` → canvas, `ArtExam.micro(x, y)`.
 - Okno „Format i eksport”: zapis PNG, kopiowanie i wklejanie specu. Ustawienia w przeglądarce: `gameLab.art.v1`.
+
+## Pomysły (na później)
+
+- **Tryb 3D** (propozycja przyjęta na później): obraz jako płaszczyzna 3D — mapa normalnych z wysokości farby ArtKit
+  (impast, włosie, splot), mapa szorstkości (werniks błyszczy, sucha farba matowa); obracanie obrazu myszą i ruchome
+  światło (odbicia wędrują po pociągnięciach i fakturze podłoża); nierówny barwnik (grubość i nasycenie w obrębie
+  pociągnięcia, ziarno pigmentu); rama 3D — profil listwy wyciągnięty wzdłuż prostokąta, UV wzdłuż listwy, złocenie
+  (złoto płatkowe na czerwonym bolusie prześwitującym na wytartych krawędziach, patyna w zagłębieniach). Po scaleniu
+  ze sceną — obraz w ramie jako obiekt na ścianę.
+- **Ilustracje do wiki** w menu Pomoc (plan: [../guides/lab-breakdown.md](../guides/lab-breakdown.md), „Pomysły na
+  później”) — małe obrazki z `ArtApi.render` i `ArtApi.exam`.
+- Z banku pomysłów gry artchecker (bank pomysłów i roadmapa w dokumentacji gry, nie przeniesione): meble, datowanie
+  archeologiczne, przekrój warstw malarskich, tryb konserwatora — nowe obiekty dopiero, gdy powstaną w grze.

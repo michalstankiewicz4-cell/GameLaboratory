@@ -326,7 +326,7 @@ function finish(col, hgt, W, H, spec, r, S) {
     const s = sf(x, y), paint = hd[i * 4] / 255, a = d[i * 4 + 3] / 255, cover = clamp(a + paint * 0.5);
     for (let k = 0; k < 3; k++) d[i * 4 + k] = (d[i * 4 + k] / 255 * cover + s.c[k] * (1 - cover)) * 255;   // podłoże prześwituje przez cienką farbę
     d[i * 4 + 3] = 255; if (Cv) { Cv[i] = Math.max(cover, paint); Sh[i] = s.h; }
-    Hgt[i] = paint * 2.2 + s.h * (1 - Math.min(1, paint * 1.3)) * 0.8 - (cr ? cr[i] * 1.5 : 0);
+    Hgt[i] = paint * 2.2 + s.h * (1 - Math.min(1, paint * 1.3)) * 0.8 - (cr ? cr[i] * 1.5 - cr.cup[i] * 0.9 * spec.cracks : 0);   // rowek pęknięcia, a przy nim podwinięte brzegi wysepek farby (cupping)
   }
   // światło boczne: normalne z wysokości, cieniowanie lambertowskie z kierunku `light` (stopnie) pod niskim kątem
   const la = spec.light * Math.PI / 180, lx = Math.cos(la), ly = -Math.sin(la), lz = 0.6, rel = spec.relief;
@@ -364,11 +364,12 @@ function examView(V, r0, g0, b0, sh, cover, h, sh0, crack, spec, S, x, y) {
   const base = spec.surface === 'metal' ? 0.85 : spec.surface === 'wood' ? 0.28 + sh0 * 0.15 : 0.12 + sh0 * 0.08;
   const v = clamp(base + cover * (0.12 + 0.55 * l * l) + h * 0.06 - crack * 0.35); return [v, v, v];
 }
-// krakelura: sieć spękań — krawędzie komórek Woronoja z drobnymi odnogami
+// krakelura: sieć spękań — krawędzie komórek Woronoja z drobnymi odnogami; out.cup — podwinięcie brzegów wysepek farby
+// (farba kurczy się i podnosi przy pęknięciu — w świetle bocznym jedna strona rowka jaśnieje, druga ciemnieje)
 function crackField(W, H, seed, amount) {
   const r = rng(seed + 9), cell = 60 / (0.5 + amount), pts = [], gw = Math.ceil(W / cell) + 1, gh = Math.ceil(H / cell) + 1;
   for (let j = 0; j < gh; j++) for (let i = 0; i < gw; i++) pts.push([(i + r()) * cell, (j + r()) * cell]);
-  const out = new Float32Array(W * H), n = valueNoise(seed + 13);
+  const out = new Float32Array(W * H), cup = new Float32Array(W * H), n = valueNoise(seed + 13); out.cup = cup;
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
     const wx = x + (fbm(n, x / 25, y / 25) - 0.5) * cell * 0.4, wy = y + (fbm(n, y / 25 + 9, x / 25) - 0.5) * cell * 0.4;
     const ci = Math.floor(wx / cell), cj = Math.floor(wy / cell); let d1 = 1e9, d2 = 1e9;
@@ -377,6 +378,7 @@ function crackField(W, H, seed, amount) {
       const d = Math.hypot(p[0] - wx, p[1] - wy); if (d < d1) { d2 = d1; d1 = d; } else if (d < d2) d2 = d;
     }
     const e = d2 - d1; out[y * W + x] = e < 1.2 ? (1.2 - e) / 1.2 : 0;
+    cup[y * W + x] = e < 1.2 ? 1 : e < 7 ? (1 - (e - 1.2) / 5.8) ** 2 : 0;   // brzeg wysepki wyżej, środek niżej
   }
   return out;
 }
