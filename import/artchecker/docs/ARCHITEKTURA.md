@@ -15,7 +15,8 @@ js/core/              rdzeń niezależny od trybu
   panel.js            prawy panel: narzędzie, notatnik, checklista
   board2d.js          plansza 2D: render, zoom/pan, bramki zoomu, warstwa mikrodetali
   game.js             oznaczenia, werdykt, nowa partia, przyciski
-  home.js` – ekran główny; `homefx.js` – efekty menu (JPG, ziarno, zakłócenia, paralaksa); `home.js             ekran główny: kategorie, podgląd trybu, postęp (localStorage), loader
+  home.js             ekran główny: kategorie, podgląd trybu, postęp (localStorage), loader
+  homefx.js           efekty menu: artefakty JPG, ziarno, aberracja, zakłócenia, paralaksa
   wiki.js             wiki eksperta: artykuły z danych trybów + słowniczek (GLOSS)
 js/data/              dane (pigmenty, artyści)
 js/paint/             silnik obrazów: sceny, widoki (UV, IR, RTG…), obserwacje, próbki
