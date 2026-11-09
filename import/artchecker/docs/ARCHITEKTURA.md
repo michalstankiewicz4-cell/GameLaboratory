@@ -4,7 +4,8 @@ Gra działa bez kroku budowania: `index.html` ładuje klasyczne skrypty w ustalo
 Zmienne najwyższego poziomu (`let`/`const`) są wspólne dla wszystkich skryptów, więc **kolejność `<script>` w `index.html` ma znaczenie**.
 
 ```
-index.html            szkielet strony + lista skryptów
+index.html            szkielet strony, meta SEO/Open Graph, lista skryptów
+og-image.jpg, favicon.svg, robots.txt, sitemap.xml – pliki dla wyszukiwarek i udostępniania
 css/style.css         wygląd
 js/version.js         numer wersji (semver)
 js/core/              rdzeń niezależny od trybu
@@ -14,7 +15,8 @@ js/core/              rdzeń niezależny od trybu
   panel.js            prawy panel: narzędzie, notatnik, checklista
   board2d.js          plansza 2D: render, zoom/pan, bramki zoomu, warstwa mikrodetali
   game.js             oznaczenia, werdykt, nowa partia, przyciski
-  home.js             ekran główny: kategorie, podgląd trybu, postęp (localStorage)
+  home.js             ekran główny: kategorie, podgląd trybu, postęp (localStorage), loader
+  wiki.js             wiki eksperta: artykuły z danych trybów + słowniczek (GLOSS)
 js/data/              dane (pigmenty, artyści)
 js/paint/             silnik obrazów: sceny, widoki (UV, IR, RTG…), obserwacje, próbki
 js/core/kinds.js      rejestr obiektów 2D + wspólne nachylenie i tworzenie partii
