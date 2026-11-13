@@ -2,6 +2,32 @@
 
 Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHANGELOG.md`.
 
+## Następne w planie (`docs/guides/lab-breakdown.md`, „Kolejność”)
+- [ ] **Punkt 7 — lekarz sceny** (następny): sprawdza układ sceny, czego nie widać w pojedynczym modelu — obiekt w złym
+  środowisku (drzewo na morzu, okręt na lądzie, łazik w kosmosie), pod gruntem albo w powietrzu, obiekty wchodzące
+  jeden w drugi, brakujące zasoby z nazwą, zachowanie niepasujące do modelu albo środowiska, koszt sceny (trójkąty,
+  wywołania rysowania) względem budżetu. Jak doktor modeli: uniwersalny, zgłasza i proponuje poprawki, niczego nie
+  przestawia po cichu; w API polecenie `check` (lista problemów dla AI).
+- [ ] Punkt 8 — materiał z Hive Hunger (z historią): laboratorium bloków, statki roju, laboratorium efektów, drzewka
+  technologiczne.
+- [ ] Punkt 9 — materiał z PatientZero (z historią): środowisko „organizm”, laboratorium tkanek, laboratorium patogenów.
+
+## Pomysły (właściciel, czekają na decyzję)
+- [ ] **Wiki w menu Pomoc**: artykuły o laboratoriach, modelach, środowiskach i zjawiskach, z małymi ilustracjami
+  generowanymi w laboratoriach (`ArtApi`) — bez wysokiej rozdzielczości i efektów, chyba że ilustracja tego wymaga.
+- [ ] **Laboratorium sztuki — tryb 3D**: obraz jako płaszczyzna 3D (mapa normalnych z wysokości farby, mapa szorstkości:
+  werniks błyszczy, sucha farba matowa), obracanie obrazu i ruchome światło, nierówny barwnik w pociągnięciu (grubość,
+  nasycenie, ziarno pigmentu), rama 3D (profil listwy, UV wzdłuż listwy) ze złoceniem (złoto płatkowe na czerwonym
+  bolusie, wytarte krawędzie, patyna w zagłębieniach). Po scaleniu ze sceną — obraz w ramie na ścianę.
+- [ ] **Laboratorium lądu — przełącznik „Okrągła”**: generator lądu na kuli (zastąpi drugie źródło lądu — z planety);
+  wraca z nim skok (skreślony z punktu 6).
+- [ ] **Widok mapy zawiniętej jako torus** (kształt, nie tylko topologia).
+- [ ] **Laboratorium animacji** (do rozważenia): chód ludzi i stworów jako zachowanie, animacje modeli.
+- [ ] **Grawitacja statków w kosmosie** (propozycja do decyzji): statki w scenie przyciągane przez ciała niebieskie,
+  jak orbity.
+- [ ] **Zasoby z nazwą dla jaskiń i roślin**: ustawienia z laboratoriów zapisane pod nazwą i użyte w scenie (jak ląd
+  i morze).
+
 ## Język
 - [ ] Przetłumaczyć okna laboratoriów na polski (teraz po polsku są pasek menu, strona startowa, tytuły okien standardowych, konsola i okno Wydajność).
 
