@@ -1,4 +1,6 @@
-const THREE = window.THREE;
+// Odłamki jako chmura punktów, gasnące — z Hive Hunger (js/three/effects/Debris3D.js).
+// Obliczenia bez zmian; liczby na klatkę (60 Hz) — wspólne wejście i stały krok: effects.js (EffectKit).
+import * as THREE from '../../../vendor/three/three.module.js';
 
 /** Debris as a point cloud; particles fade out by darkening their colour. */
 export class Debris3D {
@@ -26,20 +28,21 @@ export class Debris3D {
     scene.add(this.points);
   }
 
-  emit(at, rgb, n) {
+  // dir (nieobowiązkowe, laboratorium efektów): kierunek wyrzutu; bez niego — od środka układu (planety) przez `at`
+  emit(at, rgb, n, dir = at) {
     const c = this.cfg;
     // fewer with less effects (Settings → Graphics): n × scale, the fraction by chance
     if (this.scale < 1) { const m = n * this.scale; n = Math.floor(m) + (Math.random() < m % 1 ? 1 : 0); }
-    const len = at.length() || 1;
+    const len = dir.length() || 1;
     for (let k = 0; k < n; k++) {
       let i = this.count;
       if (i >= c.max) i = (Math.random() * c.max) | 0; // buffer full: overwrite a random one
       else this.count++;
       const s = c.minSpeed + Math.random() * (c.maxSpeed - c.minSpeed);
       this.pos.set([at.x, at.y, at.z], i * 3);
-      this.vel[i * 3] = (at.x / len) * s + (Math.random() - 0.5) * c.jitter;
-      this.vel[i * 3 + 1] = (at.y / len) * s + (Math.random() - 0.5) * c.jitter;
-      this.vel[i * 3 + 2] = (at.z / len) * s + (Math.random() - 0.5) * c.jitter;
+      this.vel[i * 3] = (dir.x / len) * s + (Math.random() - 0.5) * c.jitter;
+      this.vel[i * 3 + 1] = (dir.y / len) * s + (Math.random() - 0.5) * c.jitter;
+      this.vel[i * 3 + 2] = (dir.z / len) * s + (Math.random() - 0.5) * c.jitter;
       this.base.set(rgb, i * 3);
       this.life[i] = 1;
     }

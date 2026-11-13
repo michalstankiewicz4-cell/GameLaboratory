@@ -94,7 +94,7 @@ Wpis: `{ id, label, family, surface, lab, build() → { root, kit, dispose } }`.
 
 `createSceneApi({ store, prefabs, behaviorsFor, lights, assets, hooks })` → `{ run(polecenie | lista | tekst JSON), commands }`.
 Polecenia (`help`, `describe`, `prefabs`, `assets`, `add`, `set`, `move`, `remove`, `env`, `select`, `new`, `load`,
-`check` — lekarz sceny, [doctor.md](doctor.md), `ui` — UI gry w czasie gry, `play`, `stop`, `act`, `actions`, `events`) i przykłady: [`../../editor/README.md`](../../editor/README.md), „API dla AI”.
+`check` — lekarz sceny, [doctor.md](doctor.md), `effect` — efekt z laboratorium efektów ([`../labs/effects.md`](../labs/effects.md)), `ui` — UI gry w czasie gry, `play`, `stop`, `act`, `actions`, `events`) i przykłady: [`../../editor/README.md`](../../editor/README.md), „API dla AI”.
 
 - Wynik: `{ ok: true, cmd, … }` albo `{ ok: false, cmd, error }` (błąd mówi, co jest dozwolone).
 - Sprawdza: model istnieje, zachowanie pasuje do modelu, liczby, oświetlenie, nazwa zasobu; obiekt po `id` albo
@@ -111,6 +111,7 @@ Szyna zdarzeń silnika: `createEvents({ log })` → `on(name, fn)` (zwraca wypis
 | Zdarzenie | Dane | Kto wysyła | Kto słucha |
 |---|---|---|---|
 | `action` | `{ object, name, action, on? }` | gra w edytorze (klawisze 1…9), API `act` | zachowanie obiektu (`run.act`: model ShipKit `act`), dziennik konsoli |
+| `effect` | `{ kind \| asset, from?, to?, at?, dir?, path? }` (punkty w metrach) | API `effect` | świat edytora rysuje efekt (EffectKit, [`../labs/effects.md`](../labs/effects.md)), dziennik konsoli |
 
 Zachowanie z akcjami podaje `actions()` → `[{ id, label, kind: 'trigger' | 'toggle', on }]` i `act(id, on)`; dziś
 „ciąg w próżni” (akcje ShipKit: ogień, skan, druk, wyłączenie, zniszczenie i własne statku).
@@ -129,6 +130,7 @@ scena trzyma tylko nazwę. Inna karta widzi zmianę od razu (`onAssetsChange`).
 | `sky` | ciała niebieskie ([`../labs/bodies.md`](../labs/bodies.md)), Niebo | wszystkie liczby nieba BodyKit (mgławice, pas, pył, gwiazdy, barwy, ziarno) |
 | `ui`, `uiskin` | UI gry ([`../labs/gameui.md`](../labs/gameui.md)) | definicja `gamelab-ui`; skórka: `base`, `tokens` |
 | `material` | materiały ([`../labs/materials.md`](../labs/materials.md)) | opis MatKit |
+| `effect` | efekty ([`../labs/effects.md`](../labs/effects.md)) | `kind`, `scale`, `values` (liczby EffectKit); w scenie polecenie API `effect` |
 | `blocks` | bloki ([`../labs/blocks.md`](../labs/blocks.md)) | `shape`, `radius`, `voxel`, `seed`, `text`, `layers`, `mats` (opisy MatKit bloków stałych), `matRefs` (wybór w laboratorium); w scenie pole `asset` obiektu |
 
 - Funkcje: `listAssets(kind)`, `getAsset(kind, name)`, `saveAsset(kind, name, data)` (tylko pola rodzaju),

@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.29.0 — 2026-11-13 (efekty)
+
+### Dodane
+- Efekty z laboratorium efektów w scenie: polecenie API `effect` (strzał, kula plazmy, odłamki, błyskawica, piorun
+  łańcuchowy, kula cieczy, czarna dziura albo zapisany efekt) — zdarzenie `effect`, świat je rysuje.
+
 ## 0.28.0 — 2026-11-13 (zasób modelu)
 
 ### Dodane

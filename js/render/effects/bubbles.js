@@ -1,4 +1,6 @@
-const THREE = window.THREE;
+// Kula cieczy w locie (rysuje ją przebieg soczewki w black-holes.js) — z Hive Hunger (js/three/effects/Bubbles.js).
+// Obliczenia bez zmian; liczby na klatkę (60 Hz) — wspólne wejście i stały krok: effects.js (EffectKit).
+import * as THREE from '../../../vendor/three/three.module.js';
 
 /**
  * Splashers' shots: a bubble of liquid (`size`, 3 voxels across) flying to its target. It is drawn

@@ -1,6 +1,8 @@
-import { bandGlowTexture } from '../textures.js';
+// Piorun łańcuchowy skaczący między punktami — z Hive Hunger (js/three/effects/Zaps.js).
+// Obliczenia bez zmian; liczby na klatkę (60 Hz) — wspólne wejście i stały krok: effects.js (EffectKit).
+import { bandGlowTexture } from './textures.js';
 
-const THREE = window.THREE;
+import * as THREE from '../../../vendor/three/three.module.js';
 
 /**
  * Support ships' lightning: a bolt that jumps between ships of the same swarm, in a random order,

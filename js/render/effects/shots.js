@@ -1,6 +1,8 @@
-import { radialTexture } from '../textures.js';
+// Strzał (smuga z kulistą falą uderzeniową, przyspiesza w locie) — z Hive Hunger (js/three/effects/Shots.js).
+// Obliczenia bez zmian; liczby na klatkę (60 Hz) — wspólne wejście i stały krok: effects.js (EffectKit).
+import { radialTexture } from './textures.js';
 
-const THREE = window.THREE;
+import * as THREE from '../../../vendor/three/three.module.js';
 const FORWARD = new THREE.Vector3(0, 0, 1);
 
 /**

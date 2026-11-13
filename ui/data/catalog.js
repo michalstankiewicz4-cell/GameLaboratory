@@ -492,6 +492,23 @@ window.GameLabCatalog =
       }
     },
     {
+      "file": "labs/effects.html",
+      "cat": "matter",
+      "name": "Effects Lab",
+      "namePl": "Laboratorium efektów",
+      "doc": "docs/labs/effects.md",
+      "desc": "Effects from Hive Hunger: a shot with a bow shock, a plasma orb with a fiery tail, debris, lightning, chain lightning, a liquid bubble and a black hole that bends the picture around it — every number on a slider, saved under a name for the scene editor, where an effect plays on an event.",
+      "descPl": "Efekty z Hive Hunger: strzał z falą uderzeniową, kula plazmy z ognistym ogonem, odłamki, błyskawica, piorun łańcuchowy, kula cieczy i czarna dziura zaginająca obraz wokół siebie — każda liczba na suwaku, zapis pod nazwą dla edytora sceny, gdzie efekt gra na zdarzenie.",
+      "kind": "lab",
+      "kit": "EffectKit",
+      "phrases": ["efekty", "kosmos", "wybuchy", "błyskawice"],
+      "saved": ["gameLab.effects."],
+      "art": {
+        "bg": ["#1a1020", "#07050c"],
+        "svg": "<path d=\"M40 52 L120 44\" stroke=\"#eaffff\" stroke-width=\"2\"/><circle cx=\"124\" cy=\"44\" r=\"6\" fill=\"#ff9a3c\" opacity=\".85\"/><circle cx=\"62\" cy=\"70\" r=\"5\" fill=\"#ff3ed8\"/><circle cx=\"54\" cy=\"72\" r=\"3\" fill=\"#ff8a3c\" opacity=\".7\"/><circle cx=\"47\" cy=\"74\" r=\"2\" fill=\"#a02010\" opacity=\".6\"/><path d=\"M140 20 L132 36 L142 38 L130 60\" stroke=\"#8fd0ff\" stroke-width=\"2\" fill=\"none\"/><circle cx=\"156\" cy=\"72\" r=\"9\" fill=\"#05030a\" stroke=\"#c9a0ff\" stroke-width=\"1.5\"/>"
+      }
+    },
+    {
       "file": "labs/blocks.html",
       "cat": "voxels",
       "name": "Blocks Lab",
@@ -790,6 +807,8 @@ window.GameLabCatalog =
     "lornetka": "binoculars",
     "ekwipunek": "gear",
     "rysowanie": "drawing",
-    "dyfuzja": "diffusion"
+    "dyfuzja": "diffusion",
+    "wybuchy": "explosions",
+    "błyskawice": "lightning"
   }
 }/*END*/;

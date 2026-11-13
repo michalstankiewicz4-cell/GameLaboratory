@@ -1,4 +1,6 @@
-const THREE = window.THREE;
+// Czarna dziura: soczewkowanie obrazu wokół niej, przyciąganie odłamków — z Hive Hunger (js/three/effects/BlackHoles.js).
+// Obliczenia bez zmian; liczby na klatkę (60 Hz) — wspólne wejście i stały krok: effects.js (EffectKit).
+import * as THREE from '../../../vendor/three/three.module.js';
 const MAX = 8; // holes drawn at once
 const MAX_DROPS = 16; // liquid bubbles (splashers' shots) drawn at once
 
@@ -96,9 +98,12 @@ export class BlackHoles {
    * Draws the frame — through the lens pass when a hole or a liquid bubble is up. `drops`:
    * [{ pos, radius, phase }] (world); `hidden(pos)` → true when the planet is in front of it.
    */
-  render(renderer, scene, camera, drops = [], hidden = null) {
+  // draw(target) (nieobowiązkowe, laboratorium efektów): rysuje scenę do celu (null — ekran), np. przez potok kamery
+  // LookPipeline; bez niego — renderer.render jak w grze
+  render(renderer, scene, camera, drops = [], hidden = null, draw = null) {
+    const paint = (t) => { if (draw) { draw(t); return; } renderer.setRenderTarget(t); renderer.render(scene, camera); if (t) renderer.setRenderTarget(null); };
     if (!this.any && !drops.length) {
-      renderer.render(scene, camera);
+      paint(null);
       return;
     }
     camera.updateMatrixWorld(); // (where the holes are on screen must match this frame's camera)
@@ -132,7 +137,7 @@ export class BlackHoles {
       m++;
     }
     if (n === 0 && m === 0) {
-      renderer.render(scene, camera);
+      paint(null);
       return;
     }
     u.count.value = n;
@@ -140,8 +145,7 @@ export class BlackHoles {
     u.aspect.value = aspect;
     u.tDiffuse.value = this.target.texture;
     u.ring.value.set(this.cfg.ringColor);
-    renderer.setRenderTarget(this.target);
-    renderer.render(scene, camera);
+    paint(this.target);
     renderer.setRenderTarget(null);
     renderer.render(this.pass.scene, this.pass.camera);
   }

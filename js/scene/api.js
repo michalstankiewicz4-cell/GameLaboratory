@@ -34,6 +34,7 @@ const COMMANDS = {
   actions: { args: 'id | name', does: 'during play: the object\'s actions' },
   events: { args: '[n]', does: 'the last n events (default 20)' },
   ui: { args: 'during play, one of: say { who, text, choices }, log (text) [kind], banner (text) [sub], show (screen), hide, open (window), close (window)', does: 'the game UI of the scene (env.ui): a line of dialogue (returns at once; the choice comes as a "ui" event), an event log entry, a banner, a menu screen, a window' },
+  effect: { args: 'effect (shot | orb | debris | bolt | zap | bubble | hole, or an effect asset name from the effects lab), then: from, to (shot, orb, bubble) | at, [dir] (debris, hole) | path [p, p, …] (bolt, zap) — each point [x,y,z] m or an object id | name', does: 'shows an effect — an "effect" event (anything listening gets it)' },
   check: { args: '[budget { tris, draws }]', does: 'the scene doctor: problems in the scene (wrong environment, under the ground or in the air, overlapping, missing assets, unfitting behaviours, cost over the budget), each with a proposed fix (commands) — nothing is changed' },
   play: { args: '', does: 'runs the behaviours (like ▶ Play)' },
   stop: { args: '', does: 'back to editing' },
@@ -155,6 +156,16 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
       if (c.open != null) { if (!u.open(String(c.open))) fail(`no window "${c.open}"`); return { window: c.open }; }
       if (c.close != null) { u.close(String(c.close)); return { closed: c.close }; }
       return fail('one of: say, log, banner, show, hide, open, close');
+    },
+    effect: (c) => {
+      if (!hooks.effect) fail('effects are not available here');
+      const n = String(c.effect || ''), kinds = hooks.effectKinds || [], saved = assets.list('effect');
+      const e = saved.includes(n) ? { asset: n } : kinds.includes(n) ? { kind: n } : fail(`effect: one of ${kinds.join(', ')}${saved.length ? ' or a saved effect: ' + saved.join(', ') : ''}`);
+      // punkt: [x, y, z] m albo obiekt (id albo nazwa) — jego położenie teraz (w grze: tam, gdzie go niesie zachowanie)
+      const pt = (p, f) => (Array.isArray(p) ? vec3(p, f) : (() => { const o = target(store.scene.objects.some((q) => q.id === p) ? { id: p } : { name: p }); return hooks.objectPos ? hooks.objectPos(o) : o.pos; })());
+      for (const f of ['from', 'to', 'at', 'dir']) if (c[f] != null) e[f] = f === 'dir' ? vec3(c[f], f) : pt(c[f], f);
+      if (c.path != null) { if (!Array.isArray(c.path) || c.path.length < 2) fail('path: at least two points'); e.path = c.path.map((p, i) => pt(p, 'path[' + i + ']')); }
+      hooks.effect(e); return { effect: n, ...e };
     },
     check: (c) => { if (!hooks.check) fail('the scene doctor is not available here'); return hooks.check({ budget: c.budget }); },
     events: (c) => ({ events: hooks.events ? hooks.events(c.n > 0 ? Math.min(200, +c.n) : 20) : [] }),

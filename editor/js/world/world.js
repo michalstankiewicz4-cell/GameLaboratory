@@ -9,6 +9,7 @@ import { prefab } from '../../../js/scene/prefabs.js';
 import { getAsset, listAssets } from '../../../js/scene/assets.js';
 import { planetAirless } from '../../../js/envs/land/planet.js';
 import { spaceReady, loadSpace, SKY_PRESET, SKY_DAY } from '../../../js/scene/space.js';
+import { createEffects, STEP as FX_STEP } from '../../../js/render/effects/effects.js';
 
 export { LIGHTS };
 const D2R = Math.PI / 180;
@@ -153,6 +154,13 @@ export function createWorld(container, store, onWarn) {
   if (window.ResizeObserver) new ResizeObserver(resize).observe(container);
 
   let last = performance.now(), before = null;
+  // efekty sceny: jeden EffectKit na zapisany efekt (zasób „effect”: rodzaj, skala, liczby) albo na gotowy rodzaj
+  const fxKits = new Map(); let fxAcc = 0;
+  function effect(e) {
+    const a = e.asset ? getAsset('effect', e.asset) : null, kind = a ? a.kind : e.kind, key = e.asset || '#' + kind;
+    if (!fxKits.has(key)) fxKits.set(key, createEffects(scene, { scale: a ? +a.scale || 1 : 1, settings: a ? { [kind]: a.values || {} } : {} }));
+    return fxKits.get(key).play(kind, e);
+  }
   function frame(now) {
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
     const t = stage.update(dt, camera); if (before) before(dt, t);
@@ -171,11 +179,19 @@ export function createWorld(container, store, onWarn) {
       flare: sunB ? { position: sunB.root.position, radius: rad(sunB), strength: 1, rays: 1 } : null,
     } : null;
     look.sun(camera, stage.sunDir);
-    window.LabPerf.begin(renderer); look.render(scene, camera); window.LabPerf.end(renderer);   // okno Wydajność i dolny pasek
+    // efekty (EffectKit, zdarzenie „effect”): stałym krokiem 1/60 s; czarna dziura i kula cieczy — obraz przez soczewki
+    fxAcc += dt; let fxN = 0;
+    while (fxAcc >= FX_STEP && fxN < 6) { fxKits.forEach((k) => k.step(camera)); fxAcc -= FX_STEP; fxN++; }
+    if (fxN === 6) fxAcc = 0;
+    const lens = [...fxKits.values()].find((k) => k.lensing);
+    window.LabPerf.begin(renderer);   // okno Wydajność i dolny pasek
+    if (lens) lens.render(renderer, scene, camera, (target) => look.render(scene, camera, target)); else look.render(scene, camera);
+    window.LabPerf.end(renderer);
     requestAnimationFrame(frame);
   }
   const world = {
-    renderer, scene, camera, root, built, stage, pending, syncObjects, syncPlaces, syncEnv, bounds,
+    renderer, scene, camera, root, built, stage, pending, syncObjects, syncPlaces, syncEnv, bounds, effect,
+    clearEffects: () => { fxKits.forEach((k) => k.dispose()); fxKits.clear(); },
     objectRoot: (id) => (built.get(id) || {}).root || null,
     // lekarz sceny (js/scene/doctor.js): obrys w świecie z danych obiektu i koszt zbudowanego modelu; null — niezbudowany
     boxOf: (o) => { const r = built.get(o.id); return r && r.prefab === o.prefab && r.local ? worldBox(r.local, o) : null; },

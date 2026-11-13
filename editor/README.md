@@ -125,6 +125,7 @@ albo lista (po kolei); wynik `{ "ok": true, … }` albo `{ "ok": false, "error":
 | `act` | `id` albo `name`, `action`, `[on]` (przełącznik) | w czasie gry: akcja obiektu (statek kosmiczny: `fire`, `scan`, `print`, `offline`, `destroy`, własne) — zdarzenie „action” |
 | `actions` | `id` albo `name` | w czasie gry: akcje obiektu |
 | `events` | `[n]` | ostatnie zdarzenia szyny (domyślnie 20) |
+| `effect` | `effect` (id albo nazwa zapisanego efektu), `from` / `to` / `at` / `dir` / `path` — punkty `[x, y, z]` albo obiekty | efekt z laboratorium efektów — zdarzenie `effect`, świat je rysuje ([`../docs/labs/effects.md`](../docs/labs/effects.md)) |
 | `ui` | w czasie gry: `say { who, text, choices }`, `log`, `banner`, `show`, `hide`, `open`, `close` | UI gry sceny (`env.ui`): dialog, wpis, baner, ekran, okno ([`../docs/labs/gameui.md`](../docs/labs/gameui.md)) |
 | `check` | `[budget { tris, draws }]` | lekarz sceny: problemy (złe środowisko, pod gruntem / w powietrzu, zachodzenie, brakujące zasoby, zachowania, koszt) z proponowanymi poprawkami — niczego nie zmienia ([`../docs/scene/doctor.md`](../docs/scene/doctor.md)) |
 

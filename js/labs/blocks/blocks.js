@@ -13,6 +13,7 @@ import { Liquids, STEP } from '../../behaviors/space/liquids.js';
 import { Gases } from '../../behaviors/space/gases.js';
 import { PRESETS } from '../../render/materials/matkit.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
+import { createEffects } from '../../render/effects/effects.js';
 
 const $ = (id) => document.getElementById(id);
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
@@ -50,8 +51,9 @@ loadSpace().then(() => {
   const sky = BK.buildBody(ref.groupId, ref.bodyId, { detail: 1, values: (deep && deep.values) || {} }); sky.setRadius(9000); scene.add(sky.group);
 }).catch((e) => window.LabLog && window.LabLog.add('warn', 'Space sky: ' + e.message));
 
-/* ---------------- bryła, krople, gaz ---------------- */
+/* ---------------- bryła, krople, gaz, odłamki ---------------- */
 let body = null, liquids = null, gases = null;
+const fx = createEffects(scene);   // odłamki ugryzionych bloków stałych (EffectKit, js/render/effects/effects.js)
 function makeFx() {
   if (liquids) { liquids.meshes.forEach((m) => { scene.remove(m); m.geometry.dispose(); m.material.dispose(); }); }
   if (gases) { scene.remove(gases.points); gases.points.geometry.dispose(); gases.points.material.dispose(); }
@@ -93,6 +95,7 @@ function bite(at, r) {
     const dir = tmp.clone().sub(at); if (dir.lengthSq() < 1e-6) dir.copy(tmp).normalize();   // na zewnątrz od środka ugryzienia
     if (KINDS[v.kind].state === 'liquid') liquids.spill(v.kind, tmp, dir);
     else if (KINDS[v.kind].state === 'gas') gases.spill(tmp, dir);
+    else if (Math.random() < 0.35) fx.play('debris', { at: tmp, dir, color: KINDS[v.kind].color, n: 3 });   // bloki stałe: odłamki (laboratorium efektów)
   }
   status('Bitten: ' + (Object.entries(got).map(([k, n]) => `${n} ${KINDS[k].name.toLowerCase()}`).join(', ') || 'nothing'));
   showCounts();
@@ -191,7 +194,7 @@ $('delBody').onclick = () => { const n = $('savedSel').value; if (!n) { status('
 $('savedSel').onchange = () => { const n = $('savedSel').value; if (n) loadBody(n).then(() => status(`Loaded: ${n}.`)); };
 onAssetsChange(fillSaved);
 $('rebuild').onclick = () => rebuild();
-$('clearFx').onclick = () => { liquids.clear(); gases.clear(); showCounts(); };
+$('clearFx').onclick = () => { liquids.clear(); gases.clear(); fx.clear(); showCounts(); };
 
 /* ---------------- dla AI ---------------- */
 // BlocksApi: build(bryła) — kształt, rozmiar, blok, ziarno, warstwy; bite([x, y, z], r) → co wypadło; counts(); loose()
@@ -226,7 +229,7 @@ let last = performance.now(), acc = 0, t = 0, cntT = 0;
 function frame(now) {
   const dt = Math.min(0.1, (now - last) / 1000); last = now; t += dt;
   acc += dt; let n = 0;
-  while (acc >= STEP && n < 6) { liquids.step(body); gases.step(body); acc -= STEP; n++; }
+  while (acc >= STEP && n < 6) { liquids.step(body); gases.step(body); fx.step(camera); acc -= STEP; n++; }
   if (n === 6) acc = 0;
   if (body) body.update(t);
   if ((cntT += dt) > 0.5) { cntT = 0; showCounts(); }

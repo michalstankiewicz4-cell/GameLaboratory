@@ -32,6 +32,10 @@ W edytorze sceny model z rodziny Bloki wybiera ją w oknie Obiekt (pole „Brył
 Materiały idą z bryłą (`def.mats` w `buildBody`), a nie przez zmianę wspólnych rodzajów `KINDS` — kilka brył w jednej
 scenie może mieć różne materiały.
 
+## Odłamki
+
+Ugryzione bloki stałe sypią odłamki w barwie rodzaju (`debris` z EffectKit, [`effects.md`](effects.md)).
+
 ## Rodzaje bloków
 
 | Rodzaj | Stan | Wygląd |

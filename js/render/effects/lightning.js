@@ -1,6 +1,8 @@
-import { bandGlowTexture } from '../textures.js';
+// Błyskawica (postrzępiony rdzeń, poświata stałej szerokości na ekranie) — z Hive Hunger (js/three/effects/Lightning3D.js).
+// Obliczenia bez zmian; liczby na klatkę (60 Hz) — wspólne wejście i stały krok: effects.js (EffectKit).
+import { bandGlowTexture } from './textures.js';
 
-const THREE = window.THREE;
+import * as THREE from '../../../vendor/three/three.module.js';
 
 /**
  * Lightning bolts (chain lightning, storm ships): a jagged white core with a thin coloured glow

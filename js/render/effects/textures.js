@@ -1,4 +1,6 @@
-const THREE = window.THREE;
+// Małe tekstury z canvasa dla poświat i promieni — z Hive Hunger (js/three/textures.js).
+// Obliczenia bez zmian; liczby na klatkę (60 Hz) — wspólne wejście i stały krok: effects.js (EffectKit).
+import * as THREE from '../../../vendor/three/three.module.js';
 
 /**
  * Small canvas textures for glows and beams, shared by the effects. Stops are

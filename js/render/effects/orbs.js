@@ -1,6 +1,8 @@
-import { radialTexture } from '../textures.js';
+// Kula plazmy (pulsująca poświata, ognisty ogon iskier, błysk u celu) — z Hive Hunger (js/three/effects/Orbs.js).
+// Obliczenia bez zmian; liczby na klatkę (60 Hz) — wspólne wejście i stały krok: effects.js (EffectKit).
+import { radialTexture } from './textures.js';
 
-const THREE = window.THREE;
+import * as THREE from '../../../vendor/three/three.module.js';
 
 /**
  * Plasma orbs fired by magenta orb ships: a ball the size of a voxel with a pulsing glow and a

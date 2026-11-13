@@ -4,7 +4,7 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 
 ## Następne w planie (`docs/guides/lab-breakdown.md`, „Kolejność”)
 - [x] Punkt 7 — lekarz sceny: zrobiony w 0.60.0 (`js/scene/doctor.js`, `docs/scene/doctor.md`); następne reguły — w opisie.
-- [ ] Punkt 8 — materiał z Hive Hunger (z historią): ~~laboratorium bloków~~ (0.64.0), statki roju, laboratorium efektów, drzewka
+- [ ] Punkt 8 — materiał z Hive Hunger (z historią): ~~laboratorium bloków~~ (0.64.0), statki roju, ~~laboratorium efektów~~ (0.67.0), drzewka
   technologiczne.
 - [ ] Punkt 9 — materiał z PatientZero (z historią): środowisko „organizm”, laboratorium tkanek, laboratorium patogenów.
 
@@ -68,6 +68,11 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
   pojazdy, statki kosmiczne; potem teren i powierzchnie 2D laboratorium sztuki.
 - [x] Bloki laboratorium bloków (Hive Hunger) z materiałów (0.64.0).
 - [ ] Złocenie ramy; faktura farby jako mapa nierówności.
+
+## Efekty
+- [ ] **Dym i kurz w wodzie i na lądzie** (właściciel, 2026-11-13: na później; może być związane z pogodą i wiatrem):
+  efekty, które w każdym środowisku zachowują się inaczej (w kosmosie bez grawitacji, na lądzie opadają i unosi je
+  wiatr, w wodzie bąble idą w górę).
 
 ## Język
 - [ ] **Laboratorium tłumaczenia:** tłumaczenie gry (teksty UI, dialogi, opisy) na języki; podstawowe: polski,

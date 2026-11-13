@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Effects Lab | GameLaboratory</title>
+<meta name="description" content="GameLaboratory effects lab: effects from Hive Hunger — a shot with a bow shock, a plasma orb with a fiery tail, debris, lightning, chain lightning, a liquid bubble and a black hole that bends the picture — every number on a slider, saved under a name for the scene editor, where an effect plays on an event.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/effects.html">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../ui/style/space.css">
+<link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="../ui/pages/effects.css">
+</head>
+<!-- Laboratorium efektów (js/labs/effects/): EffectKit (js/render/effects/effects.js) — efekty z Hive Hunger; zapis jako
+     zasób „effect” (js/scene/assets.js), w edytorze sceny polecenie API „effect” i zdarzenie „effect”. -->
+<body class="lab viewFits">
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/shell/menubar.js"></script>
+<div id="view"></div>
+<div class="bar">
+  <div class="envSwitch" data-current="space" data-space="effects.html" data-water="" data-land=""></div>
+  <select id="kind" aria-label="Effect" title="The effect"></select>
+  <button type="button" id="fire" title="Play the effect once (or press Space)">Play</button>
+  <label class="chk" title="Play the effect again and again"><input type="checkbox" id="auto"> Repeat</label>
+  <button type="button" id="clearFx" title="Remove every effect now on screen">Clear</button>
+  <span class="sp"></span>
+  <span class="dimtxt" id="status"></span>
+</div>
+<div class="foot"><span id="fps" data-auto></span><span class="sp"></span><span>GameLaboratory</span></div>
+<script src="../ui/shell/bars.js"></script>
+<aside class="panel" data-std="info">
+  <h2 class="stdName">Effects</h2>
+  <p class="stdText">Effects from Hive Hunger: a shot with a round bow shock, a plasma orb with a fiery tail and a burst, debris, lightning, chain lightning, a liquid bubble that bends the picture like a lens, and a black hole that bends the picture around it and pulls the debris in. In space, with no gravity. Every number of an effect is on a slider; save it under a name and the scene editor plays it on an event. The camera: drag to turn, the wheel zooms.</p>
+  <p class="note">For AI: EffectsApi in the console (API tab).</p>
+</aside>
+<aside class="panel" data-window="effect" data-title="Effect" data-title-pl="Efekt">
+  <div class="row"><span>Scale</span><input type="range" id="scale" min="0.25" max="8" step="0.25"><output id="scaleV"></output></div>
+  <p class="note">Metres for one unit of the effect (in Hive Hunger a block is 0.5 units). Numbers per frame of 1/60 s, as in the game.</p>
+  <div id="fields"></div>
+  <div class="btns"><button type="button" id="resetFx">Back to the default</button></div>
+  <h3>Save</h3>
+  <div class="row"><span>Saved</span><select id="savedSel" title="Effects saved under a name: pick one to load it"></select><output></output></div>
+  <div class="row"><span>Name</span><input type="text" id="saveName" maxlength="40"><output></output></div>
+  <div class="btns"><button type="button" id="saveFx">Save under this name</button><button type="button" id="delFx">Delete saved</button></div>
+  <p class="note">A saved effect is a named asset: in the scene editor the API command "effect" plays it (an "effect" event).</p>
+</aside>
+<aside class="panel" data-std="perf"></aside>
+<script src="../ui/shell/loader.js"></script>
+<script src="../ui/shell/perf.js"></script>
+<script src="../ui/shell/labwin.js"></script>
+<script src="../ui/shell/windows.js"></script>
+<script src="../ui/shell/envswitch.js"></script>
+<script type="module" src="../js/labs/effects/effects.js"></script>
+</body>
+</html>

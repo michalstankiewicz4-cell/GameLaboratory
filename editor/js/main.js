@@ -8,6 +8,7 @@ import { createPanels } from './ui/panels.js';
 import { createToolbar } from './ui/toolbar.js';
 import { createPlay } from './play/play.js';
 import { createEvents } from '../../js/core/events.js';
+import { FX_KINDS } from '../../js/render/effects/effects.js';
 import { createApiConsole } from './ui/api-console.js';
 import { createSceneApi } from '../../js/scene/api.js';
 import { behaviorsFor, behaviorOf, bodyRank, BEHAVIORS } from '../../js/scene/behaviors.js';
@@ -77,6 +78,7 @@ const actions = {
 const events = createEvents({ log: (name, d) => window.LabLog && window.LabLog.add('info', `Event ${name}: ${d.name || d.object || ''}${d.action ? ' — ' + d.action + (d.on != null ? (d.on ? ' on' : ' off') : '') : ''}`) });
 const placer = createPlacer(world, store, actions, { t });
 actions.play = createPlay(store, world, controls, actions, events);
+events.on('effect', (e) => { try { world.effect(e); } catch (err) { if (window.LabLog) window.LabLog.add('warn', 'Effect: ' + err.message); } });   // efekty z laboratorium efektów
 const panels = createPanels(store, actions);
 // modele, które czekały na kity ze Space, są już zbudowane: uchwyt, hierarchia i okna od nowa
 world.afterAsync = () => { controls.attach(); panels.renderTree(); panels.renderProps(); if (window.sceneEditor) window.sceneEditor.doctor.check(); };
@@ -88,7 +90,8 @@ const api = createSceneApi({
       prefab, behaviorsFor, behaviorOf, behaviorEnv: (id) => (BEHAVIORS[id] || {}).env, bodyRank,
       assets: { list: listAssets }, lights: Object.keys(LIGHTS), skyPresets: skyPresets().map((p) => p.id),
       probe: world.stage, boxOf: world.boxOf, costOf: world.costOf, budget }),
-    act: (o, action, on) => actions.play.act(o.id, action, on), gameUI: () => actions.play.ui, actionsOf: (o) => actions.play.actionsOf(o.id), events: (n) => events.history(n) },
+    act: (o, action, on) => actions.play.act(o.id, action, on),
+    effectKinds: Object.keys(FX_KINDS), effect: (e) => events.emit('effect', e), objectPos: (o) => { const r = world.objectRoot(o.id); return r ? r.position.toArray() : o.pos; }, gameUI: () => actions.play.ui, actionsOf: (o) => actions.play.actionsOf(o.id), events: (n) => events.history(n) },
 });
 createApiConsole(api);
 const doctor = createDoctorPanel(store, api, actions);

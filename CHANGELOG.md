@@ -3,6 +3,17 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.67.0 · efekty 1.0.0 · bloki 1.2.0 · edytor sceny 0.29.0 — 2026-11-13 (laboratorium efektów)
+
+### Dodane
+- **Laboratorium efektów** (`labs/effects.html`, opis `docs/labs/effects.md`) z Hive Hunger (z historią): strzał
+  z falą uderzeniową, kula plazmy z ognistym ogonem, odłamki, błyskawica, piorun łańcuchowy, kula cieczy (soczewka)
+  i czarna dziura zaginająca obraz. **EffectKit** (`js/render/effects/`), stały krok 60 Hz. Każda liczba efektu na
+  suwaku, zapis pod nazwą (zasób `effect`), dla AI `EffectsApi`.
+- Edytor sceny: polecenie API `effect` (efekt albo zapisany efekt; punkty jako współrzędne albo obiekty sceny) —
+  zdarzenie `effect` na szynie, świat je rysuje (soczewki przez potok kamery).
+- Laboratorium bloków: ugryzione bloki stałe sypią odłamki w barwie rodzaju.
+
 ## Program 0.66.0 · bloki 1.1.0 · edytor sceny 0.28.0 — 2026-11-13 (bryła z bloków jako zasób z nazwą, kategoria Woksele)
 
 ### Dodane

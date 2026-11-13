@@ -1,0 +1,9 @@
+/* Laboratorium efektów (labs/effects.html): pola liczb efektu, zakładka API. */
+.fxRow{display:grid;grid-template-columns:104px 1fr 54px;gap:6px;align-items:center;margin:3px 0;font-size:12px}
+.fxRow input[type=range],.fxRow input[type=number]{min-width:0;width:100%}
+.fxRow output{text-align:right;font-family:var(--mono);font-size:11px}
+.fxRow .trio{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.fxRow input[type=color]{width:100%;height:20px;padding:0;border:1px solid var(--line);border-radius:var(--r);background:var(--field)}
+.fxApi{display:flex;flex-direction:column;gap:6px;padding:8px}
+.fxApi textarea{width:100%;background:var(--field);border:1px solid var(--line);border-radius:var(--r);color:var(--text);font-size:11px}
+.fxApi button{align-self:flex-start}
