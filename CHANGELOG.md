@@ -3,6 +3,22 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.68.0 · pojazdy — kosmos 1.9.0 · edytor sceny 0.30.0 — 2026-11-14 (strzały statków z laboratorium efektów)
+
+### Zmienione
+- **Strzały statków z laboratorium efektów**: statki ShipKit (Codewing, Scribe, Swarmer) nie mają już własnego
+  pocisku ani błysku u lufy. Model decyduje tylko, gdzie są lufy i kiedy strzela, i zgłasza strzał
+  (`model.onShot`, `makeShotEmitter` zamiast `makeBoltPool`); wygląd strzału to efekt z laboratorium efektów,
+  wybierany dla statku — gotowy albo zapisany pod nazwą. Pojazd z dowolnej gry, efekt z dowolnej gry.
+- Wzorzec doktora modeli: odciski trzech statków bez pocisków (mniej trójkątów i wywołań rysowania; wymiary
+  i problemy bez zmian).
+
+### Dodane
+- Laboratorium pojazdów — kosmos: pod akcjami **Efekt strzału** (zapamiętany dla statku w tej przeglądarce).
+- Edytor sceny: pole obiektu `shot` (okno Obiekt — „Efekt strzału”, API `add` / `set`), prefabrykat `shoots`.
+- EffectKit: `createEffectLibrary` (jeden efekt na wybór: rodzaj albo zapisany efekt), `shotOptions` (strzał →
+  efekt); LabLook: `through(paint)` — obraz przez soczewki efektów.
+
 ## Program 0.67.1 — 2026-11-14 (kategoria Efekty)
 
 ### Zmienione

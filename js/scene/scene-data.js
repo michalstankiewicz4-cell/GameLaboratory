@@ -9,11 +9,12 @@
 //          sky: '' | 'day' | 'preset:<id>' | nazwa zasobu „niebo” (każda powierzchnia; '' — domyślne: morze i ląd —
 //          dzienne, kosmos — Deep field; js/scene/space.js),
 //          ui: '' | nazwa zasobu „ui” (UI gry z laboratorium UI gry — nakładka w ▶ Graj; '' — bez UI) },
-//   objects: [{ id, name, prefab, pos: [x, y, z], rot: [x, y, z] (stopnie), scale, behavior?, orbit? { around, period }, asset? }]
+//   objects: [{ id, name, prefab, pos: [x, y, z], rot: [x, y, z] (stopnie), scale, behavior?, orbit? { around, period }, asset?, shot? }]
 // }
 // prefab: id z js/scene/prefabs.js; behavior: id z js/scene/behaviors.js, '' = bez zachowania, brak pola = domyślne
 // dla prefabrykatu; asset: nazwa zasobu rodzaju prefabrykatu (prefab.assetKind, np. bryła z bloków z laboratorium
-// bloków; brak — model domyślny prefabrykatu); look: wygląd kamery — zasób „look” z laboratorium filtrów (js/scene/assets.js), '' = zwykły obraz.
+// bloków; brak — model domyślny prefabrykatu); shot: efekt strzału statku (prefab.shoots) — rodzaj efektu albo nazwa
+// zasobu „effect” z laboratorium efektów (brak — strzał); look: wygląd kamery — zasób „look” z laboratorium filtrów (js/scene/assets.js), '' = zwykły obraz.
 
 export const FORMAT = 'gamelab-scene', VERSION = 1;
 
@@ -39,6 +40,7 @@ export function normalize(d) {
     pos: num3(o.pos, [0, 0, 0]), rot: num3(o.rot, [0, 0, 0]), scale: Number.isFinite(+o.scale) && +o.scale > 0 ? +o.scale : 1,
     ...(typeof o.behavior === 'string' ? { behavior: o.behavior } : {}),
     ...(typeof o.asset === 'string' && o.asset ? { asset: o.asset.slice(0, 40) } : {}),
+    ...(typeof o.shot === 'string' && o.shot ? { shot: o.shot.slice(0, 40) } : {}),
     ...(o.orbit && typeof o.orbit === 'object' ? { orbit: { ...(typeof o.orbit.around === 'string' ? { around: o.orbit.around } : {}), ...(+o.orbit.period > 0 ? { period: +o.orbit.period } : {}) } } : {}),
   }));
   return s;

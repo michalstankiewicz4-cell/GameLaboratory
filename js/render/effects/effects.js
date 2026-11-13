@@ -97,3 +97,41 @@ export function createEffects(scene, { scale = 1, settings = {} } = {}) {
   };
   return api;
 }
+
+// Strzał pojazdu jako efekt: { from, to, dir } (świat, metry; np. model.onShot ShipKit) → opcje play() dla rodzaju
+// efektu — strzał, kula plazmy, kula cieczy lecą od lufy do celu; błyskawica i piorun łańcuchowy — ścieżka lufa → cel;
+// odłamki i czarna dziura — u celu.
+export function shotOptions(kind, s) {
+  const p = (q) => (q && q.toArray ? q.toArray() : q);
+  if (kind === 'bolt' || kind === 'zap') return { path: [p(s.from), p(s.to)] };
+  if (kind === 'debris') return { at: p(s.to), dir: s.dir ? p(s.dir).map((x) => -x) : undefined };
+  if (kind === 'hole') return { at: p(s.to) };
+  return { from: p(s.from), to: p(s.to) };
+}
+
+// Biblioteka efektów sceny: wybór to rodzaj efektu (FX_KINDS) albo nazwa zapisanego efektu (zasób „effect”:
+// { kind, scale, values }); jeden EffectKit na wybór. getAsset(kind, name) — js/scene/assets.js.
+// lib.play(wybór, opcje), lib.shot(wybór, strzał), lib.step(camera), lib.lensing, lib.render(renderer, scene, camera,
+// draw), lib.kindOf(wybór), lib.clear(), lib.dispose()
+export function createEffectLibrary(scene, getAsset) {
+  const kits = new Map();
+  function entry(choice) {
+    const c = choice || 'shot';
+    if (kits.has(c)) return kits.get(c);
+    const a = FX_KINDS[c] ? null : getAsset('effect', c);
+    if (!FX_KINDS[c] && !(a && FX_KINDS[a.kind])) throw new Error(`no effect "${c}" (${Object.keys(FX_KINDS).join(', ')} or a saved effect)`);
+    const kind = a ? a.kind : c, kit = createEffects(scene, { scale: a ? +a.scale || 1 : 1, settings: a ? { [kind]: a.values || {} } : {} });
+    const e = { kind, kit }; kits.set(c, e); return e;
+  }
+  return {
+    kindOf: (choice) => entry(choice).kind,
+    play(choice, o) { const e = entry(choice); return e.kit.play(e.kind, o); },
+    shot(choice, s) { const e = entry(choice); return e.kit.play(e.kind, shotOptions(e.kind, s)); },
+    step(camera) { kits.forEach((e) => e.kit.step(camera)); },
+    get lensing() { return [...kits.values()].some((e) => e.kit.lensing); },
+    render(renderer, sc, camera, draw) { const e = [...kits.values()].find((x) => x.kit.lensing); if (e) e.kit.render(renderer, sc, camera, draw); else draw(null); },
+    forget(choice) { const e = kits.get(choice); if (e) { e.kit.dispose(); kits.delete(choice); } },   // zasób zapisany na nowo
+    clear() { kits.forEach((e) => e.kit.clear()); },
+    dispose() { kits.forEach((e) => e.kit.dispose()); kits.clear(); },
+  };
+}

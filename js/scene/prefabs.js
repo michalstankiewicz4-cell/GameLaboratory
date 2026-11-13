@@ -41,7 +41,7 @@ export const FAMILIES = {
 };
 
 const P = [];
-// extra: needs ('space' — kity ze Space), assetKind (rodzaj zasobu, który obiekt może wskazać polem „asset”; build({ asset }))
+// extra: needs ('space' — kity ze Space), shoots (strzela: efekt strzału w polu „shot” obiektu), assetKind (rodzaj zasobu, który obiekt może wskazać polem „asset”; build({ asset }))
 const add = (id, label, family, surface, lab, build, extra) => P.push({ id, label, family, surface, lab, build, ...extra });
 const g = (v) => ({ root: v.group, kit: v, dispose: v.dispose ? () => v.dispose() : null });   // kit: to, co zwrócił kit (dane do zachowań)
 
@@ -77,7 +77,9 @@ function buildSpace(id) {
   const m = SK.buildShipModel(id, { detail: 1 }), holder = SK.makeGameHolder(m, m.size.x);   // +X dziób → +Z, skala 1
   return { root: holder, kit: m, dispose: () => SK.disposeShipModel(m), tick: (t, dt) => m.update(t, dt, { power: 0 }) };
 }
-SPACE.forEach(([id, name]) => add('space/' + id, name, 'space', 'space', 'labs/vehicles-space.html', () => buildSpace(id), { needs: 'space' }));
+// shoots: statek strzela (akcja „fire”) — wygląd strzału to efekt z laboratorium efektów, pole „shot” obiektu
+const SHOOTS = new Set(['codewing', 'scribe', 'swarmer']);
+SPACE.forEach(([id, name]) => add('space/' + id, name, 'space', 'space', 'labs/vehicles-space.html', () => buildSpace(id), { needs: 'space', ...(SHOOTS.has(id) ? { shoots: true } : {}) }));
 // roboty morskie (MarineKit ze Space, ładowany jak ShipKit): ślizgacz, barka, nurek, amfibia; na postoju unoszą się
 // na płaskiej wodzie (sprężyny modelu), w grze — zachowanie „mała jednostka na wodzie” (pozę daje zachowanie)
 const MARINE = [['skimmer', 'Skimmer'], ['barge', 'Barge'], ['diver', 'Diver'], ['amphibian', 'Amphibian']];

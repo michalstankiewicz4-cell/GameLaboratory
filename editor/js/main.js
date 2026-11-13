@@ -109,7 +109,7 @@ store.on((what) => {
 $('frame').addEventListener('click', controls.frameSelection);
 $('frameAll').addEventListener('click', controls.frameAll);
 // zasób zapisany w laboratorium (morze, niebo, wygląd kamery…) — od razu na liście i w scenie
-onAssetsChange(() => { panels.renderProps(); world.syncEnv(); world.syncObjects(); });   // zasób zapisany w laboratorium: środowisko i modele z zasobem (np. bryła z bloków)
+onAssetsChange(() => { panels.renderProps(); world.syncEnv(); world.syncObjects(); world.clearEffects(); });   // zasób zapisany w laboratorium: środowisko i modele z zasobem (np. bryła z bloków)
 
 step(t('load.models'), 0.3);
 world.syncObjects(); world.syncEnv(); controls.attach(); panels.renderTree(); panels.renderProps(); controls.frameAll();

@@ -6,7 +6,7 @@
    ======================================================================= */
 (function () {
 "use strict";
-const { GOLD, detailHelpers, makeBoltPool, makeBrushed, makeEngineSet, makeExhaust, makeNavLights, makeOnlineFader, makePlating, makePlumeMaterial, makeScanWave, makeShotQueue, partsOf, shadowed, sharedMaterials, trackTextures } = ShipKit._;
+const { GOLD, detailHelpers, makeShotEmitter, makeBrushed, makeEngineSet, makeExhaust, makeNavLights, makeOnlineFader, makePlating, makePlumeMaterial, makeScanWave, makeShotQueue, partsOf, shadowed, sharedMaterials, trackTextures } = ShipKit._;
 const SHIP_DEFS = ShipKit.SHIP_DEFS;
 
 // ---------------------------------------------------------------------
@@ -121,7 +121,7 @@ SHIP_DEFS.push({
     ] });
 
     // ---- actions: bite bolts from both mandibles, a scan ping.
-    const bolts = makeBoltPool(ship, env, 0x4fe3c6, { count: 8, length: 0.6, radius: 0.035, speed: 30 });
+    const guns = makeShotEmitter(ship, env, 0x4fe3c6, { speed: 30 });   // shots: an effect from the effects lab (model.onShot)
     const wave = makeScanWave(ship, env, 0x4fe3c6);
     const actions = [
       { id: "fire", label: "BITE", kind: "trigger" },
@@ -142,8 +142,8 @@ SHIP_DEFS.push({
       engines.update(t, throttle);
       nav.update(t);
       exhaust.update(dt, throttle, particles);
-      shots.run(t, (sh) => bolts.fire(tips[sh.tip], forward, sh.target));
-      bolts.update(dt); wave.update(dt);
+      shots.run(t, (sh) => guns.fire(tips[sh.tip], forward, sh.target));
+      wave.update(dt);
     }
     return { group: ship, update, setLights: (on) => nav.setVisible(on), actions, act };
   },

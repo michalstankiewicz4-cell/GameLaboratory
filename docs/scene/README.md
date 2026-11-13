@@ -34,6 +34,8 @@ Zasada: **dane są jedynym źródłem prawdy.** Okna edytora, uchwyt, API i plik
 - `pos` w metrach (Y w górę), `rot` w stopniach (kolejność YXZ: kurs, pochylenie, przechył), `scale` — mnożnik.
 - `behavior` (nieobowiązkowe): id zachowania; bez pola — domyślne dla modelu, `""` — stoi w miejscu.
 - `orbit` (nieobowiązkowe, zachowanie „orbita”): `{ around: id obiektu, period: s }`.
+- `shot` (nieobowiązkowe, statek, który strzela — `prefab.shoots`): efekt strzału — id efektu albo nazwa zasobu
+  „effect” z laboratorium efektów; bez pola — strzał.
 - `asset` (nieobowiązkowe): nazwa zasobu rodzaju, który bierze prefabrykat (`assetKind`, np. `blocks` — bryła z laboratorium
   bloków); bez pola — model domyślny prefabrykatu.
 - Zmiana formatu podnosi `VERSION`, a `normalize` przenosi starsze sceny. Nowe nieobowiązkowe pole (jak `behavior`,

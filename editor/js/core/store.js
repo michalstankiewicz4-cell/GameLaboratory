@@ -66,6 +66,7 @@ export function createStore(firstScene) {
       const rebuild = (patch.prefab && patch.prefab !== o.prefab) || (patch.asset !== undefined && (patch.asset || '') !== (o.asset || ''));
       Object.assign(o, patch); if (!(o.scale > 0)) o.scale = 1;
       if (!o.asset) delete o.asset;
+      if (!o.shot) delete o.shot;
       emit(rebuild ? 'objects' : 'place');
     },
     setEnv(patch) { record('env:' + Object.keys(patch).sort().join()); Object.assign(S.env, patch); emit('env'); },

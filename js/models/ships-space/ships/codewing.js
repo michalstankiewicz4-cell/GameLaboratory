@@ -6,7 +6,7 @@
    ======================================================================= */
 (function () {
 "use strict";
-const { GOLD, BLUE, additiveSprite, detailHelpers, glowTextures, labelKey, makeBoltPool, makeBrushed, makeCoreMaterial, makeEngineSet, makeExhaust, makeNavLights, makeOnlineFader, makePlating, makeScanWave, makeShotQueue, partsOf, rng, shadowed, sharedMaterials, strut, trackTextures } = ShipKit._;
+const { GOLD, BLUE, additiveSprite, detailHelpers, glowTextures, labelKey, makeShotEmitter, makeBrushed, makeCoreMaterial, makeEngineSet, makeExhaust, makeNavLights, makeOnlineFader, makePlating, makeScanWave, makeShotQueue, partsOf, rng, shadowed, sharedMaterials, strut, trackTextures } = ShipKit._;
 const SHIP_DEFS = ShipKit.SHIP_DEFS;
 
 // ---------------------------------------------------------------------
@@ -289,7 +289,7 @@ SHIP_DEFS.push({
 
     // ---- actions: alternating shots from the wingtip cannons, a sensor
     // ping from the dish. Offline: core, windows and gyro wind down.
-    const bolts = makeBoltPool(ship, env, 0x9fb6ff, { count: 12, length: 1.1, radius: 0.05, speed: 34 });
+    const guns = makeShotEmitter(ship, env, 0x9fb6ff, { speed: 34 });   // shots: an effect from the effects lab (model.onShot)
     const wave = makeScanWave(ship, env, 0x7f95ff);
     const actions = [
       { id: "fire", label: "FIRE CANNONS", kind: "trigger" },
@@ -319,8 +319,8 @@ SHIP_DEFS.push({
       U.uTime.value = t;
       U.uPower.value = throttle * (0.92 + 0.08 * Math.sin(t * 37.0) * Math.sin(t * 11.0)); // flicker
       spinner.rotation.z += dt * 0.5 * online;
-      shots.run(t, (sh) => bolts.fire(muzzle.set(-1.45, -0.12, 4.72 * sh.side), forward, sh.target));
-      bolts.update(dt); wave.update(dt);
+      shots.run(t, (sh) => guns.fire(muzzle.set(-1.45, -0.12, 4.72 * sh.side), forward, sh.target));
+      wave.update(dt);
       // lights fade by the clock (t), not dt: they still switch with the motion stopped
       const lightDt = chaseLastT === null ? 0 : Math.max(0, Math.min(0.1, t - chaseLastT)); chaseLastT = t;
       chaseLevel += ((chaseOn ? 1 : 0) - chaseLevel) * Math.min(1, lightDt * 14);

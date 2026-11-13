@@ -97,6 +97,8 @@ Zasada: **dane są jedynym źródłem prawdy**. Okna, uchwyt i pliki zmieniają 
 - `prefab`: id z `js/scene/prefabs.js` (`sea/…`, `road/…`, `tram/…`, `train/…`, `air/…`, `structures/…`, `weapons/…`,
   `space/…`, `marine/…`, `rovers/…`, `plants/…`, `caves/…`, `base/…`, `bodies/…`, `humans/…`, `creatures/…`, `blocks/…`).
 - `behavior` (nieobowiązkowe): id z `js/scene/behaviors.js` (`ship`, `flight`); bez pola — domyślne dla modelu, `""` — stoi w miejscu.
+- `shot` (nieobowiązkowe, statki, które strzelają): efekt strzału z laboratorium efektów (id albo zapisany efekt);
+  w oknie Obiekt „Efekt strzału”.
 - `asset` (nieobowiązkowe): zasób modelu z laboratorium (dziś bryła z bloków — rodzaj `blocks`); w oknie Obiekt lista
   zapisanych pod nazwą i „Model domyślny”.
 - Zmiana formatu podnosi `version` w `scene-data.js`, a `normalize` przenosi starsze sceny.
@@ -112,8 +114,8 @@ albo lista (po kolei); wynik `{ "ok": true, … }` albo `{ "ok": false, "error":
 | `help` | — | lista poleceń |
 | `describe` | — | cała scena (dane) i krótki opis |
 | `prefabs` | `[family]` | modele do dodania: id, nazwa, rodzina, gdzie stoi, zachowania |
-| `add` | `prefab`, `[name]`, `[pos]`, `[rot]`, `[scale]`, `[behavior]`, `[asset]` | dodaje model, zwraca `id` (`asset` — zasób modelu, np. bryła z laboratorium bloków) |
-| `set` | `id` albo `name`, potem `newName` (z `id` także `name`), `prefab`, `pos`, `rot`, `scale`, `behavior`, `orbit` (`{ around, period }` — zachowanie „orbita”), `asset` (`""` — model domyślny) | zmienia obiekt |
+| `add` | `prefab`, `[name]`, `[pos]`, `[rot]`, `[scale]`, `[behavior]`, `[asset]`, `[shot]` | dodaje model, zwraca `id` (`asset` — zasób modelu, np. bryła z laboratorium bloków) |
+| `set` | `id` albo `name`, potem `newName` (z `id` także `name`), `prefab`, `pos`, `rot`, `scale`, `behavior`, `orbit` (`{ around, period }` — zachowanie „orbita”), `asset` (`""` — model domyślny), `shot` (efekt strzału statku, `""` — strzał) | zmienia obiekt |
 | `move` | `id` albo `name`, `by: [dx, dy, dz]` | przesuwa o wektor |
 | `remove` | `id` albo `name` | usuwa |
 | `env` | `surface` (`sea` / `land` / `space`), `light`, `look`, `land`, `sea`, `sky`, `ui` | środowisko (`ui` — UI gry z laboratorium UI gry, nakładka w ▶ Graj) |

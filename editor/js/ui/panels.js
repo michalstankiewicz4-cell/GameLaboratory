@@ -3,6 +3,7 @@
 import { PREFABS, FAMILIES, prefab } from '../../../js/scene/prefabs.js';
 import { LIGHTS, readProfiles } from '../world/world.js';
 import { listAssets, ASSET_KINDS } from '../../../js/scene/assets.js';
+import { FX_KINDS } from '../../../js/render/effects/effects.js';
 import { skyPresets, SKY_PRESET, SKY_DAY } from '../../../js/scene/space.js';
 import { BEHAVIORS, behaviorsFor, behaviorOf, ORBIT_PERIOD } from '../../../js/scene/behaviors.js';
 
@@ -135,6 +136,16 @@ export function createPanels(store, actions) {
     $('oBehavior').replaceChildren(el('option', { value: '', textContent: t('obj.noBehavior') }),
       ...fit.map((id) => el('option', { value: id, textContent: lang === 'pl' ? BEHAVIORS[id].labelPl : BEHAVIORS[id].label })));
     $('oBehavior').value = behaviorOf(o); $('oBehavior').disabled = !fit.length || document.body.classList.contains('playing');
+    // efekt strzału (statek, który strzela): rodzaj efektu z laboratorium efektów albo zapisany efekt; '' — strzał
+    $('oShotRow').hidden = !(pk0(o) && pk0(o).shoots);
+    if (!$('oShotRow').hidden) {
+      const saved = listAssets('effect'), cur = o.shot || '';
+      $('oShot').replaceChildren(el('option', { value: '', textContent: t('obj.shotDefault') }),
+        ...Object.entries(FX_KINDS).filter(([id]) => id !== 'shot').map(([id, k]) => el('option', { value: id, textContent: lang === 'pl' ? k.labelPl : k.label })),
+        ...(saved.length ? [el('optgroup', { label: t('obj.shotSaved') }, ...saved.map((n) => el('option', { value: n, textContent: n })))] : []),
+        ...(cur && !FX_KINDS[cur] && !saved.includes(cur) ? [el('option', { value: cur, textContent: t('env.seaMissing', { name: cur }) })] : []));
+      $('oShot').value = cur === 'shot' ? '' : cur;
+    }
     // zasób modelu (prefabrykat z assetKind, np. bryła z laboratorium bloków): zapisane pod nazwą albo model domyślny
     const pk = prefab(o.prefab), ak = pk && pk.assetKind; $('oAssetRow').hidden = !ak;
     if (ak) {
@@ -157,6 +168,7 @@ export function createPanels(store, actions) {
     const p = prefab(o.prefab), lab = p && labName(p.lab);
     $('openLab').href = p ? '../' + p.lab : '#'; $('openLab').textContent = lab ? t('obj.openLabIn', { lab }) : t('obj.openLab');
   }
+  function pk0(o) { return prefab(o.prefab); }
   function labName(file) {
     const f = file.split('?')[0], c = window.LabMenu && window.LabMenu.ITEMS.LABS.find((l) => l.file === f);
     return c ? (lang === 'pl' && c.namePl) || c.name : f;
@@ -174,6 +186,7 @@ export function createPanels(store, actions) {
     actions.build(() => store.update(o.id, { prefab: nu.id, name: old && o.name === old.label ? nu.label : o.name }));   // nazwa domyślna idzie za modelem
   });
   $('oBehavior').addEventListener('change', () => { const o = store.selected; if (o) store.update(o.id, { behavior: $('oBehavior').value }); });
+  $('oShot').addEventListener('change', () => { const o = store.selected; if (o) store.update(o.id, { shot: $('oShot').value }); });
   $('oAsset').addEventListener('change', () => { const o = store.selected; if (o) actions.build(() => store.update(o.id, { asset: $('oAsset').value })); });
   $('orbitAround').addEventListener('change', () => { const o = store.selected; if (o) store.update(o.id, { orbit: { ...(o.orbit || {}), around: $('orbitAround').value } }); });
   $('orbitPeriod').addEventListener('input', () => { const o = store.selected, v = parseFloat($('orbitPeriod').value); if (o && v > 0) store.update(o.id, { orbit: { ...(o.orbit || {}), period: v } }); });

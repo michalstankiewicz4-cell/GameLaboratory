@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.30.0 — 2026-11-14 (efekt strzału)
+
+### Dodane
+- Statki, które strzelają: okno Obiekt — „Efekt strzału” (efekt z laboratorium efektów albo zapisany), pole `shot`
+  w danych sceny i w API; w ▶ Graj akcja „ogień” rysuje wybrany efekt.
+
 ## 0.29.0 — 2026-11-13 (efekty)
 
 ### Dodane

@@ -67,7 +67,10 @@ export function battleImageEffects({ renderer, scene, camera, panel, sunDir, pre
       look.space = ex && (ex.lens || ex.flare) ? { lens: S.fx.lens ? ex.lens || null : null, flare: ex.flare && (S.fx.flare || S.fx.rays) ? { ...ex.flare, strength: S.fx.flare ? ex.flare.strength ?? 1 : 0, rays: S.fx.rays ? ex.flare.rays ?? 1 : 0 } : null } : null;
       if (sunDir) look.sun(camera, sun.copy(typeof sunDir === 'function' ? sunDir() : sunDir).normalize());
       renderer.info.reset();
-      look.render(scene, camera);
+      // through(paint) (nieobowiązkowe, np. efekty z soczewkami — js/render/effects/): rysuje obraz przez siebie;
+      // paint(target) — obraz potoku do celu (null — ekran)
+      const paint = (target) => look.render(scene, camera, target);
+      if (this.through) this.through(paint); else paint(null);
     },
   };
 }

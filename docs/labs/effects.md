@@ -37,6 +37,15 @@ Zasób `effect` (`js/scene/assets.js`): `{ kind, scale, values }`. W edytorze sc
 jego położenie teraz, w grze tam, gdzie go niesie zachowanie). Polecenie wysyła zdarzenie `effect` na szynę
 (`js/core/events.js`), a świat edytora je rysuje (jeden EffectKit na zapisany efekt, stały krok 1/60 s).
 
+## Strzały statków
+
+Statki ShipKit (Codewing, Scribe, Swarmer) nie mają własnego pocisku ani błysku u lufy: akcja „fire” zgłasza strzał
+(`model.onShot({ from, to, dir, color, ship })`, świat), a gospodarz rysuje efekt wybrany dla statku — w laboratorium
+pojazdów kosmicznych (pod akcjami: Efekt strzału), w edytorze sceny w oknie Obiekt i w API (pole `shot` obiektu:
+id efektu albo nazwa zapisanego efektu; bez pola — strzał). `createEffectLibrary(scene, getAsset)` — jeden EffectKit na
+wybór; `shotOptions(kind, strzał)` — jak strzał zamienia się w opcje efektu (lot lufa → cel, ścieżka błyskawicy,
+odłamki i czarna dziura u celu). Pojazd z dowolnej gry, efekt z dowolnej gry.
+
 ## W laboratorium bloków
 
 Ugryzione bloki stałe sypią odłamki (`debris`) w barwie swojego rodzaju.

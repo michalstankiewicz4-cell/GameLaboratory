@@ -208,6 +208,11 @@ result), so a new ship gets them with no work:
   a ship without an animation for something simply leaves it out
   (codewing has no `print`). Extra ship-specific actions (any other id)
   are appended after the standard four.
+- **Shots** (since GameLaboratory 0.68.0): `fire` only reports where and when a gun fires
+  (`model.onShot`); what the shot looks like is an effect from the effects lab, chosen per ship —
+  in this lab under the actions (**Shot effect**: a ready effect or one saved under a name), in the
+  scene editor in the Object window (field `shot`). A ship from any game can fire an effect from any
+  game.
 - **OFFLINE**: implemented once for all ships — engines forced to power 0
   and the running lights switched off. The ship's `act("offline", on)`
   gets the state too, to dim its own parts: codewing's logic core,
@@ -247,7 +252,7 @@ Helpers for writing actions (exported too):
 
 | Helper | What it does |
 |---|---|
-| `makeBoltPool(parent, color, opts)` | Laser bolts: `fire(origin, dir)` launches a glowing rod with a muzzle flash, `update(dt)` moves them. |
+| `makeShotEmitter(ship, env, color, { speed })` | Shots: `fire(origin, dir, target?)` reports one shot to `model.onShot({ from, to, dir, color, ship })` (world space). The model draws no shot or muzzle flash — the host draws an effect from the effects lab (`js/render/effects/`, [`effects.md`](effects.md)). |
 | `makeScanWave(parent, color)` | An expanding shell with a Fresnel rim and scan lines: `start(pos, radius)`, `update(dt)`. |
 | `textTexture(text, color)` | A glowing word on a transparent canvas (cached), e.g. for a sprite. |
 | `fxTextures()` | The shared smoke puff and scorch textures. |
@@ -330,7 +335,7 @@ animations).
 | `makeNavLights(parent, defs)` | Running lights `{ color, pos, size, kind: "steady" \| "strobe", phase }`; `update(t)`, `setVisible(on)`. Each is a lens in its colour (always there) plus a glow; off, the glow fades in ~0.15 s and the lens goes dark (the user's call: the lights stay visible, they just go out) |
 | `makeShotQueue()` | `schedule([{ delay, ... }])` for act("fire"), `run(t, fn)` fires each when due |
 | `makeOnlineFader()` | Offline state for the ship's own parts: `set(on)`, `offline`, `update(dt)` → 0..1 online level |
-| `makeBoltPool`, `makeScanWave`, `textTexture`, `fxTextures` | Action effects (see [Actions, offline and damage](#actions-offline-and-damage)) |
+| `makeShotEmitter`, `makeScanWave`, `textTexture`, `fxTextures` | Action effects (see [Actions, offline and damage](#actions-offline-and-damage)) |
 | `makeSolarCells({ seed, cols, rows })` | Solar-cell sheet texture (the drone's wing, the station's panels) |
 | `partsOf(root)` | **Named parts**: `part("engines")` is a Group named "engines" under root, made the first time it's asked for. Every ship puts each numbered section of its build in one (see rule 14). The shared effects (shots, scan wave, damage smoke and sparks) go in `"effects"` (`effectsPart`) unless the host gives them an `fxRoot`. Plain static groups: GAME BUILD merges through them as before |
 | `strut(a, b, radius, material, segments)` | A cylinder from point a to point b: struts, spokes, booms, antenna feeds |
@@ -542,7 +547,7 @@ SHIP_DEFS.push({
     const nav = makeNavLights(ship, [{ color: 0x33ff77, pos: [-2, 0, 2] }]);
     const exhaust = makeExhaust(ship, U, { count: 200, seed: 1, emitters: [{ pos: [-3.8, 0, 0], spread: 0.3, length: 3 }] });
     const power = makeOnlineFader(), shots = makeShotQueue();
-    const bolts = makeBoltPool(ship, env, 0xffb45a);
+    const guns = makeShotEmitter(ship, env, 0xffb45a);
     const actions = [{ id: "fire", label: "FIRE" }];       // enable only what you animate
     function act(id, on) {
       if (id === "offline") { power.set(on); return; }
@@ -553,8 +558,8 @@ SHIP_DEFS.push({
       const online = power.update(dt);
       U.uTime.value = t; U.uPower.value = throttle;
       engines.update(t, throttle); nav.update(t); exhaust.update(dt, throttle, particles);
-      shots.run(t, (sh) => bolts.fire(new THREE.Vector3(3, 0, 0), new THREE.Vector3(1, 0, 0), sh.target));
-      bolts.update(dt);
+      shots.run(t, (sh) => guns.fire(new THREE.Vector3(3, 0, 0), new THREE.Vector3(1, 0, 0), sh.target));
+
     }
     return { group: ship, update, setLights: (on) => nav.setVisible(on), actions, act };
   },

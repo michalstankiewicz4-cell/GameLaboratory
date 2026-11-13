@@ -446,54 +446,25 @@ function fxHost(ship, env) {
   };
 }
 
-// A pool of laser bolts (glowing rods) plus a muzzle flash.
-// fire(origin, dir, target?) launches one: origin and dir in ship space,
-// or aimed at `target` (a world-space point) when given; update(dt) moves
-// them.
-function makeBoltPool(ship, env, color, { count = 12, length = 0.9, radius = 0.045, speed = 28 } = {}) {
-  const host = fxHost(ship, env);
-  const G = glowTextures();
-  const geo = new THREE.CylinderGeometry(radius, radius, length, 8, 1, true);
-  geo.rotateZ(-Math.PI / 2); // along +X
-  const mat = new THREE.MeshBasicMaterial({ color, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
-  const pool = [], X = new THREE.Vector3(1, 0, 0);
-  for (let i = 0; i < count; i++) {
-    const g = new THREE.Group();
-    g.add(new THREE.Mesh(geo, mat));
-    const glow = additiveSprite(G.nav, color);
-    glow.scale.setScalar(length * 0.9); g.add(glow);
-    g.userData.dynamic = true; // moves on its own: never merged
-    g.visible = false; host.add(g);
-    pool.push({ g, v: new THREE.Vector3(), age: 0 });
-  }
-  const flash = additiveSprite(G.engine, color);
-  flash.visible = false; host.add(flash);
-  let flashT = 0, flashK = 1;
+// Shots: the ship decides where its guns are and when they fire (act("fire")); what a shot looks like
+// is not part of the model — it comes from the effects lab (EffectKit, js/render/effects/), drawn by the
+// host. fire(origin, dir, target?) reports one shot to model.onShot({ from, to, dir, color, ship }):
+// origin and dir in ship space, or aimed at `target` (a world-space point); `to` without a target is
+// where the old bolt would have flown in 1.4 s (`speed` × 1.4 ship units). Everything in world space.
+// `color` — the ship's own colour for its shots (a hint the host may use). update(dt) — nothing to move.
+function makeShotEmitter(ship, env, color, { speed = 28 } = {}) {
+  const ws = new THREE.Vector3();
   return {
     fire(origin, dir, target) {
-      const b = pool.find((p) => !p.g.visible) || pool[0];
-      const o = origin.clone(), k = host.point(o);
-      let d;
-      if (target) d = host.worldPoint(target.clone()).sub(o).normalize();
-      else d = host.dir(dir.clone());
-      b.g.visible = true; b.g.scale.setScalar(k);
-      b.g.position.copy(o).addScaledVector(d, length * k / 2);
-      b.g.quaternion.setFromUnitVectors(X, d);
-      b.v.copy(d).multiplyScalar(speed * k); b.age = 0;
-      flash.position.copy(o); flash.visible = true; flashT = 1; flashK = k;
+      if (!env || !env.onShot) return;
+      ship.updateMatrixWorld(true);
+      const from = origin.clone().applyMatrix4(ship.matrixWorld);
+      const k = ship.getWorldScale(ws).x;
+      const d = target ? target.clone().sub(from).normalize() : dir.clone().transformDirection(ship.matrixWorld).normalize();
+      const to = target ? target.clone() : from.clone().addScaledVector(d, speed * 1.4 * k);
+      env.onShot({ from, to, dir: d, color, ship: env.id });
     },
-    update(dt) {
-      for (const b of pool) {
-        if (!b.g.visible) continue;
-        b.g.position.addScaledVector(b.v, dt);
-        if ((b.age += dt) > 1.4) b.g.visible = false;
-      }
-      if (flash.visible) {
-        flashT -= dt * 7; flash.material.opacity = Math.max(0, flashT);
-        flash.scale.setScalar((0.4 + (1 - flashT) * 0.9) * flashK);
-        if (flashT <= 0) flash.visible = false;
-      }
-    },
+    update() {},
   };
 }
 
@@ -1643,7 +1614,7 @@ function mergeStatic(root) {
 function buildShipModel(id, { detail = 1, merge = false, fxRoot = null, envMap = null, round = 0, seal = 0, sealStyle = "fillet", labels = null } = {}) {
   const def = SHIP_DEFS.find((d) => d.id === id);
   if (!def) throw new Error("ShipKit: unknown ship id " + id);
-  const env = { fxRoot, owned: [], labels };
+  const env = { id, fxRoot, owned: [], labels, onShot: null };   // onShot: shots of act("fire") — makeShotEmitter
   // arc segments: more for a stronger rounding and a higher detail (each box costs (2k+1)² quads a face)
   const k = Math.max(1, Math.min(3, Math.round(round * 3 * detail)));
   const built = withRounding(round, k, () => def.build(detail, env));
@@ -1681,6 +1652,9 @@ function buildShipModel(id, { detail = 1, merge = false, fxRoot = null, envMap =
   const showLights = (on) => { if (on !== st.shown) { st.shown = on; built.setLights(on); } };
   const model = {
     id, detail, group: built.group, size, radius, _owned: env.owned,
+    // act("fire") reports each shot here ({ from, to, dir, color, ship }, world space); the host draws it
+    // with an effect from the effects lab (js/render/effects/) — the model has no shot of its own
+    get onShot() { return env.onShot; }, set onShot(fn) { env.onShot = fn || null; },
     // [{ id, label, kind: "trigger" | "toggle", enabled }] — see STANDARD_ACTIONS
     actions,
     damageEnabled: features.damage,
@@ -1848,10 +1822,10 @@ function prewarm(ids) {
 
 return {
   // the internals the ship files build with (js/models/ships-sea/ships/*.js) — not a public API
-  _: { GOLD, BLUE, additiveSprite, buildShipModel, canvas, clamp, detailHelpers, fxHost, fxTextures, glowTextures, labelKey, makeBoltPool, makeBrushed, makeCoreMaterial, makeEngineSet, makeExhaust, makeGameHolder, makeNavLights, makeOnlineFader, makePlating, makePlumeMaterial, makeScanWave, makeShotQueue, makeSolarCells, mergeStatic, partsOf, rng, shadowed, sharedMaterials, strut, textTexture, trackTextures },
+  _: { GOLD, BLUE, additiveSprite, buildShipModel, canvas, clamp, detailHelpers, fxHost, fxTextures, glowTextures, labelKey, makeShotEmitter, makeBrushed, makeCoreMaterial, makeEngineSet, makeExhaust, makeGameHolder, makeNavLights, makeOnlineFader, makePlating, makePlumeMaterial, makeScanWave, makeShotQueue, makeSolarCells, mergeStatic, partsOf, rng, shadowed, sharedMaterials, strut, textTexture, trackTextures },
   SHIP_DEFS, GAME_DETAIL, buildShipModel, disposeShipModel, modelStats, makeGameHolder, prewarm, mergeStatic,
   makeSpaceSky, makeEnvironment,
-  makeBoltPool, makeScanWave, textTexture, fxTextures, // action/effect helpers for ship defs
+  makeShotEmitter, makeScanWave, textTexture, fxTextures, // action/effect helpers for ship defs
   // building blocks for ship definitions (see "SHIP BUILDING BLOCKS")
   detailHelpers, partsOf, withRounding, sealJoints, roundedBoxGeometry, roundedCylinderGeometry, makeEngineSet, makeExhaust, makeNavLights, makeShotQueue, makeOnlineFader, makeSolarCells, strut,
   STANDARD_ACTIONS,

@@ -6,6 +6,8 @@
    ======================================================================= */
 import { createStage } from "../shared/stage.js";
 import { loadSpace } from "../../scene/space.js";
+import { createEffectLibrary, FX_KINDS, STEP as FX_STEP } from "../../render/effects/effects.js";
+import { listAssets, getAsset, onAssetsChange } from "../../scene/assets.js";
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 (() => {
@@ -103,6 +105,8 @@ function loadShip(index, keepCamera) {
   current.setDamage(state.damage);
   document.getElementById("dmgSlider").disabled = !current.damageEnabled;
   renderActions();
+  current.onShot = (s) => { try { shotFx.shot(shotChoice(def.id), s); } catch (e) { if (window.LabLog) window.LabLog.add("warn", "Shot effect: " + e.message); } };
+  fillShotFx();
   applyWire();
   renderModelStats({ ...ShipKit.modelStats(current.group), buildMs });
   if (!keepCamera) camera.position.set(...def.camera);
@@ -110,6 +114,24 @@ function loadShip(index, keepCamera) {
   showLabels();
   shipSelect.value = String(index);
 }
+
+// Shots: the ship only reports them (model.onShot); what they look like is an effect from the effects lab
+// (js/render/effects/) — a ready one or one saved under a name, chosen per ship, kept in this browser
+let shotFx = null, shotAcc = 0;
+const shotChoice = (id) => store.get("shotFx", {})[id] || "shot";
+function fillShotFx() {
+  const sel = document.getElementById("shotFx"), row = document.getElementById("shotRow");
+  const fires = current.actions.some((a) => a.id === "fire" && a.enabled); row.hidden = !fires;
+  if (!fires) return;
+  const saved = listAssets("effect"), cur = shotChoice(current.id);
+  const opt = (v, t) => Object.assign(document.createElement("option"), { value: v, textContent: t });
+  sel.replaceChildren(...Object.entries(FX_KINDS).map(([id, k]) => opt(id, k.label)));
+  if (saved.length) { const g = document.createElement("optgroup"); g.label = "Saved in the effects lab"; g.append(...saved.map((n) => opt(n, n))); sel.append(g); }
+  if (![...sel.options].some((o) => o.value === cur)) sel.append(opt(cur, cur + " (not in this browser)"));
+  sel.value = cur;
+}
+document.getElementById("shotFx").addEventListener("change", (e) => { const all = store.get("shotFx", {}); all[current.id] = e.target.value; store.set("shotFx", all); });
+onAssetsChange(() => { if (shotFx) shotFx.dispose(); fillShotFx(); });
 
 // One button per model action: triggers flash, toggles stay lit.
 function renderActions() {
@@ -263,6 +285,8 @@ const fx = LabKit.imageEffects({ renderer, scene, camera, panel: document.getEle
   effects: ["bloom", "fxaa", "sharpen", "filter", "dof"],
   setQuality: (level) => { state.quality = level; qSlider.value = level; paintSlider(qSlider); applyQuality(level); },
 });
+shotFx = createEffectLibrary(scene, getAsset);
+fx.through = (paint) => (shotFx.lensing ? shotFx.render(renderer, scene, camera, paint) : paint(null));   // black hole, liquid bubble: lenses
 
 // the ship: a drop-down in the lab's top bar, as on the water page (labs/vehicles-water.html); a renamed ship shows its new name
 const shipSelect = document.getElementById("ship");
@@ -393,6 +417,10 @@ function frame() {
   // runs on the clock (t) — blinking lights, engine flames — goes on
   current.update(t, state.freeze ? 0 : dt, { power, particles: QUALITY[state.quality].particles });
 
+  // shot effects: a fixed step of 1/60 s (the numbers of the effects are per frame of the game)
+  shotAcc += state.freeze ? 0 : dt; let sn = 0;
+  while (shotAcc >= FX_STEP && sn < 6) { shotFx.step(camera); shotAcc -= FX_STEP; sn++; }
+  if (sn === 6) shotAcc = 0;
   controls.update();
   stage.follow(camera);
   renderer.info.reset();
