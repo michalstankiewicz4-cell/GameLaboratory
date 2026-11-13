@@ -3,6 +3,11 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.31.1 — 2026-11-14
+
+### Zmienione
+- Okno Obiekt: „Efekt strzału” w grupach Lot i W miejscu, z odznakami wielkości przy nazwie.
+
 ## 0.31.0 — 2026-11-14 (fala skanu i efekty roju)
 
 ### Dodane

@@ -55,6 +55,8 @@
   'obj.shot': 'Shot effect',
   'obj.shotDefault': 'Shot (default)',
   'obj.shotSaved': 'Saved in the effects lab',
+  'obj.shotFlight': 'Flight — from the gun to the target',
+  'obj.shotSpot': 'In place — at the target',
   'play.none': 'Nothing to play: no model in the scene has a behaviour.',
   'play.on': 'Playing: {name}. {keys} · Esc: stop',
   'play.off': 'Stopped: back to editing.',

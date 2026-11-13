@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Pojazdy — kosmos 1.10.1 · edytor sceny 0.31.1 — 2026-11-14 (efekt strzału według odznak)
+
+### Zmienione
+- Lista **Efekt strzału** (laboratorium pojazdów — kosmos, okno Obiekt w edytorze) w dwóch grupach według odznak
+  efektów: Lot — od lufy do celu, potem W miejscu — u celu; przy nazwie odznaki wielkości (punktowy, obszarowy).
+
 ## Program 0.69.1 · efekty 1.2.0 — 2026-11-14 (odznaki efektów)
 
 ### Dodane

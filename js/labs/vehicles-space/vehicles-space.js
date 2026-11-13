@@ -6,7 +6,7 @@
    ======================================================================= */
 import { createStage } from "../shared/stage.js";
 import { loadSpace } from "../../scene/space.js";
-import { createEffectLibrary, FX_KINDS, STEP as FX_STEP } from "../../render/effects/effects.js";
+import { createEffectLibrary, FX_KINDS, FX_BADGES, STEP as FX_STEP } from "../../render/effects/effects.js";
 import { listAssets, getAsset, onAssetsChange } from "../../scene/assets.js";
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
@@ -126,7 +126,12 @@ function fillShotFx() {
   if (!fires) return;
   const saved = listAssets("effect"), cur = shotChoice(current.id);
   const opt = (v, t) => Object.assign(document.createElement("option"), { value: v, textContent: t });
-  sel.replaceChildren(...Object.entries(FX_KINDS).map(([id, k]) => opt(id, k.label)));
+  // two groups by the effects' badges: Flight (from the gun to the target) first, then In place (plays at the target);
+  // each option names its size badges (Point, Area)
+  const size = (k) => k.badges.filter((b) => b === "point" || b === "area").map((b) => FX_BADGES[b].label).join(", ");
+  const group = (b, label) => { const g = document.createElement("optgroup"); g.label = label;
+    g.append(...Object.entries(FX_KINDS).filter(([, k]) => k.badges.includes(b) && (b === "flight" || !k.badges.includes("flight"))).map(([id, k]) => opt(id, `${k.label} · ${size(k)}`))); return g; };
+  sel.replaceChildren(group("flight", "Flight — from the gun to the target"), group("spot", "In place — at the target"));
   if (saved.length) { const g = document.createElement("optgroup"); g.label = "Saved in the effects lab"; g.append(...saved.map((n) => opt(n, n))); sel.append(g); }
   if (![...sel.options].some((o) => o.value === cur)) sel.append(opt(cur, cur + " (not in this browser)"));
   sel.value = cur;

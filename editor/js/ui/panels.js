@@ -3,7 +3,7 @@
 import { PREFABS, FAMILIES, prefab } from '../../../js/scene/prefabs.js';
 import { LIGHTS, readProfiles } from '../world/world.js';
 import { listAssets, ASSET_KINDS } from '../../../js/scene/assets.js';
-import { FX_KINDS } from '../../../js/render/effects/effects.js';
+import { FX_KINDS, FX_BADGES } from '../../../js/render/effects/effects.js';
 import { skyPresets, SKY_PRESET, SKY_DAY } from '../../../js/scene/space.js';
 import { BEHAVIORS, behaviorsFor, behaviorOf, ORBIT_PERIOD } from '../../../js/scene/behaviors.js';
 
@@ -141,7 +141,10 @@ export function createPanels(store, actions) {
     if (!$('oShotRow').hidden) {
       const saved = listAssets('effect'), cur = o.shot || '';
       $('oShot').replaceChildren(el('option', { value: '', textContent: t('obj.shotDefault') }),
-        ...Object.entries(FX_KINDS).filter(([id]) => id !== 'shot').map(([id, k]) => el('option', { value: id, textContent: lang === 'pl' ? k.labelPl : k.label })),
+        // dwie grupy według odznak efektów: Lot (od lufy do celu), potem W miejscu (u celu); przy nazwie — odznaki wielkości
+        ...['flight', 'spot'].map((b) => el('optgroup', { label: t(b === 'flight' ? 'obj.shotFlight' : 'obj.shotSpot') },
+          ...Object.entries(FX_KINDS).filter(([id, k]) => id !== 'shot' && k.badges.includes(b) && (b === 'flight' || !k.badges.includes('flight')))
+            .map(([id, k]) => el('option', { value: id, textContent: (lang === 'pl' ? k.labelPl : k.label) + ' · ' + k.badges.filter((x) => x === 'point' || x === 'area').map((x) => lang === 'pl' ? FX_BADGES[x].labelPl : FX_BADGES[x].label).join(', ') })))),
         ...(saved.length ? [el('optgroup', { label: t('obj.shotSaved') }, ...saved.map((n) => el('option', { value: n, textContent: n })))] : []),
         ...(cur && !FX_KINDS[cur] && !saved.includes(cur) ? [el('option', { value: cur, textContent: t('env.seaMissing', { name: cur }) })] : []));
       $('oShot').value = cur === 'shot' ? '' : cur;

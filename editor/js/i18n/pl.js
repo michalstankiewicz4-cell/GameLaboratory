@@ -54,6 +54,8 @@
   'obj.shot': 'Efekt strzału',
   'obj.shotDefault': 'Strzał (domyślny)',
   'obj.shotSaved': 'Zapisane w laboratorium efektów',
+  'obj.shotFlight': 'Lot — od lufy do celu',
+  'obj.shotSpot': 'W miejscu — u celu',
   'play.none': 'Nie ma czym grać: żaden model w scenie nie ma zachowania.',
   'play.on': 'Gra: {name}. {keys} · Esc: stop',
   'play.off': 'Stop: powrót do edycji.',
