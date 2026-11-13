@@ -155,6 +155,9 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
   metody ekspertyzy, techniki malarskie), z ilustracjami generowanymi w laboratoriach (laboratorium sztuki: `ArtApi`) —
   małe obrazki, bez wysokiej rozdzielczości i efektów, chyba że ilustracja tego wymaga. Wzór: wiki eksperta w grze
   artchecker (ilustracje generowane w piaskownicy).
+- **Laboratorium UI gry** (pomysł użytkownika, 2026-11-13): nakładka na scenę z menu gry, HUD i ekranami — UI gry
+  jako dane sceny, warstwa nad widokiem w ▶ Graj, własna skórka gry oddzielona od wyglądu laboratoriów; kiedy i na
+  jakim poziomie — do ustalenia (szczegóły w `TODO.md`).
 - **Laboratorium sztuki — tryb 3D** (propozycja przyjęta na później, opis: [../labs/art.md](../labs/art.md),
   „Pomysły”): obraz jako płaszczyzna 3D z mapą normalnych z wysokości farby ArtKit i mapą szorstkości, obracanie
   obrazu i ruchome światło, nierówny barwnik w pociągnięciu, rama 3D (profil listwy, UV wzdłuż listwy) ze złoceniem.
