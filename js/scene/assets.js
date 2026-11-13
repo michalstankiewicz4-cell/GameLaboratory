@@ -16,6 +16,8 @@
 //         poświata, winieta, ziarno, obiektyw); dawniej własny klucz gameLab.lookProfiles.v1 — przenoszony tu sam
 //         przy pierwszym odczycie
 //   ui — UI gry z laboratorium UI: definicja 'gamelab-ui' (ekrany menu, HUD, okna gry; js/gameui/gameui.js)
+//   material — materiał z laboratorium materiałów: opis MatKit (rodzaj, barwy, kafelek, szorstkość, metaliczność,
+//         nierówność, starzenie; js/render/materials/matkit.js)
 //   uiskin — skórka UI gry z laboratorium UI: { base: 'space' | 'battle' | 'engine', tokens } (js/gameui/skins.js)
 export const KEY = 'gameLab.assets.v1';
 
@@ -26,6 +28,7 @@ export const ASSET_KINDS = {
   look: { label: 'Camera look', labelPl: 'Wygląd kamery', lab: 'labs/filters.html', keys: ['exposure', 'autoExposure', 'autoTarget', 'tone', 'contrast', 'saturation', 'vibrance', 'temperature', 'tint', 'bloom', 'vignette', 'grain', 'ca', 'distortion', 'droplets', 'dirt', 'glare', 'sharpen'] },
   sky: { label: 'Space sky', labelPl: 'Niebo kosmosu', lab: 'labs/bodies.html', keys: null },   // null: każda liczba
   ui: { label: 'Game UI', labelPl: 'UI gry', lab: 'labs/gameui.html', keys: ['format', 'version', 'name', 'skin', 'start', 'pause', 'screens', 'hud', 'windows'] },
+  material: { label: 'Material', labelPl: 'Materiał', lab: 'labs/materials.html', keys: ['label', 'kind', 'color', 'color2', 'tile', 'seed', 'roughness', 'metalness', 'bump', 'wear', 'dirt', 'rust', 'brushed', 'panels', 'rivets', 'planks', 'grain', 'cracks', 'grains', 'pores', 'bricks', 'fibres', 'threads', 'trowel'] },
   uiskin: { label: 'Game UI skin', labelPl: 'Skórka UI gry', lab: 'labs/gameui.html', keys: ['base', 'tokens'] },
 };
 

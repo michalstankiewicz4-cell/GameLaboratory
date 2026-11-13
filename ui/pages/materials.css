@@ -1,0 +1,11 @@
+/* Laboratorium materiałów (labs/materials.html): miniatury map w oknie Mapy, kafelki 3 × 3, zakładka API. */
+#maps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0}
+.mapTile{margin:0;cursor:pointer}
+.mapTile canvas{display:block;width:100%;aspect-ratio:1;border:1px solid var(--line);border-radius:var(--r);image-rendering:auto}
+.mapTile:hover canvas{border-color:var(--accent)}
+.mapTile figcaption{font-size:10px;color:var(--dim);text-align:center;margin-top:2px}
+.mapTiled{grid-column:1/-1;width:100%;aspect-ratio:1;border:1px solid var(--accent);border-radius:var(--r);cursor:zoom-out}
+.panel textarea{width:100%;box-sizing:border-box;background:var(--field);border:1px solid var(--line);border-radius:var(--r);color:var(--text);font-size:11px;resize:vertical}
+.matApi{display:flex;flex-direction:column;gap:6px;padding:8px}
+.matApi textarea{width:100%;background:var(--field);border:1px solid var(--line);border-radius:var(--r);color:var(--text);font-size:11px}
+.matApi button{align-self:flex-start}

@@ -396,6 +396,22 @@ window.GameLabCatalog =
       }
     },
     {
+      "file": "labs/materials.html",
+      "name": "Materials Lab",
+      "namePl": "Laboratorium materiałów",
+      "doc": "docs/labs/materials.md",
+      "desc": "One library of PBR materials for every lab and game — steel plate, brushed metal, rust, painted hull, copper, gold, wood, rock, concrete, brick, paper, fabric, plaster, ice — generated as seamless maps (colour, normal, roughness, metalness, occlusion) with ageing: wear, dirt, rust.",
+      "descPl": "Jedna biblioteka materiałów PBR dla wszystkich laboratoriów i gier — blacha, stal szczotkowana, rdza, malowany kadłub, miedź, złoto, drewno, skała, beton, cegła, papier, tkanina, tynk, lód — generowane jako bezszwowe mapy (barwa, nierówności, szorstkość, metaliczność, zacienienie) ze starzeniem: zużycie, brud, rdza.",
+      "kind": "lab",
+      "kit": "MatKit",
+      "phrases": ["materiały", "tekstura", "metal", "drewno", "skała"],
+      "saved": ["gameLab.materials."],
+      "art": {
+        "bg": ["#2a2d31", "#0d0f11"],
+        "svg": "<circle cx=\"64\" cy=\"48\" r=\"24\" fill=\"#8c9399\"/><circle cx=\"58\" cy=\"40\" r=\"8\" fill=\"#d6dbe0\" opacity=\".7\"/><rect x=\"100\" y=\"26\" width=\"44\" height=\"44\" rx=\"3\" fill=\"#8a6a4a\"/><path d=\"M100 37 h44 M100 48 h44 M100 59 h44\" stroke=\"#4e3826\" stroke-width=\"2\"/><path d=\"M150 70 q8 -10 2 -22\" stroke=\"#b5642d\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"60\" cy=\"56\" r=\"5\" fill=\"#9a4a24\" opacity=\".8\"/>"
+      }
+    },
+    {
       "file": "labs/art.html",
       "name": "Art Lab",
       "namePl": "Laboratorium sztuki",
@@ -567,6 +583,9 @@ window.GameLabCatalog =
   ],
   "phraseEn": {
     "2D": "2D",
+    "skała": "rock",
+    "drewno": "wood",
+    "metal": "metal",
     "UI": "UI",
     "menu": "menu",
     "HUD": "HUD",

@@ -3,6 +3,16 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.63.0 · materiały 1.0.0 — 2026-11-13 (laboratorium materiałów)
+
+### Dodane
+- **Laboratorium materiałów** (`labs/materials.html`, opis `docs/labs/materials.md`) i **MatKit**
+  (`js/render/materials/matkit.js`): jedna biblioteka materiałów PBR — materiał to opis (rodzaj powierzchni, barwy,
+  kafelek, szorstkość, metaliczność, nierówność, starzenie: zużycie, brud, rdza), z którego generator robi bezszwowe
+  mapy (barwa, normalne, szorstkość, metaliczność, AO). 11 rodzajów (metal, blacha z nitami, malowany metal, drewno,
+  skała, beton, cegła, papier, tkanina, tynk, lód), 17 gotowych; podgląd na bryłach w scenie bazowej z ruchomym
+  słońcem, mapy do PNG, kafelki 3 × 3. Zasób `material`; dla AI `MaterialApi`.
+
 ## Program 0.62.0 · edytor sceny 0.26.0 · UI gry 1.1.0 — 2026-11-13 (UI gry w scenie)
 
 ### Dodane

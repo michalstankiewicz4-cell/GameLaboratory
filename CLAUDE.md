@@ -22,7 +22,7 @@
 - Jaskinie (CaveKit, `js/models/caves/`) i przedmioty bohatera dające światło (GearKit, `js/models/gear/`) to modele; sposoby widzenia (oko, noktowizor, lornetka) — warstwa obrazu `js/render/vision.js`. Jeziorka w jaskiniach (woda i lawa) są ogólne — ich styl wybiera się w laboratorium wody (tam też lawa).
 - `js/behaviors/` — zachowania (napęd i ruch) podpinane do modeli; każde deklaruje, w których środowiskach działa.
 - `ui/` — całe UI (opis: `ui/README.md`): `ui/ui.css` (jedno wejście), `ui/style/` (tokeny, czcionki, kontrolki, motywy `space.css` i `sea.css`), `ui/shell/` (dziennik, pasek menu, paski, okna, okna standardowe, wydajność, konsola, karta ładowania, przełącznik środowiska), `ui/data/` (katalog, wersje), `ui/pages/` (style stron).
-- `js/render/`, `js/audio/`, `js/labkit/` — wspólne warstwy.
+- `js/render/`, `js/audio/`, `js/labkit/` — wspólne warstwy. Materiały (PBR, starzenie): MatKit `js/render/materials/matkit.js`, laboratorium `labs/materials.html` — nowe materiały brać stąd.
 - `js/gameui/` — UI gry jako dane (ekrany menu, HUD, okna gry, okno dialogowe; format `gamelab-ui`), ze skórkami gier (`js/gameui/skins.js`, arkusze `js/gameui/css/`) oddzielonymi od wyglądu laboratoriów; laboratorium: `labs/gameui.html` (opis `docs/labs/gameui.md`).
 - `tools/` — narzędzia (doktor modeli, kitcheck, `paths.py` — sprawdzanie ścieżek).
 - `docs/` — dokumentacja w układzie kodu (mapa: `docs/README.md`): `docs/labs/` (laboratoria), `docs/models/` (modele), `docs/scene/` (silnik sceny), `docs/behaviors/` (zachowania), `docs/tools/` (narzędzia), `docs/guides/` (przewodniki, renderowanie, pułapki), `docs/history/` (historia sprzed przeniesienia, wykonany remanent).

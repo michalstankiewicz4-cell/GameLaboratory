@@ -31,6 +31,12 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 - [ ] **Zasoby z nazwą dla jaskiń i roślin**: ustawienia z laboratoriów zapisane pod nazwą i użyte w scenie (jak ląd
   i morze).
 
+## Materiały (laboratorium materiałów, 0.63.0)
+- [ ] Przenieść materiały modeli na MatKit stopniowo, rodzina po rodzinie (doktor modeli, porównanie obrazów):
+  budowle (`js/models/structures/materials.js`), okręty (`js/render/sea/materials.js`, `js/models/ships-sea/materials.js`),
+  pojazdy, statki kosmiczne; potem teren i powierzchnie 2D laboratorium sztuki.
+- [ ] Bloki laboratorium bloków (Hive Hunger) z materiałów; złocenie ramy; faktura farby jako mapa nierówności.
+
 ## Język
 - [ ] Przetłumaczyć okna laboratoriów na polski (teraz po polsku są pasek menu, strona startowa, tytuły okien standardowych, konsola i okno Wydajność).
 
