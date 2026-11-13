@@ -91,8 +91,13 @@ const link = (label, href, opts = {}) => {
   const c = el("span", "lmChk", opts.on ? "●" : ""); a.append(c, document.createTextNode(label));
   if (opts.blank) { a.target = "_blank"; a.rel = "noopener"; }
   if (opts.group) { a.classList.add("lmGlow"); a.dataset.group = opts.group; }
+  if (opts.cat) a.insertBefore(catDot(opts.cat), c.nextSibling);   // the category's dot (catalog "cat"), after the tick
   return a;
 };
+// categories of labs (catalog "cats"): a coloured dot (--cat-<id>), its name in a tooltip
+const CATS = CAT.cats || {};
+const catName = (id) => (CATS[id] ? (PL ? CATS[id].namePl : CATS[id].name) : "");
+const catDot = (id) => { const d = el("span", "lmDot"); d.dataset.cat = id; d.title = catName(id); return d; };
 const action = (label, fn, opts = {}) => {
   const b = el("button", "lmItem"); b.type = "button";
   b.append(el("span", "lmChk", opts.on ? "✓" : ""), document.createTextNode(label));
@@ -237,13 +242,18 @@ function windowItems() {
 const short = (name) => { const s = name.replace(/^Laboratorium\s+/, "").replace(/\s+lab(?=\s*·|$)/i, ""); return s.charAt(0).toUpperCase() + s.slice(1); };
 function tools() {
   const d = [el("div", "lmLabel", t("Labs", "Laboratoria"))];
-  // labs that belong together (catalog "group": the vehicles, the space labs): their text glows in the group's colour
-  LABS.filter((l) => !l.page || l.art).forEach((l) => d.push(link(short(l.name), ROOT + l.file, { on: me === l || (!!me && !me.art && me.page === l.file), group: l.group })));
+  // two kinds of grouping: the category (catalog "cat", in its order) — a heading and a coloured dot at each lab;
+  // labs that belong together (catalog "group": the vehicles, the space labs) — their text glows in the group's colour
+  let cat = null;
+  LABS.filter((l) => !l.page || l.art).forEach((l) => {
+    if (l.cat && l.cat !== cat) { cat = l.cat; const h = el("div", "lmCat"); h.append(catDot(cat), document.createTextNode(catName(cat))); d.push(h); }
+    d.push(link(short(l.name), ROOT + l.file, { on: me === l || (!!me && !me.art && me.page === l.file), group: l.group, cat: l.cat }));
+  });
   // an item of a group under the pointer lights up the whole group, with a dot at each
   const light = (g, on) => d.forEach((x) => { if (x.dataset && x.dataset.group === g) x.classList.toggle("lmGrpOn", on); });
   d.forEach((x) => { if (x.dataset && x.dataset.group) { x.addEventListener("mouseenter", () => light(x.dataset.group, true)); x.addEventListener("mouseleave", () => light(x.dataset.group, false)); } });
   d.push(el("div", "lmSep"), el("div", "lmLabel", t("Tools", "Narzędzia")));
-  TOOLS.forEach((t) => d.push(link(t.name, ROOT + t.file, { on: me === t })));
+  TOOLS.forEach((t) => d.push(link(t.name, ROOT + t.file, { on: me === t, cat: t.cat })));
   return d;
 }
 function help() {

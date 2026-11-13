@@ -3,6 +3,19 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.65.0 — 2026-11-13 (kategorie laboratoriów w menu i na kafelkach)
+
+### Dodane
+- **Kategorie laboratoriów** (katalog: `cat` przy każdym wpisie, nazwy w `cats`, barwy `--cat-<id>` w
+  `ui/style/tokens.css`): pojazdy, kosmos, świat (woda, ląd, wygląd), życie i postacie, materiały i grafika, UI
+  i dźwięk, AI (język i obrazy), narzędzia. Laboratoria w katalogu ułożone według kategorii — tak je pokazuje menu
+  i strona startowa (własna kolejność kafelków zostaje).
+- Menu **Narzędzia**: pasek przewijania (lista nie mieści się na ekranie), nagłówek każdej kategorii i kolorowa kropka
+  przy każdym laboratorium (nazwa kategorii w podpowiedzi); grupy (pojazdy, laboratoria kosmosu) dalej świecą swoim
+  kolorem — dwa rodzaje grupowania. Narzędzia: edytor sceny, lekarz sceny, doktor modeli, kontrola kitów, transformator.
+- **Kafelki**: kolorowa górna krawędź kategorii, etykieta z kropką i nazwą; po najechaniu na etykietę podpowiedź
+  z listą laboratoriów kategorii i podświetlenie wszystkich jej kafelków.
+
 ## Program 0.64.0 · bloki 1.0.0 · edytor sceny 0.27.0 — 2026-11-13 (laboratorium bloków)
 
 ### Dodane

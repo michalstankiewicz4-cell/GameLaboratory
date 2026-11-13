@@ -15,6 +15,15 @@
   --dim:#7f8a98;           /* notes, labels */
   --accent:#f2b84b;        /* gold: headings, active, sliders, ticks */
   --plum:#c68ae8;          /* the space labs' group (bodies, systems, scale): its glow in the menu */
+  /* categories of labs (ui/data/catalog.js "cats"): the dot in the menu and on the tile */
+  --cat-vehicles:var(--accent);
+  --cat-space:var(--plum);
+  --cat-world:#36d6b5;
+  --cat-life:#8fd45e;
+  --cat-matter:#e8925a;
+  --cat-ui:#8b9cff;
+  --cat-ai:#e86a9a;
+  --cat-tools:#9aa6b4;
   --ok:#5fd0a0;
   --err:#e04b50;
   --font:"Space Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;

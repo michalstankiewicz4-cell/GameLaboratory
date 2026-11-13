@@ -19,7 +19,11 @@
 #labMenu button:active { transform: none; }
 #labMenu .lmTop > button:hover, #labMenu .lmTop.open > button { background: var(--line); color: #fff; }
 #labMenu .lmDrop { position: absolute; left: 0; top: 28px; min-width: 240px; padding: 6px; border-radius: 10px; background: var(--card);
-  border: 1px solid var(--line); box-shadow: 0 12px 32px rgba(0, 0, 0, .45); display: none; }
+  border: 1px solid var(--line); box-shadow: 0 12px 32px rgba(0, 0, 0, .45); display: none;
+  max-height: calc(100vh - 40px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--line2) transparent; }
+#labMenu .lmDrop::-webkit-scrollbar { width: 6px; }
+#labMenu .lmDrop::-webkit-scrollbar-button { display: none; }
+#labMenu .lmDrop::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 3px; }
 #labMenu .lmTop.open .lmDrop { display: block; }
 #labMenu .lmItem { display: flex; align-items: center; gap: 10px; width: 100%; height: 28px; padding: 0 10px; box-sizing: border-box; border: 0;
   border-radius: 6px; background: none; color: var(--text); font: inherit; font-weight: 400; text-align: left; text-decoration: none; cursor: pointer; }
@@ -32,6 +36,15 @@
 #labMenu .lmItem .lmChk { width: 12px; color: var(--accent); }
 #labMenu .lmItem[aria-disabled="true"] { color: #4a5363; cursor: default; background: none; }
 #labMenu .lmSep { height: 1px; margin: 5px 6px; background: var(--line); }
+/* the category of a lab (catalog "cat"): a heading and a coloured dot at each item, its name in the tooltip */
+#labMenu .lmDot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--dot, var(--dim)); }
+#labMenu .lmDot[data-cat="vehicles"] { --dot: var(--cat-vehicles); } #labMenu .lmDot[data-cat="space"] { --dot: var(--cat-space); }
+#labMenu .lmDot[data-cat="world"] { --dot: var(--cat-world); } #labMenu .lmDot[data-cat="life"] { --dot: var(--cat-life); }
+#labMenu .lmDot[data-cat="matter"] { --dot: var(--cat-matter); } #labMenu .lmDot[data-cat="ui"] { --dot: var(--cat-ui); }
+#labMenu .lmDot[data-cat="ai"] { --dot: var(--cat-ai); } #labMenu .lmDot[data-cat="tools"] { --dot: var(--cat-tools); }
+#labMenu .lmItem .lmDot { margin-left: -4px; }
+#labMenu .lmCat { display: flex; align-items: center; gap: 7px; padding: 7px 10px 2px 24px; color: var(--dim); font-size: 10.5px; letter-spacing: .4px; }
+#labMenu .lmCat .lmDot { width: 6px; height: 6px; }
 #labMenu .lmLabel { padding: 6px 10px 3px; color: var(--dim); font-size: 11px; letter-spacing: .8px; text-transform: uppercase; }
 #labMenu .lmWhere { margin-left: auto; color: var(--dim); font-weight: 400; }
 #labMenu .lmWhere b { color: var(--head); font-weight: 600; }

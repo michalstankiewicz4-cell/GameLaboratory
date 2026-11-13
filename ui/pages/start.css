@@ -33,6 +33,18 @@ h2::after{ content:""; flex:1; height:1px; background:var(--line); }
 .tile[data-group="space"]{ --glow:var(--plum); }
 .tile.grpOn{ transform:translateY(-3px); border-color:color-mix(in srgb, var(--glow) 60%, transparent);
   box-shadow:0 14px 34px rgba(0,0,0,.4), 0 0 18px color-mix(in srgb, var(--glow) 30%, transparent); }
+/* the category (catalog "cat", colours --cat-<id>): a coloured top edge, a chip with a dot; the chip under the pointer
+   lights up every tile of that category (index.html, catLight) and its tooltip lists them */
+.tile[data-cat]{ --cat:var(--dim); border-top:3px solid color-mix(in srgb, var(--cat) 75%, transparent); }
+.tile[data-cat="vehicles"]{ --cat:var(--cat-vehicles); } .tile[data-cat="space"]{ --cat:var(--cat-space); }
+.tile[data-cat="world"]{ --cat:var(--cat-world); } .tile[data-cat="life"]{ --cat:var(--cat-life); }
+.tile[data-cat="matter"]{ --cat:var(--cat-matter); } .tile[data-cat="ui"]{ --cat:var(--cat-ui); }
+.tile[data-cat="ai"]{ --cat:var(--cat-ai); } .tile[data-cat="tools"]{ --cat:var(--cat-tools); }
+.tag.cat{ display:inline-flex; align-items:center; gap:6px; cursor:help; color:var(--cat); border-color:color-mix(in srgb, var(--cat) 45%, transparent);
+  background:color-mix(in srgb, var(--cat) 9%, transparent); }
+.tag.cat .dot{ width:7px; height:7px; border-radius:50%; background:var(--cat); }
+.tile.catOn{ transform:translateY(-3px); border-color:color-mix(in srgb, var(--cat) 70%, transparent);
+  box-shadow:0 14px 34px rgba(0,0,0,.4), 0 0 18px color-mix(in srgb, var(--cat) 35%, transparent); }
 /* reordering: the six-dot grip (top right, on hover), the tile being dragged, its gap */
 /* QUICK ACCESS: pinned, last opened, the two most opened; a badge says which */
 .quick .tile .badge{ position:absolute; left:10px; top:10px; z-index:2; padding:3px 9px; border-radius:999px; font-size:11px; letter-spacing:.8px;

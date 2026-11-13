@@ -113,11 +113,13 @@ const ART = {}, INFO = {}, INFO_PL = {}, PHRASES = {}, PHRASE_EN = CAT.phraseEn 
 for (const f in BY) { const c = BY[f]; if (c.art) ART[f] = c.art; if (c.desc) { INFO[f] = [c.desc, c.kind, c.kit]; INFO_PL[f] = c.descPl; } if (c.phrases) PHRASES[f] = c.phrases; }
 const phrase = (w) => (PL ? w : PHRASE_EN[w] || w);
 const STATUS = { tool: tr("Tool", "Narzędzie") };
+const catName = (id) => { const c = (CAT.cats || {})[id]; return c ? (PL ? c.namePl : c.name) : ""; };
 const LABS = window.LabMenu.ITEMS.LABS.filter((l) => !l.page || l.art), TOOLS = window.LabMenu.ITEMS.TOOLS;   // another page of a lab gets a tile when it has its own picture
 function tile(item) {
   const a = document.createElement("a"), art = ART[item.file], info = INFO[item.file] || ["", "lab", ""];
   a.className = "tile"; a.href = window.LabMenu.ROOT + item.file;
   if (item.group) a.dataset.group = item.group;   // labs that belong together light up together (below)
+  if (item.cat) a.dataset.cat = item.cat;          // the category (catalog "cat"): a coloured edge and a dot (below)
   const id = "g" + item.file.replace(/\W/g, "");
   const pic = art.img ? `<div class="art"><img src="${window.LabMenu.ROOT + art.img}" alt="" loading="lazy"></div>`
     : `<div class="art" style="background:linear-gradient(135deg, ${art.bg[0]}, ${art.bg[1]})">
@@ -132,10 +134,25 @@ function tile(item) {
   const v = window.LabMenu.VERSIONS.labs[item.file]; if (v) a.querySelector(".file").textContent += " · v" + v;
   a.querySelector(".desc").textContent = (PL && INFO_PL[item.file]) || info[0];
   a.querySelector(".tags .tag:last-child").textContent = info[2];
+  if (item.cat && CAT.cats && CAT.cats[item.cat]) {   // the category's chip: a dot and its name; its tooltip lists the category
+    const c = document.createElement("span"), d = document.createElement("i"), nm = catName(item.cat);
+    c.className = "tag cat"; d.className = "dot"; c.append(d, document.createTextNode(nm));
+    const same = ALL.filter((x) => x.cat === item.cat).map((x) => x.name);
+    c.title = tr("Category: ", "Kategoria: ") + nm + " — " + same.join(", ");
+    a.querySelector(".tags").prepend(c);
+  }
   const ph = a.querySelector(".phrases");
   for (const w of PHRASES[item.file] || []) { const e = document.createElement("span"); e.className = "phrase"; e.textContent = phrase(w); ph.appendChild(e); }
   return a;
 }
+// a category's chip under the pointer lights up every tile of that category
+function catLight(e, on) {
+  const c = e.target.closest && e.target.closest(".tag.cat"), t = c && c.closest(".tile[data-cat]");
+  if (!t || (e.relatedTarget && c.contains(e.relatedTarget))) return;
+  document.querySelectorAll('.tile[data-cat="' + t.dataset.cat + '"]').forEach((x) => x.classList.toggle("catOn", on));
+}
+document.addEventListener("mouseover", (e) => catLight(e, true));
+document.addEventListener("mouseout", (e) => catLight(e, false));
 // a tile of a group under the pointer lights up the group's other tiles (catalog "group": the vehicles, the space labs)
 function groupLight(e, on) {
   const t = e.target.closest && e.target.closest(".tile[data-group]");

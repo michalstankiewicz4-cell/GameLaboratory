@@ -11,7 +11,9 @@
    phrases (Polish; their English in phraseEn — a new phrase needs both),
    saved (localStorage key prefixes), art (the tile: bg + svg, or img),
    group + tab / tabPl (labs that belong together — one background, one glow in the menu, a switch on the bar:
-   "vehicles": space · water · land, "space": bodies · systems · scale).
+   "vehicles": space · water · land, "space": bodies · systems · scale),
+   cat (the category: a coloured dot in the menu and on the tile; "cats" — their names, in order; colours:
+   ui/style/tokens.css --cat-<id>). The labs are listed in category order (the menu and the start page follow it).
    The JSON between the markers is read by tools/sitemap.py — keep it JSON.
    ======================================================================= */
 window.GameLabCatalog =
@@ -19,9 +21,44 @@ window.GameLabCatalog =
   "start": {
     "saved": ["labsHub."]
   },
+  "cats": {
+    "vehicles": {
+      "name": "Vehicles",
+      "namePl": "Pojazdy"
+    },
+    "space": {
+      "name": "Space",
+      "namePl": "Kosmos"
+    },
+    "world": {
+      "name": "World: water, land, look",
+      "namePl": "Świat: woda, ląd, wygląd"
+    },
+    "life": {
+      "name": "Life and characters",
+      "namePl": "Życie i postacie"
+    },
+    "matter": {
+      "name": "Materials and graphics",
+      "namePl": "Materiały i grafika"
+    },
+    "ui": {
+      "name": "UI and sound",
+      "namePl": "UI i dźwięk"
+    },
+    "ai": {
+      "name": "AI: language and images",
+      "namePl": "AI: język i obrazy"
+    },
+    "tools": {
+      "name": "Tools",
+      "namePl": "Narzędzia"
+    }
+  },
   "labs": [
     {
       "file": "labs/vehicles-space.html",
+      "cat": "vehicles",
       "group": "vehicles",
       "tab": "Space",
       "tabPl": "Kosmos",
@@ -41,6 +78,7 @@ window.GameLabCatalog =
     },
     {
       "file": "labs/vehicles-water.html",
+      "cat": "vehicles",
       "group": "vehicles",
       "tab": "Water",
       "tabPl": "Woda",
@@ -60,6 +98,7 @@ window.GameLabCatalog =
     },
     {
       "file": "labs/vehicles-land.html",
+      "cat": "vehicles",
       "group": "vehicles",
       "tab": "Land",
       "tabPl": "Ląd",
@@ -79,6 +118,7 @@ window.GameLabCatalog =
     },
     {
       "file": "labs/bodies.html",
+      "cat": "space",
       "group": "space",
       "tab": "Bodies",
       "tabPl": "Ciała niebieskie",
@@ -97,6 +137,7 @@ window.GameLabCatalog =
     },
     {
       "file": "labs/systems.html",
+      "cat": "space",
       "group": "space",
       "tab": "Systems",
       "tabPl": "Układy",
@@ -115,6 +156,7 @@ window.GameLabCatalog =
     },
     {
       "file": "labs/scale.html",
+      "cat": "space",
       "group": "space",
       "tab": "Scale",
       "tabPl": "Skala",
@@ -132,23 +174,8 @@ window.GameLabCatalog =
       }
     },
     {
-      "file": "labs/skins.html",
-      "name": "Skin lab",
-      "namePl": "Laboratorium skórek",
-      "doc": "docs/labs/skins.md",
-      "desc": "Other looks for the game's interface, tried on a mock-up.",
-      "descPl": "Inne wyglądy interfejsu gry, przymierzane na makiecie.",
-      "kind": "lab",
-      "kit": "UI",
-      "phrases": ["interfejs", "wygląd"],
-      "saved": ["gameLab.skins"],
-      "art": {
-        "bg": ["#3a1830", "#160a14"],
-        "svg": "<rect x=\"34\" y=\"22\" width=\"92\" height=\"58\" rx=\"8\" fill=\"#1d1328\" stroke=\"#ff8bd1\" stroke-width=\"2\"/><rect x=\"34\" y=\"22\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#ff8bd1\" opacity=\".5\"/><rect x=\"74\" y=\"38\" width=\"92\" height=\"52\" rx=\"8\" fill=\"#16182a\" stroke=\"#8b9cff\" stroke-width=\"2\"/><rect x=\"74\" y=\"38\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#8b9cff\" opacity=\".5\"/><g><circle cx=\"92\" cy=\"68\" r=\"7\" fill=\"#36d6b5\"/><circle cx=\"112\" cy=\"68\" r=\"7\" fill=\"#f2b84b\"/><circle cx=\"132\" cy=\"68\" r=\"7\" fill=\"#ff6b8b\"/><circle cx=\"152\" cy=\"68\" r=\"7\" fill=\"#8b9cff\"/></g>"
-      }
-    },
-    {
       "file": "labs/surface.html",
+      "cat": "space",
       "name": "Surface lab",
       "namePl": "Laboratorium powierzchni",
       "doc": "docs/labs/surface.md",
@@ -165,6 +192,7 @@ window.GameLabCatalog =
     },
     {
       "file": "labs/buildings.html",
+      "cat": "space",
       "name": "Building lab",
       "namePl": "Laboratorium budynków",
       "doc": "docs/labs/surface.md",
@@ -179,116 +207,8 @@ window.GameLabCatalog =
       }
     },
     {
-      "file": "labs/sound.html",
-      "name": "Sound lab",
-      "namePl": "Laboratorium dźwięku",
-      "doc": "docs/labs/sound.md",
-      "desc": "The game's music, made live from layers and a seed: drones, pads, chimes, whispers, a robot's voice.",
-      "descPl": "Muzyka gry tworzona na żywo z warstw i ziarna: burdony, plamy, dzwonki, szepty, głos robota.",
-      "kind": "lab",
-      "kit": "MusicKit",
-      "phrases": ["dźwięk", "muzyka"],
-      "saved": ["soundLab."],
-      "art": {
-        "bg": ["#1f1840", "#0b0818"],
-        "svg": "<g fill=\"none\" stroke-linecap=\"round\"><path d=\"M18 44 V56\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.525\"/><path d=\"M22.6 26.61905486672678 V73.38094513327322\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.7422618141659152\"/><path d=\"M27.2 16.33244614410112 V83.66755385589889\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.870844423198736\"/><path d=\"M31.799999999999997 16.613191587785153 V83.38680841221485\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.8673351051526856\"/><path d=\"M36.4 25.652195991217393 V74.3478040087826\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.7543475501097826\"/><path d=\"M41 37.54328236833426 V62.45671763166574\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.6057089703958218\"/><path d=\"M45.599999999999994 42.359795783242234 V57.640204216757766\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.5455025527094721\"/><path d=\"M50.199999999999996 41.774032526376715 V58.225967473623285\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.5528245934202911\"/><path d=\"M54.8 40.4737913384299 V59.5262086615701\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.5690776082696263\"/><path d=\"M59.4 33.6302228410456 V66.3697771589544\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.65462221448693\"/><path d=\"M64 31.889564309920857 V68.11043569007914\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.6763804461259892\"/><path d=\"M68.6 38.7069812597759 V61.2930187402241\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.5911627342528012\"/><path d=\"M73.19999999999999 35.38888167229133 V64.61111832770867\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.6326389790963584\"/><path d=\"M77.8 20.247264086663645 V79.75273591333635\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.8219091989167044\"/><path d=\"M82.39999999999999 11.082670043112977 V88.91732995688702\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.9364666244610877\"/><path d=\"M87 12.632565464129058 V87.36743453587094\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.9170929316983868\"/><path d=\"M91.6 24.585259859291735 V75.41474014070826\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.7676842517588534\"/><path d=\"M96.19999999999999 41.68946906627234 V58.31053093372766\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.5538816366715957\"/><path d=\"M100.8 31.50764153167958 V68.49235846832042\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.6811544808540052\"/><path d=\"M105.39999999999999 24.783365641958092 V75.21663435804192\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.7652079294755239\"/><path d=\"M110 27.33129532012908 V72.66870467987093\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.7333588084983865\"/><path d=\"M114.6 35.39147797834034 V64.60852202165967\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.6326065252707458\"/><path d=\"M119.19999999999999 42.58956450801383 V57.41043549198617\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.5426304436498272\"/><path d=\"M123.8 43.666744131541456 V56.333255868458544\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.5291656983557318\"/><path d=\"M128.39999999999998 37.52236702106481 V62.47763297893519\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.6059704122366899\"/><path d=\"M133 27.877806521130463 V72.12219347886953\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.7265274184858692\"/><path d=\"M137.6 21.1895620944689 V78.8104379055311\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.8101304738191388\"/><path d=\"M142.2 22.964536940537663 V77.03546305946233\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.7879432882432793\"/><path d=\"M146.79999999999998 34.52035507370054 V65.47964492629946\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.6434955615787432\"/><path d=\"M151.39999999999998 36.002456274638206 V63.997543725361794\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.6249692965670224\"/><path d=\"M156 19.802719458157615 V80.19728054184239\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.8274660067730298\"/><path d=\"M160.6 11.733887612941004 V88.266112387059\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.9283264048382375\"/><path d=\"M165.2 14.768444808650273 V85.23155519134973\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.8903944398918716\"/><path d=\"M169.79999999999998 26.530139473793124 V73.46986052620687\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.7433732565775859\"/><path d=\"M174.39999999999998 40.68256113662587 V59.31743886337413\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.5664679857921766\"/><path d=\"M179 37.59936975210632 V62.40063024789368\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.605007878098671\"/></g><path d=\"M14 50 Q40 20 66 50 T118 50 T170 50 T190 50\" fill=\"none\" stroke=\"#f2b84b\" stroke-width=\"1.8\" opacity=\".8\"/>"
-      }
-    },
-    {
-      "file": "labs/creator.html",
-      "name": "Creature editor",
-      "namePl": "Edytor stworów",
-      "doc": "docs/labs/life.md",
-      "desc": "Build a creature: drag its spine into shape, give it pairs of legs anywhere — it walks, on any number of legs.",
-      "descPl": "Zbuduj stwora: wygnij jego kręgosłup, daj mu pary nóg gdziekolwiek — chodzi, na dowolnej liczbie nóg.",
-      "kind": "lab",
-      "kit": "LifeKit",
-      "phrases": ["życie", "stwory", "chód", "nogi"],
-      "saved": ["creatorLab."],
-      "art": {
-        "bg": ["#2a2416", "#110e08"],
-        "svg": "<path d=\"M40 60 Q70 30 110 42 T170 34\" fill=\"none\" stroke=\"#e8c79a\" stroke-width=\"10\" stroke-linecap=\"round\"/><g stroke=\"#e8c79a\" stroke-width=\"4\" stroke-linecap=\"round\"><path d=\"M75 44 L68 80 M95 42 L100 80 M125 40 L118 80 M145 38 L152 80\"/></g><g fill=\"#f8bb56\"><circle cx=\"40\" cy=\"60\" r=\"5\"/><circle cx=\"80\" cy=\"40\" r=\"5\"/><circle cx=\"120\" cy=\"41\" r=\"5\"/><circle cx=\"170\" cy=\"34\" r=\"5\"/></g><g fill=\"#36d6b5\"><circle cx=\"75\" cy=\"44\" r=\"4\"/><circle cx=\"145\" cy=\"38\" r=\"4\"/></g>"
-      }
-    },
-    {
-      "file": "labs/life.html",
-      "name": "Life lab",
-      "namePl": "Laboratorium życia",
-      "doc": "docs/labs/life.md",
-      "desc": "Life forms from blocks: a skeleton, bodies that bend at the joints, moving in their medium — animals on four legs. Humans have their own lab.",
-      "descPl": "Formy życia z bloków: szkielet, ciała zginające się w stawach, ruch w swoim ośrodku — zwierzęta na czterech nogach. Ludzie mają własne laboratorium.",
-      "kind": "lab",
-      "kit": "LifeKit",
-      "phrases": ["życie", "zwierzęta", "chód", "nogi"],
-      "art": {
-        "bg": ["#203a2e", "#0b1611"],
-        "svg": "<g fill=\"none\" stroke=\"#e8d2b8\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M64 56 Q100 44 136 56 M74 58 L66 92 M90 54 L94 92 M114 54 L108 92 M128 58 L136 92 M136 56 Q150 44 156 30\"/></g><circle cx=\"158\" cy=\"26\" r=\"7\" fill=\"#e8d2b8\"/><path d=\"M0 92 H200\" stroke=\"#5fd0a0\" stroke-width=\"2\" opacity=\".5\"/><g stroke=\"#5fd0a0\" stroke-width=\"1.5\" opacity=\".45\"><path d=\"M30 92 V86 M60 92 V86 M140 92 V86 M170 92 V86\"/></g>"
-      }
-    },
-    {
-      "file": "labs/human.html",
-      "name": "Human lab",
-      "namePl": "Laboratorium człowieka",
-      "doc": "docs/labs/human.md",
-      "desc": "Humans from blocks: a skeleton, a body that bends at the joints, a face with expressions; standing, walking, running, with layers on top of any gait.",
-      "descPl": "Ludzie z bloków: szkielet, ciało zginające się w stawach, twarz z minami; stanie, chód, bieg, z warstwami na każdym chodzie.",
-      "kind": "lab",
-      "kit": "LifeKit · human",
-      "phrases": ["człowiek", "postać", "chód", "twarz", "animacja"],
-      "art": {
-        "bg": ["#2e2636", "#120e17"],
-        "svg": "<g fill=\"none\" stroke=\"#e8d2b8\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M100 40 V66 M100 66 L88 92 M100 66 L114 90 M100 46 L84 62 M100 46 L118 58\"/></g><circle cx=\"100\" cy=\"27\" r=\"9\" fill=\"#e8d2b8\"/><path d=\"M0 92 H200\" stroke=\"#5fd0a0\" stroke-width=\"2\" opacity=\".5\"/><g stroke=\"#5fd0a0\" stroke-width=\"1.5\" opacity=\".45\"><path d=\"M30 92 V86 M60 92 V86 M140 92 V86 M170 92 V86\"/></g>"
-      }
-    },
-    {
-      "file": "labs/caves.html",
-      "name": "Cave lab",
-      "namePl": "Laboratorium jaskiń",
-      "doc": "docs/labs/caves.md",
-      "desc": "Caves from a seed — passages, chambers, drip stones, rubble and lakes — cut in limestone, granite, sandstone or basalt, dry or wet, seen in the light of a flashlight and a lantern.",
-      "descPl": "Jaskinie z ziarna — korytarze, komory, nacieki, gruz i jeziorka — w wapieniu, granicie, piaskowcu albo bazalcie, suche lub mokre, w świetle latarki i lampy.",
-      "kind": "lab",
-      "kit": "CaveKit",
-      "phrases": ["jaskinie", "skały", "materiały", "światło", "teren"],
-      "saved": ["gameLab.caves."],
-      "art": {
-        "bg": ["#1c1a17", "#0b0a09"],
-        "svg": "<path d=\"M0 100 L0 30 Q30 10 60 28 Q90 46 120 22 Q150 0 200 26 L200 100 Z\" fill=\"#2b2620\"/><path d=\"M20 100 Q40 60 80 62 Q120 64 150 52 Q175 44 190 70 L190 100 Z\" fill=\"#0b0a09\"/><path d=\"M70 28 L74 44 L78 30 Z M110 30 L113 48 L116 30 Z M140 18 L143 34 L146 20 Z\" fill=\"#d8cdb8\" opacity=\".8\"/><path d=\"M95 100 L99 82 L103 100 Z\" fill=\"#d8cdb8\" opacity=\".7\"/><ellipse cx=\"130\" cy=\"88\" rx=\"34\" ry=\"5\" fill=\"#2b6f9a\" opacity=\".55\"/><path d=\"M30 86 L100 58 L100 74 Z\" fill=\"#fff3d6\" opacity=\".18\"/>"
-      }
-    },
-    {
-      "file": "labs/gear.html",
-      "name": "Hero's gear lab",
-      "namePl": "Laboratorium przedmiotów bohatera",
-      "doc": "docs/labs/gear.md",
-      "desc": "The hero's items that give light — a flashlight, a lantern, a glow stick, a lighter, a phone screen — held in first person in a dark cave, and the ways of seeing: the bare eye, night vision, binoculars.",
-      "descPl": "Przedmioty bohatera, które dają światło — latarka, lampa naftowa, światło chemiczne, zapalniczka, ekran telefonu — trzymane w dłoni w ciemnej jaskini, i sposoby widzenia: oko, noktowizor, lornetka.",
-      "kind": "lab",
-      "kit": "GearKit",
-      "phrases": ["latarka", "noktowizor", "lornetka", "światło", "ekwipunek", "jaskinie"],
-      "saved": ["gameLab.gear."],
-      "art": {
-        "bg": ["#13201a", "#060a08"],
-        "svg": "<circle cx=\"78\" cy=\"50\" r=\"30\" fill=\"#46ff7a\" opacity=\".18\"/><circle cx=\"122\" cy=\"50\" r=\"30\" fill=\"#46ff7a\" opacity=\".18\"/><circle cx=\"78\" cy=\"50\" r=\"30\" fill=\"none\" stroke=\"#7dffa0\" stroke-width=\"2\" opacity=\".6\"/><circle cx=\"122\" cy=\"50\" r=\"30\" fill=\"none\" stroke=\"#7dffa0\" stroke-width=\"2\" opacity=\".6\"/><path d=\"M60 50 H140 M100 40 V60\" stroke=\"#0b1a10\" stroke-width=\"2\"/><rect x=\"150\" y=\"70\" width=\"36\" height=\"9\" rx=\"3\" fill=\"#2a2d33\"/><path d=\"M150 70 L132 62 L132 87 L150 79 Z\" fill=\"#fff3d6\" opacity=\".35\"/>"
-      }
-    },
-    {
-      "file": "labs/structures.html",
-      "name": "Structures lab",
-      "namePl": "Laboratorium budowli",
-      "doc": "docs/labs/structures.md",
-      "desc": "Waterside structures at real scale: a jack-up drilling rig, a quay, a breakwater.",
-      "descPl": "Budowle nad wodą w prawdziwej skali: platforma wiertnicza typu jack-up, nabrzeże, falochron.",
-      "kind": "lab",
-      "kit": "StructKit",
-      "phrases": ["woda", "ląd", "budowle", "platforma", "nabrzeże"],
-      "saved": ["gameLab.structures."],
-      "art": {
-        "img": "assets/labs/structures.jpg"
-      }
-    },
-    {
       "file": "labs/water.html",
+      "cat": "world",
       "name": "Water lab",
       "namePl": "Laboratorium wody",
       "doc": "docs/labs/water.md",
@@ -304,6 +224,7 @@ window.GameLabCatalog =
     },
     {
       "file": "labs/land.html",
+      "cat": "world",
       "name": "Land lab",
       "namePl": "Laboratorium lądu",
       "doc": "docs/labs/land.md",
@@ -318,22 +239,8 @@ window.GameLabCatalog =
       }
     },
     {
-      "file": "labs/plants.html",
-      "name": "Plants lab",
-      "namePl": "Laboratorium roślin",
-      "doc": "docs/labs/plants.md",
-      "desc": "Trees, palms, shrubs and grass grown from code, moving in the wind.",
-      "descPl": "Drzewa, palmy, krzewy i trawa wyhodowane z kodu, poruszane wiatrem.",
-      "kind": "lab",
-      "kit": "PlantKit",
-      "phrases": ["ląd", "rośliny", "drzewa", "trawa", "wiatr"],
-      "saved": ["gameLab.plants."],
-      "art": {
-        "img": "assets/labs/plants.jpg"
-      }
-    },
-    {
       "file": "labs/look.html",
+      "cat": "world",
       "name": "Look lab",
       "namePl": "Laboratorium wyglądu",
       "doc": "docs/labs/look.md",
@@ -349,6 +256,7 @@ window.GameLabCatalog =
     },
     {
       "file": "labs/filters.html",
+      "cat": "world",
       "name": "Filters lab",
       "namePl": "Laboratorium filtrów",
       "doc": "docs/labs/filters.md",
@@ -364,87 +272,123 @@ window.GameLabCatalog =
       }
     },
     {
-      "file": "labs/pixel.html",
-      "name": "Pixel Studio",
-      "namePl": "Pixel Studio",
-      "doc": "docs/labs/pixel/README.md",
-      "desc": "Pixel art with a transparent background: 3D models rendered to pixels, generated sprites and tiles, a pixel editor; palettes, dither, outline; PNG, sprite sheets, GIF. With its own Pixel Doctor.",
-      "descPl": "Pixel art z przezroczystym tłem: modele 3D renderowane do pikseli, generowane sprite'y i kafelki, edytor pikseli; palety, dithering, obrys; PNG, arkusze sprite'ów, GIF. Z własnym Pixel Doctorem.",
+      "file": "labs/structures.html",
+      "cat": "world",
+      "name": "Structures lab",
+      "namePl": "Laboratorium budowli",
+      "doc": "docs/labs/structures.md",
+      "desc": "Waterside structures at real scale: a jack-up drilling rig, a quay, a breakwater.",
+      "descPl": "Budowle nad wodą w prawdziwej skali: platforma wiertnicza typu jack-up, nabrzeże, falochron.",
       "kind": "lab",
-      "kit": "Pixel Studio",
-      "phrases": ["pixel art", "sprite", "2D", "animacja", "paleta", "GIF"],
-      "saved": ["gameLab.pixel."],
+      "kit": "StructKit",
+      "phrases": ["woda", "ląd", "budowle", "platforma", "nabrzeże"],
+      "saved": ["gameLab.structures."],
       "art": {
-        "bg": ["#1d2b22", "#0b120d"],
-        "svg": "<rect x=\"80\" y=\"14\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"90\" y=\"14\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"80\" y=\"24\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"90\" y=\"24\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"70\" y=\"34\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"80\" y=\"34\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"90\" y=\"34\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"100\" y=\"34\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"60\" y=\"44\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"70\" y=\"44\" width=\"10\" height=\"10\" fill=\"#13261a\"/><rect x=\"80\" y=\"44\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"90\" y=\"44\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"100\" y=\"44\" width=\"10\" height=\"10\" fill=\"#13261a\"/><rect x=\"110\" y=\"44\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"60\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"70\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"80\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"90\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"100\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"110\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"70\" y=\"64\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"100\" y=\"64\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"60\" y=\"74\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"110\" y=\"74\" width=\"10\" height=\"10\" fill=\"#8be07a\"/>"
+        "img": "assets/labs/structures.jpg"
       }
     },
     {
-      "file": "labs/gameui.html",
-      "name": "Game UI Lab",
-      "namePl": "Laboratorium UI gry",
-      "doc": "docs/labs/gameui.md",
-      "desc": "A game's interface as data over a live scene: menu screens, HUD (bars, counters, telegraph, rudder, crosshair, event log, minimap, banners), in-game windows and a dialogue box for characters and the narrator, in skins kept apart from the labs' look — Space, Battle, the engine's or your own. JSON for AI.",
-      "descPl": "Interfejs gry jako dane nad żywą sceną: ekrany menu, HUD (paski, liczniki, telegraf, ster, celownik, dziennik zdarzeń, minimapa, banery), okna w grze i okno dialogowe postaci i narratora, w skórkach oddzielonych od wyglądu laboratoriów — Space, Battle, silnika albo własnych. JSON dla AI.",
+      "file": "labs/caves.html",
+      "cat": "world",
+      "name": "Cave lab",
+      "namePl": "Laboratorium jaskiń",
+      "doc": "docs/labs/caves.md",
+      "desc": "Caves from a seed — passages, chambers, drip stones, rubble and lakes — cut in limestone, granite, sandstone or basalt, dry or wet, seen in the light of a flashlight and a lantern.",
+      "descPl": "Jaskinie z ziarna — korytarze, komory, nacieki, gruz i jeziorka — w wapieniu, granicie, piaskowcu albo bazalcie, suche lub mokre, w świetle latarki i lampy.",
       "kind": "lab",
-      "kit": "GameUI",
-      "phrases": ["UI", "menu", "HUD", "dialogi", "gra"],
-      "saved": ["gameLab.gameui."],
+      "kit": "CaveKit",
+      "phrases": ["jaskinie", "skały", "materiały", "światło", "teren"],
+      "saved": ["gameLab.caves."],
       "art": {
-        "bg": ["#13213a", "#060b16"],
-        "svg": "<rect x=\"40\" y=\"12\" width=\"120\" height=\"72\" rx=\"6\" fill=\"#0a1430\" stroke=\"#3c55d8\" stroke-width=\"2\"/><rect x=\"48\" y=\"20\" width=\"34\" height=\"6\" fill=\"#0bd99a\"/><rect x=\"48\" y=\"30\" width=\"24\" height=\"6\" fill=\"#f8bb56\"/><rect x=\"128\" y=\"20\" width=\"24\" height=\"24\" rx=\"12\" fill=\"none\" stroke=\"#5f77f7\" stroke-width=\"2\"/><rect x=\"62\" y=\"58\" width=\"76\" height=\"18\" rx=\"3\" fill=\"#050a24\" stroke=\"#e7c27a\" stroke-width=\"1.5\"/><rect x=\"68\" y=\"64\" width=\"40\" height=\"3\" fill=\"#eef1ff\"/><rect x=\"68\" y=\"69\" width=\"28\" height=\"3\" fill=\"#93a6ff\"/>"
+        "bg": ["#1c1a17", "#0b0a09"],
+        "svg": "<path d=\"M0 100 L0 30 Q30 10 60 28 Q90 46 120 22 Q150 0 200 26 L200 100 Z\" fill=\"#2b2620\"/><path d=\"M20 100 Q40 60 80 62 Q120 64 150 52 Q175 44 190 70 L190 100 Z\" fill=\"#0b0a09\"/><path d=\"M70 28 L74 44 L78 30 Z M110 30 L113 48 L116 30 Z M140 18 L143 34 L146 20 Z\" fill=\"#d8cdb8\" opacity=\".8\"/><path d=\"M95 100 L99 82 L103 100 Z\" fill=\"#d8cdb8\" opacity=\".7\"/><ellipse cx=\"130\" cy=\"88\" rx=\"34\" ry=\"5\" fill=\"#2b6f9a\" opacity=\".55\"/><path d=\"M30 86 L100 58 L100 74 Z\" fill=\"#fff3d6\" opacity=\".18\"/>"
       }
     },
     {
-      "file": "labs/blocks.html",
-      "name": "Blocks Lab",
-      "namePl": "Laboratorium bloków",
-      "doc": "docs/labs/blocks.md",
-      "desc": "Bodies built of blocks, from Hive Hunger: rock, iron, ice, sandstone, water, lava and gas in layers (surface, deep, core, veins, pools), solid blocks in materials from the materials lab. Bite a hole: water and lava come loose as droplets that hold together, gas as a drifting cloud — in space, with no gravity.",
-      "descPl": "Bryły z bloków, z Hive Hunger: skała, żelazo, lód, piaskowiec, woda, lawa i gaz w warstwach (powierzchnia, głębia, jądro, żyły, jeziorka), bloki stałe w materiałach z laboratorium materiałów. Ugryź dziurę: woda i lawa wypływają kroplami, które trzymają się razem, gaz — dryfującą chmurą, w kosmosie bez grawitacji.",
+      "file": "labs/plants.html",
+      "cat": "world",
+      "name": "Plants lab",
+      "namePl": "Laboratorium roślin",
+      "doc": "docs/labs/plants.md",
+      "desc": "Trees, palms, shrubs and grass grown from code, moving in the wind.",
+      "descPl": "Drzewa, palmy, krzewy i trawa wyhodowane z kodu, poruszane wiatrem.",
       "kind": "lab",
-      "kit": "BlockKit",
-      "phrases": ["bloki", "kosmos", "ciecze", "materiały"],
-      "saved": ["gameLab.blocks."],
+      "kit": "PlantKit",
+      "phrases": ["ląd", "rośliny", "drzewa", "trawa", "wiatr"],
+      "saved": ["gameLab.plants."],
       "art": {
-        "bg": ["#1a1626", "#07060c"],
-        "svg": "<rect x=\"70\" y=\"30\" width=\"14\" height=\"14\" fill=\"#8a7d70\"/><rect x=\"84\" y=\"30\" width=\"14\" height=\"14\" fill=\"#7a6e62\"/><rect x=\"98\" y=\"30\" width=\"14\" height=\"14\" fill=\"#8a8f98\"/><rect x=\"70\" y=\"44\" width=\"14\" height=\"14\" fill=\"#3f7fd0\"/><rect x=\"84\" y=\"44\" width=\"14\" height=\"14\" fill=\"#ff5a1f\"/><rect x=\"98\" y=\"44\" width=\"14\" height=\"14\" fill=\"#8a7d70\"/><rect x=\"84\" y=\"58\" width=\"14\" height=\"14\" fill=\"#c4a57c\"/><circle cx=\"128\" cy=\"40\" r=\"4\" fill=\"#3f7fd0\"/><circle cx=\"136\" cy=\"46\" r=\"3\" fill=\"#3f7fd0\"/><circle cx=\"134\" cy=\"62\" r=\"6\" fill=\"#c4a0e8\" opacity=\".6\"/>"
+        "img": "assets/labs/plants.jpg"
       }
     },
     {
-      "file": "labs/materials.html",
-      "name": "Materials Lab",
-      "namePl": "Laboratorium materiałów",
-      "doc": "docs/labs/materials.md",
-      "desc": "One library of PBR materials for every lab and game — steel plate, brushed metal, rust, painted hull, copper, gold, wood, rock, concrete, brick, paper, fabric, plaster, ice — generated as seamless maps (colour, normal, roughness, metalness, occlusion) with ageing: wear, dirt, rust.",
-      "descPl": "Jedna biblioteka materiałów PBR dla wszystkich laboratoriów i gier — blacha, stal szczotkowana, rdza, malowany kadłub, miedź, złoto, drewno, skała, beton, cegła, papier, tkanina, tynk, lód — generowane jako bezszwowe mapy (barwa, nierówności, szorstkość, metaliczność, zacienienie) ze starzeniem: zużycie, brud, rdza.",
+      "file": "labs/life.html",
+      "cat": "life",
+      "name": "Life lab",
+      "namePl": "Laboratorium życia",
+      "doc": "docs/labs/life.md",
+      "desc": "Life forms from blocks: a skeleton, bodies that bend at the joints, moving in their medium — animals on four legs. Humans have their own lab.",
+      "descPl": "Formy życia z bloków: szkielet, ciała zginające się w stawach, ruch w swoim ośrodku — zwierzęta na czterech nogach. Ludzie mają własne laboratorium.",
       "kind": "lab",
-      "kit": "MatKit",
-      "phrases": ["materiały", "tekstura", "metal", "drewno", "skała"],
-      "saved": ["gameLab.materials."],
+      "kit": "LifeKit",
+      "phrases": ["życie", "zwierzęta", "chód", "nogi"],
       "art": {
-        "bg": ["#2a2d31", "#0d0f11"],
-        "svg": "<circle cx=\"64\" cy=\"48\" r=\"24\" fill=\"#8c9399\"/><circle cx=\"58\" cy=\"40\" r=\"8\" fill=\"#d6dbe0\" opacity=\".7\"/><rect x=\"100\" y=\"26\" width=\"44\" height=\"44\" rx=\"3\" fill=\"#8a6a4a\"/><path d=\"M100 37 h44 M100 48 h44 M100 59 h44\" stroke=\"#4e3826\" stroke-width=\"2\"/><path d=\"M150 70 q8 -10 2 -22\" stroke=\"#b5642d\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"60\" cy=\"56\" r=\"5\" fill=\"#9a4a24\" opacity=\".8\"/>"
+        "bg": ["#203a2e", "#0b1611"],
+        "svg": "<g fill=\"none\" stroke=\"#e8d2b8\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M64 56 Q100 44 136 56 M74 58 L66 92 M90 54 L94 92 M114 54 L108 92 M128 58 L136 92 M136 56 Q150 44 156 30\"/></g><circle cx=\"158\" cy=\"26\" r=\"7\" fill=\"#e8d2b8\"/><path d=\"M0 92 H200\" stroke=\"#5fd0a0\" stroke-width=\"2\" opacity=\".5\"/><g stroke=\"#5fd0a0\" stroke-width=\"1.5\" opacity=\".45\"><path d=\"M30 92 V86 M60 92 V86 M140 92 V86 M170 92 V86\"/></g>"
       }
     },
     {
-      "file": "labs/art.html",
-      "name": "Art Lab",
-      "namePl": "Laboratorium sztuki",
-      "doc": "docs/labs/art.md",
-      "desc": "2D pictures on a canvas: a subject painted in oil (brush strokes, impasto), watercolour, pencil, ballpoint, ink with a stick, charcoal, pastel, marker, pointillism or engraving, on canvas, paper, wood, parchment or metal lit from the side; conversions and formats (postage stamp, frame). Zoom to the bristles. Examine: paintings, banknotes, coins, stamps and manuscripts — original or forgery — under UV, infrared, X-ray and raking light. Every picture is a JSON spec — for games and AI.",
-      "descPl": "Obrazy 2D na płótnie: temat malowany olejem (pociągnięcia pędzla, impast), akwarelą, ołówkiem, długopisem, tuszem patyczkiem, węglem, pastelem, flamastrem, puentylizmem albo rytownictwem, na płótnie, papierze, drewnie, pergaminie lub metalu w świetle bocznym; konwersje i formaty (znaczek pocztowy, rama). Zoom do włosia pędzla. Ekspertyza: obrazy, banknoty, monety, znaczki i rękopisy — oryginał albo fałszerstwo — w UV, podczerwieni, RTG i świetle bocznym. Każdy obraz to spec JSON — dla gier i AI.",
+      "file": "labs/creator.html",
+      "cat": "life",
+      "name": "Creature editor",
+      "namePl": "Edytor stworów",
+      "doc": "docs/labs/life.md",
+      "desc": "Build a creature: drag its spine into shape, give it pairs of legs anywhere — it walks, on any number of legs.",
+      "descPl": "Zbuduj stwora: wygnij jego kręgosłup, daj mu pary nóg gdziekolwiek — chodzi, na dowolnej liczbie nóg.",
       "kind": "lab",
-      "kit": "ArtKit",
-      "phrases": ["sztuka", "malarstwo", "obraz", "2D", "znaczki", "ekspertyza", "tekstura", "paleta"],
-      "saved": ["gameLab.art."],
+      "kit": "LifeKit",
+      "phrases": ["życie", "stwory", "chód", "nogi"],
+      "saved": ["creatorLab."],
       "art": {
-        "bg": ["#2b2117", "#120d08"],
-        "svg": "<rect x=\"58\" y=\"14\" width=\"84\" height=\"66\" rx=\"2\" fill=\"#d9c7a4\" stroke=\"#d6b25e\" stroke-width=\"4\"/><path d=\"M62 62 Q80 44 98 56 T138 50 V76 H62 Z\" fill=\"#4f6b3a\"/><circle cx=\"120\" cy=\"32\" r=\"8\" fill=\"#f2b84b\"/><path d=\"M66 40 q14 -6 28 0\" stroke=\"#2f5a85\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M150 84 L172 60\" stroke=\"#a0522d\" stroke-width=\"4\" stroke-linecap=\"round\"/><path d=\"M146 88 l6 -6 l4 4 z\" fill=\"#e8e1cf\"/>"
+        "bg": ["#2a2416", "#110e08"],
+        "svg": "<path d=\"M40 60 Q70 30 110 42 T170 34\" fill=\"none\" stroke=\"#e8c79a\" stroke-width=\"10\" stroke-linecap=\"round\"/><g stroke=\"#e8c79a\" stroke-width=\"4\" stroke-linecap=\"round\"><path d=\"M75 44 L68 80 M95 42 L100 80 M125 40 L118 80 M145 38 L152 80\"/></g><g fill=\"#f8bb56\"><circle cx=\"40\" cy=\"60\" r=\"5\"/><circle cx=\"80\" cy=\"40\" r=\"5\"/><circle cx=\"120\" cy=\"41\" r=\"5\"/><circle cx=\"170\" cy=\"34\" r=\"5\"/></g><g fill=\"#36d6b5\"><circle cx=\"75\" cy=\"44\" r=\"4\"/><circle cx=\"145\" cy=\"38\" r=\"4\"/></g>"
+      }
+    },
+    {
+      "file": "labs/human.html",
+      "cat": "life",
+      "name": "Human lab",
+      "namePl": "Laboratorium człowieka",
+      "doc": "docs/labs/human.md",
+      "desc": "Humans from blocks: a skeleton, a body that bends at the joints, a face with expressions; standing, walking, running, with layers on top of any gait.",
+      "descPl": "Ludzie z bloków: szkielet, ciało zginające się w stawach, twarz z minami; stanie, chód, bieg, z warstwami na każdym chodzie.",
+      "kind": "lab",
+      "kit": "LifeKit · human",
+      "phrases": ["człowiek", "postać", "chód", "twarz", "animacja"],
+      "art": {
+        "bg": ["#2e2636", "#120e17"],
+        "svg": "<g fill=\"none\" stroke=\"#e8d2b8\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M100 40 V66 M100 66 L88 92 M100 66 L114 90 M100 46 L84 62 M100 46 L118 58\"/></g><circle cx=\"100\" cy=\"27\" r=\"9\" fill=\"#e8d2b8\"/><path d=\"M0 92 H200\" stroke=\"#5fd0a0\" stroke-width=\"2\" opacity=\".5\"/><g stroke=\"#5fd0a0\" stroke-width=\"1.5\" opacity=\".45\"><path d=\"M30 92 V86 M60 92 V86 M140 92 V86 M170 92 V86\"/></g>"
+      }
+    },
+    {
+      "file": "labs/gear.html",
+      "cat": "life",
+      "name": "Hero's gear lab",
+      "namePl": "Laboratorium przedmiotów bohatera",
+      "doc": "docs/labs/gear.md",
+      "desc": "The hero's items that give light — a flashlight, a lantern, a glow stick, a lighter, a phone screen — held in first person in a dark cave, and the ways of seeing: the bare eye, night vision, binoculars.",
+      "descPl": "Przedmioty bohatera, które dają światło — latarka, lampa naftowa, światło chemiczne, zapalniczka, ekran telefonu — trzymane w dłoni w ciemnej jaskini, i sposoby widzenia: oko, noktowizor, lornetka.",
+      "kind": "lab",
+      "kit": "GearKit",
+      "phrases": ["latarka", "noktowizor", "lornetka", "światło", "ekwipunek", "jaskinie"],
+      "saved": ["gameLab.gear."],
+      "art": {
+        "bg": ["#13201a", "#060a08"],
+        "svg": "<circle cx=\"78\" cy=\"50\" r=\"30\" fill=\"#46ff7a\" opacity=\".18\"/><circle cx=\"122\" cy=\"50\" r=\"30\" fill=\"#46ff7a\" opacity=\".18\"/><circle cx=\"78\" cy=\"50\" r=\"30\" fill=\"none\" stroke=\"#7dffa0\" stroke-width=\"2\" opacity=\".6\"/><circle cx=\"122\" cy=\"50\" r=\"30\" fill=\"none\" stroke=\"#7dffa0\" stroke-width=\"2\" opacity=\".6\"/><path d=\"M60 50 H140 M100 40 V60\" stroke=\"#0b1a10\" stroke-width=\"2\"/><rect x=\"150\" y=\"70\" width=\"36\" height=\"9\" rx=\"3\" fill=\"#2a2d33\"/><path d=\"M150 70 L132 62 L132 87 L150 79 Z\" fill=\"#fff3d6\" opacity=\".35\"/>"
       }
     },
     {
       "file": "labs/zombies.html",
+      "cat": "life",
       "name": "Zombie Generator",
       "namePl": "Generator zombie",
       "doc": "docs/labs/pixel/zombies.md",
@@ -461,6 +405,7 @@ window.GameLabCatalog =
     },
     {
       "file": "labs/morgue.html",
+      "cat": "life",
       "name": "SDF Morgue",
       "namePl": "Kostnica SDF",
       "doc": "docs/labs/morgue.md",
@@ -476,6 +421,7 @@ window.GameLabCatalog =
     },
     {
       "file": "labs/walkers.html",
+      "cat": "life",
       "name": "SDF Walkers",
       "namePl": "SDF Walkers",
       "doc": "docs/labs/walkers/README.md",
@@ -491,7 +437,127 @@ window.GameLabCatalog =
       }
     },
     {
+      "file": "labs/materials.html",
+      "cat": "matter",
+      "name": "Materials Lab",
+      "namePl": "Laboratorium materiałów",
+      "doc": "docs/labs/materials.md",
+      "desc": "One library of PBR materials for every lab and game — steel plate, brushed metal, rust, painted hull, copper, gold, wood, rock, concrete, brick, paper, fabric, plaster, ice — generated as seamless maps (colour, normal, roughness, metalness, occlusion) with ageing: wear, dirt, rust.",
+      "descPl": "Jedna biblioteka materiałów PBR dla wszystkich laboratoriów i gier — blacha, stal szczotkowana, rdza, malowany kadłub, miedź, złoto, drewno, skała, beton, cegła, papier, tkanina, tynk, lód — generowane jako bezszwowe mapy (barwa, nierówności, szorstkość, metaliczność, zacienienie) ze starzeniem: zużycie, brud, rdza.",
+      "kind": "lab",
+      "kit": "MatKit",
+      "phrases": ["materiały", "tekstura", "metal", "drewno", "skała"],
+      "saved": ["gameLab.materials."],
+      "art": {
+        "bg": ["#2a2d31", "#0d0f11"],
+        "svg": "<circle cx=\"64\" cy=\"48\" r=\"24\" fill=\"#8c9399\"/><circle cx=\"58\" cy=\"40\" r=\"8\" fill=\"#d6dbe0\" opacity=\".7\"/><rect x=\"100\" y=\"26\" width=\"44\" height=\"44\" rx=\"3\" fill=\"#8a6a4a\"/><path d=\"M100 37 h44 M100 48 h44 M100 59 h44\" stroke=\"#4e3826\" stroke-width=\"2\"/><path d=\"M150 70 q8 -10 2 -22\" stroke=\"#b5642d\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"60\" cy=\"56\" r=\"5\" fill=\"#9a4a24\" opacity=\".8\"/>"
+      }
+    },
+    {
+      "file": "labs/blocks.html",
+      "cat": "matter",
+      "name": "Blocks Lab",
+      "namePl": "Laboratorium bloków",
+      "doc": "docs/labs/blocks.md",
+      "desc": "Bodies built of blocks, from Hive Hunger: rock, iron, ice, sandstone, water, lava and gas in layers (surface, deep, core, veins, pools), solid blocks in materials from the materials lab. Bite a hole: water and lava come loose as droplets that hold together, gas as a drifting cloud — in space, with no gravity.",
+      "descPl": "Bryły z bloków, z Hive Hunger: skała, żelazo, lód, piaskowiec, woda, lawa i gaz w warstwach (powierzchnia, głębia, jądro, żyły, jeziorka), bloki stałe w materiałach z laboratorium materiałów. Ugryź dziurę: woda i lawa wypływają kroplami, które trzymają się razem, gaz — dryfującą chmurą, w kosmosie bez grawitacji.",
+      "kind": "lab",
+      "kit": "BlockKit",
+      "phrases": ["bloki", "kosmos", "ciecze", "materiały"],
+      "saved": ["gameLab.blocks."],
+      "art": {
+        "bg": ["#1a1626", "#07060c"],
+        "svg": "<rect x=\"70\" y=\"30\" width=\"14\" height=\"14\" fill=\"#8a7d70\"/><rect x=\"84\" y=\"30\" width=\"14\" height=\"14\" fill=\"#7a6e62\"/><rect x=\"98\" y=\"30\" width=\"14\" height=\"14\" fill=\"#8a8f98\"/><rect x=\"70\" y=\"44\" width=\"14\" height=\"14\" fill=\"#3f7fd0\"/><rect x=\"84\" y=\"44\" width=\"14\" height=\"14\" fill=\"#ff5a1f\"/><rect x=\"98\" y=\"44\" width=\"14\" height=\"14\" fill=\"#8a7d70\"/><rect x=\"84\" y=\"58\" width=\"14\" height=\"14\" fill=\"#c4a57c\"/><circle cx=\"128\" cy=\"40\" r=\"4\" fill=\"#3f7fd0\"/><circle cx=\"136\" cy=\"46\" r=\"3\" fill=\"#3f7fd0\"/><circle cx=\"134\" cy=\"62\" r=\"6\" fill=\"#c4a0e8\" opacity=\".6\"/>"
+      }
+    },
+    {
+      "file": "labs/art.html",
+      "cat": "matter",
+      "name": "Art Lab",
+      "namePl": "Laboratorium sztuki",
+      "doc": "docs/labs/art.md",
+      "desc": "2D pictures on a canvas: a subject painted in oil (brush strokes, impasto), watercolour, pencil, ballpoint, ink with a stick, charcoal, pastel, marker, pointillism or engraving, on canvas, paper, wood, parchment or metal lit from the side; conversions and formats (postage stamp, frame). Zoom to the bristles. Examine: paintings, banknotes, coins, stamps and manuscripts — original or forgery — under UV, infrared, X-ray and raking light. Every picture is a JSON spec — for games and AI.",
+      "descPl": "Obrazy 2D na płótnie: temat malowany olejem (pociągnięcia pędzla, impast), akwarelą, ołówkiem, długopisem, tuszem patyczkiem, węglem, pastelem, flamastrem, puentylizmem albo rytownictwem, na płótnie, papierze, drewnie, pergaminie lub metalu w świetle bocznym; konwersje i formaty (znaczek pocztowy, rama). Zoom do włosia pędzla. Ekspertyza: obrazy, banknoty, monety, znaczki i rękopisy — oryginał albo fałszerstwo — w UV, podczerwieni, RTG i świetle bocznym. Każdy obraz to spec JSON — dla gier i AI.",
+      "kind": "lab",
+      "kit": "ArtKit",
+      "phrases": ["sztuka", "malarstwo", "obraz", "2D", "znaczki", "ekspertyza", "tekstura", "paleta"],
+      "saved": ["gameLab.art."],
+      "art": {
+        "bg": ["#2b2117", "#120d08"],
+        "svg": "<rect x=\"58\" y=\"14\" width=\"84\" height=\"66\" rx=\"2\" fill=\"#d9c7a4\" stroke=\"#d6b25e\" stroke-width=\"4\"/><path d=\"M62 62 Q80 44 98 56 T138 50 V76 H62 Z\" fill=\"#4f6b3a\"/><circle cx=\"120\" cy=\"32\" r=\"8\" fill=\"#f2b84b\"/><path d=\"M66 40 q14 -6 28 0\" stroke=\"#2f5a85\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M150 84 L172 60\" stroke=\"#a0522d\" stroke-width=\"4\" stroke-linecap=\"round\"/><path d=\"M146 88 l6 -6 l4 4 z\" fill=\"#e8e1cf\"/>"
+      }
+    },
+    {
+      "file": "labs/pixel.html",
+      "cat": "matter",
+      "name": "Pixel Studio",
+      "namePl": "Pixel Studio",
+      "doc": "docs/labs/pixel/README.md",
+      "desc": "Pixel art with a transparent background: 3D models rendered to pixels, generated sprites and tiles, a pixel editor; palettes, dither, outline; PNG, sprite sheets, GIF. With its own Pixel Doctor.",
+      "descPl": "Pixel art z przezroczystym tłem: modele 3D renderowane do pikseli, generowane sprite'y i kafelki, edytor pikseli; palety, dithering, obrys; PNG, arkusze sprite'ów, GIF. Z własnym Pixel Doctorem.",
+      "kind": "lab",
+      "kit": "Pixel Studio",
+      "phrases": ["pixel art", "sprite", "2D", "animacja", "paleta", "GIF"],
+      "saved": ["gameLab.pixel."],
+      "art": {
+        "bg": ["#1d2b22", "#0b120d"],
+        "svg": "<rect x=\"80\" y=\"14\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"90\" y=\"14\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"80\" y=\"24\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"90\" y=\"24\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"70\" y=\"34\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"80\" y=\"34\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"90\" y=\"34\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"100\" y=\"34\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"60\" y=\"44\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"70\" y=\"44\" width=\"10\" height=\"10\" fill=\"#13261a\"/><rect x=\"80\" y=\"44\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"90\" y=\"44\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"100\" y=\"44\" width=\"10\" height=\"10\" fill=\"#13261a\"/><rect x=\"110\" y=\"44\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"60\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"70\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"80\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"90\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"100\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"110\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"70\" y=\"64\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"100\" y=\"64\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"60\" y=\"74\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"110\" y=\"74\" width=\"10\" height=\"10\" fill=\"#8be07a\"/>"
+      }
+    },
+    {
+      "file": "labs/gameui.html",
+      "cat": "ui",
+      "name": "Game UI Lab",
+      "namePl": "Laboratorium UI gry",
+      "doc": "docs/labs/gameui.md",
+      "desc": "A game's interface as data over a live scene: menu screens, HUD (bars, counters, telegraph, rudder, crosshair, event log, minimap, banners), in-game windows and a dialogue box for characters and the narrator, in skins kept apart from the labs' look — Space, Battle, the engine's or your own. JSON for AI.",
+      "descPl": "Interfejs gry jako dane nad żywą sceną: ekrany menu, HUD (paski, liczniki, telegraf, ster, celownik, dziennik zdarzeń, minimapa, banery), okna w grze i okno dialogowe postaci i narratora, w skórkach oddzielonych od wyglądu laboratoriów — Space, Battle, silnika albo własnych. JSON dla AI.",
+      "kind": "lab",
+      "kit": "GameUI",
+      "phrases": ["UI", "menu", "HUD", "dialogi", "gra"],
+      "saved": ["gameLab.gameui."],
+      "art": {
+        "bg": ["#13213a", "#060b16"],
+        "svg": "<rect x=\"40\" y=\"12\" width=\"120\" height=\"72\" rx=\"6\" fill=\"#0a1430\" stroke=\"#3c55d8\" stroke-width=\"2\"/><rect x=\"48\" y=\"20\" width=\"34\" height=\"6\" fill=\"#0bd99a\"/><rect x=\"48\" y=\"30\" width=\"24\" height=\"6\" fill=\"#f8bb56\"/><rect x=\"128\" y=\"20\" width=\"24\" height=\"24\" rx=\"12\" fill=\"none\" stroke=\"#5f77f7\" stroke-width=\"2\"/><rect x=\"62\" y=\"58\" width=\"76\" height=\"18\" rx=\"3\" fill=\"#050a24\" stroke=\"#e7c27a\" stroke-width=\"1.5\"/><rect x=\"68\" y=\"64\" width=\"40\" height=\"3\" fill=\"#eef1ff\"/><rect x=\"68\" y=\"69\" width=\"28\" height=\"3\" fill=\"#93a6ff\"/>"
+      }
+    },
+    {
+      "file": "labs/skins.html",
+      "cat": "ui",
+      "name": "Skin lab",
+      "namePl": "Laboratorium skórek",
+      "doc": "docs/labs/skins.md",
+      "desc": "Other looks for the game's interface, tried on a mock-up.",
+      "descPl": "Inne wyglądy interfejsu gry, przymierzane na makiecie.",
+      "kind": "lab",
+      "kit": "UI",
+      "phrases": ["interfejs", "wygląd"],
+      "saved": ["gameLab.skins"],
+      "art": {
+        "bg": ["#3a1830", "#160a14"],
+        "svg": "<rect x=\"34\" y=\"22\" width=\"92\" height=\"58\" rx=\"8\" fill=\"#1d1328\" stroke=\"#ff8bd1\" stroke-width=\"2\"/><rect x=\"34\" y=\"22\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#ff8bd1\" opacity=\".5\"/><rect x=\"74\" y=\"38\" width=\"92\" height=\"52\" rx=\"8\" fill=\"#16182a\" stroke=\"#8b9cff\" stroke-width=\"2\"/><rect x=\"74\" y=\"38\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#8b9cff\" opacity=\".5\"/><g><circle cx=\"92\" cy=\"68\" r=\"7\" fill=\"#36d6b5\"/><circle cx=\"112\" cy=\"68\" r=\"7\" fill=\"#f2b84b\"/><circle cx=\"132\" cy=\"68\" r=\"7\" fill=\"#ff6b8b\"/><circle cx=\"152\" cy=\"68\" r=\"7\" fill=\"#8b9cff\"/></g>"
+      }
+    },
+    {
+      "file": "labs/sound.html",
+      "cat": "ui",
+      "name": "Sound lab",
+      "namePl": "Laboratorium dźwięku",
+      "doc": "docs/labs/sound.md",
+      "desc": "The game's music, made live from layers and a seed: drones, pads, chimes, whispers, a robot's voice.",
+      "descPl": "Muzyka gry tworzona na żywo z warstw i ziarna: burdony, plamy, dzwonki, szepty, głos robota.",
+      "kind": "lab",
+      "kit": "MusicKit",
+      "phrases": ["dźwięk", "muzyka"],
+      "saved": ["soundLab."],
+      "art": {
+        "bg": ["#1f1840", "#0b0818"],
+        "svg": "<g fill=\"none\" stroke-linecap=\"round\"><path d=\"M18 44 V56\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.525\"/><path d=\"M22.6 26.61905486672678 V73.38094513327322\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.7422618141659152\"/><path d=\"M27.2 16.33244614410112 V83.66755385589889\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.870844423198736\"/><path d=\"M31.799999999999997 16.613191587785153 V83.38680841221485\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.8673351051526856\"/><path d=\"M36.4 25.652195991217393 V74.3478040087826\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.7543475501097826\"/><path d=\"M41 37.54328236833426 V62.45671763166574\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.6057089703958218\"/><path d=\"M45.599999999999994 42.359795783242234 V57.640204216757766\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.5455025527094721\"/><path d=\"M50.199999999999996 41.774032526376715 V58.225967473623285\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.5528245934202911\"/><path d=\"M54.8 40.4737913384299 V59.5262086615701\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.5690776082696263\"/><path d=\"M59.4 33.6302228410456 V66.3697771589544\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.65462221448693\"/><path d=\"M64 31.889564309920857 V68.11043569007914\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.6763804461259892\"/><path d=\"M68.6 38.7069812597759 V61.2930187402241\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.5911627342528012\"/><path d=\"M73.19999999999999 35.38888167229133 V64.61111832770867\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.6326389790963584\"/><path d=\"M77.8 20.247264086663645 V79.75273591333635\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.8219091989167044\"/><path d=\"M82.39999999999999 11.082670043112977 V88.91732995688702\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.9364666244610877\"/><path d=\"M87 12.632565464129058 V87.36743453587094\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.9170929316983868\"/><path d=\"M91.6 24.585259859291735 V75.41474014070826\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.7676842517588534\"/><path d=\"M96.19999999999999 41.68946906627234 V58.31053093372766\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.5538816366715957\"/><path d=\"M100.8 31.50764153167958 V68.49235846832042\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.6811544808540052\"/><path d=\"M105.39999999999999 24.783365641958092 V75.21663435804192\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.7652079294755239\"/><path d=\"M110 27.33129532012908 V72.66870467987093\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.7333588084983865\"/><path d=\"M114.6 35.39147797834034 V64.60852202165967\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.6326065252707458\"/><path d=\"M119.19999999999999 42.58956450801383 V57.41043549198617\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.5426304436498272\"/><path d=\"M123.8 43.666744131541456 V56.333255868458544\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.5291656983557318\"/><path d=\"M128.39999999999998 37.52236702106481 V62.47763297893519\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.6059704122366899\"/><path d=\"M133 27.877806521130463 V72.12219347886953\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.7265274184858692\"/><path d=\"M137.6 21.1895620944689 V78.8104379055311\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.8101304738191388\"/><path d=\"M142.2 22.964536940537663 V77.03546305946233\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.7879432882432793\"/><path d=\"M146.79999999999998 34.52035507370054 V65.47964492629946\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.6434955615787432\"/><path d=\"M151.39999999999998 36.002456274638206 V63.997543725361794\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.6249692965670224\"/><path d=\"M156 19.802719458157615 V80.19728054184239\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.8274660067730298\"/><path d=\"M160.6 11.733887612941004 V88.266112387059\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.9283264048382375\"/><path d=\"M165.2 14.768444808650273 V85.23155519134973\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.8903944398918716\"/><path d=\"M169.79999999999998 26.530139473793124 V73.46986052620687\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.7433732565775859\"/><path d=\"M174.39999999999998 40.68256113662587 V59.31743886337413\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.5664679857921766\"/><path d=\"M179 37.59936975210632 V62.40063024789368\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.605007878098671\"/></g><path d=\"M14 50 Q40 20 66 50 T118 50 T170 50 T190 50\" fill=\"none\" stroke=\"#f2b84b\" stroke-width=\"1.8\" opacity=\".8\"/>"
+      }
+    },
+    {
       "file": "labs/lang.html",
+      "cat": "ai",
       "name": "Language lab",
       "namePl": "Laboratorium języka",
       "doc": "docs/labs/walkers/README.md",
@@ -507,6 +573,7 @@ window.GameLabCatalog =
     },
     {
       "file": "labs/img.html",
+      "cat": "ai",
       "name": "Image lab",
       "namePl": "Laboratorium obrazów",
       "doc": "docs/labs/walkers/README.md",
@@ -524,6 +591,7 @@ window.GameLabCatalog =
   "tools": [
     {
       "file": "editor/index.html",
+      "cat": "tools",
       "name": "Scene editor",
       "namePl": "Edytor sceny",
       "doc": "editor/README.md",
@@ -539,21 +607,8 @@ window.GameLabCatalog =
       }
     },
     {
-      "file": "tools/doctor.html",
-      "name": "Model doctor",
-      "namePl": "Doktor modeli",
-      "doc": "docs/tools/doctor.md",
-      "desc": "Every model of every lab — space, sea, land, rail — examined for the repeating mistakes: inside-out shapes, holes, flicker, floating pieces, guns firing into their own ship, fittings through the hull.",
-      "descPl": "Każdy model każdego laboratorium — kosmos, morze, ląd, kolej — badany pod kątem powtarzających się błędów: odwrócone bryły, dziury, migotanie, wiszące części, działa strzelające we własny okręt, okucia przez kadłub.",
-      "kind": "tool",
-      "kit": "ModelDoctor",
-      "phrases": ["narzędzie", "modele", "błędy", "kosmos", "woda", "ląd"],
-      "art": {
-        "img": "assets/labs/doctor.jpg"
-      }
-    },
-    {
       "file": "editor/index.html?doctor",
+      "cat": "tools",
       "name": "Scene doctor",
       "namePl": "Lekarz sceny",
       "doc": "docs/scene/doctor.md",
@@ -568,21 +623,23 @@ window.GameLabCatalog =
       }
     },
     {
-      "file": "labs/transform.html",
-      "name": "Transformer",
-      "namePl": "Transformator",
-      "doc": "docs/labs/transform.md",
-      "desc": "A lab ship made game-ready: levels of detail, hitboxes, shader damage, fleet performance test.",
-      "descPl": "Statek z laboratorium przygotowany do gry: poziomy szczegółów, hitboxy, uszkodzenia w shaderze, test wydajności floty.",
+      "file": "tools/doctor.html",
+      "cat": "tools",
+      "name": "Model doctor",
+      "namePl": "Doktor modeli",
+      "doc": "docs/tools/doctor.md",
+      "desc": "Every model of every lab — space, sea, land, rail — examined for the repeating mistakes: inside-out shapes, holes, flicker, floating pieces, guns firing into their own ship, fittings through the hull.",
+      "descPl": "Każdy model każdego laboratorium — kosmos, morze, ląd, kolej — badany pod kątem powtarzających się błędów: odwrócone bryły, dziury, migotanie, wiszące części, działa strzelające we własny okręt, okucia przez kadłub.",
       "kind": "tool",
-      "kit": "transform",
-      "phrases": ["narzędzie", "LOD", "hitboxy", "wydajność"],
+      "kit": "ModelDoctor",
+      "phrases": ["narzędzie", "modele", "błędy", "kosmos", "woda", "ląd"],
       "art": {
-        "img": "assets/labs/transform.jpg"
+        "img": "assets/labs/doctor.jpg"
       }
     },
     {
       "file": "tools/kitcheck.html",
+      "cat": "tools",
       "name": "Kit check",
       "namePl": "Kontrola kitów",
       "doc": "CLAUDE.md",
@@ -594,6 +651,21 @@ window.GameLabCatalog =
       "art": {
         "bg": ["#123024", "#08140f"],
         "svg": "<rect x=\"58\" y=\"24\" width=\"12\" height=\"12\" rx=\"3\" fill=\"none\" stroke=\"#36d6b5\" stroke-width=\"2\"/><path d=\"M61 30 l3 3 l6 -7\" stroke=\"#36d6b5\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/><rect x=\"80\" y=\"27\" width=\"70\" height=\"6\" rx=\"3\" fill=\"#9fe8de\" opacity=\".5\"/><rect x=\"58\" y=\"44\" width=\"12\" height=\"12\" rx=\"3\" fill=\"none\" stroke=\"#36d6b5\" stroke-width=\"2\"/><path d=\"M61 50 l3 3 l6 -7\" stroke=\"#36d6b5\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/><rect x=\"80\" y=\"47\" width=\"56\" height=\"6\" rx=\"3\" fill=\"#9fe8de\" opacity=\".5\"/><rect x=\"58\" y=\"64\" width=\"12\" height=\"12\" rx=\"3\" fill=\"none\" stroke=\"#36d6b5\" stroke-width=\"2\"/><path d=\"M61 70 l3 3 l6 -7\" stroke=\"#36d6b5\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/><rect x=\"80\" y=\"67\" width=\"42\" height=\"6\" rx=\"3\" fill=\"#9fe8de\" opacity=\".5\"/>"
+      }
+    },
+    {
+      "file": "labs/transform.html",
+      "cat": "tools",
+      "name": "Transformer",
+      "namePl": "Transformator",
+      "doc": "docs/labs/transform.md",
+      "desc": "A lab ship made game-ready: levels of detail, hitboxes, shader damage, fleet performance test.",
+      "descPl": "Statek z laboratorium przygotowany do gry: poziomy szczegółów, hitboxy, uszkodzenia w shaderze, test wydajności floty.",
+      "kind": "tool",
+      "kit": "transform",
+      "phrases": ["narzędzie", "LOD", "hitboxy", "wydajność"],
+      "art": {
+        "img": "assets/labs/transform.jpg"
       }
     }
   ],
