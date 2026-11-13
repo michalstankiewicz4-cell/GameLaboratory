@@ -12,23 +12,25 @@ scenie: grafika ją rysuje, fizyka ją przesuwa, audio z niej gra, sieć ją syn
 i edytor ją pokazują, AI ją zmienia.
 
 ```
+            ┌──────────── LABORATORIA: edytory części silnika ─────────────────────────────────┐
+            │ Modele ▶ prefabrykaty │ Ustawienia ▶ zasoby z nazwą │ Materiały ~ │ niepołączone … │
+            └────────────────────────────── ▼ do sceny ────────────────────────────────────────┘
                          ┌────────────────────── ENGINE: pętla, czas, cykl życia ───────────────────────┐
- [Input] ──► zdarzenia ─►│  Rules ─► Scripts ─► Physics ─► Animacje ─► Render ─► Post-FX ─► ekran       │
- klawiatura, mysz, pad,  │ (reguły (zachowania) (stały krok)   │         ▲      └─► Audio, UI           │
- dotyk, Pointer Lock     │  gry)                               ▼         │                              │
-                         │   └───────┴──────────┴───────► [SCENE] ──────┘                               │
-                         │                   obiekty: położenie + składniki                             │
-                         │                   (siatka, światło, kamera, kolizja,                         │
-                         │                    zachowanie, źródło dźwięku, cząsteczki)                   │
-                         │                   środowisko: niebo, woda, ląd, pogoda, prawa                │
+ [Input ~] ──► zdarzenia ►│  Rules … ─► Zachowania ─► Fizyka ~ ─► Animacje ~ ─► Render ─► Wygląd kamery ─► ekran │
+ klawiatura, mysz         │  [UI gry: menu, HUD, okna, dialogi — nad ekranem]          [Audio …]          │
+ (pad, dotyk …)           │   └──────── zmieniają ───────► [SCENA (dane, JSON)] ◄──── rysuje ─────┘        │
+                         │   obiekty: prefabrykat, położenie, zachowanie (kolizja, cząsteczki, dźwięk …)  │
+                         │   środowisko: powierzchnia, niebo, morze, ląd, światło i pogoda, kamera, UI gry │
                          └──────────────────────────────┬───────────────────────────────────────────────┘
-      ┌────────────────┬──────────────────┬─────────────┼──────────────┬──────────────────┐
-  [Assets]        [Events]           [Network]      [Save/Load]     [Jobs/Workers]   [Debug + Editor + API dla AI]
-  kity, tekstury, wiadomości         stan sceny,    scena jako      fizyka, AI,      hierarchia, atrybuty,
-  dźwięki,        „trafienie” →      zdarzenia      dane (JSON) →   generowanie      statystyki, konsola,
-  prefabrykaty,   audio + UI + sieć  (WebRTC,       IndexedDB /     terenu, nauka    AI buduje i zmienia
-  postęp ładowania                   Supabase…)     LocalStorage    sieci            scenę przez API
+   ┌──────────────┬──────────────┬─────────────┬────────┼─────────┬──────────────┬─────────────────────┐
+ [Assets]      [Events]      [Network …]  [Save/Load ~]  [Jobs/Workers …]  [Edytor + API dla AI]  [Lekarze]
+ kity,         jedna szyna:  stan sceny,   scena jako    fizyka, AI,       hierarchia, ▶ Graj,    doktor modeli,
+ prefabrykaty, akcje,        zdarzenia     JSON: plik    generowanie       konsola; AI buduje     lekarz sceny
+ zasoby, mat.  UI gry                      i przeglądarka terenu           i gra przez API
 ```
+
+Oznaczenia: bez znaku — działa, `~` — częściowo, `…` — w planie (stan 0.63.0; co zostało do połączenia: `TODO.md`,
+„Pełne połączenie laboratoriów”).
 
 Ten schemat narysowany ramkami: menu **Pomoc → Schemat silnika** na każdej stronie (`ui/shell/menubar.js`, `engineMap`).
 

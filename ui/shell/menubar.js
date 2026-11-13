@@ -119,43 +119,72 @@ function dialog(title, rows, note) {
   dlg.classList.add("open");
 }
 
-// the engine's diagram (docs/guides/engine-architecture.md, "Zasada: scena w środku") drawn with boxes instead of ASCII
+// the engine's diagram (docs/guides/engine-architecture.md, "Zasada: scena w środku") drawn with boxes; every block shows
+// whether it works today (solid) or is planned (dashed) — the state of the full connection of the labs: TODO.md
 function engineMap() {
   box.textContent = ""; box.classList.add("lmWide");
   box.appendChild(el("h3", null, t("How the engine is built", "Schemat silnika")));
   const m = el("div", "emMap");
-  const node = (cls, name, note) => { const n = el("div", "emNode " + (cls || "")); n.appendChild(el("b", null, name)); if (note) n.appendChild(el("span", null, note)); return n; };
+  // st: "on" — works, "part" — partly, "plan" — planned
+  const node = (cls, name, note, st = "on") => {
+    const n = el("div", "emNode " + (cls || "") + " st-" + st); n.appendChild(el("b", null, name)); if (note) n.appendChild(el("span", null, note));
+    if (st !== "on") n.appendChild(el("i", "emSt", st === "plan" ? t("planned", "w planie") : t("partly", "częściowo")));
+    return n;
+  };
   const arrow = (txt, cls) => el("div", "emArrow " + (cls || ""), txt);
+  // the labs: editors of the engine's parts
+  const labs = el("div", "emLabs");
+  labs.appendChild(el("div", "emTitle", t("LABS: editors of the engine's parts", "LABORATORIA: edytory części silnika")));
+  const lrow = el("div", "emLabRow");
+  lrow.append(
+    node("emLab", t("Models ▶ prefabs", "Modele ▶ prefabrykaty"), t("vehicles (space, water, land), celestial bodies, base, structures, plants, caves, creatures, humans, weapons", "pojazdy (kosmos, woda, ląd), ciała niebieskie, baza, budowle, rośliny, jaskinie, stwory, ludzie, broń")),
+    node("emLab", t("Settings ▶ named assets", "Ustawienia ▶ zasoby z nazwą"), t("sea (water), land, weather and light (look), camera look (filters), space sky (bodies), game UI", "morze (woda), ląd, pogoda i światło (wygląd), wygląd kamery (filtry), niebo kosmosu (ciała niebieskie), UI gry")),
+    node("emLab", t("Materials (MatKit)", "Materiały (MatKit)"), t("saved as assets; models do not use them yet", "zapisywane jako zasoby; modele jeszcze z nich nie korzystają"), "part"),
+    node("emLab", t("Not connected yet", "Jeszcze niepołączone"), t("art, systems, skins, surface, gear, sound, creature editor, transformer, SDF and pixel art, scale", "sztuka, układy, skórki, powierzchnia, przedmioty, dźwięk, edytor stworów, transformator, SDF i pixel art, skala"), "plan"));
+  labs.appendChild(lrow);
+  m.appendChild(labs);
+  m.appendChild(el("div", "emDown", t("▼ prefabs and assets go into the scene", "▼ prefabrykaty i zasoby trafiają do sceny")));
   // input → the engine
   const top = el("div", "emTop");
-  top.append(node("emInput", t("Input", "Wejście"), t("keyboard, mouse, pad, touch, Pointer Lock", "klawiatura, mysz, pad, dotyk, Pointer Lock")), arrow(t("events ▶", "zdarzenia ▶")));
+  top.append(node("emInput", t("Input", "Wejście"), t("keyboard, mouse (pad, touch: planned)", "klawiatura, mysz (pad, dotyk: w planie)"), "part"), arrow(t("events ▶", "zdarzenia ▶")));
   const eng = el("div", "emEngine");
   eng.appendChild(el("div", "emTitle", t("ENGINE: loop, time, life cycle", "ENGINE: pętla, czas, cykl życia")));
   const pipe = el("div", "emPipe");
-  [["Rules", t("game rules", "reguły gry")], [t("Scripts", "Scripts"), t("behaviours", "zachowania")], [t("Physics", "Physics"), t("fixed step", "stały krok")], [t("Animation", "Animacje")], ["Render"], ["Post-FX"], [t("screen", "ekran")]]
-    .forEach(([a, b], i, all) => { if (i) pipe.appendChild(arrow("▶")); pipe.appendChild(node(i === all.length - 1 ? "emScreen" : "", a, b)); });
+  [["Rules", t("game rules", "reguły gry"), "plan"], [t("Behaviours", "Zachowania"), t("drive, sail, fly, thrust, orbit, land, build", "jazda, pływanie, lot, ciąg, orbita, lądowanie, budowa")],
+    [t("Physics", "Fizyka"), t("of the environment: vacuum, water, land; rail", "środowiska: próżnia, woda, ląd; szyny"), "part"], [t("Animation", "Animacje"), t("idle only", "tylko postój"), "part"],
+    ["Render", "Three.js r186"], [t("Camera look", "Wygląd kamery"), t("tone, glow, lens, space effects", "ton, poświata, obiektyw, efekty kosmosu")], [t("screen", "ekran")]]
+    .forEach(([a, b, st], i, all) => { if (i) pipe.appendChild(arrow("▶")); pipe.appendChild(node(i === all.length - 1 ? "emScreen" : "", a, b, st)); });
   eng.appendChild(pipe);
-  eng.appendChild(el("div", "emSide", t("Post-FX ▶ Audio, UI", "Post-FX ▶ Audio, UI")));
-  eng.appendChild(el("div", "emFlow", t("▼ rules, scripts, physics and animation change the scene · render draws it ▲", "▼ reguły, zachowania, fizyka i animacje zmieniają scenę · render ją rysuje ▲")));
-  const scene = node("emScene", t("SCENE", "SCENA"));
-  scene.append(el("span", null, t("objects: position + components (mesh, light, camera, collision, behaviour, sound source, particles)", "obiekty: położenie + składniki (siatka, światło, kamera, kolizja, zachowanie, źródło dźwięku, cząsteczki)")),
-    el("span", null, t("environment: sky, water, land, weather, laws", "środowisko: niebo, woda, ląd, pogoda, prawa")));
+  const over = el("div", "emOver");
+  over.append(node("emUi", t("Game UI", "UI gry"), t("menu, HUD, windows, dialogue — over the screen, from the game state and events", "menu, HUD, okna, dialogi — nad ekranem, ze stanu gry i zdarzeń")),
+    node("", "Audio", t("music and sounds of events", "muzyka i odgłosy zdarzeń"), "plan"));
+  eng.appendChild(over);
+  eng.appendChild(el("div", "emFlow", t("▼ behaviours and physics change the scene · render draws it ▲", "▼ zachowania i fizyka zmieniają scenę · render ją rysuje ▲")));
+  const scene = node("emScene", t("SCENE (data, JSON)", "SCENA (dane, JSON)"));
+  scene.append(el("span", null, t("objects: prefab, position, behaviour (collision, particles, sound source: planned)", "obiekty: prefabrykat, położenie, zachowanie (kolizja, cząsteczki, źródło dźwięku: w planie)")),
+    el("span", null, t("environment: surface, sky, sea, land, light and weather, camera look, game UI", "środowisko: powierzchnia, niebo, morze, ląd, światło i pogoda, wygląd kamery, UI gry")));
   eng.appendChild(scene);
   top.appendChild(eng);
   m.appendChild(top);
   // the modules around the scene
   m.appendChild(el("div", "emBus"));
   const mods = el("div", "emMods");
-  [["Assets", t("kits, textures, sounds, prefabs, loading progress", "kity, tekstury, dźwięki, prefabrykaty, postęp ładowania")],
-    ["Events", t("messages: “hit” → audio + UI + network", "wiadomości: „trafienie” → audio + UI + sieć")],
-    ["Network", t("scene state, events (WebRTC, Supabase…)", "stan sceny, zdarzenia (WebRTC, Supabase…)")],
-    ["Save/Load", t("scene as data (JSON) → IndexedDB / LocalStorage", "scena jako dane (JSON) → IndexedDB / LocalStorage")],
-    ["Jobs/Workers", t("physics, AI, terrain generation, network training", "fizyka, AI, generowanie terenu, nauka sieci")],
-    [t("Debug + Editor + API for AI", "Debug + Editor + API dla AI"), t("hierarchy, attributes, stats, console; AI builds and changes the scene through the API", "hierarchia, atrybuty, statystyki, konsola; AI buduje i zmienia scenę przez API")]]
-    .forEach(([a, b]) => mods.appendChild(node("emMod", a, b)));
+  [["Assets", t("kits, prefabs, named assets, materials, loading progress", "kity, prefabrykaty, zasoby z nazwą, materiały, postęp ładowania")],
+    ["Events", t("one bus: actions of ships, the game UI", "jedna szyna: akcje statków, UI gry")],
+    ["Network", t("scene state, events (WebRTC, Supabase…)", "stan sceny, zdarzenia (WebRTC, Supabase…)"), "plan"],
+    ["Save/Load", t("scene as JSON: file and the browser (IndexedDB: planned)", "scena jako JSON: plik i przeglądarka (IndexedDB: w planie)"), "part"],
+    ["Jobs/Workers", t("physics, AI, terrain generation", "fizyka, AI, generowanie terenu"), "plan"],
+    [t("Editor + API for AI", "Edytor + API dla AI"), t("hierarchy, properties, ▶ Play, console; AI builds and plays the scene through the API", "hierarchia, właściwości, ▶ Graj, konsola; AI buduje i gra scenę przez API")],
+    [t("Doctors", "Lekarze"), t("model doctor (one model), scene doctor (the whole scene)", "doktor modeli (jeden model), lekarz sceny (cała scena)")]]
+    .forEach(([a, b, st]) => mods.appendChild(node("emMod", a, b, st)));
   m.appendChild(mods);
+  // legend
+  const leg = el("div", "emLegend");
+  leg.append(node("st-on emKey", t("works", "działa")), node("st-part emKey", t("partly", "częściowo")), node("st-plan emKey", t("planned", "w planie")));
+  m.appendChild(leg);
   box.appendChild(m);
-  box.appendChild(el("p", null, t("The scene is the middle of the engine: every module works on the same scene.", "Scena jest środkiem silnika: wszystkie moduły pracują na tej samej scenie.")));
+  box.appendChild(el("p", null, t("The scene is the middle of the engine: every module works on the same scene. What is left to connect: TODO.md, “Full connection of the labs”.",
+    "Scena jest środkiem silnika: wszystkie moduły pracują na tej samej scenie. Co zostało do połączenia: TODO.md, „Pełne połączenie laboratoriów”.")));
   const ok = el("button", null, t("Close", "Zamknij")); ok.addEventListener("click", () => dlg.classList.remove("open"));
   box.appendChild(ok);
   dlg.classList.add("open");

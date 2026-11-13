@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.63.1 — 2026-11-13 (schemat silnika)
+
+### Zmienione
+- **Schemat silnika** (Pomoc → Schemat silnika, `docs/guides/engine-architecture.md`): pas laboratoriów (modele →
+  prefabrykaty, ustawienia → zasoby z nazwą, materiały, jeszcze niepołączone), UI gry jako osobny blok, lekarze,
+  materiały w zasobach; każdy blok oznaczony: działa, częściowo, w planie.
+
 ## Program 0.63.0 · materiały 1.0.0 — 2026-11-13 (laboratorium materiałów)
 
 ### Dodane
