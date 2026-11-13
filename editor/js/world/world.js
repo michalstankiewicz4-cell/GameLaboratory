@@ -35,10 +35,10 @@ export function createWorld(container, store, onWarn) {
     const p = prefab(o.prefab);
     if (!p) { onWarn && onWarn(o.prefab); return; }
     if (p.needs === 'space' && !spaceReady()) { later(); return; }
-    const b = p.build(), g = new THREE.Group(); g.userData.sceneId = o.id; g.add(b.root);
+    const b = p.build({ asset: assetData(o) }), g = new THREE.Group(); g.userData.sceneId = o.id; g.add(b.root);
     const lb = new THREE.Box3().setFromObject(g);   // obrys w układzie obiektu (g jeszcze bez położenia) — lekarz sceny
     g.traverse((m) => { if (m.isMesh && !(m.material && m.material.isMeshBasicMaterial)) { m.castShadow = true; m.receiveShadow = true; } });
-    built.set(o.id, { prefab: o.prefab, root: g, kit: b.kit || null, tick: b.tick || null, driven: false, dispose: b.dispose, size: new THREE.Box3().setFromObject(b.root).getSize(new THREE.Vector3()).length(),
+    built.set(o.id, { prefab: o.prefab, key: keyOf(o), root: g, kit: b.kit || null, tick: b.tick || null, driven: false, dispose: b.dispose, size: new THREE.Box3().setFromObject(b.root).getSize(new THREE.Vector3()).length(),
       local: lb.isEmpty() ? null : { min: lb.min.toArray(), max: lb.max.toArray() }, cost: costOf(g) });
     root.add(g);
   }
@@ -63,12 +63,16 @@ export function createWorld(container, store, onWarn) {
     r.root.position.fromArray(o.pos); r.root.rotation.set(o.rot[0] * D2R, o.rot[1] * D2R, o.rot[2] * D2R, 'YXZ');
     r.root.scale.setScalar(o.scale); r.root.name = o.name;
   }
-  // modele, które trzeba zbudować (nowe albo z innym prefabrykatem)
-  const pending = () => store.scene.objects.filter((o) => { const r = built.get(o.id); return !r || r.prefab !== o.prefab; });
+  // zasób obiektu (pole „asset”, rodzaj z prefabrykatu, np. bryła z bloków): dane albo null — model domyślny
+  function assetData(o) { const p = prefab(o.prefab); return p && p.assetKind && o.asset ? getAsset(p.assetKind, o.asset) : null; }
+  // co wyznacza zbudowany model: prefabrykat i dane zasobu (zapis zasobu w laboratorium przebudowuje model)
+  const keyOf = (o) => o.prefab + (o.asset ? '|' + o.asset + '|' + JSON.stringify(assetData(o)) : '');
+  // modele, które trzeba zbudować (nowe, z innym prefabrykatem albo zasobem)
+  const pending = () => store.scene.objects.filter((o) => { const r = built.get(o.id); return !r || r.key !== keyOf(o); });
   function syncObjects() {
     const ids = new Set(store.scene.objects.map((o) => o.id));
     [...built.keys()].forEach((id) => { if (!ids.has(id)) drop(id); });
-    store.scene.objects.forEach((o) => { const r = built.get(o.id); if (r && r.prefab !== o.prefab) drop(o.id); if (!built.has(o.id)) build(o); place(o); });
+    store.scene.objects.forEach((o) => { const r = built.get(o.id); if (r && r.key !== keyOf(o)) drop(o.id); if (!built.has(o.id)) build(o); place(o); });
     fitShadow();
   }
   function syncPlaces() { store.scene.objects.forEach(place); fitShadow(); }

@@ -54,6 +54,9 @@ export function checkScene(scene, ctx) {
     const p = P(o);
     if (!p) { add('error', 'unknown-prefab', o, `Unknown model "${o.prefab}": it is not built`, { cmd: 'remove', id: o.id }); continue; }
     const [x, y, z] = o.pos, at = `at (${fmt(x)}, ${fmt(z)})`;
+    // zasób modelu (pole „asset”, np. bryła z laboratorium bloków): nie ma go w tej przeglądarce — stoi model domyślny
+    if (o.asset && p.assetKind && !A.list(p.assetKind).includes(o.asset))
+      add('error', 'missing-asset', o, `No ${p.assetKind} asset "${o.asset}" (save one in ${p.lab}): the default model stands instead`, { cmd: 'set', id: o.id, asset: '' });
 
     // zachowanie: wybrane, a nie pasuje do modelu; działa w innym środowisku niż scena
     if (o.behavior && !ctx.behaviorsFor(o.prefab).includes(o.behavior))

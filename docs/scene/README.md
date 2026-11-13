@@ -34,6 +34,8 @@ Zasada: **dane są jedynym źródłem prawdy.** Okna edytora, uchwyt, API i plik
 - `pos` w metrach (Y w górę), `rot` w stopniach (kolejność YXZ: kurs, pochylenie, przechył), `scale` — mnożnik.
 - `behavior` (nieobowiązkowe): id zachowania; bez pola — domyślne dla modelu, `""` — stoi w miejscu.
 - `orbit` (nieobowiązkowe, zachowanie „orbita”): `{ around: id obiektu, period: s }`.
+- `asset` (nieobowiązkowe): nazwa zasobu rodzaju, który bierze prefabrykat (`assetKind`, np. `blocks` — bryła z laboratorium
+  bloków); bez pola — model domyślny prefabrykatu.
 - Zmiana formatu podnosi `VERSION`, a `normalize` przenosi starsze sceny. Nowe nieobowiązkowe pole (jak `behavior`,
   `env.sea`) wersji nie zmienia.
 
@@ -125,11 +127,17 @@ scena trzyma tylko nazwę. Inna karta widzi zmianę od razu (`onAssetsChange`).
 | `weather` | wygląd ([`../labs/look.md`](../labs/look.md)) | `weather`, `coverage`, `density`, `scale`, `haze`, `wind`, `rain`, `vis`, `lightning`, `time`, `sunEl`, `sunAz`, `moon` |
 | `look` | filtry ([`../labs/filters.md`](../labs/filters.md)) | profil potoku kamery (`LOOK_DEFAULTS` w `js/render/sea/look.js`); dawny klucz `gameLab.lookProfiles.v1` przenosi się sam |
 | `sky` | ciała niebieskie ([`../labs/bodies.md`](../labs/bodies.md)), Niebo | wszystkie liczby nieba BodyKit (mgławice, pas, pył, gwiazdy, barwy, ziarno) |
+| `ui`, `uiskin` | UI gry ([`../labs/gameui.md`](../labs/gameui.md)) | definicja `gamelab-ui`; skórka: `base`, `tokens` |
+| `material` | materiały ([`../labs/materials.md`](../labs/materials.md)) | opis MatKit |
+| `blocks` | bloki ([`../labs/blocks.md`](../labs/blocks.md)) | `shape`, `radius`, `voxel`, `seed`, `text`, `layers`, `mats` (opisy MatKit bloków stałych), `matRefs` (wybór w laboratorium); w scenie pole `asset` obiektu |
 
 - Funkcje: `listAssets(kind)`, `getAsset(kind, name)`, `saveAsset(kind, name, data)` (tylko pola rodzaju),
   `removeAsset`, `onAssetsChange(f)`.
 - Zasoby są w tej przeglądarce: scena z nazwą zasobu, którego tu nie ma, pokazuje ustawienie domyślne i ostrzega.
 - Nowy rodzaj: wpis w `ASSET_KINDS` (pola, laboratorium), zapis w laboratorium, wybór w edytorze i w `env` API.
+- Zasób modelu (nie środowiska): prefabrykat dostaje `assetKind`, a `build({ asset })` — dane zasobu; obiekt wskazuje go
+  polem `asset` (okno Obiekt w edytorze, `add` / `set` w API). Edytor przebudowuje model, gdy zmieni się nazwa albo
+  zasób zostanie zapisany na nowo; brakujący zasób — model domyślny i błąd lekarza sceny `missing-asset`.
 
 ## Kosmos (`space.js`)
 

@@ -3,7 +3,7 @@
 Bryły z bloków (wokseli), jak w Hive Hunger (przeniesione z historią, 0.64.0). Kit: **BlockKit**
 (`js/models/blocks/blockkit.js`, kształty `shapes.js`, siatka `grid.js`); ciecze i gaz w kosmosie — zachowania
 `js/behaviors/space/liquids.js`, `gases.js` (siatka sąsiedztwa `grid3d.js`), shader cieczy `js/render/liquid.js`;
-strona `js/labs/blocks/blocks.js`, arkusz `ui/pages/blocks.css`. Środowisko: tylko kosmos (bez grawitacji) —
+strona `js/labs/blocks/blocks.js`, arkusz `ui/pages/blocks.css`; kategoria w menu i na stronie startowej: **Woksele**. Środowisko: tylko kosmos (bez grawitacji) —
 w przełączniku woda i ląd są wyszarzone.
 
 ## Bryła to opis
@@ -20,6 +20,17 @@ w przełączniku woda i ląd są wyszarzone.
 - `layers` — warstwy po kolei, późniejsze przykrywają wcześniejsze. `where`: `everywhere`, `surface` (warstwa
   wierzchnia), `under` (pod nią), `deep` (głęboko), `core` (jądro), `veins` (żyły), `pools` (jeziorka) — żyły
   i jeziorka to plamy z szumu; `amount` — % danego miejsca.
+
+## Zapis pod nazwą — bryła dla sceny
+
+Okno Bryła → Zapisz: bryła (kształt, rozmiar, blok, ziarno, napis, warstwy) razem z materiałami bloków stałych (opisy
+MatKit, więc zasób nie zależy od zapisanych materiałów) idzie do zasobów z nazwą jako rodzaj `blocks`
+(`js/scene/assets.js`). Lista „Zapisane” wczytuje bryłę z powrotem (z wyborem materiałów), „Usuń zapisaną” — usuwa.
+W edytorze sceny model z rodziny Bloki wybiera ją w oknie Obiekt (pole „Bryła z bloków”) albo przez API
+(`add` / `set` z `asset`); ponowny zapis w laboratorium przebudowuje bryłę w otwartym edytorze.
+
+Materiały idą z bryłą (`def.mats` w `buildBody`), a nie przez zmianę wspólnych rodzajów `KINDS` — kilka brył w jednej
+scenie może mieć różne materiały.
 
 ## Rodzaje bloków
 
@@ -44,13 +55,14 @@ liczy je stałym krokiem 60 Hz (najwyżej 6 kroków na klatkę), niezależnie od
 - `BlocksApi.build(bryła)` → `{ counts }` — buduje bryłę z opisu.
 - `BlocksApi.bite([x, y, z], r)` → co wypadło (liczba bloków na rodzaj).
 - `BlocksApi.counts()`, `BlocksApi.loose()` — bloki w bryle, luźne krople i gaz.
+- `BlocksApi.save(nazwa)`, `BlocksApi.load(nazwa)`, `BlocksApi.saved()` — zapis bryły jako zasobu `blocks`, wczytanie, lista.
 
 Zakładka API w konsoli: bryła jako JSON i przycisk budowy.
 
 ## W edytorze sceny
 
 Rodzina prefabrykatów **Bloki** (`blocks/sphere`, `blocks/cube`, `blocks/pair`, `blocks/belt`, `blocks/balls`) —
-bryły z domyślnymi warstwami, na powierzchni kosmosu.
+bryły z domyślnymi warstwami, na powierzchni kosmosu; z polem `asset` — bryła zapisana w laboratorium (wyżej).
 
 ## Dalej (w planie)
 

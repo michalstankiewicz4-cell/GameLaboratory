@@ -38,6 +38,7 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
 - **Już połączone ze sceną:**
   - przez prefabrykaty (modele) — pojazdy: kosmos, woda, ląd; ciała niebieskie, moduły bazy, budowle, rośliny,
     jaskinie, życie (stwory), ludzie i broń, bryły z bloków (domyślne);
+  - przez zasoby modelu (pole `asset` obiektu) — bryła z bloków (0.66.0);
   - przez zasoby z nazwą — morze (woda), ląd (ląd), pogoda i światło (wygląd), wygląd kamery (filtry), niebo kosmosu
     (ciała niebieskie), UI gry (UI gry), materiał (materiały).
 - [ ] **Materiały → modele i scena:** modele biorą materiały z MatKit (rodzina po rodzinie, doktor modeli, porównanie
@@ -46,7 +47,7 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
   w 2D i 3D).
 - [ ] **Sztuka → scena:** obraz z laboratorium sztuki jako zasób i obiekt sceny (płaszczyzna z fakturą farby, rama 3D
   ze złoceniem — tryb 3D sztuki).
-- [ ] **Bloki:** bryła z laboratorium bloków jako zasób z nazwą (dziś w scenie tylko domyślne bryły).
+- [x] **Bloki:** bryła z laboratorium bloków jako zasób z nazwą (0.66.0; pole `asset` obiektu).
 - [ ] **Jaskinie i rośliny:** ustawienia z laboratoriów jako zasoby z nazwą (dziś w scenie tylko ustawienia domyślne).
 - [ ] **Układy (systems):** układ planetarny z laboratorium jako zasób, wstawiany do sceny kosmosu z orbitami.
 - [ ] **Skórki (skins):** malowanie statków jako zasób, wybierany dla obiektu w scenie.

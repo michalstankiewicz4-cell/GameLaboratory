@@ -28,7 +28,7 @@ Kod się przy tym spisie nie zmienia. Plan silnika: [`engine-architecture.md`](e
 | zachowania | okręt na wodzie, mała jednostka na wodzie (MarineKit, amfibia), jazda po lądzie (siłami), lądowanie, lot, koło na szynie (skład, tramwaj), ciąg w próżni, orbita, ciecze i gaz w kosmosie (0.64.0) | chód (LifeKit), zanurzenie |
 | środowiska | woda (WaterKit), ląd (LandKit, RegionKit), niebo dzienne (SkyKit, RainKit), powierzchnia planety (SurfaceKit), układy (SystemKit) | jedno niebo kosmosu w środowiskach; trzy osobne nieba do połączenia (niżej) |
 | obraz | potok kamery (LookPipeline), filtry, PostPipeline, widzenie | jeden potok — zrobione (0.56.0) |
-| zasoby z nazwą | morze (woda), ląd (ląd), pogoda i światło (wygląd), wygląd kamery (filtry), niebo kosmosu (ciała niebieskie), materiał (materiały), UI gry i skórka UI (UI gry) | bryła z bloków, jaskinia, roślinność, układ, wariant modelu |
+| zasoby z nazwą | morze (woda), ląd (ląd), pogoda i światło (wygląd), wygląd kamery (filtry), niebo kosmosu (ciała niebieskie), materiał (materiały), UI gry i skórka UI (UI gry), bryła z bloków (bloki — zasób modelu, pole `asset`) | jaskinia, roślinność, układ, wariant modelu |
 | prefabrykaty | okręty, drogowe, tramwaj, pociąg, Spitfire, budowle, broń, statki kosmiczne, MarineKit, łaziki, moduły baz, ciała niebieskie, rośliny, jaskinie, ludzie, stwory, bryły z bloków | przedmioty bohatera, wynik edytora stworów i transformatora |
 
 ## Laboratoria — co i dokąd
@@ -78,7 +78,7 @@ dla edytora; **priorytet** — 1 teraz (edytor tego potrzebuje), 2 potem, 3 kied
 | **Materiały** (`labs/materials.html`, 219 l., 0.63.0) | MatKit (`js/render/materials/`) | — | materiały modeli i sceny z MatKit; powierzchnie 2D sztuki | **materiał** (jest) | 1 |
 | **Sztuka** (`labs/art.html`, 252 l., 0.57.0) | ArtKit, silnik ekspertyzy (`js/render/art/exam/`) | powierzchnie 2D (papier, drewno, metal) liczone osobno od MatKit | powierzchnie → MatKit; obraz → zasób i obiekt sceny (tryb 3D) | **obraz** (w planie) | 2 |
 | **UI gry** (`labs/gameui.html`, 326 l., 0.61.0) | `js/gameui/` (ekrany, HUD, okna, dialog, skórki) | — | w scenie `env.ui`, nakładka w ▶ Graj (0.62.0) | **UI gry**, **skórka UI** (są) | — |
-| **Bloki** (`labs/blocks.html`, 220 l., 0.64.0) | BlockKit (`js/models/blocks/`), ciecze i gaz (`js/behaviors/space/`), MatKit | — | bryły → prefabrykaty (są, domyślne); bryła z laboratorium → zasób z nazwą | **bryła z bloków** (w planie) | 2 |
+| **Bloki** (`labs/blocks.html`, 220 l., 0.64.0) | BlockKit (`js/models/blocks/`), ciecze i gaz (`js/behaviors/space/`), MatKit | — | bryły → prefabrykaty; bryła z laboratorium → zasób z nazwą, pole `asset` obiektu (0.66.0) | **bryła z bloków** (jest) | — |
 
 ### Zostają, jakie są (narzędzia)
 

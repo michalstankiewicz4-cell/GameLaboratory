@@ -12,7 +12,7 @@ import { KINDS, WHERE, SHAPES, LIQUIDS, GAS, BODY_DEFAULTS, normalizeBody, build
 import { Liquids, STEP } from '../../behaviors/space/liquids.js';
 import { Gases } from '../../behaviors/space/gases.js';
 import { PRESETS } from '../../render/materials/matkit.js';
-import { listAssets, getAsset } from '../../scene/assets.js';
+import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 
 const $ = (id) => document.getElementById(id);
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
@@ -24,7 +24,8 @@ const save = () => { try { localStorage.setItem(KEY, JSON.stringify(L)); } catch
 const status = (s) => { $('status').textContent = s || ''; };
 // materiał rodzaju: zapisany w laboratorium materiałów (zasób „material”), gotowy MatKit albo domyślny rodzaju
 const matOf = (k) => { const v = L.mats[k]; if (!v) return null; if (v.startsWith('asset:')) return getAsset('material', v.slice(6)); return PRESETS[v.slice(7)] || null; };
-function applyMats() { for (const k of Object.keys(KINDS)) if (KINDS[k].state === 'solid') { const m = matOf(k); if (m) KINDS[k].mat = { ...m }; } }
+// materiały tej bryły (opisy MatKit) — idą do BlockKit z bryłą (def.mats) i do zapisanego zasobu
+function matsNow() { const o = {}; for (const k of Object.keys(KINDS)) if (KINDS[k].state === 'solid') { const m = matOf(k); if (m) o[k] = { ...m }; } return o; }
 
 /* ---------------- scena ---------------- */
 const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
@@ -58,8 +59,7 @@ function makeFx() {
   gases = new Gases(scene, L.gas, 4000); gases.setView(VS().h, camera.fov);
 }
 async function rebuild() {
-  applyMats();
-  const t0 = performance.now(), work = async () => buildBody(L.body);
+  const t0 = performance.now(), work = async () => buildBody({ ...L.body, mats: matsNow() });
   const b = window.LabLoad ? await window.LabLoad.run('Building the body…', work) : await work();
   if (body) { scene.remove(body.group); body.dispose(); }
   body = b; scene.add(body.group);
@@ -170,6 +170,26 @@ $('addLayer').onclick = () => { L.body.layers.push({ kind: 'iron', where: 'veins
 $('resetLayers').onclick = () => { L.body.layers = clone(BODY_DEFAULTS.layers); showBody(); soon(0); };
 $('biteR').oninput = () => { L.biteR = +$('biteR').value; $('biteRV').textContent = L.biteR + ' m'; save(); };
 $('biteOn').onchange = setButtons;
+
+/* ---------------- zapis pod nazwą: zasób „blocks” (js/scene/assets.js) dla edytora sceny ---------------- */
+function fillSaved() {
+  const names = listAssets('blocks'), s = $('savedSel');
+  s.replaceChildren(new Option(names.length ? '—' : 'none yet', ''), ...names.map((n) => new Option(n, n)));
+  s.value = names.includes(L.savedAs || '') ? L.savedAs : '';
+}
+function saveBody(n) {
+  n = String(n || '').trim(); if (!n) throw new Error('give the body a name');
+  saveAsset('blocks', n, { ...clone(L.body), mats: matsNow(), matRefs: { ...L.mats } }); L.savedAs = n; save(); fillSaved(); return n;
+}
+function loadBody(n) {
+  const a = getAsset('blocks', n); if (!a) throw new Error(`no saved body "${n}"`);
+  const { mats, matRefs, ...b } = a; L.body = normalizeBody(b); L.mats = { ...(matRefs || {}) }; L.savedAs = n; $('saveName').value = n;
+  save(); showBody(); showKinds(); fillSaved(); return rebuild();
+}
+$('saveBody').onclick = () => { try { const n = saveBody($('saveName').value); status(`Saved: ${n} (asset "blocks").`); } catch (e) { status('Give the body a name first.'); } };
+$('delBody').onclick = () => { const n = $('savedSel').value; if (!n) { status('Pick a saved body first.'); return; } removeAsset('blocks', n); if (L.savedAs === n) L.savedAs = ''; save(); fillSaved(); status(`Deleted: ${n}.`); };
+$('savedSel').onchange = () => { const n = $('savedSel').value; if (n) loadBody(n).then(() => status(`Loaded: ${n}.`)); };
+onAssetsChange(fillSaved);
 $('rebuild').onclick = () => rebuild();
 $('clearFx').onclick = () => { liquids.clear(); gases.clear(); showCounts(); };
 
@@ -181,6 +201,9 @@ window.BlocksApi = {
   counts: () => body.counts(), loose: () => ({ droplets: liquids.count, gas: gases.count }),
   kinds: Object.fromEntries(Object.entries(KINDS).map(([k, x]) => [k, x.state])), where: Object.keys(WHERE), shapes: Object.keys(SHAPES),
   get body() { return clone(L.body); },
+  save: (name) => ({ saved: saveBody(name) }),                       // zasób „blocks” — w edytorze sceny pole „asset” modelu bloków
+  load: async (name) => { await loadBody(name); return { ...L.body, counts: body.counts() }; },
+  saved: () => listAssets('blocks'),
 };
 function apiTab() {
   if (!window.LabConsole) return;
@@ -189,7 +212,7 @@ function apiTab() {
   ta.value = JSON.stringify({ shape: 'sphere', radius: 6, layers: [{ kind: 'rock', where: 'everywhere', amount: 100 }, { kind: 'water', where: 'pools', amount: 30 }] });
   const go = document.createElement('button'); go.type = 'button'; go.textContent = 'Build (BlocksApi.build)';
   const out = document.createElement('p'); out.className = 'note';
-  out.textContent = `A body as JSON. Shapes: ${Object.keys(SHAPES).join(', ')}; kinds: ${Object.keys(KINDS).join(', ')}; where: ${Object.keys(WHERE).join(', ')}. Bite: BlocksApi.bite([x, y, z], r).`;
+  out.textContent = `A body as JSON. Shapes: ${Object.keys(SHAPES).join(', ')}; kinds: ${Object.keys(KINDS).join(', ')}; where: ${Object.keys(WHERE).join(', ')}. Bite: BlocksApi.bite([x, y, z], r). Save for the scene: BlocksApi.save(name), load(name), saved().`;
   go.onclick = async () => { try { const r = await window.BlocksApi.build(JSON.parse(ta.value)); out.textContent = 'Built: ' + JSON.stringify(r.counts); } catch (e) { out.textContent = 'Error: ' + e.message; } };
   el.append(ta, go, out);
   window.LabConsole.addTab({ id: 'blocksapi', title: 'API', titlePl: 'API', el });
@@ -215,6 +238,6 @@ function frame(now) {
 }
 L.body = normalizeBody(L.body);
 $('biteR').value = L.biteR; $('biteRV').textContent = L.biteR + ' m';
-setButtons(); showBody(); showKinds(); showFx(); resize(); makeFx();
+setButtons(); showBody(); showKinds(); showFx(); resize(); makeFx(); fillSaved(); $('saveName').value = L.savedAs || '';
 rebuild().then(() => requestAnimationFrame(frame));
 window.__blocks = { get body() { return body; }, get liquids() { return liquids; }, get gases() { return gases; }, camera, controls };

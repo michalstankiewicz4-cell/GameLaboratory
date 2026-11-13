@@ -51,6 +51,7 @@
   'bar.stop.tip': 'Back to editing: the models return to their places (Esc)',
   'obj.behavior': 'Behaviour',
   'obj.noBehavior': 'None (stands still)',
+  'obj.assetDefault': 'The default model',
   'play.none': 'Nothing to play: no model in the scene has a behaviour.',
   'play.on': 'Playing: {name}. {keys} · Esc: stop',
   'play.off': 'Stopped: back to editing.',

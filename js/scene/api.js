@@ -20,13 +20,13 @@ import { normalize, clone } from './scene-data.js';
 const COMMANDS = {
   help: { args: '', does: 'this list' },
   describe: { args: '', does: 'the whole scene as data (format gamelab-scene) and a short summary' },
-  prefabs: { args: '[family]', does: 'the models that can be added: id, name, family, where it stands, behaviours' },
-  add: { args: 'prefab, [name], [pos [x,y,z] m], [rot [pitch,heading,roll] °], [scale], [behavior]', does: 'adds a model; returns its id' },
-  set: { args: 'id | name, then any of: newName (with id also name), prefab, pos, rot, scale, behavior, orbit { around: id | name ("" — the nearest heavier body), period: s } (the orbit behaviour)', does: 'changes an object' },
+  prefabs: { args: '[family]', does: 'the models that can be added: id, name, family, where it stands, behaviours, and the kind of asset it takes (asset)' },
+  add: { args: 'prefab, [name], [pos [x,y,z] m], [rot [pitch,heading,roll] °], [scale], [behavior], [asset]', does: 'adds a model; returns its id (asset — a named asset of the kind the model takes, e.g. a block body from the blocks lab)' },
+  set: { args: 'id | name, then any of: newName (with id also name), prefab, pos, rot, scale, behavior, orbit { around: id | name ("" — the nearest heavier body), period: s } (the orbit behaviour), asset (a named asset of the kind the model takes; "" — the default model)', does: 'changes an object' },
   move: { args: 'id | name, by [dx,dy,dz] m', does: 'moves an object by an offset' },
   remove: { args: 'id | name', does: 'removes an object' },
   env: { args: 'any of: surface (sea | land | space), light (a ready light or a weather asset name), look, ui (a game UI asset name, "" — none), land (a land asset name, "" — the plain ground), sea (a sea asset name, "" — the default sea), sky (any surface: "" — the default for the surface, "day" — the day sky, "preset:<id>" — a ready space sky, or a sky asset name)', does: 'changes the environment' },
-  assets: { args: '[kind]', does: 'named assets saved in the labs, by kind (sea — the water lab, sky — the celestial bodies lab, look — the filters lab, weather — the look lab, land — the land lab) and the ready skies' },
+  assets: { args: '[kind]', does: 'named assets saved in the labs, by kind (sea — the water lab, sky — the celestial bodies lab, look — the filters lab, weather — the look lab, land — the land lab, ui and uiskin — the game UI lab, material — the materials lab, blocks — the blocks lab) and the ready skies' },
   select: { args: 'id | name, or nothing', does: 'selects an object in the editor (nothing: the environment)' },
   new: { args: '[name]', does: 'an empty scene' },
   load: { args: 'scene (format gamelab-scene)', does: 'replaces the whole scene' },
@@ -70,6 +70,12 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
     if (c.rot != null) p.rot = vec3(c.rot, 'rot');
     if (c.scale != null) { p.scale = num(c.scale, 'scale'); if (!(p.scale > 0)) fail('scale must be > 0'); }
     const b = behavior(prefabId, c.behavior); if (b !== undefined) p.behavior = b;
+    if (c.asset != null) {   // zasób modelu (rodzaj z prefabrykatu, np. bryła z bloków): nazwa albo "" — model domyślny
+      const pf = prefabs.find((q) => q.id === prefabId), kind = pf && pf.assetKind, n = String(c.asset);
+      if (!kind) { if (n !== '') fail(`${prefabId} takes no asset`); }
+      else { const all = assets.list(kind); if (n !== '' && !all.includes(n)) fail(`no ${kind} asset "${n}" (saved: ${all.join(', ') || 'none yet — save one in ' + (pf.lab || 'its lab')}; "" — the default model)`); }
+      p.asset = n;
+    }
     if (c.orbit != null) {   // zachowanie „orbita”: { around: id albo nazwa obiektu ("" — sam wybiera), period: s }
       const o = c.orbit, x = {};
       if (o.around != null) x.around = o.around === '' ? '' : target(typeof o.around === 'string' && !store.scene.objects.some((q) => q.id === o.around) ? { name: o.around } : { id: o.around }).id;
@@ -78,7 +84,7 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
     }
     return p;
   }
-  const summary = (o) => ({ id: o.id, name: o.name, prefab: o.prefab, pos: o.pos, rot: o.rot, scale: o.scale, ...(o.behavior != null ? { behavior: o.behavior } : {}), ...(o.orbit ? { orbit: o.orbit } : {}) });
+  const summary = (o) => ({ id: o.id, name: o.name, prefab: o.prefab, pos: o.pos, rot: o.rot, scale: o.scale, ...(o.behavior != null ? { behavior: o.behavior } : {}), ...(o.orbit ? { orbit: o.orbit } : {}), ...(o.asset ? { asset: o.asset } : {}) });
 
   const run1 = {
     help: () => ({ commands: COMMANDS, notes: 'Units: metres, degrees. Y is up; heading 0 looks along +Z. An object is named by "id" or "name". A list of commands runs in order.' }),
@@ -86,7 +92,7 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
       const S = store.scene;
       return { scene: clone(S), summary: `${S.name}: ${S.env.surface}, ${S.env.light}${S.env.look ? ', look ' + S.env.look : ''}; ${S.objects.length} object(s)${hooks.playing && hooks.playing() ? '; playing' : ''}` };
     },
-    prefabs: (c) => ({ prefabs: prefabs.filter((p) => !c.family || p.family === c.family).map((p) => ({ id: p.id, name: p.label, family: p.family, stands: p.surface, behaviors: behaviorsFor(p.id) })) }),
+    prefabs: (c) => ({ prefabs: prefabs.filter((p) => !c.family || p.family === c.family).map((p) => ({ id: p.id, name: p.label, family: p.family, stands: p.surface, behaviors: behaviorsFor(p.id), ...(p.assetKind ? { asset: p.assetKind } : {}) })) }),
     add: (c) => {
       const p = prefabOf(c.prefab), x = patch({ ...c, newName: null }, p.id);
       const pos = x.pos || [0, p.surface === 'air' ? 30 : 0, 0];   // statek kosmiczny: na wysokości 0, jak inne

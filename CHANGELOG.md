@@ -3,6 +3,22 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.66.0 · bloki 1.1.0 · edytor sceny 0.28.0 — 2026-11-13 (bryła z bloków jako zasób z nazwą, kategoria Woksele)
+
+### Dodane
+- **Bryła z bloków jako zasób z nazwą** (rodzaj `blocks`, `js/scene/assets.js`): laboratorium bloków zapisuje bryłę
+  pod nazwą (okno Bryła → Zapisz; lista zapisanych wczytuje ją z powrotem; `BlocksApi.save`, `load`, `saved`) razem
+  z materiałami bloków stałych.
+- **Zasób modelu w scenie**: pole `asset` obiektu (`scene-data.js`), prefabrykat z `assetKind` buduje model z danych
+  zasobu (`build({ asset })`). Bloki: w edytorze okno Obiekt → „Bryła z bloków” (zapisane albo model domyślny),
+  w API `add` / `set` z `asset`, `prefabs` mówi, jaki zasób model bierze; ponowny zapis w laboratorium przebudowuje
+  bryłę w otwartym edytorze. Lekarz sceny: brakujący zasób obiektu — `missing-asset` z poprawką.
+- Kategoria laboratoriów **Woksele** (`--cat-voxels`): laboratorium bloków przeniesione z „Materiały i grafika”.
+
+### Zmienione
+- BlockKit: materiały bloków stałych idą z bryłą (`def.mats`), zamiast zmieniać wspólne rodzaje — kilka brył w jednej
+  scenie może mieć różne materiały; w laboratorium usunięcie wyboru materiału przywraca domyślny rodzaju.
+
 ## Program 0.65.0 — 2026-11-13 (kategorie laboratoriów w menu i na kafelkach)
 
 ### Dodane

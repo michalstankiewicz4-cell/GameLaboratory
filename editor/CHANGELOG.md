@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.28.0 — 2026-11-13 (zasób modelu)
+
+### Dodane
+- Okno Obiekt: model z rodziny Bloki wybiera bryłę zapisaną w laboratorium bloków („Bryła z bloków”, albo model
+  domyślny); zapis bryły w laboratorium przebudowuje ją w edytorze. API: `add` / `set` z `asset`.
+
 ## 0.27.0 — 2026-11-13 (bryły z bloków)
 
 ### Dodane

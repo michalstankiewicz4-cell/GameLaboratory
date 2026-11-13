@@ -45,6 +45,11 @@
   <div id="layers"></div>
   <div class="btns"><button type="button" id="addLayer">Add a layer</button><button type="button" id="resetLayers">Back to the default</button></div>
   <p class="note">Later layers cover earlier ones. Where: the whole body, the surface layer, under it, deep inside, the core; veins and pools are patches from noise. Amount: % of that place.</p>
+  <h3>Save</h3>
+  <div class="row"><span>Saved</span><select id="savedSel" title="Bodies saved under a name: pick one to load it"></select><output></output></div>
+  <div class="row"><span>Name</span><input type="text" id="saveName" maxlength="40"><output></output></div>
+  <div class="btns"><button type="button" id="saveBody">Save under this name</button><button type="button" id="delBody">Delete saved</button></div>
+  <p class="note">A saved body is a named asset (with the materials of its blocks): in the scene editor pick it for a Blocks model.</p>
 </aside>
 <aside class="panel" data-window="kinds" data-title="Kinds of blocks" data-title-pl="Rodzaje bloków">
   <div id="kinds"></div>

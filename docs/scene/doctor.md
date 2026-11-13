@@ -23,7 +23,7 @@ w edytorze, w API dla AI i w grach. Plan: [`../guides/lab-breakdown.md`](../guid
 
 | Kod | Poziom | Co | Poprawka |
 |---|---|---|---|
-| `missing-asset` | błąd | środowisko wskazuje zasób z nazwą, którego nie ma (ląd, morze, niebo, wygląd kamery, pogoda) | domyślne (`""`, gotowe światło) |
+| `missing-asset` | błąd | środowisko albo obiekt (pole `asset`, np. bryła z bloków) wskazuje zasób z nazwą, którego nie ma (ląd, morze, niebo, wygląd kamery, pogoda, UI gry, bryła) | domyślne (`""`, gotowe światło, model domyślny) |
 | `unused-asset` | uwaga | ląd ustawiony, a powierzchnia nie jest lądem | — |
 | `unknown-prefab` | błąd | model, którego nie ma w prefabrykatach (nie zbuduje się) | `remove` |
 | `behavior-misfit` | błąd | wybrane zachowanie nie pasuje do modelu | bez zachowania |

@@ -58,12 +58,14 @@ export function createStore(firstScene) {
       S.objects.push(c); sel = c.id; emit('objects'); return c;
     },
     remove(id) { if (!find(id)) return; record(null); S.objects = S.objects.filter((o) => o.id !== id); if (sel === id) sel = null; emit('objects'); },
-    // patch: { name, prefab, pos, rot, scale, behavior }; zmiana modelu to 'objects' (trzeba go zbudować), reszta 'place'
+    // patch: { name, prefab, pos, rot, scale, behavior, asset }; zmiana modelu albo zasobu to 'objects' (trzeba go
+    // zbudować), reszta 'place'; asset '' — bez zasobu (model domyślny prefabrykatu)
     update(id, patch) {
       const o = find(id); if (!o) return;
       record('u:' + id + ':' + Object.keys(patch).sort().join());
-      const rebuild = patch.prefab && patch.prefab !== o.prefab;
+      const rebuild = (patch.prefab && patch.prefab !== o.prefab) || (patch.asset !== undefined && (patch.asset || '') !== (o.asset || ''));
       Object.assign(o, patch); if (!(o.scale > 0)) o.scale = 1;
+      if (!o.asset) delete o.asset;
       emit(rebuild ? 'objects' : 'place');
     },
     setEnv(patch) { record('env:' + Object.keys(patch).sort().join()); Object.assign(S.env, patch); emit('env'); },

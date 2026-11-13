@@ -50,6 +50,7 @@
   'bar.stop.tip': 'Powrót do edycji: modele wracają na swoje miejsca (Esc)',
   'obj.behavior': 'Zachowanie',
   'obj.noBehavior': 'Brak (stoi w miejscu)',
+  'obj.assetDefault': 'Model domyślny',
   'play.none': 'Nie ma czym grać: żaden model w scenie nie ma zachowania.',
   'play.on': 'Gra: {name}. {keys} · Esc: stop',
   'play.off': 'Stop: powrót do edycji.',

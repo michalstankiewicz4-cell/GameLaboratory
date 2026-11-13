@@ -41,6 +41,7 @@ export const FAMILIES = {
 };
 
 const P = [];
+// extra: needs ('space' — kity ze Space), assetKind (rodzaj zasobu, który obiekt może wskazać polem „asset”; build({ asset }))
 const add = (id, label, family, surface, lab, build, extra) => P.push({ id, label, family, surface, lab, build, ...extra });
 const g = (v) => ({ root: v.group, kit: v, dispose: v.dispose ? () => v.dispose() : null });   // kit: to, co zwrócił kit (dane do zachowań)
 
@@ -128,11 +129,13 @@ function buildLife(id) {
 [['humanBust', 'Human I'], ['humanHead', 'Human II']].forEach(([id, name]) => add('humans/' + id, name, 'humans', 'land', 'labs/human.html', () => buildLife(id), { needs: 'space' }));
 [['strider', 'Plains strider']].forEach(([id, name]) => add('creatures/' + id, name, 'creatures', 'land', 'labs/life.html', () => buildLife(id), { needs: 'space' }));
 
-// bryły z bloków (BlockKit, z Hive Hunger): kształt z warstwami domyślnymi laboratorium bloków; w kosmosie
-['sphere', 'cube', 'pair', 'belt', 'balls'].forEach((id) => add('blocks/' + id, BLOCK_SHAPES[id], 'blocks', 'space', 'labs/blocks.html', () => {
-  const b = buildBlocks({ shape: id, radius: id === 'belt' ? 6 : 8 });
+// bryły z bloków (BlockKit, z Hive Hunger): kształt z warstwami domyślnymi laboratorium bloków; w kosmosie.
+// assetKind: obiekt może wskazać zasób „blocks” (bryła zapisana w laboratorium bloków, pole „asset”) — wtedy
+// build({ asset }) dostaje jego dane i buduje tę bryłę (z jej kształtem, warstwami i materiałami)
+['sphere', 'cube', 'pair', 'belt', 'balls'].forEach((id) => add('blocks/' + id, BLOCK_SHAPES[id], 'blocks', 'space', 'labs/blocks.html', (opts) => {
+  const b = buildBlocks(opts && opts.asset ? opts.asset : { shape: id, radius: id === 'belt' ? 6 : 8 });
   return { root: b.group, kit: b, dispose: () => b.dispose(), tick: (t) => b.update(t) };
-}));
+}, { assetKind: 'blocks' }));
 
 export const PREFABS = P;
 export const prefab = (id) => P.find((p) => p.id === id) || null;

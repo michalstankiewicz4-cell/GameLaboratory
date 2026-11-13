@@ -19,6 +19,9 @@
 //   material — materiał z laboratorium materiałów: opis MatKit (rodzaj, barwy, kafelek, szorstkość, metaliczność,
 //         nierówność, starzenie; js/render/materials/matkit.js)
 //   uiskin — skórka UI gry z laboratorium UI: { base: 'space' | 'battle' | 'engine', tokens } (js/gameui/skins.js)
+//   blocks — bryła z bloków z laboratorium bloków: opis BlockKit (kształt, rozmiar, blok, ziarno, napis, warstwy,
+//         mats — materiały bloków stałych jako opisy MatKit, matRefs — co było wybrane w laboratorium);
+//         w scenie: pole „asset” obiektu z prefabrykatem bloków (js/models/blocks/blockkit.js)
 export const KEY = 'gameLab.assets.v1';
 
 export const ASSET_KINDS = {
@@ -30,6 +33,7 @@ export const ASSET_KINDS = {
   ui: { label: 'Game UI', labelPl: 'UI gry', lab: 'labs/gameui.html', keys: ['format', 'version', 'name', 'skin', 'start', 'pause', 'screens', 'hud', 'windows'] },
   material: { label: 'Material', labelPl: 'Materiał', lab: 'labs/materials.html', keys: ['label', 'kind', 'color', 'color2', 'tile', 'seed', 'roughness', 'metalness', 'bump', 'wear', 'dirt', 'rust', 'brushed', 'panels', 'rivets', 'planks', 'grain', 'cracks', 'grains', 'pores', 'bricks', 'fibres', 'threads', 'trowel'] },
   uiskin: { label: 'Game UI skin', labelPl: 'Skórka UI gry', lab: 'labs/gameui.html', keys: ['base', 'tokens'] },
+  blocks: { label: 'Block body', labelPl: 'Bryła z bloków', lab: 'labs/blocks.html', keys: ['shape', 'radius', 'voxel', 'seed', 'text', 'layers', 'mats', 'matRefs'] },
 };
 
 // profile wyglądu kamery sprzed zasobów (laboratorium filtrów do 0.4) — przeniesione raz do rodzaju look

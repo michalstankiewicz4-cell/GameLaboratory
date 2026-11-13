@@ -42,6 +42,10 @@ window.GameLabCatalog =
       "name": "Materials and graphics",
       "namePl": "Materiały i grafika"
     },
+    "voxels": {
+      "name": "Voxels",
+      "namePl": "Woksele"
+    },
     "ui": {
       "name": "UI and sound",
       "namePl": "UI i dźwięk"
@@ -454,23 +458,6 @@ window.GameLabCatalog =
       }
     },
     {
-      "file": "labs/blocks.html",
-      "cat": "matter",
-      "name": "Blocks Lab",
-      "namePl": "Laboratorium bloków",
-      "doc": "docs/labs/blocks.md",
-      "desc": "Bodies built of blocks, from Hive Hunger: rock, iron, ice, sandstone, water, lava and gas in layers (surface, deep, core, veins, pools), solid blocks in materials from the materials lab. Bite a hole: water and lava come loose as droplets that hold together, gas as a drifting cloud — in space, with no gravity.",
-      "descPl": "Bryły z bloków, z Hive Hunger: skała, żelazo, lód, piaskowiec, woda, lawa i gaz w warstwach (powierzchnia, głębia, jądro, żyły, jeziorka), bloki stałe w materiałach z laboratorium materiałów. Ugryź dziurę: woda i lawa wypływają kroplami, które trzymają się razem, gaz — dryfującą chmurą, w kosmosie bez grawitacji.",
-      "kind": "lab",
-      "kit": "BlockKit",
-      "phrases": ["bloki", "kosmos", "ciecze", "materiały"],
-      "saved": ["gameLab.blocks."],
-      "art": {
-        "bg": ["#1a1626", "#07060c"],
-        "svg": "<rect x=\"70\" y=\"30\" width=\"14\" height=\"14\" fill=\"#8a7d70\"/><rect x=\"84\" y=\"30\" width=\"14\" height=\"14\" fill=\"#7a6e62\"/><rect x=\"98\" y=\"30\" width=\"14\" height=\"14\" fill=\"#8a8f98\"/><rect x=\"70\" y=\"44\" width=\"14\" height=\"14\" fill=\"#3f7fd0\"/><rect x=\"84\" y=\"44\" width=\"14\" height=\"14\" fill=\"#ff5a1f\"/><rect x=\"98\" y=\"44\" width=\"14\" height=\"14\" fill=\"#8a7d70\"/><rect x=\"84\" y=\"58\" width=\"14\" height=\"14\" fill=\"#c4a57c\"/><circle cx=\"128\" cy=\"40\" r=\"4\" fill=\"#3f7fd0\"/><circle cx=\"136\" cy=\"46\" r=\"3\" fill=\"#3f7fd0\"/><circle cx=\"134\" cy=\"62\" r=\"6\" fill=\"#c4a0e8\" opacity=\".6\"/>"
-      }
-    },
-    {
       "file": "labs/art.html",
       "cat": "matter",
       "name": "Art Lab",
@@ -502,6 +489,23 @@ window.GameLabCatalog =
       "art": {
         "bg": ["#1d2b22", "#0b120d"],
         "svg": "<rect x=\"80\" y=\"14\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"90\" y=\"14\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"80\" y=\"24\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"90\" y=\"24\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"70\" y=\"34\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"80\" y=\"34\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"90\" y=\"34\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"100\" y=\"34\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"60\" y=\"44\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"70\" y=\"44\" width=\"10\" height=\"10\" fill=\"#13261a\"/><rect x=\"80\" y=\"44\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"90\" y=\"44\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"100\" y=\"44\" width=\"10\" height=\"10\" fill=\"#13261a\"/><rect x=\"110\" y=\"44\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"60\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"70\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"80\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"90\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"100\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"110\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"70\" y=\"64\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"100\" y=\"64\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"60\" y=\"74\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"110\" y=\"74\" width=\"10\" height=\"10\" fill=\"#8be07a\"/>"
+      }
+    },
+    {
+      "file": "labs/blocks.html",
+      "cat": "voxels",
+      "name": "Blocks Lab",
+      "namePl": "Laboratorium bloków",
+      "doc": "docs/labs/blocks.md",
+      "desc": "Bodies built of blocks, from Hive Hunger: rock, iron, ice, sandstone, water, lava and gas in layers (surface, deep, core, veins, pools), solid blocks in materials from the materials lab. Bite a hole: water and lava come loose as droplets that hold together, gas as a drifting cloud — in space, with no gravity.",
+      "descPl": "Bryły z bloków, z Hive Hunger: skała, żelazo, lód, piaskowiec, woda, lawa i gaz w warstwach (powierzchnia, głębia, jądro, żyły, jeziorka), bloki stałe w materiałach z laboratorium materiałów. Ugryź dziurę: woda i lawa wypływają kroplami, które trzymają się razem, gaz — dryfującą chmurą, w kosmosie bez grawitacji.",
+      "kind": "lab",
+      "kit": "BlockKit",
+      "phrases": ["bloki", "kosmos", "ciecze", "materiały"],
+      "saved": ["gameLab.blocks."],
+      "art": {
+        "bg": ["#1a1626", "#07060c"],
+        "svg": "<rect x=\"70\" y=\"30\" width=\"14\" height=\"14\" fill=\"#8a7d70\"/><rect x=\"84\" y=\"30\" width=\"14\" height=\"14\" fill=\"#7a6e62\"/><rect x=\"98\" y=\"30\" width=\"14\" height=\"14\" fill=\"#8a8f98\"/><rect x=\"70\" y=\"44\" width=\"14\" height=\"14\" fill=\"#3f7fd0\"/><rect x=\"84\" y=\"44\" width=\"14\" height=\"14\" fill=\"#ff5a1f\"/><rect x=\"98\" y=\"44\" width=\"14\" height=\"14\" fill=\"#8a7d70\"/><rect x=\"84\" y=\"58\" width=\"14\" height=\"14\" fill=\"#c4a57c\"/><circle cx=\"128\" cy=\"40\" r=\"4\" fill=\"#3f7fd0\"/><circle cx=\"136\" cy=\"46\" r=\"3\" fill=\"#3f7fd0\"/><circle cx=\"134\" cy=\"62\" r=\"6\" fill=\"#c4a0e8\" opacity=\".6\"/>"
       }
     },
     {

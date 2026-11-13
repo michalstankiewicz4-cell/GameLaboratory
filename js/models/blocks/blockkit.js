@@ -56,6 +56,9 @@ export function normalizeBody(d = {}) {
   if (!SHAPES[b.shape]) b.shape = 'sphere';
   b.radius = Math.max(1, Math.min(40, +b.radius || 8)); b.voxel = Math.max(0.1, Math.min(2, +b.voxel || 0.5)); b.seed = Math.max(1, Math.round(+b.seed || 1));
   b.layers = (Array.isArray(b.layers) ? b.layers : BODY_DEFAULTS.layers).filter((l) => KINDS[l.kind] && WHERE[l.where]).map((l) => ({ kind: l.kind, where: l.where, amount: Math.max(0, Math.min(100, +l.amount || 0)) }));
+  // materiały bloków stałych tej bryły (opisy MatKit; brak — materiał domyślny rodzaju, KINDS[].mat)
+  b.mats = Object.fromEntries(Object.entries(b.mats && typeof b.mats === 'object' ? b.mats : {})
+    .filter(([k, v]) => KINDS[k] && KINDS[k].state === 'solid' && v && typeof v === 'object'));
   return b;
 }
 
@@ -124,7 +127,7 @@ export function buildBody(def0) {
   function materialFor(kid) {
     const K = KINDS[KIND_IDS[kid - 1]];
     if (K.state === 'solid') {
-      const m = makeMaterial(K.mat, { res: 256 }), tile = m.material.userData.tile;
+      const m = makeMaterial(def.mats[KIND_IDS[kid - 1]] || K.mat, { res: 256 }), tile = m.material.userData.tile;
       // UV w układzie świata (rzut wzdłuż osi ściany): faktura ciągnie się przez sąsiednie bloki zamiast powtarzać się w każdym
       m.material.onBeforeCompile = (sh2) => {
         sh2.vertexShader = sh2.vertexShader.replace('#include <uv_vertex>', `#include <uv_vertex>
