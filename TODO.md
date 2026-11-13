@@ -4,7 +4,7 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 
 ## Następne w planie (`docs/guides/lab-breakdown.md`, „Kolejność”)
 - [x] Punkt 7 — lekarz sceny: zrobiony w 0.60.0 (`js/scene/doctor.js`, `docs/scene/doctor.md`); następne reguły — w opisie.
-- [ ] Punkt 8 — materiał z Hive Hunger (z historią): ~~laboratorium bloków~~ (0.64.0), statki roju, ~~laboratorium efektów~~ (0.67.0), drzewka
+- [ ] Punkt 8 — materiał z Hive Hunger (z historią): ~~laboratorium bloków~~ (0.64.0), ~~statki roju~~ (nie przenosimy — w grze to tylko kolorowe kreski; decyzja właściciela 2026-11-14), ~~laboratorium efektów~~ (0.67.0), drzewka
   technologiczne.
 - [ ] Punkt 9 — materiał z PatientZero (z historią): środowisko „organizm”, laboratorium tkanek, laboratorium patogenów.
 

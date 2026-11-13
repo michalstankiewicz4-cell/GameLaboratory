@@ -70,4 +70,4 @@ bryły z domyślnymi warstwami, na powierzchni kosmosu; z polem `asset` — bry�
 
 ## Dalej (w planie)
 
-Pozostałe z punktu 8: statki roju, laboratorium efektów, drzewka technologii.
+Pozostałe z punktu 8: drzewka technologii (laboratorium efektów — zrobione w 0.67.0; statków roju nie przenosimy).

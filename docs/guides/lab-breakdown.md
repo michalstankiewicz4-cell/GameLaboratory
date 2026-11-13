@@ -142,7 +142,8 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
       `Liquids.js`, `Gases.js`): bloki stałe w różnych kolorach i rodzajach (skała, żelazo…) jako model (kit bloków
       w `js/models/`), ciecze (woda, lawa) i gazy jako zachowania w kosmosie (spójność kropel, kłęby, odbicia od
       bloków); w edytorze sceny — bryły z bloków (budowa poziomów);
-   2. **statki roju** (`tools/ship-editor.html`) — kolejna rodzina w laboratorium pojazdów — kosmos;
+   2. ~~**statki roju**~~ — nie przenosimy (właściciel, 2026-11-14: w grze to tylko kolorowe kreski); ich efekty
+      (promienie, holowanie, cięcie, pola, skok) są już w laboratorium efektów (0.69.0);
    3. *(zrobione w 0.67.0: `labs/effects.html`, opis `docs/labs/effects.md`)* **laboratorium efektów** (`js/three/effects`): strzały, wybuchy, cząsteczki — odpowiedź na zdarzenia (np. akcja
       `fire`);
    4. **drzewka technologiczne** (`tools/tree-editor.html`) — później: dane gry jako zasób z nazwą i narzędzie do ich
