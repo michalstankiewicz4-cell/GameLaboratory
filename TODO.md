@@ -31,6 +31,35 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 - [ ] **Zasoby z nazwą dla jaskiń i roślin**: ustawienia z laboratoriów zapisane pod nazwą i użyte w scenie (jak ląd
   i morze).
 
+## Pełne połączenie laboratoriów — przekształcenie w silnik (właściciel, 2026-11-13)
+Cel: każde laboratorium jest edytorem jednej części silnika, a jego wynik trafia do sceny (i do gier) jako prefabrykat
+albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.63.0):
+
+- **Już połączone ze sceną:**
+  - przez prefabrykaty (modele) — pojazdy: kosmos, woda, ląd; ciała niebieskie, moduły bazy, budowle, rośliny,
+    jaskinie, życie (stwory), ludzie i broń;
+  - przez zasoby z nazwą — morze (woda), ląd (ląd), pogoda i światło (wygląd), wygląd kamery (filtry), niebo kosmosu
+    (ciała niebieskie), UI gry (UI gry).
+- [ ] **Materiały → modele i scena:** modele biorą materiały z MatKit (rodzina po rodzinie, doktor modeli, porównanie
+  obrazów); w scenie i w API pole materiału obiektu (podmiana np. kadłuba na zardzewiałą stal).
+- [ ] **Materiały ↔ sztuka:** powierzchnie 2D laboratorium sztuki z generatora MatKit (ten sam papier, drewno, metal
+  w 2D i 3D).
+- [ ] **Sztuka → scena:** obraz z laboratorium sztuki jako zasób i obiekt sceny (płaszczyzna z fakturą farby, rama 3D
+  ze złoceniem — tryb 3D sztuki).
+- [ ] **Jaskinie i rośliny:** ustawienia z laboratoriów jako zasoby z nazwą (dziś w scenie tylko ustawienia domyślne).
+- [ ] **Układy (systems):** układ planetarny z laboratorium jako zasób, wstawiany do sceny kosmosu z orbitami.
+- [ ] **Skórki (skins):** malowanie statków jako zasób, wybierany dla obiektu w scenie.
+- [ ] **Powierzchnia (surface):** to, czego ląd z planety jeszcze nie przejął (grunt SurfaceKit, zejście, jazda) —
+  rozliczyć i zamknąć albo połączyć z laboratorium lądu.
+- [ ] **Przedmioty bohatera (gear):** latarki i lampy jako prefabrykaty (światło w scenie, jaskinie).
+- [ ] **Dźwięk (sound):** MusicKit jako zasób sceny (muzyka, odgłosy zdarzeń z szyny `js/core/events.js`).
+- [ ] **Edytor stworów (creator), transformator (transform):** wynik jako prefabrykat sceny.
+- [ ] **Postacie SDF i pixel art** (generator zombie, Kostnica SDF, SDF Walkers, Pixel Studio): postacie i sprite'y jako
+  zasoby (np. dla gier 2D i HUD); laboratoria języka i obrazów — rozstrzygnąć, czy należą do silnika.
+- [ ] **Skala (scale):** jednostki i skala sceny (kosmos: prawdziwe odległości a model) — wspólne ustawienie silnika.
+- [ ] **Silnik bez laboratoriów:** jedno wejście dla gier (scena + zasoby + zachowania + UI gry + zdarzenia) — gra
+  ładuje scenę i gra, bez edytora; opis API silnika w jednym miejscu (`docs/guides/engine-architecture.md`).
+
 ## Materiały (laboratorium materiałów, 0.63.0)
 - [ ] Przenieść materiały modeli na MatKit stopniowo, rodzina po rodzinie (doktor modeli, porównanie obrazów):
   budowle (`js/models/structures/materials.js`), okręty (`js/render/sea/materials.js`, `js/models/ships-sea/materials.js`),

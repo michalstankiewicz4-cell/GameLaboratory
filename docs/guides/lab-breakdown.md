@@ -151,6 +151,10 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
 
 ## Pomysły na później (laboratoria)
 
+- **Pełne połączenie wszystkich laboratoriów i przekształcenie w silnik** (pomysł użytkownika, 2026-11-13): każde
+  laboratorium jest edytorem jednej części silnika, a wynik trafia do sceny i gier jako prefabrykat albo zasób
+  z nazwą; na końcu jedno wejście dla gier bez edytora. Spis stanu i kroki — `TODO.md`, „Pełne połączenie laboratoriów”.
+
 - **Wiki w menu Pomoc** (pomysł użytkownika): artykuły o laboratoriach, modelach, środowiskach i zjawiskach (np.
   metody ekspertyzy, techniki malarskie), z ilustracjami generowanymi w laboratoriach (laboratorium sztuki: `ArtApi`) —
   małe obrazki, bez wysokiej rozdzielczości i efektów, chyba że ilustracja tego wymaga. Wzór: wiki eksperta w grze
