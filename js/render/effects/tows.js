@@ -1,6 +1,9 @@
-import { linearTexture } from '../textures.js';
+// Promień ściągający holownika: wachlarz światła do obrysu holowanej bryły — z Hive Hunger (js/three/swarm/tows.js, metody Swarm3D).
+// Obliczenia bez zmian; liczby na klatkę (60 Hz). Metody działają na „roju” — tablice położeń statków; laboratorium podaje
+// je przez gospodarza w effects.js (EffectKit).
+import { linearTexture } from './textures.js';
 
-const THREE = window.THREE;
+import * as THREE from '../../../vendor/three/three.module.js';
 
 /**
  * Tugs' tractor beams (Swarm3D): a fan of light from the tug to the towed piece's outline.

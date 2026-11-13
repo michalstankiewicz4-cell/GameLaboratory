@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.31.0 — 2026-11-14 (fala skanu i efekty roju)
+
+### Dodane
+- Akcja „skan” statków w ▶ Graj rysuje falę skanu z laboratorium efektów; polecenie `effect` zna nowe efekty
+  (laser, przebijacz, burza, holowanie, cięcie, pole, skok, znacznik, tunel, skan).
+
 ## 0.30.0 — 2026-11-14 (efekt strzału)
 
 ### Dodane

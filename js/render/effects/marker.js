@@ -1,4 +1,6 @@
-const THREE = window.THREE;
+// Znacznik kliknięcia: pulsujący pierścień — z Hive Hunger (js/three/scene/ClickMarker.js).
+// Obliczenia bez zmian; liczby na klatkę (60 Hz).
+import * as THREE from '../../../vendor/three/three.module.js';
 
 /**
  * Marker shown where the player clicked: a pulsing ring lying on the planet's surface

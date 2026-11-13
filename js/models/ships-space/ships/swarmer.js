@@ -6,7 +6,7 @@
    ======================================================================= */
 (function () {
 "use strict";
-const { GOLD, detailHelpers, makeShotEmitter, makeBrushed, makeEngineSet, makeExhaust, makeNavLights, makeOnlineFader, makePlating, makePlumeMaterial, makeScanWave, makeShotQueue, partsOf, shadowed, sharedMaterials, trackTextures } = ShipKit._;
+const { GOLD, detailHelpers, makeShotEmitter, makeBrushed, makeEngineSet, makeExhaust, makeNavLights, makeOnlineFader, makePlating, makePlumeMaterial, makeScanEmitter, makeShotQueue, partsOf, shadowed, sharedMaterials, trackTextures } = ShipKit._;
 const SHIP_DEFS = ShipKit.SHIP_DEFS;
 
 // ---------------------------------------------------------------------
@@ -122,7 +122,7 @@ SHIP_DEFS.push({
 
     // ---- actions: bite bolts from both mandibles, a scan ping.
     const guns = makeShotEmitter(ship, env, 0x4fe3c6, { speed: 30 });   // shots: an effect from the effects lab (model.onShot)
-    const wave = makeScanWave(ship, env, 0x4fe3c6);
+    const wave = makeScanEmitter(ship, env, 0x4fe3c6);
     const actions = [
       { id: "fire", label: "BITE", kind: "trigger" },
       { id: "scan", label: "SCAN", kind: "trigger" },

@@ -161,6 +161,7 @@ export function createWorld(container, store, onWarn) {
   // strzały statków (ShipKit model.onShot): efekt wybrany dla obiektu (pole „shot”: rodzaj albo zapisany efekt; brak — strzał)
   function wireShots(o, kit) {
     if (!kit || !('onShot' in kit)) return;
+    kit.onScan = (s) => { try { fxLib.play('scan', { at: s.at.toArray(), radius: s.radius, color: s.color }); } catch { /* bez fali */ } };   // fala skanu: laboratorium efektów
     kit.onShot = (s) => { const cur = store.scene.objects.find((q) => q.id === o.id); try { fxLib.shot((cur && cur.shot) || 'shot', s); } catch (err) { if (window.LabLog) window.LabLog.add('warn', 'Shot effect: ' + err.message); } };
   }
   function frame(now) {

@@ -6,7 +6,7 @@
    ======================================================================= */
 (function () {
 "use strict";
-const { GOLD, buildShipModel, detailHelpers, labelKey, makeGameHolder, makeNavLights, makeOnlineFader, makePlating, makeScanWave, makeSolarCells, partsOf, rng, shadowed, sharedMaterials, strut, trackTextures } = ShipKit._;
+const { GOLD, buildShipModel, detailHelpers, labelKey, makeGameHolder, makeNavLights, makeOnlineFader, makePlating, makeScanEmitter, makeSolarCells, partsOf, rng, shadowed, sharedMaterials, strut, trackTextures } = ShipKit._;
 const SHIP_DEFS = ShipKit.SHIP_DEFS;
 
 // ---------------------------------------------------------------------
@@ -308,7 +308,7 @@ SHIP_DEFS.push({
       { color: 0xffffff, pos: [0, 4.05, 0], size: 0.6, kind: "strobe", phase: 0.5 },
       { color: 0x4fe3c6, pos: [dishTip.x, dishTip.y + 0.5, dishTip.z + 0.4], size: 0.45 },
     ]);
-    const wave = makeScanWave(station, env, 0x4fe3c6);
+    const wave = makeScanEmitter(station, env, 0x4fe3c6);
     const power = makeOnlineFader(0.8);
     const actions = [{ id: "scan", label: "SCAN" }];
     let scanT = 0;

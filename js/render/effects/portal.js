@@ -1,6 +1,8 @@
-import { radialTexture } from '../textures.js';
+// Tunel podprzestrzenny: wir otwierający się w lejek smug światła — z Hive Hunger (js/three/scene/Portal3D.js).
+// Obliczenia bez zmian; liczby na klatkę (60 Hz).
+import { radialTexture } from './textures.js';
 
-const THREE = window.THREE;
+import * as THREE from '../../../vendor/three/three.module.js';
 const ORIGIN = new THREE.Vector3(); // the planet's centre: the tunnel faces it
 const OUT = new THREE.Vector3(0, 0, 1);
 // scratch values for update()

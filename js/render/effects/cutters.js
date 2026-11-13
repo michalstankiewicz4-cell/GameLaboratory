@@ -1,4 +1,7 @@
-const THREE = window.THREE;
+// Płaski promień tnący: dwa promienie na krawędziach i mgiełka między nimi — z Hive Hunger (js/three/swarm/cutters.js, metody Swarm3D).
+// Obliczenia bez zmian; liczby na klatkę (60 Hz). Metody działają na „roju” — tablice położeń statków; laboratorium podaje
+// je przez gospodarza w effects.js (EffectKit).
+import * as THREE from '../../../vendor/three/three.module.js';
 
 /**
  * Cutters' sheets: from the ship to the row it is cutting, a flat beam — a red ray along each edge and a

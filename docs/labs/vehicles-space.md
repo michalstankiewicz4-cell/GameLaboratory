@@ -253,7 +253,7 @@ Helpers for writing actions (exported too):
 | Helper | What it does |
 |---|---|
 | `makeShotEmitter(ship, env, color, { speed })` | Shots: `fire(origin, dir, target?)` reports one shot to `model.onShot({ from, to, dir, color, ship })` (world space). The model draws no shot or muzzle flash — the host draws an effect from the effects lab (`js/render/effects/`, [`effects.md`](effects.md)). |
-| `makeScanWave(parent, color)` | An expanding shell with a Fresnel rim and scan lines: `start(pos, radius)`, `update(dt)`. |
+| `makeScanEmitter(ship, env, color)` | Scans: `start(pos, radius)` (ship space) reports one scan to `model.onScan({ at, radius, color, ship })` (world space); the expanding shell is the effects lab's scan wave (`js/render/effects/scan.js`), drawn by the host. |
 | `textTexture(text, color)` | A glowing word on a transparent canvas (cached), e.g. for a sprite. |
 | `fxTextures()` | The shared smoke puff and scorch textures. |
 
@@ -335,7 +335,7 @@ animations).
 | `makeNavLights(parent, defs)` | Running lights `{ color, pos, size, kind: "steady" \| "strobe", phase }`; `update(t)`, `setVisible(on)`. Each is a lens in its colour (always there) plus a glow; off, the glow fades in ~0.15 s and the lens goes dark (the user's call: the lights stay visible, they just go out) |
 | `makeShotQueue()` | `schedule([{ delay, ... }])` for act("fire"), `run(t, fn)` fires each when due |
 | `makeOnlineFader()` | Offline state for the ship's own parts: `set(on)`, `offline`, `update(dt)` → 0..1 online level |
-| `makeShotEmitter`, `makeScanWave`, `textTexture`, `fxTextures` | Action effects (see [Actions, offline and damage](#actions-offline-and-damage)) |
+| `makeShotEmitter`, `makeScanEmitter`, `textTexture`, `fxTextures` | Action effects (see [Actions, offline and damage](#actions-offline-and-damage)) |
 | `makeSolarCells({ seed, cols, rows })` | Solar-cell sheet texture (the drone's wing, the station's panels) |
 | `partsOf(root)` | **Named parts**: `part("engines")` is a Group named "engines" under root, made the first time it's asked for. Every ship puts each numbered section of its build in one (see rule 14). The shared effects (shots, scan wave, damage smoke and sparks) go in `"effects"` (`effectsPart`) unless the host gives them an `fxRoot`. Plain static groups: GAME BUILD merges through them as before |
 | `strut(a, b, radius, material, segments)` | A cylinder from point a to point b: struts, spokes, booms, antenna feeds |

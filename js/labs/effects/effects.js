@@ -54,7 +54,10 @@ function remake() { fx.dispose(); fx = createEffects(scene, { scale: L.scale, se
 function demo(kind) {
   const arc = [0, 1, 2, 3, 4].map((i) => { const t = i / 4; return [A.x + (B.x - A.x) * t, Math.sin(t * Math.PI) * 3, (i % 2 ? 1.5 : -1.5)]; });
   const at = { shot: { from: A, to: B }, orb: { from: A, to: B }, bubble: { from: A, to: B }, bolt: { path: [A.toArray(), [0, 1.5, 0], B.toArray()] },
-    zap: { path: arc }, debris: { at: B, dir: new THREE.Vector3(0, 1, 0.3) }, hole: { at: new THREE.Vector3(0, 0, -4) } }[kind];
+    zap: { path: arc }, debris: { at: B, dir: new THREE.Vector3(0, 1, 0.3) }, hole: { at: new THREE.Vector3(0, 0, -4) },
+    laser: { from: A, to: B }, piercer: { from: A, to: B }, storm: { from: A, to: B }, tow: { from: A, to: B }, cutter: { from: A, to: B },
+    field: { at: A }, marker: { at: B }, portal: { at: new THREE.Vector3(0, 0, -4) }, scan: { at: new THREE.Vector3(0, 0, 0) },
+    warp: { from: A, dir: new THREE.Vector3(1, 0.15, 0) } }[kind];
   return fx.play(kind, at);
 }
 
@@ -72,10 +75,13 @@ function showFields() {
     const name = document.createElement('span'); name.textContent = key; name.title = key;
     const out = document.createElement('output');
     let ctl;
-    if (Array.isArray(def[key])) {   // trzy liczby (rozmiar smugi)
+    if (Array.isArray(def[key]) && typeof def[key][0] !== 'number') continue;   // barwy CSS pasa (przebijacz) — bez suwaka
+    if (Array.isArray(def[key])) {   // kilka liczb (rozmiar smugi) albo kilka barw (pole siłowe)
       ctl = document.createElement('div'); ctl.className = 'trio';
-      def[key].forEach((d, i) => { const n = document.createElement('input'); n.type = 'number'; n.step = String(stepOf(d)); n.value = vals[key][i];
-        n.oninput = () => { const v = parseFloat(n.value); if (Number.isFinite(v)) { vals[key][i] = v; changed(); } }; ctl.append(n); });
+      def[key].forEach((d, i) => { const n = document.createElement('input');
+        if (isColor(key)) { n.type = 'color'; n.value = hex(vals[key][i]); n.oninput = () => { vals[key][i] = parseInt(n.value.slice(1), 16); changed(); }; }
+        else { n.type = 'number'; n.step = String(stepOf(d)); n.value = vals[key][i]; n.oninput = () => { const v = parseFloat(n.value); if (Number.isFinite(v)) { vals[key][i] = v; changed(); } }; }
+        ctl.append(n); });
     } else if (isColor(key)) {
       ctl = document.createElement('input'); ctl.type = 'color'; ctl.value = hex(vals[key]); out.textContent = '';
       ctl.oninput = () => { vals[key] = parseInt(ctl.value.slice(1), 16); changed(); };

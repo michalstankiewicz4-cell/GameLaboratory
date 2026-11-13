@@ -6,7 +6,7 @@
    ======================================================================= */
 (function () {
 "use strict";
-const { GOLD, BLUE, additiveSprite, detailHelpers, glowTextures, labelKey, makeShotEmitter, makeBrushed, makeCoreMaterial, makeEngineSet, makeExhaust, makeNavLights, makeOnlineFader, makePlating, makeScanWave, makeShotQueue, partsOf, rng, shadowed, sharedMaterials, strut, trackTextures } = ShipKit._;
+const { GOLD, BLUE, additiveSprite, detailHelpers, glowTextures, labelKey, makeShotEmitter, makeBrushed, makeCoreMaterial, makeEngineSet, makeExhaust, makeNavLights, makeOnlineFader, makePlating, makeScanEmitter, makeShotQueue, partsOf, rng, shadowed, sharedMaterials, strut, trackTextures } = ShipKit._;
 const SHIP_DEFS = ShipKit.SHIP_DEFS;
 
 // ---------------------------------------------------------------------
@@ -290,7 +290,7 @@ SHIP_DEFS.push({
     // ---- actions: alternating shots from the wingtip cannons, a sensor
     // ping from the dish. Offline: core, windows and gyro wind down.
     const guns = makeShotEmitter(ship, env, 0x9fb6ff, { speed: 34 });   // shots: an effect from the effects lab (model.onShot)
-    const wave = makeScanWave(ship, env, 0x7f95ff);
+    const wave = makeScanEmitter(ship, env, 0x7f95ff);
     const actions = [
       { id: "fire", label: "FIRE CANNONS", kind: "trigger" },
       { id: "scan", label: "SENSOR PING", kind: "trigger" },

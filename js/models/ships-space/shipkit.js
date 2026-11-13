@@ -468,46 +468,19 @@ function makeShotEmitter(ship, env, color, { speed = 28 } = {}) {
   };
 }
 
-// An expanding sensor shell: Fresnel-bright rim with latitude scan lines,
-// fading as it grows. start(position, maxRadius), both in ship space.
-function makeScanWave(ship, env, color) {
-  const host = fxHost(ship, env);
-  const uniforms = { uT: { value: 0 }, uColor: { value: new THREE.Color(color) } };
-  const mat = new THREE.ShaderMaterial({
-    uniforms,
-    vertexShader: `
-      varying vec3 vN; varying vec3 vView; varying vec3 vP;
-      void main(){
-        vP = position; vN = normalize(normalMatrix * normal);
-        vec4 mv = modelViewMatrix * vec4(position, 1.0); vView = normalize(-mv.xyz);
-        gl_Position = projectionMatrix * mv;
-      }`,
-    fragmentShader: `
-      uniform float uT; uniform vec3 uColor; varying vec3 vN; varying vec3 vView; varying vec3 vP;
-      void main(){
-        float fres = pow(1.0 - abs(dot(normalize(vN), normalize(vView))), 2.5);
-        float lines = 0.55 + 0.45 * sin(vP.y * 60.0);
-        float a = (fres * 0.9 + 0.06) * lines * pow(1.0 - uT, 1.5);
-        gl_FragColor = vec4(uColor * a * 1.8, 1.0);
-      }`,
-    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
-  });
-  const mesh = new THREE.Mesh(new THREE.SphereGeometry(1, 48, 24), mat);
-  mesh.userData.dynamic = true;
-  mesh.visible = false; host.add(mesh);
-  let t = -1, maxR = 8;
+// Scans: the ship decides where its sensor sits and how far it reaches (act("scan")); the expanding
+// shell itself is not part of the model — it is the effects lab's scan wave (js/render/effects/scan.js),
+// drawn by the host. start(position, maxRadius) — both in ship space — reports one scan to
+// model.onScan({ at, radius, color, ship }), in world space. update(dt) — nothing to move.
+function makeScanEmitter(ship, env, color) {
+  const ws = new THREE.Vector3();
   return {
     start(pos, radius = 8) {
-      const p = pos.clone(), k = host.point(p);
-      mesh.position.copy(p); maxR = radius * k; t = 0; mesh.visible = true;
+      if (!env || !env.onScan) return;
+      ship.updateMatrixWorld(true);
+      env.onScan({ at: pos.clone().applyMatrix4(ship.matrixWorld), radius: radius * ship.getWorldScale(ws).x, color, ship: env.id });
     },
-    update(dt) {
-      if (t < 0) return;
-      t += dt / 1.7;
-      if (t >= 1) { t = -1; mesh.visible = false; return; }
-      mesh.scale.setScalar(0.3 + maxR * (1 - Math.pow(1 - t, 3)));
-      uniforms.uT.value = t;
-    },
+    update() {},
   };
 }
 
@@ -698,7 +671,7 @@ function createDamageFx(ship, radius) {
     f.visible = false; fxp.add(f);
     fireballs.push({ s: f, off: new THREE.Vector3(rand() - 0.5, rand() - 0.5, rand() - 0.5).multiplyScalar(radius * 0.8), delay: rand() * 0.35 });
   }
-  const shock = makeScanWave(ship, null, 0xff8a3c);
+  const shock = makeScanEmitter(ship, null, 0xff8a3c);
   const flying = [];
   let boomT = -1;
   function breakApart() {
@@ -1614,7 +1587,7 @@ function mergeStatic(root) {
 function buildShipModel(id, { detail = 1, merge = false, fxRoot = null, envMap = null, round = 0, seal = 0, sealStyle = "fillet", labels = null } = {}) {
   const def = SHIP_DEFS.find((d) => d.id === id);
   if (!def) throw new Error("ShipKit: unknown ship id " + id);
-  const env = { id, fxRoot, owned: [], labels, onShot: null };   // onShot: shots of act("fire") — makeShotEmitter
+  const env = { id, fxRoot, owned: [], labels, onShot: null, onScan: null };   // shots and scans: makeShotEmitter, makeScanEmitter
   // arc segments: more for a stronger rounding and a higher detail (each box costs (2k+1)² quads a face)
   const k = Math.max(1, Math.min(3, Math.round(round * 3 * detail)));
   const built = withRounding(round, k, () => def.build(detail, env));
@@ -1655,6 +1628,8 @@ function buildShipModel(id, { detail = 1, merge = false, fxRoot = null, envMap =
     // act("fire") reports each shot here ({ from, to, dir, color, ship }, world space); the host draws it
     // with an effect from the effects lab (js/render/effects/) — the model has no shot of its own
     get onShot() { return env.onShot; }, set onShot(fn) { env.onShot = fn || null; },
+    // act("scan") reports each scan here ({ at, radius, color, ship }, world space): the effects lab's scan wave
+    get onScan() { return env.onScan; }, set onScan(fn) { env.onScan = fn || null; },
     // [{ id, label, kind: "trigger" | "toggle", enabled }] — see STANDARD_ACTIONS
     actions,
     damageEnabled: features.damage,
@@ -1822,10 +1797,10 @@ function prewarm(ids) {
 
 return {
   // the internals the ship files build with (js/models/ships-sea/ships/*.js) — not a public API
-  _: { GOLD, BLUE, additiveSprite, buildShipModel, canvas, clamp, detailHelpers, fxHost, fxTextures, glowTextures, labelKey, makeShotEmitter, makeBrushed, makeCoreMaterial, makeEngineSet, makeExhaust, makeGameHolder, makeNavLights, makeOnlineFader, makePlating, makePlumeMaterial, makeScanWave, makeShotQueue, makeSolarCells, mergeStatic, partsOf, rng, shadowed, sharedMaterials, strut, textTexture, trackTextures },
+  _: { GOLD, BLUE, additiveSprite, buildShipModel, canvas, clamp, detailHelpers, fxHost, fxTextures, glowTextures, labelKey, makeShotEmitter, makeBrushed, makeCoreMaterial, makeEngineSet, makeExhaust, makeGameHolder, makeNavLights, makeOnlineFader, makePlating, makePlumeMaterial, makeScanEmitter, makeShotQueue, makeSolarCells, mergeStatic, partsOf, rng, shadowed, sharedMaterials, strut, textTexture, trackTextures },
   SHIP_DEFS, GAME_DETAIL, buildShipModel, disposeShipModel, modelStats, makeGameHolder, prewarm, mergeStatic,
   makeSpaceSky, makeEnvironment,
-  makeShotEmitter, makeScanWave, textTexture, fxTextures, // action/effect helpers for ship defs
+  makeShotEmitter, makeScanEmitter, textTexture, fxTextures, // action/effect helpers for ship defs
   // building blocks for ship definitions (see "SHIP BUILDING BLOCKS")
   detailHelpers, partsOf, withRounding, sealJoints, roundedBoxGeometry, roundedCylinderGeometry, makeEngineSet, makeExhaust, makeNavLights, makeShotQueue, makeOnlineFader, makeSolarCells, strut,
   STANDARD_ACTIONS,

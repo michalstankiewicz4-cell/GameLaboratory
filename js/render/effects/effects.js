@@ -19,6 +19,7 @@ import { Lightning3D } from './lightning.js';
 import { Zaps } from './zaps.js';
 import { Bubbles } from './bubbles.js';
 import { BlackHoles } from './black-holes.js';
+import { createSwarmEffects, SWARM_DEFAULTS, SWARM_KINDS } from './swarm-fx.js';
 
 export const STEP = 1 / 60;
 const VOXEL = 0.5;   // blok Hive Hunger: rozmiary efektów są w tych jednostkach
@@ -32,6 +33,7 @@ export const FX_DEFAULTS = {
   zap: { color: 0xffffff, glowColor: 0xdfe8ff, life: 90, fadeOut: 25, points: 24, bend: 0.09, jag: 0.025, glowPx: 4, branchGlowPx: 2, branches: 3, branchLength: 1.6, branchBrightness: 0.6, flowWaves: 3, flowSpeed: 0.05 },
   bubble: { speed: 0.07, size: 1.5, wobble: 0.08 },
   hole: { grow: 60, hold: 120, shrink: 60, size: 2.2, range: 7.5, core: 0.9, pullDebris: 0.004, pullPieces: 0.0015, maxPieceSpeed: 0.05, ringColor: 0xc9a0ff },
+  ...SWARM_DEFAULTS,   // laser, przebijacz, burza, holowanie, cięcie, pole, skok, znacznik, tunel, skan (swarm-fx.js)
 };
 export const FX_KINDS = {
   shot: { label: 'Shot', labelPl: 'Strzał', needs: 'from, to' },
@@ -41,6 +43,7 @@ export const FX_KINDS = {
   zap: { label: 'Chain lightning', labelPl: 'Piorun łańcuchowy', needs: 'path' },
   bubble: { label: 'Liquid bubble', labelPl: 'Kula cieczy', needs: 'from, to' },
   hole: { label: 'Black hole', labelPl: 'Czarna dziura', needs: 'at' },
+  ...SWARM_KINDS,
 };
 const clone = (o) => JSON.parse(JSON.stringify(o));
 
@@ -54,10 +57,11 @@ export function createEffects(scene, { scale = 1, settings = {} } = {}) {
     fx = {
       shot: new Shots(root, S.shot, VOXEL), orb: new Orbs(root, S.orb, VOXEL), debris: new Debris3D(root, S.debris),
       bolt: new Lightning3D(root, S.bolt), zap: new Zaps(root, S.zap), bubble: new Bubbles(S.bubble), hole: new BlackHoles(S.hole),
+      swarm: createSwarmEffects(root, S),
     };
   }
   function drop() {
-    fx.shot.clear(); fx.orb.clear(); fx.bolt.clear(); fx.zap.clear(); fx.bubble.clear(); fx.hole.clear();
+    fx.swarm.clear(); fx.shot.clear(); fx.orb.clear(); fx.bolt.clear(); fx.zap.clear(); fx.bubble.clear(); fx.hole.clear();
     root.traverse((m) => { if (m.geometry) m.geometry.dispose(); if (m.material) [].concat(m.material).forEach((x) => x.dispose()); });
     root.clear();
   }
@@ -76,10 +80,14 @@ export function createEffects(scene, { scale = 1, settings = {} } = {}) {
         case 'bolt': { const p = (o.path || []).flatMap((q) => v(q).toArray()); if (p.length < 6) return false; fx.bolt.show(p, o.color != null ? o.color : S.bolt.color, o.strength || 1); return true; }
         case 'zap': { const pts = o.path || []; if (pts.length < 2) return false; fx.zap.add(chain(pts), pts.map((_, i) => i), (Math.random() * 1e9) | 0); return true; }
         case 'hole': fx.hole.add(v(o.at)); return true;
-        default: throw new Error(`unknown effect "${kind}" (${Object.keys(FX_KINDS).join(', ')})`);
+        default: if (SWARM_KINDS[kind]) return fx.swarm.play(kind, o, v); throw new Error(`unknown effect "${kind}" (${Object.keys(FX_KINDS).join(', ')})`);
       }
     },
     step(camera) {
+      // kamera w jednostkach efektu (root ma skalę): pasy i poświaty obracają się do niej
+      const lc = scale === 1 ? camera : { position: camera.position.clone().divideScalar(scale), fov: camera.fov };
+      fx.swarm.step(lc, camera);
+      camera = lc;
       fx.shot.update(); fx.orb.update(); fx.bubble.update((b) => fx.debris.emit(b.pos.clone(), [0.55, 0.8, 1], 10));   // rozbryzg u celu (splashColor, splash z gry)
       fx.hole.update(fx.debris); fx.debris.update(); fx.bolt.update(camera); fx.zap.update(camera);
     },
@@ -91,7 +99,7 @@ export function createEffects(scene, { scale = 1, settings = {} } = {}) {
       try { H.render(renderer, sc, camera, lenses, null, draw); } finally { H.holes.forEach((h, i) => h.pos.copy(keep[i])); H.cfg.size = size; }
     },
     set(kind, values) { Object.assign(S[kind], values); make(); },
-    counts: () => ({ shot: fx.shot.list.length, orb: fx.orb.list.length, debris: fx.debris.count, bolt: fx.bolt.bolts.length, zap: fx.zap.list.length, bubble: fx.bubble.list.length, hole: fx.hole.holes.length }),
+    counts: () => ({ shot: fx.shot.list.length, orb: fx.orb.list.length, debris: fx.debris.count, bolt: fx.bolt.bolts.length, zap: fx.zap.list.length, bubble: fx.bubble.list.length, hole: fx.hole.holes.length, ...fx.swarm.counts() }),
     clear() { make(); },
     dispose() { drop(); scene.remove(root); },
   };
@@ -105,7 +113,8 @@ export function shotOptions(kind, s) {
   const p = (q) => (q && q.toArray ? q.toArray() : q);
   if (kind === 'bolt' || kind === 'zap') return { path: [p(s.from), p(s.to)] };
   if (kind === 'debris') return { at: p(s.to), dir: s.dir ? p(s.dir).map((x) => -x) : undefined };
-  if (kind === 'hole') return { at: p(s.to) };
+  if (kind === 'hole' || kind === 'field' || kind === 'marker' || kind === 'portal' || kind === 'scan') return { at: p(s.to) };
+  if (kind === 'warp') return { from: p(s.from), dir: s.dir ? p(s.dir) : undefined, to: p(s.to) };
   return { from: p(s.from), to: p(s.to) };
 }
 

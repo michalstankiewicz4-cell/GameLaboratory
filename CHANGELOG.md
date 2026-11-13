@@ -3,6 +3,21 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.69.0 · efekty 1.1.0 · pojazdy — kosmos 1.10.0 · edytor sceny 0.31.0 — 2026-11-14 (efekty roju, fala skanu)
+
+### Dodane
+- Laboratorium efektów: **10 nowych efektów** — z roju Hive Hunger (z historią): laser, promień przebijacza ze
+  spiralną błyskawicą, rozwidlona błyskawica burzy, promień ściągający holownika, płaski promień tnący, pole siłowe
+  wzmacniacza, skok w nadprzestrzeń; ze sceny gry: znacznik i tunel podprzestrzenny; z ShipKit: fala skanu.
+  W grze to metody roju — gospodarz `js/render/effects/swarm-fx.js` podaje im „statki” z położeń efektu (obliczenia
+  bez zmian). Barwy pola siłowego — wybór koloru.
+
+### Zmienione
+- **Fala skanu z laboratorium efektów**: statki i stacja (Codewing, Scribe, Swarmer, Haven) nie mają własnej
+  powłoki skanu — akcja „scan” zgłasza skan (`model.onScan`, `makeScanEmitter` zamiast `makeScanWave`), a falę
+  rysuje laboratorium pojazdów i edytor sceny. Wzorzec doktora modeli: bez powłoki skanu (−4416 trójkątów, −2
+  wywołania rysowania na model; wymiary i problemy bez zmian).
+
 ## Program 0.68.0 · pojazdy — kosmos 1.9.0 · edytor sceny 0.30.0 — 2026-11-14 (strzały statków z laboratorium efektów)
 
 ### Zmienione

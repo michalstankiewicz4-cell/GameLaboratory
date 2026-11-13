@@ -6,7 +6,7 @@
    ======================================================================= */
 (function () {
 "use strict";
-const { GOLD, additiveSprite, canvas, clamp, detailHelpers, fxHost, fxTextures, glowTextures, makeShotEmitter, makeBrushed, makeEngineSet, makeExhaust, makeNavLights, makeOnlineFader, makePlating, makePlumeMaterial, makeScanWave, makeShotQueue, makeSolarCells, mergeStatic, partsOf, rng, shadowed, sharedMaterials, textTexture, trackTextures } = ShipKit._;
+const { GOLD, additiveSprite, canvas, clamp, detailHelpers, fxHost, fxTextures, glowTextures, makeShotEmitter, makeBrushed, makeEngineSet, makeExhaust, makeNavLights, makeOnlineFader, makePlating, makePlumeMaterial, makeScanEmitter, makeShotQueue, makeSolarCells, mergeStatic, partsOf, rng, shadowed, sharedMaterials, textTexture, trackTextures } = ShipKit._;
 const SHIP_DEFS = ShipKit.SHIP_DEFS;
 
 // ---------------------------------------------------------------------
@@ -355,7 +355,7 @@ SHIP_DEFS.push({
     // the game's print(). Offline: the drone sinks and lists, its eye, code
     // ring ("switched-off lettering"), crystal and gauges go dark.
     const guns = makeShotEmitter(ship, env, 0xffb45a);   // shots: an effect from the effects lab (model.onShot)
-    const wave = makeScanWave(ship, env, 0x4fe3c6);
+    const wave = makeScanEmitter(ship, env, 0x4fe3c6);
     const host = fxHost(ship, env);
     const cloudMat = new THREE.SpriteMaterial({ map: fxTextures().smoke, color: 0xd8d2c8, transparent: true, depthWrite: false, opacity: 0 });
     const cloud = new THREE.Sprite(cloudMat);

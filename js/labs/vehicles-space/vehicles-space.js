@@ -105,6 +105,7 @@ function loadShip(index, keepCamera) {
   current.setDamage(state.damage);
   document.getElementById("dmgSlider").disabled = !current.damageEnabled;
   renderActions();
+  current.onScan = (s) => { try { shotFx.play("scan", { at: s.at.toArray(), radius: s.radius, color: s.color }); } catch (e) { if (window.LabLog) window.LabLog.add("warn", "Scan effect: " + e.message); } };   // the scan wave: the effects lab
   current.onShot = (s) => { try { shotFx.shot(shotChoice(def.id), s); } catch (e) { if (window.LabLog) window.LabLog.add("warn", "Shot effect: " + e.message); } };
   fillShotFx();
   applyWire();

@@ -15,6 +15,21 @@ w menu i na stronie startowej: **Efekty**.
 | Piorun łańcuchowy | `zap` | `path` | skacze od punktu do punktu, z odgałęzieniami i płynącą energią |
 | Kula cieczy | `bubble` | `from` → `to` | drgająca kropla, która zagina obraz jak soczewka; rozbryzg u celu |
 | Czarna dziura | `hole` | `at` | rośnie, trwa, maleje; zagina obraz wokół siebie (pierścień Einsteina), wciąga odłamki |
+| Laser | `laser` | `from` → `to` | czerwony pas z białym rdzeniem i blaskiem u celu (statki laserowe) |
+| Promień przebijacza | `piercer` | `from` → `to` | pomarańczowy pas, wokół niego spiralna żółta błyskawica |
+| Błyskawica burzy | `storm` | `from` → `to` | rozwidla się przed celem na trzy: do celu i dwie słabsze obok (`side`) |
+| Promień ściągający | `tow` | `from` → `to` | zielony wachlarz światła do obrysu holowanej bryły (`size`), smugi |
+| Promień tnący | `cutter` | `from` → `to` | płaski promień: dwa czerwone promienie na krawędziach i mgiełka, cięcie w poprzek (`width`) |
+| Pole siłowe | `field` | `at` | kula ośmiokątnych komórek w różach, obraca się, mieni |
+| Skok w nadprzestrzeń | `warp` | `from`, `dir` | punkt rozpędza się i znika, zostaje smuga w błękitach |
+| Znacznik | `marker` | `at` | pulsujący pierścień z kropką, gaśnie |
+| Tunel podprzestrzenny | `portal` | `at` | wir otwiera się w lejek smug światła z jasnym rdzeniem i zamyka |
+| Fala skanu | `scan` | `at`, `radius` | rosnąca powłoka z jasnym brzegiem i liniami (z ShipKit) |
+
+Efekty z gry dzielą się tak, jak je gra wywoływała: z `effects/` (strzały, odłamki, błyskawice, soczewki) i z roju
+(`beams.js`, `tows.js`, `cutters.js`, `fields.js`, `warp.js` — w grze metody `Swarm3D` na tablicach statków; tu podaje im
+je gospodarz `swarm-fx.js`: każdy grany efekt to jeden „statek”, `frames` — jak długo trwa). Znacznik (`marker.js`)
+i tunel (`portal.js`) — ze sceny gry; fala skanu (`scan.js`) — z ShipKit. Wiertło wiertnicy zostaje przy modelu statku.
 
 Soczewki (czarna dziura, kula cieczy) potrzebują obrazu sceny: `fx.render(renderer, scene, camera, draw)` rysuje
 scenę do celu (`draw(target)` — w laboratoriach przez potok kamery `LookPipeline`) i zagina go.
@@ -39,7 +54,9 @@ jego położenie teraz, w grze tam, gdzie go niesie zachowanie). Polecenie wysy�
 
 ## Strzały statków
 
-Statki ShipKit (Codewing, Scribe, Swarmer) nie mają własnego pocisku ani błysku u lufy: akcja „fire” zgłasza strzał
+Statki ShipKit (Codewing, Scribe, Swarmer) nie mają własnego pocisku ani błysku u lufy (rozbłysk oka Scribe zostaje —
+to część statku), a wszystkie z Haven nie mają własnej fali skanu: akcja „scan” zgłasza skan
+(`model.onScan({ at, radius, color, ship })`), a gospodarz rysuje falę skanu z laboratorium efektów. Strzały: akcja „fire” zgłasza strzał
 (`model.onShot({ from, to, dir, color, ship })`, świat), a gospodarz rysuje efekt wybrany dla statku — w laboratorium
 pojazdów kosmicznych (pod akcjami: Efekt strzału), w edytorze sceny w oknie Obiekt i w API (pole `shot` obiektu:
 id efektu albo nazwa zapisanego efektu; bez pola — strzał). `createEffectLibrary(scene, getAsset)` — jeden EffectKit na

@@ -1,6 +1,9 @@
-import { linearTexture } from '../textures.js';
+// Skok w nadprzestrzeń: rozpędzenie i smuga — z Hive Hunger (js/three/swarm/warp.js, metody Swarm3D).
+// Obliczenia bez zmian; liczby na klatkę (60 Hz). Metody działają na „roju” — tablice położeń statków; laboratorium podaje
+// je przez gospodarza w effects.js (EffectKit).
+import { linearTexture } from './textures.js';
 
-const THREE = window.THREE;
+import * as THREE from '../../../vendor/three/three.module.js';
 
 /**
  * Jumping to hyperspace (Swarm3D): after a planet every ship waits a random time, speeds up away

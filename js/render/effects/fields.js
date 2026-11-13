@@ -1,4 +1,7 @@
-const THREE = window.THREE;
+// Pole siłowe wzmacniacza: kula ośmiokątnych komórek — z Hive Hunger (js/three/swarm/fields.js, metody Swarm3D).
+// Obliczenia bez zmian; liczby na klatkę (60 Hz). Metody działają na „roju” — tablice położeń statków; laboratorium podaje
+// je przez gospodarza w effects.js (EffectKit).
+import * as THREE from '../../../vendor/three/three.module.js';
 
 /**
  * Boosters' force fields: a gentle ball of octagonal cells in pinks round every booster (drawn on the

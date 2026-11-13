@@ -1,6 +1,9 @@
-import { linearTexture, radialTexture } from '../textures.js';
+// Promienie: laser, promień przebijacza ze spiralną błyskawicą, rozwidlona błyskawica statków burzy — z Hive Hunger (js/three/swarm/beams.js, metody Swarm3D).
+// Obliczenia bez zmian; liczby na klatkę (60 Hz). Metody działają na „roju” — tablice położeń statków; laboratorium podaje
+// je przez gospodarza w effects.js (EffectKit).
+import { linearTexture, radialTexture } from './textures.js';
 
-const THREE = window.THREE;
+import * as THREE from '../../../vendor/three/three.module.js';
 const SP_D = new THREE.Vector3(), SP_U = new THREE.Vector3(), SP_W = new THREE.Vector3();
 
 /**
