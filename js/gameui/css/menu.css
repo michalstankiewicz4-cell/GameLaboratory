@@ -1,0 +1,25 @@
+/* UI gry · ekrany menu (z Battle, css/menu.css): menu główne po lewej na tle przyciemnionym od lewej, pozostałe ekrany
+   na środku w ramce; stos przycisków, wiersze ustawień, wybory. Barwy i czcionki — tokeny skórki (--g-*). */
+.gui .gMenu{position:absolute;inset:0;z-index:5;display:flex;align-items:center;pointer-events:auto;
+  background:linear-gradient(90deg,var(--g-backdrop) 0,color-mix(in srgb,var(--g-backdrop) 70%,transparent) 40%,transparent 68%)}
+.gui .gMenu[data-layout=center]{background:var(--g-backdrop);justify-content:center}
+.gui .screen{width:min(30em,calc(100% - 32px));box-sizing:border-box;padding:1.4em 1.6em;margin-left:clamp(16px,5vw,80px);max-height:100%;overflow:auto}
+.gui .gMenu[data-layout=center] .screen{margin-left:0;background:var(--g-panel);border:1px solid var(--g-line);border-radius:var(--g-radius);
+  box-shadow:0 0 8px var(--g-glow);text-align:center}
+.gui .logo{margin:0 0 .2em;font-family:var(--g-fontHead);font-size:2.7em;line-height:1;letter-spacing:.14em;color:var(--g-head);
+  text-shadow:3px 3px 0 color-mix(in srgb,var(--g-head) 35%,#000)}
+.gui .screen h2{margin:.8em 0 .6em;font-family:var(--g-fontHead);font-size:1.2em;color:var(--g-head);letter-spacing:.06em}
+.gui .screen p{margin:.4em 0;color:var(--g-dim);white-space:pre-line}
+.gui .stack{display:flex;flex-direction:column;gap:.5em;margin:1em 0 .6em}
+.gui .stack button{padding:.65em .9em;font-size:1em;text-align:left;letter-spacing:.04em;transition:padding-left .15s,background .15s}
+.gui .stack button:hover:not(:disabled){background:var(--g-btnHover);padding-left:1.3em}
+.gui .stack button.sub{color:var(--g-dim);font-size:.87em;padding:.45em .9em}
+.gui .gMenu[data-layout=center] .stack button{text-align:center}
+.gui .gMenu[data-layout=center] .stack button:hover:not(:disabled){padding-left:.9em}
+.gui .orow{display:grid;grid-template-columns:minmax(0,12em) 1fr 3.5em;gap:.5em;align-items:center;margin:.35em 0;text-align:left}
+.gui .orow .val{text-align:right;color:var(--g-dim)}
+.gui .orow.chk{grid-template-columns:1.4em 1fr}
+.gui .orow.col{grid-template-columns:1fr;gap:.3em}
+.gui .choices{display:flex;gap:.4em;flex-wrap:wrap}
+.gui .choices button.on{border-color:var(--g-accent);color:var(--g-accent)}
+.gui input[type=range]{width:100%;accent-color:var(--g-accent)}

@@ -14,7 +14,7 @@ dostosowywać (zasoby z nazwą, wspólne zachowania).
 ## Obsługa
 
 - Okna: **Opis**, **Scena** (dodaj model, hierarchia), **Właściwości** (środowisko albo wybrany obiekt), **Lekarz sceny**
-  (przycisk **Sprawdź** na pasku: problemy w scenie i poprawki, `docs/scene/doctor.md`), **Kamera**,
+  (przycisk **Badaj** na pasku; kafelek „Lekarz sceny” na stronie startowej otwiera edytor z tym oknem, `editor/index.html?doctor`: problemy w scenie i poprawki, `docs/scene/doctor.md`), **Kamera**,
   **Wydajność**; OPCJE → Okna. **Okna | Panele** na pasku: w Panelach okna są panelami przy krawędziach, konsola na dole
   pośrodku, a widok 3D zajmuje wolny środek (`body.viewFits`).
 - Pasek narzędzi: cofnij · domek · ponów (przeglądarka), **▶ Graj / ■ Stop**, **Cofnij / Ponów** (zmiany sceny), uchwyt **Przesuń / Obróć / Skaluj**, **Nowa**, **Zapisz plik**, **Otwórz plik**.

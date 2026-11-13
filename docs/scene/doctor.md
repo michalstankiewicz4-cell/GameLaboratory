@@ -8,7 +8,8 @@ w edytorze, w API dla AI i w grach. Plan: [`../guides/lab-breakdown.md`](../guid
 ## Gdzie
 
 - **API:** `{"cmd": "check"}` (nieobowiązkowo `"budget": { "tris": …, "draws": … }`) → `{ issues, counts, cost, skipped }`.
-- **Edytor sceny:** przycisk **Sprawdź** na pasku narzędzi i okno **Lekarz sceny** (OPCJE → Okna): lista problemów,
+- **Edytor sceny:** przycisk **Badaj** na pasku narzędzi (kafelek **Lekarz sceny** na stronie startowej i w menu
+  Narzędzia otwiera edytor od razu z tym oknem: `editor/index.html?doctor`; wersja — wersja edytora) i okno **Lekarz sceny** (OPCJE → Okna): lista problemów,
   kliknięcie zaznacza obiekt, **Popraw** wykonuje proponowane polecenie API jako jeden krok (Cofnij je odwraca).
   Okno sprawdza scenę samo po każdej zmianie (z opóźnieniem).
 - **W kodzie:** `checkScene(scene, ctx)` — `ctx` opisany w nagłówku pliku (prefabrykaty, zachowania, zasoby, a ze świata

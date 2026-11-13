@@ -92,6 +92,8 @@ const api = createSceneApi({
 });
 createApiConsole(api);
 const doctor = createDoctorPanel(store, api, actions);
+// kafelek „Lekarz sceny” (editor/index.html?doctor): od razu okno lekarza i badanie sceny
+if (new URLSearchParams(location.search).has('doctor')) addEventListener('load', () => { if (window.LabWindows) window.LabWindows.show('doctor', true); doctor.check(); });
 createToolbar(store, controls, actions);
 
 // dane → świat i okna

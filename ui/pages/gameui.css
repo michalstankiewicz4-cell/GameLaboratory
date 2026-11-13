@@ -1,0 +1,12 @@
+/* Laboratorium UI gry (labs/gameui.html): tylko okna laboratorium; UI gry ma własne arkusze (js/gameui/css/gameui.css). */
+.hudRow{display:flex;align-items:center;gap:6px;padding:3px 0;border-top:1px solid var(--line);font-size:11px}
+.hudRow:first-child{border-top:0}
+.hudRow span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hudRow button{padding:0 6px}
+#tokens input[type=text]{min-width:0}
+#tokens output input[type=color]{width:26px;height:18px;padding:0;border:0;background:none}
+.panel textarea{width:100%;box-sizing:border-box;background:var(--field);border:1px solid var(--line);border-radius:var(--r);color:var(--text);font-size:11px;resize:vertical}
+#screenBtns button.on{border-color:var(--accent);color:var(--accent)}
+.guiApi{display:flex;flex-direction:column;gap:6px;padding:8px}
+.guiApi textarea{width:100%;background:var(--field);border:1px solid var(--line);border-radius:var(--r);color:var(--text);font-size:11px}
+.guiApi button{align-self:flex-start}

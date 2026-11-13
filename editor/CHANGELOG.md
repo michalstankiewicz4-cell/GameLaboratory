@@ -3,6 +3,14 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.25.0 — 2026-11-13 (Badaj, kafelek lekarza sceny)
+
+### Zmienione
+- Przycisk lekarza sceny: **Badaj** (EN: Examine); w oknie — **Zbadaj scenę**.
+
+### Dodane
+- `editor/index.html?doctor` (kafelek „Lekarz sceny” na stronie startowej): edytor od razu z oknem lekarza i badaniem.
+
 ## 0.24.0 — 2026-11-13 (lekarz sceny)
 
 ### Dodane

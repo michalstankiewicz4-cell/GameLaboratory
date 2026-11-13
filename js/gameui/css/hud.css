@@ -1,84 +1,39 @@
-/* In-game HUD. */
-#hud{position:fixed;inset:0;z-index:2;pointer-events:none;text-shadow:0 0 3px #000,0 0 1px #000}
-#top{position:fixed;left:50%;top:10px;transform:translateX(-50%);display:flex;gap:18px;color:#e6eef2;font-size:14px;white-space:nowrap}
-.gold{color:#f0c070}
-#feed{position:fixed;right:12px;top:10px;text-align:right;font-size:12px;display:flex;flex-direction:column;gap:3px}
-#feed .kill{color:#ffb090}#feed .rep{color:#a0f0b0}
-#banner{position:fixed;left:50%;top:22%;transform:translateX(-50%);text-align:center}
-#banner b{display:block;font-size:30px;letter-spacing:.12em;color:#f0c070}
-#banner span{color:#d4e0e6;font-size:14px}
-#warn{position:fixed;left:50%;top:15%;transform:translateX(-50%);color:#ff6a4a;font-size:20px;letter-spacing:.1em;animation:blink .5s steps(2) infinite}
-@keyframes blink{50%{opacity:.35}}
-#ship{z-index:1;position:fixed;left:50%;bottom:14px;transform:translateX(-50%);width:min(420px,calc(100vw - 420px));min-width:260px;background:rgba(5,14,22,.72);border:1px solid #23404f;padding:7px 10px}
-.sname{font-size:12px;color:#b8ccd6;margin-bottom:3px}
-.hpbar{position:relative;height:14px;background:#1a2a20;border:1px solid #2f5040}
-.hpbar i{display:block;height:100%;background:#4fbf6a}
-.hpbar i.low{background:#d0402a}
-.hpt{position:absolute;inset:0;text-align:center;font-size:11px;line-height:14px;color:#fff}
-.nav{display:flex;align-items:center;gap:10px;margin-top:6px}
-.tele{display:flex;gap:2px}
-.tele i{font-style:normal;font-size:10px;padding:1px 4px;border:1px solid #2c4c60;color:#7d94a0}
-.tele i.on{background:#f0c070;color:#0a1824;border-color:#f0c070}
-.spd{min-width:60px;color:#e6eef2}
-.rudder{position:relative;flex:1;height:8px;border:1px solid #2c4c60;background:#0a1824}
-.rudder i{position:absolute;top:-2px;width:4px;height:10px;margin-left:-2px;background:#f0c070}
-.rudder::after{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:#4a6a7c}
-#weap{position:fixed;right:12px;bottom:14px;display:flex;flex-direction:column;gap:4px;width:190px}
-.wslot{display:grid;grid-template-columns:18px 1fr auto;gap:2px 6px;align-items:center;background:rgba(5,14,22,.72);border:1px solid #23404f;padding:4px 7px;font-size:11px;color:#9ab0bc}
-.wslot em{font-style:normal;color:#f0c070;grid-row:span 2}
-.wslot span{grid-column:3;grid-row:1;color:#e6eef2}
-.wslot .bar{grid-column:2/4;height:4px;background:#1a2a36}
-.wslot .bar i{display:block;height:100%;background:#7d94a0}
-.wslot.ok .bar i{background:#4fbf6a}.wslot.ok b{color:#e6eef2}
-.wslot.sel{border-color:#f0c070;background:rgba(40,32,10,.75)}
-#cross{position:fixed;left:0;top:0;width:0;height:0}
-#cross b{position:absolute;left:-11px;top:-11px;width:20px;height:20px;border:1px solid #c8f0c0;border-radius:50%}
-#cross b::before,#cross b::after{content:'';position:absolute;background:#c8f0c0}
-#cross b::before{left:9px;top:-6px;width:1px;height:32px}
-#cross b::after{top:9px;left:-6px;height:1px;width:32px}
-#cross span{position:absolute;left:16px;top:10px;white-space:nowrap;font-size:11px;color:#c8f0c0}
-#cross.far b{border-color:#f0a080}#cross.far span{color:#f0a080}
-#cross.far b::before,#cross.far b::after{background:#f0a080}
-#labels,#pops{position:fixed;inset:0}
-.lab{position:absolute;left:0;top:0;width:110px;margin-left:-55px;text-align:center;font-size:11px;color:#ffb0a0}
-.lab .bar{height:4px;margin-top:2px;background:#3a1a1a;border:1px solid #000}
-.lab .bar i{display:block;height:100%;background:#e04a3a}
-.lab.hit span{color:#fff}
-.pop{position:absolute;left:0;top:0;transform-origin:center;font-size:13px;font-weight:bold;white-space:nowrap;margin-left:-30px}
-.pop.mine{color:#ffe08a}.pop.onme{color:#ff7a6a}
-.pop.cit{font-size:16px;color:#ffd040}.pop.torp{font-size:16px}
-#mini{position:fixed;left:12px;bottom:14px;width:180px;height:180px;border:1px solid #23404f;image-rendering:pixelated;opacity:.92}
-#hint{position:fixed;left:12px;top:34px;max-width:300px;color:#8fa6b2;font-size:11px}
-#fps{position:fixed;left:12px;top:10px;z-index:6;color:#f0c070;text-shadow:0 0 3px #000;pointer-events:none}
-@media (max-width:900px){#mini{width:120px;height:120px}#hint{display:none}}
-/* gun camera: wide reticle with range ticks, info line under the screen centre */
-#cross.gun b{left:-40px;top:-1px;width:80px;height:1px;border:0;border-radius:0;background:#c8f0c0}
-#cross.gun b::before{left:39px;top:-14px;width:1px;height:12px}
-#cross.gun b::after{left:-60px;top:0;width:200px;height:1px;background:linear-gradient(90deg,#c8f0c0 0 20px,transparent 20px 180px,#c8f0c0 180px)}
-#cross.gun span{left:-50px;top:10px;width:100px;text-align:center}
-#cross.gun.far b,#cross.gun.far b::before{background:#f0a080}
-#gunInfo{position:fixed;left:50%;top:calc(50% + 46px);transform:translateX(-50%);font-size:11px;color:#c8f0c0;opacity:.8}
-/* periscope: round view in a black mask, thin hairlines with range ticks, bearing readout */
-#scope{position:fixed;inset:0}
-#scope .mask{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,transparent 0 41vmin,rgba(0,0,0,.6) 42vmin,#000 44vmin)}
-#scope .ring{position:absolute;left:50%;top:50%;width:84vmin;height:84vmin;margin:-42vmin 0 0 -42vmin;border-radius:50%;box-shadow:inset 0 0 6vmin rgba(0,10,20,.55)}
-#scope .hair{position:absolute;background:rgba(10,20,20,.75)}
-#scope .hair.h{left:50%;top:50%;width:84vmin;height:1px;margin-left:-42vmin;background:repeating-linear-gradient(90deg,rgba(10,20,20,.8) 0 2px,transparent 2px 4.2vmin),rgba(10,20,20,.55)}
-#scope .hair.v{left:50%;top:50%;width:1px;height:84vmin;margin-top:-42vmin}
-#scope .brg{position:absolute;left:50%;top:calc(50% - 39vmin);transform:translateX(-50%);color:#d8e8d8;font-size:13px;letter-spacing:.1em}
-/* salvo camera frame (top right); the kill feed drops below it while it is shown */
-#pip{z-index:3;background:#0a1824;position:fixed;right:12px;top:12px;width:320px;height:180px;box-sizing:border-box;border:1px solid #6a8a9a;box-shadow:0 0 0 1px rgba(0,0,0,.6)}
-#pip canvas{display:block;width:100%;height:100%}
-#pip span{position:absolute;left:6px;top:4px;font-size:10px;letter-spacing:.12em;color:#e6eef2;text-transform:uppercase}
-#feed.low{top:202px}
-@media (max-width:900px){#pip{width:200px;height:113px}#feed.low{top:134px}}
-/* binoculars: black everywhere except two overlapping round views (each mask layer hides one circle; layers intersect) */
-#scope.bino .mask{background:#000;
-  -webkit-mask:radial-gradient(circle at calc(50% - 17vmin) 50%,transparent 36vmin,#000 38.5vmin),radial-gradient(circle at calc(50% + 17vmin) 50%,transparent 36vmin,#000 38.5vmin);
-  -webkit-mask-composite:source-in;
-  mask:radial-gradient(circle at calc(50% - 17vmin) 50%,transparent 36vmin,#000 38.5vmin),radial-gradient(circle at calc(50% + 17vmin) 50%,transparent 36vmin,#000 38.5vmin);
-  mask-composite:intersect}
-#scope.bino .ring{display:none}
-#scope.bino .hair.h{width:110vmin;margin-left:-55vmin}
-#scope.bino .hair.v{height:20vmin;margin-top:-10vmin}
-#scope.bino .brg{top:calc(50% - 36vmin)}
+/* UI gry · HUD nad sceną (z Battle, css/hud.css — tam stałe miejsca jednej gry: #top, #ship, #weap, #mini…). Tu
+   dziewięć kotwic (gZone tl…br), w każdej elementy jeden pod drugim; pasek życia, telegraf i ster z Battle jako typy
+   bar, steps i dial; celownik i baner jak w Battle. Barwy — tokeny skórki (--g-*). */
+.gui .gHud{position:absolute;inset:0;z-index:2;pointer-events:none;text-shadow:0 0 3px #000,0 0 1px #000}
+.gui .gZone{position:absolute;display:flex;flex-direction:column;gap:.45em;max-width:34%}
+.gui .gZone.tl{left:12px;top:10px}.gui .gZone.t{left:50%;top:10px;transform:translateX(-50%);align-items:center}
+.gui .gZone.tr{right:12px;top:10px;align-items:flex-end}
+.gui .gZone.l{left:12px;top:50%;transform:translateY(-50%)}.gui .gZone.r{right:12px;top:50%;transform:translateY(-50%);align-items:flex-end}
+.gui .gZone.c{left:50%;top:50%;transform:translate(-50%,-50%);align-items:center}
+.gui .gZone.bl{left:12px;bottom:14px}.gui .gZone.b{left:50%;bottom:14px;transform:translateX(-50%);align-items:center}
+.gui .gZone.br{right:12px;bottom:14px;align-items:flex-end}
+.gui .gItem{color:var(--g-text);font-size:.93em}
+.gui .gItem.bar,.gui .gItem.steps,.gui .gItem.dial,.gui .gItem.log,.gui .gItem.value,.gui .gItem.minimap{background:var(--g-panel);border:1px solid var(--g-line);
+  border-radius:var(--g-radius);box-shadow:0 0 6px var(--g-glow);padding:.4em .65em;text-shadow:none;min-width:12em}
+.gui .gLabel{display:block;font-size:.8em;color:var(--g-dim);margin-bottom:.2em;font-family:var(--g-fontHead);letter-spacing:.05em}
+.gui .gBar{position:relative;height:1em;background:color-mix(in srgb,var(--g-ok) 14%,#000);border:1px solid color-mix(in srgb,var(--g-ok) 35%,#000)}
+.gui .gBar i{display:block;height:100%;background:var(--g-ok);transition:width .2s}
+.gui .c-accent .gBar i{background:var(--g-accent)}.gui .c-warn .gBar i{background:var(--g-warn)}.gui .c-err .gBar i{background:var(--g-err)}
+.gui .gBar i.low{background:var(--g-err)}
+.gui .gBarT{position:absolute;inset:0;text-align:center;font-size:.75em;line-height:1.33em;color:#fff}
+.gui .gVal{font-size:1.4em;font-weight:600;color:var(--g-text)}.gui .c-accent .gVal{color:var(--g-accent)}
+.gui .gUnit{margin-left:.3em;color:var(--g-dim);font-size:.85em}
+.gui .gText{color:var(--g-text)}
+.gui .gSteps{display:flex;gap:2px}
+.gui .gSteps i{font-style:normal;font-size:.72em;padding:1px 4px;border:1px solid var(--g-line);color:var(--g-dim)}
+.gui .gSteps i.on{background:var(--g-accent);color:#000;border-color:var(--g-accent)}
+.gui .gDial{position:relative;height:.55em;border:1px solid var(--g-line);background:color-mix(in srgb,var(--g-panel) 60%,#000)}
+.gui .gDial i{position:absolute;top:-2px;width:4px;height:calc(100% + 4px);margin-left:-2px;background:var(--g-accent)}
+.gui .gDial::after{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--g-dim)}
+.gui .gItem.banner{text-align:center}
+.gui .gItem.banner b{display:block;font-family:var(--g-fontHead);font-size:2.1em;letter-spacing:.12em;color:var(--g-head)}
+.gui .gItem.banner span{color:var(--g-text);font-size:.95em}
+.gui .gItem.crosshair{position:relative;width:0;height:0}
+.gui .gItem.crosshair b{position:absolute;left:-11px;top:-11px;width:20px;height:20px;border:1px solid var(--g-ok);border-radius:50%}
+.gui .gItem.crosshair b::before,.gui .gItem.crosshair b::after{content:'';position:absolute;background:var(--g-ok)}
+.gui .gItem.crosshair b::before{left:9px;top:-6px;width:1px;height:32px}
+.gui .gItem.crosshair b::after{top:9px;left:-6px;height:1px;width:32px}
+.gui .gItem.crosshair .gLabel{position:absolute;left:16px;top:10px;white-space:nowrap;color:var(--g-ok)}
+.gui .gItem.minimap canvas{display:block;width:11em;height:11em}

@@ -15,6 +15,8 @@
 //   look — wygląd kamery z laboratorium filtrów (profil potoku js/render/sea/look.js: ekspozycja, tonowanie, kolor,
 //         poświata, winieta, ziarno, obiektyw); dawniej własny klucz gameLab.lookProfiles.v1 — przenoszony tu sam
 //         przy pierwszym odczycie
+//   ui — UI gry z laboratorium UI: definicja 'gamelab-ui' (ekrany menu, HUD, okna gry; js/gameui/gameui.js)
+//   uiskin — skórka UI gry z laboratorium UI: { base: 'space' | 'battle' | 'engine', tokens } (js/gameui/skins.js)
 export const KEY = 'gameLab.assets.v1';
 
 export const ASSET_KINDS = {
@@ -23,6 +25,8 @@ export const ASSET_KINDS = {
   weather: { label: 'Weather and light', labelPl: 'Pogoda i światło', lab: 'labs/look.html', keys: ['weather', 'coverage', 'density', 'scale', 'haze', 'wind', 'rain', 'vis', 'lightning', 'time', 'sunEl', 'sunAz', 'moon'] },
   look: { label: 'Camera look', labelPl: 'Wygląd kamery', lab: 'labs/filters.html', keys: ['exposure', 'autoExposure', 'autoTarget', 'tone', 'contrast', 'saturation', 'vibrance', 'temperature', 'tint', 'bloom', 'vignette', 'grain', 'ca', 'distortion', 'droplets', 'dirt', 'glare', 'sharpen'] },
   sky: { label: 'Space sky', labelPl: 'Niebo kosmosu', lab: 'labs/bodies.html', keys: null },   // null: każda liczba
+  ui: { label: 'Game UI', labelPl: 'UI gry', lab: 'labs/gameui.html', keys: ['format', 'version', 'name', 'skin', 'start', 'pause', 'screens', 'hud', 'windows'] },
+  uiskin: { label: 'Game UI skin', labelPl: 'Skórka UI gry', lab: 'labs/gameui.html', keys: ['base', 'tokens'] },
 };
 
 // profile wyglądu kamery sprzed zasobów (laboratorium filtrów do 0.4) — przeniesione raz do rodzaju look

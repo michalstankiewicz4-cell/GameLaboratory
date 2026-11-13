@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Game UI Lab | GameLaboratory</title>
+<meta name="description" content="GameLaboratory game UI lab: a game's interface as data over a live scene — menu screens, HUD (bars, counters, telegraph, rudder, crosshair, event log, minimap, banners), in-game windows and a dialogue box for characters and the narrator — in skins kept apart from the labs' look (Space, Battle, engine, your own). JSON for AI.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/gameui.html">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../ui/style/sea.css">
+<link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="../js/gameui/css/gameui.css">
+<link rel="stylesheet" href="../ui/pages/gameui.css">
+</head>
+<!-- Laboratorium UI gry (js/labs/gameui/): UI gry z danych (js/gameui/) nad sceną bazową (js/labs/shared/stage.js). -->
+<body class="lab viewFits">
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/shell/menubar.js"></script>
+<div id="view"></div>
+<div class="bar">
+  <select id="defSel" aria-label="Game UI" title="A sample or a UI saved under a name"></select>
+  <select id="skinSel" aria-label="Skin" title="The UI skin: ready ones and the ones saved under a name"></select>
+  <button type="button" id="menuBtn" title="Show the start screen (in the game: the pause screen with Esc)">Menu</button>
+  <button type="button" id="playBtn" title="Close the menu: the game with its HUD">Game</button>
+  <span class="sp"></span>
+  <span class="dimtxt" id="status"></span>
+</div>
+<div class="foot"><span id="fps" data-auto></span><span class="sp"></span><span>GameLaboratory</span></div>
+<script src="../ui/shell/bars.js"></script>
+<aside class="panel" data-std="info">
+  <h2 class="stdName">Game UI</h2>
+  <p class="stdText">A game's interface as data, over a live scene: menu screens, the HUD, in-game windows and a dialogue box for characters and the narrator. The look is a skin, kept apart from the labs' look: Space, Battle, the engine's, or your own saved under a name. Esc opens the pause screen and closes windows; window keys (I, C, L…) open them.</p>
+  <p class="note">For AI: GameUIApi in the console (API tab) — load a definition, set the game state, show a screen, say a line.</p>
+</aside>
+<aside class="panel" data-window="def" data-title="Interface" data-title-pl="Interfejs">
+  <div class="row"><span>Name</span><input type="text" id="defName" maxlength="40"><output></output></div>
+  <div class="btns"><button type="button" id="defSave">Save under this name</button><button type="button" id="defDel">Delete saved</button></div>
+  <h3>Screens</h3>
+  <div class="row"><span>Start screen</span><select id="startSel"></select><output></output></div>
+  <div class="row"><span>Pause (Esc)</span><select id="pauseSel"></select><output></output></div>
+  <div class="btns" id="screenBtns"></div>
+  <h3>HUD</h3>
+  <div id="hudList"></div>
+  <div class="row"><span>Add</span><select id="hudType"></select><output></output></div>
+  <div class="row"><span>Where</span><select id="hudAt"></select><output></output></div>
+  <div class="row"><span>Value from</span><input type="text" id="hudBind" placeholder="ship.hull"><output></output></div>
+  <div class="row"><span>Label</span><input type="text" id="hudLabel"><output></output></div>
+  <div class="btns"><button type="button" id="hudAdd">Add to the HUD</button></div>
+  <h3>Windows</h3>
+  <div class="btns" id="winBtns"></div>
+  <p class="note">Screens and windows are edited in the JSON (window Definition); the HUD here too.</p>
+</aside>
+<aside class="panel" data-window="skin" data-title="Skin" data-title-pl="Skórka">
+  <div class="row"><span>Based on</span><select id="skinBase"></select><output></output></div>
+  <div id="tokens"></div>
+  <div class="row"><span>Save as</span><input type="text" id="skinName" maxlength="40" placeholder="My skin"><output></output></div>
+  <div class="btns"><button type="button" id="skinSave">Save the skin</button><button type="button" id="skinReset">Back to the base</button></div>
+  <p class="note">A saved skin is a named asset: any UI (and later a game in the scene editor) can use it.</p>
+</aside>
+<aside class="panel" data-window="state" data-side="right" data-title="Game state" data-title-pl="Stan gry">
+  <div class="row"><span>Hull</span><input type="range" id="sHull" min="0" max="1000" step="1"><output id="sHullV"></output></div>
+  <div class="row"><span>Energy</span><input type="range" id="sEnergy" min="0" max="100" step="1"><output id="sEnergyV"></output></div>
+  <div class="row"><span>Speed</span><input type="range" id="sSpeed" min="0" max="40" step="0.1"><output id="sSpeedV"></output></div>
+  <div class="row"><span>Throttle</span><input type="range" id="sThrottle" min="0" max="6" step="1"><output id="sThrottleV"></output></div>
+  <div class="row"><span>Rudder</span><input type="range" id="sRudder" min="-1" max="1" step="0.05"><output id="sRudderV"></output></div>
+  <div class="row"><span>Credits</span><input type="range" id="sCredits" min="0" max="10000" step="10"><output id="sCreditsV"></output></div>
+  <label class="chk"><input type="checkbox" id="sim" checked> Simulate (radar moves, energy drains)</label>
+  <h3>Events</h3>
+  <div class="btns"><button type="button" data-log="info">Log: info</button><button type="button" data-log="gain">Log: gain</button><button type="button" data-log="alert">Log: alert</button><button type="button" id="bannerBtn">Banner</button></div>
+</aside>
+<aside class="panel" data-window="dialog" data-side="right" data-title="Dialogue" data-title-pl="Dialog">
+  <div class="row"><span>Who</span><input type="text" id="dWho" value="Station AI"><output></output></div>
+  <textarea id="dText" rows="3" spellcheck="false">Captain, the swarm is back. Three ships are coming in from the outer ring.</textarea>
+  <p class="note">Choices, one per line (none — the line just goes on):</p>
+  <textarea id="dChoices" rows="3" spellcheck="false">Launch the drones
+Hold position
+Ask for more data</textarea>
+  <div class="row"><span>Where</span><select id="dSide"><option value="b">Bottom</option><option value="t">Top</option></select><output></output></div>
+  <div class="btns"><button type="button" id="dSay">Say</button><button type="button" id="dNarr">Narrator line</button></div>
+  <p class="note" id="dRes"></p>
+</aside>
+<aside class="panel" data-window="json" data-side="right" data-title="Definition (JSON)" data-title-pl="Definicja (JSON)">
+  <textarea id="jsonText" class="mono" rows="12" spellcheck="false"></textarea>
+  <div class="btns"><button type="button" id="jsonApply">Apply</button><button type="button" id="jsonCopy">Copy</button></div>
+  <p class="note" id="jsonMsg">Format gamelab-ui: screens, hud, windows, skin. Description: docs/labs/gameui.md.</p>
+</aside>
+<aside class="panel" data-std="perf"></aside>
+<script src="../ui/shell/perf.js"></script>
+<script src="../ui/shell/labwin.js"></script>
+<script src="../ui/shell/windows.js"></script>
+<script type="module" src="../js/labs/gameui/gameui.js"></script>
+</body>
+</html>

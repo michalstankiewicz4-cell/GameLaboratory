@@ -1,0 +1,30 @@
+/* UI gry (js/gameui/): jedno wejście — nakładka .gui nad sceną, przyciski, okno dialogowe, potem części i skórki.
+   Wszystko w zakresie .gui, barwy z tokenów skórki (--g-*, js/gameui/skins.js) — wygląd laboratoriów zostaje osobno. */
+@import url("menu.css");
+@import url("hud.css");
+@import url("log.css");
+@import url("window.css");
+@import url("skin-space.css");
+@import url("skin-battle.css");
+
+.gui{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:3;
+  font-family:var(--g-font);font-size:calc(15px * var(--g-scale,1));line-height:1.4;color:var(--g-text)}
+.gui [hidden]{display:none!important}
+.gui button{font:inherit;color:var(--g-text);background:var(--g-btn);border:1px solid var(--g-line);border-radius:calc(var(--g-radius) * .5);
+  padding:.35em .7em;cursor:pointer;pointer-events:auto}
+.gui button:hover:not(:disabled){background:var(--g-btnHover)}
+.gui button:disabled{opacity:.5;cursor:default}
+.gui input,.gui select,.gui label{pointer-events:auto}
+
+/* okno dialogowe: postać (imię) albo narrator (bez imienia, kursywą), tekst po literze, wybory, ▼ — dalej */
+.gui .gDialog{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);width:min(46em,calc(100% - 32px));z-index:6;box-sizing:border-box;
+  padding:.8em 1.1em 1em;background:var(--g-panel);border:1.5px solid var(--g-line);border-radius:var(--g-radius);
+  box-shadow:0 0 10px var(--g-glow);pointer-events:auto;cursor:pointer}
+.gui .gDialog[data-side=t]{top:4%;bottom:auto}
+.gui .gWho{display:block;font-family:var(--g-fontHead);color:var(--g-head);font-size:1.15em;letter-spacing:.05em;margin-bottom:.25em}
+.gui .gSay{margin:0;min-height:2.6em;white-space:pre-line;color:var(--g-text)}
+.gui .gDialog.narrator .gSay{font-style:italic;color:var(--g-dim);text-align:center}
+.gui .gChoices{display:flex;flex-direction:column;gap:.35em;margin-top:.6em}
+.gui .gChoices button{text-align:left}
+.gui .gMore{position:absolute;right:.8em;bottom:.4em;color:var(--g-accent);font-size:.8em;animation:gBlink 1s steps(2) infinite}
+@keyframes gBlink{50%{opacity:.3}}

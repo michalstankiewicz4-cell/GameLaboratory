@@ -380,6 +380,22 @@ window.GameLabCatalog =
       }
     },
     {
+      "file": "labs/gameui.html",
+      "name": "Game UI Lab",
+      "namePl": "Laboratorium UI gry",
+      "doc": "docs/labs/gameui.md",
+      "desc": "A game's interface as data over a live scene: menu screens, HUD (bars, counters, telegraph, rudder, crosshair, event log, minimap, banners), in-game windows and a dialogue box for characters and the narrator, in skins kept apart from the labs' look — Space, Battle, the engine's or your own. JSON for AI.",
+      "descPl": "Interfejs gry jako dane nad żywą sceną: ekrany menu, HUD (paski, liczniki, telegraf, ster, celownik, dziennik zdarzeń, minimapa, banery), okna w grze i okno dialogowe postaci i narratora, w skórkach oddzielonych od wyglądu laboratoriów — Space, Battle, silnika albo własnych. JSON dla AI.",
+      "kind": "lab",
+      "kit": "GameUI",
+      "phrases": ["UI", "menu", "HUD", "dialogi", "gra"],
+      "saved": ["gameLab.gameui."],
+      "art": {
+        "bg": ["#13213a", "#060b16"],
+        "svg": "<rect x=\"40\" y=\"12\" width=\"120\" height=\"72\" rx=\"6\" fill=\"#0a1430\" stroke=\"#3c55d8\" stroke-width=\"2\"/><rect x=\"48\" y=\"20\" width=\"34\" height=\"6\" fill=\"#0bd99a\"/><rect x=\"48\" y=\"30\" width=\"24\" height=\"6\" fill=\"#f8bb56\"/><rect x=\"128\" y=\"20\" width=\"24\" height=\"24\" rx=\"12\" fill=\"none\" stroke=\"#5f77f7\" stroke-width=\"2\"/><rect x=\"62\" y=\"58\" width=\"76\" height=\"18\" rx=\"3\" fill=\"#050a24\" stroke=\"#e7c27a\" stroke-width=\"1.5\"/><rect x=\"68\" y=\"64\" width=\"40\" height=\"3\" fill=\"#eef1ff\"/><rect x=\"68\" y=\"69\" width=\"28\" height=\"3\" fill=\"#93a6ff\"/>"
+      }
+    },
+    {
       "file": "labs/art.html",
       "name": "Art Lab",
       "namePl": "Laboratorium sztuki",
@@ -505,6 +521,21 @@ window.GameLabCatalog =
       }
     },
     {
+      "file": "editor/index.html?doctor",
+      "name": "Scene doctor",
+      "namePl": "Lekarz sceny",
+      "doc": "docs/scene/doctor.md",
+      "desc": "The whole scene examined for what a single model cannot show: a model in the wrong environment (a ship on land, a tree at sea, a rover in space), under the ground or in the air, objects inside each other, missing assets, unfitting behaviours, the cost over the budget — each with a proposed fix. Opens the scene editor with its window.",
+      "descPl": "Cała scena badana pod kątem tego, czego nie widać w pojedynczym modelu: model w złym środowisku (okręt na lądzie, drzewo na morzu, łazik w kosmosie), pod gruntem albo w powietrzu, obiekty wchodzące w siebie, brakujące zasoby, niepasujące zachowania, koszt ponad budżet — każdy problem z proponowaną poprawką. Otwiera edytor sceny z jego oknem.",
+      "kind": "tool",
+      "kit": "SceneDoctor",
+      "phrases": ["narzędzie", "scena", "błędy"],
+      "art": {
+        "bg": ["#1d2a1f", "#0a100b"],
+        "svg": "<rect x=\"46\" y=\"16\" width=\"108\" height=\"64\" rx=\"6\" fill=\"#0d1a12\" stroke=\"#6fcf8e\" stroke-width=\"2\"/><path d=\"M54 66 L80 44 L98 58 L118 36 L146 62\" fill=\"none\" stroke=\"#7aa6c9\" stroke-width=\"3\"/><circle cx=\"118\" cy=\"36\" r=\"9\" fill=\"none\" stroke=\"#e0675f\" stroke-width=\"3\"/><path d=\"M92 22 v16 M84 30 h16\" stroke=\"#6fcf8e\" stroke-width=\"5\" stroke-linecap=\"round\"/>"
+      }
+    },
+    {
       "file": "labs/transform.html",
       "name": "Transformer",
       "namePl": "Transformator",
@@ -536,6 +567,11 @@ window.GameLabCatalog =
   ],
   "phraseEn": {
     "2D": "2D",
+    "UI": "UI",
+    "menu": "menu",
+    "HUD": "HUD",
+    "dialogi": "dialogues",
+    "gra": "game",
     "sztuka": "art",
     "malarstwo": "painting",
     "znaczki": "stamps",

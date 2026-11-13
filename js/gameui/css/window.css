@@ -1,31 +1,20 @@
-/* Centered windows opened from the HUD (Research/Tech, Fleet, Diplomacy/players,
-   Planets/body types, drone script). Same look as the setup modal, but a
-   normal flow layout sized by its content, scaled by --uiScale like the
-   rest of the kit. The setup modal itself keeps its own fixed-coordinate
-   layout (setupModal.css). */
-.uiWindow{
-  position:fixed; inset:0; z-index:10; display:flex;
-  align-items:center; justify-content:center;
-  background:rgb(0 0 8 / .6);
-}
-.uiWindowBox{
-  position:relative; display:flex; flex-direction:column;
-  max-height:calc(88vh / var(--uiScale));
-  padding:8px 14px 16px 44px;
-  transform:scale(var(--uiScale));
-  font-family:var(--uiFontBody); color:var(--uiText); text-align:left;
-}
-/* The frame sits behind the content: the transform above makes the box a
-   stacking context, so z-index:-1 stays inside it. */
-.uiWindowBox::before{
-  content:""; position:absolute; inset:0; z-index:-1; border-radius:12px;
-  border:1.5px solid var(--uiFrame);
-  box-shadow:0 0 8px var(--uiFrameGlow), inset 0 0 8px rgb(40 80 255 / .18);
-  background:rgb(0 2 12 / .94);
-}
-.uiWinSide{ position:absolute; left:12px; top:52px; bottom:12px; width:18px; border-radius:0 0 0 12px; }
-.uiWinHead{ display:flex; align-items:center; gap:10px; height:34px; flex:none; }
-.uiWinHead .hdSq{ margin-left:-32px; flex:none; }
-.uiWinHead .hd{ flex:1; font-size:21px; }
-.uiWindowBox > .hdLine{ flex:none; margin:2px -2px 10px -32px; }
-.uiWinBody{ overflow:auto; min-height:0; }
+/* UI gry · okna w grze (ze Space, css/ui/windows/window.css): ramka z poświatą, kwadracik przed nagłówkiem, linia pod
+   nim, przewijana treść; tu okno przy kotwicy (środek, lewa, prawa) zamiast stałego środka i bez skali --uiScale. */
+.gui .gWins{position:absolute;inset:0;z-index:4;pointer-events:none}
+.gui .gWin{position:absolute;top:50%;transform:translateY(-50%);width:min(26em,calc(100% - 32px));max-height:80%;display:flex;flex-direction:column;
+  padding:.5em .9em 1em;background:var(--g-panel);border:1.5px solid var(--g-line);border-radius:var(--g-radius);
+  box-shadow:0 0 8px var(--g-glow),inset 0 0 8px color-mix(in srgb,var(--g-glow) 40%,transparent);pointer-events:auto}
+.gui .gWin.at-c{left:50%;transform:translate(-50%,-50%)}.gui .gWin.at-l{left:16px}.gui .gWin.at-r{right:16px}
+.gui .gWinHead{display:flex;align-items:center;gap:.6em;height:2.1em;flex:none}
+.gui .gSq{width:1.1em;height:1.1em;border-radius:.6em .2em .2em .55em;background:var(--g-accent);flex:none}
+.gui .gHd{flex:1;font-family:var(--g-fontHead);font-weight:400;font-size:1.3em;color:var(--g-head);letter-spacing:.4px}
+.gui .gWinHead kbd{font-family:var(--g-font);font-size:.75em;color:var(--g-dim);border:1px solid var(--g-line);border-radius:3px;padding:0 .35em}
+.gui .gClose{width:2.6em;height:1.6em;border-radius:.25em .8em .8em .25em;background:var(--g-err);color:#200;border:0;padding:0;font-size:1em}
+.gui .gLine{height:1.5px;flex:none;margin:.15em 0 .6em;background:linear-gradient(90deg,var(--g-line),transparent)}
+.gui .gWinBody{overflow:auto;min-height:0}
+.gui .gWinBody p{margin:.3em 0;color:var(--g-text)}
+.gui .st{display:flex;justify-content:space-between;gap:.5em;padding:.15em 0}
+.gui .st span{color:var(--g-dim)}.gui .st b{color:var(--g-text);font-weight:normal}
+.gui .gList{margin:0;padding:0;list-style:none}
+.gui .gList li{display:flex;justify-content:space-between;padding:.3em 0;border-top:1px solid color-mix(in srgb,var(--g-line) 60%,transparent);color:var(--g-text)}
+.gui .gList li:first-child{border-top:0}

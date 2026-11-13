@@ -3,6 +3,22 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.61.0 · UI gry 1.0.0 · edytor sceny 0.25.0 — 2026-11-13 (laboratorium UI gry)
+
+### Dodane
+- **Laboratorium UI gry** (`labs/gameui.html`, opis `docs/labs/gameui.md`) i silnik **UI gry jako dane** (`js/gameui/`):
+  ekrany menu (stos z cofaniem, przyciski, suwaki, przełączniki, wybory), HUD z dziewięcioma kotwicami (pasek, liczba,
+  tekst, telegraf, wskaźnik steru, dziennik zdarzeń, baner, celownik, minimapa) powiązany ze stanem gry, okna w grze
+  (klawisze, Esc) i okno dialogowe postaci i narratora (tekst po literze, wybory 1–9). Format `gamelab-ui`; skórki
+  oddzielone od wyglądu laboratoriów — gotowe Space, Battle i silnika, własne zapisywane pod nazwą (zasoby `ui`
+  i `uiskin`). Przykłady: dowództwo kosmiczne, bitwa morska, prosta gra. Dla AI: `GameUIApi` i zakładka API w konsoli.
+- Przeniesione **z historią**: ze Space — zestaw UI (materiał z ziarnem, ramki, okno, dziennik zdarzeń, czcionki
+  Antonio i Roboto Condensed), z Battle — pomocnik DOM, menu i HUD; przerobione na elementy z danych.
+- Kafelek **Lekarz sceny** (narzędzia): otwiera edytor sceny od razu z oknem lekarza (`editor/index.html?doctor`).
+
+### Zmienione
+- Edytor: przycisk lekarza sceny — **Badaj** (EN: Examine), w oknie **Zbadaj scenę**.
+
 ## Program 0.60.0 · edytor sceny 0.24.0 — 2026-11-13 (lekarz sceny)
 
 ### Dodane

@@ -8,7 +8,7 @@
 ## Co jest w repozytorium
 
 - Tylko laboratoria i ich strona startowa (`index.html`), z modelami, środowiskami i narzędziami, których używają. Gier nie przenosimy.
-- Źródła (z historią): Space, Battle, aTrain (tabor i fizyka), NeuroLabPA (SDF Walkers, laboratorium języka, laboratorium obrazów), artchecker (silnik ekspertyzy w laboratorium sztuki: `js/render/art/exam/`); SDF Morgue z artefaktu claude.ai.
+- Źródła (z historią): Space, Battle, aTrain (tabor i fizyka), NeuroLabPA (SDF Walkers, laboratorium języka, laboratorium obrazów), artchecker (silnik ekspertyzy w laboratorium sztuki: `js/render/art/exam/`), zestaw UI ze Space i menu/HUD z Battle (UI gry: `js/gameui/`); SDF Morgue z artefaktu claude.ai.
 - Jedna wersja Three.js: r186, moduły ES (`vendor/three/`, dodatki w `vendor/three/addons/`).
 - Laboratoria z Battle importują r186 bezpośrednio. Kity i laboratoria ze Space ładują go przez `js/core/three-global.js` (globalne `THREE`, potem skrypty jako `type="module"`) — zawsze w grafice Battle (tryb legacy r128 usunięty w 0.12.0).
 
@@ -23,6 +23,7 @@
 - `js/behaviors/` — zachowania (napęd i ruch) podpinane do modeli; każde deklaruje, w których środowiskach działa.
 - `ui/` — całe UI (opis: `ui/README.md`): `ui/ui.css` (jedno wejście), `ui/style/` (tokeny, czcionki, kontrolki, motywy `space.css` i `sea.css`), `ui/shell/` (dziennik, pasek menu, paski, okna, okna standardowe, wydajność, konsola, karta ładowania, przełącznik środowiska), `ui/data/` (katalog, wersje), `ui/pages/` (style stron).
 - `js/render/`, `js/audio/`, `js/labkit/` — wspólne warstwy.
+- `js/gameui/` — UI gry jako dane (ekrany menu, HUD, okna gry, okno dialogowe; format `gamelab-ui`), ze skórkami gier (`js/gameui/skins.js`, arkusze `js/gameui/css/`) oddzielonymi od wyglądu laboratoriów; laboratorium: `labs/gameui.html` (opis `docs/labs/gameui.md`).
 - `tools/` — narzędzia (doktor modeli, kitcheck, `paths.py` — sprawdzanie ścieżek).
 - `docs/` — dokumentacja w układzie kodu (mapa: `docs/README.md`): `docs/labs/` (laboratoria), `docs/models/` (modele), `docs/scene/` (silnik sceny), `docs/behaviors/` (zachowania), `docs/tools/` (narzędzia), `docs/guides/` (przewodniki, renderowanie, pułapki), `docs/history/` (historia sprzed przeniesienia, wykonany remanent).
 - Nazwy plików i folderów małymi literami, słowa łączone myślnikiem (`solar-system.js`, `vehicles-water.html`); w kodzie nazwy mówią, co robią teraz (np. `LabKit.autoHideWindows`, nie dawne „hud”).

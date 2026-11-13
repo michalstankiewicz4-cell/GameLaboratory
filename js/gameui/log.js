@@ -1,35 +1,21 @@
-import { svgIcon } from "../icons.js";
+// UI gry · dziennik zdarzeń (ze Space, js/ui/hud/eventLog.js): każda wiadomość gry, najnowsza na górze, z godziną;
+// rodzaj (info, gain, alert) wybiera barwę. Tekst zawsze przez textContent — wiadomości mogą zawierać dane gracza.
+// Tu bez ikon SVG gry i bez stałego id: dziennik to element HUD (js/gameui/hud.js, typ "log"), może być ich kilka.
+import { h } from './dom.js';
 
-// EVENT LOG panel: every in-game message, newest on top. The rest of the
-// game only ever calls showToast() below — the one entry point it has
-// always used for player-facing notices — so nothing else needs to know
-// this panel exists.
-const MAX_EVENTS = 60;
-const KIND_ICON = { info: "evInfo", arrive: "evArrive", alert: "evAlert" };
+const KINDS = ['info', 'gain', 'alert'];
+const clockText = (d) => String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
 
-function clockText(d){
-  return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
-}
-
-// kind: "info" (default), "arrive" (something gained/reached) or "alert".
-// The message is set via textContent — some messages embed player data.
-function addEvent(msg, kind){
-  const list = document.getElementById("evList");
-  if(!list) return;
-  const k = KIND_ICON[kind] ? kind : "info";
-  const li = document.createElement("li");
-  li.className = (k === "alert" ? "alert " : "") + "fresh";
-  li.innerHTML = svgIcon(KIND_ICON[k]) + '<span class="t"></span><span class="m"></span>';
-  li.querySelector(".t").textContent = clockText(new Date());
-  li.querySelector(".m").textContent = msg;
-  li.addEventListener("animationend", function(){ li.classList.remove("fresh"); });
-  list.prepend(li);
-  list.scrollTop = 0;
-  while(list.children.length > MAX_EVENTS) list.lastElementChild.remove();
-}
-
-// Every player-facing notice in the game goes through here. kind: "info"
-// (default), "arrive" or "alert" — only picks the entry's icon/color.
-export function showToast(msg, kind){
-  addEvent(msg, kind);
+// createLog({ max, fade }) → { el, add(msg, kind), clear() }; fade [s] — wpis znika po czasie (0 — zostaje)
+export function createLog({ max = 60, fade = 0 } = {}) {
+  const list = h('ol', { class: 'gLog' });
+  function add(msg, kind = 'info') {
+    const k = KINDS.includes(kind) ? kind : 'info';
+    const li = h('li', { class: k + ' fresh' }, h('span', { class: 't' }, clockText(new Date())), h('span', { class: 'm' }, String(msg)));
+    li.addEventListener('animationend', (e) => { if (e.animationName === 'gFresh') li.classList.remove('fresh'); });
+    list.prepend(li); list.scrollTop = 0;
+    while (list.children.length > max) list.lastElementChild.remove();
+    if (fade > 0) setTimeout(() => { li.classList.add('gone'); setTimeout(() => li.remove(), 600); }, fade * 1000);
+  }
+  return { el: list, add, clear: () => list.replaceChildren() };
 }

@@ -18,12 +18,7 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 - [ ] **Laboratorium lądu — przełącznik „Okrągła”**: generator lądu na kuli (zastąpi drugie źródło lądu — z planety);
   wraca z nim skok (skreślony z punktu 6).
 - [ ] **Widok mapy zawiniętej jako torus** (kształt, nie tylko topologia).
-- [ ] **Laboratorium UI gry** (właściciel, 2026-11-13; kiedy i na jakim poziomie — do ustalenia): nakładka na scenę
-  z menu gry, HUD, oknami i ekranami (start, pauza, ekwipunek). Propozycja miejsca w schemacie: UI gry jako dane
-  sceny (jak prefabrykaty i zachowania), rysowane warstwą nad widokiem w ▶ Graj edytora i w laboratorium UI;
-  własna skórka gry oddzielona od wyglądu laboratoriów (tokeny jak `ui/style/tokens.css`, ale osobne), elementy
-  reagują na zdarzenia (`js/core/events.js`) i stan gry; w API polecenia dla AI. Materiał: HUD i okna ze Space,
-  menu z Battle i Hive Hunger. Propozycja kolejności: po lekarzu sceny i Hive Hunger (wtedy są gry z HUD do porównania).
+- [x] Laboratorium UI gry: zrobione w 0.61.0 (`labs/gameui.html`, `js/gameui/`, `docs/labs/gameui.md`). Dalej: pole `ui` sceny i nakładka w ▶ Graj edytora (HUD ze stanem zachowań, zdarzenia).
 - [ ] **Laboratorium scenariusza** (właściciel, 2026-11-13): treści i dialogi podpinane pod postacie i narratora —
   sceny scenariusza, kwestie, wybory, warunki (stan gry, zdarzenia), teksty po angielsku i po polsku; dane jako zasób
   z nazwą, w scenie przypięte do obiektów (postać, narrator), w API dla AI.

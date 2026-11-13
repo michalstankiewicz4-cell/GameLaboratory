@@ -25,6 +25,8 @@ def build():
            "  <url>", "    <loc>%s</loc>" % SITE, alt, "    <changefreq>weekly</changefreq>", "    <priority>1.0</priority>", "  </url>",
            "  <url>", "    <loc>%s?lang=pl</loc>" % SITE, alt, "  </url>"]
     for c in cat["labs"] + cat["tools"]:
+        if "?" in c["file"]:   # ta sama strona z parametrem (np. edytor z oknem lekarza sceny) — nie osobny adres
+            continue
         page = os.path.join(ROOT, c["file"])
         head = open(page, encoding="utf-8").read().split("</head>")[0]
         if 'name="robots" content="noindex' in head:

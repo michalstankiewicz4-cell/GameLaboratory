@@ -157,7 +157,7 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
   artchecker (ilustracje generowane w piaskownicy).
 - **Laboratorium scenariusza** (pomysł użytkownika, 2026-11-13): treści i dialogi podpinane pod postacie i narratora;
   z nim **opisy statków i rzeczy w grze** (szczegóły w `TODO.md`).
-- **Laboratorium UI gry** (pomysł użytkownika, 2026-11-13): nakładka na scenę z menu gry, HUD i ekranami — UI gry
+- **Laboratorium UI gry** *(zrobione w 0.61.0: `labs/gameui.html`, `js/gameui/`, opis `docs/labs/gameui.md`)* (pomysł użytkownika, 2026-11-13): nakładka na scenę z menu gry, HUD i ekranami — UI gry
   jako dane sceny, warstwa nad widokiem w ▶ Graj, własna skórka gry oddzielona od wyglądu laboratoriów; kiedy i na
   jakim poziomie — do ustalenia (szczegóły w `TODO.md`).
 - **Laboratorium sztuki — tryb 3D** (propozycja przyjęta na później, opis: [../labs/art.md](../labs/art.md),

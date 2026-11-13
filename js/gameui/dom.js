@@ -1,5 +1,5 @@
-// Minimal DOM helpers (no innerHTML anywhere: the CSP-friendly, injection-safe way to build UI).
-import { bind } from '../i18n/index.js';
+// UI gry · pomocnik DOM (z Battle, js/ui/dom.js): elementy bez innerHTML — zgodnie z CSP i bezpiecznie dla tekstów
+// z danych gry. Bez tłumaczeń: teksty przychodzą już w języku gry (definicja UI, js/gameui/gameui.js).
 
 // h('div', { class: 'x', on: { click: fn }, hidden: true }, child, 'text', [more])
 export function h(tag, props = {}, ...kids) {
@@ -19,14 +19,17 @@ export function h(tag, props = {}, ...kids) {
   kids.forEach(add);
   return el;
 }
-export const $ = (id) => document.getElementById(id);
 
-// Element whose text follows the current language.
-export const tx = (key, tag = 'span', params) => bind(h(tag), key, undefined, params);
-// Button with translated text. Releases focus after a click so Space/Enter never re-trigger it during play.
-export function btn(key, onClick, cls = '') {
-  const b = h('button', { type: 'button', class: cls });
-  bind(b, key);
+// przycisk; po kliknięciu oddaje fokus, żeby spacja i Enter nie wciskały go znowu w czasie gry
+export function btn(text, onClick, cls = '') {
+  const b = h('button', { type: 'button', class: cls }, text);
   b.addEventListener('click', (e) => { onClick(e); b.blur(); });
   return b;
+}
+
+// wartość ze stanu gry po ścieżce ('ship.hp', 'ammo.0'); liczba podana wprost zostaje liczbą
+export function pick(state, path) {
+  if (typeof path === 'number') return path;
+  if (path == null || path === '') return undefined;
+  return String(path).split('.').reduce((o, k) => (o == null ? undefined : o[k]), state);
 }

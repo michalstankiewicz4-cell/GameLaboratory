@@ -1,132 +1,75 @@
-// Menu overlay: main menu with ship selection, pause, results and options screens.
-import { h, btn, tx } from './dom.js';
-import { t, bind, LANGS } from '../i18n/index.js';
-import { CLASSES, CLASS_KEYS, KNOTS } from '../world/constants.js';
-import { VERSION } from '../version.js';
-import { GFX_PRESETS } from '../core/settings.js';
+// UI gry · ekrany menu (z Battle, js/ui/menu.js — tam stałe ekrany jednej gry: menu główne z wyborem okrętu, pauza,
+// wyniki, opcje). Tu ekrany z danych: stos ekranów z cofaniem jak w Battle, pozycje i ustawienia z definicji UI.
+//
+// ekran: { title, text?, layout?: 'side' | 'center', items: [pozycja] }
+// pozycja: przycisk { label, do, sub? } albo ustawienie { type: 'slider' | 'toggle' | 'choice', label, bind, min?, max?,
+//   step?, options? } (wartość w stanie gry, bind np. 'settings.volume')
+// do: 'screen:<id>' (następny ekran), 'back', 'resume' (zamyka menu — gra), 'window:<id>' (okno gry), 'event:<nazwa>'
+//     (zdarzenie dla gry), 'quit' (zdarzenie quit)
+import { h, btn, pick } from './dom.js';
 
-export function createMenu(root, { actions, settings, progress }) {
-  const screens = {};
+export function createScreens(root, { onAction, getState, setState }) {
+  const el = h('div', { class: 'gMenu', hidden: true });
+  root.append(el);
+  let defs = {}, current = null;
   const history = [];
-  let current = null, pick = progress.cls;
-  const screen = (name, ...kids) => { screens[name] = h('section', { class: 'screen', hidden: true }, ...kids); return screens[name]; };
-  const back = () => btn('common.back', () => menu.back(), 'sub');
 
-  /* ---- ship cards ---- */
-  const cards = h('div', { class: 'cards' });
-  const stat = (k, v) => h('div', { class: 'st' }, h('span', {}, t(k)), h('b', {}, v));
-  function drawCards() {
-    cards.replaceChildren(...CLASS_KEYS.map((k) => {
-      const c = CLASSES[k];
-      return h('button', { type: 'button', class: 'card' + (k === pick ? ' on' : ''), on: { click: () => { pick = k; progress.cls = k; progress.save(); drawCards(); actions.pick?.(k); } } },
-        h('h3', {}, t('cls.' + k)),
-        h('p', { class: 'role' }, t('role.' + k)),
-        stat('st.hp', c.hp),
-        stat('st.speed', `${(c.speed * KNOTS).toFixed(0)} ${t('hud.kn')}`),
-        stat('st.guns', `${c.turrets.length}×${c.turrets[0].barrels} · ${c.guns.reload}s`),
-        stat('st.range', `${(c.guns.range / 1000).toFixed(1)} km`),
-        stat('st.torps', c.torps ? `${c.torps.n} · ${c.torps.reload}s` : '—'));
-    }));
+  function setPath(path, v) {
+    const s = getState(), keys = path.split('.'), last = keys.pop();
+    const o = keys.reduce((a, k) => (a[k] = a[k] && typeof a[k] === 'object' ? a[k] : {}), s);
+    o[last] = v; setState(s);
   }
-  const best = h('p', { class: 'info' });
-
-  screen('main',
-    h('h1', { class: 'logo' }, 'STEEL', h('br'), 'SALVO'),
-    tx('menu.tagline', 'p'),
-    tx('menu.pick', 'h2'),
-    cards,
-    h('div', { class: 'stack' },
-      btn('menu.start', () => actions.start(pick)),
-      btn('menu.multi', () => menu.go('multi'), 'sub'),
-      btn('menu.options', () => menu.go('options'), 'sub')),
-    best,
-    h('p', { class: 'labs' }, tx('menu.labs', 'span'), ' ',
-      // the labs moved to GameLaboratory (its own repository and site)
-      h('a', { href: 'https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/vehicles-water.html' }, tx('menu.shipLab', 'span')), ' · ',
-      h('a', { href: 'https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/water.html' }, tx('menu.waterLab', 'span')), ' · ',
-      h('a', { href: 'https://michalstankiewicz4-cell.github.io/GameLaboratory/' }, tx('menu.allLabs', 'span'))),
-    h('p', { class: 'foot' }, 'v' + VERSION, ' · ', tx('menu.credit')));
-  screen('multi', tx('multi.title', 'h2'), tx('multi.note', 'p'), h('div', { class: 'stack' }, back()));
-  screen('pause', tx('pause.title', 'h2'), tx('pause.keys', 'p'),
-    h('div', { class: 'stack' }, btn('pause.resume', actions.resume), btn('menu.options', () => menu.go('options')), btn('pause.quit', actions.quit)));
-  const deadInfo = h('div', { class: 'res' });
-  const deadTitle = h('h2');
-  screen('dead', deadTitle, deadInfo,
-    h('div', { class: 'stack' }, btn('dead.again', () => actions.start(pick)), btn('pause.quit', actions.quit)));
-
-  /* ---- options ---- */
-  const opt = h('div', { class: 'tabbody' });
-  function slider(key, get, set, min, max, step, fmt = (v) => v) {
-    const val = h('span', { class: 'val' });
-    const inp = h('input', { type: 'range', min, max, step });
-    inp.value = get(); val.textContent = fmt(get());
-    inp.addEventListener('input', () => { set(+inp.value); val.textContent = fmt(+inp.value); });
-    return h('label', { class: 'orow' }, tx(key), inp, val);
+  function row(it) {
+    const val = pick(getState(), it.bind);
+    if (it.type === 'slider') {
+      const out = h('span', { class: 'val' }), inp = h('input', { type: 'range', min: it.min ?? 0, max: it.max ?? 1, step: it.step ?? 0.01 });
+      inp.value = val ?? it.min ?? 0; out.textContent = inp.value;
+      inp.addEventListener('input', () => { out.textContent = inp.value; setPath(it.bind, +inp.value); });
+      return h('label', { class: 'orow' }, h('span', {}, it.label), inp, out);
+    }
+    if (it.type === 'toggle') {
+      const inp = h('input', { type: 'checkbox' }); inp.checked = !!val;
+      inp.addEventListener('change', () => setPath(it.bind, inp.checked));
+      return h('label', { class: 'orow chk' }, inp, h('span', {}, it.label));
+    }
+    if (it.type === 'choice') {
+      const box = h('div', { class: 'choices' });
+      const draw = () => box.replaceChildren(...(it.options || []).map((o) => btn(o, () => { setPath(it.bind, o); draw(); }, pick(getState(), it.bind) === o ? 'on' : '')));
+      draw();
+      return h('div', { class: 'orow col' }, h('span', {}, it.label), box);
+    }
+    return btn(it.label, () => act(it.do), it.sub ? 'sub' : '');
   }
-  function drawOptions() {
-    const d = settings.data;
-    const up = (fn) => settings.update(fn);
-    const pct = (v) => Math.round(v * 100) + '%';
-    const langs = h('div', { class: 'choices' }, LANGS.map((l) => h('button', { type: 'button', class: d.lang === l.id ? 'on' : '', on: { click: () => { up((x) => { x.lang = l.id; }); drawOptions(); } } }, l.name)));
-    const check = (key, field) => {
-      const c = h('input', { type: 'checkbox' });
-      c.checked = d.gfx[field];
-      c.addEventListener('change', () => up((x) => { x.gfx[field] = c.checked; }));
-      return h('label', { class: 'orow chk' }, c, tx(key));
-    };
-    // presets set several graphics options at once; each one can still be changed afterwards
-    const presets = h('div', { class: 'choices' }, Object.keys(GFX_PRESETS).map((id) => h('button', { type: 'button', on: { click: () => {
-      up((x) => { Object.assign(x.gfx, GFX_PRESETS[id]); }); drawOptions();
-    } } }, t('preset.' + id))));
-    opt.replaceChildren(...[
-      tx('opt.lang', 'h3'), langs,
-      tx('opt.gfx', 'h3'),
-      h('div', { class: 'orow col' }, tx('opt.preset'), presets),
-      slider('opt.scale', () => d.gfx.scale, (v) => up((x) => { x.gfx.scale = v; }), 0.5, 1, 0.05, pct),
-      slider('opt.fx', () => d.gfx.fx, (v) => up((x) => { x.gfx.fx = v; }), 0.25, 1, 0.05, pct),
-      slider('opt.bright', () => d.gfx.bright, (v) => up((x) => { x.gfx.bright = v; }), 0.6, 2, 0.05, (v) => v.toFixed(2)),
-      slider('opt.sat', () => d.gfx.sat, (v) => up((x) => { x.gfx.sat = v; }), 0, 1.6, 0.05, pct),
-      check('opt.shadows', 'shadows'), check('opt.aa', 'aa'), check('opt.bloom', 'bloom'), check('opt.water', 'water'),
-      check('opt.pip', 'pip'), check('opt.fps', 'showFps'),
-      tx('opt.play', 'h3'),
-      (() => { const c = h('input', { type: 'checkbox' }); c.checked = d.play.god; c.addEventListener('change', () => up((x) => { x.play.god = c.checked; })); return h('label', { class: 'orow chk' }, c, tx('opt.god')); })(),
-      tx('opt.audio', 'h3'),
-      slider('opt.vol', () => d.vol, (v) => up((x) => { x.vol = v; }), 0, 1, 0.05, pct),
-      tx('opt.mouse', 'h3'),
-      slider('opt.zoom', () => d.mouse.zoomSens, (v) => up((x) => { x.mouse.zoomSens = v; }), 0.2, 3, 0.1, (v) => v.toFixed(1)),
-      slider('opt.rot', () => d.mouse.rotSens, (v) => up((x) => { x.mouse.rotSens = v; }), 0.2, 3, 0.1, (v) => v.toFixed(1)),
-      h('div', { class: 'btns' }, btn('opt.reset', () => { settings.reset(); drawOptions(); }))].filter(Boolean));
+  function draw(id) {
+    const d = defs[id]; if (!d) return false;
+    el.dataset.screen = id; el.dataset.layout = d.layout || (history.length ? 'center' : 'side');
+    const items = (d.items || []).map(row);
+    el.replaceChildren(h('section', { class: 'screen' },
+      d.title ? h(history.length ? 'h2' : 'h1', { class: history.length ? '' : 'logo' }, d.title) : null,
+      d.text ? h('p', {}, d.text) : null,
+      h('div', { class: 'stack' }, items)));
+    return true;
   }
-  screen('options', tx('opt.title', 'h2'), opt, h('div', { class: 'stack' }, back()));
-
-  const overlay = h('div', { id: 'menu', hidden: true }, Object.values(screens));
-  root.append(overlay);
-
-  function refresh() {
-    drawCards();
-    best.textContent = t('menu.best', { wave: progress.bestWave, score: progress.best });
-    if (current === 'options') drawOptions();
+  function act(a = '') {
+    const [k, arg] = String(a).split(/:(.*)/s);
+    if (k === 'screen') show(arg);
+    else if (k === 'back') back();
+    else if (k === 'resume') hide();
+    else onAction(k, arg);
   }
-
-  const menu = {
+  function show(id, push = true) {
+    if (!defs[id]) return false;
+    if (push && current && current !== id) history.push(current);
+    current = id; el.hidden = false; draw(id); onAction('screen', id);
+    return true;
+  }
+  function back() { if (history.length) { current = history.pop(); draw(current); onAction('screen', current); } else hide(); }
+  function hide() { el.hidden = true; current = null; history.length = 0; onAction('resume'); }
+  return {
+    el, show, back, hide,
+    build(screens = {}) { defs = screens; if (current && !defs[current]) hide(); else if (current) draw(current); },
     get current() { return current; },
-    show(name) { history.length = 0; menu.switchTo(name); },
-    switchTo(name) {
-      for (const [k, el] of Object.entries(screens)) el.hidden = k !== name;
-      current = name; overlay.hidden = false; overlay.dataset.screen = name;
-      if (name === 'options') drawOptions();
-      refresh();
-    },
-    go(name) { history.push(current); menu.switchTo(name); },
-    back() { if (!history.length) return false; menu.switchTo(history.pop()); return true; },
-    hide() { overlay.hidden = true; current = null; history.length = 0; },
-    setResult(r) {
-      bind(deadTitle, r.newBest ? 'dead.titleBest' : 'dead.title');
-      deadInfo.replaceChildren(...[
-        ['res.wave', r.wave], ['res.kills', r.kills], ['res.dmg', r.dmg], ['res.acc', r.acc + '%'], ['res.time', r.time], ['res.score', r.score],
-      ].map(([k, v]) => h('div', { class: 'st' }, h('span', {}, t(k)), h('b', {}, String(v)))));
-    },
-    refresh,
+    get open() { return !el.hidden; },
+    refresh() { if (current) draw(current); },
   };
-  return menu;
 }

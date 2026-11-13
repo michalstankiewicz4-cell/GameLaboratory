@@ -1,16 +1,11 @@
-/* HUD event log, stretches vertically (ui/hud/eventLog.js). */
-#eventPanel{ right:16px; top:436px; width:307px; bottom:278px; }
-#evHdSq{ left:9px; top:7px; width:19px; height:21px; }
-#evHd{ left:39px; top:3px; }
-#evHdLine{ left:36px; right:8px; top:33px; }
-#evBars{ left:9px; top:40px; width:18px; bottom:6px; display:flex; flex-direction:column; gap:6px; }
-#evBars span{ width:18px; }
-#evList{ left:36px; top:36px; right:6px; bottom:6px; margin:0; padding:0 4px 0 0; list-style:none; overflow-y:auto; }
-#evList li{ display:flex; align-items:center; gap:8px; padding:6px 0 6px 2px; border-top:1px solid #132a86; }
-#evList li:first-child{ border-top:0; }
-#evList svg{ flex:none; width:20px; height:20px; }
-#evList .t{ flex:none; width:40px; font-size:14.5px; color:#c7d0ff; }
-#evList .m{ flex:1; min-width:0; font-size:14.5px; line-height:18px; color:#a9bdff; overflow-wrap:anywhere; }
-#evList li.alert .m{ color:#d69ad8; }
-#evList li.fresh{ animation:evFresh 1.4s ease-out; }
-@keyframes evFresh{ 0%{ background:rgb(245 189 92 / .22); } 100%{ background:transparent; } }
+/* UI gry · dziennik zdarzeń (ze Space, css/ui/hud/eventLog.css): wpisy z godziną, kreska między wpisami, świeży wpis
+   rozjaśniony na chwilę; rodzaj wpisu (info, gain, alert) — barwa. Tu bez stałego miejsca na ekranie (kotwica HUD). */
+.gui .gLog{margin:0;padding:0 .25em 0 0;list-style:none;max-height:12em;width:19em;overflow-y:auto;pointer-events:auto}
+.gui .gLog li{display:flex;align-items:baseline;gap:.5em;padding:.35em 0 .35em 2px;border-top:1px solid color-mix(in srgb,var(--g-line) 70%,transparent)}
+.gui .gLog li:first-child{border-top:0}
+.gui .gLog .t{flex:none;width:2.6em;font-size:.9em;color:var(--g-dim)}
+.gui .gLog .m{flex:1;min-width:0;font-size:.9em;line-height:1.25em;color:var(--g-text);overflow-wrap:anywhere}
+.gui .gLog li.gain .m{color:var(--g-ok)}.gui .gLog li.alert .m{color:var(--g-err)}
+.gui .gLog li.fresh{animation:gFresh 1.4s ease-out}
+.gui .gLog li.gone{opacity:0;transition:opacity .6s}
+@keyframes gFresh{0%{background:color-mix(in srgb,var(--g-accent) 22%,transparent)}100%{background:transparent}}
