@@ -122,7 +122,7 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
    skreślony (wraca z okrągłą planetą). Punkt zrobiony)*
    Później (pomysły użytkownika): przełącznik **Okrągła** w laboratorium lądu (generator lądu na kuli — zastąpi
    drugie źródło) i widok mapy zawiniętej jako **torus** (kształt, nie tylko topologia).
-7. **Lekarz sceny** (na końcu, gdy są prefabrykaty i zachowania): sprawdza układ sceny, czego nie widać w pojedynczym
+7. **Lekarz sceny** *(zrobiony w 0.60.0: `js/scene/doctor.js`, opis `docs/scene/doctor.md`)* (na końcu, gdy są prefabrykaty i zachowania): sprawdza układ sceny, czego nie widać w pojedynczym
    modelu — obiekt w złym środowisku (drzewo na morzu, okręt na lądzie, łazik w kosmosie), pod gruntem albo
    w powietrzu, obiekty wchodzące jeden w drugi, brakujące zasoby z nazwą, zachowanie niepasujące do modelu albo
    środowiska, koszt sceny (trójkąty, wywołania rysowania) względem budżetu. Jak doktor modeli: uniwersalny, zgłasza
@@ -155,6 +155,8 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
   metody ekspertyzy, techniki malarskie), z ilustracjami generowanymi w laboratoriach (laboratorium sztuki: `ArtApi`) —
   małe obrazki, bez wysokiej rozdzielczości i efektów, chyba że ilustracja tego wymaga. Wzór: wiki eksperta w grze
   artchecker (ilustracje generowane w piaskownicy).
+- **Laboratorium scenariusza** (pomysł użytkownika, 2026-11-13): treści i dialogi podpinane pod postacie i narratora;
+  z nim **opisy statków i rzeczy w grze** (szczegóły w `TODO.md`).
 - **Laboratorium UI gry** (pomysł użytkownika, 2026-11-13): nakładka na scenę z menu gry, HUD i ekranami — UI gry
   jako dane sceny, warstwa nad widokiem w ▶ Graj, własna skórka gry oddzielona od wyglądu laboratoriów; kiedy i na
   jakim poziomie — do ustalenia (szczegóły w `TODO.md`).

@@ -10,7 +10,9 @@ import { createPlay } from './play/play.js';
 import { createEvents } from '../../js/core/events.js';
 import { createApiConsole } from './ui/api-console.js';
 import { createSceneApi } from '../../js/scene/api.js';
-import { behaviorsFor } from '../../js/scene/behaviors.js';
+import { behaviorsFor, behaviorOf, bodyRank, BEHAVIORS } from '../../js/scene/behaviors.js';
+import { checkScene } from '../../js/scene/doctor.js';
+import { createDoctorPanel } from './ui/doctor-panel.js';
 import { onAssetsChange, listAssets, ASSET_KINDS } from '../../js/scene/assets.js';
 import { emptyScene, makeObject } from '../../js/scene/scene-data.js';
 import { prefab, PREFABS } from '../../js/scene/prefabs.js';
@@ -77,14 +79,19 @@ const placer = createPlacer(world, store, actions, { t });
 actions.play = createPlay(store, world, controls, actions, events);
 const panels = createPanels(store, actions);
 // modele, które czekały na kity ze Space, są już zbudowane: uchwyt, hierarchia i okna od nowa
-world.afterAsync = () => { controls.attach(); panels.renderTree(); panels.renderProps(); };
+world.afterAsync = () => { controls.attach(); panels.renderTree(); panels.renderProps(); if (window.sceneEditor) window.sceneEditor.doctor.check(); };
 // API dla AI (js/scene/api.js): polecenia JSON na tych samych danych; zakładka API w konsoli i window.sceneApi.run(…)
 const api = createSceneApi({
   store, prefabs: PREFABS, behaviorsFor, lights: Object.keys(LIGHTS), assets: { kinds: Object.keys(ASSET_KINDS), list: listAssets, get skyPresets() { return skyPresets().map((p) => p.id); } },
   hooks: { build, group: (fn) => store.group(fn), play: () => actions.play.start(), stop: () => actions.play.stop(), playing: () => actions.play.playing,
+    check: ({ budget } = {}) => checkScene(store.scene, {   // lekarz sceny: dane sceny + pomiary świata (obrysy, koszt, grunt)
+      prefab, behaviorsFor, behaviorOf, behaviorEnv: (id) => (BEHAVIORS[id] || {}).env, bodyRank,
+      assets: { list: listAssets }, lights: Object.keys(LIGHTS), skyPresets: skyPresets().map((p) => p.id),
+      probe: world.stage, boxOf: world.boxOf, costOf: world.costOf, budget }),
     act: (o, action, on) => actions.play.act(o.id, action, on), actionsOf: (o) => actions.play.actionsOf(o.id), events: (n) => events.history(n) },
 });
 createApiConsole(api);
+const doctor = createDoctorPanel(store, api, actions);
 createToolbar(store, controls, actions);
 
 // dane → świat i okna
@@ -107,5 +114,5 @@ requestAnimationFrame(() => window.LabLoad && window.LabLoad.done());
 // gotowe tła kosmosu na liście Niebo (też nad morzem i lądem): kity ze Space w tle, chwilę po starcie
 setTimeout(() => { if (!spaceReady()) loadSpace().then(() => panels.renderProps()).catch(() => {}); }, 2500);
 // do sprawdzania z konsoli i testów
-window.sceneEditor = { store, world, controls, play: actions.play };
+window.sceneEditor = { store, world, controls, play: actions.play, doctor };
 window.sceneApi = api;   // dla AI sterującej przeglądarką: window.sceneApi.run({ cmd: 'help' })

@@ -13,7 +13,8 @@
 //   assets       — zasoby z nazwą: { kinds: ['sea', …], list(kind) → nazwy, skyPresets — id gotowych teł kosmosu }
 //                  (js/scene/assets.js, js/scene/space.js)
 //   hooks        — { build(fn) — zmiana, po której trzeba zbudować modele; group(fn) — lista poleceń jako jeden krok
-//                  historii (cofnij / ponów); play(), stop(), playing() } (nieobowiązkowe)
+//                  historii (cofnij / ponów); play(), stop(), playing(); check(opts) — lekarz sceny, js/scene/doctor.js }
+//                  (nieobowiązkowe)
 import { normalize, clone } from './scene-data.js';
 
 const COMMANDS = {
@@ -32,6 +33,7 @@ const COMMANDS = {
   act: { args: 'id | name, action (from "actions"), [on] (a toggle: true / false; without — switches)', does: 'during play: the object does an action (a spaceship: fire, scan, print, offline, destroy) — an "action" event' },
   actions: { args: 'id | name', does: 'during play: the object\'s actions' },
   events: { args: '[n]', does: 'the last n events (default 20)' },
+  check: { args: '[budget { tris, draws }]', does: 'the scene doctor: problems in the scene (wrong environment, under the ground or in the air, overlapping, missing assets, unfitting behaviours, cost over the budget), each with a proposed fix (commands) — nothing is changed' },
   play: { args: '', does: 'runs the behaviours (like ▶ Play)' },
   stop: { args: '', does: 'back to editing' },
 };
@@ -135,6 +137,7 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
       if (!hooks.actionsOf || !(hooks.playing && hooks.playing())) fail('not playing: {"cmd":"play"} first');
       const o = target(c); return { object: o.id, actions: hooks.actionsOf(o) };
     },
+    check: (c) => { if (!hooks.check) fail('the scene doctor is not available here'); return hooks.check({ budget: c.budget }); },
     events: (c) => ({ events: hooks.events ? hooks.events(c.n > 0 ? Math.min(200, +c.n) : 20) : [] }),
   };
 

@@ -31,6 +31,7 @@
   <button type="button" id="newScene" data-i18n="bar.new" data-i18n-tip="bar.new.tip">New</button>
   <button type="button" id="saveFile" data-i18n="bar.save" data-i18n-tip="bar.save.tip">Save file</button>
   <button type="button" id="loadFile" data-i18n="bar.open" data-i18n-tip="bar.open.tip">Open file</button>
+  <button type="button" id="docOpen" data-i18n="bar.doctor" data-i18n-tip="bar.doctor.tip">Check</button>
   <input type="file" id="fileIn" accept=".json,application/json" hidden>
   <span class="dimtxt" id="status"></span>
   <span class="sp"></span>
@@ -89,6 +90,12 @@
     </div>
     <div class="btns"><a class="labLink" id="openLab" href="#" data-i18n="obj.openLab">Open in its lab</a></div>
   </div>
+</aside>
+<aside class="panel" id="docWin" data-window="doctor" data-side="right" data-i18n-win="win.doctor">
+  <div class="btns"><button type="button" id="docCheck" data-i18n="doc.check">Check the scene</button></div>
+  <p class="note" id="docSum"></p>
+  <div id="docList"></div>
+  <p class="note" data-i18n="doc.note">Click a problem to select its object; Fix runs the proposed API command (Undo takes it back). Nothing is changed by itself.</p>
 </aside>
 <aside class="panel" data-std="camera">
   <div class="btns"><button type="button" id="frame" data-i18n="cam.frame">Frame the selection</button><button type="button" id="frameAll" data-i18n="cam.all">Show the whole scene</button></div>

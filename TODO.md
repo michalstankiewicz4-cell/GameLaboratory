@@ -3,11 +3,7 @@
 Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHANGELOG.md`.
 
 ## Następne w planie (`docs/guides/lab-breakdown.md`, „Kolejność”)
-- [ ] **Punkt 7 — lekarz sceny** (następny): sprawdza układ sceny, czego nie widać w pojedynczym modelu — obiekt w złym
-  środowisku (drzewo na morzu, okręt na lądzie, łazik w kosmosie), pod gruntem albo w powietrzu, obiekty wchodzące
-  jeden w drugi, brakujące zasoby z nazwą, zachowanie niepasujące do modelu albo środowiska, koszt sceny (trójkąty,
-  wywołania rysowania) względem budżetu. Jak doktor modeli: uniwersalny, zgłasza i proponuje poprawki, niczego nie
-  przestawia po cichu; w API polecenie `check` (lista problemów dla AI).
+- [x] Punkt 7 — lekarz sceny: zrobiony w 0.60.0 (`js/scene/doctor.js`, `docs/scene/doctor.md`); następne reguły — w opisie.
 - [ ] Punkt 8 — materiał z Hive Hunger (z historią): laboratorium bloków, statki roju, laboratorium efektów, drzewka
   technologiczne.
 - [ ] Punkt 9 — materiał z PatientZero (z historią): środowisko „organizm”, laboratorium tkanek, laboratorium patogenów.
@@ -28,6 +24,12 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
   własna skórka gry oddzielona od wyglądu laboratoriów (tokeny jak `ui/style/tokens.css`, ale osobne), elementy
   reagują na zdarzenia (`js/core/events.js`) i stan gry; w API polecenia dla AI. Materiał: HUD i okna ze Space,
   menu z Battle i Hive Hunger. Propozycja kolejności: po lekarzu sceny i Hive Hunger (wtedy są gry z HUD do porównania).
+- [ ] **Laboratorium scenariusza** (właściciel, 2026-11-13): treści i dialogi podpinane pod postacie i narratora —
+  sceny scenariusza, kwestie, wybory, warunki (stan gry, zdarzenia), teksty po angielsku i po polsku; dane jako zasób
+  z nazwą, w scenie przypięte do obiektów (postać, narrator), w API dla AI.
+- [ ] **Opisy statków i rzeczy w grze** (właściciel, 2026-11-13): opisy modeli i przedmiotów (nazwa, historia, dane)
+  pisane przy laboratorium i podpinane pod prefabrykaty — do wiki, podpowiedzi i ekranów gry; może część
+  laboratorium scenariusza.
 - [ ] **Laboratorium animacji** (do rozważenia): chód ludzi i stworów jako zachowanie, animacje modeli.
 - [ ] **Grawitacja statków w kosmosie** (propozycja do decyzji): statki w scenie przyciągane przez ciała niebieskie,
   jak orbity.

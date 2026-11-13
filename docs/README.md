@@ -9,7 +9,7 @@ Układ folderów jest taki sam jak w kodzie:
 |---|---|---|
 | `labs/` | jeden dokument na laboratorium | `labs/*.html`, `js/labs/<lab>/` |
 | `models/` | modele używane przez kilka laboratoriów | `js/models/` |
-| `scene/` | silnik sceny: scena jako dane, prefabrykaty, zachowania w scenie, API dla AI, zasoby z nazwą | `js/scene/` |
+| `scene/` | silnik sceny: scena jako dane, prefabrykaty, zachowania w scenie, API dla AI, zasoby z nazwą, lekarz sceny | `js/scene/` |
 | `behaviors/` | zachowania (napęd i ruch modeli w środowiskach) | `js/behaviors/` |
 | `tools/` | narzędzia | `tools/` |
 | `guides/` | jak korzystać z laboratoriów, renderowanie, znane pułapki | — |
@@ -23,6 +23,7 @@ Układ folderów jest taki sam jak w kodzie:
 | Rozbiór laboratoriów: co z każdego idzie do modeli, zachowań, środowisk i zasobów | [guides/lab-breakdown.md](guides/lab-breakdown.md) |
 | Edytor sceny („Warsztat”, `editor/index.html`): obsługa, budowa, format sceny, API dla AI | [../editor/README.md](../editor/README.md), zmiany: [../editor/CHANGELOG.md](../editor/CHANGELOG.md) |
 | Silnik sceny (`js/scene/`) | [scene/README.md](scene/README.md) |
+| Lekarz sceny (`js/scene/doctor.js`) | [scene/doctor.md](scene/doctor.md) |
 | Zachowania (`js/behaviors/`): okręt na wodzie, lot, koło na szynie | [behaviors/README.md](behaviors/README.md) |
 
 ## Laboratoria

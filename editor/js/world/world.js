@@ -1,6 +1,7 @@
 // Świat 3D edytora: renderer, scena bazowa (niebo, morze, grunt — js/labs/shared/stage.js), potok obrazu z laboratoriów
 // wodnych (js/render/sea/look.js) i modele sceny zbudowane z prefabrykatów. Odbija dane ze store: buduje brakujące
 // i zmienione modele, usuwa nieobecne, ustawia położenie, środowisko i wygląd kamery.
+import { worldBox } from '../../../js/scene/doctor.js';
 import * as THREE from '../../../vendor/three/three.module.js';
 import { LookPipeline, LOOK_DEFAULTS } from '../../../js/render/sea/look.js';
 import { createStage, LIGHTS } from '../../../js/labs/shared/stage.js';
@@ -35,9 +36,22 @@ export function createWorld(container, store, onWarn) {
     if (!p) { onWarn && onWarn(o.prefab); return; }
     if (p.needs === 'space' && !spaceReady()) { later(); return; }
     const b = p.build(), g = new THREE.Group(); g.userData.sceneId = o.id; g.add(b.root);
+    const lb = new THREE.Box3().setFromObject(g);   // obrys w układzie obiektu (g jeszcze bez położenia) — lekarz sceny
     g.traverse((m) => { if (m.isMesh && !(m.material && m.material.isMeshBasicMaterial)) { m.castShadow = true; m.receiveShadow = true; } });
-    built.set(o.id, { prefab: o.prefab, root: g, kit: b.kit || null, tick: b.tick || null, driven: false, dispose: b.dispose, size: new THREE.Box3().setFromObject(b.root).getSize(new THREE.Vector3()).length() });
+    built.set(o.id, { prefab: o.prefab, root: g, kit: b.kit || null, tick: b.tick || null, driven: false, dispose: b.dispose, size: new THREE.Box3().setFromObject(b.root).getSize(new THREE.Vector3()).length(),
+      local: lb.isEmpty() ? null : { min: lb.min.toArray(), max: lb.max.toArray() }, cost: costOf(g) });
     root.add(g);
+  }
+  // koszt modelu: trójkąty (instancje razem) i wywołania rysowania (siatka × grupy materiałów)
+  function costOf(g) {
+    let tris = 0, draws = 0;
+    g.traverse((m) => {
+      if (!(m.isMesh || m.isLine || m.isPoints) || !m.geometry) return;
+      const geo = m.geometry, n = geo.index ? geo.index.count : (geo.attributes.position ? geo.attributes.position.count : 0), inst = m.isInstancedMesh ? m.count : 1;
+      if (m.isMesh) tris += (n / 3) * inst;
+      draws += Array.isArray(m.material) ? Math.max(1, geo.groups.length) : 1;
+    });
+    return { tris: Math.round(tris), draws };
   }
   function drop(id) {
     const r = built.get(id); if (!r) return;
@@ -159,6 +173,9 @@ export function createWorld(container, store, onWarn) {
   const world = {
     renderer, scene, camera, root, built, stage, pending, syncObjects, syncPlaces, syncEnv, bounds,
     objectRoot: (id) => (built.get(id) || {}).root || null,
+    // lekarz sceny (js/scene/doctor.js): obrys w świecie z danych obiektu i koszt zbudowanego modelu; null — niezbudowany
+    boxOf: (o) => { const r = built.get(o.id); return r && r.prefab === o.prefab && r.local ? worldBox(r.local, o) : null; },
+    costOf: (o) => { const r = built.get(o.id); return r && r.prefab === o.prefab ? r.cost : null; },
     size: (id) => (built.get(id) || {}).size || 10,
     start(beforeFrame) { before = beforeFrame; requestAnimationFrame((t) => { last = t; frame(t); }); },
     afterAsync: null,   // po dobudowaniu modeli, które czekały na kity (edytor: uchwyt, okna)

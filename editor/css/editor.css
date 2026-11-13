@@ -36,3 +36,17 @@
 .pickItem:hover{border-color:var(--line)}
 .pickItem .pName{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--head)}
 .pickAdd{flex:none;width:22px;height:22px;padding:0;line-height:1;font-size:15px}
+/* lekarz sceny (editor/js/ui/doctor-panel.js) */
+#docList{display:flex;flex-direction:column;gap:5px;max-height:46vh;overflow:auto}
+.docRow{border:1px solid var(--line);border-left:3px solid var(--dim);border-radius:var(--r);padding:5px 7px;cursor:default}
+.docRow[title]{cursor:pointer}
+.docRow.error{border-left-color:var(--err)}
+.docRow.warn{border-left-color:var(--accent)}
+.docRow.info{border-left-color:var(--dim)}
+.docHead{display:flex;gap:6px;align-items:baseline;font-size:11px}
+.docLvl{color:var(--head)}
+.docRow.error .docLvl{color:var(--err)}
+.docCode{font-family:var(--mono);color:var(--dim)}
+.docObj{margin-left:auto;color:var(--text)}
+.docText{font-size:12px;margin:2px 0 4px}
+.docRow .btn{padding:1px 8px}

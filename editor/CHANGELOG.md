@@ -3,6 +3,15 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.24.0 — 2026-11-13 (lekarz sceny)
+
+### Dodane
+- Przycisk **Sprawdź** i okno **Lekarz sceny**: problemy w scenie (model w złym środowisku, pod gruntem albo
+  w powietrzu, obiekty wchodzące w siebie, brakujące zasoby z nazwą, zachowania niepasujące do modelu lub środowiska,
+  orbity, koszt ponad budżet), kliknięcie zaznacza obiekt, **Popraw** wykonuje proponowaną poprawkę (Cofnij ją
+  odwraca). Sprawdza samo po każdej zmianie, niczego nie zmienia samo.
+- API: polecenie `check`.
+
 ## 0.23.0 — 2026-11-07 (słońce i czarna dziura w kosmosie)
 
 ### Dodane

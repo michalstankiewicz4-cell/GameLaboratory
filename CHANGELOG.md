@@ -3,6 +3,17 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.60.0 · edytor sceny 0.24.0 — 2026-11-13 (lekarz sceny)
+
+### Dodane
+- **Lekarz sceny** (`js/scene/doctor.js`, opis `docs/scene/doctor.md`; plan, punkt 7): sprawdza układ sceny — model
+  w złym środowisku (okręt na lądzie, drzewo na morzu, łazik w kosmosie, samolot bez powietrza), pod gruntem albo
+  w powietrzu, obiekty wchodzące jeden w drugi, brakujące zasoby z nazwą, zachowanie niepasujące do modelu albo
+  środowiska, orbity, koszt sceny (trójkąty, wywołania rysowania) względem budżetu. Uniwersalny, zgłasza i proponuje
+  poprawki (polecenia API), niczego nie przestawia sam. API: `{"cmd":"check"}`; edytor: przycisk **Sprawdź** i okno
+  **Lekarz sceny** z poprawkami jednym kliknięciem (Cofnij je odwraca).
+- Pomysły w `TODO.md`: laboratorium scenariusza (treści i dialogi postaci i narratora), opisy statków i rzeczy w grze.
+
 ## Program 0.59.0 · sztuka 1.2.0 — 2026-11-09 (wszystkie obiekty ekspertyzy)
 
 ### Dodane

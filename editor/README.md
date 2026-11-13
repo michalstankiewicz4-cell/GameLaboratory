@@ -13,7 +13,8 @@ dostosowywać (zasoby z nazwą, wspólne zachowania).
 
 ## Obsługa
 
-- Okna: **Opis**, **Scena** (dodaj model, hierarchia), **Właściwości** (środowisko albo wybrany obiekt), **Kamera**,
+- Okna: **Opis**, **Scena** (dodaj model, hierarchia), **Właściwości** (środowisko albo wybrany obiekt), **Lekarz sceny**
+  (przycisk **Sprawdź** na pasku: problemy w scenie i poprawki, `docs/scene/doctor.md`), **Kamera**,
   **Wydajność**; OPCJE → Okna. **Okna | Panele** na pasku: w Panelach okna są panelami przy krawędziach, konsola na dole
   pośrodku, a widok 3D zajmuje wolny środek (`body.viewFits`).
 - Pasek narzędzi: cofnij · domek · ponów (przeglądarka), **▶ Graj / ■ Stop**, **Cofnij / Ponów** (zmiany sceny), uchwyt **Przesuń / Obróć / Skaluj**, **Nowa**, **Zapisz plik**, **Otwórz plik**.
@@ -47,6 +48,7 @@ editor/
   js/ui/panels.js       okna Scena i Właściwości
   js/ui/toolbar.js      pasek narzędzi i klawisze
   js/ui/api-console.js  zakładka API w konsoli
+  js/ui/doctor-panel.js okno Lekarz sceny (js/scene/doctor.js przez polecenie API check)
   js/play/play.js       gra: zachowania w ruchu, gracz, kamera za graczem, linia stanu
   js/play/input.js      klawiatura gracza → sterowanie (dźwignia maszyn / gazu, stery, podwozie, klapy)
   js/i18n/              en.js, pl.js, i18n.js (klasyczne skrypty przed ui/shell/windows.js)
@@ -62,6 +64,7 @@ Silnik (wspólny, poza folderem edytora — będą z niego korzystać też labor
 | `js/scene/space.js` | kosmos: ładowanie kitów ze Space przy pierwszej potrzebie, gotowe tła nieba |
 | `js/scene/assets.js` | zasoby z nazwą: ustawienia zapisane w laboratoriach pod nazwą (na razie morze z laboratorium wody) |
 | `js/scene/api.js` | API sceny: polecenia JSON na danych sceny (bez Three.js) |
+| `js/scene/doctor.js` | lekarz sceny: problemy w układzie sceny i proponowane poprawki (bez Three.js) |
 | `js/scene/behaviors.js` | zachowania w scenie: okręt na wodzie (`js/behaviors/water/ship.js`), lot (`js/behaviors/air/flight.js`); które pasują do modelu, domyślne |
 | `js/labs/shared/stage.js` | scena bazowa: niebo SkyKit, morze WaterKit albo płaski grunt, słońce z cieniem (wspólna z laboratorium filtrów) |
 | `vendor/three/addons/controls/TransformControls.js` | uchwyt z Three.js r186 (import przepisany na `../../three.module.js`) |
@@ -118,6 +121,7 @@ albo lista (po kolei); wynik `{ "ok": true, … }` albo `{ "ok": false, "error":
 | `act` | `id` albo `name`, `action`, `[on]` (przełącznik) | w czasie gry: akcja obiektu (statek kosmiczny: `fire`, `scan`, `print`, `offline`, `destroy`, własne) — zdarzenie „action” |
 | `actions` | `id` albo `name` | w czasie gry: akcje obiektu |
 | `events` | `[n]` | ostatnie zdarzenia szyny (domyślnie 20) |
+| `check` | `[budget { tris, draws }]` | lekarz sceny: problemy (złe środowisko, pod gruntem / w powietrzu, zachodzenie, brakujące zasoby, zachowania, koszt) z proponowanymi poprawkami — niczego nie zmienia ([`../docs/scene/doctor.md`](../docs/scene/doctor.md)) |
 
 ```json
 [{ "cmd": "add", "prefab": "sea/orzel", "name": "Orzeł 2", "pos": [60, 0, -20], "rot": [0, 45, 0] },
