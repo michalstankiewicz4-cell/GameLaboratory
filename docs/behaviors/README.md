@@ -15,6 +15,8 @@ Zasada (CLAUDE.md): fizyka jest prawdziwa — start, ruch, skręt i zatrzymanie 
 | lądowanie | `land/lander.js` | ląd | laboratorium pojazdów — ląd (statki kosmiczne), edytor sceny (statki kosmiczne nad lądem) |
 | lot w atmosferze | `air/flight.js` | ląd (powietrze nad lądem) | edytor sceny (Spitfire) |
 | koło na szynie — skład | `rail/physics.js`, `rail/rail.js` | ląd | laboratorium pojazdów — ląd (pociąg) |
+| ciecze w kosmosie | `space/liquids.js` (siatka `space/grid3d.js`, shader `js/render/liquid.js`) | kosmos | laboratorium bloków (krople wody i lawy) |
+| gaz w kosmosie | `space/gases.js` | kosmos | laboratorium bloków (chmura gazu) |
 | koło na szynie — tramwaj | `rail/tram.js`, `rail/path.js` | ląd | laboratorium pojazdów — ląd (Swing na pętli toru; liczby w TramKit: `js/models/train/trams/swing.js`, `phys`) |
 
 ## Okręt na wodzie (`water/ship.js`)
@@ -126,3 +128,11 @@ sprężyny, zderzaki, sprzęgi; sieć torowa z rozjazdami: `js/models/structures
 `rail.js` — `attachRail(train, sim)` podpina symulację do składu TrainKit; `tram.js` — `createTramSim(track, info, s0)`
 dla tramwaju TramKit (człony na wózkach i podwieszone) na torze z dowolnej ścieżki (`path.js`, `pathTrack`).
 Szczegóły: [`../models/train/fizyka.md`](../models/train/fizyka.md). W edytorze sceny jeszcze nie: potrzebuje toru w scenie.
+
+## Ciecze i gaz w kosmosie (`space/liquids.js`, `space/gases.js`)
+
+Z Hive Hunger (0.64.0), bez grawitacji, stałym krokiem `STEP` = 1/60 s (liczby w danych są na krok). Ciecz: krople
+jednego rodzaju (woda, lawa) przyciągają się w zasięgu `reach` (spójność), odpychają bliżej niż `rest` i są tłumione
+(`damping`) — zbijają się w pływające kule; sąsiedzi szukani w siatce `grid3d.js`, wygląd — shader `js/render/liquid.js`.
+Gaz: kłęby dryfują, rosną i rozpływają się. Liczby rodzajów: BlockKit (`LIQUIDS`, `GAS`); opis:
+[`../labs/blocks.md`](../labs/blocks.md).

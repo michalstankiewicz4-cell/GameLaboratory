@@ -94,7 +94,8 @@ Zasada: **dane są jedynym źródłem prawdy**. Okna, uchwyt i pliki zmieniają 
 - `env.surface`: `sea` | `land`; `env.light`: `afternoon` | `noon` | `dusk` | `overcast`; `env.look`: nazwa profilu
   z laboratorium filtrów (zasób `look`, `gameLab.assets.v1`) albo `""`.
 - `pos` w metrach (Y w górę), `rot` w stopniach (kolejność YXZ: kurs, pochylenie, przechył), `scale` — mnożnik.
-- `prefab`: id z `js/scene/prefabs.js` (`sea/…`, `road/…`, `tram/…`, `train/…`, `air/…`, `structures/…`, `weapons/…`).
+- `prefab`: id z `js/scene/prefabs.js` (`sea/…`, `road/…`, `tram/…`, `train/…`, `air/…`, `structures/…`, `weapons/…`,
+  `space/…`, `marine/…`, `rovers/…`, `plants/…`, `caves/…`, `base/…`, `bodies/…`, `humans/…`, `creatures/…`, `blocks/…`).
 - `behavior` (nieobowiązkowe): id z `js/scene/behaviors.js` (`ship`, `flight`); bez pola — domyślne dla modelu, `""` — stoi w miejscu.
 - Zmiana formatu podnosi `version` w `scene-data.js`, a `normalize` przenosi starsze sceny.
 

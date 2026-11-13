@@ -33,19 +33,20 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 
 ## Pełne połączenie laboratoriów — przekształcenie w silnik (właściciel, 2026-11-13)
 Cel: każde laboratorium jest edytorem jednej części silnika, a jego wynik trafia do sceny (i do gier) jako prefabrykat
-albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.63.0):
+albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.65.0):
 
 - **Już połączone ze sceną:**
   - przez prefabrykaty (modele) — pojazdy: kosmos, woda, ląd; ciała niebieskie, moduły bazy, budowle, rośliny,
-    jaskinie, życie (stwory), ludzie i broń;
+    jaskinie, życie (stwory), ludzie i broń, bryły z bloków (domyślne);
   - przez zasoby z nazwą — morze (woda), ląd (ląd), pogoda i światło (wygląd), wygląd kamery (filtry), niebo kosmosu
-    (ciała niebieskie), UI gry (UI gry).
+    (ciała niebieskie), UI gry (UI gry), materiał (materiały).
 - [ ] **Materiały → modele i scena:** modele biorą materiały z MatKit (rodzina po rodzinie, doktor modeli, porównanie
   obrazów); w scenie i w API pole materiału obiektu (podmiana np. kadłuba na zardzewiałą stal).
 - [ ] **Materiały ↔ sztuka:** powierzchnie 2D laboratorium sztuki z generatora MatKit (ten sam papier, drewno, metal
   w 2D i 3D).
 - [ ] **Sztuka → scena:** obraz z laboratorium sztuki jako zasób i obiekt sceny (płaszczyzna z fakturą farby, rama 3D
   ze złoceniem — tryb 3D sztuki).
+- [ ] **Bloki:** bryła z laboratorium bloków jako zasób z nazwą (dziś w scenie tylko domyślne bryły).
 - [ ] **Jaskinie i rośliny:** ustawienia z laboratoriów jako zasoby z nazwą (dziś w scenie tylko ustawienia domyślne).
 - [ ] **Układy (systems):** układ planetarny z laboratorium jako zasób, wstawiany do sceny kosmosu z orbitami.
 - [ ] **Skórki (skins):** malowanie statków jako zasób, wybierany dla obiektu w scenie.

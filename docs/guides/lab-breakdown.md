@@ -24,12 +24,12 @@ Kod się przy tym spisie nie zmienia. Plan silnika: [`engine-architecture.md`](e
 
 | Szuflada | Już jest | Brakuje |
 |---|---|---|
-| modele | kity okrętów, pojazdów drogowych, tramwaju, pociągu, samolotu, budowli, broni, statków kosmicznych, ciał niebieskich, życia, ludzi, roślin, jaskiń, przedmiotów, baz | — (modele są) |
-| zachowania | okręt na wodzie, lot, koło na szynie (skład, tramwaj), ciąg w próżni | jazda po lądzie (siłami), pływanie małych jednostek MarineKit, chód (LifeKit), zanurzenie |
+| modele | kity okrętów, pojazdów drogowych, tramwaju, pociągu, samolotu, budowli, broni, statków kosmicznych, ciał niebieskich, życia, ludzi, roślin, jaskiń, przedmiotów, baz, bloków (BlockKit, 0.64.0); materiały MatKit (0.63.0) | materiały modeli z MatKit (rodzina po rodzinie) |
+| zachowania | okręt na wodzie, mała jednostka na wodzie (MarineKit, amfibia), jazda po lądzie (siłami), lądowanie, lot, koło na szynie (skład, tramwaj), ciąg w próżni, orbita, ciecze i gaz w kosmosie (0.64.0) | chód (LifeKit), zanurzenie |
 | środowiska | woda (WaterKit), ląd (LandKit, RegionKit), niebo dzienne (SkyKit, RainKit), powierzchnia planety (SurfaceKit), układy (SystemKit) | jedno niebo kosmosu w środowiskach; trzy osobne nieba do połączenia (niżej) |
 | obraz | potok kamery (LookPipeline), filtry, PostPipeline, widzenie | jeden potok — zrobione (0.56.0) |
-| zasoby z nazwą | morze (laboratorium wody), niebo kosmosu (ciała niebieskie) | wygląd kamery (osobny klucz), ląd, pogoda i światło, roślinność, wariant modelu |
-| prefabrykaty | okręty, drogowe, tramwaj, pociąg, Spitfire, budowle, broń, statki kosmiczne | MarineKit, łaziki VehicleKit, moduły baz, ciała niebieskie, rośliny, jaskinie, przedmioty, ludzie i zwierzęta |
+| zasoby z nazwą | morze (woda), ląd (ląd), pogoda i światło (wygląd), wygląd kamery (filtry), niebo kosmosu (ciała niebieskie), materiał (materiały), UI gry i skórka UI (UI gry) | bryła z bloków, jaskinia, roślinność, układ, wariant modelu |
+| prefabrykaty | okręty, drogowe, tramwaj, pociąg, Spitfire, budowle, broń, statki kosmiczne, MarineKit, łaziki, moduły baz, ciała niebieskie, rośliny, jaskinie, ludzie, stwory, bryły z bloków | przedmioty bohatera, wynik edytora stworów i transformatora |
 
 ## Laboratoria — co i dokąd
 
@@ -70,6 +70,15 @@ dla edytora; **priorytet** — 1 teraz (edytor tego potrzebuje), 2 potem, 3 kied
 | **Życie / Edytor stworów / Człowiek** (`life`, `creator`, `human`) | LifeKit, studio (`js/labs/shared/studio.js`) | chód i ruch w LifeKit (model); laboratoria ze Space na globalnym THREE | chód → zachowanie „chód” (ląd); stwory i ludzie → prefabrykaty | **stwór** (projekt z edytora stworów); **człowiek** (wygląd) | 2 |
 | **Przedmioty bohatera** (`labs/gear.html`, 127 l.) | GearKit, CaveKit, widzenie (`js/render/vision.js`) | — | przedmioty → prefabrykaty (w ręku postaci); widzenie → kamera gracza | — | 3 |
 | **Dźwięk** (`labs/sound.html`, 198 l.) | MusicKit | — | → `js/audio/` jako warstwa silnika (Audio) | **muzyka / dźwięk** | 3 |
+
+### Materiały, grafika, UI (dodane po spisie)
+
+| Laboratorium | W szufladach | Pomieszane | Dokąd | Zasób | Priorytet |
+|---|---|---|---|---|---|
+| **Materiały** (`labs/materials.html`, 219 l., 0.63.0) | MatKit (`js/render/materials/`) | — | materiały modeli i sceny z MatKit; powierzchnie 2D sztuki | **materiał** (jest) | 1 |
+| **Sztuka** (`labs/art.html`, 252 l., 0.57.0) | ArtKit, silnik ekspertyzy (`js/render/art/exam/`) | powierzchnie 2D (papier, drewno, metal) liczone osobno od MatKit | powierzchnie → MatKit; obraz → zasób i obiekt sceny (tryb 3D) | **obraz** (w planie) | 2 |
+| **UI gry** (`labs/gameui.html`, 326 l., 0.61.0) | `js/gameui/` (ekrany, HUD, okna, dialog, skórki) | — | w scenie `env.ui`, nakładka w ▶ Graj (0.62.0) | **UI gry**, **skórka UI** (są) | — |
+| **Bloki** (`labs/blocks.html`, 220 l., 0.64.0) | BlockKit (`js/models/blocks/`), ciecze i gaz (`js/behaviors/space/`), MatKit | — | bryły → prefabrykaty (są, domyślne); bryła z laboratorium → zasób z nazwą | **bryła z bloków** (w planie) | 2 |
 
 ### Zostają, jakie są (narzędzia)
 
@@ -129,7 +138,7 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
    i proponuje poprawki, niczego nie przestawia po cichu; w API polecenie `check` (lista problemów dla AI).
 8. **Materiał z Hive Hunger** (repozytorium `michalstankiewicz4-cell/Hive-Hunger`; przeniesienie **z historią**, jak
    Space, Battle i aTrain), po lekarzu sceny, w tej kolejności:
-   1. **laboratorium bloków (wokseli)** — z edytora wokseli (`tools/voxel-editor.html`) i `js/three` (`liquidShader.js`,
+   1. *(zrobione w 0.64.0: `labs/blocks.html`, opis `docs/labs/blocks.md`)* **laboratorium bloków (wokseli)** — z edytora wokseli (`tools/voxel-editor.html`) i `js/three` (`liquidShader.js`,
       `Liquids.js`, `Gases.js`): bloki stałe w różnych kolorach i rodzajach (skała, żelazo…) jako model (kit bloków
       w `js/models/`), ciecze (woda, lawa) i gazy jako zachowania w kosmosie (spójność kropel, kłęby, odbicia od
       bloków); w edytorze sceny — bryły z bloków (budowa poziomów);

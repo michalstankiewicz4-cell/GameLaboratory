@@ -57,6 +57,8 @@ Wpis: `{ id, label, family, surface, lab, build() → { root, kit, dispose } }`.
   — oświetlenie od słońca sceny, obrót, błyski pulsara (edytor podaje kierunek słońca i kamerę).
 - Ludzie i stwory: `humans/humanBust`, `humans/humanHead`, `creatures/strider` (LifeKit) — parametry domyślne,
   `tick` — chód „idle”; chodzenie jako zachowanie — później.
+- Bryły z bloków: `blocks/<kształt>` (BlockKit, `sphere`, `cube`, `pair`, `belt`, `balls`) — domyślne warstwy
+  laboratorium bloków, powierzchnia kosmosu; [`../labs/blocks.md`](../labs/blocks.md).
 - Moduły bazy: `base/<moduł>` (BaseKit, `MODULES`: `pad`, `hab`, `solar`, `drill`, `refinery`, `depot`) — gotowe
   (`setProgress(1)`), `tick` — światła i ruchome części.
 

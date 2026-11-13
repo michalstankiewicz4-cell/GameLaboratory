@@ -15,7 +15,7 @@ gold headings and controls). Font: Space Grotesk; numbers: IBM Plex Mono. Colour
 
 | File | What it is |
 |---|---|
-| `tokens.css` | colours, fonts, radii, the heights of the menu bar and the two bars (`--menuH`, `--barH`, `--footH`) — every other file uses these; in a cascade layer, so a page with its own theme keeps its values, while the menu bar, its dialog and the two bars always get these |
+| `tokens.css` | colours (also the category colours `--cat-<id>`), fonts, radii, the heights of the menu bar and the two bars (`--menuH`, `--barH`, `--footH`) — every other file uses these; in a cascade layer, so a page with its own theme keeps its values, while the menu bar, its dialog and the two bars always get these |
 | `fonts.css` | the self-hosted fonts (`fonts/`, latin + latin-ext) |
 | `base.css` | thin scroll bars without arrow buttons, everywhere |
 | `controls.css` | what is inside a window (`.labWin`) or any `.labUi`: buttons (`.tBtn`, `.btn`, `.btns button`), sliders (gold up to `--fill`), check boxes, radio buttons, drop-downs, fields, headings |
@@ -42,7 +42,7 @@ gold headings and controls). Font: Space Grotesk; numbers: IBM Plex Mono. Colour
 | File | What it is |
 |---|---|
 | `versions.js` | the program's and every lab's version (`app`, `labs`); fills every `data-lab-version` |
-| `catalog.js` | every lab and tool: names (EN/PL), docs, descriptions, phrases, saved settings, tile pictures; read by the menu bar, the start page and `tools/sitemap.py` |
+| `catalog.js` | every lab and tool: names (EN/PL), docs, descriptions, phrases, saved settings, tile pictures, group (`group`: labs that belong together — one glow, one switch) and category (`cat`, names in `cats`: a coloured dot and heading in the Tools menu, a coloured edge, chip, tooltip and highlight on the tile); the labs stand in category order; read by the menu bar, the start page and `tools/sitemap.py` |
 
 ## A page
 
