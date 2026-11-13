@@ -3,11 +3,14 @@
 // zmieniają — zachowania ustawiają tylko modele w świecie 3D; po „Stop” modele wracają na miejsca z danych.
 import { BEHAVIORS, behaviorOf, bodyRank } from '../../../js/scene/behaviors.js';
 import { createInput } from './input.js';
+import { createPlayUI } from './gameui-play.js';
 
 const { t, lang } = window.EditorI18n;
 
 export function createPlay(store, world, controls, actions, events) {
   const input = createInput();
+  const playUI = createPlayUI(store, world, events);   // UI gry ze sceny (env.ui) jako nakładka w czasie gry
+  playUI.onQuit = () => stop();
   // akcje modelu (statki kosmiczne: ogień, skan, druk, wyłączenie, zniszczenie) — zdarzenie „action” na szynie; słucha
   // go zachowanie obiektu (run.act), dziennik i później dźwięk, interfejs, sieć
   if (events) events.on('action', (e) => { const r = runs.find((x) => x.obj.id === e.object); if (r && r.run.act) r.run.act(e.action, e.on); });
@@ -51,13 +54,14 @@ export function createPlay(store, world, controls, actions, events) {
     controls.setPlaying(true); document.body.classList.add('playing');
     const acts = me.run.actions ? me.run.actions().map((a, i) => `${i + 1}: ${a.label.toLowerCase()}`).join(' · ') : '';
     actions.status(t('play.on', { name: me.obj.name, keys: (lang === 'pl' ? BEHAVIORS[me.id].keysPl : BEHAVIORS[me.id].keys) + (acts ? ' · ' + acts : '') }));
+    playUI.start(me.obj.name);
     if (window.LabLog) window.LabLog.add('info', 'Play: ' + runs.length + ' object(s), controlling ' + me.obj.name);
     changed();
   }
   function stop() {
     if (!runs.length) return;
     runs.forEach((r) => { if (r.run.reset) r.run.reset(); r.b.driven = false; });
-    runs = []; me = null; input.release();
+    runs = []; me = null; input.release(); playUI.stop();
     controls.setPlaying(false); document.body.classList.remove('playing');
     world.syncPlaces(); controls.attach();
     actions.status(t('play.off'));
@@ -71,6 +75,7 @@ export function createPlay(store, world, controls, actions, events) {
     const p = me.b.root.position, d = p.clone().sub(last); last.copy(p);
     controls.orbit.target.add(d); world.camera.position.add(d);
     if ((hudT -= dt) <= 0) { hudT = 0.2; actions.status(hudText(me.run.hud())); }
+    playUI.frame(dt, me, runs);
   }
   function hudText(h) {
     const parts = h.progress != null ? [me.obj.name, `${t('play.build')} ${Math.round(h.progress * 100)}%`]
@@ -89,6 +94,7 @@ export function createPlay(store, world, controls, actions, events) {
     toggle: () => (runs.length ? stop() : start()),
     get playing() { return runs.length > 0; },
     get controlled() { return me ? me.obj.id : null; },
+    get ui() { return playUI.ui; }, takesEscape: () => playUI.takesEscape(),
     onChange: (f) => subs.add(f),
   };
 }

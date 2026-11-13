@@ -3,6 +3,18 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.62.0 · edytor sceny 0.26.0 · UI gry 1.1.0 — 2026-11-13 (UI gry w scenie)
+
+### Dodane
+- **UI gry w scenie:** pole `env.ui` (UI zapisane w laboratorium UI gry) — lista „UI gry” we Właściwościach
+  środowiska; w ▶ Graj nakładka nad widokiem (`editor/js/play/gameui-play.js`) ze stanem gracza z zachowania
+  (prędkość z jednostką, ciąg, wysokość, lądowanie, rozbicie…), sceną, czasem i radarem; akcje statków w dzienniku,
+  akcje UI i wybory w dialogu jako zdarzenie `ui` na szynie, „quit” kończy grę; Esc — pauza UI (bez ekranu pauzy
+  kończy grę jak dotąd).
+- API: `env` z `ui`, polecenie `ui` (dialog, wpis, baner, ekran, okno — w czasie gry); lekarz sceny zgłasza
+  brakujące UI.
+- UI gry: element `value` z jednostką ze stanu (`unitBind`); przykład **Scene play** do ▶ Graj edytora.
+
 ## Program 0.61.0 · UI gry 1.0.0 · edytor sceny 0.25.0 — 2026-11-13 (laboratorium UI gry)
 
 ### Dodane

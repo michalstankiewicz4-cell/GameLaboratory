@@ -25,7 +25,7 @@ const COMMANDS = {
   set: { args: 'id | name, then any of: newName (with id also name), prefab, pos, rot, scale, behavior, orbit { around: id | name ("" — the nearest heavier body), period: s } (the orbit behaviour)', does: 'changes an object' },
   move: { args: 'id | name, by [dx,dy,dz] m', does: 'moves an object by an offset' },
   remove: { args: 'id | name', does: 'removes an object' },
-  env: { args: 'any of: surface (sea | land | space), light (a ready light or a weather asset name), look, land (a land asset name, "" — the plain ground), sea (a sea asset name, "" — the default sea), sky (any surface: "" — the default for the surface, "day" — the day sky, "preset:<id>" — a ready space sky, or a sky asset name)', does: 'changes the environment' },
+  env: { args: 'any of: surface (sea | land | space), light (a ready light or a weather asset name), look, ui (a game UI asset name, "" — none), land (a land asset name, "" — the plain ground), sea (a sea asset name, "" — the default sea), sky (any surface: "" — the default for the surface, "day" — the day sky, "preset:<id>" — a ready space sky, or a sky asset name)', does: 'changes the environment' },
   assets: { args: '[kind]', does: 'named assets saved in the labs, by kind (sea — the water lab, sky — the celestial bodies lab, look — the filters lab, weather — the look lab, land — the land lab) and the ready skies' },
   select: { args: 'id | name, or nothing', does: 'selects an object in the editor (nothing: the environment)' },
   new: { args: '[name]', does: 'an empty scene' },
@@ -33,6 +33,7 @@ const COMMANDS = {
   act: { args: 'id | name, action (from "actions"), [on] (a toggle: true / false; without — switches)', does: 'during play: the object does an action (a spaceship: fire, scan, print, offline, destroy) — an "action" event' },
   actions: { args: 'id | name', does: 'during play: the object\'s actions' },
   events: { args: '[n]', does: 'the last n events (default 20)' },
+  ui: { args: 'during play, one of: say { who, text, choices }, log (text) [kind], banner (text) [sub], show (screen), hide, open (window), close (window)', does: 'the game UI of the scene (env.ui): a line of dialogue (returns at once; the choice comes as a "ui" event), an event log entry, a banner, a menu screen, a window' },
   check: { args: '[budget { tris, draws }]', does: 'the scene doctor: problems in the scene (wrong environment, under the ground or in the air, overlapping, missing assets, unfitting behaviours, cost over the budget), each with a proposed fix (commands) — nothing is changed' },
   play: { args: '', does: 'runs the behaviours (like ▶ Play)' },
   stop: { args: '', does: 'back to editing' },
@@ -110,12 +111,13 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
       if (c.look != null) { const n = String(c.look), all = assets.list('look'); e.look = n === '' || all.includes(n) ? n : fail(`no camera look "${n}" (looks: ${all.join(', ') || 'none yet — save one in the filters lab'})`); }
       if (c.sea != null) { const n = String(c.sea), all = assets.list('sea'); e.sea = n === '' || all.includes(n) ? n : fail(`no sea asset "${n}" (seas: ${all.join(', ') || 'none yet — save one in the water lab'})`); }
       if (c.land != null) { const n = String(c.land), all = assets.list('land'); e.land = n === '' || all.includes(n) ? n : fail(`no land "${n}" (lands: ${all.join(', ') || 'none yet — save one in the land lab'}; "" — the plain ground)`); }
+      if (c.ui != null) { const n = String(c.ui), all = assets.list('ui'); e.ui = n === '' || all.includes(n) ? n : fail(`no game UI "${n}" (UIs: ${all.join(', ') || 'none yet — save one in the game UI lab'}; "" — none)`); }
       if (c.sky != null) {
         const n = String(c.sky), all = assets.list('sky'), ready = (assets.skyPresets || []).map((id) => 'preset:' + id);
         e.sky = n === '' || n === 'day' || all.includes(n) || ready.includes(n) || (n.startsWith('preset:') && !ready.length) ? n
           : fail(`no sky "${n}" ("day", ready: ${ready.join(', ') || 'preset:deep, preset:quiet, preset:crimson, preset:emerald, preset:core, preset:black'}; saved: ${all.join(', ') || 'none yet — save one in the celestial bodies lab'})`);
       }
-      if (!Object.keys(e).length) fail('nothing to change (surface, light, look, land, sea, sky)');
+      if (!Object.keys(e).length) fail('nothing to change (surface, light, look, land, sea, sky, ui)');
       store.setEnv(e); return { env: clone(store.scene.env) };
     },
     assets: (c) => {
@@ -136,6 +138,17 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
     actions: (c) => {
       if (!hooks.actionsOf || !(hooks.playing && hooks.playing())) fail('not playing: {"cmd":"play"} first');
       const o = target(c); return { object: o.id, actions: hooks.actionsOf(o) };
+    },
+    ui: (c) => {
+      const u = hooks.gameUI && hooks.gameUI(); if (!u) fail('no game UI: set env.ui (a UI saved in the game UI lab) and {"cmd":"play"}');
+      if (c.say) { u.say(c.say); return { said: true }; }
+      if (c.log != null) { u.log(String(c.log), c.kind); return { logged: true }; }
+      if (c.banner != null) { u.banner(String(c.banner), c.sub || ''); return { banner: true }; }
+      if (c.show != null) { if (!u.show(String(c.show))) fail(`no screen "${c.show}" (screens: ${Object.keys(u.def.screens).join(', ')})`); return { screen: c.show }; }
+      if (c.hide) { u.hide(); return { screen: null }; }
+      if (c.open != null) { if (!u.open(String(c.open))) fail(`no window "${c.open}"`); return { window: c.open }; }
+      if (c.close != null) { u.close(String(c.close)); return { closed: c.close }; }
+      return fail('one of: say, log, banner, show, hide, open, close');
     },
     check: (c) => { if (!hooks.check) fail('the scene doctor is not available here'); return hooks.check({ budget: c.budget }); },
     events: (c) => ({ events: hooks.events ? hooks.events(c.n > 0 ? Math.min(200, +c.n) : 20) : [] }),

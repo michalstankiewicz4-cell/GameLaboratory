@@ -18,7 +18,7 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 - [ ] **Laboratorium lądu — przełącznik „Okrągła”**: generator lądu na kuli (zastąpi drugie źródło lądu — z planety);
   wraca z nim skok (skreślony z punktu 6).
 - [ ] **Widok mapy zawiniętej jako torus** (kształt, nie tylko topologia).
-- [x] Laboratorium UI gry: zrobione w 0.61.0 (`labs/gameui.html`, `js/gameui/`, `docs/labs/gameui.md`). Dalej: pole `ui` sceny i nakładka w ▶ Graj edytora (HUD ze stanem zachowań, zdarzenia).
+- [x] Laboratorium UI gry: zrobione w 0.61.0 (`labs/gameui.html`, `js/gameui/`, `docs/labs/gameui.md`). UI w scenie (`env.ui`, nakładka w ▶ Graj): 0.62.0.
 - [ ] **Laboratorium scenariusza** (właściciel, 2026-11-13): treści i dialogi podpinane pod postacie i narratora —
   sceny scenariusza, kwestie, wybory, warunki (stan gry, zdarzenia), teksty po angielsku i po polsku; dane jako zasób
   z nazwą, w scenie przypięte do obiektów (postać, narrator), w API dla AI.

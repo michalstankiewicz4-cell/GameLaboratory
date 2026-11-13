@@ -41,6 +41,7 @@ export function checkScene(scene, ctx) {
   asset('land', 'land', 'land lab');
   asset('sea', 'sea', 'water lab');
   asset('look', 'look', 'filters lab');
+  asset('ui', 'ui', 'game UI lab');
   asset('sky', 'sky', 'celestial bodies lab', (n) => n === 'day' || (n.startsWith('preset:') && (!(ctx.skyPresets || []).length || ctx.skyPresets.includes(n.slice(7)))));
   if (S.env.light && !(ctx.lights || []).includes(S.env.light) && !A.list('weather').includes(S.env.light))
     add('error', 'missing-asset', null, `Environment light: no ready light or weather asset "${S.env.light}" (save one in the look lab)`, { cmd: 'env', light: (ctx.lights || ['afternoon'])[0] });

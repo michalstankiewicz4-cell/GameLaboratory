@@ -35,7 +35,8 @@ export function createToolbar(store, controls, actions) {
   addEventListener('keydown', (e) => {
     if (e.target.closest && e.target.closest('input, select, textarea')) return;
     const k = e.key.toLowerCase();
-    if (actions.play.playing) { if (k === 'escape') actions.play.stop(); return; }   // w grze klawisze ma gracz (play/input.js)
+    // w grze klawisze ma gracz (play/input.js); Esc zatrzymuje grę, chyba że weźmie go UI gry (pauza, okno, dialog)
+    if (actions.play.playing) { if (k === 'escape' && !actions.play.takesEscape()) actions.play.stop(); return; }
     const mod = e.ctrlKey || e.metaKey;
     if (mod && k === 'z' && !e.shiftKey) { e.preventDefault(); actions.undo(); return; }
     if (mod && (k === 'y' || (k === 'z' && e.shiftKey))) { e.preventDefault(); actions.redo(); return; }

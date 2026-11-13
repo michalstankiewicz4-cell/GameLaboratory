@@ -97,6 +97,11 @@ export function createPanels(store, actions) {
       const names = Object.keys(readProfiles());
       $('look').replaceChildren(el('option', { value: '', textContent: t('env.plain') }), ...names.map((n) => el('option', { value: n, textContent: n })));
       $('look').value = names.includes(S.env.look) ? S.env.look : '';
+      // UI gry: zasoby z laboratorium UI gry (nakładka w ▶ Graj)
+      const uis = listAssets('ui'), curUi = S.env.ui || '';
+      $('uiAsset').replaceChildren(el('option', { value: '', textContent: t('env.uiNone') }), ...uis.map((n) => el('option', { value: n, textContent: n })),
+        ...(curUi && !uis.includes(curUi) ? [el('option', { value: curUi, textContent: t('env.seaMissing', { name: curUi }) })] : []));
+      $('uiAsset').value = curUi;
       // morze: zasoby z laboratorium wody; nazwa ze sceny, której nie ma w tej przeglądarce, zostaje na liście (oznaczona)
       const seas = listAssets('sea'), cur = S.env.sea || '';
       $('seaAsset').replaceChildren(el('option', { value: '', textContent: t('env.seaDefault') }), ...seas.map((n) => el('option', { value: n, textContent: n })),
@@ -167,6 +172,7 @@ export function createPanels(store, actions) {
   $('seaAsset').addEventListener('change', () => store.setEnv({ sea: $('seaAsset').value }));
   $('light').addEventListener('change', () => store.setEnv({ light: $('light').value }));
   $('look').addEventListener('change', () => store.setEnv({ look: $('look').value }));
+  $('uiAsset').addEventListener('change', () => store.setEnv({ ui: $('uiAsset').value }));
   $('toGround').addEventListener('click', () => { const o = store.selected; if (o) store.update(o.id, { pos: [o.pos[0], +actions.groundAt(o.pos[0], o.pos[2]).toFixed(2), o.pos[2]] }); });   // teren z laboratorium lądu albo 0
   $('dupBtn').addEventListener('click', actions.duplicate);
   $('delBtn').addEventListener('click', actions.remove);

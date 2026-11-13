@@ -70,8 +70,8 @@ pod nazwą jako zasób **uiskin**; całe UI — zasób **ui** (`js/scene/assets.
   okna gry), **Skin** (podstawa, tokeny z próbnikiem barw, zapis), **Game state** (suwaki stanu, symulacja radaru
   i energii, wpisy dziennika, baner), **Dialogue** (postać, tekst, wybory; linia narratora), **Definition (JSON)**
   (cała definicja — ekrany i okna edytuje się tu), Opis, Wydajność.
-- Przykłady: dowództwo kosmiczne (skórka Space), bitwa morska (Battle: kadłub, telegraf, ster, celownik), prosta gra
-  (skórka silnika).
+- Przykłady: dowództwo kosmiczne (skórka Space), bitwa morska (Battle: kadłub, telegraf, ster, celownik), gra
+  w scenie (do ▶ Graj edytora, stan `player.*`), prosta gra (skórka silnika).
 
 ## API dla AI
 
@@ -79,7 +79,25 @@ pod nazwą jako zasób **uiskin**; całe UI — zasób **ui** (`js/scene/assets.
 `say({ who, text, choices })` → wybór, `log(tekst, rodzaj)`, `banner(tekst, podpis)`, `def`, `state`, `samples`,
 `skins`, `empty()`. Zakładka **API** w konsoli: `{ "method": "say", "arg": { … } }`.
 
+## UI gry w scenie (edytor, ▶ Graj)
+
+Scena wskazuje UI polem **`env.ui`** — nazwą UI zapisanego tutaj (zasób `ui`): w edytorze lista **UI gry** w oknie
+Właściwości środowiska, w API `{"cmd": "env", "ui": "<nazwa>"}`. W ▶ Graj UI przykrywa widok
+(`editor/js/play/gameui-play.js`):
+
+- **Stan gry** (co 0,1 s): `player` — `name`, `speed`, `unit`, `throttle` (−1…1), `throttlePct`, `alt`, `vs`,
+  `landed`, `crashed`, `stall`, `aground`, `progress` (z linii stanu zachowania gracza); `scene` — `name`, `surface`,
+  `objects`; `time` (s gry); `radar` — `[{ x, y, kind: me | body | other, name }]` (metry od gracza, do minimapy).
+- **Zdarzenia:** akcje statków (`action` na szynie) — wpis w dzienniku; akcje UI `event:<nazwa>` i wybory
+  w dialogu — zdarzenie **`ui`** na szynie (`{ name }` albo `{ choice }`), `quit` — koniec gry (powrót do edycji).
+- **Esc:** zamyka dialog i okna, cofa w menu, a w grze otwiera ekran pauzy; bez ekranu pauzy Esc kończy grę jak
+  dotąd.
+- **API:** `{"cmd": "ui", "say": { "who", "text", "choices" }}` (wybór przychodzi jako zdarzenie `ui`), `log`, `banner`,
+  `show`, `hide`, `open`, `close` — w czasie gry.
+- **Lekarz sceny:** brakujące UI (`env.ui` bez zapisanego zasobu) — błąd `missing-asset`.
+- Przykład **Scene play** (skórka Space): nazwa gracza, prędkość z jednostką zachowania (`unitBind`), ciąg, wysokość,
+  dziennik, radar, pauza z powrotem do edytora, okno pomocy (H).
+
 ## Dalej (pomysły)
 
-UI gry w scenie: pole `ui` sceny (nazwa zasobu) i nakładka w ▶ Graj edytora, HUD z prawdziwym stanem zachowań
-(prędkość, ciąg, kadłub) i zdarzeniami (`js/core/events.js`); dialogi z laboratorium scenariusza (`TODO.md`).
+Dialogi z laboratorium scenariusza (`TODO.md`); kadłub, amunicja i inne wartości gry, gdy zachowania je podadzą.

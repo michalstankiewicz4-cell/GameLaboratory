@@ -32,6 +32,7 @@
   'tree.env': 'Environment', 'tree.empty': 'No models yet: pick a category above and click + next to a model.',
   'env.title': 'Environment', 'env.surface': 'Surface', 'env.sea': 'Sea', 'env.land': 'Land',
   'env.light': 'Light', 'env.look': 'Camera look', 'env.plain': 'Plain (no profile)',
+  'env.ui': 'Game UI', 'env.uiNone': 'None', 'env.uiNote': 'The game\'s menu, HUD, windows and dialogue over the view in ▶ Play — saved in the game UI lab.',
   'env.lookNote': 'Camera looks are the profiles saved in the filters lab.',
   'obj.title': 'Object', 'obj.orbitAround': 'Orbits', 'obj.orbitAuto': 'Nearest heavier body', 'obj.orbitPeriod': 'Period', 'obj.name': 'Name', 'obj.model': 'Model',
   'obj.x': 'Position X', 'obj.y': 'Position Y', 'obj.z': 'Position Z',

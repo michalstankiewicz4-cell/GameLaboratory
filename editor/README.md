@@ -50,6 +50,7 @@ editor/
   js/ui/api-console.js  zakładka API w konsoli
   js/ui/doctor-panel.js okno Lekarz sceny (js/scene/doctor.js przez polecenie API check)
   js/play/play.js       gra: zachowania w ruchu, gracz, kamera za graczem, linia stanu
+  js/play/gameui-play.js UI gry sceny (env.ui) w ▶ Graj: nakładka, stan gracza, zdarzenia, Esc
   js/play/input.js      klawiatura gracza → sterowanie (dźwignia maszyn / gazu, stery, podwozie, klapy)
   js/i18n/              en.js, pl.js, i18n.js (klasyczne skrypty przed ui/shell/windows.js)
   README.md, CHANGELOG.md
@@ -112,7 +113,7 @@ albo lista (po kolei); wynik `{ "ok": true, … }` albo `{ "ok": false, "error":
 | `set` | `id` albo `name`, potem `newName` (z `id` także `name`), `prefab`, `pos`, `rot`, `scale`, `behavior`, `orbit` (`{ around, period }` — zachowanie „orbita”) | zmienia obiekt |
 | `move` | `id` albo `name`, `by: [dx, dy, dz]` | przesuwa o wektor |
 | `remove` | `id` albo `name` | usuwa |
-| `env` | `surface` (`sea` / `land` / `space`), `light`, `look`, `land`, `sea`, `sky` | środowisko |
+| `env` | `surface` (`sea` / `land` / `space`), `light`, `look`, `land`, `sea`, `sky`, `ui` | środowisko (`ui` — UI gry z laboratorium UI gry, nakładka w ▶ Graj) |
 | `assets` | `[kind]` | zasoby z nazwą (`sea` — woda, `land` — ląd, `weather` — wygląd, `look` — filtry, `sky` — ciała niebieskie) i gotowe tła kosmosu |
 | `select` | `id` / `name` albo nic | wybór w edytorze |
 | `new` | `[name]` | pusta scena |
@@ -121,6 +122,7 @@ albo lista (po kolei); wynik `{ "ok": true, … }` albo `{ "ok": false, "error":
 | `act` | `id` albo `name`, `action`, `[on]` (przełącznik) | w czasie gry: akcja obiektu (statek kosmiczny: `fire`, `scan`, `print`, `offline`, `destroy`, własne) — zdarzenie „action” |
 | `actions` | `id` albo `name` | w czasie gry: akcje obiektu |
 | `events` | `[n]` | ostatnie zdarzenia szyny (domyślnie 20) |
+| `ui` | w czasie gry: `say { who, text, choices }`, `log`, `banner`, `show`, `hide`, `open`, `close` | UI gry sceny (`env.ui`): dialog, wpis, baner, ekran, okno ([`../docs/labs/gameui.md`](../docs/labs/gameui.md)) |
 | `check` | `[budget { tris, draws }]` | lekarz sceny: problemy (złe środowisko, pod gruntem / w powietrzu, zachodzenie, brakujące zasoby, zachowania, koszt) z proponowanymi poprawkami — niczego nie zmienia ([`../docs/scene/doctor.md`](../docs/scene/doctor.md)) |
 
 ```json

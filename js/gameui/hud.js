@@ -8,7 +8,8 @@
 //         zdarzeń), 'banner' (duży napis na chwilę), 'crosshair' (celownik na środku), 'minimap' (punkty ze stanu:
 //         bind → [{ x, y, kind }], zasięg max)
 //   at: 'tl' 't' 'tr' 'l' 'c' 'r' 'bl' 'b' 'br' — kotwica na ekranie; elementy z tą samą kotwicą stoją jeden pod drugim
-//   bind: ścieżka w stanie gry ('ship.hp'); max: liczba albo ścieżka; color: 'ok' | 'accent' | 'warn' | 'err'
+//   bind: ścieżka w stanie gry ('ship.hp'); max: liczba albo ścieżka; color: 'ok' | 'accent' | 'warn' | 'err';
+//   value: unit — stała jednostka albo unitBind — jednostka ze stanu (np. 'player.unit')
 import { h, pick } from './dom.js';
 import { createLog } from './log.js';
 
@@ -37,9 +38,9 @@ export function createHud(root) {
         txt.textContent = `${Math.round(v)} / ${Math.round(m)}`;
       };
     } else if (d.type === 'value') {
-      const v = h('b', { class: 'gVal' }), u = d.unit ? h('span', { class: 'gUnit' }, d.unit) : null;
+      const v = h('b', { class: 'gVal' }), u = d.unit || d.unitBind ? h('span', { class: 'gUnit' }, d.unit || '') : null;
       add(box, label, v, u);
-      it.update = (s) => { const x = pick(s, d.bind); v.textContent = typeof x === 'number' ? x.toFixed(d.digits ?? 0) : (x ?? '—'); };
+      it.update = (s) => { const x = pick(s, d.bind); v.textContent = typeof x === 'number' ? x.toFixed(d.digits ?? 0) : (x ?? '—'); if (d.unitBind) u.textContent = pick(s, d.unitBind) ?? ''; };
     } else if (d.type === 'text') {
       const v = h('span', { class: 'gText' }, d.text || '');
       add(box, label, v);

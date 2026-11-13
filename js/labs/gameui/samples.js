@@ -59,6 +59,27 @@ export const SAMPLES = {
       windows: [{ id: 'log', title: 'Ship\'s log', key: 'L', at: 'c', body: [{ type: 'stats', bind: 'ship.stats' }] }],
     },
   },
+  play: {
+    label: 'Scene play (for the scene editor)',
+    def: {
+      format: 'gamelab-ui', version: 1, name: 'Scene play', skin: 'space', start: '', pause: 'pause',
+      screens: {
+        pause: { title: 'Paused', text: 'The scene keeps running behind the menu.', items: [{ label: 'Resume', do: 'resume' }, { label: 'Help', do: 'window:help' }, { label: 'Back to the editor', do: 'quit', sub: true }] },
+      },
+      hud: [
+        { id: 'name', type: 'text', at: 'tl', label: 'You fly', bind: 'player.name' },
+        { id: 'speed', type: 'value', at: 'bl', label: 'Speed', bind: 'player.speed', unitBind: 'player.unit', digits: 1 },
+        { id: 'throttle', type: 'bar', at: 'bl', label: 'Throttle', bind: 'player.throttlePct', max: 100, color: 'accent' },
+        { id: 'alt', type: 'value', at: 'bl', label: 'Altitude', bind: 'player.alt', unit: 'm' },
+        { id: 'events', type: 'log', at: 'tr', label: 'Events', fade: 12 },
+        { id: 'radar', type: 'minimap', at: 'br', label: 'Radar', bind: 'radar', max: 600 },
+        { id: 'banner', type: 'banner', at: 'c' },
+      ],
+      windows: [{ id: 'help', title: 'Help', key: 'H', at: 'c', body: [
+        { type: 'text', text: 'The keys of the behaviour are in the status line. 1–9: the actions of a spacecraft (fire, scan…). Esc: this pause menu.' },
+        { type: 'value', label: 'Objects in the scene', bind: 'scene.objects' }, { type: 'value', label: 'Game time', bind: 'time', unit: 's' }] }],
+    },
+  },
   simple: {
     label: 'Simple game (engine skin)',
     def: {
@@ -82,5 +103,8 @@ export function sampleState() {
     cargo: [{ name: 'Iron ore', n: 40 }, { name: 'Ice', n: 12 }, { name: 'Drone parts', n: 3 }],
     radar: [{ x: 0, y: 0, kind: 'me' }, { x: 400, y: -300, kind: 'enemy' }, { x: -600, y: 250, kind: 'ally' }, { x: 900, y: 700, kind: 'enemy' }],
     settings: { music: 0.6, sound: 0.8, gfx: 'High', minimap: true },
+    // jak w ▶ Graj edytora (editor/js/play/gameui-play.js): gracz z zachowania, scena, czas
+    player: { name: 'SP-01 Codewing', speed: 42.5, unit: 'm/s', throttle: 0.6, throttlePct: 60, alt: 120 },
+    scene: { name: 'Sample scene', surface: 'space', objects: 4 }, time: 63,
   };
 }

@@ -31,6 +31,7 @@
   'tree.env': 'Środowisko', 'tree.empty': 'Nie ma jeszcze modeli: wybierz wyżej kategorię i kliknij + przy modelu.',
   'env.title': 'Środowisko', 'env.surface': 'Powierzchnia', 'env.sea': 'Morze', 'env.land': 'Ląd',
   'env.light': 'Światło', 'env.look': 'Wygląd kamery', 'env.plain': 'Zwykły (bez profilu)',
+  'env.ui': 'UI gry', 'env.uiNone': 'Brak', 'env.uiNote': 'Menu, HUD, okna i dialogi gry nad widokiem w ▶ Graj — zapisane w laboratorium UI gry.',
   'env.lookNote': 'Wygląd kamery to profile zapisane w laboratorium filtrów.',
   'obj.title': 'Obiekt', 'obj.orbitAround': 'Krąży wokół', 'obj.orbitAuto': 'Najbliższego cięższego ciała', 'obj.orbitPeriod': 'Okres', 'obj.name': 'Nazwa', 'obj.model': 'Model',
   'obj.x': 'Położenie X', 'obj.y': 'Położenie Y', 'obj.z': 'Położenie Z',

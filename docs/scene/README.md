@@ -90,14 +90,14 @@ Wpis: `{ id, label, family, surface, lab, build() → { root, kit, dispose } }`.
 
 `createSceneApi({ store, prefabs, behaviorsFor, lights, assets, hooks })` → `{ run(polecenie | lista | tekst JSON), commands }`.
 Polecenia (`help`, `describe`, `prefabs`, `assets`, `add`, `set`, `move`, `remove`, `env`, `select`, `new`, `load`,
-`check` — lekarz sceny, [doctor.md](doctor.md), `play`, `stop`, `act`, `actions`, `events`) i przykłady: [`../../editor/README.md`](../../editor/README.md), „API dla AI”.
+`check` — lekarz sceny, [doctor.md](doctor.md), `ui` — UI gry w czasie gry, `play`, `stop`, `act`, `actions`, `events`) i przykłady: [`../../editor/README.md`](../../editor/README.md), „API dla AI”.
 
 - Wynik: `{ ok: true, cmd, … }` albo `{ ok: false, cmd, error }` (błąd mówi, co jest dozwolone).
 - Sprawdza: model istnieje, zachowanie pasuje do modelu, liczby, oświetlenie, nazwa zasobu; obiekt po `id` albo
   jednoznacznej `name`.
 - Lista poleceń to jeden krok cofania (`hooks.group`); w czasie gry polecenia zmieniające scenę są odrzucane.
 - `hooks`: `build(fn)` (zmiana, po której trzeba zbudować modele), `group(fn)`, `play()`, `stop()`, `playing()`,
-  `act(obj, action, on)`, `actionsOf(obj)`, `events(n)` (szyna zdarzeń), `check(opts)` (lekarz sceny).
+  `act(obj, action, on)`, `actionsOf(obj)`, `events(n)` (szyna zdarzeń), `check(opts)` (lekarz sceny), `gameUI()` (UI gry w czasie gry).
 
 ## Zdarzenia (`js/core/events.js`)
 

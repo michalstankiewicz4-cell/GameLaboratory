@@ -7,7 +7,8 @@
 //          land: '' | nazwa zasobu „ląd” (teren z laboratorium lądu; '' — płaski grunt),
 //          sea: '' | nazwa zasobu „morze” (js/scene/assets.js; '' — morze domyślne),
 //          sky: '' | 'day' | 'preset:<id>' | nazwa zasobu „niebo” (każda powierzchnia; '' — domyślne: morze i ląd —
-//          dzienne, kosmos — Deep field; js/scene/space.js) },
+//          dzienne, kosmos — Deep field; js/scene/space.js),
+//          ui: '' | nazwa zasobu „ui” (UI gry z laboratorium UI gry — nakładka w ▶ Graj; '' — bez UI) },
 //   objects: [{ id, name, prefab, pos: [x, y, z], rot: [x, y, z] (stopnie), scale, behavior?, orbit? { around, period } }]
 // }
 // prefab: id z js/scene/prefabs.js; behavior: id z js/scene/behaviors.js, '' = bez zachowania, brak pola = domyślne
@@ -16,7 +17,7 @@
 export const FORMAT = 'gamelab-scene', VERSION = 1;
 
 export function emptyScene(name = 'New scene') {
-  return { format: FORMAT, version: VERSION, name, env: { surface: 'sea', light: 'afternoon', look: '', sea: '', sky: '', land: '' }, objects: [] };
+  return { format: FORMAT, version: VERSION, name, env: { surface: 'sea', light: 'afternoon', look: '', sea: '', sky: '', land: '', ui: '' }, objects: [] };
 }
 
 let seq = 0;

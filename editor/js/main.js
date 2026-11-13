@@ -88,7 +88,7 @@ const api = createSceneApi({
       prefab, behaviorsFor, behaviorOf, behaviorEnv: (id) => (BEHAVIORS[id] || {}).env, bodyRank,
       assets: { list: listAssets }, lights: Object.keys(LIGHTS), skyPresets: skyPresets().map((p) => p.id),
       probe: world.stage, boxOf: world.boxOf, costOf: world.costOf, budget }),
-    act: (o, action, on) => actions.play.act(o.id, action, on), actionsOf: (o) => actions.play.actionsOf(o.id), events: (n) => events.history(n) },
+    act: (o, action, on) => actions.play.act(o.id, action, on), gameUI: () => actions.play.ui, actionsOf: (o) => actions.play.actionsOf(o.id), events: (n) => events.history(n) },
 });
 createApiConsole(api);
 const doctor = createDoctorPanel(store, api, actions);

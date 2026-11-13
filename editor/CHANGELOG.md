@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.26.0 — 2026-11-13 (UI gry w ▶ Graj)
+
+### Dodane
+- Właściwości środowiska: **UI gry** (zasób z laboratorium UI gry); w ▶ Graj nakładka: menu, HUD ze stanem gracza,
+  okna, dialogi; Esc otwiera pauzę UI. API: `env.ui`, polecenie `ui`.
+
 ## 0.25.0 — 2026-11-13 (Badaj, kafelek lekarza sceny)
 
 ### Zmienione
