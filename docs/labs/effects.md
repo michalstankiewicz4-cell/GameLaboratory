@@ -34,6 +34,20 @@ i tunel (`portal.js`) — ze sceny gry; fala skanu (`scan.js`) — z ShipKit. Wi
 Soczewki (czarna dziura, kula cieczy) potrzebują obrazu sceny: `fx.render(renderer, scene, camera, draw)` rysuje
 scenę do celu (`draw(target)` — w laboratoriach przez potok kamery `LookPipeline`) i zagina go.
 
+## Odznaki
+
+Każdy efekt ma odznaki (`FX_BADGES`, pole `badges` w `FX_KINDS`) — mogą się pokrywać:
+
+| Odznaka | Znaczy | Efekty |
+|---|---|---|
+| **Lot** (`flight`) | z punktu do punktu (`from` → `to`, ścieżka) | strzał, kula plazmy, kula cieczy, błyskawica, piorun łańcuchowy, laser, przebijacz, burza, holowanie, cięcie, skok |
+| **W miejscu** (`spot`) | w jednym punkcie (`at`) | odłamki, czarna dziura, pole siłowe, znacznik, tunel, fala skanu |
+| **Punktowy** (`point`) | punkt, linia, mała rzecz | strzał, kula plazmy, kula cieczy, błyskawica, piorun łańcuchowy, laser, przebijacz, burza, skok, znacznik, tunel |
+| **Obszarowy** (`area`) | chmura, pole, fala, rozwidlenie, wachlarz, płaszczyzna | kula plazmy (wybuch), kula cieczy (rozbryzg), odłamki, czarna dziura, burza, holowanie, cięcie, pole siłowe, tunel, fala skanu |
+
+W laboratorium okno **Efekty**: lista z odznakami; kliknięte odznaki u góry filtrują (efekty z wszystkimi wybranymi).
+Dla AI: `EffectsApi.find('flight', 'area')` → efekty z tymi odznakami.
+
 ## Laboratorium
 
 Na pasku: efekt, Graj (albo spacja), Powtarzaj, Wyczyść. Znaczniki: A (skąd, niebieski) i B (dokąd, pomarańczowy);

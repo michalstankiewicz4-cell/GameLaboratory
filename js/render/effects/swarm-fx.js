@@ -34,16 +34,16 @@ export const SWARM_DEFAULTS = {
   scan: { color: 0x4fe3c6, radius: 8, seconds: 1.7 },
 };
 export const SWARM_KINDS = {
-  laser: { label: 'Laser', labelPl: 'Laser', needs: 'from, to' },
-  piercer: { label: 'Piercer beam', labelPl: 'Promień przebijacza', needs: 'from, to' },
-  storm: { label: 'Storm lightning', labelPl: 'Błyskawica burzy', needs: 'from, to' },
-  tow: { label: 'Tractor beam', labelPl: 'Promień ściągający', needs: 'from, to' },
-  cutter: { label: 'Cutting sheet', labelPl: 'Promień tnący', needs: 'from, to' },
-  field: { label: 'Force field', labelPl: 'Pole siłowe', needs: 'at' },
-  warp: { label: 'Hyperspace jump', labelPl: 'Skok w nadprzestrzeń', needs: 'from, dir' },
-  marker: { label: 'Marker', labelPl: 'Znacznik', needs: 'at' },
-  portal: { label: 'Subspace tunnel', labelPl: 'Tunel podprzestrzenny', needs: 'at' },
-  scan: { label: 'Scan wave', labelPl: 'Fala skanu', needs: 'at' },
+  laser: { label: 'Laser', labelPl: 'Laser', needs: 'from, to', badges: ['flight', 'point'] },
+  piercer: { label: 'Piercer beam', labelPl: 'Promień przebijacza', needs: 'from, to', badges: ['flight', 'point'] },
+  storm: { label: 'Storm lightning', labelPl: 'Błyskawica burzy', needs: 'from, to', badges: ['flight', 'point', 'area'] },
+  tow: { label: 'Tractor beam', labelPl: 'Promień ściągający', needs: 'from, to', badges: ['flight', 'area'] },
+  cutter: { label: 'Cutting sheet', labelPl: 'Promień tnący', needs: 'from, to', badges: ['flight', 'area'] },
+  field: { label: 'Force field', labelPl: 'Pole siłowe', needs: 'at', badges: ['spot', 'area'] },
+  warp: { label: 'Hyperspace jump', labelPl: 'Skok w nadprzestrzeń', needs: 'from, dir', badges: ['flight', 'point'] },
+  marker: { label: 'Marker', labelPl: 'Znacznik', needs: 'at', badges: ['spot', 'point'] },
+  portal: { label: 'Subspace tunnel', labelPl: 'Tunel podprzestrzenny', needs: 'at', badges: ['spot', 'point', 'area'] },
+  scan: { label: 'Scan wave', labelPl: 'Fala skanu', needs: 'at', badges: ['spot', 'area'] },
 };
 
 // „rój” dla metod z gry: położenia statków (pos), cele (beamTo), kto strzela (firing), kto jest ukryty (hidden)

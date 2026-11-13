@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.69.1 · efekty 1.2.0 — 2026-11-14 (odznaki efektów)
+
+### Dodane
+- **Odznaki efektów** (`FX_BADGES`, mogą się pokrywać): Lot (z punktu do punktu), W miejscu, Punktowy, Obszarowy.
+  Laboratorium efektów: okno **Efekty** — lista z odznakami i filtr po odznakach; `EffectsApi.find(...odznaki)`.
+
 ## Program 0.69.0 · efekty 1.1.0 · pojazdy — kosmos 1.10.0 · edytor sceny 0.31.0 — 2026-11-14 (efekty roju, fala skanu)
 
 ### Dodane

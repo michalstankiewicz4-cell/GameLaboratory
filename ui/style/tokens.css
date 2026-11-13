@@ -23,6 +23,11 @@
   --cat-matter:#e8925a;
   --cat-voxels:#5fb8f0;
   --cat-effects:#ff7a5c;
+  /* odznaki efektów (laboratorium efektów): lot, w miejscu, punktowy, obszarowy */
+  --badge-flight:#ffb35a;
+  --badge-spot:#6fd0ff;
+  --badge-point:#c9d2e0;
+  --badge-area:#c58bff;
   --cat-ui:#8b9cff;
   --cat-ai:#e86a9a;
   --cat-tools:#9aa6b4;

@@ -36,14 +36,23 @@ export const FX_DEFAULTS = {
   ...SWARM_DEFAULTS,   // laser, przebijacz, burza, holowanie, cięcie, pole, skok, znacznik, tunel, skan (swarm-fx.js)
 };
 export const FX_KINDS = {
-  shot: { label: 'Shot', labelPl: 'Strzał', needs: 'from, to' },
-  orb: { label: 'Plasma orb', labelPl: 'Kula plazmy', needs: 'from, to' },
-  debris: { label: 'Debris', labelPl: 'Odłamki', needs: 'at' },
-  bolt: { label: 'Lightning', labelPl: 'Błyskawica', needs: 'path' },
-  zap: { label: 'Chain lightning', labelPl: 'Piorun łańcuchowy', needs: 'path' },
-  bubble: { label: 'Liquid bubble', labelPl: 'Kula cieczy', needs: 'from, to' },
-  hole: { label: 'Black hole', labelPl: 'Czarna dziura', needs: 'at' },
+  shot: { label: 'Shot', labelPl: 'Strzał', needs: 'from, to', badges: ['flight', 'point'] },
+  orb: { label: 'Plasma orb', labelPl: 'Kula plazmy', needs: 'from, to', badges: ['flight', 'point', 'area'] },
+  debris: { label: 'Debris', labelPl: 'Odłamki', needs: 'at', badges: ['spot', 'area'] },
+  bolt: { label: 'Lightning', labelPl: 'Błyskawica', needs: 'path', badges: ['flight', 'point'] },
+  zap: { label: 'Chain lightning', labelPl: 'Piorun łańcuchowy', needs: 'path', badges: ['flight', 'point'] },
+  bubble: { label: 'Liquid bubble', labelPl: 'Kula cieczy', needs: 'from, to', badges: ['flight', 'point', 'area'] },
+  hole: { label: 'Black hole', labelPl: 'Czarna dziura', needs: 'at', badges: ['spot', 'area'] },
   ...SWARM_KINDS,
+};
+// odznaki efektów (właściciel, 2026-11-14): gdzie gra — lot (z punktu do punktu: from → to, ścieżka) albo w miejscu
+// (at); jak duży — punktowy albo obszarowy (chmura, pole, fala, rozwidlenie, wachlarz, płaszczyzna). Mogą się
+// pokrywać: kula plazmy leci (lot) i wybucha u celu (obszarowy), tunel jest w miejscu, punktem i szerokim lejkiem
+export const FX_BADGES = {
+  flight: { label: 'Flight', labelPl: 'Lot', title: 'From a point to a point (from → to)' },
+  spot: { label: 'In place', labelPl: 'W miejscu', title: 'At one point (at)' },
+  point: { label: 'Point', labelPl: 'Punktowy', title: 'A point, a line or a small thing' },
+  area: { label: 'Area', labelPl: 'Obszarowy', title: 'Covers an area: a cloud, a field, a wave, a fan, a sheet' },
 };
 const clone = (o) => JSON.parse(JSON.stringify(o));
 

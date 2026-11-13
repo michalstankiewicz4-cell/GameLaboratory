@@ -7,7 +7,7 @@ import { OrbitControls } from '../../../vendor/three/addons/controls/OrbitContro
 import { createStage } from '../shared/stage.js';
 import { LookPipeline, LOOK_DEFAULTS } from '../../render/sea/look.js';
 import { loadSpace } from '../../scene/space.js';
-import { createEffects, FX_DEFAULTS, FX_KINDS, STEP } from '../../render/effects/effects.js';
+import { createEffects, FX_DEFAULTS, FX_KINDS, FX_BADGES, STEP } from '../../render/effects/effects.js';
 import { buildBody } from '../../models/blocks/blockkit.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 
@@ -98,9 +98,30 @@ let soonT = 0;
 function changed() { save(); clearTimeout(soonT); soonT = setTimeout(() => { remake(); if (!L.auto) demo(L.kind); }, 150); }
 function showAll() {
   $('kind').value = L.kind; $('auto').checked = L.auto; $('scale').value = L.scale; $('scaleV').textContent = L.scale + ' m';
-  showFields(); fillSaved();
+  showFields(); fillSaved(); showList();
 }
-$('kind').onchange = () => { L.kind = $('kind').value; save(); showFields(); demo(L.kind); };
+$('kind').onchange = () => { L.kind = $('kind').value; save(); showFields(); showList(); demo(L.kind); };
+/* ---------------- okno Efekty: lista z odznakami, filtr po odznakach (wszystkie wybrane naraz) ---------------- */
+const badge = (b, tag = 'span') => { const e = document.createElement(tag); e.className = 'badge'; e.dataset.b = b; e.textContent = FX_BADGES[b].label; e.title = FX_BADGES[b].title; return e; };
+function showList() {
+  const f = $('badgeFilter'); if (!f.childElementCount) for (const b of Object.keys(FX_BADGES)) {
+    const btn = badge(b, 'button'); btn.type = 'button';
+    btn.onclick = () => { const s = new Set(L.badges || []); s.has(b) ? s.delete(b) : s.add(b); L.badges = [...s]; save(); showList(); };
+    f.append(btn);
+  }
+  const want = L.badges || [];
+  [...f.children].forEach((btn) => btn.classList.toggle('on', want.includes(btn.dataset.b)));
+  const box = $('fxList'); box.replaceChildren();
+  for (const [id, k] of Object.entries(FX_KINDS)) {
+    if (!want.every((b) => (k.badges || []).includes(b))) continue;
+    const it = document.createElement('div'); it.className = 'fxItem' + (id === L.kind ? ' on' : '');
+    const nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = k.label;
+    const bs = document.createElement('span'); bs.className = 'bs'; (k.badges || []).forEach((b) => bs.append(badge(b)));
+    it.append(nm, bs); it.onclick = () => { $('kind').value = id; $('kind').onchange(); };
+    box.append(it);
+  }
+  if (!box.childElementCount) { const p = document.createElement('p'); p.className = 'note'; p.textContent = 'No effect has all these badges.'; box.append(p); }
+}
 $('scale').oninput = () => { L.scale = +$('scale').value; $('scaleV').textContent = L.scale + ' m'; changed(); };
 $('auto').onchange = () => { L.auto = $('auto').checked; save(); };
 $('fire').onclick = () => demo(L.kind);
@@ -131,7 +152,8 @@ onAssetsChange(fillSaved);
 /* ---------------- dla AI ---------------- */
 // EffectsApi: play(kind, { from, to | at, dir | path }) — punkty [x, y, z]; set(kind, liczby); save(nazwa) — zasób „effect”
 window.EffectsApi = {
-  kinds: Object.fromEntries(Object.entries(FX_KINDS).map(([k, x]) => [k, x.needs])),
+  kinds: Object.fromEntries(Object.entries(FX_KINDS).map(([k, x]) => [k, { needs: x.needs, badges: x.badges }])), badges: Object.keys(FX_BADGES),
+  find: (...badges) => Object.keys(FX_KINDS).filter((k) => badges.every((b) => FX_KINDS[k].badges.includes(b))),   // efekty z tymi odznakami
   play: (kind, opts) => (opts ? fx.play(kind, opts) : demo(kind)),
   get: (kind = L.kind) => clone(L.values[kind]),
   set: (kind, values) => { if (!FX_KINDS[kind]) throw new Error(`unknown effect "${kind}"`); Object.assign(L.values[kind], values); L.kind = kind; save(); showAll(); remake(); return clone(L.values[kind]); },
