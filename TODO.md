@@ -4,7 +4,7 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 
 ## Następne w planie (`docs/guides/lab-breakdown.md`, „Kolejność”)
 - [x] Punkt 7 — lekarz sceny: zrobiony w 0.60.0 (`js/scene/doctor.js`, `docs/scene/doctor.md`); następne reguły — w opisie.
-- [ ] Punkt 8 — materiał z Hive Hunger (z historią): laboratorium bloków, statki roju, laboratorium efektów, drzewka
+- [ ] Punkt 8 — materiał z Hive Hunger (z historią): ~~laboratorium bloków~~ (0.64.0), statki roju, laboratorium efektów, drzewka
   technologiczne.
 - [ ] Punkt 9 — materiał z PatientZero (z historią): środowisko „organizm”, laboratorium tkanek, laboratorium patogenów.
 
@@ -64,9 +64,13 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
 - [ ] Przenieść materiały modeli na MatKit stopniowo, rodzina po rodzinie (doktor modeli, porównanie obrazów):
   budowle (`js/models/structures/materials.js`), okręty (`js/render/sea/materials.js`, `js/models/ships-sea/materials.js`),
   pojazdy, statki kosmiczne; potem teren i powierzchnie 2D laboratorium sztuki.
-- [ ] Bloki laboratorium bloków (Hive Hunger) z materiałów; złocenie ramy; faktura farby jako mapa nierówności.
+- [x] Bloki laboratorium bloków (Hive Hunger) z materiałów (0.64.0).
+- [ ] Złocenie ramy; faktura farby jako mapa nierówności.
 
 ## Język
+- [ ] **Laboratorium tłumaczenia:** tłumaczenie gry (teksty UI, dialogi, opisy) na języki; podstawowe: polski,
+  angielski, ukraiński. Dwa rodzaje przekształcenia gry: LTR (od lewej do prawej) i RTL (od prawej do lewej —
+  odwrócony układ UI, kierunek tekstu).
 - [ ] Przetłumaczyć okna laboratoriów na polski (teraz po polsku są pasek menu, strona startowa, tytuły okien standardowych, konsola i okno Wydajność).
 
 ## Pociąg (zachowanie „koło na szynie”)

@@ -1,7 +1,11 @@
-import { LIQUID_TIME, LIQUID_GLSL } from '../liquidShader.js';
-import { Grid3D } from './Grid3D.js';
+// Zachowanie „gaz w próżni” (środowisko: kosmos) — z Hive Hunger (js/three/effects/Gases.js), obliczenia bez zmian.
+// Krok step() = jedna klatka gry przy 60 Hz: wołany stałym krokiem 1/60 s. Laboratorium: labs/blocks.html.
+import * as THREE from '../../../vendor/three/three.module.js';
+import { LIQUID_TIME, LIQUID_GLSL } from '../../render/liquid.js';
+import { Grid3D } from './grid3d.js';
 
-const THREE = window.THREE;
+export const ENVIRONMENTS = ['space'];
+export const STEP = 1 / 60;   // s — jedna klatka gry, z którą liczy step()
 
 /**
  * Gas let loose in space: every voxel of solid gas that is eaten or destroyed becomes a puff of a

@@ -3,6 +3,11 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.27.0 — 2026-11-13 (bryły z bloków)
+
+### Dodane
+- Rodzina prefabrykatów **Bloki** (laboratorium bloków): planetoida, sześcian, dwie kule, pas skał, kulki testowe.
+
 ## 0.26.0 — 2026-11-13 (UI gry w ▶ Graj)
 
 ### Dodane

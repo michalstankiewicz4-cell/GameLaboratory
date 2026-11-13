@@ -3,6 +3,17 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.64.0 · bloki 1.0.0 · edytor sceny 0.27.0 — 2026-11-13 (laboratorium bloków)
+
+### Dodane
+- **Laboratorium bloków** (`labs/blocks.html`, opis `docs/labs/blocks.md`) z Hive Hunger (z historią): bryły
+  z bloków (skała, żelazo, lód, piaskowiec, woda, lawa, gaz) w warstwach (wierzch, pod spodem, głęboko, jądro, żyły,
+  jeziorka); kształty: kula, sześcian, dwie kule, pudła, pas skał, kulki testowe, napis. **BlockKit**
+  (`js/models/blocks/`); bloki stałe z materiałami z MatKit. Ugryzienie: woda i lawa wypadają jako krople, które
+  zbijają się w pływające kule, gaz jako dryfująca chmura (`js/behaviors/space/liquids.js`, `gases.js`, stały krok
+  60 Hz). Dla AI `BlocksApi`.
+- Edytor sceny: rodzina prefabrykatów **Bloki**.
+
 ## Program 0.63.1 — 2026-11-13 (schemat silnika)
 
 ### Zmienione

@@ -54,6 +54,7 @@ Układ folderów jest taki sam jak w kodzie:
 | Sztuka (obrazy 2D, ekspertyza) | `labs/art.html`, `js/render/art/` | [labs/art.md](labs/art.md) (obiekty: [labs/art/](labs/art/)) |
 | UI gry (menu, HUD, okna, dialogi, skórki) | `labs/gameui.html`, `js/gameui/` | [labs/gameui.md](labs/gameui.md) |
 | Materiały (MatKit: PBR, starzenie) | `labs/materials.html`, `js/render/materials/` | [labs/materials.md](labs/materials.md) |
+| Bloki (BlockKit: bryły z wokseli, ciecze i gaz) | `labs/blocks.html`, `js/models/blocks/` | [labs/blocks.md](labs/blocks.md) |
 | Kostnica SDF | `labs/morgue.html` | [labs/morgue.md](labs/morgue.md) |
 | SDF Walkers, laboratorium języka, laboratorium obrazów | `labs/walkers.html`, `labs/lang.html`, `labs/img.html` | [labs/walkers/README.md](labs/walkers/README.md), [labs/walkers/ROADMAP.md](labs/walkers/ROADMAP.md), [labs/walkers/notatki/](labs/walkers/notatki/README.md) |
 

@@ -13,6 +13,9 @@
  *   colors   for tags (text, boxes): [r, g, b] 0..255 per tag
  *
  * To add a shape: add a case here and use its name as `shape` in CONFIG.levels.
+ *
+ * GameLaboratory: z Hive Hunger (js/three/planet/shapes.js) — kształty brył z bloków (js/models/blocks/blockkit.js);
+ * jednostka: metr, s — bok bloku.
  */
 export function buildShape(look, s) {
   const shape = look.shape || 'sphere';

@@ -1,3 +1,5 @@
+// Wygląd cieczy i gazu (z Hive Hunger, js/three/liquidShader.js): lawa, woda, gaz stały — wspólna warstwa obrazu dla
+// bloków (js/models/blocks/blockkit.js) i kropel / chmur w kosmosie (js/behaviors/space/liquids.js, gases.js).
 /**
  * Moving looks for liquids (lava, water) and solid gas, shared by the planet's smooth surface (look.js) and the
  * droplets let loose in space (effects/Liquids.js): 3D value noise flowing with time, so no two

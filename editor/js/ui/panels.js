@@ -28,6 +28,7 @@ const ICONS = {
   base: 'M3 18h18M5 18a7 7 0 0 1 14 0M12 11v-4M10 7h4',
   bodies: 'M12 18a6 6 0 1 0 0-12a6 6 0 1 0 0 12M3 15c2 2 8 1 13-2s7-6 5-7',
   humans: 'M12 7a2.5 2.5 0 1 0 0-5a2.5 2.5 0 1 0 0 5M8 21l1-8h6l1 8M6 12l3-3h6l3 3',
+  blocks: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
   creatures: 'M4 10c2-3 5-3 8-2h5l3-2v4l-3 1c-1 2-3 3-6 3H8zM7 13l-1 7M10 14l1 6M15 13l1 7M18 11l1 4',
 };
 function familyIcon(f) {

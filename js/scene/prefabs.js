@@ -18,6 +18,7 @@ import { BODIES, DEFAULT_TRAIN, buildVehicle as buildRail } from '../models/trai
 import * as THREE from '../../vendor/three/three.module.js';
 import { SPECIES, SPECIES_IDS, growPlant, plantMaterials, windUniforms } from '../models/plants/plantkit.js';
 import { buildCave } from '../models/caves/cavekit.js';
+import { buildBody as buildBlocks, SHAPES as BLOCK_SHAPES } from '../models/blocks/blockkit.js';
 
 // family: grupa na liście; surface: gdzie stoi ('sea' — na wodzie, 'land' — na gruncie, 'air' — w powietrzu)
 export const FAMILIES = {
@@ -36,6 +37,7 @@ export const FAMILIES = {
   bodies: { label: 'Celestial bodies', labelPl: 'Ciała niebieskie' },
   humans: { label: 'Humans', labelPl: 'Ludzie' },
   creatures: { label: 'Creatures', labelPl: 'Stwory' },
+  blocks: { label: 'Blocks', labelPl: 'Bloki' },
 };
 
 const P = [];
@@ -125,6 +127,12 @@ function buildLife(id) {
 }
 [['humanBust', 'Human I'], ['humanHead', 'Human II']].forEach(([id, name]) => add('humans/' + id, name, 'humans', 'land', 'labs/human.html', () => buildLife(id), { needs: 'space' }));
 [['strider', 'Plains strider']].forEach(([id, name]) => add('creatures/' + id, name, 'creatures', 'land', 'labs/life.html', () => buildLife(id), { needs: 'space' }));
+
+// bryły z bloków (BlockKit, z Hive Hunger): kształt z warstwami domyślnymi laboratorium bloków; w kosmosie
+['sphere', 'cube', 'pair', 'belt', 'balls'].forEach((id) => add('blocks/' + id, BLOCK_SHAPES[id], 'blocks', 'space', 'labs/blocks.html', () => {
+  const b = buildBlocks({ shape: id, radius: id === 'belt' ? 6 : 8 });
+  return { root: b.group, kit: b, dispose: () => b.dispose(), tick: (t) => b.update(t) };
+}));
 
 export const PREFABS = P;
 export const prefab = (id) => P.find((p) => p.id === id) || null;

@@ -1,7 +1,12 @@
-import { LIQUID_TIME, LIQUID_GLSL } from '../liquidShader.js';
-import { Grid3D } from './Grid3D.js';
+// Zachowanie „ciecz w próżni” (środowisko: kosmos) — z Hive Hunger (js/three/effects/Liquids.js), obliczenia bez zmian.
+// Krok step() = jedna klatka gry przy 60 Hz: laboratorium i scena wołają go stałym krokiem 1/60 s (jak fizyka pociągu).
+// Laboratorium: labs/blocks.html; opis: docs/labs/blocks.md.
+import * as THREE from '../../../vendor/three/three.module.js';
+import { LIQUID_TIME, LIQUID_GLSL } from '../../render/liquid.js';
+import { Grid3D } from './grid3d.js';
 
-const THREE = window.THREE;
+export const ENVIRONMENTS = ['space'];
+export const STEP = 1 / 60;   // s — jedna klatka gry, z którą liczy step()
 
 /**
  * Liquid let loose in space: every voxel of a liquid (water, lava — a level's `liquids`) that is

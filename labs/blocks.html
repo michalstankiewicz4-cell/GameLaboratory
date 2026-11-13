@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Blocks Lab | GameLaboratory</title>
+<meta name="description" content="GameLaboratory blocks lab: bodies built of blocks (voxels) — rock, iron, ice, sandstone, water, lava, gas in layers (surface, under the surface, deep, core, veins, pools), solid blocks with materials from the materials lab; bite a hole and water and lava come loose as droplets that hold together, gas as a drifting cloud — in space, with no gravity. From Hive Hunger.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/blocks.html">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../ui/style/space.css">
+<link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="../ui/pages/blocks.css">
+</head>
+<!-- Laboratorium bloków (js/labs/blocks/): BlockKit (js/models/blocks/), ciecze i gaz w kosmosie (js/behaviors/space/
+     liquids.js, gases.js) — z Hive Hunger; materiały bloków z MatKit (js/render/materials/matkit.js). -->
+<body class="lab viewFits">
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/shell/menubar.js"></script>
+<div id="view"></div>
+<div class="bar">
+  <div class="envSwitch" data-current="space" data-space="blocks.html" data-water="" data-land=""></div>
+  <select id="shape" aria-label="Shape" title="The body's shape"></select>
+  <label class="chk" title="Click the body to bite a hole (otherwise: drag turns the camera)"><input type="checkbox" id="biteOn" checked> Bite on click</label>
+  <button type="button" id="rebuild" title="Build the body again (everything bitten comes back)">Rebuild</button>
+  <button type="button" id="clearFx" title="Remove the loose droplets and gas">Clear the loose</button>
+  <span class="sp"></span>
+  <span class="dimtxt" id="status"></span>
+</div>
+<div class="foot"><span id="fps" data-auto></span><span class="sp"></span><span>GameLaboratory</span></div>
+<script src="../ui/shell/bars.js"></script>
+<aside class="panel" data-std="info">
+  <h2 class="stdName">Blocks</h2>
+  <p class="stdText">Bodies built of blocks, as in Hive Hunger: rock, iron, ice, sandstone, water, lava and gas in layers. Click the body to bite a hole: water and lava come loose as droplets that hold together into floating blobs, gas as a drifting cloud — in space there is no gravity. Solid blocks take their look from the materials lab. Right-drag or Shift-drag turns the camera, the wheel zooms.</p>
+  <p class="note">For AI: BlocksApi in the console (API tab).</p>
+</aside>
+<aside class="panel" data-window="body" data-title="Body" data-title-pl="Bryła">
+  <div class="row"><span>Size (radius)</span><input type="range" id="radius" min="2" max="20" step="0.5"><output id="radiusV"></output></div>
+  <div class="row"><span>Block size</span><select id="voxel"><option value="0.25">0.25 m</option><option value="0.5">0.5 m</option><option value="1">1 m</option></select><output></output></div>
+  <div class="row"><span>Seed</span><input type="number" id="seed" min="1" max="99999" step="1"><output></output></div>
+  <div class="row" id="textRow"><span>Text</span><input type="text" id="text" maxlength="12"><output></output></div>
+  <h3>Layers</h3>
+  <div id="layers"></div>
+  <div class="btns"><button type="button" id="addLayer">Add a layer</button><button type="button" id="resetLayers">Back to the default</button></div>
+  <p class="note">Later layers cover earlier ones. Where: the whole body, the surface layer, under it, deep inside, the core; veins and pools are patches from noise. Amount: % of that place.</p>
+</aside>
+<aside class="panel" data-window="kinds" data-title="Kinds of blocks" data-title-pl="Rodzaje bloków">
+  <div id="kinds"></div>
+  <p class="note">Solid blocks: a material from the materials lab (ready ones and your own saved). Water and lava come loose as droplets, gas as a cloud.</p>
+</aside>
+<aside class="panel" data-window="bite" data-side="right" data-title="Bite and the loose" data-title-pl="Ugryzienie i luźne">
+  <div class="row"><span>Bite radius</span><input type="range" id="biteR" min="0.5" max="6" step="0.25"><output id="biteRV"></output></div>
+  <div id="counts"></div>
+  <h3>Liquids</h3>
+  <div class="row"><span>Liquid</span><select id="lqSel"><option value="water">Water</option><option value="lava">Lava</option></select><output></output></div>
+  <div id="lqFields"></div>
+  <h3>Gas</h3>
+  <div id="gasFields"></div>
+  <p class="note">Numbers as in Hive Hunger: per step of 1/60 s (the lab steps them at a fixed 60 Hz). Cohesion pulls droplets of the same liquid together within reach, push keeps them apart closer than rest, damping slows them.</p>
+</aside>
+<aside class="panel" data-std="perf"></aside>
+<script src="../ui/shell/loader.js"></script>
+<script src="../ui/shell/perf.js"></script>
+<script src="../ui/shell/labwin.js"></script>
+<script src="../ui/shell/windows.js"></script>
+<script src="../ui/shell/envswitch.js"></script>
+<script type="module" src="../js/labs/blocks/blocks.js"></script>
+</body>
+</html>
