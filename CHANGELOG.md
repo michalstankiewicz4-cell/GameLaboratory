@@ -3,6 +3,11 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.67.1 — 2026-11-14 (kategoria Efekty)
+
+### Zmienione
+- Laboratorium efektów ma własną kategorię **Efekty** (`--cat-effects`), zamiast „Materiały i grafika”.
+
 ## Program 0.67.0 · efekty 1.0.0 · bloki 1.2.0 · edytor sceny 0.29.0 — 2026-11-13 (laboratorium efektów)
 
 ### Dodane

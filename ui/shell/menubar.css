@@ -41,7 +41,7 @@
 #labMenu .lmDot[data-cat="vehicles"] { --dot: var(--cat-vehicles); } #labMenu .lmDot[data-cat="space"] { --dot: var(--cat-space); }
 #labMenu .lmDot[data-cat="world"] { --dot: var(--cat-world); } #labMenu .lmDot[data-cat="life"] { --dot: var(--cat-life); }
 #labMenu .lmDot[data-cat="matter"] { --dot: var(--cat-matter); } #labMenu .lmDot[data-cat="ui"] { --dot: var(--cat-ui); }
-#labMenu .lmDot[data-cat="voxels"] { --dot: var(--cat-voxels); } #labMenu .lmDot[data-cat="ai"] { --dot: var(--cat-ai); } #labMenu .lmDot[data-cat="tools"] { --dot: var(--cat-tools); }
+#labMenu .lmDot[data-cat="voxels"] { --dot: var(--cat-voxels); } #labMenu .lmDot[data-cat="effects"] { --dot: var(--cat-effects); } #labMenu .lmDot[data-cat="ai"] { --dot: var(--cat-ai); } #labMenu .lmDot[data-cat="tools"] { --dot: var(--cat-tools); }
 #labMenu .lmItem .lmDot { margin-left: -4px; }
 #labMenu .lmCat { display: flex; align-items: center; gap: 7px; padding: 7px 10px 2px 24px; color: var(--dim); font-size: 10.5px; letter-spacing: .4px; }
 #labMenu .lmCat .lmDot { width: 6px; height: 6px; }

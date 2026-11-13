@@ -39,7 +39,7 @@ h2::after{ content:""; flex:1; height:1px; background:var(--line); }
 .tile[data-cat="vehicles"]{ --cat:var(--cat-vehicles); } .tile[data-cat="space"]{ --cat:var(--cat-space); }
 .tile[data-cat="world"]{ --cat:var(--cat-world); } .tile[data-cat="life"]{ --cat:var(--cat-life); }
 .tile[data-cat="matter"]{ --cat:var(--cat-matter); } .tile[data-cat="ui"]{ --cat:var(--cat-ui); }
-.tile[data-cat="voxels"]{ --cat:var(--cat-voxels); } .tile[data-cat="ai"]{ --cat:var(--cat-ai); } .tile[data-cat="tools"]{ --cat:var(--cat-tools); }
+.tile[data-cat="voxels"]{ --cat:var(--cat-voxels); } .tile[data-cat="effects"]{ --cat:var(--cat-effects); } .tile[data-cat="ai"]{ --cat:var(--cat-ai); } .tile[data-cat="tools"]{ --cat:var(--cat-tools); }
 .tag.cat{ display:inline-flex; align-items:center; gap:6px; cursor:help; color:var(--cat); border-color:color-mix(in srgb, var(--cat) 45%, transparent);
   background:color-mix(in srgb, var(--cat) 9%, transparent); }
 .tag.cat .dot{ width:7px; height:7px; border-radius:50%; background:var(--cat); }
