@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.69.2 — 2026-11-14 (poprawka: fala uderzeniowa przy zniszczeniu statku)
+
+### Naprawione
+- Zniszczenie statku (ShipKit) znowu ma pomarańczową falę uderzeniową: od 0.69.0 korzystała z emitera skanu bez
+  `env`, więc nie zgłaszała się nigdzie i znikała. Teraz idzie przez `model.onScan` jak skan (barwa wybuchu) —
+  rysuje ją laboratorium efektów w laboratorium pojazdów i w edytorze sceny.
+
 ## Pojazdy — kosmos 1.10.1 · edytor sceny 0.31.1 — 2026-11-14 (efekt strzału według odznak)
 
 ### Zmienione

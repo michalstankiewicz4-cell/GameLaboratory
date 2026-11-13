@@ -541,7 +541,8 @@ function fractureMesh(mesh, pieces, rand) {
 // they follow any animation), and emits smoke and spark bursts. Small
 // parts are the debris candidates. setDamage(0..1) decides how much of
 // it shows; update() animates it.
-function createDamageFx(ship, radius) {
+// env: the model's env — the shockwave of the final blast is reported like a scan (env.onScan, orange)
+function createDamageFx(ship, radius, env = null) {
   const T = fxTextures(), G = glowTextures(), rand = rng(101);
   ship.updateMatrixWorld(true);
   const big = [], small = [];
@@ -671,7 +672,7 @@ function createDamageFx(ship, radius) {
     f.visible = false; fxp.add(f);
     fireballs.push({ s: f, off: new THREE.Vector3(rand() - 0.5, rand() - 0.5, rand() - 0.5).multiplyScalar(radius * 0.8), delay: rand() * 0.35 });
   }
-  const shock = makeScanEmitter(ship, null, 0xff8a3c);
+  const shock = makeScanEmitter(ship, env, 0xff8a3c);   // the shockwave: the effects lab's scan wave, orange
   const flying = [];
   let boomT = -1;
   function breakApart() {
@@ -1613,7 +1614,7 @@ function buildShipModel(id, { detail = 1, merge = false, fxRoot = null, envMap =
   // effects and flickering lights, on top of the ship's own actions.
   const features = { offline: true, damage: true, destroy: true, ...(def.features || {}) };
   if (!features.damage) features.destroy = false;
-  const fx = features.damage ? createDamageFx(built.group, radius)
+  const fx = features.damage ? createDamageFx(built.group, radius, env)
     : { damage: 0, setDamage() {}, update() {} };
   const own = built.actions || [];
   const actions = STANDARD_ACTIONS.map((a) => {
