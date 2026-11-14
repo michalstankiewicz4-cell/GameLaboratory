@@ -71,10 +71,15 @@ export function lathe(profile, segs = 48, { closed = false, sharp = [] } = {}) {
   g.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
   g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
   g.setIndex(idx);
-  // kierunek ścian zgodny z normalnymi
-  const a = V().fromArray(pos, idx[0] * 3), b = V().fromArray(pos, idx[1] * 3), c = V().fromArray(pos, idx[2] * 3);
-  const fn = b.clone().sub(a).cross(c.clone().sub(a)), vn = V().fromArray(nor, idx[0] * 3);
-  if (fn.dot(vn) < 0) { const ia = g.index.array; for (let t = 0; t < ia.length; t += 3) { const x = ia[t + 1]; ia[t + 1] = ia[t + 2]; ia[t + 2] = x; } }
+  // kierunek ścian zgodny z normalnymi (pierwszy niezdegenerowany trójkąt — przy osi trójkąty mają zerowe pole)
+  for (let t = 0; t < idx.length; t += 3) {
+    const a = V().fromArray(pos, idx[t] * 3), b = V().fromArray(pos, idx[t + 1] * 3), c = V().fromArray(pos, idx[t + 2] * 3);
+    const fn = b.clone().sub(a).cross(c.clone().sub(a));
+    if (fn.lengthSq() < 1e-14) continue;
+    const vn = V().fromArray(nor, idx[t] * 3).add(V().fromArray(nor, idx[t + 1] * 3)).add(V().fromArray(nor, idx[t + 2] * 3));
+    if (fn.dot(vn) < 0) { const ia = g.index.array; for (let k = 0; k < ia.length; k += 3) { const x = ia[k + 1]; ia[k + 1] = ia[k + 2]; ia[k + 2] = x; } }
+    break;
+  }
   g.userData.arc = arc.map((x) => x / tot); g.userData.arcLen = tot;
   return g;
 }

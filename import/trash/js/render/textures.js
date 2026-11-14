@@ -109,6 +109,50 @@ const RECIPES = {
   },
 };
 
+// nadruk puszki: tło, pasy, duży napis, objętość, tabelka, kod kreskowy; poza ścianką goły aluminium (metal)
+RECIPES.canLabel = (m, d) => {
+  const W = 1024, H = 512, [c, x] = canvas(W, H);
+  const [mc, mx] = canvas(W, H);   // metaliczność (B) i szorstkość (G): farba mniej metaliczna
+  x.fillStyle = '#d4d8dc'; x.fillRect(0, 0, W, H);
+  mx.fillStyle = 'rgb(0,80,255)'; mx.fillRect(0, 0, W, H);
+  const [v0, v1] = d.wallV, yA = (1 - v1) * H, yB = (1 - v0) * H, hh = yB - yA;
+  const ax = (W / d.circ) / (H / d.arcLen);   // proporcja px/m wokół i wzdłuż profilu
+  x.fillStyle = d.base; x.fillRect(0, yA, W, hh);
+  mx.fillStyle = 'rgb(0,120,90)'; mx.fillRect(0, yA, W, hh);
+  // pasy
+  x.fillStyle = d.band; x.fillRect(0, yA + hh * 0.08, W, hh * 0.035); x.fillRect(0, yB - hh * 0.12, W, hh * 0.05);
+  // fala na tle
+  x.globalAlpha = 0.18; x.fillStyle = d.band;
+  x.beginPath(); x.moveTo(0, yB);
+  for (let i = 0; i <= 64; i++) x.lineTo(i / 64 * W, yA + hh * (0.62 + 0.12 * Math.sin(i / 64 * Math.PI * 4)));
+  x.lineTo(W, yB); x.fill(); x.globalAlpha = 1;
+  const txt = (s, cx, cy, size, weight, col, rot = 0) => {
+    x.save(); x.translate(cx, cy); x.rotate(rot); x.scale(ax, 1); x.font = `${weight} ${size}px Arial, sans-serif`;
+    x.fillStyle = col; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(s, 0, 0); x.restore();
+  };
+  // duży napis biegnie wzdłuż wysokości puszki (obrócony), dwa razy wokół
+  for (const cx of [W * 0.22, W * 0.72]) {
+    x.save(); x.translate(cx, yA + hh * 0.48); x.rotate(-Math.PI / 2); x.scale(1, 1 / ax);
+    x.font = `900 ${Math.round(hh * 0.30)}px Arial Black, Arial, sans-serif`; x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.lineWidth = hh * 0.02; x.strokeStyle = 'rgba(0,0,0,0.35)'; x.strokeText(d.text, 0, 0);
+    x.fillStyle = d.ink; x.fillText(d.text, 0, 0); x.restore();
+    txt(d.sub, cx, yA + hh * 0.86, Math.round(hh * 0.045), 700, d.ink);
+  }
+  txt('0,33 l', W * 0.47, yA + hh * 0.2, Math.round(hh * 0.07), 800, d.ink);
+  // tabelka i kod kreskowy (z tyłu)
+  x.fillStyle = 'rgba(255,255,255,0.88)'; const tx = W * 0.47 - 24 * ax, ty = yA + hh * 0.36;
+  x.fillRect(tx, ty, 48 * ax, hh * 0.3);
+  x.fillStyle = '#222';
+  for (let i = 0; i < 9; i++) x.fillRect(tx + 3 * ax, ty + 6 + i * hh * 0.03, (30 + (i * 7) % 14) * ax, 2);
+  const bx = W * 0.97 - 20 * ax, by = yA + hh * 0.42;
+  x.fillStyle = '#fff'; x.fillRect(bx, by, 40 * ax * 0.5, hh * 0.18);
+  x.fillStyle = '#000'; const r = rng(7);
+  for (let k = 0, px = bx + 2; px < bx + 40 * ax * 0.5 - 3; k++) { const w = 1 + (r() * 3 | 0); if (k % 2 === 0) x.fillRect(px, by + 3, w, hh * 0.15); px += w; }
+  m.map = tex(c);
+  m.metalnessMap = tex(mc, { srgb: false }); m.roughnessMap = m.metalnessMap;
+  m.metalness = 1; m.roughness = 1;
+};
+
 export function applyTextures() {
   for (const m of allMaterials()) {
     if (m.userData.textured) continue;
