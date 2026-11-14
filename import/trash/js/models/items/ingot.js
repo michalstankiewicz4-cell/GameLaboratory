@@ -12,10 +12,10 @@ export const VARIANTS = [
   { name: 'mieszanka', color: '#80786e', metalness: 0.85, roughness: 0.65, density: 5200 },
 ];
 
-export function ingotGeometry(lod = 0) {
-  const [tx, tz] = INGOT.top, [bx, bz] = INGOT.bottom, h = INGOT.h, n = lod ? 2 : 6, rings = [];
+export function ingotGeometry(lod = 0, D = INGOT) {
+  const [tx, tz] = D.top, [bx, bz] = D.bottom, h = D.h, n = lod ? 2 : 6, rings = [];
   // przekroje poziome od dołu do góry; zaokrąglone narożniki (8 punktów na róg)
-  const rr = 0.012, k = lod ? 2 : 6;
+  const rr = Math.min(0.012, bz * 0.13), k = lod ? 2 : 6;
   for (let i = 0; i <= n; i++) {
     const t = i / n, y = -h / 2 + h * t;
     // zaokrąglenie dolnej i górnej krawędzi: przekrój zwęża się przy samych krawędziach
@@ -30,7 +30,7 @@ export function ingotGeometry(lod = 0) {
   const g = loft(rings, { smooth: true });
   // skurcz na górze: wierzchołki górnej zaślepki wciśnięte (środek niżej)
   const p = g.attributes.position;
-  for (let i = 0; i < p.count; i++) if (p.getY(i) > h / 2 - 1e-6) { const fx = 1 - Math.abs(p.getX(i)) / (tx / 2), fz = 1 - Math.abs(p.getZ(i)) / (tz / 2); p.setY(i, p.getY(i) - 0.006 * Math.min(fx * 3, 1) * Math.min(fz * 3, 1)); }
+  for (let i = 0; i < p.count; i++) if (p.getY(i) > h / 2 - 1e-6) { const fx = 1 - Math.abs(p.getX(i)) / (tx / 2), fz = 1 - Math.abs(p.getZ(i)) / (tz / 2); p.setY(i, p.getY(i) - h * 0.075 * Math.min(fx * 3, 1) * Math.min(fz * 3, 1)); }
   g.computeVertexNormals(); uvMeters(g, 0.12);
   return g;
 }
@@ -45,7 +45,7 @@ export function build(lod = 0, variant = 0) {
 
 const [tx, tz] = INGOT.top, [bx, bz] = INGOT.bottom, hh = INGOT.h / 2;
 export const info = {
-  id: 'ingot', name: 'Sztabka', version: '1.0.0', variants: VARIANTS.length,
+  id: 'ingot', name: 'Sztabka', version: '1.0.1', variants: VARIANTS.length,
   mass: INGOT.volume * 2700, material: 'metal (wg wariantu)',
   crush: { x: 400, y: 400, z: 400 }, minScale: { x: 1, y: 1, z: 1 },
   collider: { type: 'hulls', hulls: [[-bx / 2, -hh, -bz / 2, bx / 2, -hh, -bz / 2, bx / 2, -hh, bz / 2, -bx / 2, -hh, bz / 2, -tx / 2, hh, -tz / 2, tx / 2, hh, -tz / 2, tx / 2, hh, tz / 2, -tx / 2, hh, tz / 2]] },

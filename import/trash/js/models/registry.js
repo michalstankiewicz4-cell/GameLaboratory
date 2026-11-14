@@ -16,6 +16,7 @@ export const MODELS = [
   { id: 'metal-crusher', label: 'Zgniatarka do metalu', group: 'Maszyny', load: () => import('./machines/metal-crusher.js') },
   { id: 'induction-furnace', label: 'Piec indukcyjny', group: 'Maszyny', load: () => import('./machines/induction-furnace.js') },
   { id: 'ingot', label: 'Sztabka', group: 'Przedmioty', load: () => import('./items/ingot.js') },
+  { id: 'ingot-small', label: 'Mała sztabka', group: 'Przedmioty', load: () => import('./items/ingot-small.js') },
   { id: 'casting-line', label: 'Linia odlewnicza', group: 'Maszyny', load: () => import('./machines/casting-line.js') },
   { id: 'fence', label: 'Ogrodzenie', group: 'Otoczenie', load: () => import('./world/fence.js') },
   { id: 'buyback', label: 'Punkt skupu', group: 'Otoczenie', load: () => import('./world/buyback.js') },
