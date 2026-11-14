@@ -64,3 +64,8 @@ razem) i wywołania rysowania (siatka × grupy materiałów), liczone przy budow
 Nowa reguła = funkcja w `checkScene` (kod, poziom, tekst, poprawka) i wiersz w tabeli wyżej. Możliwe następne: obiekt
 poza mapą lądu, pojazd szynowy poza torem, moduły bazy za blisko siebie (zasady budowy z `editor/js/world/placer.js`),
 światła i cienie ponad budżet.
+
+## W planie: styki terenów
+
+Reguły dla połączeń między terenami (jaskinia i ląd, później nabrzeża i tory) — lista w `TODO.md`, „Łączenie terenów
+zamiast osobnego laboratorium”.

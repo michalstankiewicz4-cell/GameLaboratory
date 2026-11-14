@@ -54,6 +54,14 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
 - [ ] **Rozległe jaskinie** (właściciel, 2026-11-14): jaskinia dzielona na kawałki liczone wokół gracza (dziś CaveKit liczy
   całą jaskinię naraz, do ok. 2,4 mln próbek — przy dużej jaskini oczka siatki rosną i ściany tracą szczegóły);
   wejście do jaskini wycięte w terenie lądu — połączenie lądu i podziemia.
+- [ ] **Łączenie terenów zamiast osobnego laboratorium** (właściciel, 2026-11-14): połączenia w jednym generatorze
+  (morze z ujściem rzeki, rzeka w górach) robi laboratorium lądu; między generatorami — operacje sceny:
+  - obiekt **„wejście jaskini”**: postawiony na terenie lądu sam wycina otwór w zboczu i łączy się z jaskinią;
+  - **reguły styków w lekarzu sceny** (uniwersalne, zgłasza i proponuje poprawkę): dziura albo szczelina między
+    terenami (wejście jaskini nie dochodzi do powierzchni), uskok wysokości na styku, niezgodny poziom wody
+    (jezioro w jaskini a morze obok), rzeka kończąca się w niczym, obiekt wiszący nad otworem albo wbity w ścianę
+    jaskini, światło przeciekające tam, gdzie go nie powinno być (słońce w jaskini); później — wygląd z kilku ujęć
+    (porównanie zrzutów).
 - [ ] **Układy (systems):** układ planetarny z laboratorium jako zasób, wstawiany do sceny kosmosu z orbitami.
 - [ ] **Skórki (skins):** malowanie statków jako zasób, wybierany dla obiektu w scenie.
 - [ ] **Powierzchnia (surface):** to, czego ląd z planety jeszcze nie przejął (grunt SurfaceKit, zejście, jazda) —
