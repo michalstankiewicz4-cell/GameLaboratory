@@ -344,9 +344,9 @@ RECIPES.signSkup = (m) => {
 RECIPES.priceBoard = (m) => {
   const [c, x] = canvas(512, 420); x.fillStyle = '#f4f1e6'; x.fillRect(0, 0, 512, 420); x.fillStyle = '#1d4f2c'; x.fillRect(0, 0, 512, 70);
   x.fillStyle = '#fff'; x.font = '800 44px Arial'; x.textAlign = 'center'; x.fillText('CENNIK', 256, 50);
-  x.fillStyle = '#222'; x.font = '600 30px Arial'; x.textAlign = 'left';
-  [['Aluminium (sztabki)', '6,20 zł/kg'], ['Stal (sztabki)', '1,10 zł/kg'], ['Mieszanka', '0,90 zł/kg']].forEach(([a, b], i) => { x.fillText(a, 24, 130 + i * 70); x.textAlign = 'right'; x.fillText(b, 490, 130 + i * 70); x.textAlign = 'left'; });
-  x.font = '400 20px Arial'; x.fillText('Skupujemy tylko przetopiony metal.', 24, 390); m.map = tex(c);
+  x.fillStyle = '#222'; x.font = '600 28px Arial'; x.textAlign = 'left';
+  [['Aluminium (sztabki)', '6,20 zł/kg'], ['Stal (sztabki)', '1,10 zł/kg'], ['Mieszanka', '0,90 zł/kg'], ['Opony (guma)', '0,30 zł/kg']].forEach(([a, b], i) => { x.fillText(a, 24, 120 + i * 62); x.textAlign = 'right'; x.fillText(b, 490, 120 + i * 62); x.textAlign = 'left'; });
+  x.font = '400 19px Arial'; x.fillText('Metal tylko przetopiony. Opony całe lub zgniecione.', 24, 395); m.map = tex(c);
 };
 
 export function applyTextures() {

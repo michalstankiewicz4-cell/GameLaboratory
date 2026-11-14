@@ -118,7 +118,7 @@ Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zacz
 
 ### Punkt skupu (`world/buyback.js`)
 - Kontener 6 × 2,45 × 2,6 m przy bramie; `LAYOUT.scale` — waga (przedmioty na niej są wyceniane), `LAYOUT.window` — okienko (sprzedaż).
-- Cennik (zł/kg): aluminium 6,20, stal 1,10, mieszanka 0,90 — skup przyjmuje tylko sztabki.
+- Cennik (zł/kg): aluminium 6,20, stal 1,10, mieszanka 0,90, opony 0,30 — skup przyjmuje sztabki i opony (całe lub zgniecione). Od v1.1.0 opony na cenniku.
 
 ## Pojazd
 

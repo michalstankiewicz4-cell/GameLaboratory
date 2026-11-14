@@ -1,6 +1,6 @@
 // Punkt skupu przy bramie: kontener biurowy 6 × 2,45 × 2,6 m (blacha trapezowa) z oknem i okienkiem kasowym,
 // drzwi, klimatyzator, tablica „SKUP ZŁOMU” na dachu, waga platformowa 1,5 × 1,5 m z wyświetlaczem na słupku
-// (położony przedmiot się waży), cennik na ścianie. Układ: środek podstawy kontenera w (0,0,0), front +x.
+// (położony przedmiot się waży), cennik na ścianie (sztabki i opony). Układ: środek podstawy kontenera w (0,0,0), front +x.
 import * as THREE from '../../../vendor/three/three.module.js';
 import { merge, part, place, uvMeters, roundedBox } from '../geom.js';
 import { mat } from '../materials.js';
@@ -74,4 +74,4 @@ export function colliders() {
   c.push({ kind: 'box', half: [0.18, 0.03, 0.65], at: [LAYOUT.window[0] + 0.18, LAYOUT.window[1] - 0.33, LAYOUT.window[2]] });
   return c;
 }
-export const info = { id: 'buyback', name: 'Punkt skupu', version: '1.0.0' };
+export const info = { id: 'buyback', name: 'Punkt skupu', version: '1.1.0' };
