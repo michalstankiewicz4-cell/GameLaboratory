@@ -17,4 +17,5 @@ export const MODELS = [
   { id: 'induction-furnace', label: 'Piec indukcyjny', group: 'Maszyny', load: () => import('./machines/induction-furnace.js') },
   { id: 'ingot', label: 'Sztabka', group: 'Przedmioty', load: () => import('./items/ingot.js') },
   { id: 'casting-line', label: 'Linia odlewnicza', group: 'Maszyny', load: () => import('./machines/casting-line.js') },
+  { id: 'fence', label: 'Ogrodzenie', group: 'Otoczenie', load: () => import('./world/fence.js') },
 ];

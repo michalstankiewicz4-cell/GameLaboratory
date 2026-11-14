@@ -321,6 +321,26 @@ RECIPES.cast = (m) => {
   m.bumpMap = tex(grayCanvas(S, S, fbm(S, S, [16, 4], 43)), { srgb: false, repeat: [3, 3] }); m.bumpScale = 0.6;
 };
 
+// siatka plecionka: romby z drutu (kanał alfa), oczko 5 cm — tekstura 20 oczek na metr
+RECIPES.chainLink = (m) => {
+  const S = 256, [c, x] = canvas(S, S);
+  x.clearRect(0, 0, S, S); x.strokeStyle = '#ffffff'; x.lineWidth = 3.2; x.lineCap = 'round';
+  const n = 5, s = S / n;
+  for (let i = -1; i <= n; i++) { x.beginPath(); x.moveTo(i * s, 0); x.lineTo(i * s + S, S); x.stroke(); x.beginPath(); x.moveTo(i * s + S, 0); x.lineTo(i * s, S); x.stroke(); }
+  m.map = tex(c, { repeat: [4, 4] }); m.alphaMap = null;
+};
+// tablice: ogrodzenie (zakaz wstępu) i punkt skupu
+RECIPES.signYard = (m) => {
+  const [c, x] = canvas(512, 256); x.fillStyle = '#f2f2ee'; x.fillRect(0, 0, 512, 256); x.strokeStyle = '#c42020'; x.lineWidth = 14; x.strokeRect(10, 10, 492, 236);
+  x.fillStyle = '#c42020'; x.font = '900 64px Arial'; x.textAlign = 'center'; x.fillText('TEREN', 256, 95); x.fillText('PRYWATNY', 256, 160);
+  x.fillStyle = '#222'; x.font = '700 28px Arial'; x.fillText('WYSYPISKO — WSTĘP WZBRONIONY', 256, 215); m.map = tex(c);
+};
+RECIPES.signSkup = (m) => {
+  const [c, x] = canvas(1024, 256); x.fillStyle = '#1d4f2c'; x.fillRect(0, 0, 1024, 256); x.strokeStyle = '#e8d24a'; x.lineWidth = 10; x.strokeRect(12, 12, 1000, 232);
+  x.fillStyle = '#f2e9c9'; x.font = '900 120px Arial'; x.textAlign = 'center'; x.fillText('SKUP ZŁOMU', 512, 150);
+  x.font = '700 40px Arial'; x.fillStyle = '#e8d24a'; x.fillText('ALUMINIUM · STAL · METALE KOLOROWE', 512, 215); m.map = tex(c);
+};
+
 export function applyTextures() {
   for (const m of allMaterials()) {
     if (m.userData.textured) continue;

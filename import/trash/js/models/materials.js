@@ -39,6 +39,9 @@ export const DEFS = {
   copper: { color: '#c27a4a', roughness: 0.35, metalness: 1, tex: 'brushed' },
   refractory: { color: '#ffffff', roughness: 1, metalness: 0, tex: 'matkit', kit: { kind: 'brick', color: '#b9a48a', color2: '#5e5246', tile: 1, roughness: 0.92, metalness: 0, bricks: 6, wear: 0.3, dirt: 0.5, seed: 13 } },
   castIron: { color: '#ffffff', roughness: 1, metalness: 1, tex: 'matkit', kit: { kind: 'metal', color: '#4a4c4e', tile: 0.5, roughness: 0.75, metalness: 0.8, brushed: 0, wear: 0.4, dirt: 0.5, rust: 0.3, seed: 14 } },
+  chainLink: { color: '#b4babe', roughness: 0.5, metalness: 0.8, tex: 'chainLink', alphaTest: 0.5, double: true },
+  signYard: { color: '#ffffff', roughness: 0.6, metalness: 0.1, tex: 'signYard' },
+  signSkup: { color: '#ffffff', roughness: 0.5, metalness: 0.1, tex: 'signSkup' },
   glass: { color: '#9fb4bf', roughness: 0.08, metalness: 0.2, tex: null },
   rubberBlack: { color: '#151515', roughness: 0.8, metalness: 0, tex: 'rubber' },
   glowOrange: { color: '#ff7a1a', roughness: 1, metalness: 0, tex: null, emissive: '#ff6a10', emissiveIntensity: 3 },
@@ -58,6 +61,8 @@ export function mat(id) {
   const d = DEFS[id];
   if (!d) throw new Error('nieznany materiał: ' + id);
   m = new THREE.MeshStandardMaterial({ color: new THREE.Color(d.color), roughness: d.roughness, metalness: d.metalness });
+  if (d.alphaTest) { m.alphaTest = d.alphaTest; m.transparent = false; }
+  if (d.double) m.side = THREE.DoubleSide;
   if (d.emissive) { m.emissive = new THREE.Color(d.emissive); m.emissiveIntensity = d.emissiveIntensity ?? 1; }
   m.name = id; m.userData.def = d;
   cache.set(id, m);
