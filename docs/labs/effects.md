@@ -34,7 +34,9 @@ w menu i na stronie startowej: **Efekty**.
 Efekty z gry dzielą się tak, jak je gra wywoływała: z `effects/` (strzały, odłamki, błyskawice, soczewki) i z roju
 (`beams.js`, `tows.js`, `cutters.js`, `fields.js`, `warp.js` — w grze metody `Swarm3D` na tablicach statków; tu podaje im
 je gospodarz `swarm-fx.js`: każdy grany efekt to jeden „statek”, `frames` — jak długo trwa). Znacznik (`marker.js`)
-i tunel (`portal.js`) — ze sceny gry; fala skanu (`scan.js`) — z ShipKit. Wiertło wiertnicy zostaje przy modelu statku.
+i tunel (`portal.js`) — ze sceny gry; fala skanu (`scan.js`) — z ShipKit. Zostają przy modelu (decyzje właściciela,
+2026-11-14): wiertło wiertnicy, łamanie i odpadanie części przy uszkodzeniu i zniszczeniu, laser „print” Scribe (pisze
+napis w chmurze gazu — animacja statku) i rozbłysk oka Scribe przy strzale.
 
 Soczewki (czarna dziura, kula cieczy) potrzebują obrazu sceny: `fx.render(renderer, scene, camera, draw)` rysuje
 scenę do celu (`draw(target)` — w laboratoriach przez potok kamery `LookPipeline`) i zagina go.
