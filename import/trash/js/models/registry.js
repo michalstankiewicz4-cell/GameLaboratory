@@ -18,4 +18,5 @@ export const MODELS = [
   { id: 'ingot', label: 'Sztabka', group: 'Przedmioty', load: () => import('./items/ingot.js') },
   { id: 'casting-line', label: 'Linia odlewnicza', group: 'Maszyny', load: () => import('./machines/casting-line.js') },
   { id: 'fence', label: 'Ogrodzenie', group: 'Otoczenie', load: () => import('./world/fence.js') },
+  { id: 'buyback', label: 'Punkt skupu', group: 'Otoczenie', load: () => import('./world/buyback.js') },
 ];

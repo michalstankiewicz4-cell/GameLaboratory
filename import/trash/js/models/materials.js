@@ -42,6 +42,8 @@ export const DEFS = {
   chainLink: { color: '#b4babe', roughness: 0.5, metalness: 0.8, tex: 'chainLink', alphaTest: 0.5, double: true },
   signYard: { color: '#ffffff', roughness: 0.6, metalness: 0.1, tex: 'signYard' },
   signSkup: { color: '#ffffff', roughness: 0.5, metalness: 0.1, tex: 'signSkup' },
+  display: { color: '#0a140c', roughness: 0.3, metalness: 0, tex: null, emissive: '#3cff6a', emissiveIntensity: 0.15 },
+  priceBoard: { color: '#ffffff', roughness: 0.7, metalness: 0, tex: 'priceBoard' },
   glass: { color: '#9fb4bf', roughness: 0.08, metalness: 0.2, tex: null },
   rubberBlack: { color: '#151515', roughness: 0.8, metalness: 0, tex: 'rubber' },
   glowOrange: { color: '#ff7a1a', roughness: 1, metalness: 0, tex: null, emissive: '#ff6a10', emissiveIntensity: 3 },

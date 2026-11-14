@@ -113,3 +113,7 @@ Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zacz
 ### Ogrodzenie (`world/fence.js`)
 - Plac 80 × 80 m, brama 6 m od strony +z (zamknięta — nie da się wyjść); 4 ściany zderzaczy po 4 m wysokości.
 - Siatka jako płaszczyzny dwustronne z teksturą przezroczystą (`alphaTest`) — tanie na GPU.
+
+### Punkt skupu (`world/buyback.js`)
+- Kontener 6 × 2,45 × 2,6 m przy bramie; `LAYOUT.scale` — waga (przedmioty na niej są wyceniane), `LAYOUT.window` — okienko (sprzedaż).
+- Cennik (zł/kg): aluminium 6,20, stal 1,10, mieszanka 0,90 — skup przyjmuje tylko sztabki.

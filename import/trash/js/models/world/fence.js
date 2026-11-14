@@ -53,7 +53,7 @@ function gate(lod) {
     for (const y of [0.5, H - 0.5]) frame.push(cyl(0.025, 0.12, x1 + s * 0.06, y, z, 8, 0, Math.PI / 2));   // zawiasy
   }
   frame.push(box(0.12, 0.2, 0.06, g.x, 1.1, z + 0.05));   // zamek z kłódką
-  const sign = box(1.4, 0.7, 0.02, g.x - 1.3, 1.5, z + 0.05);
+  const sign = place(new THREE.BoxGeometry(1.4, 0.7, 0.02), [g.x - 1.3, 1.5, z + 0.05]);
   return { posts: merge(o), frame: merge(frame), mesh: merge(mesh), sign };
 }
 
@@ -75,4 +75,4 @@ export function colliders() {
     { kind: 'box', half: [0.25, h / 2, D / 2 + 0.5], at: [W / 2 + 0.2, h / 2, 0] },
   ];
 }
-export const info = { id: 'fence', name: 'Ogrodzenie z bramą', version: '1.0.0' };
+export const info = { id: 'fence', name: 'Ogrodzenie z bramą', version: '1.0.1' };
