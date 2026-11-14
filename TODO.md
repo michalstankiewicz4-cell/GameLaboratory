@@ -50,7 +50,9 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
 - [x] **Bloki:** bryła z laboratorium bloków jako zasób z nazwą (0.66.0; pole `asset` obiektu).
 - [x] **Jaskinie:** zasób „cave” (0.71.0) — w scenie jako obiekt (pole `asset`) albo teren całej planszy (powierzchnia
   „podziemie”, `env.cave`); grupa laboratoriów „Teren” (ląd · jaskinie).
-- [ ] **Rośliny:** ustawienia z laboratorium jako zasoby z nazwą (dziś w scenie tylko ustawienia domyślne).
+- [x] **Rośliny:** pojedyncza roślina jako zasób `plant` (0.72.0; gatunek, ziarno, wielkość, szczegółowość, pora roku).
+- [ ] **Roślinność krajobrazu:** las, zagajniki i trawa z laboratorium roślin (biom, gęstość) jako zasób — pokrycie
+  terenu lądu w scenie.
 - [ ] **Rozległe jaskinie** (właściciel, 2026-11-14): jaskinia dzielona na kawałki liczone wokół gracza (dziś CaveKit liczy
   całą jaskinię naraz, do ok. 2,4 mln próbek — przy dużej jaskini oczka siatki rosną i ściany tracą szczegóły);
   wejście do jaskini wycięte w terenie lądu — połączenie lądu i podziemia.

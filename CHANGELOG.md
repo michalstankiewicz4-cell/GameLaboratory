@@ -3,6 +3,17 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.72.0 · rośliny 1.4.0 — 2026-11-14 (roślina jako zasób z nazwą)
+
+### Dodane
+- **Roślina jako zasób z nazwą** (rodzaj `plant`): laboratorium roślin zapisuje okaz — gatunek, ziarno, wielkość,
+  szczegółowość, porę roku (okno Rośliny → Okaz → Zapisz, lista zapisanych, `PlantApi`). W edytorze sceny model
+  z rodziny Rośliny wybiera ją w oknie Obiekt (pole `asset`; budowany jest zapisany gatunek), w API `add` / `set`
+  z `asset`.
+
+### Zmienione
+- Generator zombie w kategorii **Materiały i grafika**, obok Pixel Studio (był w „Życie i postacie”).
+
 ## Program 0.71.1 · generator zombie 1.2.1 — 2026-11-14 (porządek plików i dokumentacji)
 
 ### Zmienione

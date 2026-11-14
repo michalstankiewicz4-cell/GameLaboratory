@@ -49,12 +49,12 @@ W kolejności kategorii z menu Narzędzia i strony startowej (`ui/data/catalog.j
 | Życie i postacie | Życie, edytor stworów | `labs/life.html`, `labs/creator.html` | [labs/life.md](labs/life.md) |
 | | Człowiek | `labs/human.html` | [labs/human.md](labs/human.md) |
 | | Przedmioty bohatera | `labs/gear.html` | [labs/gear.md](labs/gear.md) |
-| | Generator zombie | `labs/zombies.html` | [labs/zombies.md](labs/zombies.md) |
 | | Kostnica SDF | `labs/morgue.html` | [labs/morgue.md](labs/morgue.md) |
 | | SDF Walkers | `labs/walkers.html` | [labs/walkers/README.md](labs/walkers/README.md), [labs/walkers/roadmap.md](labs/walkers/roadmap.md), [labs/walkers/notatki/](labs/walkers/notatki/README.md) |
 | Materiały i grafika | Materiały (MatKit: PBR, starzenie) | `labs/materials.html`, `js/render/materials/` | [labs/materials.md](labs/materials.md) |
 | | Sztuka (obrazy 2D, ekspertyza) | `labs/art.html`, `js/render/art/` | [labs/art.md](labs/art.md) (obiekty: [labs/art/](labs/art/)) |
 | | Pixel Studio | `labs/pixel.html` | [labs/pixel/README.md](labs/pixel/README.md) |
+| | Generator zombie | `labs/zombies.html` | [labs/zombies.md](labs/zombies.md) |
 | Woksele | Bloki (BlockKit: bryły z wokseli, ciecze i gaz) | `labs/blocks.html`, `js/models/blocks/` | [labs/blocks.md](labs/blocks.md) |
 | Efekty | Efekty (EffectKit: 22 efekty z odznakami — strzały, plazma, odłamki, błyskawice, czarne dziury, promienie, pola, skok, tunel, fala skanu, dym, iskry, wybuch, spalenizna, ognik) | `labs/effects.html`, `js/render/effects/` | [labs/effects.md](labs/effects.md) |
 | UI i dźwięk | UI gry (menu, HUD, okna, dialogi, skórki) | `labs/gameui.html`, `js/gameui/` | [labs/gameui.md](labs/gameui.md) |

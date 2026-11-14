@@ -43,6 +43,11 @@
     <div class="row"><span>Detail</span><input type="range" id="detail" min="0.5" max="1.5" step="0.25"><output id="detailV"></output></div>
     <div class="row"><span>Season</span><input type="range" id="season" min="0" max="1" step="0.01"><output id="seasonV"></output></div>
     <label class="chk"><input type="checkbox" id="compare" checked> Its impostor beside it (what is drawn far away)</label>
+    <h3>Save</h3>
+    <div class="row"><span>Saved</span><select id="savedSel" title="Plants saved under a name: pick one to load it"></select><output></output></div>
+    <div class="row"><span>Name</span><input type="text" id="saveName" maxlength="40"><output></output></div>
+    <div class="btns"><button type="button" id="savePlant">Save under this name</button><button type="button" id="delPlant">Delete saved</button></div>
+    <p class="note">A saved plant (species, seed, size, detail, season) is a named asset: in the scene editor pick it for a Plants model.</p>
   </div>
   <div id="landPanel" hidden>
     <h3>Landscape</h3>

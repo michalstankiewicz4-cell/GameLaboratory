@@ -25,6 +25,8 @@
 //   cave — jaskinia z laboratorium jaskiń: ustawienia CaveKit (ziarno, długość, odnogi, szerokość, kręcenie, komory,
 //         chropowatość, siatka, nacieki, gruz, jeziorka, lawa, skała, wilgoć, rzeźba; js/models/caves/cavekit.js); w scenie
 //         jako obiekt (pole „asset” prefabrykatu caves/cave) albo teren planszy (env.cave przy powierzchni „podziemie”)
+//   plant — roślina z laboratorium roślin: { species (gatunek PlantKit), seed, size, detail, season (0 lato … 1 jesień) };
+//         w scenie pole „asset” obiektu z prefabrykatem roślin (js/models/plants/plantkit.js)
 //   effect — efekt z laboratorium efektów: { kind (shot, orb, debris, bolt, zap, bubble, hole), scale (metry na jednostkę
 //         efektu), values — liczby efektu EffectKit (js/render/effects/effects.js) }; w scenie: polecenie API „effect”
 export const KEY = 'gameLab.assets.v1';
@@ -38,6 +40,7 @@ export const ASSET_KINDS = {
   ui: { label: 'Game UI', labelPl: 'UI gry', lab: 'labs/gameui.html', keys: ['format', 'version', 'name', 'skin', 'start', 'pause', 'screens', 'hud', 'windows'] },
   material: { label: 'Material', labelPl: 'Materiał', lab: 'labs/materials.html', keys: ['label', 'kind', 'color', 'color2', 'tile', 'seed', 'roughness', 'metalness', 'bump', 'wear', 'dirt', 'rust', 'brushed', 'panels', 'rivets', 'planks', 'grain', 'cracks', 'grains', 'pores', 'bricks', 'fibres', 'threads', 'trowel'] },
   uiskin: { label: 'Game UI skin', labelPl: 'Skórka UI gry', lab: 'labs/gameui.html', keys: ['base', 'tokens'] },
+  plant: { label: 'Plant', labelPl: 'Roślina', lab: 'labs/plants.html', keys: ['species', 'seed', 'size', 'detail', 'season'] },
   cave: { label: 'Cave', labelPl: 'Jaskinia', lab: 'labs/caves.html', keys: ['seed', 'length', 'branches', 'width', 'winding', 'chambers', 'rough', 'cell', 'drips', 'rubble', 'lakes', 'lava', 'rock', 'wet', 'relief'] },
   effect: { label: 'Effect', labelPl: 'Efekt', lab: 'labs/effects.html', keys: ['kind', 'scale', 'values'] },
   blocks: { label: 'Block body', labelPl: 'Bryła z bloków', lab: 'labs/blocks.html', keys: ['shape', 'radius', 'voxel', 'seed', 'text', 'layers', 'mats', 'matRefs'] },

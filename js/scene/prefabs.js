@@ -53,10 +53,13 @@ AIRCRAFT_IDS.forEach((id) => add('air/' + id, aircraftInfo(id).name, 'air', 'air
 STRUCTURE_IDS.forEach((id) => add('structures/' + id, structureInfo(id).name, 'structures', id === 'super300' ? 'sea' : 'land', 'labs/structures.html', () => g(buildStructure(id, { detail: 1 }))));
 WEAPON_IDS.forEach((id) => add('weapons/' + id, weaponInfo(id).name, 'weapons', 'land', 'labs/human.html', () => g(buildWeapon(id, {}))));
 
-// rośliny (PlantKit): jedna roślina gatunku (ziarno 1, wielkość 1 — jak w laboratorium roślin na starcie), z wiatrem
-// w shaderze (tick przesuwa czas wiatru); podstawa w punkcie obiektu
-function buildPlant(id) {
-  const wind = windUniforms(), pl = growPlant(id, { seed: 1, size: 1, detail: 1 }), mats = plantMaterials(id, wind);
+// rośliny (PlantKit): jedna roślina gatunku (ziarno 1, wielkość 1 — jak w laboratorium roślin na starcie) albo roślina
+// zapisana w laboratorium roślin (zasób „plant”, pole „asset”: gatunek, ziarno, wielkość, szczegółowość, pora roku);
+// z wiatrem w shaderze (tick przesuwa czas wiatru); podstawa w punkcie obiektu
+function buildPlant(id0, a) {
+  const id = a && SPECIES[a.species] ? a.species : id0;
+  const wind = windUniforms(), pl = growPlant(id, { seed: a ? +a.seed || 1 : 1, size: a ? +a.size || 1 : 1, detail: a ? +a.detail || 1 : 1 }), mats = plantMaterials(id, wind);
+  wind.uSeason.value = a ? +a.season || 0 : 0;
   const root = new THREE.Group();
   for (const [geo, m, dm] of [[pl.bark, mats.bark, mats.barkDepth], [pl.leaf, mats.leaf, mats.leafDepth]]) {
     if (!geo) continue;
@@ -65,7 +68,7 @@ function buildPlant(id) {
   return { root, kit: pl, tick: (t) => { wind.uTime.value = t; },
     dispose: () => { for (const x of [pl.bark, pl.leaf]) if (x) x.dispose(); for (const m of Object.values(mats)) { if (m.map) m.map.dispose(); m.dispose(); } } };
 }
-SPECIES_IDS.forEach((id) => add('plants/' + id, SPECIES[id].name, 'plants', 'land', 'labs/plants.html', () => buildPlant(id)));
+SPECIES_IDS.forEach((id) => add('plants/' + id, SPECIES[id].name, 'plants', 'land', 'labs/plants.html', (opts) => buildPlant(id, opts && opts.asset), { assetKind: 'plant' }));
 // jaskinia (CaveKit) z ustawień domyślnych laboratorium jaskiń (CAVE_DEFAULTS): korytarze, komory, nacieki, jeziorka;
 // budowa trwa (pole odległości, ok. sekundy)
 // jaskinia jako obiekt: domyślna albo zapisana w laboratorium jaskiń (zasób „cave”, pole „asset”); jaskinia jako teren

@@ -53,7 +53,8 @@ Wpis: `{ id, label, family, surface, lab, build() → { root, kit, dispose } }`.
 - `lab`: laboratorium, w którym model się robi („Otwórz w laboratorium”).
 - `build()`: `root` — grupa Three.js; `kit` — obiekt zwrócony przez kit (wymiary, linie kadłuba, `update` ruchomych
   części), z niego korzystają zachowania; `dispose` — zwolnienie geometrii.
-- Rośliny: `plants/<gatunek>` (PlantKit, `SPECIES`) — jedna roślina gatunku (ziarno 1, wielkość 1), `tick` przesuwa czas
+- Rośliny: `plants/<gatunek>` (PlantKit, `SPECIES`) — jedna roślina gatunku (ziarno 1, wielkość 1) albo zapisana w
+  laboratorium roślin (pole `asset`, zasób `plant`: gatunek, ziarno, wielkość, szczegółowość, pora roku), `tick` przesuwa czas
   wiatru; jaskinia: `caves/cave` (CaveKit, `CAVE_DEFAULTS` albo zapisana jaskinia — pole `asset`, zasób `cave`; budowa ok.
   sekundy; ściany patrzą do środka — z zewnątrz widać wnętrze). Jaskinia jako teren całej planszy — powierzchnia
   `underground` i `env.cave` (świat edytora, `editor/js/world/world.js`).
@@ -136,6 +137,7 @@ scena trzyma tylko nazwę. Inna karta widzi zmianę od razu (`onAssetsChange`).
 | `sky` | ciała niebieskie ([`../labs/bodies.md`](../labs/bodies.md)), Niebo | wszystkie liczby nieba BodyKit (mgławice, pas, pył, gwiazdy, barwy, ziarno) |
 | `ui`, `uiskin` | UI gry ([`../labs/gameui.md`](../labs/gameui.md)) | definicja `gamelab-ui`; skórka: `base`, `tokens` |
 | `material` | materiały ([`../labs/materials.md`](../labs/materials.md)) | opis MatKit |
+| `plant` | rośliny ([`../labs/plants.md`](../labs/plants.md)) | `species`, `seed`, `size`, `detail`, `season`; w scenie pole `asset` obiektu `plants/<gatunek>` |
 | `cave` | jaskinie ([`../labs/caves.md`](../labs/caves.md)) | ustawienia CaveKit (`seed`, `length`, `branches`, `width`, `winding`, `chambers`, `rough`, `cell`, `drips`, `rubble`, `lakes`, `lava`, `rock`, `wet`, `relief`); w scenie pole `asset` obiektu `caves/cave` albo `env.cave` podziemia |
 | `effect` | efekty ([`../labs/effects.md`](../labs/effects.md)) | `kind`, `scale`, `values` (liczby EffectKit); w scenie polecenie API `effect` |
 | `blocks` | bloki ([`../labs/blocks.md`](../labs/blocks.md)) | `shape`, `radius`, `voxel`, `seed`, `text`, `layers`, `mats` (opisy MatKit bloków stałych), `matRefs` (wybór w laboratorium); w scenie pole `asset` obiektu |

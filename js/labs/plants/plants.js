@@ -10,6 +10,7 @@ import { generateWorld, biomeTexture, biomeAt, BIOMES } from '../../envs/land/re
 import { SPECIES, SPECIES_IDS, growPlant, plantMaterials, windUniforms } from '../../models/plants/plantkit.js';
 import { Forest, bakeImpostors, impostorMaterial, grassField, plantLight } from '../../models/plants/forestkit.js';
 import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
+import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -256,6 +257,31 @@ $('mapSeed').value = S.mapSeed; $('mapSeed').onchange = () => { S.mapSeed = Math
 $('newMap').onclick = () => { S.mapSeed = Math.floor(Math.random() * 1e5); $('mapSeed').value = S.mapSeed; buildLand(); save(); };
 $('impostors').checked = S.impostors; $('impostors').onchange = () => { S.impostors = $('impostors').checked; if (forest) { forest.impostors = S.impostors; forest.update(camera); } save(); };
 $('weather').value = S.weather; $('weather').onchange = () => { S.weather = $('weather').value; updateSky(); save(); };
+/* ---------------- save under a name: the "plant" asset (js/scene/assets.js) for the scene editor ---------------- */
+const PLANT_KEYS = ['species', 'seed', 'size', 'detail', 'season'];
+function fillSaved() {
+  const names = listAssets('plant'), s = $('savedSel');
+  s.replaceChildren(el('option', { value: '', textContent: names.length ? '—' : 'none yet' }), ...names.map((n) => el('option', { value: n, textContent: n })));
+  s.value = names.includes(S.savedAs || '') ? S.savedAs : '';
+}
+function savePlant(n) {
+  n = String(n || '').trim(); if (!n) throw new Error('give the plant a name');
+  saveAsset('plant', n, Object.fromEntries(PLANT_KEYS.map((k) => [k, S[k]]))); S.savedAs = n; save(); fillSaved(); return n;
+}
+function loadPlant(n) {
+  const a = getAsset('plant', n); if (!a || !SPECIES[a.species]) throw new Error(`no saved plant "${n}"`);
+  for (const k of PLANT_KEYS) if (a[k] != null) S[k] = a[k];
+  S.savedAs = n; $('saveName').value = n; $('species').value = S.species; $('seed').value = S.seed;
+  for (const k of ['size', 'detail', 'season']) { $(k).value = S[k]; $(k + 'V').textContent = RANGES[k][0](+S[k]); }
+  wind.uSeason.value = S.season; save(); fillSaved(); if (S.mode !== 'specimen') setMode('specimen'); buildSpecimen(); return a;
+}
+$('saveName').value = S.savedAs || '';
+$('savePlant').onclick = () => { try { const n = savePlant($('saveName').value); window.LabLog && window.LabLog.add('info', `Saved: ${n} (asset "plant")`); } catch { $('saveName').focus(); } };
+$('delPlant').onclick = () => { const n = $('savedSel').value; if (!n) return; removeAsset('plant', n); if (S.savedAs === n) S.savedAs = ''; save(); fillSaved(); };
+$('savedSel').onchange = () => { const n = $('savedSel').value; if (n) loadPlant(n); };
+onAssetsChange(fillSaved); fillSaved();
+// for AI: PlantApi.save(name) — the "plant" asset; load(name), saved(), get()
+window.PlantApi = { save: (n) => ({ saved: savePlant(n) }), load: (n) => loadPlant(n), saved: () => listAssets('plant'), get: () => Object.fromEntries(PLANT_KEYS.map((k) => [k, S[k]])) };
 function setMode(m) {
   S.mode = m; save();
   [...$('modes').children].forEach((b) => b.classList.toggle('on', b.dataset.m === m));

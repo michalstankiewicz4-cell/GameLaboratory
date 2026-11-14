@@ -401,23 +401,6 @@ window.GameLabCatalog =
       }
     },
     {
-      "file": "labs/zombies.html",
-      "cat": "life",
-      "name": "Zombie Generator",
-      "namePl": "Generator zombie",
-      "doc": "docs/labs/zombies.md",
-      "desc": "Original zombies from a seed, animated in 8 directions, exported as Unity sprite sheets (JSON, slicer script, ZIP).",
-      "descPl": "Oryginalne zombie z ziarna, animowane w 8 kierunkach, eksportowane jako arkusze sprite'ów dla Unity (JSON, skrypt cięcia, ZIP).",
-      "kind": "lab",
-      "kit": "Pixel Studio",
-      "phrases": ["zombie", "postać", "sprite", "animacja", "Unity"],
-      "saved": ["gameLab.zombies."],
-      "art": {
-        "bg": ["#2a2020", "#120b0b"],
-        "svg": "<rect x=\"86\" y=\"12\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"94\" y=\"12\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"102\" y=\"12\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"78\" y=\"20\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"86\" y=\"20\" width=\"8\" height=\"8\" fill=\"#e8e04a\"/><rect x=\"94\" y=\"20\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"102\" y=\"20\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"110\" y=\"20\" width=\"8\" height=\"8\" fill=\"#e8e04a\"/><rect x=\"86\" y=\"28\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"94\" y=\"28\" width=\"8\" height=\"8\" fill=\"#5a1b1b\"/><rect x=\"102\" y=\"28\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"94\" y=\"36\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"86\" y=\"44\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"94\" y=\"44\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"102\" y=\"44\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"78\" y=\"52\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"94\" y=\"52\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"110\" y=\"52\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"86\" y=\"60\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"102\" y=\"60\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"86\" y=\"68\" width=\"8\" height=\"8\" fill=\"#3a3a44\"/><rect x=\"102\" y=\"68\" width=\"8\" height=\"8\" fill=\"#3a3a44\"/><rect x=\"86\" y=\"76\" width=\"8\" height=\"8\" fill=\"#3a3a44\"/><rect x=\"102\" y=\"76\" width=\"8\" height=\"8\" fill=\"#3a3a44\"/>"
-      }
-    },
-    {
       "file": "labs/morgue.html",
       "cat": "life",
       "name": "SDF Morgue",
@@ -499,6 +482,23 @@ window.GameLabCatalog =
       "art": {
         "bg": ["#1d2b22", "#0b120d"],
         "svg": "<rect x=\"80\" y=\"14\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"90\" y=\"14\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"80\" y=\"24\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"90\" y=\"24\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"70\" y=\"34\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"80\" y=\"34\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"90\" y=\"34\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"100\" y=\"34\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"60\" y=\"44\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"70\" y=\"44\" width=\"10\" height=\"10\" fill=\"#13261a\"/><rect x=\"80\" y=\"44\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"90\" y=\"44\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"100\" y=\"44\" width=\"10\" height=\"10\" fill=\"#13261a\"/><rect x=\"110\" y=\"44\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"60\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"70\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"80\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"90\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"100\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"110\" y=\"54\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"70\" y=\"64\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"100\" y=\"64\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"60\" y=\"74\" width=\"10\" height=\"10\" fill=\"#8be07a\"/><rect x=\"110\" y=\"74\" width=\"10\" height=\"10\" fill=\"#8be07a\"/>"
+      }
+    },
+    {
+      "file": "labs/zombies.html",
+      "cat": "matter",
+      "name": "Zombie Generator",
+      "namePl": "Generator zombie",
+      "doc": "docs/labs/zombies.md",
+      "desc": "Original zombies from a seed, animated in 8 directions, exported as Unity sprite sheets (JSON, slicer script, ZIP).",
+      "descPl": "Oryginalne zombie z ziarna, animowane w 8 kierunkach, eksportowane jako arkusze sprite'ów dla Unity (JSON, skrypt cięcia, ZIP).",
+      "kind": "lab",
+      "kit": "Pixel Studio",
+      "phrases": ["zombie", "postać", "sprite", "animacja", "Unity"],
+      "saved": ["gameLab.zombies."],
+      "art": {
+        "bg": ["#2a2020", "#120b0b"],
+        "svg": "<rect x=\"86\" y=\"12\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"94\" y=\"12\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"102\" y=\"12\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"78\" y=\"20\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"86\" y=\"20\" width=\"8\" height=\"8\" fill=\"#e8e04a\"/><rect x=\"94\" y=\"20\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"102\" y=\"20\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"110\" y=\"20\" width=\"8\" height=\"8\" fill=\"#e8e04a\"/><rect x=\"86\" y=\"28\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"94\" y=\"28\" width=\"8\" height=\"8\" fill=\"#5a1b1b\"/><rect x=\"102\" y=\"28\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"94\" y=\"36\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"86\" y=\"44\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"94\" y=\"44\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"102\" y=\"44\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"78\" y=\"52\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"94\" y=\"52\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"110\" y=\"52\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"86\" y=\"60\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"102\" y=\"60\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"86\" y=\"68\" width=\"8\" height=\"8\" fill=\"#3a3a44\"/><rect x=\"102\" y=\"68\" width=\"8\" height=\"8\" fill=\"#3a3a44\"/><rect x=\"86\" y=\"76\" width=\"8\" height=\"8\" fill=\"#3a3a44\"/><rect x=\"102\" y=\"76\" width=\"8\" height=\"8\" fill=\"#3a3a44\"/>"
       }
     },
     {

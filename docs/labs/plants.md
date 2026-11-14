@@ -62,6 +62,14 @@ A jittered grid (~7 m between candidates at 100 %) over a 2.4 km RegionKit world
 - **Desert**: date palm oases within ~110 m of water and below 8 m; acacias scattered sparsely on gentle ground;
   saltbush scrub.
 
+## Saved under a name — a plant for the scene
+
+Window *Plants* → *Specimen* → *Save*: the species, seed, size, detail and season as the named asset `plant`
+(`js/scene/assets.js`); the list loads one back. In the scene editor a Plants model picks it in the Object window
+(field `asset`; the saved species is built, whatever the model's own species), or through the API (`add` / `set` with
+`asset`). For AI: `PlantApi.save(name)`, `load(name)`, `saved()`, `get()`. The landscape's forest (density, biome)
+is not an asset yet (`TODO.md`).
+
 ## Sources
 
 - Wikipedia: [Picea abies](https://en.wikipedia.org/wiki/Picea_abies), [Pinus sylvestris](https://en.wikipedia.org/wiki/Pinus_sylvestris),

@@ -66,7 +66,7 @@ dla edytora; **priorytet** — 1 teraz (edytor tego potrzebuje), 2 potem, 3 kied
 |---|---|---|---|---|---|
 | **Budowle** (`labs/structures.html`, 265 l.) | StructKit, LandKit, SkyKit, WaterKit | własna scena z lądem i wodą | scena → wspólna scena bazowa | **wariant budowli** | 2 |
 | **Budynki** (`labs/buildings.html`, 99 l.) | BaseKit (Space, globalne THREE) | — (małe) | moduły baz → prefabrykaty (jak statki kosmiczne, `js/scene/space.js`) | — | 2 |
-| **Rośliny** (`labs/plants.html`, 308 l.) | PlantKit, ForestKit, LandKit | las, zagajniki i trawa (ForestKit) rozmieszczane według biomu tylko w laboratorium | → środowisko lądu (pokrycie terenu) | **roślinność** (gatunki, gęstość) | 2 |
+| **Rośliny** (`labs/plants.html`, 308 l.) | PlantKit, ForestKit, LandKit | las, zagajniki i trawa (ForestKit) rozmieszczane według biomu tylko w laboratorium | → środowisko lądu (pokrycie terenu); pojedyncza roślina → zasób `plant`, pole `asset` obiektu (0.72.0) | **roślina** (jest); **roślinność** (gatunki, gęstość — w planie) | 2 |
 | **Życie / Edytor stworów / Człowiek** (`life`, `creator`, `human`) | LifeKit, studio (`js/labs/shared/studio.js`) | chód i ruch w LifeKit (model); laboratoria ze Space na globalnym THREE | chód → zachowanie „chód” (ląd); stwory i ludzie → prefabrykaty | **stwór** (projekt z edytora stworów); **człowiek** (wygląd) | 2 |
 | **Przedmioty bohatera** (`labs/gear.html`, 127 l.) | GearKit, CaveKit, widzenie (`js/render/vision.js`) | — | przedmioty → prefabrykaty (w ręku postaci); widzenie → kamera gracza | — | 3 |
 | **Dźwięk** (`labs/sound.html`, 198 l.) | MusicKit | — | → `js/audio/` jako warstwa silnika (Audio) | **muzyka / dźwięk** | 3 |
