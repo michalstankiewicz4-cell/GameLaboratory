@@ -5,9 +5,9 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 ## Następne w planie (`docs/guides/lab-breakdown.md`, „Kolejność”)
 - [x] Punkt 7 — lekarz sceny: zrobiony w 0.60.0 (`js/scene/doctor.js`, `docs/scene/doctor.md`); następne reguły — w opisie.
 - [ ] Punkt 8 — materiał z Hive Hunger (z historią): ~~laboratorium bloków~~ (0.64.0), ~~statki roju~~ (nie przenosimy — w grze to tylko kolorowe kreski; decyzja właściciela 2026-11-14), ~~laboratorium efektów~~ (0.67.0), drzewka
-  technologiczne.
+  technologiczne (etap 1: 0.73.0).
 - [ ] **Laboratorium drzewek technologicznych** (właściciel, 2026-11-14; koniec punktu 8) — uniwersalne, dla dowolnej gry:
-  - [ ] **Etap 1:** jeden format drzewka jako zasób z nazwą (`tree`: gałęzie z kolorami, węzły, rodzice — „którykolwiek”
+  - [x] **Etap 1** (0.73.0, `labs/trees.html`, `docs/labs/trees.md`): jeden format drzewka jako zasób z nazwą (`tree`: gałęzie z kolorami, węzły, rodzice — „którykolwiek”
     albo „wszystkie”, koszt, efekt jako dane, opis EN/PL, ikona, pole `background`); edytor z Hive Hunger
     (`tools/tree-editor.html`, z historią) w wyglądzie laboratoriów; widok promienisty w pixel arcie z Hive Hunger
     (`js/ui/TreeView.js`, dane `js/core/SkillTree.js`); tryb próby (punkty, kupowanie, co się odblokowuje; koszt
@@ -42,6 +42,9 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 - [ ] **System statystyk i stanu gry** (właściciel, 2026-11-14, do przemyślenia): statystyki obiektów (np. HP postaci
   i przeciwników) i matematyka gry (wzory, modyfikatory — np. z drzewek i przedmiotów), połączone z zapisem stanu gry
   (statystyki, położenie obiektów i ich zmiany w czasie). Na schemacie silnika: moduły Rules i Save/Load.
+- [ ] **Ustawienia gry: grafika i sterowanie** (właściciel, 2026-11-14): połączenie laboratorium UI gry (menu Opcje)
+  z ustawieniami grafiki i sterowania — wejście (klawiatura, mysz) i systemowe ustawienia grafiki (rozdzielczość,
+  cienie, dynamiczne oświetlenie i inne).
 - [ ] **Laboratorium animacji** (do rozważenia): chód ludzi i stworów jako zachowanie, animacje modeli.
 - [ ] **Grawitacja statków w kosmosie** (propozycja do decyzji): statki w scenie przyciągane przez ciała niebieskie,
   jak orbity.

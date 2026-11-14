@@ -58,6 +58,7 @@ W kolejności kategorii z menu Narzędzia i strony startowej (`ui/data/catalog.j
 | Woksele | Bloki (BlockKit: bryły z wokseli, ciecze i gaz) | `labs/blocks.html`, `js/models/blocks/` | [labs/blocks.md](labs/blocks.md) |
 | Efekty | Efekty (EffectKit: 22 efekty z odznakami — strzały, plazma, odłamki, błyskawice, czarne dziury, promienie, pola, skok, tunel, fala skanu, dym, iskry, wybuch, spalenizna, ognik) | `labs/effects.html`, `js/render/effects/` | [labs/effects.md](labs/effects.md) |
 | UI i dźwięk | UI gry (menu, HUD, okna, dialogi, skórki) | `labs/gameui.html`, `js/gameui/` | [labs/gameui.md](labs/gameui.md) |
+| UI i dźwięk | drzewka ulepszeń i badań (format `gamelab-tree`, widok promienisty, próba, sprawdzanie) | `labs/trees.html`, `js/gameui/tree/` | [labs/trees.md](labs/trees.md) |
 | | Skórki | `labs/skins.html` | [labs/skins.md](labs/skins.md) |
 | | Dźwięk | `labs/sound.html` | [labs/sound.md](labs/sound.md) |
 | AI | Laboratorium języka, laboratorium obrazów | `labs/lang.html`, `labs/img.html` | [labs/walkers/README.md](labs/walkers/README.md) (wspólny dokument z SDF Walkers) |

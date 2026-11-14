@@ -3,6 +3,19 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.73.0 · drzewka 1.0.0 — 2026-11-14 (laboratorium drzewek, etap 1)
+
+### Dodane
+- **Laboratorium drzewek** (`labs/trees.html`, kategoria UI, obok UI gry): drzewko ulepszeń albo badań gry jako dane
+  (format `gamelab-tree`, `js/gameui/tree/tree.js`) — gałęzie z kolorami, węzły z rodzicami (którykolwiek albo
+  wszyscy), koszt, efekt (statystyki, które się sumują), teksty EN/PL, ikona, notatki, pole `background` (tło —
+  w etapie 2). Z Hive Hunger, z historią: dane i stan gracza, widok promienisty w pixel arcie (`radial.js`, rozmiar
+  z elementu widoku), edytor (Wybierz / Dodaj / Połącz, przeciąganie, okna Węzeł i Gałęzie, eksport i import JSON).
+  Tryb **Próba**: punkty, kupowanie, zsumowane efekty; liczby drzewka (koszt całości, najdłuższa i najdroższa droga).
+  Okno **Sprawdzenie**: węzły nieosiągalne, pętle, brakujący rodzic, brak opisu, efekt bez znaczenia. Przykład:
+  drzewko Hive Hunger. `TreeApi` dla AI.
+- Zasób z nazwą **`tree`** (`js/scene/assets.js`): zapisane drzewko.
+
 ## Program 0.72.1 · edytor sceny 0.33.1 — 2026-11-14 (poświata w jaskini)
 
 ### Dodane

@@ -1,645 +1,299 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex">
-<title>Hive Hunger — Tree editor</title>
-<link rel="icon" href="../favicon.svg" type="image/svg+xml">
-<style>
-  :root {
-    --bg: #0b0c14; --panel: #141726; --panel2: #1b1f33; --line: #2a3050; --text: #e6e9f5; --muted: #8a92b2;
-    --accent: #ffd84a; --changed: #ffb13b; --bad: #ff5a6a;
-  }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; }
-  body { background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; display: flex; flex-direction: column; }
-  header { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--panel); }
-  header h1 { font-size: 18px; margin: 0 12px 0 0; letter-spacing: .5px; }
-  header .ver { color: var(--muted); margin-right: auto; }
-  .legend { color: var(--muted); font-size: 12px; }
-  button { background: var(--panel2); color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; font: inherit; cursor: pointer; }
-  button:hover { border-color: var(--accent); }
-  button.primary { background: var(--accent); color: #1a1500; border-color: var(--accent); font-weight: 600; }
-  button.small { padding: 2px 8px; font-size: 12px; }
-  button[aria-pressed=true] { background: var(--accent); color: #1a1500; border-color: var(--accent); }
-  button:disabled { opacity: .35; cursor: default; }
-  .langs { display: inline-flex; gap: 2px; }
-  .layout { flex: 1; display: flex; min-height: 0; }
-  .stage { flex: 1; position: relative; min-width: 0; display: flex; flex-direction: column; }
-  .tools { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--line); }
-  .tools .hint { color: var(--muted); font-size: 12px; margin-left: 6px; }
-  .tools select { width: auto; background: #0e1120; color: var(--text); border: 1px solid var(--line); border-radius: 5px; padding: 4px 6px; font: inherit; }
-  canvas { flex: 1; width: 100%; min-height: 0; display: block; cursor: default; touch-action: none; }
-  canvas.adding, canvas.linking { cursor: crosshair; }
-  aside { width: 340px; flex: none; overflow-y: auto; border-left: 1px solid var(--line); background: var(--panel); padding: 12px 14px 40px; }
-  aside h2 { font-size: 15px; margin: 4px 0 8px; display: flex; align-items: center; gap: 8px; }
-  aside h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin: 18px 0 6px; }
-  aside p.hint { color: var(--muted); font-size: 12px; margin: 0 0 8px; }
-  label.f { display: grid; gap: 3px; margin-bottom: 8px; font-size: 12px; color: var(--muted); }
-  label.f.changed > span { color: var(--changed); }
-  input[type=text], input[type=number], select, textarea { background: #0e1120; color: var(--text); border: 1px solid var(--line); border-radius: 5px; padding: 5px 7px; font: inherit; width: 100%; }
-  textarea { min-height: 64px; resize: vertical; }
-  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .chk { display: flex; gap: 6px; align-items: center; font-size: 13px; margin-bottom: 8px; }
-  .parents { display: grid; gap: 4px; margin-bottom: 8px; }
-  .parents div { display: flex; align-items: center; gap: 6px; font-size: 13px; }
-  .parents div span { flex: 1; }
-  .palette { display: grid; grid-template-columns: repeat(9, 1fr); gap: 4px; margin-bottom: 8px; }
-  .swatch { aspect-ratio: 1; border-radius: 5px; border: 2px solid transparent; padding: 0; cursor: pointer; }
-  .swatch[aria-pressed=true] { border-color: #fff; }
-  .swatch.none { background: repeating-linear-gradient(45deg, #2a3050 0 4px, #141726 4px 8px); }
-  .branches { display: grid; gap: 4px; }
-  .branch { display: flex; align-items: center; gap: 8px; font-size: 13px; }
-  .branch .dot { width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--line); cursor: pointer; padding: 0; }
-  .branch .dot[aria-pressed=true] { outline: 2px solid #fff; }
-  .tag { font-size: 11px; padding: 1px 6px; border-radius: 10px; border: 1px solid var(--line); color: var(--muted); }
-  .tag.changed { color: var(--changed); border-color: var(--changed); }
-  .tag.new { color: #8fd0ff; border-color: #8fd0ff; }
-  .danger { border-color: var(--bad); color: var(--bad); }
-  .toast { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: var(--panel2); border: 1px solid var(--accent); padding: 8px 14px; border-radius: 8px; opacity: 0; transition: opacity .2s; pointer-events: none; }
-  .toast.show { opacity: 1; }
-  .tip { position: fixed; pointer-events: none; background: var(--panel2); border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; font-size: 12px; max-width: 260px; }
-  @media (max-width: 860px) {
-    .layout { flex-direction: column; }
-    .stage { min-height: 60vh; }
-    aside { width: auto; border-left: none; border-top: 1px solid var(--line); }
-  }
-</style>
-</head>
-<body>
-<header>
-  <h1 id="h1">Hive Hunger — Tree editor</h1>
-  <span class="ver" id="ver"></span>
-  <span class="legend" id="summary"></span>
-  <span class="langs" role="group" aria-label="Language"><button id="lang-en" class="small">EN</button><button id="lang-pl" class="small">PL</button></span>
-  <button id="import">Import…</button>
-  <button id="reset-all">Reset all</button>
-  <button id="export" class="primary">Export</button>
-  <input type="file" id="file" accept=".json,application/json" hidden>
-</header>
-<div class="layout">
-  <div class="stage">
-    <div class="tools">
-      <button id="m-select" class="small">Select / move</button>
-      <button id="m-add" class="small">Add node</button>
-      <select id="add-kind" aria-label="Kind of the new node"></select>
-      <button id="m-link" class="small">Connect</button>
-      <span class="hint" id="mode-hint"></span>
-    </div>
-    <canvas id="cv"></canvas>
-  </div>
-  <aside id="side"></aside>
-</div>
-<div class="toast" id="toast"></div>
-<div class="tip" id="tip" hidden></div>
+// Tech Tree Lab (labs/trees.html): drzewko 'gamelab-tree' (js/gameui/tree/tree.js) w widoku promienistym (radial.js).
+// Z edytora drzewka Hive Hunger (tools/tree-editor.html): tryby Wybierz / Dodaj / Połącz, przeciąganie węzła (poziom co 0,1
+// i kąt), okno węzła, kolory gałęzi, notatki, eksport i import JSON. Do tego: tryb Próba (punkty, kupowanie, zsumowane
+// efekty), sprawdzanie drzewka, liczby drzewka, zapis jako zasób z nazwą „tree” (js/scene/assets.js), TreeApi dla AI.
+import { KINDS, emptyTree, normalizeTree, cloneTree, TreeState, checkTree, treeStats, nodeName } from '../../gameui/tree/tree.js';
+import { RadialView, ICONS } from '../../gameui/tree/radial.js';
+import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
+import HIVE_HUNGER from '../../gameui/tree/samples/hive-hunger.js';
 
-<script type="module">
-/*
- * A stand-alone page for planning the upgrade tree. It starts from the game's tree (js/core/SkillTree.js):
- * move nodes (level and angle), add nodes on any level, connect them, choose a ship for a node or write
- * in your own words what should be there, change names, texts, costs, and colours (from a palette of 16).
- * Nothing here changes the game: Export saves a JSON file with the tree and every change, to talk over
- * and apply to the code. Your work is kept in this browser (localStorage) until you reset it.
- */
-import { NODES, BRANCHES } from '../js/core/SkillTree.js';
-import { CONFIG, SHIP_GROUPS } from '../js/config.js';
-import { VERSION } from '../js/version.js';
-import { SHIP_INFO } from '../js/ui/ShipGuide.js';
-
-const STORE = 'hive-hunger-tree-editor';
 const $ = (id) => document.getElementById(id);
-const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
-const clone = (v) => JSON.parse(JSON.stringify(v));
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const hex = (c) => '#' + c.map((v) => Math.round(v).toString(16).padStart(2, '0')).join('');
+const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
+const PL = () => (window.LabMenu || {}).LANG === 'pl';
+const SAMPLES = { 'Hive Hunger': HIVE_HUNGER };
+const STORE = 'gamelab.trees';
+const TREE_KEYS = ['format', 'version', 'name', 'background', 'points', 'branches', 'nodes', 'notes'];
 
-// ---------------------------------------------------------------- language (English / Polski)
-const PL = {
-  'Hive Hunger — Tree editor': 'Hive Hunger — edytor drzewka', 'Import…': 'Importuj…', 'Reset all': 'Resetuj wszystko', 'Export': 'Eksportuj',
-  'game': 'gra', 'no changes': 'bez zmian', 'change': 'zmiana', 'changes': 'zmian',
-  'Select / move': 'Zaznacz / przesuń', 'Add node': 'Dodaj węzeł', 'Connect': 'Połącz',
-  'Click a node to edit it, drag it to move it (level and angle). Pointing at a node lights up its links.': 'Kliknij węzeł, by go edytować, przeciągnij, by przesunąć (poziom i kąt). Najechanie podświetla jego połączenia.',
-  'Click where the new node should go (its level is the nearest ring, in halves).': 'Kliknij, gdzie ma być nowy węzeł (poziom to najbliższy pierścień, co pół).',
-  'Click the lower node (the parent), then the higher one (the child). The same two again: the link goes.': 'Kliknij niższy węzeł (rodzica), potem wyższy (dziecko). Te same dwa jeszcze raz: połączenie znika.',
-  'now click the child': 'teraz kliknij dziecko',
-  'Swarm trait (diamond)': 'Cecha roju (romb)', 'Ship (hexagon)': 'Statek (sześciokąt)', 'Ship property (circle)': 'Cecha statku (kółko)', 'Core': 'Rdzeń',
-  'Node': 'Węzeł', 'new': 'nowy', 'changed': 'zmieniony', 'as in the game': 'jak w grze',
-  'Name': 'Nazwa', 'Kind': 'Rodzaj', 'Branch (its colour)': 'Gałąź (jej kolor)', 'Ship': 'Statek', '— none —': '— brak —',
-  'What should be here — in your words': 'Co ma tu być — własnymi słowami', 'e.g. "Lasers fire 2 beams at once"': 'np. „Lasery strzelają 2 promieniami naraz”',
-  'Text in the game': 'Tekst w grze', 'Cost (points)': 'Koszt (punkty)', 'Level (0–5)': 'Poziom (0–5)', 'Angle (° from straight up)': 'Kąt (° od pionu)',
-  'Needs': 'Wymaga', 'any one parent': 'dowolnego rodzica', 'all parents': 'wszystkich rodziców',
-  'Parents (links down)': 'Rodzice (połączenia w dół)', 'none': 'brak', 'Remove the link': 'Usuń połączenie',
-  'Coming soon (shown, not built yet)': 'Wkrótce (widoczny, jeszcze niezrobiony)', 'Colour': 'Kolor', "Branch's colour": 'Kolor gałęzi',
-  'Delete this node': 'Usuń ten węzeł', 'Delete': 'Usuń', 'Back to the game\'s version': 'Przywróć wersję z gry',
-  'Delete node': 'Usunąć węzeł', 'Click a node to edit it.': 'Kliknij węzeł, by go edytować.',
-  'Branch colours': 'Kolory gałęzi', 'Click a colour, then a swatch of the palette.': 'Kliknij kolor, a potem próbkę z palety.',
-  'Palette': 'Paleta', '16 darker pastel colours, from the ships\' colours.': '16 ciemniejszych pastelowych kolorów, z kolorów statków.',
-  'Notes': 'Notatki', 'Anything else about the tree.': 'Wszystko inne o drzewku.',
-  'Exported': 'Wyeksportowano', 'Imported': 'Zaimportowano', 'Could not read the file: ': 'Nie udało się odczytać pliku: ',
-  'Reset every change to the tree?': 'Cofnąć wszystkie zmiany w drzewku?', 'Everything as in the game': 'Wszystko jak w grze',
-  'The core can\'t be deleted': 'Rdzenia nie można usunąć', 'A node can\'t link to itself': 'Węzeł nie może łączyć się sam ze sobą',
-  'Linked': 'Połączono', 'Link removed': 'Usunięto połączenie', 'New node': 'Nowy węzeł', 'level': 'poziom', 'cost': 'koszt', 'pts': 'pkt',
-  'Hive': 'Ul', 'Units': 'Jednostki', 'Speed': 'Szybkość', 'Power': 'Moc', 'Agility': 'Zwinność', 'Chain lightning': 'Błyskawica łańcuchowa',
-  'Eaters': 'Zjadacze', 'Lasers': 'Lasery', 'Tugs': 'Holowniki', 'Cleaners': 'Sprzątacze', 'Storms': 'Burze', 'Support': 'Wsparcie', 'Orbs': 'Kule',
-  'Splashers': 'Chlapacze', 'Bombers': 'Bombowce', 'Drills': 'Wiertła', 'Piercers': 'Przebijacze', 'Snipers': 'Snajperzy', 'Boosters': 'Wzmacniacze', 'Cutters': 'Tnące', 'Siphons': 'Syfony', 'Scoops': 'Czerpaki',
+/* ---------------- stan (ta przeglądarka) ---------------- */
+let L = { tree: null, source: 'sample:Hive Hunger', mode: 'edit', tool: 'select', addKind: 'trait', budget: 500, owned: [], nextId: 1 };
+try { const s = JSON.parse(localStorage.getItem(STORE)); if (s && s.tree) L = { ...L, ...s }; } catch { /* nic zapisanego */ }
+L.tree = normalizeTree(L.tree || HIVE_HUNGER);
+let saveT = 0;
+const save = () => { clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(STORE, JSON.stringify(L)); } catch { /* pełno */ } }, 200); };
+const status = (t) => { $('status').textContent = t; };
+const byId = (id) => L.tree.nodes.find((n) => n.id === id);
+
+// stan do widoku: w edycji wszystko „kupione” (kolory gałęzi), „wkrótce” przygaszone; w próbie — prawdziwy stan gracza
+let trial = new TreeState(L.tree), preview = new TreeState(L.tree);
+function rebuildStates() {
+  const owned = L.owned.filter((id) => byId(id));
+  trial = new TreeState(L.tree); trial.load({ owned: [...new Set([...trial.owned, ...owned])], spent: owned.reduce((a, id) => a + (byId(id).kind === 'core' ? 0 : byId(id).cost), 0) });
+  preview = new TreeState(L.tree); preview.owned = new Set(L.tree.nodes.filter((n) => !n.soon).map((n) => n.id));
+}
+const points = () => Math.max(0, L.budget - trial.spent);
+
+let selected = null, linkFrom = null, drag = null;
+const view = new RadialView($('view'), {
+  getTree: () => L.tree, getState: () => (L.mode === 'trial' ? trial : preview), getPoints: () => (L.mode === 'trial' ? points() : Infinity),
+  onBuy: (id) => { if (trial.buy(id, points())) { L.owned = [...trial.owned]; save(); showTrial(); status(`Bought: ${nodeName(byId(id), PL())}.`); } },
+  pl: PL, pointsName: () => (PL() && L.tree.points.labelPl) || L.tree.points.label, editing: () => L.mode === 'edit',
+});
+
+/* ---------------- zmiany drzewka ---------------- */
+// po każdej zmianie: układ, stany, okna, sprawdzenie
+function changed({ form = true } = {}) {
+  rebuildStates(); view.layout(); view.selected = L.mode === 'edit' ? (linkFrom || selected) : null;
+  if (form) showNode(); showBranches(); showChecks(); showTrial(); save();
+}
+function setTree(def, source) {
+  L.tree = normalizeTree(def); L.source = source; L.owned = []; selected = null; linkFrom = null;
+  L.nextId = 1; showTreeForm(); changed();
+}
+
+/* ---------------- pasek: drzewko, tryb, narzędzie ---------------- */
+function fillTreeSel() {
+  const s = $('treeSel'); s.replaceChildren();
+  const g1 = el('optgroup', { label: 'Samples' }), g2 = el('optgroup', { label: 'Saved' });
+  Object.keys(SAMPLES).forEach((k) => g1.append(el('option', { value: `sample:${k}`, textContent: k })));
+  listAssets('tree').forEach((k) => g2.append(el('option', { value: `asset:${k}`, textContent: k })));
+  s.append(g1); if (g2.children.length) s.append(g2);
+  if (L.source === 'new') s.append(el('option', { value: 'new', textContent: '(new)' }));
+  s.value = L.source; if (s.value !== L.source) s.selectedIndex = -1;
+}
+$('treeSel').onchange = () => {
+  const v = $('treeSel').value, [kind, name] = [v.slice(0, v.indexOf(':')), v.slice(v.indexOf(':') + 1)];
+  const def = kind === 'sample' ? SAMPLES[name] : getAsset('tree', name);
+  if (def) { setTree(cloneTree(def), v); status(`Loaded: ${name}.`); }
 };
-let LANG = 'en';
-try { if (localStorage.getItem(STORE + '-lang') === 'pl') LANG = 'pl'; } catch { /* storage off */ }
-const T = (s) => (LANG === 'pl' && s && PL[s]) || s;
-
-// ---------------------------------------------------------------- the game's tree, the palette
-const KINDS = { swarm: 'Swarm trait (diamond)', ship: 'Ship (hexagon)', prop: 'Ship property (circle)', core: 'Core' };
-const SHIPS = SHIP_GROUPS.flatMap((g) => g.kinds); // eaters, lasers, … (the Ship guide's order)
-const FIELDS = ['name', 'kind', 'branch', 'ship', 'wish', 'text', 'cost', 'depth', 'angle', 'all', 'parents', 'soon', 'color'];
-const fromGame = (n) => ({ id: n.id, name: n.name, kind: n.kind, branch: n.branch, ship: n.kind === 'ship' && SHIPS.includes(n.id === 'support' ? 'supports' : n.id) ? (n.id === 'support' ? 'supports' : n.id) : '',
-  wish: '', text: n.text || '', cost: n.cost || 0, depth: n.depth, angle: n.angle, all: Boolean(n.all), parents: [...n.parents], soon: Boolean(n.soon), color: null, icon: n.icon || null });
-const GAME = NODES.map(fromGame);
-const GAME_BY_ID = Object.fromEntries(GAME.map((n) => [n.id, n]));
-const GAME_BRANCH = Object.fromEntries(Object.entries(BRANCHES).map(([k, b]) => [k, hex(b.color)]));
-
-// 16 darker pastel colours, made from the colours of the ships + Chain lightning (violet) (+ Brood's green while there is room)
-function pastel(rgb) {
-  let [r, g, b] = rgb.map((v) => v / 255);
-  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
-  let h = 0, s = 0;
-  if (d) {
-    s = d / (1 - Math.abs(2 * l - 1));
-    h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
-    h *= 60; if (h < 0) h += 360;
-  }
-  const S = s * 0.42, L = 0.42 + (l - 0.5) * 0.25; // softer and darker
-  const C = (1 - Math.abs(2 * L - 1)) * S, X = C * (1 - Math.abs(((h / 60) % 2) - 1)), m = L - C / 2;
-  const [a, bb, c] = h < 60 ? [C, X, 0] : h < 120 ? [X, C, 0] : h < 180 ? [0, C, X] : h < 240 ? [0, X, C] : h < 300 ? [X, 0, C] : [C, 0, X];
-  return hex([(a + m) * 255, (bb + m) * 255, (c + m) * 255]);
+function setMode(m) {
+  L.mode = m; linkFrom = null; drag = null;
+  document.querySelectorAll('#modes button').forEach((b) => b.classList.toggle('on', b.dataset.mode === m));
+  $('tools').hidden = $('addKind').hidden = m !== 'edit';
+  setTool(L.tool); changed({ form: false });
 }
-const shipRgb = (k) => { const c = k === 'eaters' ? CONFIG.swarm.eaterColor : CONFIG.swarm[k.slice(0, -1)].color; return [(c >> 16) & 255, (c >> 8) & 255, c & 255]; };
-// (16 in all: the ships' colours, then Brood's green and the lightning's violet as long as there is room)
-const PALETTE = [...SHIPS.map((k) => ({ name: SHIP_INFO[k][0], color: pastel(shipRgb(k)) })),
-  { name: 'Chain lightning', color: pastel(BRANCHES.bolt.color) }, { name: 'Brood', color: pastel(BRANCHES.units.color) }].slice(0, 16);
-
-// ---------------------------------------------------------------- state (kept in this browser)
-let state = { nodes: clone(GAME), branchColors: {}, notes: '', nextId: 1 };
-try { const s = JSON.parse(localStorage.getItem(STORE)); if (s && Array.isArray(s.nodes)) state = { branchColors: {}, notes: '', nextId: 1, ...s }; } catch { /* nothing kept */ }
-let saveTimer = 0;
-function save() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch { /* storage off */ } }, 200);
-  updateSummary();
+function setTool(t) {
+  L.tool = t; linkFrom = null;
+  document.querySelectorAll('#tools button').forEach((b) => b.classList.toggle('on', b.dataset.tool === t));
+  view.canvas.classList.toggle('adding', L.mode === 'edit' && t === 'add'); view.canvas.classList.toggle('linking', L.mode === 'edit' && t === 'link');
+  hint(); view.selected = L.mode === 'edit' ? selected : null; save();
 }
-const byId = (id) => state.nodes.find((n) => n.id === id);
-const branchColor = (b) => state.branchColors[b] || GAME_BRANCH[b] || '#888888';
-const nodeColor = (n) => n.color || branchColor(n.branch);
-
-/** Every difference from the game's tree. */
-function diff() {
-  const out = { added: [], removed: [], changed: [], linksAdded: [], linksRemoved: [], branchColors: [] };
-  for (const n of state.nodes) {
-    const g = GAME_BY_ID[n.id];
-    if (!g) { out.added.push(n.id); for (const p of n.parents) out.linksAdded.push([p, n.id]); continue; }
-    for (const f of FIELDS) {
-      if (f === 'parents') continue;
-      if (!same(n[f], g[f])) out.changed.push({ id: n.id, field: f, from: g[f], to: n[f] });
-    }
-    for (const p of n.parents) if (!g.parents.includes(p)) out.linksAdded.push([p, n.id]);
-    for (const p of g.parents) if (!n.parents.includes(p) && byId(p)) out.linksRemoved.push([p, n.id]);
-  }
-  for (const g of GAME) if (!byId(g.id)) out.removed.push(g.id);
-  for (const [b, c] of Object.entries(state.branchColors)) if (c !== GAME_BRANCH[b]) out.branchColors.push({ branch: b, from: GAME_BRANCH[b], to: c });
-  return out;
+function hint() {
+  if (L.mode === 'trial') { status(`Click a blinking node to buy it: ${points().toLocaleString('en')} ${L.tree.points.label} left.`); return; }
+  status(L.tool === 'add' ? 'Click where the new node should go: its level is the nearest ring (in halves). It grows from the selected node.'
+    : L.tool === 'link' ? (linkFrom ? `${byId(linkFrom).name} → now click the child.` : 'Click the lower node (the parent), then the higher one (the child). The same two again: the link goes.')
+      : 'Click a node to edit it, drag it to move it (level and angle). Delete removes it.');
 }
-const countChanges = (d) => d.added.length + d.removed.length + d.changed.length + d.linksAdded.length + d.linksRemoved.length + d.branchColors.length + (state.notes ? 1 : 0);
-function nodeStatus(n) {
-  const g = GAME_BY_ID[n.id];
-  if (!g) return 'new';
-  return FIELDS.some((f) => !same(n[f], g[f])) ? 'changed' : 'as in the game';
-}
+document.querySelectorAll('#modes button').forEach((b) => { b.onclick = () => setMode(b.dataset.mode); });
+document.querySelectorAll('#tools button').forEach((b) => { b.onclick = () => setTool(b.dataset.tool); });
+Object.entries(KINDS).filter(([k]) => k !== 'core').forEach(([k, x]) => $('addKind').append(el('option', { value: k, textContent: x.label })));
+$('addKind').value = L.addKind; $('addKind').onchange = () => { L.addKind = $('addKind').value; save(); };
 
-// ---------------------------------------------------------------- the canvas: the tree as in the game
-const cv = $('cv'), ctx = cv.getContext('2d');
-let view = { cx: 0, cy: 0, ring: 40, W: 0, H: 0 };
-const SQ = 0.82, R0 = 0.45;
-const radius = (d) => (d <= 0 ? 0 : (d + R0) * view.ring);
-const posOf = (n) => { const a = (n.angle * SQ * Math.PI) / 180, r = radius(n.depth); return { x: view.cx + r * Math.sin(a), y: view.cy - r * Math.cos(a) }; };
-const sizeOf = (n) => ({ core: 22, ship: 15, swarm: n.icon ? 13 : 10, prop: 7 }[n.kind] ?? 9);
-
-function layout() {
-  const dpr = Math.min(2, window.devicePixelRatio || 1), r = cv.getBoundingClientRect();
-  cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  view.W = r.width; view.H = r.height;
-  view.cx = r.width / 2; view.cy = r.height - 36;
-  const maxSin = Math.max(...state.nodes.map((n) => Math.abs(Math.sin((n.angle * SQ * Math.PI) / 180)) * (n.depth + R0)), 1);
-  view.ring = Math.max(24, Math.min((view.cy - 40) / (5 + R0), (r.width / 2 - 30) / maxSin));
-  draw();
-}
-
-let mode = 'select', selected = null, hover = null, linkFrom = null, drag = null;
-
-function shapePath(n, x, y, r) {
-  ctx.beginPath();
-  if (n.kind === 'ship') for (let k = 0; k < 6; k++) { const a = (Math.PI / 3) * k - Math.PI / 2; k ? ctx.lineTo(x + r * Math.cos(a), y + r * Math.sin(a)) : ctx.moveTo(x + r * Math.cos(a), y + r * Math.sin(a)); }
-  else if (n.kind === 'prop') ctx.arc(x, y, r, 0, Math.PI * 2);
-  else { ctx.moveTo(x, y - r); ctx.lineTo(x + r, y); ctx.lineTo(x, y + r); ctx.lineTo(x - r, y); }
-  ctx.closePath();
-}
-
-function draw() {
-  const { W, H, cx, cy } = view;
-  ctx.fillStyle = '#0d0818';
-  ctx.fillRect(0, 0, W, H);
-  // level rings 1 … 5, numbered
-  ctx.font = '11px monospace';
-  for (let d = 0; d <= 5; d++) {
-    const r = radius(d);
-    if (d) {
-      ctx.strokeStyle = d % 2 ? 'rgba(62,46,100,0.9)' : 'rgba(62,46,100,0.55)';
-      ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.arc(cx, cy, r, -Math.PI / 2 - 1.4, -Math.PI / 2 + 1.4); ctx.stroke();
-    }
-    const t = -Math.min(1.4, Math.asin(Math.min(1, (cx - 14) / Math.max(r, 1))));
-    ctx.fillStyle = 'rgba(255,214,92,0.8)';
-    ctx.fillText(String(d), d ? cx + r * Math.sin(t) - 12 : cx - 34, (d ? cy - r * Math.cos(t) : cy) + 4);
-  }
-  // links: dashed across branches when either parent is enough; the selected / pointed-at node's links lit
-  const lit = [];
-  for (const n of state.nodes) {
-    for (const pid of n.parents) {
-      const p = byId(pid);
-      if (!p) continue;
-      const a = posOf(p), b = posOf(n);
-      const cross = p.branch !== n.branch && p.kind !== 'core' && n.kind !== 'prop';
-      const dashed = cross && !n.all;
-      const focus = [hover, selected].some((id) => id && (id === n.id || id === pid));
-      if (focus) { lit.push([a, b, nodeColor(n), dashed]); continue; }
-      ctx.strokeStyle = cross ? 'rgba(200,190,230,0.45)' : nodeColor(n) + 'aa';
-      ctx.lineWidth = 1;
-      ctx.setLineDash(dashed ? [5, 4] : []);
-      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-    }
-  }
-  for (const [a, b, c, dashed] of lit) {
-    ctx.setLineDash([]); ctx.strokeStyle = c + '55'; ctx.lineWidth = 5;
-    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-    ctx.setLineDash(dashed ? [5, 4] : []); ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-  }
-  ctx.setLineDash([]);
-  view.lit = lit.length;
-  // the link being made
-  if (mode === 'link' && linkFrom && byId(linkFrom) && pointer) {
-    const a = posOf(byId(linkFrom));
-    ctx.strokeStyle = '#ffd84a'; ctx.setLineDash([3, 3]); ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(pointer.x, pointer.y); ctx.stroke(); ctx.setLineDash([]);
-  }
-  // nodes
-  for (const n of state.nodes) {
-    const { x, y } = posOf(n), r = sizeOf(n), c = nodeColor(n);
-    if (n.id === selected || n.id === linkFrom) { shapePath(n, x, y, r + 5); ctx.fillStyle = 'rgba(255,216,74,0.25)'; ctx.fill(); }
-    shapePath(n, x, y, r);
-    ctx.fillStyle = n.soon ? c + '55' : c;
-    ctx.fill();
-    ctx.strokeStyle = n.id === hover || n.id === selected ? '#ffffff' : c;
-    ctx.lineWidth = 1;
-    ctx.stroke();
-    if (n.kind === 'ship') { shapePath(n, x, y, 5); ctx.fillStyle = 'rgba(255,255,255,0.75)'; ctx.fill(); }
-    const st = nodeStatus(n);
-    if (st !== 'as in the game') { ctx.fillStyle = st === 'new' ? '#8fd0ff' : '#ffb13b'; ctx.beginPath(); ctx.arc(x + r * 0.8, y - r * 0.8, 3, 0, Math.PI * 2); ctx.fill(); }
-  }
-}
-
-// ---------------------------------------------------------------- canvas input
-let pointer = null;
-const at = (e) => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
-function nodeAt(p) {
-  let best = null, bestD = Infinity;
-  for (const n of state.nodes) {
-    const q = posOf(n), d = Math.hypot(p.x - q.x, p.y - q.y);
-    if (d <= sizeOf(n) + 4 && d < bestD) { bestD = d; best = n.id; }
-  }
-  return best;
-}
-/** Level (in halves, 0.5 … 5) and angle (whole degrees) of a point on the canvas. */
-function polar(p) {
-  const dx = p.x - view.cx, dy = view.cy - p.y, r = Math.hypot(dx, dy);
-  const depth = Math.max(0.5, Math.min(5, Math.round((r / view.ring - R0) * 2) / 2));
-  const angle = Math.round(((Math.atan2(dx, dy) * 180) / Math.PI) / SQ);
-  return { depth, angle: Math.max(-110, Math.min(110, angle)) };
-}
-
-cv.addEventListener('pointerdown', (e) => {
-  const p = at(e), id = nodeAt(p);
-  if (mode === 'add') { addNode(polar(p)); return; }
-  if (mode === 'link') { if (id) linkClick(id); return; }
-  selected = id; renderSide(); draw();
-  if (id && byId(id).kind !== 'core') { drag = { id, moved: false }; cv.setPointerCapture(e.pointerId); }
+/* ---------------- mysz w edycji ---------------- */
+view.opts.onPick = () => {};   // kliknięcie obsługuje pointerdown poniżej (w próbie — kupowanie widoku)
+const pickHandler = view.opts.onPick;
+function syncPick() { view.opts.onPick = L.mode === 'edit' ? pickHandler : null; }
+view.canvas.addEventListener('pointerdown', (e) => {
+  syncPick(); if (L.mode !== 'edit') return;
+  const id = view.nodeAt(e);
+  if (L.tool === 'add') { addNode(view.polar(e)); return; }
+  if (L.tool === 'link') { if (id) linkClick(id); return; }
+  selected = id; view.selected = id; showNode();
+  if (id && byId(id).kind !== 'core') { drag = { id, moved: false }; view.canvas.setPointerCapture(e.pointerId); }
 });
-cv.addEventListener('pointermove', (e) => {
-  pointer = at(e);
-  if (drag) {
-    const n = byId(drag.id), q = polar(pointer);
-    // finer while dragging: a tenth of a level
-    const dx = pointer.x - view.cx, dy = view.cy - pointer.y;
-    const depth = Math.max(0.5, Math.min(5, Math.round((Math.hypot(dx, dy) / view.ring - R0) * 10) / 10));
-    if (n.depth !== depth || n.angle !== q.angle) { n.depth = depth; n.angle = q.angle; drag.moved = true; draw(); }
-    return;
-  }
-  const h = nodeAt(pointer);
-  if (h !== hover) { hover = h; }
-  showTip(e, hover);
-  draw();
+view.canvas.addEventListener('pointermove', (e) => {
+  if (!drag) return;
+  const n = byId(drag.id), q = view.polar(e);
+  const depth = Math.max(0.5, Math.min(8, Math.round(q.depth * 10) / 10)), angle = Math.round(q.angle);   // przy przeciąganiu co 0,1 poziomu
+  if (n.depth !== depth || n.angle !== angle) { n.depth = depth; n.angle = angle; drag.moved = true; view.pos[n.id] = view.place(depth, angle); view.tip.hidden = true; }
 });
-cv.addEventListener('pointerup', () => { if (drag?.moved) { save(); renderSide(); } drag = null; });
-cv.addEventListener('pointerleave', () => { hover = null; pointer = null; $('tip').hidden = true; draw(); });
-
-function showTip(e, id) {
-  const tip = $('tip');
-  if (!id || drag) { tip.hidden = true; return; }
-  const n = byId(id);
-  tip.textContent = `${n.name} · ${T('level')} ${n.depth}${n.cost ? ` · ${T('cost')} ${n.cost} ${T('pts')}` : ''}${n.wish ? ` — ${n.wish}` : ''}`;
-  tip.hidden = false;
-  tip.style.left = `${Math.min(window.innerWidth - 270, e.clientX + 14)}px`;
-  tip.style.top = `${e.clientY + 14}px`;
-}
+view.canvas.addEventListener('pointerup', () => { if (drag && drag.moved) changed(); drag = null; });
 
 function addNode({ depth, angle }) {
-  const kind = $('add-kind').value;
-  const id = `new${state.nextId++}`;
-  const parent = selected && byId(selected) ? selected : 'core';
-  const n = { id, name: T('New node'), kind, branch: byId(parent)?.branch === 'core' ? 'units' : byId(parent)?.branch || 'units', ship: '', wish: '', text: '', cost: 100,
-    depth, angle, all: false, parents: [parent], soon: true, color: null, icon: null };
-  state.nodes.push(n);
-  selected = id;
-  setMode('select');
-  save(); renderSide(); draw();
+  let id; do id = `new${L.nextId++}`; while (byId(id));
+  const parent = selected && byId(selected) ? selected : (L.tree.nodes.find((n) => n.kind === 'core') || {}).id;
+  const pb = parent ? byId(parent).branch : 'core';
+  L.tree.nodes.push({ id, name: 'New node', namePl: '', kind: L.addKind, branch: pb, parents: parent ? [parent] : [], all: false,
+    depth: Math.max(0.5, Math.round(depth * 2) / 2), angle: Math.round(angle), cost: 100, effect: {}, text: '', textPl: '', icon: null, soon: false, color: null, note: '' });
+  selected = id; setTool('select'); changed(); status(`Added ${id}: fill it in in the Node window.`);
 }
-
 function linkClick(id) {
-  if (!linkFrom) { linkFrom = id; modeHint(); draw(); return; }
-  if (id === linkFrom) { toast(T("A node can't link to itself")); return; }
-  const child = byId(id);
-  const k = child.parents.indexOf(linkFrom);
-  if (k >= 0) { child.parents.splice(k, 1); toast(T('Link removed')); } else { child.parents.push(linkFrom); toast(T('Linked')); }
-  linkFrom = null;
-  selected = id;
-  save(); renderSide(); modeHint(); draw();
+  if (!linkFrom) { linkFrom = id; view.selected = id; hint(); return; }
+  if (id === linkFrom) { status("A node can't grow from itself."); return; }
+  const child = byId(id), k = child.parents.indexOf(linkFrom);
+  if (k >= 0) child.parents.splice(k, 1); else child.parents.push(linkFrom);
+  status(k >= 0 ? `Link removed: ${byId(linkFrom).name} → ${child.name}.` : `Linked: ${byId(linkFrom).name} → ${child.name}.`);
+  linkFrom = null; selected = id; changed();
 }
-
-function setMode(m) {
-  mode = m; linkFrom = null;
-  for (const [id, mm] of [['m-select', 'select'], ['m-add', 'add'], ['m-link', 'link']]) $(id).setAttribute('aria-pressed', String(m === mm));
-  cv.className = m === 'add' ? 'adding' : m === 'link' ? 'linking' : '';
-  modeHint(); draw();
-}
-function modeHint() {
-  $('mode-hint').textContent = mode === 'add' ? T('Click where the new node should go (its level is the nearest ring, in halves).')
-    : mode === 'link' ? (linkFrom ? `${byId(linkFrom)?.name} → ${T('now click the child')}` : T('Click the lower node (the parent), then the higher one (the child). The same two again: the link goes.'))
-    : T('Click a node to edit it, drag it to move it (level and angle). Pointing at a node lights up its links.');
-}
-$('m-select').onclick = () => setMode('select');
-$('m-add').onclick = () => setMode('add');
-$('m-link').onclick = () => setMode('link');
-
-// ---------------------------------------------------------------- the side panel
-function field(label, input, changed, key) {
-  if (key) input.dataset.f = key; // (tests)
-  const l = el('label', 'f' + (changed ? ' changed' : ''));
-  l.append(el('span', '', T(label)), input);
-  return l;
-}
-function swatches(current, onPick, withNone) {
-  const box = el('div', 'palette');
-  if (withNone) {
-    const b = el('button', 'swatch none'); b.title = T("Branch's colour"); b.setAttribute('aria-pressed', String(!current));
-    b.onclick = () => onPick(null); box.append(b);
-  }
-  for (const p of PALETTE) {
-    const b = el('button', 'swatch'); b.style.background = p.color; b.title = `${T(p.name)} ${p.color}`;
-    b.setAttribute('aria-pressed', String(current === p.color));
-    b.onclick = () => onPick(p.color);
-    box.append(b);
-  }
-  return box;
-}
-
-let branchPick = null;
-function renderSide() {
-  const side = $('side');
-  side.textContent = '';
-  const n = selected && byId(selected);
-  if (!n) {
-    side.append(el('p', 'hint', T('Click a node to edit it.')));
-  } else {
-    const g = GAME_BY_ID[n.id] || {};
-    const ch = (f) => !GAME_BY_ID[n.id] || !same(n[f], g[f]);
-    const set = (f, v) => { n[f] = v; save(); draw(); };
-    const h = el('h2');
-    const dot = el('span'); dot.style.cssText = `width:14px;height:14px;border-radius:3px;background:${nodeColor(n)}`;
-    const st = nodeStatus(n), tag = el('span', 'tag' + (st === 'new' ? ' new' : st === 'changed' ? ' changed' : ''), T(st));
-    h.append(dot, el('span', '', n.name), tag);
-    side.append(h);
-
-    const name = el('input'); name.type = 'text'; name.value = n.name;
-    name.oninput = () => set('name', name.value);
-    side.append(field('Name', name, ch('name'), 'name'));
-
-    const kind = el('select');
-    for (const [k, label] of Object.entries(KINDS)) { if (k === 'core' && n.kind !== 'core') continue; const o = el('option', '', T(label)); o.value = k; kind.append(o); }
-    kind.value = n.kind; kind.disabled = n.kind === 'core';
-    kind.onchange = () => { set('kind', kind.value); renderSide(); };
-    const branch = el('select');
-    for (const [k, b] of Object.entries(BRANCHES)) { const o = el('option', '', T(b.label)); o.value = k; branch.append(o); }
-    branch.value = n.branch;
-    branch.onchange = () => { set('branch', branch.value); renderSide(); };
-    const r1 = el('div', 'row2'); r1.append(field('Kind', kind, ch('kind'), 'kind'), field('Branch (its colour)', branch, ch('branch'), 'branch'));
-    side.append(r1);
-
-    const shipSel = el('select');
-    const none = el('option', '', T('— none —')); none.value = ''; shipSel.append(none);
-    for (const k of SHIPS) { const o = el('option', '', T(SHIP_INFO[k][0])); o.value = k; shipSel.append(o); }
-    shipSel.value = n.ship || '';
-    shipSel.onchange = () => set('ship', shipSel.value);
-    side.append(field('Ship', shipSel, ch('ship'), 'ship'));
-
-    const wish = el('textarea'); wish.value = n.wish || ''; wish.placeholder = T('e.g. "Lasers fire 2 beams at once"');
-    wish.oninput = () => set('wish', wish.value);
-    side.append(field('What should be here — in your words', wish, ch('wish'), 'wish'));
-
-    const text = el('input'); text.type = 'text'; text.value = n.text || '';
-    text.oninput = () => set('text', text.value);
-    side.append(field('Text in the game', text, ch('text'), 'text'));
-
-    const num = (f, step, min, max) => {
-      const i = el('input'); i.type = 'number'; i.step = step; if (min !== undefined) i.min = min; if (max !== undefined) i.max = max; i.value = n[f];
-      i.oninput = () => { const v = Number(i.value); if (i.value.trim() !== '' && Number.isFinite(v)) { set(f, v); } };
-      return i;
-    };
-    const r2 = el('div', 'row2');
-    r2.append(field('Cost (points)', num('cost', 10, 0), ch('cost'), 'cost'), field('Level (0–5)', num('depth', 0.1, 0, 5), ch('depth'), 'depth'));
-    side.append(r2);
-    const needs = el('select');
-    for (const [v, label] of [['any', 'any one parent'], ['all', 'all parents']]) { const o = el('option', '', T(label)); o.value = v; needs.append(o); }
-    needs.value = n.all ? 'all' : 'any';
-    needs.onchange = () => set('all', needs.value === 'all');
-    const r3 = el('div', 'row2');
-    r3.append(field('Angle (° from straight up)', num('angle', 1, -110, 110), ch('angle'), 'angle'), field('Needs', needs, ch('all'), 'all'));
-    side.append(r3);
-
-    side.append(el('h3', '', T('Parents (links down)')));
-    const pl = el('div', 'parents');
-    if (!n.parents.length) pl.append(el('div', '', T('none')));
-    for (const pid of n.parents) {
-      const row = el('div');
-      row.append(el('span', '', byId(pid)?.name || pid));
-      const x = el('button', 'small', '✕'); x.title = T('Remove the link');
-      x.onclick = () => { n.parents = n.parents.filter((p) => p !== pid); save(); renderSide(); draw(); };
-      row.append(x);
-      pl.append(row);
-    }
-    side.append(pl);
-
-    const soon = el('label', 'chk'); const sc = el('input'); sc.type = 'checkbox'; sc.checked = n.soon;
-    sc.onchange = () => set('soon', sc.checked);
-    soon.append(sc, el('span', '', T('Coming soon (shown, not built yet)')));
-    side.append(soon);
-
-    side.append(el('h3', '', T('Colour')));
-    side.append(swatches(n.color, (c) => { set('color', c); renderSide(); }, true));
-
-    const btns = el('div', 'row2');
-    const del = el('button', 'danger', T('Delete this node'));
-    del.disabled = n.kind === 'core';
-    del.onclick = () => deleteNode(n.id);
-    const back = el('button', '', T("Back to the game's version"));
-    back.disabled = !GAME_BY_ID[n.id] || st === 'as in the game';
-    back.onclick = () => { Object.assign(n, clone(GAME_BY_ID[n.id])); save(); renderSide(); draw(); };
-    btns.append(del, back);
-    side.append(btns);
-  }
-
-  // the branches' colours, from the palette
-  side.append(el('h3', '', T('Branch colours')), el('p', 'hint', T('Click a colour, then a swatch of the palette.')));
-  const bl = el('div', 'branches');
-  for (const [k, b] of Object.entries(BRANCHES)) {
-    const row = el('div', 'branch');
-    const d = el('button', 'dot'); d.style.background = branchColor(k); d.title = branchColor(k);
-    d.setAttribute('aria-pressed', String(branchPick === k));
-    d.onclick = () => { branchPick = branchPick === k ? null : k; renderSide(); };
-    const changed = state.branchColors[k] && state.branchColors[k] !== GAME_BRANCH[k];
-    row.append(d, el('span', '', T(b.label)));
-    if (changed) {
-      row.append(el('span', 'tag changed', T('changed')));
-      const x = el('button', 'small', '↺'); x.title = T("Back to the game's version");
-      x.onclick = () => { delete state.branchColors[k]; save(); renderSide(); draw(); };
-      row.append(x);
-    }
-    bl.append(row);
-    if (branchPick === k) bl.append(swatches(state.branchColors[k] || null, (c) => { if (c) state.branchColors[k] = c; else delete state.branchColors[k]; branchPick = null; save(); renderSide(); draw(); }, true));
-  }
-  side.append(bl);
-
-  side.append(el('h3', '', T('Palette')), el('p', 'hint', T("16 darker pastel colours, from the ships' colours.")));
-  const pal = swatches(undefined, () => {}, false);
-  pal.querySelectorAll('button').forEach((b) => { b.disabled = true; b.style.cursor = 'default'; b.style.opacity = 1; });
-  side.append(pal);
-
-  side.append(el('h3', '', T('Notes')), el('p', 'hint', T('Anything else about the tree.')));
-  const notes = el('textarea'); notes.value = state.notes || '';
-  notes.oninput = () => { state.notes = notes.value; save(); };
-  side.append(notes);
-}
-
+let delArm = null;
 function deleteNode(id) {
-  const n = byId(id);
-  if (!n || n.kind === 'core') { toast(T("The core can't be deleted")); return; }
-  if (!confirm(`${T('Delete node')} „${n.name}”?`)) return;
-  state.nodes = state.nodes.filter((x) => x.id !== id);
-  for (const x of state.nodes) x.parents = x.parents.filter((p) => p !== id);
-  selected = null;
-  save(); renderSide(); draw();
+  const n = byId(id); if (!n || n.kind === 'core') { status("The core can't be deleted."); return; }
+  if (delArm !== id) { delArm = id; status(`Delete ${n.name}? Once more to delete.`); setTimeout(() => { if (delArm === id) delArm = null; }, 3000); return; }
+  delArm = null; L.tree.nodes = L.tree.nodes.filter((x) => x.id !== id);
+  for (const x of L.tree.nodes) x.parents = x.parents.filter((p) => p !== id);
+  selected = null; changed(); status(`Deleted: ${n.name}.`);
 }
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'Delete' && selected && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) deleteNode(selected);
-  if (e.key === 'Escape') { setMode('select'); }
+addEventListener('keydown', (e) => {
+  if (['INPUT', 'TEXTAREA', 'SELECT'].includes((document.activeElement || {}).tagName)) return;
+  if (e.key === 'Delete' && selected && L.mode === 'edit') deleteNode(selected);
+  if (e.key === 'Escape' && L.mode === 'edit') setTool('select');
 });
 
-// ---------------------------------------------------------------- header: summary, export / import, language
-function toast(t) { const e = $('toast'); e.textContent = t; e.classList.add('show'); setTimeout(() => e.classList.remove('show'), 1800); }
-function updateSummary() {
-  const n = countChanges(diff());
-  $('summary').textContent = n ? `${n} ${T(n > 1 ? 'changes' : 'change')}` : T('no changes');
+/* ---------------- okno Drzewko ---------------- */
+function showTreeForm() {
+  $('treeName').value = L.tree.name; $('ptsEn').value = L.tree.points.label; $('ptsPl').value = L.tree.points.labelPl;
+  $('bg').value = L.tree.background; $('notes').value = L.tree.notes || '';
 }
-
-function exportData() {
-  const d = diff();
-  const out = { game: 'Hive Hunger', file: 'tree-editor', version: VERSION, exported: new Date().toISOString(),
-    changes: d, notes: state.notes || undefined,
-    nodes: state.nodes.map((n) => ({ ...n, status: nodeStatus(n), color: n.color || undefined, ship: n.ship || undefined, wish: n.wish || undefined })),
-    branchColors: Object.fromEntries(Object.keys(BRANCHES).map((k) => [k, branchColor(k)])),
-    palette: PALETTE.map((p) => ({ name: p.name, color: p.color })),
-    raw: state };
-  const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
-  const a = el('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `hive-hunger-tree-${new Date().toISOString().slice(0, 10)}.json`;
-  document.body.append(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  toast(T('Exported'));
+$('treeName').oninput = () => { L.tree.name = $('treeName').value; save(); };
+$('ptsEn').oninput = () => { L.tree.points.label = $('ptsEn').value || 'points'; save(); showTrial(); };
+$('ptsPl').oninput = () => { L.tree.points.labelPl = $('ptsPl').value; save(); };
+$('bg').oninput = () => { L.tree.background = $('bg').value.trim(); save(); };
+$('notes').oninput = () => { L.tree.notes = $('notes').value; save(); };
+function saveTree(name) {
+  const n = String(name || L.tree.name || '').trim(); if (!n) throw new Error('a tree needs a name');
+  L.tree.name = n; const d = cloneTree(L.tree);
+  saveAsset('tree', n, Object.fromEntries(TREE_KEYS.map((k) => [k, d[k]]))); L.source = `asset:${n}`; save(); fillTreeSel(); showTreeForm(); return n;
 }
-$('export').onclick = exportData;
-$('import').onclick = () => $('file').click();
-$('file').onchange = async () => {
-  const f = $('file').files[0]; $('file').value = '';
-  if (!f) return;
-  try {
-    const d = JSON.parse(await f.text());
-    const raw = d.raw || d;
-    if (!raw || !Array.isArray(raw.nodes)) throw new Error('not a tree editor file');
-    state = { branchColors: {}, notes: '', nextId: 1, ...raw };
-    selected = null;
-    save(); layout(); renderSide(); toast(T('Imported'));
-  } catch (e) { toast(T('Could not read the file: ') + e.message); }
+$('treeSave').onclick = () => { try { status(`Saved: ${saveTree($('treeName').value)}.`); } catch (e) { status(e.message); } };
+$('treeDel').onclick = () => {
+  if (!L.source.startsWith('asset:')) { status('Pick a saved tree first.'); return; }
+  const n = L.source.slice(6); removeAsset('tree', n); L.source = 'new'; save(); fillTreeSel(); status(`Deleted the saved ${n} (it stays here until you load another).`);
 };
-$('reset-all').onclick = () => {
-  if (!confirm(T('Reset every change to the tree?'))) return;
-  state = { nodes: clone(GAME), branchColors: {}, notes: '', nextId: 1 };
-  selected = null;
-  save(); layout(); renderSide(); toast(T('Everything as in the game'));
+$('treeNew').onclick = () => { setTree(emptyTree(), 'new'); fillTreeSel(); status('A new, empty tree: add nodes with Add.'); };
+$('exportBtn').onclick = () => {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(L.tree, null, 2)], { type: 'application/json' }));
+  const a = el('a', { href: url, download: `${(L.tree.name || 'tree').toLowerCase().replace(/[^a-z0-9]+/g, '-')}.json` }); a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+$('importBtn').onclick = () => $('importFile').click();
+$('importFile').onchange = async () => {
+  const f = $('importFile').files[0]; if (!f) return;
+  try { setTree(JSON.parse(await f.text()), 'new'); fillTreeSel(); status(`Imported: ${L.tree.name}.`); } catch (e) { status(`Not a tree: ${e.message}`); }
+  $('importFile').value = '';
 };
 
-function applyLang() {
-  document.documentElement.lang = LANG;
-  document.title = T('Hive Hunger — Tree editor');
-  $('h1').textContent = T('Hive Hunger — Tree editor');
-  $('import').textContent = T('Import…');
-  $('reset-all').textContent = T('Reset all');
-  $('export').textContent = T('Export');
-  $('m-select').textContent = T('Select / move');
-  $('m-add').textContent = T('Add node');
-  $('m-link').textContent = T('Connect');
-  const k = $('add-kind'), v = k.value || 'prop';
-  k.textContent = '';
-  for (const [id, label] of Object.entries(KINDS)) { if (id === 'core') continue; const o = el('option', '', T(label)); o.value = id; k.append(o); }
-  k.value = v;
-  $('ver').textContent = `${T('game')} ${VERSION}`;
-  $('lang-en').setAttribute('aria-pressed', String(LANG === 'en'));
-  $('lang-pl').setAttribute('aria-pressed', String(LANG === 'pl'));
-  modeHint(); updateSummary();
+/* ---------------- okno Węzeł ---------------- */
+function row(label, input) { return el('div', { className: 'row' }, el('span', { textContent: label }), input, el('output')); }
+function input(type, value, on, extra = {}) { const i = el('input', { type, value: value ?? '', ...extra }); i.addEventListener(type === 'checkbox' ? 'change' : 'input', () => on(i)); return i; }
+function select(opts, value, on) { const s = el('select'); opts.forEach(([v, t]) => s.append(el('option', { value: v, textContent: t }))); s.value = value; s.onchange = () => on(s); return s; }
+function check(label, on, value) { const i = el('input', { type: 'checkbox', checked: !!value }); i.onchange = () => on(i.checked); return el('label', { className: 'chk' }, i, ` ${label}`); }
+const effectText = (e) => Object.entries(e).map(([k, v]) => `${k} ${v}`).join('\n');
+function parseEffect(s) {
+  const e = {};
+  for (const line of s.split('\n')) { const [k, v] = line.trim().split(/[\s=:]+/); if (!k) continue; if (v === undefined || v === 'true') e[k] = true; else if (Number.isFinite(+v)) e[k] = +v; }
+  return e;
 }
-function setLang(l) {
-  LANG = l;
-  try { localStorage.setItem(STORE + '-lang', l); } catch { /* storage off */ }
-  applyLang(); renderSide(); draw();
+function showNode() {
+  const f = $('nodeForm'); f.replaceChildren(); const n = selected && byId(selected);
+  if (!n) { f.append(el('p', { className: 'note', textContent: 'Click a node in the tree (Edit → Select) to edit it here.' })); return; }
+  const set = (k, redraw = true) => (i) => { n[k] = i.type === 'number' ? +i.value || 0 : i.value; if (redraw) changed({ form: false }); else save(); };
+  const id = input('text', n.id, () => {}, { maxLength: 32 });
+  id.onchange = () => {
+    const v = id.value.trim(); if (!v || v === n.id) { id.value = n.id; return; }
+    if (byId(v)) { status(`There already is a node "${v}".`); id.value = n.id; return; }
+    for (const x of L.tree.nodes) x.parents = x.parents.map((p) => (p === n.id ? v : p));
+    L.owned = L.owned.map((p) => (p === n.id ? v : p)); n.id = v; selected = v; changed();
+  };
+  f.append(row('Id', id), row('Name (EN)', input('text', n.name, set('name'))), row('Name (PL)', input('text', n.namePl, set('namePl'))));
+  if (n.kind !== 'core') f.append(row('Kind', select(Object.entries(KINDS).filter(([k]) => k !== 'core').map(([k, x]) => [k, x.label]), n.kind, (s) => { n.kind = s.value; changed({ form: false }); })));
+  f.append(row('Branch', select(Object.entries(L.tree.branches).map(([k, b]) => [k, b.label]), n.branch, (s) => { n.branch = s.value; changed({ form: false }); })));
+  f.append(row('Icon', select([['', '(none)'], ...Object.keys(ICONS).map((k) => [k, k])], n.icon || '', (s) => { n.icon = s.value || null; changed({ form: false }); })));
+  const col = input('color', n.color || L.tree.branches[n.branch].color, (i) => { n.color = i.value; changed({ form: false }); });
+  f.append(row('Own colour', col), check("the branch's colour", (v) => { n.color = v ? null : col.value; changed(); }, !n.color));
+  if (n.kind !== 'core') {
+    f.append(row('Cost', input('number', n.cost, set('cost'), { min: 0, step: 10 })));
+    f.append(row('Level', input('number', n.depth, set('depth'), { min: 0.5, max: 8, step: 0.1 })), row('Angle', input('number', n.angle, set('angle'), { min: -110, max: 110, step: 1 })));
+    f.append(el('h3', { textContent: 'Grows from' }));
+    const list = el('div', { className: 'parents' });
+    n.parents.forEach((p) => { const b = el('button', { type: 'button', textContent: `${(byId(p) || {}).name || p} ✕`, title: 'Remove this link' }); b.onclick = () => { n.parents = n.parents.filter((x) => x !== p); changed(); }; list.append(b); });
+    if (!n.parents.length) list.append(el('span', { className: 'note', textContent: 'nothing (Link: click a parent, then this node)' }));
+    f.append(list, row('Needs', select([['any', 'any one of them'], ['all', 'all of them']], n.all ? 'all' : 'any', (s) => { n.all = s.value === 'all'; changed({ form: false }); })));
+    f.append(check('Coming soon (shown, not for sale yet)', (v) => { n.soon = v; changed({ form: false }); }, n.soon));
+    f.append(el('h3', { textContent: 'Effect' }), el('p', { className: 'note', textContent: 'One per line: a game stat and a number (they add up), or just a name (on). E.g. "count 10", "bolt".' }));
+    const ef = el('textarea', { rows: 3, spellcheck: false, value: effectText(n.effect) }); ef.oninput = () => { n.effect = parseEffect(ef.value); changed({ form: false }); }; f.append(ef);
+  }
+  f.append(el('h3', { textContent: 'Text (EN)' }));
+  const tx = el('textarea', { rows: 2, value: n.text }); tx.oninput = () => { n.text = tx.value; changed({ form: false }); }; f.append(tx);
+  f.append(el('h3', { textContent: 'Text (PL)' }));
+  const tp = el('textarea', { rows: 2, value: n.textPl }); tp.oninput = () => { n.textPl = tp.value; changed({ form: false }); }; f.append(tp);
+  f.append(el('h3', { textContent: 'Note' }), el('p', { className: 'note', textContent: 'For you: what should be there (not shown in the game).' }));
+  const nt = el('textarea', { rows: 2, value: n.note || '' }); nt.oninput = () => { n.note = nt.value; save(); }; f.append(nt);
+  if (n.kind !== 'core') { const d = el('button', { type: 'button', textContent: 'Delete the node' }); d.onclick = () => deleteNode(n.id); f.append(el('div', { className: 'btns' }, d)); }
 }
-$('lang-en').onclick = () => setLang('en');
-$('lang-pl').onclick = () => setLang('pl');
 
-window.addEventListener('resize', layout);
-window.__treeEditor = { state: () => state, diff, posOf: (id) => posOf(byId(id)), canvas: cv, view, select: (id) => { selected = id; renderSide(); draw(); }, setMode, setLang, english: new Map(Object.entries(PL)), PALETTE };
-applyLang();
-setMode('select');
-renderSide();
-layout();
-</script>
-</body>
-</html>
+/* ---------------- okno Gałęzie ---------------- */
+function showBranches() {
+  const box = $('branchList'); box.replaceChildren();
+  const count = (k) => L.tree.nodes.filter((n) => n.branch === k).length;
+  for (const [k, b] of Object.entries(L.tree.branches)) {
+    const c = input('color', b.color, (i) => { b.color = i.value; save(); });
+    const en = input('text', b.label, (i) => { b.label = i.value; save(); }, { title: 'Name (EN)' });
+    const pl = input('text', b.labelPl, (i) => { b.labelPl = i.value; save(); }, { title: 'Name (PL)', placeholder: 'PL' });
+    const r = el('div', { className: 'branchRow', title: `${k}: ${count(k)} nodes` }, c, en, pl);
+    if (k !== 'core') { const x = el('button', { type: 'button', textContent: '✕', title: count(k) ? 'Nodes still use it' : 'Remove the branch', disabled: !!count(k) }); x.onclick = () => { delete L.tree.branches[k]; changed(); }; r.append(x); }
+    box.append(r);
+  }
+}
+$('branchAdd').onclick = () => {
+  const k = $('branchId').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+  if (!k || L.tree.branches[k]) { status(k ? `There already is a branch "${k}".` : 'Give the branch an id.'); return; }
+  L.tree.branches[k] = { label: k, labelPl: '', color: '#88aaff' }; $('branchId').value = ''; changed();
+};
+
+/* ---------------- okno Próba ---------------- */
+const kv = (k, v) => [el('span', { textContent: k }), el('b', { textContent: v })];
+function showTrial() {
+  const pts = L.tree.points.label, buy = L.tree.nodes.filter((n) => n.kind !== 'core' && !n.soon);
+  $('trialStats').replaceChildren(...kv('Left', `${points().toLocaleString('en')} ${pts}`), ...kv('Spent', trial.spent.toLocaleString('en')),
+    ...kv('Bought', `${buy.filter((n) => trial.has(n.id)).length} / ${buy.length}`));
+  const e = trial.effects();
+  $('effects').replaceChildren(...(Object.keys(e).length ? Object.entries(e).flatMap(([k, v]) => kv(k, v === true ? 'on' : String(+v.toFixed(3)))) : kv('—', 'nothing yet')));
+  const s = treeStats(L.tree), nm = (r) => (r ? `${byId(r.id).name} (${r.steps} steps, ${r.cost.toLocaleString('en')})` : '—');
+  $('treeStats').replaceChildren(...kv('Nodes', `${s.nodes} (for sale ${s.buyable}, soon ${s.soon})`), ...kv('All for sale', `${s.total.toLocaleString('en')} ${pts}`),
+    ...kv('Longest way', nm(s.longest)), ...kv('Dearest way', nm(s.dearest)));
+  $('budget').value = L.budget; if (L.mode === 'trial') hint();
+}
+$('budget').oninput = () => { L.budget = Math.max(0, +$('budget').value || 0); save(); showTrial(); };
+$('plus100').onclick = () => { L.budget += 100; save(); showTrial(); };
+$('plus1000').onclick = () => { L.budget += 1000; save(); showTrial(); };
+$('trialReset').onclick = () => { L.owned = []; rebuildStates(); save(); showTrial(); status('Everything sold: the points are back.'); };
+
+/* ---------------- okno Sprawdzenie ---------------- */
+function showChecks() {
+  const list = checkTree(L.tree), box = $('checkList'); box.replaceChildren();
+  view.marked = new Set(list.filter((i) => i.id && i.level !== 'info').map((i) => i.id));
+  if (!list.length) { box.append(el('p', { className: 'note ok', textContent: 'All good: every node can be reached, no loops, every one has a text and an effect.' })); return; }
+  for (const i of list) {
+    const b = el('button', { type: 'button', className: `issue is-${i.level}`, textContent: i.text, title: i.code });
+    b.onclick = () => { if (i.id && byId(i.id)) { if (L.mode !== 'edit') setMode('edit'); selected = i.id; view.selected = i.id; showNode(); } };
+    box.append(b);
+  }
+}
+
+/* ---------------- dla AI ---------------- */
+// TreeApi: get() — drzewko; load(def | nazwa); check(); stats(); points(n); buy(id); effects(); reset(); save(nazwa) — zasób „tree”
+window.TreeApi = {
+  get: () => cloneTree(L.tree),
+  load: (d) => { const def = typeof d === 'string' ? SAMPLES[d] || getAsset('tree', d) : d; if (!def) throw new Error(`no tree "${d}"`); setTree(cloneTree(def), typeof d === 'string' ? (SAMPLES[d] ? `sample:${d}` : `asset:${d}`) : 'new'); fillTreeSel(); return window.TreeApi.check(); },
+  check: () => checkTree(L.tree), stats: () => treeStats(L.tree),
+  points: (n) => { if (n != null) { L.budget = Math.max(0, +n || 0); save(); showTrial(); } return points(); },
+  buy: (id) => { const ok = trial.buy(id, points()); if (ok) { L.owned = [...trial.owned]; save(); showTrial(); } return { bought: ok, state: trial.state(id), left: points() }; },
+  effects: () => trial.effects(), reset: () => { L.owned = []; rebuildStates(); save(); showTrial(); },
+  mode: (m) => { if (m) setMode(m); return L.mode; },
+  save: (name) => ({ saved: saveTree(name) }), saved: () => listAssets('tree'), samples: () => Object.keys(SAMPLES),
+};
+function apiTab() {
+  if (!window.LabConsole) return;
+  const box = el('div', { className: 'treeApi' }), ta = el('textarea', { className: 'mono', rows: 4, spellcheck: false, value: 'TreeApi.check()' });
+  const go = el('button', { type: 'button', textContent: 'Run' }), out = el('pre', { className: 'note mono' });
+  go.onclick = () => {
+    const m = /^\s*TreeApi\.(\w+)\((.*)\)\s*$/s.exec(ta.value);
+    try { if (!m || !window.TreeApi[m[1]]) throw new Error('write TreeApi.<method>(JSON arguments)'); const args = m[2].trim() ? JSON.parse(`[${m[2]}]`) : []; out.textContent = JSON.stringify(window.TreeApi[m[1]](...args), null, 1).slice(0, 4000); } catch (e) { out.textContent = `Error: ${e.message}`; }
+  };
+  box.append(ta, go, el('p', { className: 'note', textContent: 'Methods: get, load(tree | "name"), check, stats, points(n), buy("id"), effects, reset, mode("edit" | "trial"), save("name"), saved, samples.' }), out);
+  window.LabConsole.addTab({ id: 'treeapi', title: 'API', titlePl: 'API', el: box });
+}
+if (window.LabConsole) apiTab(); else addEventListener('load', apiTab);
+
+/* ---------------- start ---------------- */
+onAssetsChange(fillTreeSel);
+fillTreeSel(); showTreeForm(); setMode(L.mode); showNode();

@@ -553,6 +553,23 @@ window.GameLabCatalog =
       }
     },
     {
+      "file": "labs/trees.html",
+      "cat": "ui",
+      "name": "Tech Tree Lab",
+      "namePl": "Laboratorium drzewek",
+      "doc": "docs/labs/trees.md",
+      "desc": "A game's upgrade or research tree as data, from Hive Hunger: branches with colours, nodes with parents (any one or all), cost, effects and texts in English and Polish, in a radial pixel-art view — edited with the mouse, tried out with points, checked for nodes nobody can reach and for loops, saved under a name. JSON for AI.",
+      "descPl": "Drzewko ulepszeń albo badań gry jako dane, z Hive Hunger: gałęzie z kolorami, węzły z rodzicami (którykolwiek albo wszyscy), koszt, efekty i teksty po angielsku i polsku, w promienistym widoku pixel art — edytowane myszą, sprawdzane w próbie z punktami, badane pod kątem nieosiągalnych węzłów i pętli, zapisywane pod nazwą. JSON dla AI.",
+      "kind": "lab",
+      "kit": "TreeKit",
+      "phrases": ["drzewko", "ulepszenia", "badania", "gra", "pixel art"],
+      "saved": ["gamelab.trees"],
+      "art": {
+        "bg": ["#140c26", "#07040e"],
+        "svg": "<path d=\"M60 84 A40 40 0 0 1 140 84\" fill=\"none\" stroke=\"#2a1d45\" stroke-width=\"1.5\"/><path d=\"M36 84 A64 64 0 0 1 164 84\" fill=\"none\" stroke=\"#2a1d45\" stroke-width=\"1.5\"/><g stroke-width=\"1.5\"><path d=\"M100 84 L70 56 L56 30\" stroke=\"#78ff8c\"/><path d=\"M100 84 L100 50 L100 22\" stroke=\"#ff5a96\"/><path d=\"M100 84 L132 58 L146 32\" stroke=\"#be8cff\"/><path d=\"M100 50 L132 58\" stroke=\"#c9b0ff\" stroke-dasharray=\"3 3\"/></g><path d=\"M100 74 L110 84 L100 94 L90 84 Z\" fill=\"#ffd65c\"/><path d=\"M70 50 L76 56 L70 62 L64 56 Z\" fill=\"#78ff8c\"/><path d=\"M100 44 L106 50 L100 56 L94 50 Z\" fill=\"#ff5a96\"/><path d=\"M132 51 L138 55 L138 62 L132 66 L126 62 L126 55 Z\" fill=\"#140c26\" stroke=\"#be8cff\" stroke-width=\"1.5\"/><circle cx=\"56\" cy=\"30\" r=\"3.5\" fill=\"#140c26\" stroke=\"#78ff8c\"/><circle cx=\"100\" cy=\"22\" r=\"3.5\" fill=\"#ff5a96\"/><circle cx=\"146\" cy=\"32\" r=\"3.5\" fill=\"#140c26\" stroke=\"#46385e\"/>"
+      }
+    },
+    {
       "file": "labs/skins.html",
       "cat": "ui",
       "name": "Skin lab",
@@ -712,6 +729,9 @@ window.GameLabCatalog =
     "HUD": "HUD",
     "dialogi": "dialogues",
     "gra": "game",
+    "drzewko": "tech tree",
+    "ulepszenia": "upgrades",
+    "badania": "research",
     "sztuka": "art",
     "malarstwo": "painting",
     "znaczki": "stamps",

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Tech Tree Lab — upgrade and research trees as data | GameLaboratory</title>
+<meta name="description" content="GameLaboratory tech tree lab: a game's upgrade or research tree as data — branches with colours, nodes with parents (any one or all), cost, effects and texts in English and Polish — drawn as a radial pixel-art tree, edited with the mouse, tried out with points, checked for unreachable nodes and loops. JSON for AI.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/trees.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Tech Tree Lab — upgrade trees as data">
+<meta property="og:description" content="Upgrade and research trees for any game: edit, try out with points, check.">
+<meta property="og:url" content="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/trees.html">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../ui/style/sea.css">
+<link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="../ui/pages/trees.css">
+</head>
+<!-- Laboratorium drzewek (js/labs/trees/): drzewko jako dane (js/gameui/tree/tree.js), widok promienisty (radial.js). -->
+<body class="lab viewFits">
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/shell/menubar.js"></script>
+<div id="view"></div>
+<div class="bar">
+  <select id="treeSel" aria-label="Tree" title="A sample or a tree saved under a name"></select>
+  <div class="btns" id="modes">
+    <button type="button" data-mode="edit" title="Edit the tree with the mouse">Edit</button>
+    <button type="button" data-mode="trial" title="Try it out: points, buying">Trial</button>
+  </div>
+  <div class="btns" id="tools">
+    <button type="button" data-tool="select" title="Click a node to edit it, drag it to move it">Select</button>
+    <button type="button" data-tool="add" title="Click where the new node should go">Add</button>
+    <button type="button" data-tool="link" title="Click the parent, then the child (the same two again: the link goes)">Link</button>
+  </div>
+  <select id="addKind" aria-label="New node's kind" title="The kind of node Add puts in"></select>
+  <span class="sp"></span>
+  <span class="dimtxt" id="status"></span>
+</div>
+<div class="foot"><span id="fps" data-auto></span><span class="sp"></span><span>GameLaboratory</span></div>
+<script src="../ui/shell/bars.js"></script>
+<aside class="panel" data-std="info">
+  <h2 class="stdName">Tech tree</h2>
+  <p class="stdText">A game's upgrade or research tree as data: branches with their colours, nodes that grow from their parents (any one of them or all), with a cost, an effect (game stats that add up) and a text in English and Polish. Drawn as a radial pixel-art tree growing up from its core. Edit it with the mouse, try it out with points, check it for nodes nobody can reach.</p>
+  <p class="note">Shapes: diamond — a trait of the whole (big with an icon), hexagon — a unit or building, circle — a unit's property. Dashed link: either parent is enough; solid across branches: it needs all of them.</p>
+  <p class="note">For AI: TreeApi in the console (API tab) — load a tree, check it, buy nodes, save it under a name.</p>
+</aside>
+<aside class="panel" data-window="tree" data-title="Tree" data-title-pl="Drzewko">
+  <div class="row"><span>Name</span><input type="text" id="treeName" maxlength="40"><output></output></div>
+  <div class="btns"><button type="button" id="treeSave">Save under this name</button><button type="button" id="treeDel">Delete saved</button><button type="button" id="treeNew">New, empty</button></div>
+  <div class="row"><span>Points (EN)</span><input type="text" id="ptsEn" maxlength="24"><output></output></div>
+  <div class="row"><span>Points (PL)</span><input type="text" id="ptsPl" maxlength="24"><output></output></div>
+  <div class="row"><span>Background</span><input type="text" id="bg" maxlength="40" placeholder="image name"><output></output></div>
+  <p class="note">Background: the name of an image (from the art lab, in the next stage); kept in the tree, not drawn yet.</p>
+  <h3>Notes</h3>
+  <textarea id="notes" rows="3" spellcheck="false"></textarea>
+  <h3>JSON</h3>
+  <div class="btns"><button type="button" id="exportBtn">Export a file</button><button type="button" id="importBtn">Import a file</button><input type="file" id="importFile" accept=".json,application/json" hidden></div>
+  <p class="note">A saved tree is a named asset (tree): a game takes it from there.</p>
+</aside>
+<aside class="panel" data-window="node" data-title="Node" data-title-pl="Węzeł">
+  <div id="nodeForm"></div>
+</aside>
+<aside class="panel" data-window="trial" data-side="right" data-title="Trial" data-title-pl="Próba">
+  <div class="row"><span>Points</span><input type="number" id="budget" min="0" step="10"><output></output></div>
+  <div class="btns"><button type="button" id="plus100">+100</button><button type="button" id="plus1000">+1000</button><button type="button" id="trialReset">Sell everything</button></div>
+  <div class="stats" id="trialStats"></div>
+  <h3>Effects bought</h3>
+  <div class="stats" id="effects"></div>
+  <h3>The tree</h3>
+  <div class="stats" id="treeStats"></div>
+</aside>
+<aside class="panel" data-window="checks" data-side="right" data-title="Checks" data-title-pl="Sprawdzenie">
+  <div id="checkList"></div>
+</aside>
+<aside class="panel" data-window="branches" data-side="right" data-title="Branches" data-title-pl="Gałęzie">
+  <div id="branchList"></div>
+  <div class="row"><span>New branch</span><input type="text" id="branchId" maxlength="24" placeholder="id"><output></output></div>
+  <div class="btns"><button type="button" id="branchAdd">Add a branch</button></div>
+</aside>
+<script src="../ui/shell/labwin.js"></script>
+<script src="../ui/shell/windows.js"></script>
+<script type="module" src="../js/labs/trees/trees.js"></script>
+</body>
+</html>
