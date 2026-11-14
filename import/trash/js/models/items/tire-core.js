@@ -60,7 +60,14 @@ export function buildTire(spec, lod = 0) {
     outer.forEach(([r, y], i) => { if (Math.sign(y) === side && r >= r0 && r <= r1) { lo = Math.min(lo, arc[i]); hi = Math.max(hi, arc[i]); } });
     bands.push([lo, hi, side]);
   }
-  const sideId = defineMat('tireSide-' + spec.id, { color: spec.sideColor || '#1c1c1e', roughness: 0.86, metalness: 0, tex: 'tireSide', bands, text: spec.text || [], circ: 2 * Math.PI * (r0 + r1) / 2, arcLen: carcass.userData.arcLen });
+  // pas bieżnika w innym kolorze niż boki (rowerowe z beżowymi bokami): zakres v korony na mapie barwy
+  let crownV = null;
+  if (spec.treadBand) {
+    let lo = 1, hi = 0;
+    outer.forEach(([r, y], i) => { if (Math.abs(y) <= spec.treadBand) { lo = Math.min(lo, arc[i]); hi = Math.max(hi, arc[i]); } });
+    crownV = [lo, hi];
+  }
+  const sideId = defineMat('tireSide-' + spec.id, { color: spec.treadBand ? '#ffffff' : (spec.sideColor || '#1c1c1e'), sideColor: spec.sideColor, crownColor: '#1b1b1c', crownV, roughness: 0.86, metalness: 0, tex: 'tireSide', bands, text: spec.text || [], circ: 2 * Math.PI * (r0 + r1) / 2, arcLen: carcass.userData.arcLen });
   const g = new THREE.Group(); g.name = spec.id;
   g.add(part('korpus', carcass, mat(sideId)));
   if (lod) {

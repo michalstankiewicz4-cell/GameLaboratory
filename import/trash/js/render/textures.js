@@ -91,6 +91,15 @@ const RECIPES = {
     }
     x.putImageData(img, 0, 0);
     m.bumpMap = tex(c, { srgb: false }); m.bumpScale = 4;
+    // mapa barwy: beżowe boki i czarny pas korony (opony gumwall); przejście miękkie jak przy wulkanizacji
+    if (d.crownV) {
+      const [c3, x3] = canvas(64, 1024), [v0, v1] = d.crownV, cs = new THREE.Color(d.sideColor), cc = new THREE.Color(d.crownColor);
+      const g = x3.createLinearGradient(0, 0, 0, 1024), e = 0.006;
+      const st = (v, col) => g.addColorStop(Math.min(1, Math.max(0, 1 - v)), '#' + col.getHexString());
+      st(1, cs); st(v1 + e, cs); st(v1 - e, cc); st(v0 + e, cc); st(v0 - e, cs); st(0, cs);
+      x3.fillStyle = g; x3.fillRect(0, 0, 64, 1024);
+      m.map = tex(c3);
+    }
     // szorstkość: litery trochę gładsze (od formy wulkanizacyjnej)
     const [c2, x2] = canvas(W / 4, H / 4); x2.drawImage(c, 0, 0, W / 4, H / 4);
     const im2 = x2.getImageData(0, 0, W / 4, H / 4);
