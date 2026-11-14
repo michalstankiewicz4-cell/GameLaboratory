@@ -6,6 +6,16 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 - [x] Punkt 7 — lekarz sceny: zrobiony w 0.60.0 (`js/scene/doctor.js`, `docs/scene/doctor.md`); następne reguły — w opisie.
 - [ ] Punkt 8 — materiał z Hive Hunger (z historią): ~~laboratorium bloków~~ (0.64.0), ~~statki roju~~ (nie przenosimy — w grze to tylko kolorowe kreski; decyzja właściciela 2026-11-14), ~~laboratorium efektów~~ (0.67.0), drzewka
   technologiczne.
+- [ ] **Laboratorium drzewek technologicznych** (właściciel, 2026-11-14; koniec punktu 8) — uniwersalne, dla dowolnej gry:
+  - [ ] **Etap 1:** jeden format drzewka jako zasób z nazwą (`tree`: gałęzie z kolorami, węzły, rodzice — „którykolwiek”
+    albo „wszystkie”, koszt, efekt jako dane, opis EN/PL, ikona, pole `background`); edytor z Hive Hunger
+    (`tools/tree-editor.html`, z historią) w wyglądzie laboratoriów; widok promienisty w pixel arcie z Hive Hunger
+    (`js/ui/TreeView.js`, dane `js/core/SkillTree.js`); tryb próby (punkty, kupowanie, co się odblokowuje; koszt
+    całości, najdłuższa ścieżka); sprawdzanie drzewka (węzły nieosiągalne, pętle, brak opisu, efekt bez znaczenia);
+    przykład: drzewko Hive Hunger.
+  - [ ] **Etap 2:** widok „płytka drukowana” z badań Space (`js/ui/windows/techTree.js`, `techTreeData.js`) z jego dwoma
+    drzewkami; drzewko jako okno w UI gry (nowy rodzaj okna w laboratorium UI gry) i w API; tło drzewka z obrazu
+    z laboratorium sztuki (zasób `image` — ten sam co „Sztuka → scena”).
 - [ ] Punkt 9 — materiał z PatientZero (z historią): środowisko „organizm”, laboratorium tkanek, laboratorium patogenów.
 
 ## Pomysły (właściciel, czekają na decyzję)
@@ -29,6 +39,9 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
   prefabrykaty, zasoby) — wszystkie modele, postacie, rośliny, pojazdy, efekty, drzewka; każda strona: nazwa, opis
   (z „Opisów statków i rzeczy”), miniatura renderowana z modelu, dane (wymiary, prędkość, środowisko, zachowania),
   kategoria, powiązania; łączy się z „Wiki w menu Pomoc” (wiki silnika) i z obrazami z laboratorium sztuki.
+- [ ] **System statystyk i stanu gry** (właściciel, 2026-11-14, do przemyślenia): statystyki obiektów (np. HP postaci
+  i przeciwników) i matematyka gry (wzory, modyfikatory — np. z drzewek i przedmiotów), połączone z zapisem stanu gry
+  (statystyki, położenie obiektów i ich zmiany w czasie). Na schemacie silnika: moduły Rules i Save/Load.
 - [ ] **Laboratorium animacji** (do rozważenia): chód ludzi i stworów jako zachowanie, animacje modeli.
 - [ ] **Grawitacja statków w kosmosie** (propozycja do decyzji): statki w scenie przyciągane przez ciała niebieskie,
   jak orbity.
