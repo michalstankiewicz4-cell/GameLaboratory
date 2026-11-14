@@ -171,6 +171,47 @@ RECIPES.brushed = (m) => {
   m.map = tex(c2, { repeat: [2, 8] });
 };
 
+// boki stosu gazet: krawędzie kartek (cienkie linie), pożółkłe i nierówne
+RECIPES.newsEdge = (m) => {
+  const Wd = 512, Hh = 512, r = rng(5), [c, x] = canvas(Wd, Hh);
+  x.fillStyle = '#d9d2bf'; x.fillRect(0, 0, Wd, Hh);
+  // każda kartka to cienka jasna linia z ciemną szczeliną; co kilkanaście — kolorowa wkładka reklamowa
+  for (let y = 0; y < Hh; y += 2 + (r() * 1.6 | 0)) {
+    const v = 120 + r() * 60 | 0;
+    x.fillStyle = `rgba(${v},${v - 6},${v - 18},0.55)`; x.fillRect(0, y, Wd, 1);
+    if (r() < 0.025) { const cl = ['#c85a4a', '#4a78b0', '#d8b04a', '#6aa060'][r() * 4 | 0]; x.fillStyle = cl; x.globalAlpha = 0.45; x.fillRect(0, y + 1, Wd, 1); x.globalAlpha = 1; }
+  }
+  // zabrudzenia i zawilgocenia
+  for (let i = 0; i < 25; i++) { x.fillStyle = `rgba(110,90,55,${r() * 0.10})`; x.beginPath(); x.ellipse(r() * Wd, r() * Hh, 20 + r() * 80, 4 + r() * 12, 0, 0, 7); x.fill(); }
+  m.map = tex(c, { repeat: [1, 1] });
+  const [b, bx] = canvas(Wd, Hh); bx.drawImage(c, 0, 0); m.bumpMap = tex(b, { srgb: false, repeat: [1, 1] }); m.bumpScale = 0.5;
+};
+// pierwsza strona gazety: winieta, tytuł, zdjęcia, szpalty tekstu (bez prawdziwych tytułów prasowych)
+RECIPES.newsTop = (m) => {
+  const Wd = 1024, Hh = 732, r = rng(9), [c, x] = canvas(Wd, Hh);
+  x.fillStyle = '#e4dfd0'; x.fillRect(0, 0, Wd, Hh);
+  x.fillStyle = '#1a1a1a'; x.font = '900 86px Georgia, serif'; x.textAlign = 'center'; x.fillText('GŁOS OKOLICY', Wd / 2, 96);
+  x.fillRect(40, 116, Wd - 80, 4); x.font = '600 18px Georgia, serif'; x.fillText('NR 214 · SOBOTA · CENA 3,50 ZŁ', Wd / 2, 144); x.fillRect(40, 156, Wd - 80, 2);
+  x.font = '800 54px Georgia, serif'; x.textAlign = 'left'; x.fillText('Nowa zgniatarka na wysypisku', 44, 220);
+  x.fillStyle = '#6f6a60'; x.fillRect(44, 246, 560, 300); x.fillStyle = '#8c8577'; x.fillRect(64, 270, 240, 160); x.fillStyle = '#58534b'; x.fillRect(330, 300, 240, 220);
+  x.fillStyle = '#1a1a1a';
+  for (let col = 0; col < 4; col++) for (let ln = 0; ln < 26; ln++) {
+    const cx = 630 + (col % 2) * 180, cy = 250 + (col > 1 ? 300 : 0) + ln * 10;
+    if (cy > Hh - 20 || (col > 1 && ln > 14)) continue; x.fillRect(cx, cy, 160 - (ln % 7 === 6 ? 60 : r() * 10), 3);
+  }
+  for (let col = 0; col < 3; col++) for (let ln = 0; ln < 14; ln++) x.fillRect(44 + col * 190, 568 + ln * 10, 172 - (ln % 6 === 5 ? 70 : r() * 12), 3);
+  m.map = tex(c);
+};
+// sznurek jutowy: skręcone włókna (ukośne paski wzdłuż rurki)
+RECIPES.twine = (m) => {
+  const S = 128, [c, x] = canvas(S, S), r = rng(3);
+  x.fillStyle = '#b39463'; x.fillRect(0, 0, S, S);
+  for (let i = -S; i < S * 2; i += 16) { x.fillStyle = 'rgba(70,50,25,0.45)'; x.beginPath(); x.moveTo(i, 0); x.lineTo(i + 10, 0); x.lineTo(i + 10 - S, S); x.lineTo(i - S, S); x.fill(); }
+  for (let i = 0; i < 300; i++) { x.fillStyle = `rgba(230,210,170,${r() * 0.4})`; x.fillRect(r() * S, r() * S, 1, 3 + r() * 6); }
+  m.map = tex(c, { repeat: [60, 1] });
+  m.bumpMap = m.map; m.bumpScale = 0.8;
+};
+
 export function applyTextures() {
   for (const m of allMaterials()) {
     if (m.userData.textured) continue;

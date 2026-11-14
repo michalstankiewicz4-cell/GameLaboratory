@@ -18,7 +18,7 @@ export const DEFS = {
   bakelite: { color: '#16171a', roughness: 0.45, metalness: 0, tex: null },
   // papier
   newsprint: { color: '#ffffff', roughness: 0.92, metalness: 0, tex: 'newsEdge' },
-  newsTop: { color: '#ffffff', roughness: 0.9, metalness: 0, tex: 'newsTop' },
+  newsTop: { color: '#ffffff', roughness: 0.9, metalness: 0, tex: 'newsTop', side: 'front' },
   twine: { color: '#b89a6a', roughness: 0.95, metalness: 0, tex: 'twine' },
   cardboard: { color: '#ffffff', roughness: 0.95, metalness: 0, tex: 'cardboard' },
   cardboardEdge: { color: '#b78f5c', roughness: 0.95, metalness: 0, tex: 'corrugated' },
