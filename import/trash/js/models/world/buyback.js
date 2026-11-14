@@ -74,4 +74,4 @@ export function colliders() {
   c.push({ kind: 'box', half: [0.18, 0.03, 0.65], at: [LAYOUT.window[0] + 0.18, LAYOUT.window[1] - 0.33, LAYOUT.window[2]] });
   return c;
 }
-export const info = { id: 'buyback', name: 'Punkt skupu', version: '1.1.0' };
+export const info = { id: 'buyback', name: 'Punkt skupu', version: '1.1.1' };

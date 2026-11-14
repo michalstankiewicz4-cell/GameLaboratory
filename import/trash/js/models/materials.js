@@ -44,7 +44,7 @@ export const DEFS = {
   signSkup: { color: '#ffffff', roughness: 0.5, metalness: 0.1, tex: 'signSkup' },
   display: { color: '#0a140c', roughness: 0.3, metalness: 0, tex: null, emissive: '#3cff6a', emissiveIntensity: 0.15 },
   priceBoard: { color: '#ffffff', roughness: 0.7, metalness: 0, tex: 'priceBoard' },
-  glass: { color: '#9fb4bf', roughness: 0.08, metalness: 0.2, tex: null },
+  glass: { color: '#9fb4bf', roughness: 0.05, metalness: 0.1, tex: null, opacity: 0.22 },
   rubberBlack: { color: '#151515', roughness: 0.8, metalness: 0, tex: 'rubber' },
   glowOrange: { color: '#ff7a1a', roughness: 1, metalness: 0, tex: null, emissive: '#ff6a10', emissiveIntensity: 3 },
   lampLens: { color: '#fff6dc', roughness: 0.2, metalness: 0, tex: null, emissive: '#fff1c8', emissiveIntensity: 2 },
@@ -65,6 +65,7 @@ export function mat(id) {
   m = new THREE.MeshStandardMaterial({ color: new THREE.Color(d.color), roughness: d.roughness, metalness: d.metalness });
   if (d.alphaTest) { m.alphaTest = d.alphaTest; m.transparent = false; }
   if (d.double) m.side = THREE.DoubleSide;
+  if (d.opacity != null) { m.transparent = true; m.opacity = d.opacity; m.depthWrite = false; m.side = THREE.DoubleSide; }
   if (d.emissive) { m.emissive = new THREE.Color(d.emissive); m.emissiveIntensity = d.emissiveIntensity ?? 1; }
   m.name = id; m.userData.def = d;
   cache.set(id, m);

@@ -171,7 +171,7 @@ export function build(lod = 0) {
   const bm = new THREE.Group(); bm.name = 'wysięgnik';
   bm.position.set(LAYOUT.boomPivot[0], LAYOUT.boomPivot[1] - LAYOUT.slew[1], LAYOUT.boomPivot[2]); bm.rotation.x = -0.55; up.add(bm);
   const b = boom(lod); bm.add(part('wysięgnik', b.body, mat('paintYellow')), part('siłowniki', b.cyl, mat('steelDark')), part('tłoczyska', b.rod, mat('stainless')));
-  const st = new THREE.Group(); st.name = 'ramię'; st.position.set(0, 0.05, LAYOUT.boomLen); st.rotation.x = 1.75; bm.add(st);
+  const st = new THREE.Group(); st.name = 'ramię'; st.position.set(0, 0.05, LAYOUT.boomLen); st.rotation.x = 1.35; bm.add(st);
   st.add(part('ramię', stick(lod), mat('paintYellow')));
   const gr = new THREE.Group(); gr.name = 'chwytak'; gr.position.set(0, 0, LAYOUT.stickLen); st.add(gr);
   // chwytak wisi pionowo: kompensacja obrotów wysięgnika i ramienia (gra ustawia go fizycznie)
@@ -186,4 +186,4 @@ export function build(lod = 0) {
   return g;
 }
 
-export const info = { id: 'grapple-truck', name: 'Przeładowarka z chwytakiem', version: '1.0.0' };
+export const info = { id: 'grapple-truck', name: 'Przeładowarka z chwytakiem', version: '1.0.2' };
