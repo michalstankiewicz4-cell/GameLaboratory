@@ -8,4 +8,5 @@ export const MODELS = [
   { id: 'can-crushed', label: 'Puszka zgnieciona', group: 'Przedmioty', load: () => import('./items/can-crushed.js') },
   { id: 'pot', label: 'Garnek', group: 'Przedmioty', load: () => import('./items/pot.js') },
   { id: 'newspapers', label: 'Gazety (związane)', group: 'Przedmioty', load: () => import('./items/newspapers.js') },
+  { id: 'box', label: 'Karton zamknięty', group: 'Przedmioty', load: () => import('./items/box.js') },
 ];

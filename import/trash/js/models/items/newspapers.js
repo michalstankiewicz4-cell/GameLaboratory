@@ -73,7 +73,7 @@ export function build(lod = 0) {
 }
 
 export const info = {
-  id: 'newspapers', name: 'Gazety związane sznurkiem', version: '1.0.0',
+  id: 'newspapers', name: 'Gazety związane sznurkiem', version: '1.0.1',
   mass: 12.5, material: 'papier',
   // sprasowany papier prawie się nie zgniata; najłatwiej z góry
   crush: { x: 25, y: 60, z: 25 }, minScale: { x: 0.9, y: 0.82, z: 0.9 },

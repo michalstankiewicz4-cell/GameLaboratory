@@ -58,7 +58,7 @@ export function build(lod = 0) {
 }
 
 export const info = {
-  id: 'pot', name: 'Garnek nierdzewny 6 l', version: '1.0.0',
+  id: 'pot', name: 'Garnek nierdzewny 6 l', version: '1.0.1',
   mass: 1.6, material: 'stal nierdzewna',
   crush: { x: 3, y: 6, z: 3 }, minScale: { x: 0.3, y: 0.35, z: 0.3 },
   collider: { type: 'cup', r: 0.121, h: 0.1518, wall: 0.006, bottom: 0.008, segs: 14, handles: { x: 0.165, y: 0.0438, w: 0.024, h: 0.012, d: 0.075 } },

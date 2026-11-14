@@ -21,8 +21,9 @@ export const DEFS = {
   newsTop: { color: '#ffffff', roughness: 0.9, metalness: 0, tex: 'newsTop', side: 'front' },
   twine: { color: '#b89a6a', roughness: 0.95, metalness: 0, tex: 'twine' },
   cardboard: { color: '#ffffff', roughness: 0.95, metalness: 0, tex: 'cardboard' },
+  cardboardPlain: { color: '#ffffff', roughness: 0.95, metalness: 0, tex: 'cardboardPlain' },
   cardboardEdge: { color: '#b78f5c', roughness: 0.95, metalness: 0, tex: 'corrugated' },
-  tape: { color: '#c9a36a', roughness: 0.35, metalness: 0, tex: 'tape', transparent: false },
+  tape: { color: '#b88c4e', roughness: 0.28, metalness: 0, tex: null },
 };
 
 const cache = new Map();

@@ -223,18 +223,22 @@ export function part(name, geo, material) {
   return m;
 }
 
-/** Prostopadłościan z fazowanymi krawędziami (zaokrąglone rogi), środek w (0,0,0). */
+/**
+ * Prostopadłościan z zaokrąglonymi krawędziami (promień r), środek w (0,0,0). Ściany mają osobne wierzchołki
+ * (UV 0…1 na każdej ścianie, czytelne z zewnątrz — jak BoxGeometry), normalne liczone z zaokrąglenia (gładkie).
+ */
 export function roundedBox(w, h, d, r = 0.01, seg = 2) {
-  const g = new THREE.BoxGeometry(w, h, d, 6, 6, 6);
-  const p = g.attributes.position, hw = w / 2 - r, hh = h / 2 - r, hd = d / 2 - r, v = V(), c = V();
+  const n = Math.max(4, seg * 3);
+  const g = new THREE.BoxGeometry(w, h, d, n, n, n);
+  const p = g.attributes.position, nr = g.attributes.normal, hw = w / 2 - r, hh = h / 2 - r, hd = d / 2 - r, v = V(), c = V(), dl = V();
   for (let i = 0; i < p.count; i++) {
     v.fromBufferAttribute(p, i);
     c.set(Math.max(-hw, Math.min(hw, v.x)), Math.max(-hh, Math.min(hh, v.y)), Math.max(-hd, Math.min(hd, v.z)));
-    const dlt = v.clone().sub(c);
-    if (dlt.lengthSq() > 0) dlt.normalize().multiplyScalar(r);
-    p.setXYZ(i, c.x + dlt.x, c.y + dlt.y, c.z + dlt.z);
+    dl.copy(v).sub(c);
+    if (dl.lengthSq() > 1e-12) { dl.normalize(); nr.setXYZ(i, dl.x, dl.y, dl.z); dl.multiplyScalar(r); }
+    p.setXYZ(i, c.x + dl.x, c.y + dl.y, c.z + dl.z);
   }
-  return weld(g);
+  return g;
 }
 
 export { V };

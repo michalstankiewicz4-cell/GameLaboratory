@@ -212,6 +212,35 @@ RECIPES.twine = (m) => {
   m.bumpMap = m.map; m.bumpScale = 0.8;
 };
 
+// tektura: kraft z włóknami i delikatnymi pasami fali (prześwitują przez warstwę zewnętrzną)
+function kraft(x, S, r) {
+  x.fillStyle = '#b48a55'; x.fillRect(0, 0, S, S);
+  for (let i = 0; i < S; i += 8) { x.fillStyle = `rgba(80,55,25,${0.05 + r() * 0.03})`; x.fillRect(0, i, S, 4); }
+  for (let i = 0; i < 5000; i++) { const v = r(); x.fillStyle = v < 0.5 ? `rgba(70,45,20,${r() * 0.18})` : `rgba(230,200,150,${r() * 0.15})`; x.fillRect(r() * S, r() * S, 1 + r() * 5, 1); }
+  for (let i = 0; i < 12; i++) { x.fillStyle = `rgba(60,40,20,${r() * 0.08})`; x.beginPath(); x.ellipse(r() * S, r() * S, 20 + r() * 90, 10 + r() * 50, r() * 3, 0, 7); x.fill(); }
+}
+RECIPES.cardboardPlain = (m) => { const S = 512, r = rng(21), [c, x] = canvas(S, S); kraft(x, S, r); m.map = tex(c); m.bumpMap = m.map; m.bumpScale = 0.3; };
+RECIPES.cardboard = (m) => {
+  const S = 1024, r = rng(22), [c, x] = canvas(S, S); kraft(x, S, r);
+  x.strokeStyle = x.fillStyle = 'rgba(25,20,15,0.85)'; x.lineWidth = 10;
+  // strzałki „tą stroną do góry”
+  for (const ax of [S * 0.12, S * 0.22]) { x.beginPath(); x.moveTo(ax, S * 0.32); x.lineTo(ax, S * 0.16); x.stroke(); x.beginPath(); x.moveTo(ax - 26, S * 0.19); x.lineTo(ax, S * 0.13); x.lineTo(ax + 26, S * 0.19); x.fill(); }
+  x.fillRect(S * 0.09, S * 0.34, S * 0.16, 8);
+  // kieliszek (ostrożnie, szkło)
+  x.lineWidth = 8; x.beginPath(); x.moveTo(S * 0.36, S * 0.14); x.lineTo(S * 0.44, S * 0.14); x.quadraticCurveTo(S * 0.44, S * 0.25, S * 0.40, S * 0.26); x.quadraticCurveTo(S * 0.36, S * 0.25, S * 0.36, S * 0.14); x.stroke();
+  x.beginPath(); x.moveTo(S * 0.40, S * 0.26); x.lineTo(S * 0.40, S * 0.32); x.moveTo(S * 0.37, S * 0.33); x.lineTo(S * 0.43, S * 0.33); x.stroke();
+  // recykling: trzy strzałki w trójkącie
+  x.save(); x.translate(S * 0.83, S * 0.22);
+  for (let k = 0; k < 3; k++) { x.rotate(Math.PI * 2 / 3); x.beginPath(); x.arc(0, 0, 52, -0.9, 0.5); x.stroke(); x.beginPath(); x.moveTo(52 * Math.cos(0.5) - 12, 52 * Math.sin(0.5) - 10); x.lineTo(52 * Math.cos(0.5) + 6, 52 * Math.sin(0.5) + 16); x.lineTo(52 * Math.cos(0.5) + 18, 52 * Math.sin(0.5) - 12); x.fill(); }
+  x.restore(); x.font = '700 28px Arial'; x.textAlign = 'center'; x.fillText('PAP 20', S * 0.83, S * 0.33);
+  // pieczątka producenta tektury (kółko z danymi)
+  x.lineWidth = 4; x.beginPath(); x.arc(S * 0.8, S * 0.78, 95, 0, 7); x.stroke(); x.beginPath(); x.arc(S * 0.8, S * 0.78, 80, 0, 7); x.stroke();
+  x.font = '700 22px Arial'; ['BOX CERTIFICATE', 'BC 3-W  ECT 32', '40×30×30 cm', 'MAX 25 kg'].forEach((t, i) => x.fillText(t, S * 0.8, S * 0.73 + i * 26));
+  // napis i kod partii
+  x.font = '800 64px Arial'; x.textAlign = 'left'; x.fillText('GÓRA', S * 0.08, S * 0.52); x.font = '600 30px monospace'; x.fillText('LOT 2611-0347', S * 0.08, S * 0.9);
+  m.map = tex(c); m.bumpMap = m.map; m.bumpScale = 0.25;
+};
+
 export function applyTextures() {
   for (const m of allMaterials()) {
     if (m.userData.textured) continue;

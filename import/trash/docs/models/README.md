@@ -12,8 +12,9 @@ Materiały — `js/models/materials.js` (dane), tekstury proceduralne — `js/re
 | tire-tractor | Opona traktorowa 18.4-38 (R-1) | Ø 1790 × 470 mm | 190 kg | pierścień 483–895 mm, h 470 | 35 · 18 · 35 | 1.0.0 |
 | can | Puszka aluminiowa 0,33 l | Ø 66 × 115 mm | 13,5 g | walec r 33, h 115,5 | 0,35 · 0,35 · 0,35 | 1.0.0 |
 | can-crushed | Puszka zgnieciona | Ø ~79 × 41 mm | 13,5 g | walec r 38, h 42 | 2,5 · 2,5 · 2,5 | 1.0.0 |
-| pot | Garnek nierdzewny 6 l | Ø 240 (z uchwytami 347) × 152 mm | 1,6 kg | naczynie r 121, h 152 + uchwyty | 3 · 6 · 3 | 1.0.0 |
-| newspapers | Gazety związane sznurkiem | 420 × 300 × 220 mm | 12,5 kg | prostopadłościan | 25 · 60 · 25 | 1.0.0 |
+| pot | Garnek nierdzewny 6 l | Ø 240 (z uchwytami 347) × 152 mm | 1,6 kg | naczynie r 121, h 152 + uchwyty | 3 · 6 · 3 | 1.0.1 |
+| newspapers | Gazety związane sznurkiem | 420 × 300 × 220 mm | 12,5 kg | prostopadłościan | 25 · 60 · 25 | 1.0.1 |
+| box | Karton zamknięty (F0201) | 400 × 300 × 300 mm | 4 kg | prostopadłościan | 1 · 1,6 · 1 | 1.0.0 |
 
 Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zaczyna się zgniatać wzdłuż danej osi;
 `minScale` — do ilu procent wymiaru da się go zgnieść.
@@ -56,3 +57,9 @@ Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zacz
 - Pierwsza strona (fikcyjny tytuł „Głos Okolicy”) jako cienka kartka 0,8 mm na wierzchu.
 - Sznurek: dwie zamknięte pętle (wzdłuż i w poprzek) z narożnikami wciśniętymi w papier, supeł i dwa luźne końce.
 - Sprasowany papier: duży opór, zgniata się najwyżej o 10–18%.
+
+### Karton (`items/box.js`)
+- Tektura falista 4 mm, ścianki wybrzuszone do 6 mm, górny róg wgnieciony (gładkie odkształcenie w promieniu 13 cm).
+- Klapy górne lekko uniesione przy szczelinie, taśma 48 mm zawinięta 7 cm na krótsze ściany, zakładka klejona.
+- Nadruki proceduralne na tekturze kraft: strzałki „góra”, kieliszek, recykling PAP 20, pieczątka BC/ECT, nr partii.
+- Pali się w piecu na papier; zgniata się łatwo (mały opór).
