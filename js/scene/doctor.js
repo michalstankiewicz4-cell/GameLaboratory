@@ -19,7 +19,7 @@
 export const BUDGET = { tris: 2_000_000, draws: 1500 };
 // odstęp od gruntu, który jeszcze nie jest „pod gruntem” ani „w powietrzu” [m] (nierówny teren, podpory, koła)
 const GROUND_TOL = 0.6, WATER_TOL = 1.5;
-const ENV_OF = { sea: 'water', land: 'land', space: 'space' };
+const ENV_OF = { sea: 'water', land: 'land', space: 'space', underground: 'land' };   // podziemie: prawa lądu
 const ENV_NAME = { water: 'water', land: 'land', space: 'space' };
 const fmt = (v) => +v.toFixed(2);
 
@@ -27,8 +27,9 @@ export function checkScene(scene, ctx) {
   const issues = [], skipped = new Set(), S = scene, surf = S.env.surface;
   const add = (level, code, o, text, fix) => issues.push({ code, level, ...(o ? { object: o.id, name: o.name } : {}), text, ...(fix ? { fix } : {}) });
   const P = (o) => ctx.prefab(o.prefab);
-  const ground = ctx.probe && surf !== 'space' ? (x, z) => ctx.probe.groundAt(x, z) : null;
-  const water = ctx.probe ? (x, z, d = 0.5) => ctx.probe.isWater(x, z, d) : () => surf === 'sea';
+  // podziemie: dno jaskini ma wiele poziomów — bez sprawdzania gruntu po wysokości (jak w kosmosie)
+  const ground = ctx.probe && surf !== 'space' && surf !== 'underground' ? (x, z) => ctx.probe.groundAt(x, z) : null;
+  const water = surf === 'underground' ? () => false : ctx.probe ? (x, z, d = 0.5) => ctx.probe.isWater(x, z, d) : () => surf === 'sea';
   const boxes = new Map();
   for (const o of S.objects) { const b = ctx.boxOf ? ctx.boxOf(o) : null; if (b) boxes.set(o.id, b); else if (ctx.boxOf) skipped.add('box'); }
 
@@ -42,6 +43,7 @@ export function checkScene(scene, ctx) {
   asset('sea', 'sea', 'water lab');
   asset('look', 'look', 'filters lab');
   asset('ui', 'ui', 'game UI lab');
+  if (surf === 'underground') asset('cave', 'cave', 'cave lab');
   asset('sky', 'sky', 'celestial bodies lab', (n) => n === 'day' || (n.startsWith('preset:') && (!(ctx.skyPresets || []).length || ctx.skyPresets.includes(n.slice(7)))));
   if (S.env.light && !(ctx.lights || []).includes(S.env.light) && !A.list('weather').includes(S.env.light))
     add('error', 'missing-asset', null, `Environment light: no ready light or weather asset "${S.env.light}" (save one in the look lab)`, { cmd: 'env', light: (ctx.lights || ['afternoon'])[0] });
@@ -66,11 +68,13 @@ export function checkScene(scene, ctx) {
     if (p.surface === 'sea') {
       if (surf === 'space') { add('error', 'wrong-env', o, `${p.label} floats on water, the scene is space`); want.push('sea'); }
       else if (surf === 'land' && !water(x, z, 0.5)) { add('error', 'wrong-env', o, `${p.label} stands on dry land ${at}: it needs water (the land map has none here)`); want.push('sea'); }
+      else if (surf === 'underground') { add('warn', 'wrong-env', o, `${p.label} floats on water, the scene is a cave (only its lakes)`); want.push('sea'); }
     } else if (p.surface === 'land') {
       if (surf === 'space') { add('error', 'wrong-env', o, `${p.label} needs ground, the scene is space`); want.push('land'); }
       else if (surf === 'sea' || water(x, z, 0.5)) { add('error', 'wrong-env', o, `${p.label} stands in water ${at}: it belongs on land`); want.push('land'); }
     } else if (p.surface === 'air') {
       if (surf === 'space') { add('error', 'wrong-env', o, `${p.label} flies in the atmosphere, the scene is space (no air)`); want.push('land'); }
+      else if (surf === 'underground') { add('warn', 'wrong-env', o, `${p.label} flies in the open air, the scene is a cave`); want.push('land'); }
     } else if (p.surface === 'space') {
       if (ctx.bodyRank(o.prefab) >= 0 && surf !== 'space') { add('warn', 'wrong-env', o, `${p.label} (a celestial body) stands in a ${surf} scene`); want.push('space'); }
       else if (hasBeh && !bid) add('warn', 'wrong-env', o, `${p.label} has no behaviour for a ${surf} scene: it will stand still`);

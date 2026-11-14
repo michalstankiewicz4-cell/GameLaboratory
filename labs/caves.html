@@ -18,6 +18,7 @@
 <script src="../ui/shell/menubar.js"></script>
 <div id="view"></div>
 <div class="bar">
+  <div class="envSwitch groupSwitch" data-group="terrain"></div>
   <div class="btns" id="views"></div>
   <span class="dimtxt" id="status"></span>
   <span class="sp"></span>
@@ -45,6 +46,11 @@
   <div class="row"><span>Rubble</span><input type="range" id="rubble" min="0" max="2" step="0.1"><output id="rubbleV"></output></div>
   <div class="row"><span>Lakes</span><input type="range" id="lakes" min="0" max="1" step="0.05"><output id="lakesV"></output></div>
   <div class="row"><span>Of them lava</span><input type="range" id="lava" min="0" max="1" step="0.05"><output id="lavaV"></output></div>
+  <h3>Save</h3>
+  <div class="row"><span>Saved</span><select id="savedSel" title="Caves saved under a name: pick one to load it"></select><output></output></div>
+  <div class="row"><span>Name</span><input type="text" id="saveName" maxlength="40"><output></output></div>
+  <div class="btns"><button type="button" id="saveCave">Save under this name</button><button type="button" id="delCave">Delete saved</button></div>
+  <p class="note">A saved cave (its shape and rock) is a named asset: in the scene editor it is a Cave model, or the whole level under Surface → Underground.</p>
 </aside>
 <aside class="panel" data-window="rock" data-side="right" data-title="Rock" data-title-pl="Skała">
   <div class="row"><span>Rock</span><select id="rock"></select><output></output></div>
@@ -74,6 +80,7 @@
 <script src="../ui/shell/perf.js"></script>
 <script src="../ui/shell/labwin.js"></script>
 <script src="../ui/shell/windows.js"></script>
+<script src="../ui/shell/envswitch.js"></script>
 <script type="module" src="../js/labs/caves/caves.js"></script>
 </body>
 </html>

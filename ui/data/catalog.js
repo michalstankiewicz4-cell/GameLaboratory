@@ -11,7 +11,7 @@
    phrases (Polish; their English in phraseEn — a new phrase needs both),
    saved (localStorage key prefixes), art (the tile: bg + svg, or img),
    group + tab / tabPl (labs that belong together — one background, one glow in the menu, a switch on the bar:
-   "vehicles": space · water · land, "space": bodies · systems · scale),
+   "vehicles": space · water · land, "space": bodies · systems · scale, "terrain": land · caves),
    cat (the category: a coloured dot in the menu and on the tile; "cats" — their names, in order; colours:
    ui/style/tokens.css --cat-<id>). The labs are listed in category order (the menu and the start page follow it).
    The JSON between the markers is read by tools/sitemap.py — keep it JSON.
@@ -232,6 +232,9 @@ window.GameLabCatalog =
     },
     {
       "file": "labs/land.html",
+      "group": "terrain",
+      "tab": "Land",
+      "tabPl": "Ląd",
       "cat": "world",
       "name": "Land lab",
       "namePl": "Laboratorium lądu",
@@ -244,6 +247,26 @@ window.GameLabCatalog =
       "saved": ["gameLab.land."],
       "art": {
         "img": "assets/labs/land.jpg"
+      }
+    },
+    {
+      "file": "labs/caves.html",
+      "group": "terrain",
+      "tab": "Caves",
+      "tabPl": "Jaskinie",
+      "cat": "world",
+      "name": "Cave lab",
+      "namePl": "Laboratorium jaskiń",
+      "doc": "docs/labs/caves.md",
+      "desc": "Caves from a seed — passages, chambers, drip stones, rubble and lakes — cut in limestone, granite, sandstone or basalt, dry or wet, seen in the light of a flashlight and a lantern.",
+      "descPl": "Jaskinie z ziarna — korytarze, komory, nacieki, gruz i jeziorka — w wapieniu, granicie, piaskowcu albo bazalcie, suche lub mokre, w świetle latarki i lampy.",
+      "kind": "lab",
+      "kit": "CaveKit",
+      "phrases": ["jaskinie", "skały", "materiały", "światło", "teren"],
+      "saved": ["gameLab.caves."],
+      "art": {
+        "bg": ["#1c1a17", "#0b0a09"],
+        "svg": "<path d=\"M0 100 L0 30 Q30 10 60 28 Q90 46 120 22 Q150 0 200 26 L200 100 Z\" fill=\"#2b2620\"/><path d=\"M20 100 Q40 60 80 62 Q120 64 150 52 Q175 44 190 70 L190 100 Z\" fill=\"#0b0a09\"/><path d=\"M70 28 L74 44 L78 30 Z M110 30 L113 48 L116 30 Z M140 18 L143 34 L146 20 Z\" fill=\"#d8cdb8\" opacity=\".8\"/><path d=\"M95 100 L99 82 L103 100 Z\" fill=\"#d8cdb8\" opacity=\".7\"/><ellipse cx=\"130\" cy=\"88\" rx=\"34\" ry=\"5\" fill=\"#2b6f9a\" opacity=\".55\"/><path d=\"M30 86 L100 58 L100 74 Z\" fill=\"#fff3d6\" opacity=\".18\"/>"
       }
     },
     {
@@ -293,23 +316,6 @@ window.GameLabCatalog =
       "saved": ["gameLab.structures."],
       "art": {
         "img": "assets/labs/structures.jpg"
-      }
-    },
-    {
-      "file": "labs/caves.html",
-      "cat": "world",
-      "name": "Cave lab",
-      "namePl": "Laboratorium jaskiń",
-      "doc": "docs/labs/caves.md",
-      "desc": "Caves from a seed — passages, chambers, drip stones, rubble and lakes — cut in limestone, granite, sandstone or basalt, dry or wet, seen in the light of a flashlight and a lantern.",
-      "descPl": "Jaskinie z ziarna — korytarze, komory, nacieki, gruz i jeziorka — w wapieniu, granicie, piaskowcu albo bazalcie, suche lub mokre, w świetle latarki i lampy.",
-      "kind": "lab",
-      "kit": "CaveKit",
-      "phrases": ["jaskinie", "skały", "materiały", "światło", "teren"],
-      "saved": ["gameLab.caves."],
-      "art": {
-        "bg": ["#1c1a17", "#0b0a09"],
-        "svg": "<path d=\"M0 100 L0 30 Q30 10 60 28 Q90 46 120 22 Q150 0 200 26 L200 100 Z\" fill=\"#2b2620\"/><path d=\"M20 100 Q40 60 80 62 Q120 64 150 52 Q175 44 190 70 L190 100 Z\" fill=\"#0b0a09\"/><path d=\"M70 28 L74 44 L78 30 Z M110 30 L113 48 L116 30 Z M140 18 L143 34 L146 20 Z\" fill=\"#d8cdb8\" opacity=\".8\"/><path d=\"M95 100 L99 82 L103 100 Z\" fill=\"#d8cdb8\" opacity=\".7\"/><ellipse cx=\"130\" cy=\"88\" rx=\"34\" ry=\"5\" fill=\"#2b6f9a\" opacity=\".55\"/><path d=\"M30 86 L100 58 L100 74 Z\" fill=\"#fff3d6\" opacity=\".18\"/>"
       }
     },
     {

@@ -35,7 +35,7 @@ function firstScene() {
 step(t('load.renderer'), 0.1);
 const store = createStore(firstScene);
 const world = createWorld($('view'), store, (id) => status(id.startsWith('sea:') ? t('status.noSea', { name: id.slice(4) })
-  : id.startsWith('sky:') ? t('status.noSky', { name: id.slice(4) }) : id.startsWith('land:') ? t('status.noLand', { name: id.slice(5) }) : id.startsWith('light:') ? t('status.noLight', { name: id.slice(6) })
+  : id.startsWith('sky:') ? t('status.noSky', { name: id.slice(4) }) : id.startsWith('land:') ? t('status.noLand', { name: id.slice(5) }) : id.startsWith('cave:') ? t('status.noCave', { name: id.slice(5) }) : id.startsWith('light:') ? t('status.noLight', { name: id.slice(6) })
   : t('status.unknown', { id })));
 const controls = createControls(world, store);
 

@@ -25,7 +25,7 @@ const COMMANDS = {
   set: { args: 'id | name, then any of: newName (with id also name), prefab, pos, rot, scale, behavior, orbit { around: id | name ("" — the nearest heavier body), period: s } (the orbit behaviour), asset (a named asset of the kind the model takes; "" — the default model), shot (a ship that shoots: the look of its shots — an effect id or a saved effect from the effects lab; "" — the shot)', does: 'changes an object' },
   move: { args: 'id | name, by [dx,dy,dz] m', does: 'moves an object by an offset' },
   remove: { args: 'id | name', does: 'removes an object' },
-  env: { args: 'any of: surface (sea | land | space), light (a ready light or a weather asset name), look, ui (a game UI asset name, "" — none), land (a land asset name, "" — the plain ground), sea (a sea asset name, "" — the default sea), sky (any surface: "" — the default for the surface, "day" — the day sky, "preset:<id>" — a ready space sky, or a sky asset name)', does: 'changes the environment' },
+  env: { args: 'any of: surface (sea | land | space | underground — inside a cave), cave (underground: a cave asset name from the cave lab, "" — the default cave), light (a ready light or a weather asset name), look, ui (a game UI asset name, "" — none), land (a land asset name, "" — the plain ground), sea (a sea asset name, "" — the default sea), sky (any surface: "" — the default for the surface, "day" — the day sky, "preset:<id>" — a ready space sky, or a sky asset name)', does: 'changes the environment' },
   assets: { args: '[kind]', does: 'named assets saved in the labs, by kind (sea — the water lab, sky — the celestial bodies lab, look — the filters lab, weather — the look lab, land — the land lab, ui and uiskin — the game UI lab, material — the materials lab, blocks — the blocks lab) and the ready skies' },
   select: { args: 'id | name, or nothing', does: 'selects an object in the editor (nothing: the environment)' },
   new: { args: '[name]', does: 'an empty scene' },
@@ -119,7 +119,8 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
     remove: (c) => { const o = target(c); store.remove(o.id); return { removed: o.id }; },
     env: (c) => {
       const e = {};
-      if (c.surface != null) e.surface = ['sea', 'land', 'space'].includes(c.surface) ? c.surface : fail('surface: sea | land | space');
+      if (c.surface != null) e.surface = ['sea', 'land', 'space', 'underground'].includes(c.surface) ? c.surface : fail('surface: sea | land | space | underground');
+      if (c.cave != null) { const n = String(c.cave), all = assets.list('cave'); e.cave = n === '' || all.includes(n) ? n : fail(`no cave "${n}" (caves: ${all.join(', ') || 'none yet — save one in the cave lab'}; "" — the default cave)`); }
       if (c.light != null) { const n = String(c.light), wx = assets.list('weather'); e.light = lights.includes(n) || wx.includes(n) ? n : fail(`light: ${lights.join(' | ')}${wx.length ? ' or a saved weather: ' + wx.join(', ') : ''}`); }
       if (c.look != null) { const n = String(c.look), all = assets.list('look'); e.look = n === '' || all.includes(n) ? n : fail(`no camera look "${n}" (looks: ${all.join(', ') || 'none yet — save one in the filters lab'})`); }
       if (c.sea != null) { const n = String(c.sea), all = assets.list('sea'); e.sea = n === '' || all.includes(n) ? n : fail(`no sea asset "${n}" (seas: ${all.join(', ') || 'none yet — save one in the water lab'})`); }

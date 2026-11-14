@@ -68,7 +68,9 @@ function buildPlant(id) {
 SPECIES_IDS.forEach((id) => add('plants/' + id, SPECIES[id].name, 'plants', 'land', 'labs/plants.html', () => buildPlant(id)));
 // jaskinia (CaveKit) z ustawień domyślnych laboratorium jaskiń (CAVE_DEFAULTS): korytarze, komory, nacieki, jeziorka;
 // budowa trwa (pole odległości, ok. sekundy)
-add('caves/cave', 'Cave', 'caves', 'land', 'labs/caves.html', () => { const c = buildCave({}); return { root: c.group, kit: c, dispose: () => c.dispose() }; });
+// jaskinia jako obiekt: domyślna albo zapisana w laboratorium jaskiń (zasób „cave”, pole „asset”); jaskinia jako teren
+// całej planszy — powierzchnia „podziemie” (env.cave, editor/js/world/world.js)
+add('caves/cave', 'Cave', 'caves', 'land', 'labs/caves.html', (opts) => { const c = buildCave((opts && opts.asset) || {}); return { root: c.group, kit: c, dispose: () => c.dispose() }; }, { assetKind: 'cave' });
 
 // statki kosmiczne, dron i stacja (ShipKit); nazwy jak w ShipKit (SHIP_DEFS), żeby lista była bez ładowania kitu
 const SPACE = [['codewing', 'SP-01 Codewing'], ['scribe', 'DR-01 Scribe (drone)'], ['swarmer', 'SW-01 Swarmer'], ['haven', 'ST-04 Haven (station)']];

@@ -3,6 +3,18 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.71.0 · jaskinie 1.3.0 · ląd 1.7.1 · edytor sceny 0.33.0 — 2026-11-14 (jaskinia jako teren)
+
+### Dodane
+- **Grupa „Teren”: ląd · jaskinie** — przełącznik grupy na pasku obu laboratoriów, poświata w menu i podświetlenie
+  kafelków (`--terrain`); jaskinie w katalogu zaraz za lądem.
+- **Jaskinia jako zasób z nazwą** (rodzaj `cave`): laboratorium jaskiń zapisuje kształt i skałę (okno Jaskinia →
+  Zapisz, lista zapisanych, `CaveApi`). W edytorze sceny: model *Jaskinia* z polem `asset` (jaskinia jako obiekt)
+  albo **powierzchnia „Podziemie”** (`env.surface: "underground"`, `env.cave`): cała plansza to jaskinia — bez
+  nieba, morza, gruntu i słońca, ze słabą poświatą; zachowania według praw lądu; lekarz sceny ostrzega przed
+  okrętami i samolotami w jaskini i brakującą jaskinią. API: `env` z `surface: "underground"` i `cave`.
+- TODO: rozległe jaskinie (kawałki liczone wokół gracza) i wejście do jaskini wycięte w lądzie.
+
 ## Program 0.70.0 · efekty 1.3.0 · pojazdy — kosmos 1.11.0 · edytor sceny 0.32.0 — 2026-11-14 (uszkodzenia statków z laboratorium efektów)
 
 ### Dodane

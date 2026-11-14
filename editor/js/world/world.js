@@ -11,6 +11,7 @@ import { planetAirless } from '../../../js/envs/land/planet.js';
 import { spaceReady, loadSpace, SKY_PRESET, SKY_DAY } from '../../../js/scene/space.js';
 import { createEffectLibrary, STEP as FX_STEP } from '../../../js/render/effects/effects.js';
 import { DamageFx, shipDamage } from '../../../js/render/effects/damage.js';
+import { buildCave } from '../../../js/models/caves/cavekit.js';
 
 export { LIGHTS };
 const D2R = Math.PI / 180;
@@ -96,7 +97,19 @@ export function createWorld(container, store, onWarn) {
   // niebo kosmosu: wybrane, kosmos albo ląd z planety bez atmosfery (Luna, Mercury)
   const airlessLand = (env) => { const d = env.surface === 'land' && env.land ? getAsset('land', env.land) : null; return !!(d && d.map && d.map.planet && planetAirless(d.map.planet)); };
   const skyIsSpace = (env) => (env.sky ? env.sky !== SKY_DAY : env.surface === 'space' || airlessLand(env));
+  // podziemie: jaskinia z laboratorium jaskiń (zasób „cave”, env.cave; '' — domyślna) jako teren całej planszy — bez
+  // nieba, morza i gruntu; światło: bez słońca, tylko słaba poświata (widać jaskinię w edytorze), lawa świeci sama
+  let caveTerrain = null, lastCave = 'null';
+  function syncCave(env) {
+    const on = env.surface === 'underground', def = on && env.cave ? getAsset('cave', env.cave) : null;
+    if (on && env.cave && !def && onWarn) onWarn('cave:' + env.cave);
+    const key = on ? JSON.stringify(def || {}) : 'null';
+    if (key === lastCave) return; lastCave = key;
+    if (caveTerrain) { scene.remove(caveTerrain.group); caveTerrain.dispose(); caveTerrain = null; }
+    if (on) { caveTerrain = buildCave(def || {}); caveTerrain.group.name = 'cave terrain'; scene.add(caveTerrain.group); }
+  }
   function syncSpace(env) {
+    if (env.surface === 'underground') { stage.setSkyMode('space'); if (skyBody) skyBody.group.visible = false; return; }   // w jaskini: bez nieba
     const on = skyIsSpace(env);
     stage.setSkyMode(on ? 'space' : 'day');
     if (!on) { if (skyBody) skyBody.group.visible = false; return; }
@@ -123,12 +136,14 @@ export function createWorld(container, store, onWarn) {
       if (landDef && landDef.map && landDef.map.planet && !spaceReady()) { later(); return; }   // ląd z planety: najpierw BodyKit
       lastLand = landKey; stage.setLand(landDef);
     }
-    stage.setSurface(env.surface === 'land' || env.surface === 'space' ? env.surface : 'sea');
+    stage.setSurface(env.surface === 'land' || env.surface === 'space' || env.surface === 'underground' ? env.surface : 'sea');
+    syncCave(env);
     syncSpace(env);   // przed światłem: tryb nieba decyduje o słońcu, mgle i odbiciach
     // światło: gotowe (LIGHTS) albo zasób „weather” z laboratorium wyglądu; brak zasobu — popołudnie i ostrzeżenie
     let light = LIGHTS[env.light] ? env.light : env.light ? getAsset('weather', env.light) : null;
     if (!light) { if (env.light && onWarn) onWarn('light:' + env.light); light = 'afternoon'; }
     stage.setLight(light);
+    if (env.surface === 'underground') { stage.sun.intensity = 0; stage.hemi.intensity = 0.35; stage.hemi.color.setRGB(0.75, 0.78, 0.85); stage.hemi.groundColor.setRGB(0.12, 0.1, 0.09); }
     // morze: zasób z laboratorium wody (po nazwie) albo domyślne; brak zasobu w tej przeglądarce — domyślne i ostrzeżenie
     const sea = env.sea ? getAsset('sea', env.sea) : null, seaKey = JSON.stringify(sea);
     if (env.sea && !sea && onWarn) onWarn('sea:' + env.sea);
@@ -140,7 +155,7 @@ export function createWorld(container, store, onWarn) {
   }
   function bounds(id) {
     const box = new THREE.Box3();
-    if (id) { const r = built.get(id); if (r) box.setFromObject(r.root); } else built.forEach((r) => box.expandByObject(r.root));
+    if (id) { const r = built.get(id); if (r) box.setFromObject(r.root); } else { built.forEach((r) => box.expandByObject(r.root)); if (caveTerrain) box.union(caveTerrain.bounds); }   // całość: także jaskinia planszy
     return box;
   }
   function fitShadow() {

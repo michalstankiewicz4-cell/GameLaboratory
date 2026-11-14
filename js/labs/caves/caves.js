@@ -7,6 +7,7 @@ import { OrbitControls } from '../../../vendor/three/addons/controls/OrbitContro
 import { buildCave, setRock, ROCKS, CAVE_DEFAULTS } from '../../models/caves/cavekit.js';
 import { FreeCam } from '../../labkit/freecam.js';
 import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
+import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -96,6 +97,30 @@ $('rock').onchange = () => { S.rock = $('rock').value; $('rockNote').textContent
 for (const k of ['torch', 'lamp']) { $(k).checked = S[k]; $(k).onchange = () => { S[k] = $(k).checked; save(); applyLight(); }; }
 $('seed').value = S.seed; $('seed').onchange = () => { S.seed = Math.max(1, +$('seed').value | 0); save(); rebuild(); };
 $('another').onclick = () => { S.seed = 1 + Math.floor(Math.random() * 99998); $('seed').value = S.seed; save(); rebuild(); };
+
+/* ---------------- save under a name: the "cave" asset (js/scene/assets.js) for the scene editor ---------------- */
+const CAVE_KEYS = Object.keys(CAVE_DEFAULTS);
+function fillSaved() {
+  const names = listAssets('cave'), s = $('savedSel');
+  s.replaceChildren(new Option(names.length ? '—' : 'none yet', ''), ...names.map((n) => new Option(n, n)));
+  s.value = names.includes(S.savedAs || '') ? S.savedAs : '';
+}
+function saveCave(n) {
+  n = String(n || '').trim(); if (!n) throw new Error('give the cave a name');
+  saveAsset('cave', n, Object.fromEntries(CAVE_KEYS.map((k) => [k, S[k]]))); S.savedAs = n; save(); fillSaved(); return n;
+}
+function loadCave(n) {
+  const a = getAsset('cave', n); if (!a) throw new Error(`no saved cave "${n}"`);
+  for (const k of CAVE_KEYS) if (a[k] != null) S[k] = a[k];
+  S.savedAs = n; save(); location.reload();   // every slider and the rock from the loaded values
+}
+$('saveName').value = S.savedAs || '';
+$('saveCave').onclick = () => { try { $('status').textContent = `Saved: ${saveCave($('saveName').value)} (asset "cave").`; } catch { $('status').textContent = 'Give the cave a name first.'; } };
+$('delCave').onclick = () => { const n = $('savedSel').value; if (!n) { $('status').textContent = 'Pick a saved cave first.'; return; } removeAsset('cave', n); if (S.savedAs === n) S.savedAs = ''; save(); fillSaved(); $('status').textContent = `Deleted: ${n}.`; };
+$('savedSel').onchange = () => { const n = $('savedSel').value; if (n) loadCave(n); };
+onAssetsChange(fillSaved); fillSaved();
+// for AI: CaveApi.save(name) — the "cave" asset; load(name) (reloads the page with it), saved(), get()
+window.CaveApi = { save: (n) => ({ saved: saveCave(n) }), load: (n) => loadCave(n), saved: () => listAssets('cave'), get: () => Object.fromEntries(CAVE_KEYS.map((k) => [k, S[k]])) };
 
 /* ---------------- loop ---------------- */
 function resize() { renderer.setSize(VS().w, VS().h, false); camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix(); look.resize(VS().w, VS().h); }

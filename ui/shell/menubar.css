@@ -31,6 +31,7 @@
 /* labs that belong together (catalog "group"): the vehicles gold, the space labs (bodies, systems, scale) plum */
 #labMenu .lmItem.lmGlow { --glow: var(--accent); text-shadow: 0 0 8px color-mix(in srgb, var(--glow) 70%, transparent), 0 0 16px color-mix(in srgb, var(--glow) 35%, transparent); }
 #labMenu .lmItem.lmGlow[data-group="space"] { --glow: var(--plum); }
+#labMenu .lmItem.lmGlow[data-group="terrain"] { --glow: var(--terrain); }
 #labMenu .lmItem.lmGrpOn { background: var(--field); color: var(--head); }
 #labMenu .lmItem.lmGrpOn .lmChk:empty::before { content: "●"; color: var(--glow); }
 #labMenu .lmItem .lmChk { width: 12px; color: var(--accent); }

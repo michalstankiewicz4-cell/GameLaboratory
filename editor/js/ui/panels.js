@@ -78,7 +78,7 @@ export function createPanels(store, actions) {
         el('span', { className: 'tName', textContent: name }), el('span', { className: 'tSub', textContent: sub }));
       li.addEventListener('click', () => store.select(id)); ul.append(li);
     };
-    item(t('tree.env'), `${t(S.env.surface === 'land' ? 'env.land' : S.env.surface === 'space' ? 'env.space' : 'env.sea')} · ${lightName(S.env.light).toLowerCase()}`, null);
+    item(t('tree.env'), `${t(S.env.surface === 'land' ? 'env.land' : S.env.surface === 'space' ? 'env.space' : S.env.surface === 'underground' ? 'env.underground' : 'env.sea')} · ${lightName(S.env.light).toLowerCase()}`, null);
     S.objects.forEach((o) => { const p = prefab(o.prefab); item(o.name, p ? familyName(p.family).toLowerCase() : o.prefab, o.id); });
     if (!S.objects.length) ul.append(el('li', { className: 'note', textContent: t('tree.empty') }));
   }
@@ -109,7 +109,14 @@ export function createPanels(store, actions) {
       $('seaAsset').replaceChildren(el('option', { value: '', textContent: t('env.seaDefault') }), ...seas.map((n) => el('option', { value: n, textContent: n })),
         ...(cur && !seas.includes(cur) ? [el('option', { value: cur, textContent: t('env.seaMissing', { name: cur }) })] : []));
       $('seaAsset').value = cur;
-      $('seaRow').hidden = $('seaNote').hidden = S.env.surface === 'space' || (S.env.surface === 'land' && !S.env.land);   // morze: też wokół terenu
+      $('seaRow').hidden = $('seaNote').hidden = S.env.surface === 'space' || S.env.surface === 'underground' || (S.env.surface === 'land' && !S.env.land);
+      // podziemie: jaskinia z laboratorium jaskiń jako teren planszy (domyślna albo zapisana)
+      const caves = listAssets('cave'), curCave = S.env.cave || '';
+      $('caveAsset').replaceChildren(el('option', { value: '', textContent: t('env.caveDefault') }), ...caves.map((n) => el('option', { value: n, textContent: n })),
+        ...(curCave && !caves.includes(curCave) ? [el('option', { value: curCave, textContent: t('env.seaMissing', { name: curCave }) })] : []));
+      $('caveAsset').value = curCave;
+      $('caveRow').hidden = $('caveNote').hidden = S.env.surface !== 'underground';
+      $('skyRow').hidden = $('skyNote').hidden = S.env.surface === 'underground';   // w jaskini nie ma nieba   // morze: też wokół terenu
       // ląd: płaski grunt albo teren z laboratorium lądu
       const lands = listAssets('land'), curLand = S.env.land || '';
       $('landAsset').replaceChildren(el('option', { value: '', textContent: t('env.landPlain') }), ...lands.map((n) => el('option', { value: n, textContent: n })),
@@ -195,6 +202,7 @@ export function createPanels(store, actions) {
   $('orbitPeriod').addEventListener('input', () => { const o = store.selected, v = parseFloat($('orbitPeriod').value); if (o && v > 0) store.update(o.id, { orbit: { ...(o.orbit || {}), period: v } }); });
   $('surface').addEventListener('change', () => store.setEnv({ surface: $('surface').value }));
   $('landAsset').addEventListener('change', () => actions.build(() => store.setEnv({ land: $('landAsset').value })));
+  $('caveAsset').addEventListener('change', () => actions.build(() => store.setEnv({ cave: $('caveAsset').value })));
   $('skyAsset').addEventListener('change', () => store.setEnv({ sky: $('skyAsset').value }));
   $('seaAsset').addEventListener('change', () => store.setEnv({ sea: $('seaAsset').value }));
   $('light').addEventListener('change', () => store.setEnv({ light: $('light').value }));

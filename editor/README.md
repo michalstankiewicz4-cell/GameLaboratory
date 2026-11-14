@@ -118,7 +118,7 @@ albo lista (po kolei); wynik `{ "ok": true, … }` albo `{ "ok": false, "error":
 | `set` | `id` albo `name`, potem `newName` (z `id` także `name`), `prefab`, `pos`, `rot`, `scale`, `behavior`, `orbit` (`{ around, period }` — zachowanie „orbita”), `asset` (`""` — model domyślny), `shot` (efekt strzału statku, `""` — strzał) | zmienia obiekt |
 | `move` | `id` albo `name`, `by: [dx, dy, dz]` | przesuwa o wektor |
 | `remove` | `id` albo `name` | usuwa |
-| `env` | `surface` (`sea` / `land` / `space`), `light`, `look`, `land`, `sea`, `sky`, `ui` | środowisko (`ui` — UI gry z laboratorium UI gry, nakładka w ▶ Graj) |
+| `env` | `surface` (`sea` / `land` / `space` / `underground`), `light`, `look`, `land`, `sea`, `sky`, `ui`, `cave` | środowisko (`ui` — UI gry z laboratorium UI gry, nakładka w ▶ Graj; `underground` — w jaskini, `cave` — jaskinia z laboratorium jaskiń jako teren planszy) |
 | `assets` | `[kind]` | zasoby z nazwą (`sea` — woda, `land` — ląd, `weather` — wygląd, `look` — filtry, `sky` — ciała niebieskie) i gotowe tła kosmosu |
 | `select` | `id` / `name` albo nic | wybór w edytorze |
 | `new` | `[name]` | pusta scena |

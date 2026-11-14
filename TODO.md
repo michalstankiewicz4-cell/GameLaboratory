@@ -48,7 +48,12 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
 - [ ] **Sztuka → scena:** obraz z laboratorium sztuki jako zasób i obiekt sceny (płaszczyzna z fakturą farby, rama 3D
   ze złoceniem — tryb 3D sztuki).
 - [x] **Bloki:** bryła z laboratorium bloków jako zasób z nazwą (0.66.0; pole `asset` obiektu).
-- [ ] **Jaskinie i rośliny:** ustawienia z laboratoriów jako zasoby z nazwą (dziś w scenie tylko ustawienia domyślne).
+- [x] **Jaskinie:** zasób „cave” (0.71.0) — w scenie jako obiekt (pole `asset`) albo teren całej planszy (powierzchnia
+  „podziemie”, `env.cave`); grupa laboratoriów „Teren” (ląd · jaskinie).
+- [ ] **Rośliny:** ustawienia z laboratorium jako zasoby z nazwą (dziś w scenie tylko ustawienia domyślne).
+- [ ] **Rozległe jaskinie** (właściciel, 2026-11-14): jaskinia dzielona na kawałki liczone wokół gracza (dziś CaveKit liczy
+  całą jaskinię naraz, do ok. 2,4 mln próbek — przy dużej jaskini oczka siatki rosną i ściany tracą szczegóły);
+  wejście do jaskini wycięte w terenie lądu — połączenie lądu i podziemia.
 - [ ] **Układy (systems):** układ planetarny z laboratorium jako zasób, wstawiany do sceny kosmosu z orbitami.
 - [ ] **Skórki (skins):** malowanie statków jako zasób, wybierany dla obiektu w scenie.
 - [ ] **Powierzchnia (surface):** to, czego ląd z planety jeszcze nie przejął (grunt SurfaceKit, zejście, jazda) —

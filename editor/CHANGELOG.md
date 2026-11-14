@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.33.0 — 2026-11-14 (podziemie)
+
+### Dodane
+- Powierzchnia **Podziemie**: cała plansza to jaskinia z laboratorium jaskiń (wybór w oknie Środowisko, `env.cave`);
+  bez nieba i słońca. Model *Jaskinia* bierze zapisaną jaskinię (pole „Jaskinia” w oknie Obiekt).
+
 ## 0.32.0 — 2026-11-14 (uszkodzenia statków)
 
 ### Zmienione

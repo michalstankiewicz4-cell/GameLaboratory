@@ -31,6 +31,7 @@ h2::after{ content:""; flex:1; height:1px; background:var(--line); }
 /* a group's tiles light up together (index.html, groupLight): the vehicles gold, the space labs plum */
 .tile[data-group]{ --glow:var(--accent); }
 .tile[data-group="space"]{ --glow:var(--plum); }
+.tile[data-group="terrain"]{ --glow:var(--terrain); }
 .tile.grpOn{ transform:translateY(-3px); border-color:color-mix(in srgb, var(--glow) 60%, transparent);
   box-shadow:0 14px 34px rgba(0,0,0,.4), 0 0 18px color-mix(in srgb, var(--glow) 30%, transparent); }
 /* the category (catalog "cat", colours --cat-<id>): a coloured top edge, a chip with a dot; the chip under the pointer

@@ -272,7 +272,7 @@ export const defaultBehavior = (prefabId) => behaviorsFor(prefabId)[0] || '';
 // surface (nieobowiązkowe): bez wybranego zachowania — pierwsze pasujące, które działa w tym środowisku (statek nad
 // lądem: lądowanie, w kosmosie: ciąg w próżni)
 export function behaviorOf(obj, surface) {
-  const envOf = { sea: 'water', land: 'land', space: 'space' }[surface];
+  const envOf = { sea: 'water', land: 'land', space: 'space', underground: 'land' }[surface];   // podziemie: prawa lądu
   const fit = envOf && obj.behavior == null ? behaviorsFor(obj.prefab).find((id) => BEHAVIORS[id].env === envOf) : null;
   const id = obj.behavior == null ? fit || defaultBehavior(obj.prefab) : obj.behavior;
   return id && BEHAVIORS[id] && BEHAVIORS[id].fits(obj.prefab) ? id : '';

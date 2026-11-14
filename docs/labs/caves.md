@@ -38,6 +38,22 @@ style is chosen in the water lab. The hero's light sources and ways of seeing ha
   light, the exposure of the camera look (`js/render/sea/look.js`). *Overview* lights the cave from outside and shows
   both sides of the wall.
 
+## Saved under a name — a cave for the scene
+
+The lab is in the **Terrain** group with the land lab (land · caves: one switch on the bar, one glow in the menu) — a
+cave is terrain too. Window *Cave* → *Save*: the shape and the rock (the `CAVE_DEFAULTS` keys) as the named asset
+`cave` (`js/scene/assets.js`); the list loads one back (the page reloads with it). For AI: `CaveApi.save(name)`,
+`load(name)`, `saved()`, `get()`.
+
+In the scene editor a saved cave is used two ways:
+
+- **an object**: the model *Cave* (`caves/cave`) with the field `asset` — a cave standing in the scene;
+- **the whole level**: Surface → **Underground** (`env.surface: "underground"`, `env.cave`: the cave's name, `""` —
+  the default): the level is the cave — no sky, no sea, no ground, no sun, a faint glow so it shows in the editor; the
+  lava lights by itself. Behaviours follow the land's laws; the scene doctor warns about ships and aircraft in a cave.
+
+Later (`TODO.md`): a large cave split into pieces generated round the player, and a cave's entrance cut into the land.
+
 ## Numbers (default cave, seed 7)
 
 About 55–65 k triangles, ~200 drip stones and stones, built in ~1.7 s in a software-rendered test browser (faster on

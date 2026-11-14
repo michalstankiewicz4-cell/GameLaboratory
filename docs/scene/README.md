@@ -29,7 +29,8 @@ Zasada: **dane są jedynym źródłem prawdy.** Okna edytora, uchwyt, API i plik
 }
 ```
 
-- `env.surface`: `sea` | `land` | `space`; `env.sky` (każda powierzchnia): `""` (domyślne) | `"day"` | `"preset:<id>"` | nazwa zasobu „niebo”; `env.light`: `afternoon` | `noon` | `dusk` | `overcast` (oświetlenia sceny bazowej
+- `env.surface`: `sea` | `land` | `space` | `underground` (podziemie: cała plansza to jaskinia z `env.cave` — zasób
+  „cave” z laboratorium jaskiń, `""` — domyślna; bez nieba, morza, gruntu i słońca, słaba poświata; prawa lądu); `env.sky` (każda powierzchnia): `""` (domyślne) | `"day"` | `"preset:<id>"` | nazwa zasobu „niebo”; `env.light`: `afternoon` | `noon` | `dusk` | `overcast` (oświetlenia sceny bazowej
   `js/labs/shared/stage.js`); `env.look`: profil z laboratorium filtrów albo `""`; `env.sea`: zasób „morze” albo `""`.
 - `pos` w metrach (Y w górę), `rot` w stopniach (kolejność YXZ: kurs, pochylenie, przechył), `scale` — mnożnik.
 - `behavior` (nieobowiązkowe): id zachowania; bez pola — domyślne dla modelu, `""` — stoi w miejscu.
@@ -132,6 +133,7 @@ scena trzyma tylko nazwę. Inna karta widzi zmianę od razu (`onAssetsChange`).
 | `sky` | ciała niebieskie ([`../labs/bodies.md`](../labs/bodies.md)), Niebo | wszystkie liczby nieba BodyKit (mgławice, pas, pył, gwiazdy, barwy, ziarno) |
 | `ui`, `uiskin` | UI gry ([`../labs/gameui.md`](../labs/gameui.md)) | definicja `gamelab-ui`; skórka: `base`, `tokens` |
 | `material` | materiały ([`../labs/materials.md`](../labs/materials.md)) | opis MatKit |
+| `cave` | jaskinie ([`../labs/caves.md`](../labs/caves.md)) | ustawienia CaveKit (`seed`, `length`, `branches`, `width`, `winding`, `chambers`, `rough`, `cell`, `drips`, `rubble`, `lakes`, `lava`, `rock`, `wet`, `relief`); w scenie pole `asset` obiektu `caves/cave` albo `env.cave` podziemia |
 | `effect` | efekty ([`../labs/effects.md`](../labs/effects.md)) | `kind`, `scale`, `values` (liczby EffectKit); w scenie polecenie API `effect` |
 | `blocks` | bloki ([`../labs/blocks.md`](../labs/blocks.md)) | `shape`, `radius`, `voxel`, `seed`, `text`, `layers`, `mats` (opisy MatKit bloków stałych), `matRefs` (wybór w laboratorium); w scenie pole `asset` obiektu |
 
