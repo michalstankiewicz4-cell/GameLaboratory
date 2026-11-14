@@ -57,7 +57,9 @@ function demo(kind) {
     zap: { path: arc }, debris: { at: B, dir: new THREE.Vector3(0, 1, 0.3) }, hole: { at: new THREE.Vector3(0, 0, -4) },
     laser: { from: A, to: B }, piercer: { from: A, to: B }, storm: { from: A, to: B }, tow: { from: A, to: B }, cutter: { from: A, to: B },
     field: { at: A }, marker: { at: B }, portal: { at: new THREE.Vector3(0, 0, -4) }, scan: { at: new THREE.Vector3(0, 0, 0) },
-    warp: { from: A, dir: new THREE.Vector3(1, 0.15, 0) } }[kind];
+    warp: { from: A, dir: new THREE.Vector3(1, 0.15, 0) },
+    smoke: { at: B, dir: new THREE.Vector3(0, 1, 0) }, sparks: { at: B, dir: new THREE.Vector3(-1, 0.4, 0) }, explosion: { at: new THREE.Vector3(0, 0, 0), radius: 2.5 },
+    scorch: { at: new THREE.Vector3(0, 0, -8.9), dir: new THREE.Vector3(0, 0, 1), size: 1.5 }, ember: { at: new THREE.Vector3(0, 0, -8.9), dir: new THREE.Vector3(0, 0, 1) } }[kind];
   return fx.play(kind, at);
 }
 

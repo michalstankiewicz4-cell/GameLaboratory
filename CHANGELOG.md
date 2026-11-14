@@ -3,6 +3,19 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.70.0 · efekty 1.3.0 · pojazdy — kosmos 1.11.0 · edytor sceny 0.32.0 — 2026-11-14 (uszkodzenia statków z laboratorium efektów)
+
+### Dodane
+- Laboratorium efektów: **dym, iskry, wybuch (błysk i kule ognia), spalenizna, ognik** — z ShipKit
+  (`js/render/effects/damage.js`, `DamageFx`; shadery, tekstury i liczby bez zmian).
+
+### Zmienione
+- **Uszkodzenia statków z laboratorium efektów**: ShipKit zostawia u siebie miejsca uszkodzeń (kotwice na częściach,
+  lecą z odłamkami), odpadanie i łamanie części; dym, iskry, ogniki, spalenizna, błysk i kule ognia rysuje
+  laboratorium efektów (`model.damageView()`, `model.onDamage`, `shipDamage`) — w laboratorium pojazdów i w edytorze.
+- Wzorzec doktora modeli: bez krążków spalenizny (−160 trójkątów, −8 wywołań rysowania na statek); wymiary Haven
+  i Swarmera mniejsze — ukryte krążki wystawały poza kadłub, teraz obrys to sam kadłub.
+
 ## Program 0.69.2 — 2026-11-14 (poprawka: fala uderzeniowa przy zniszczeniu statku)
 
 ### Naprawione

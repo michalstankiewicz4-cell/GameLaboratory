@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.32.0 — 2026-11-14 (uszkodzenia statków)
+
+### Zmienione
+- Dym, iskry, ogniki, spalenizna i wybuch statków (ShipKit) rysuje laboratorium efektów; polecenie `effect` zna
+  `smoke`, `sparks`, `explosion`, `scorch`, `ember`.
+
 ## 0.31.1 — 2026-11-14
 
 ### Zmienione

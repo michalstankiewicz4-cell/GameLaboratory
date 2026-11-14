@@ -10,6 +10,7 @@ import { getAsset, listAssets } from '../../../js/scene/assets.js';
 import { planetAirless } from '../../../js/envs/land/planet.js';
 import { spaceReady, loadSpace, SKY_PRESET, SKY_DAY } from '../../../js/scene/space.js';
 import { createEffectLibrary, STEP as FX_STEP } from '../../../js/render/effects/effects.js';
+import { DamageFx, shipDamage } from '../../../js/render/effects/damage.js';
 
 export { LIGHTS };
 const D2R = Math.PI / 180;
@@ -57,6 +58,7 @@ export function createWorld(container, store, onWarn) {
   }
   function drop(id) {
     const r = built.get(id); if (!r) return;
+    if (r.dmg) r.dmg.dispose();
     root.remove(r.root); if (r.dispose) { try { r.dispose(); } catch { /* bez zwalniania */ } }
     built.delete(id);
   }
@@ -156,11 +158,12 @@ export function createWorld(container, store, onWarn) {
 
   let last = performance.now(), before = null;
   // efekty sceny: jeden EffectKit na zapisany efekt (zasób „effect”: rodzaj, skala, liczby) albo na gotowy rodzaj
-  const fxLib = createEffectLibrary(scene, getAsset); let fxAcc = 0;
+  const fxLib = createEffectLibrary(scene, getAsset), dmgFx = new DamageFx(scene); let fxAcc = 0;
   const effect = (e) => fxLib.play(e.asset || e.kind, e);
   // strzały statków (ShipKit model.onShot): efekt wybrany dla obiektu (pole „shot”: rodzaj albo zapisany efekt; brak — strzał)
   function wireShots(o, kit) {
     if (!kit || !('onShot' in kit)) return;
+    const r = built.get(o.id); if (r && kit.damageView) r.dmg = shipDamage(kit, dmgFx);   // uszkodzenia: laboratorium efektów
     kit.onScan = (s) => { try { fxLib.play('scan', { at: s.at.toArray(), radius: s.radius, color: s.color }); } catch { /* bez fali */ } };   // fala skanu: laboratorium efektów
     kit.onShot = (s) => { const cur = store.scene.objects.find((q) => q.id === o.id); try { fxLib.shot((cur && cur.shot) || 'shot', s); } catch (err) { if (window.LabLog) window.LabLog.add('warn', 'Shot effect: ' + err.message); } };
   }
@@ -184,7 +187,7 @@ export function createWorld(container, store, onWarn) {
     look.sun(camera, stage.sunDir);
     // efekty (EffectKit, zdarzenie „effect”): stałym krokiem 1/60 s; czarna dziura i kula cieczy — obraz przez soczewki
     fxAcc += dt; let fxN = 0;
-    while (fxAcc >= FX_STEP && fxN < 6) { fxLib.step(camera); fxAcc -= FX_STEP; fxN++; }
+    while (fxAcc >= FX_STEP && fxN < 6) { fxLib.step(camera); built.forEach((r) => r.dmg && r.dmg.step()); dmgFx.step(); fxAcc -= FX_STEP; fxN++; }
     if (fxN === 6) fxAcc = 0;
     window.LabPerf.begin(renderer);   // okno Wydajność i dolny pasek
     if (fxLib.lensing) fxLib.render(renderer, scene, camera, (target) => look.render(scene, camera, target)); else look.render(scene, camera);

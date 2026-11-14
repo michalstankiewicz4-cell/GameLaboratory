@@ -7,6 +7,7 @@
 import { createStage } from "../shared/stage.js";
 import { loadSpace } from "../../scene/space.js";
 import { createEffectLibrary, FX_KINDS, FX_BADGES, STEP as FX_STEP } from "../../render/effects/effects.js";
+import { DamageFx, shipDamage } from "../../render/effects/damage.js";
 import { listAssets, getAsset, onAssetsChange } from "../../scene/assets.js";
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
@@ -105,6 +106,8 @@ function loadShip(index, keepCamera) {
   current.setDamage(state.damage);
   document.getElementById("dmgSlider").disabled = !current.damageEnabled;
   renderActions();
+  if (dmgBind) dmgBind.dispose();
+  dmgBind = shipDamage(current, dmgFx);   // damage: scorch, embers, smoke, sparks, blast — the effects lab
   current.onScan = (s) => { try { shotFx.play("scan", { at: s.at.toArray(), radius: s.radius, color: s.color }); } catch (e) { if (window.LabLog) window.LabLog.add("warn", "Scan effect: " + e.message); } };   // the scan wave: the effects lab
   current.onShot = (s) => { try { shotFx.shot(shotChoice(def.id), s); } catch (e) { if (window.LabLog) window.LabLog.add("warn", "Shot effect: " + e.message); } };
   fillShotFx();
@@ -118,7 +121,7 @@ function loadShip(index, keepCamera) {
 
 // Shots: the ship only reports them (model.onShot); what they look like is an effect from the effects lab
 // (js/render/effects/) — a ready one or one saved under a name, chosen per ship, kept in this browser
-let shotFx = null, shotAcc = 0;
+let shotFx = null, shotAcc = 0, dmgFx = null, dmgBind = null;
 const shotChoice = (id) => store.get("shotFx", {})[id] || "shot";
 function fillShotFx() {
   const sel = document.getElementById("shotFx"), row = document.getElementById("shotRow");
@@ -292,6 +295,8 @@ const fx = LabKit.imageEffects({ renderer, scene, camera, panel: document.getEle
   setQuality: (level) => { state.quality = level; qSlider.value = level; paintSlider(qSlider); applyQuality(level); },
 });
 shotFx = createEffectLibrary(scene, getAsset);
+dmgFx = new DamageFx(scene);
+window.__shipFx = { get damage() { return dmgFx && dmgFx.counts; }, get view() { return current && current.damageView && current.damageView(); } };   // (tests)
 fx.through = (paint) => (shotFx.lensing ? shotFx.render(renderer, scene, camera, paint) : paint(null));   // black hole, liquid bubble: lenses
 
 // the ship: a drop-down in the lab's top bar, as on the water page (labs/vehicles-water.html); a renamed ship shows its new name
@@ -425,7 +430,7 @@ function frame() {
 
   // shot effects: a fixed step of 1/60 s (the numbers of the effects are per frame of the game)
   shotAcc += state.freeze ? 0 : dt; let sn = 0;
-  while (shotAcc >= FX_STEP && sn < 6) { shotFx.step(camera); shotAcc -= FX_STEP; sn++; }
+  while (shotAcc >= FX_STEP && sn < 6) { shotFx.step(camera); if (dmgBind) dmgBind.step(); dmgFx.step(); shotAcc -= FX_STEP; sn++; }
   if (sn === 6) shotAcc = 0;
   controls.update();
   stage.follow(camera);

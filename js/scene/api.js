@@ -34,7 +34,7 @@ const COMMANDS = {
   actions: { args: 'id | name', does: 'during play: the object\'s actions' },
   events: { args: '[n]', does: 'the last n events (default 20)' },
   ui: { args: 'during play, one of: say { who, text, choices }, log (text) [kind], banner (text) [sub], show (screen), hide, open (window), close (window)', does: 'the game UI of the scene (env.ui): a line of dialogue (returns at once; the choice comes as a "ui" event), an event log entry, a banner, a menu screen, a window' },
-  effect: { args: 'effect (shot | orb | debris | bolt | zap | bubble | hole | laser | piercer | storm | tow | cutter | field | warp | marker | portal | scan, or an effect asset name from the effects lab), then: from, to (shot, orb, bubble, laser, piercer, storm, tow, cutter; warp: from, dir) | at, [dir] (debris, hole, field, marker, portal, scan) | path [p, p, …] (bolt, zap) — each point [x,y,z] m or an object id | name', does: 'shows an effect — an "effect" event (anything listening gets it)' },
+  effect: { args: 'effect (shot | orb | debris | bolt | zap | bubble | hole | laser | piercer | storm | tow | cutter | field | warp | marker | portal | scan | smoke | sparks | explosion | scorch | ember, or an effect asset name from the effects lab), then: from, to (shot, orb, bubble, laser, piercer, storm, tow, cutter; warp: from, dir) | at, [dir] (debris, hole, field, marker, portal, scan, smoke, sparks, scorch, ember; explosion: at, radius) | path [p, p, …] (bolt, zap) — each point [x,y,z] m or an object id | name', does: 'shows an effect — an "effect" event (anything listening gets it)' },
   check: { args: '[budget { tris, draws }]', does: 'the scene doctor: problems in the scene (wrong environment, under the ground or in the air, overlapping, missing assets, unfitting behaviours, cost over the budget), each with a proposed fix (commands) — nothing is changed' },
   play: { args: '', does: 'runs the behaviours (like ▶ Play)' },
   stop: { args: '', does: 'back to editing' },
@@ -170,6 +170,7 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
       // punkt: [x, y, z] m albo obiekt (id albo nazwa) — jego położenie teraz (w grze: tam, gdzie go niesie zachowanie)
       const pt = (p, f) => (Array.isArray(p) ? vec3(p, f) : (() => { const o = target(store.scene.objects.some((q) => q.id === p) ? { id: p } : { name: p }); return hooks.objectPos ? hooks.objectPos(o) : o.pos; })());
       for (const f of ['from', 'to', 'at', 'dir']) if (c[f] != null) e[f] = f === 'dir' ? vec3(c[f], f) : pt(c[f], f);
+      for (const f of ['radius', 'n', 'size', 'frames']) if (c[f] != null) e[f] = num(c[f], f);   // wybuch, iskry, znak, czas
       if (c.path != null) { if (!Array.isArray(c.path) || c.path.length < 2) fail('path: at least two points'); e.path = c.path.map((p, i) => pt(p, 'path[' + i + ']')); }
       hooks.effect(e); return { effect: n, ...e };
     },

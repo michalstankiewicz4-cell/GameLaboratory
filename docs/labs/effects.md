@@ -25,6 +25,11 @@ w menu i na stronie startowej: **Efekty**.
 | Znacznik | `marker` | `at` | pulsujący pierścień z kropką, gaśnie |
 | Tunel podprzestrzenny | `portal` | `at` | wir otwiera się w lejek smug światła z jasnym rdzeniem i zamyka |
 | Fala skanu | `scan` | `at`, `radius` | rosnąca powłoka z jasnym brzegiem i liniami (z ShipKit) |
+| Dym | `smoke` | `at`, `dir` | miękkie szare kłęby, unoszą się i rozchodzą (`frames` — jak długo dymi) |
+| Iskry | `sparks` | `at`, `dir`, `n` | seria krótkich jasnych iskier z oporem |
+| Wybuch | `explosion` | `at`, `radius` | błysk i kule ognia (1.4 s) |
+| Spalenizna | `scorch` | `at`, `dir` (normalna) | ciemny poszarpany ślad na powierzchni |
+| Ognik | `ember` | `at`, `dir` | migoczący pomarańczowy ognik na powierzchni |
 
 Efekty z gry dzielą się tak, jak je gra wywoływała: z `effects/` (strzały, odłamki, błyskawice, soczewki) i z roju
 (`beams.js`, `tows.js`, `cutters.js`, `fields.js`, `warp.js` — w grze metody `Swarm3D` na tablicach statków; tu podaje im
@@ -76,6 +81,15 @@ pojazdów kosmicznych (pod akcjami: Efekt strzału), w edytorze sceny w oknie Ob
 id efektu albo nazwa zapisanego efektu; bez pola — strzał). `createEffectLibrary(scene, getAsset)` — jeden EffectKit na
 wybór; `shotOptions(kind, strzał)` — jak strzał zamienia się w opcje efektu (lot lufa → cel, ścieżka błyskawicy,
 odłamki i czarna dziura u celu). Pojazd z dowolnej gry, efekt z dowolnej gry.
+
+## Uszkodzenia statków
+
+Dym, iskry, ogniki, spalenizna, błysk i kule ognia przy uszkodzeniu i zniszczeniu statku ShipKit to efekty z
+laboratorium efektów (`js/render/effects/damage.js`, `DamageFx`). Statek zostawia u siebie miejsca uszkodzeń —
+kotwice na częściach, które lecą razem z odłamkami — oraz łamanie i odpadanie części (to sam model, nie efekt).
+`model.damageView()` → `{ sites: [{ anchor, on, ember, size }], damage, particles }`, `model.onDamage({ type:
+"sparks", at, dir, n } | { type: "blast", at, radius })`; `shipDamage(model, fx)` je podpina (laboratorium pojazdów,
+edytor sceny). Fala uderzeniowa zniszczenia — przez `model.onScan` (pomarańczowa fala).
 
 ## W laboratorium bloków
 

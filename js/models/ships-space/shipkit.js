@@ -543,7 +543,7 @@ function fractureMesh(mesh, pieces, rand) {
 // it shows; update() animates it.
 // env: the model's env — the shockwave of the final blast is reported like a scan (env.onScan, orange)
 function createDamageFx(ship, radius, env = null) {
-  const T = fxTextures(), G = glowTextures(), rand = rng(101);
+  const rand = rng(101);
   ship.updateMatrixWorld(true);
   const big = [], small = [];
   ship.traverse((o) => {
@@ -558,9 +558,8 @@ function createDamageFx(ship, radius, env = null) {
     else if (r < radius * 0.12) small.push(o);
   });
 
-  // --- damage sites
-  const decalMat = new THREE.MeshBasicMaterial({ map: T.scorch, transparent: true, depthWrite: false,
-    polygonOffset: true, polygonOffsetFactor: -4 });
+  // --- damage sites: anchors on the ship's parts (+z out of the surface) that fly off with the debris; the
+  // scorch mark, ember, smoke and sparks at them are the effects lab's (js/render/effects/damage.js, damageView())
   const sites = [], SITES = 8;
   const pickBig = () => {
     let x = rand() * big.reduce((a, b) => a + b.r, 0);
@@ -578,82 +577,22 @@ function createDamageFx(ship, radius, env = null) {
     const n = vb.clone().sub(va).cross(vc.clone().sub(va)).normalize();
     if (!isFinite(n.x) || n.lengthSq() === 0) n.set(0, 1, 0);
     if (n.dot(p.clone().sub(g.boundingSphere.center)) < 0) n.negate();
-    const decal = new THREE.Mesh(new THREE.CircleGeometry(1, 20), decalMat);
+    const anchor = new THREE.Object3D(); anchor.name = "damage site";
     const size = 0.38 + rand() * 0.34;
-    decal.position.copy(p).addScaledVector(n, 0.012);
-    decal.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), n);
-    decal.userData.size = size; decal.visible = false;
-    o.add(decal);
-    const ember = additiveSprite(G.engine, 0xff5a1a);
-    ember.position.copy(p).addScaledVector(n, 0.05); ember.visible = false;
-    o.add(ember);
-    sites.push({ o, decal, ember, n, sparkT: rand() * 2, world: new THREE.Vector3(), dir: new THREE.Vector3() });
+    anchor.position.copy(p);
+    anchor.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), n);
+    o.add(anchor);
+    sites.push({ o, anchor, size, on: false, ember: false, n, sparkT: rand() * 2, world: new THREE.Vector3(), dir: new THREE.Vector3() });
   }
 
-  // --- smoke: soft grey puffs, normal blending, rising and spreading
-  const SMOKE = 180, sGeo = new THREE.BufferGeometry();
-  const sPos = new Float32Array(SMOKE * 3), sLife = new Float32Array(SMOKE).fill(1), sAlpha = new Float32Array(SMOKE);
-  const sVel = new Float32Array(SMOKE * 3), sRate = new Float32Array(SMOKE);
-  for (let i = 0; i < SMOKE; i++) { sLife[i] = rand(); sRate[i] = 0.25 + rand() * 0.2; }
-  sGeo.setAttribute("position", new THREE.BufferAttribute(sPos, 3));
-  sGeo.setAttribute("life", new THREE.BufferAttribute(sLife, 1));
-  sGeo.setAttribute("alpha", new THREE.BufferAttribute(sAlpha, 1));
-  const smoke = new THREE.Points(sGeo, new THREE.ShaderMaterial({
-    uniforms: { uTex: { value: T.smoke } },
-    vertexShader: `
-      attribute float life; attribute float alpha; varying float vLife; varying float vAlpha;
-      void main(){
-        vLife = life; vAlpha = alpha;
-        vec4 mv = modelViewMatrix * vec4(position, 1.0);
-        gl_PointSize = (0.35 + life * 1.8) * 420.0 / -mv.z;
-        gl_Position = projectionMatrix * mv;
-      }`,
-    fragmentShader: `
-      uniform sampler2D uTex; varying float vLife; varying float vAlpha;
-      void main(){
-        float a = texture2D(uTex, gl_PointCoord).a * vAlpha * (1.0 - vLife) * smoothstep(0.0, 0.12, vLife);
-        gl_FragColor = vec4(mix(vec3(0.34, 0.31, 0.29), vec3(0.06), vLife), a * 0.95);
-      }`,
-    transparent: true, depthWrite: false,
-  }));
-  const fxp = effectsPart(ship);
-  smoke.frustumCulled = false; fxp.add(smoke);
-
-  // --- sparks: short-lived additive points in bursts, with drag
-  const SPARKS = 220, kGeo = new THREE.BufferGeometry();
-  const kPos = new Float32Array(SPARKS * 3), kLife = new Float32Array(SPARKS).fill(1), kVel = new Float32Array(SPARKS * 3), kRate = new Float32Array(SPARKS);
-  kGeo.setAttribute("position", new THREE.BufferAttribute(kPos, 3));
-  kGeo.setAttribute("life", new THREE.BufferAttribute(kLife, 1));
-  const sparks = new THREE.Points(kGeo, new THREE.ShaderMaterial({
-    vertexShader: `
-      attribute float life; varying float vLife;
-      void main(){
-        vLife = life;
-        vec4 mv = modelViewMatrix * vec4(position, 1.0);
-        gl_PointSize = (1.0 - life) * 70.0 / -mv.z;
-        gl_Position = projectionMatrix * mv;
-      }`,
-    fragmentShader: `
-      varying float vLife;
-      void main(){
-        float a = smoothstep(0.5, 0.0, length(gl_PointCoord - 0.5)) * (1.0 - vLife);
-        gl_FragColor = vec4(mix(vec3(1.0, 0.96, 0.8), vec3(1.0, 0.42, 0.08), vLife) * a * 2.0, 1.0);
-      }`,
-    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-  }));
-  sparks.frustumCulled = false; fxp.add(sparks);
-  let kNext = 0;
+  // --- sparks: a burst at a site is reported (env.onDamage, world space); the effects lab draws it
+  const sw = new THREE.Vector3(), sd = new THREE.Vector3();
   const burst = (s, n) => {
-    for (let j = 0; j < n; j++) {
-      const i = kNext = (kNext + 1) % SPARKS;
-      kPos[i * 3] = s.world.x; kPos[i * 3 + 1] = s.world.y; kPos[i * 3 + 2] = s.world.z;
-      const sp = 1.2 + rand() * 2.2;
-      kVel[i * 3] = (s.dir.x + (rand() - 0.5) * 1.4) * sp;
-      kVel[i * 3 + 1] = (s.dir.y + (rand() - 0.5) * 1.4) * sp;
-      kVel[i * 3 + 2] = (s.dir.z + (rand() - 0.5) * 1.4) * sp;
-      kLife[i] = 0; kRate[i] = 1.4 + rand() * 2.2;
-    }
+    if (!env || !env.onDamage) return;
+    ship.updateMatrixWorld(true);
+    env.onDamage({ type: "sparks", at: sw.copy(s.world).applyMatrix4(ship.matrixWorld).clone(), dir: sd.copy(s.dir).transformDirection(ship.matrixWorld).clone(), n, ship: env.id });
   };
+  let particlesOn = true;
 
   // --- debris: small parts that break off, in a fixed (seeded) order
   for (let i = small.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [small[i], small[j]] = [small[j], small[i]]; }
@@ -665,13 +604,7 @@ function createDamageFx(ship, radius, env = null) {
   // the big hull pieces are fractured first. Burning sites stay attached to
   // the chunk they landed on, so the wreckage trails smoke.
   const builtParts = new Set(ship.children);  // snapshot before any effect objects are added below
-  const flash = additiveSprite(G.engine, 0xffe2b0), fireballs = [];
-  flash.visible = false; fxp.add(flash);
-  for (let i = 0; i < 7; i++) {
-    const f = additiveSprite(G.engine, i % 2 ? 0xff6a1a : 0xffb45a);
-    f.visible = false; fxp.add(f);
-    fireballs.push({ s: f, off: new THREE.Vector3(rand() - 0.5, rand() - 0.5, rand() - 0.5).multiplyScalar(radius * 0.8), delay: rand() * 0.35 });
-  }
+  // the flash and fireballs of the blast: reported (env.onDamage { type: "blast" }), drawn by the effects lab
   const shock = makeScanEmitter(ship, env, 0xff8a3c);   // the shockwave: the effects lab's scan wave, orange
   const flying = [];
   let boomT = -1;
@@ -697,10 +630,10 @@ function createDamageFx(ship, radius, env = null) {
         const chunks = fractureMesh(o, 6 + Math.floor(rand() * 4), rand);
         o.updateMatrixWorld(true);
         for (const s of sites) if (s.o === o) {      // move burning sites onto the nearest chunk
-          const lp = s.decal.position;
+          const lp = s.anchor.position;
           let best = chunks[0], bd = Infinity;
           for (const c of chunks) { const d = c.position.distanceToSquared(lp); if (d < bd) { bd = d; best = c; } }
-          best.attach(s.decal); best.attach(s.ember); s.o = best;
+          best.attach(s.anchor); s.o = best;
         }
         for (const c of chunks) { ship.attach(c); pieces.push(c); }
         o.visible = false;
@@ -724,19 +657,18 @@ function createDamageFx(ship, radius, env = null) {
       boomT = 0;
       this.setDamage(1);
       loose.forEach((l) => { l.off = true; l.o.visible = true; });   // no more separate break-offs
-      flash.visible = true;
+      ship.updateMatrixWorld(true);
+      if (env && env.onDamage) env.onDamage({ type: "blast", at: new THREE.Vector3().setFromMatrixPosition(ship.matrixWorld), radius: radius * ship.getWorldScale(sw).x, ship: env.id });
       shock.start(new THREE.Vector3(), radius * 1.8);
-      for (const s of sites) { ship.updateMatrixWorld(true); s.decal.getWorldPosition(s.world); ship.worldToLocal(s.world); s.dir.copy(s.world).normalize(); burst(s, 36); }
+      for (const s of sites) { ship.updateMatrixWorld(true); s.anchor.getWorldPosition(s.world); ship.worldToLocal(s.world); s.dir.copy(s.world).normalize(); burst(s, 36); }
     },
     get destroyed() { return boomT >= 0; },
     setDamage(d) {
       damage = d;
       active = d <= 0 ? 0 : Math.ceil(d * sites.length);
       sites.forEach((s, i) => {
-        const on = i < active;
-        s.decal.visible = on;
-        s.decal.scale.setScalar(s.decal.userData.size * (0.6 + 0.9 * d));
-        s.ember.visible = on && d > 0.45 && i % 2 === 0;
+        s.on = i < active;
+        s.ember = s.on && d > 0.45 && i % 2 === 0;
       });
       const wantOff = d >= 0.7 ? Math.round((d - 0.6) / 0.4 * loose.length) : 0;
       loose.forEach((l, i) => {
@@ -754,22 +686,14 @@ function createDamageFx(ship, radius, env = null) {
       });
     },
     get damage() { return damage; },
-    update(t, dt, particlesOn = true) {
+    // what the effects lab draws: the sites (anchor, on, ember, size), the damage, whether particles are on
+    view() { return { sites: sites.map((s) => ({ anchor: s.anchor, on: s.on, ember: s.ember, size: s.size })), damage, particles: particlesOn, destroyed: boomT >= 0 }; },
+    update(t, dt, particles = true) {
+      particlesOn = particles;
       if (boomT >= 0) {
         const before = boomT;
         boomT += dt;
         if (before < 0.12 && boomT >= 0.12) breakApart();
-        flash.material.opacity = Math.max(0, 1 - boomT / 0.9);
-        flash.scale.setScalar(radius * (0.8 + 4 * Math.min(1, boomT / 0.35)));
-        flash.visible = boomT < 0.9;
-        for (const f of fireballs) {
-          const k = (boomT - f.delay) / 1.4;
-          f.s.visible = k > 0 && k < 1;
-          if (!f.s.visible) continue;
-          f.s.position.copy(f.off).multiplyScalar(1 + k * 1.5);
-          f.s.scale.setScalar(radius * (0.4 + 1.3 * Math.sqrt(k)));
-          f.s.material.opacity = (1 - k) * (0.8 + 0.2 * Math.sin(t * 30));
-        }
         shock.update(dt);
         const drag = Math.max(0, 1 - dt * 0.18);
         for (const f of flying) {
@@ -781,9 +705,8 @@ function createDamageFx(ship, radius, env = null) {
       shipInv.copy(ship.matrixWorld).invert();
       for (let i = 0; i < active; i++) {                // site positions in ship space
         const s = sites[i];
-        s.decal.getWorldPosition(s.world).applyMatrix4(shipInv);
+        s.anchor.getWorldPosition(s.world).applyMatrix4(shipInv);
         s.dir.copy(s.n).transformDirection(s.o.matrixWorld).transformDirection(shipInv);
-        if (s.ember.visible) s.ember.scale.setScalar(0.35 + 0.25 * Math.sin(t * 17 + i * 3) * Math.sin(t * 7 + i));
         if (damage > 0.25 && (s.sparkT -= dt) <= 0) {
           s.sparkT = 0.12 + rand() * (1.8 - damage * 1.5);
           if (particlesOn) burst(s, 10 + Math.floor(rand() * 18 * damage));
@@ -795,36 +718,7 @@ function createDamageFx(ship, radius, env = null) {
         l.o.rotateOnAxis(l.spin, l.spinRate * dt);
         if ((l.age += dt) > 6) l.o.visible = false;
       }
-      smoke.visible = particlesOn && active > 0;
-      sparks.visible = particlesOn && damage > 0.25;
-      if (smoke.visible) {
-        for (let i = 0; i < SMOKE; i++) {
-          sLife[i] += dt * sRate[i];
-          if (sLife[i] >= 1) {
-            const s = sites[i % SITES];
-            sLife[i] -= 1;
-            if (!s || i % SITES >= active) { sAlpha[i] = 0; continue; }
-            sPos[i * 3] = s.world.x + s.dir.x * 0.05; sPos[i * 3 + 1] = s.world.y + s.dir.y * 0.05; sPos[i * 3 + 2] = s.world.z + s.dir.z * 0.05;
-            const sp = 0.25 + rand() * 0.25;
-            sVel[i * 3] = s.dir.x * sp + (rand() - 0.5) * 0.12;
-            sVel[i * 3 + 1] = s.dir.y * sp + 0.12 + (rand() - 0.5) * 0.12;
-            sVel[i * 3 + 2] = s.dir.z * sp + (rand() - 0.5) * 0.12;
-            sAlpha[i] = 0.35 + 0.65 * damage;
-          }
-          sPos[i * 3] += sVel[i * 3] * dt; sPos[i * 3 + 1] += sVel[i * 3 + 1] * dt; sPos[i * 3 + 2] += sVel[i * 3 + 2] * dt;
-        }
-        sGeo.attributes.position.needsUpdate = true; sGeo.attributes.life.needsUpdate = true; sGeo.attributes.alpha.needsUpdate = true;
-      }
-      if (sparks.visible) {
-        const drag = Math.max(0, 1 - dt * 1.8);
-        for (let i = 0; i < SPARKS; i++) {
-          if (kLife[i] >= 1) continue;
-          kLife[i] = Math.min(1, kLife[i] + dt * kRate[i]);
-          kVel[i * 3] *= drag; kVel[i * 3 + 1] *= drag; kVel[i * 3 + 2] *= drag;
-          kPos[i * 3] += kVel[i * 3] * dt; kPos[i * 3 + 1] += kVel[i * 3 + 1] * dt; kPos[i * 3 + 2] += kVel[i * 3 + 2] * dt;
-        }
-        kGeo.attributes.position.needsUpdate = true; kGeo.attributes.life.needsUpdate = true;
-      }
+      // smoke and sparks: the effects lab (damageView, onDamage)
     },
   };
 }
@@ -1588,7 +1482,7 @@ function mergeStatic(root) {
 function buildShipModel(id, { detail = 1, merge = false, fxRoot = null, envMap = null, round = 0, seal = 0, sealStyle = "fillet", labels = null } = {}) {
   const def = SHIP_DEFS.find((d) => d.id === id);
   if (!def) throw new Error("ShipKit: unknown ship id " + id);
-  const env = { id, fxRoot, owned: [], labels, onShot: null, onScan: null };   // shots and scans: makeShotEmitter, makeScanEmitter
+  const env = { id, fxRoot, owned: [], labels, onShot: null, onScan: null, onDamage: null };   // shots, scans, sparks and blasts: reported to the host
   // arc segments: more for a stronger rounding and a higher detail (each box costs (2k+1)² quads a face)
   const k = Math.max(1, Math.min(3, Math.round(round * 3 * detail)));
   const built = withRounding(round, k, () => def.build(detail, env));
@@ -1631,6 +1525,11 @@ function buildShipModel(id, { detail = 1, merge = false, fxRoot = null, envMap =
     get onShot() { return env.onShot; }, set onShot(fn) { env.onShot = fn || null; },
     // act("scan") reports each scan here ({ at, radius, color, ship }, world space): the effects lab's scan wave
     get onScan() { return env.onScan; }, set onScan(fn) { env.onScan = fn || null; },
+    // damage: sparks at the damage sites and the final blast are reported here ({ type: "sparks", at, dir, n } |
+    // { type: "blast", at, radius }, world space); damageView() — the sites (anchors on the parts: scorch, ember,
+    // smoke), the damage, whether particles are on. The effects lab draws them (js/render/effects/damage.js)
+    get onDamage() { return env.onDamage; }, set onDamage(fn) { env.onDamage = fn || null; },
+    damageView: () => (fx.view ? fx.view() : null),
     // [{ id, label, kind: "trigger" | "toggle", enabled }] — see STANDARD_ACTIONS
     actions,
     damageEnabled: features.damage,

@@ -325,14 +325,14 @@
    "sliver": 1
   },
   "fingerprint": {
-   "drawCalls": 78,
-   "materials": 22,
+   "drawCalls": 70,
+   "materials": 21,
    "size": [
     16.38,
     6.21,
     9.85
    ],
-   "triangles": 63120
+   "triangles": 62960
   }
  },
  "space/ship/haven": {
@@ -342,14 +342,14 @@
    "seethrough": 1
   },
   "fingerprint": {
-   "drawCalls": 91,
-   "materials": 19,
+   "drawCalls": 83,
+   "materials": 18,
    "size": [
-    15.3,
+    15.1,
     8.1,
-    9.12
+    8.69
    ],
-   "triangles": 21812
+   "triangles": 21652
   }
  },
  "space/ship/scribe": {
@@ -359,14 +359,14 @@
    "sliver": 1
   },
   "fingerprint": {
-   "drawCalls": 67,
-   "materials": 18,
+   "drawCalls": 59,
+   "materials": 17,
    "size": [
     6.37,
     3.81,
     5.77
    ],
-   "triangles": 23024
+   "triangles": 22864
   }
  },
  "space/ship/swarmer": {
@@ -374,14 +374,14 @@
    "seethrough": 1
   },
   "fingerprint": {
-   "drawCalls": 40,
-   "materials": 14,
+   "drawCalls": 32,
+   "materials": 13,
    "size": [
     8.4,
-    2.62,
-    5.26
+    1.66,
+    3.66
    ],
-   "triangles": 8794
+   "triangles": 8634
   }
  },
  "space/vehicle/constructor": {

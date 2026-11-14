@@ -253,6 +253,7 @@ Helpers for writing actions (exported too):
 | Helper | What it does |
 |---|---|
 | `makeShotEmitter(ship, env, color, { speed })` | Shots: `fire(origin, dir, target?)` reports one shot to `model.onShot({ from, to, dir, color, ship })` (world space). The model draws no shot or muzzle flash — the host draws an effect from the effects lab (`js/render/effects/`, [`effects.md`](effects.md)). |
+| `createDamageFx(ship, radius, env)` | Damage: picks the damage sites (anchors on the parts, they fly off with the debris), breaks off small parts, fractures the ship on DESTROY. Scorch marks, embers, smoke, sparks, the flash and fireballs are the effects lab's (`js/render/effects/damage.js`): `model.damageView()` (the sites) and `model.onDamage` (sparks, blast). |
 | `makeScanEmitter(ship, env, color)` | Scans: `start(pos, radius)` (ship space) reports one scan to `model.onScan({ at, radius, color, ship })` (world space); the expanding shell is the effects lab's scan wave (`js/render/effects/scan.js`), drawn by the host. |
 | `textTexture(text, color)` | A glowing word on a transparent canvas (cached), e.g. for a sprite. |
 | `fxTextures()` | The shared smoke puff and scorch textures. |
