@@ -9,4 +9,5 @@ export const MODELS = [
   { id: 'pot', label: 'Garnek', group: 'Przedmioty', load: () => import('./items/pot.js') },
   { id: 'newspapers', label: 'Gazety (związane)', group: 'Przedmioty', load: () => import('./items/newspapers.js') },
   { id: 'box', label: 'Karton zamknięty', group: 'Przedmioty', load: () => import('./items/box.js') },
+  { id: 'barrel', label: 'Beczka metalowa', group: 'Przedmioty', load: () => import('./items/barrel.js') },
 ];

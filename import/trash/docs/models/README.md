@@ -15,6 +15,7 @@ Materiały — `js/models/materials.js` (dane), tekstury proceduralne — `js/re
 | pot | Garnek nierdzewny 6 l | Ø 240 (z uchwytami 347) × 152 mm | 1,6 kg | naczynie r 121, h 152 + uchwyty | 3 · 6 · 3 | 1.0.1 |
 | newspapers | Gazety związane sznurkiem | 420 × 300 × 220 mm | 12,5 kg | prostopadłościan | 25 · 60 · 25 | 1.0.1 |
 | box | Karton zamknięty (F0201) | 400 × 300 × 300 mm | 4 kg | prostopadłościan | 1 · 1,6 · 1 | 1.0.0 |
+| barrel | Beczka stalowa 200 l (1A1) | Ø 585 × 880 mm | 18 kg | walec r 292, h 880 | 12 · 45 · 12 | 1.0.0 |
 
 Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zaczyna się zgniatać wzdłuż danej osi;
 `minScale` — do ilu procent wymiaru da się go zgnieść.
@@ -63,3 +64,9 @@ Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zacz
 - Klapy górne lekko uniesione przy szczelinie, taśma 48 mm zawinięta 7 cm na krótsze ściany, zakładka klejona.
 - Nadruki proceduralne na tekturze kraft: strzałki „góra”, kieliszek, recykling PAP 20, pieczątka BC/ECT, nr partii.
 - Pali się w piecu na papier; zgniata się łatwo (mały opór).
+
+### Beczka (`items/barrel.js`)
+- Profil 1A1: rąbki zwijane (Ø 585), ścianka Ø 572, 2 obręcze toczne +11 mm, wieko i dno wpuszczone o 14 mm.
+- Wieko i dno osobnymi krążkami z płaskim UV i własną teksturą (pierścienie usztywniające, rdza przy brzegu).
+- Korki gwintowane z kołnierzem i 8 żeberkami; 2 wgniecenia ścianki (losowe, stałe dla wariantu).
+- Farba: zacieki, rysy, odpryski, łaty rdzy (mapa szorstkości i metaliczności), rdza wzdłuż rąbków i obręczy.

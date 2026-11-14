@@ -241,6 +241,48 @@ RECIPES.cardboard = (m) => {
   m.map = tex(c); m.bumpMap = m.map; m.bumpScale = 0.25;
 };
 
+// farba beczki: kolor z zaciekami i rysami, rdza na rąbkach i obręczach (def.rustV — v profilu), łaty rdzy, napis UN
+RECIPES.drumPaint = (m, d) => {
+  const W = 1024, H = 1024, r = rng(30 + (d.seed || 0)), [c, x] = canvas(W, H), [rc, rx] = canvas(W, H);
+  const paint = new THREE.Color(d.paint);
+  x.fillStyle = '#' + paint.getHexString(); x.fillRect(0, 0, W, H);
+  rx.fillStyle = 'rgb(0,120,90)'; rx.fillRect(0, 0, W, H);   // G szorstkość, B metaliczność (farba)
+  const n = fbm(256, 256, [64, 16, 4], 3 + (d.seed || 0));
+  // zacieki / wyblaknięcie
+  for (let i = 0; i < 40; i++) { x.fillStyle = `rgba(255,255,255,${r() * 0.025})`; x.fillRect(r() * W, 0, 8 + r() * 40, H); }
+  const rust = (px, py, rad, a) => {
+    const g = x.createRadialGradient(px, py, 0, px, py, rad);
+    g.addColorStop(0, `rgba(92,45,20,${a})`); g.addColorStop(0.6, `rgba(120,62,28,${a * 0.7})`); g.addColorStop(1, 'rgba(120,62,28,0)');
+    x.fillStyle = g; x.beginPath(); x.arc(px, py, rad, 0, 7); x.fill();
+    const g2 = rx.createRadialGradient(px, py, 0, px, py, rad); g2.addColorStop(0, `rgba(0,240,60,${a})`); g2.addColorStop(1, 'rgba(0,240,60,0)');
+    rx.fillStyle = g2; rx.beginPath(); rx.arc(px, py, rad, 0, 7); rx.fill();
+  };
+  // rdza wzdłuż rąbków i obręczy
+  for (const v of d.rustV || []) { const py = (1 - v) * H; for (let i = 0; i < 70; i++) rust(r() * W, py + (r() - 0.5) * 18, 4 + r() * 16, 0.35 + r() * 0.5); }
+  // łaty rdzy i odpryski farby (goła stal)
+  for (let i = 0; i < 35; i++) rust(r() * W, r() * H, 6 + r() * 30, 0.2 + r() * 0.5);
+  for (let i = 0; i < 120; i++) { x.fillStyle = `rgba(150,150,145,${0.4 + r() * 0.4})`; x.fillRect(r() * W, r() * H, 1 + r() * 5, 1 + r() * 3); }
+  // rysy
+  x.strokeStyle = 'rgba(30,25,20,0.35)'; x.lineWidth = 1;
+  for (let i = 0; i < 90; i++) { const px = r() * W, py = r() * H, a = r() * Math.PI; x.beginPath(); x.moveTo(px, py); x.lineTo(px + Math.cos(a) * (10 + r() * 60), py + Math.sin(a) * (4 + r() * 20)); x.stroke(); }
+  // brud z szumu
+  const img = x.getImageData(0, 0, W, H);
+  for (let y = 0; y < H; y++) for (let xx = 0; xx < W; xx++) { const k = (y * W + xx) * 4, f = 0.82 + n[((y >> 2) % 256) * 256 + ((xx >> 2) % 256)] * 0.25; img.data[k] *= f; img.data[k + 1] *= f; img.data[k + 2] *= f; }
+  x.putImageData(img, 0, 0);
+  // wieko / dno: wytłoczone pierścienie usztywniające i rdza przy brzegu
+  if (d.head) {
+    for (const rr of [0.62, 0.8]) { x.strokeStyle = 'rgba(0,0,0,0.25)'; x.lineWidth = 6; x.beginPath(); x.arc(W / 2, H / 2, rr * W / 2, 0, 7); x.stroke(); x.strokeStyle = 'rgba(255,255,255,0.12)'; x.lineWidth = 3; x.beginPath(); x.arc(W / 2, H / 2 - 3, rr * W / 2, 0, 7); x.stroke(); }
+    for (let i = 0; i < 90; i++) { const a = r() * 7; rust(W / 2 + Math.cos(a) * W * 0.49, H / 2 + Math.sin(a) * H * 0.49, 6 + r() * 18, 0.3 + r() * 0.5); }
+    m.map = tex(c); m.roughnessMap = m.metalnessMap = tex(rc, { srgb: false }); m.roughness = 1; m.metalness = 1;
+    return;
+  }
+  // napis (oznakowanie UN) na środku ścianki
+  x.save(); x.translate(W * 0.25, H * 0.5); x.scale(0.45, 1); x.font = '700 30px Arial'; x.fillStyle = 'rgba(235,235,225,0.85)'; x.textAlign = 'center';
+  ['UN 1A1/Y1.4/150', 'PL/26/BMR 0817'].forEach((t, i) => x.fillText(t, 0, i * 36)); x.restore();
+  m.map = tex(c); m.roughnessMap = m.metalnessMap = tex(rc, { srgb: false }); m.roughness = 1; m.metalness = 1;
+  m.bumpMap = tex(grayCanvas(256, 256, n), { srgb: false, repeat: [4, 4] }); m.bumpScale = 0.4;
+};
+
 export function applyTextures() {
   for (const m of allMaterials()) {
     if (m.userData.textured) continue;
