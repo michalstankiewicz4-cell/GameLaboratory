@@ -19,4 +19,5 @@ export const MODELS = [
   { id: 'casting-line', label: 'Linia odlewnicza', group: 'Maszyny', load: () => import('./machines/casting-line.js') },
   { id: 'fence', label: 'Ogrodzenie', group: 'Otoczenie', load: () => import('./world/fence.js') },
   { id: 'buyback', label: 'Punkt skupu', group: 'Otoczenie', load: () => import('./world/buyback.js') },
+  { id: 'grapple-truck', label: 'Pojazd z chwytakiem', group: 'Pojazd', load: () => import('./vehicle/grapple-truck.js') },
 ];

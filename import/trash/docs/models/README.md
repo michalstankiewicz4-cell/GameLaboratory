@@ -117,3 +117,11 @@ Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zacz
 ### Punkt skupu (`world/buyback.js`)
 - Kontener 6 × 2,45 × 2,6 m przy bramie; `LAYOUT.scale` — waga (przedmioty na niej są wyceniane), `LAYOUT.window` — okienko (sprzedaż).
 - Cennik (zł/kg): aluminium 6,20, stal 1,10, mieszanka 0,90 — skup przyjmuje tylko sztabki.
+
+## Pojazd
+
+### Przeładowarka z chwytakiem (`vehicle/grapple-truck.js`)
+- Grupy ruchome: `podwozie` › `koło 0…3`; `nadwozie` (obrót y w `LAYOUT.slew`) › `wysięgnik` (x, 6,2 m) › `ramię` (x, 4,4 m) › `chwytak` › `szczęka 0…3` (x, otwarte 0,95 rad, zamknięte −0,12).
+- Szczęki: zakrzywione trójkąty (szerokie 0,5 m przy sworzniu, ostre na końcu), grubość malejąca, żebro wzdłuż.
+- Lewe koła: obrót o 180° wpisany w geometrię (doktor modeli źle ocenia obrócone grupy — test `facing`).
+- Doktor: LOD 1 czysty; LOD 0 — jedno zgłoszenie `facing` na korpusie opony w całym pojeździe (sama opona i każde koło osobno są czyste).
