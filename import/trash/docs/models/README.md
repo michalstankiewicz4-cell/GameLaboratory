@@ -11,6 +11,7 @@ Materiały — `js/models/materials.js` (dane), tekstury proceduralne — `js/re
 | tire-bike | Opona rowerowa 700×35C (ETRTO 37-622) | Ø 695 × 37 mm | 0,55 kg | pierścień 311–348 mm, h 35 | 0,08 · 0,05 · 0,08 | 1.0.0 |
 | tire-tractor | Opona traktorowa 18.4-38 (R-1) | Ø 1790 × 470 mm | 190 kg | pierścień 483–895 mm, h 470 | 35 · 18 · 35 | 1.0.0 |
 | can | Puszka aluminiowa 0,33 l | Ø 66 × 115 mm | 13,5 g | walec r 33, h 115,5 | 0,35 · 0,35 · 0,35 | 1.0.0 |
+| can-crushed | Puszka zgnieciona | Ø ~79 × 41 mm | 13,5 g | walec r 38, h 42 | 2,5 · 2,5 · 2,5 | 1.0.0 |
 
 Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zaczyna się zgniatać wzdłuż danej osi;
 `minScale` — do ilu procent wymiaru da się go zgnieść.
@@ -36,3 +37,9 @@ Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zacz
 - Wieczko: nit, języczek (wytłoczka z otworem na palec), otwór wlewu jako ciemna naklejka (polygonOffset).
 - Nadruk proceduralny (`canLabel`): farba mniej metaliczna niż goły aluminium (mapa metaliczności); warianty: piwo, cola, woda.
 - Opór uproszczony — taki sam w 3 osiach.
+
+### Puszka zgnieciona (`items/can-crushed.js`)
+- Budowana z puszki (gęsta ścianka: 36 pierścieni) przez odkształcenie: ścianka i szyjka ściśnięte do 15% wysokości,
+  promień rośnie na grzbietach fałd (fala trójkątna), grzbiety biegną zygzakiem (4 płaty) — wygląd wyboczenia w romby.
+- Wieczko przechylone o ~9° i przesunięte; dno lekko spłaszczone. Fałdy nie przenikają się (sprawdzone doktorem).
+- W grze cała puszka po zgnieceniu zamienia się w ten model.

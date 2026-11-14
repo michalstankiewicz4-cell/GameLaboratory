@@ -5,4 +5,5 @@ export const MODELS = [
   { id: 'tire-bike', label: 'Opona rowerowa', group: 'Przedmioty', load: () => import('./items/tire-bike.js') },
   { id: 'tire-tractor', label: 'Opona traktorowa', group: 'Przedmioty', load: () => import('./items/tire-tractor.js') },
   { id: 'can', label: 'Puszka aluminiowa', group: 'Przedmioty', load: () => import('./items/can.js') },
+  { id: 'can-crushed', label: 'Puszka zgnieciona', group: 'Przedmioty', load: () => import('./items/can-crushed.js') },
 ];

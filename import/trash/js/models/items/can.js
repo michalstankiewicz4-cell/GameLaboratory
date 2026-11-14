@@ -71,9 +71,9 @@ function lidParts(lod) {
   return out;
 }
 
-export function buildCan(variant = 0, lod = 0, profileFn = null) {
-  const prof = canProfile(lod ? 2 : 2);
-  const body = lathe(prof, lod ? 20 : 64);
+export function buildCan(variant = 0, lod = 0, wallSteps = 2, segs = null) {
+  const prof = canProfile(wallSteps);
+  const body = lathe(prof, segs || (lod ? 20 : 64));
   const g = new THREE.Group(); g.name = 'can';
   g.add(part('puszka', body, mat(labelMat(variant, prof, body))));
   lidParts(lod).forEach((p) => g.add(p));
