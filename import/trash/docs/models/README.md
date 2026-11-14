@@ -12,6 +12,7 @@ Materiały — `js/models/materials.js` (dane), tekstury proceduralne — `js/re
 | tire-tractor | Opona traktorowa 18.4-38 (R-1) | Ø 1790 × 470 mm | 190 kg | pierścień 483–895 mm, h 470 | 35 · 18 · 35 | 1.0.0 |
 | can | Puszka aluminiowa 0,33 l | Ø 66 × 115 mm | 13,5 g | walec r 33, h 115,5 | 0,35 · 0,35 · 0,35 | 1.0.0 |
 | can-crushed | Puszka zgnieciona | Ø ~79 × 41 mm | 13,5 g | walec r 38, h 42 | 2,5 · 2,5 · 2,5 | 1.0.0 |
+| pot | Garnek nierdzewny 6 l | Ø 240 (z uchwytami 347) × 152 mm | 1,6 kg | naczynie r 121, h 152 + uchwyty | 3 · 6 · 3 | 1.0.0 |
 
 Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zaczyna się zgniatać wzdłuż danej osi;
 `minScale` — do ilu procent wymiaru da się go zgnieść.
@@ -43,3 +44,8 @@ Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zacz
   promień rośnie na grzbietach fałd (fala trójkątna), grzbiety biegną zygzakiem (4 płaty) — wygląd wyboczenia w romby.
 - Wieczko przechylone o ~9° i przesunięte; dno lekko spłaszczone. Fałdy nie przenikają się (sprawdzone doktorem).
 - W grze cała puszka po zgnieceniu zamienia się w ten model.
+
+### Garnek (`items/pot.js`)
+- Profil z grubością ścianki (1,1 mm), zawinięty brzeg, dno kapsułowe 5,8 mm mniejszej średnicy.
+- Uchwyty: owalna rura po łuku, płytki przy ściance, po 2 nity z łbami na zewnątrz i w środku.
+- Zderzacz `cup`: dno + 14 wycinków ścianki + 2 prostopadłościany uchwytów — w środku mieszczą się mniejsze przedmioty.

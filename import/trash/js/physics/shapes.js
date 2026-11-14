@@ -31,6 +31,12 @@ export function shapeParts(d, s = [1, 1, 1]) {
     for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI * 2; for (const y of [y0, y0 + d.bottom]) p.push(d.r * Math.sin(a), y, d.r * Math.cos(a)); }
     hull(p);
     for (let i = 0; i < n; i++) wedge(d.r - d.wall, d.r, y0 + d.bottom * 0.5, d.h / 2, (i / n) * Math.PI * 2, ((i + 1) / n) * Math.PI * 2, 1);
+    // uchwyty: prostopadłościany po bokach (x — odległość końca uchwytu od osi, y — wysokość od środka)
+    if (d.handles) for (const sx of [-1, 1]) {
+      const H = d.handles, x0 = sx * d.r * 0.98, x1 = sx * H.x, p2 = [];
+      for (const x of [x0, x1]) for (const y of [H.y - H.h / 2, H.y + H.h / 2]) for (const z of [-H.d / 2, H.d / 2]) p2.push(x, y, z);
+      hull(p2);
+    }
   } else if (d.type === 'hulls') {
     d.hulls.forEach(hull);
   }

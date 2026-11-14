@@ -153,6 +153,24 @@ RECIPES.canLabel = (m, d) => {
   m.metalness = 1; m.roughness = 1;
 };
 
+// metal szczotkowany: rysy wzdłuż u (wokół bryły obrotowej), drobne zarysowania w poprzek
+RECIPES.brushed = (m) => {
+  const S = 512, r = rng(11), [c, x] = canvas(S, S);
+  x.fillStyle = 'rgb(0,150,0)'; x.fillRect(0, 0, S, S);
+  for (let i = 0; i < 2600; i++) {
+    const y = r() * S, g = 110 + r() * 90 | 0;
+    x.fillStyle = `rgba(0,${g},0,${0.12 + r() * 0.25})`; x.fillRect(0, y, S, 0.5 + r() * 0.8);
+  }
+  for (let i = 0; i < 160; i++) {   // rysy użytkowania
+    x.strokeStyle = `rgba(0,${200 + r() * 55 | 0},0,0.5)`; x.lineWidth = 0.6;
+    const x0 = r() * S, y0 = r() * S, a = r() * Math.PI; x.beginPath(); x.moveTo(x0, y0); x.lineTo(x0 + Math.cos(a) * (5 + r() * 40), y0 + Math.sin(a) * (5 + r() * 40)); x.stroke();
+  }
+  m.roughnessMap = tex(c, { srgb: false, repeat: [2, 8] }); m.roughness = Math.min(1, m.roughness * 1.6);
+  const [c2, x2] = canvas(S, S); x2.fillStyle = '#e8e8e8'; x2.fillRect(0, 0, S, S);
+  for (let i = 0; i < 900; i++) { const v = 205 + r() * 50 | 0; x2.fillStyle = `rgba(${v},${v},${v},0.25)`; x2.fillRect(0, r() * S, S, 0.5 + r() * 0.6); }
+  m.map = tex(c2, { repeat: [2, 8] });
+};
+
 export function applyTextures() {
   for (const m of allMaterials()) {
     if (m.userData.textured) continue;
