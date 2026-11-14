@@ -241,4 +241,20 @@ export function roundedBox(w, h, d, r = 0.01, seg = 2) {
   return g;
 }
 
+/** UV w metrach (rzut na płaszczyznę ściany wg największej składowej normalnej) — tekstury o stałej skali. */
+export function uvMeters(g, tile = 1, off = [0, 0]) {
+  if (!g.attributes.normal) g.computeVertexNormals();
+  const p = g.attributes.position, n = g.attributes.normal, uv = new Float32Array(p.count * 2);
+  for (let i = 0; i < p.count; i++) {
+    const ax = Math.abs(n.getX(i)), ay = Math.abs(n.getY(i)), az = Math.abs(n.getZ(i));
+    let u, v;
+    if (ay >= ax && ay >= az) { u = p.getX(i); v = -p.getZ(i) * Math.sign(n.getY(i) || 1); }
+    else if (ax >= az) { u = -p.getZ(i) * Math.sign(n.getX(i)); v = p.getY(i); }
+    else { u = p.getX(i) * Math.sign(n.getZ(i)); v = p.getY(i); }
+    uv[i * 2] = u / tile + off[0]; uv[i * 2 + 1] = v / tile + off[1];
+  }
+  g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+  return g;
+}
+
 export { V };

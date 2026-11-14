@@ -10,4 +10,5 @@ export const MODELS = [
   { id: 'newspapers', label: 'Gazety (związane)', group: 'Przedmioty', load: () => import('./items/newspapers.js') },
   { id: 'box', label: 'Karton zamknięty', group: 'Przedmioty', load: () => import('./items/box.js') },
   { id: 'barrel', label: 'Beczka metalowa', group: 'Przedmioty', load: () => import('./items/barrel.js') },
+  { id: 'platform', label: 'Platforma', group: 'Otoczenie', load: () => import('./world/platform.js') },
 ];

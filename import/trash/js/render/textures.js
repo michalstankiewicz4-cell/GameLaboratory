@@ -3,6 +3,7 @@
 import * as THREE from '../../vendor/three/three.module.js';
 import { allMaterials } from '../models/materials.js';
 import { rng } from '../models/geom.js';
+import { makeMaterial } from './matkit.js';
 
 let maxAniso = 8;
 export function setAnisotropy(n) { maxAniso = n; }
@@ -281,6 +282,36 @@ RECIPES.drumPaint = (m, d) => {
   ['UN 1A1/Y1.4/150', 'PL/26/BMR 0817'].forEach((t, i) => x.fillText(t, 0, i * 36)); x.restore();
   m.map = tex(c); m.roughnessMap = m.metalnessMap = tex(rc, { srgb: false }); m.roughness = 1; m.metalness = 1;
   m.bumpMap = tex(grayCanvas(256, 256, n), { srgb: false, repeat: [4, 4] }); m.bumpScale = 0.4;
+};
+
+// materiały PBR z MatKit (GameLaboratory): mapy barwy, normalnych i ORM; UV modelu w metrach (uvMeters)
+RECIPES.matkit = (m, d) => {
+  const k = makeMaterial(d.kit, { res: 512 }), km = k.material, rep = 1 / (d.kit.tile || 1);
+  for (const key of ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'aoMap']) { m[key] = km[key]; if (m[key]) { m[key].repeat.set(rep, rep); m[key].anisotropy = maxAniso; } }
+  m.roughness = 1; m.metalness = 1; m.aoMapIntensity = 0.8;
+  if (m.normalMap) m.normalScale.set(1, 1);
+};
+// pasy ostrzegawcze żółto-czarne (UV w metrach: pasy 10 cm pod kątem 45°), zużyte
+RECIPES.hazard = (m) => {
+  const S = 512, r = rng(17), [c, x] = canvas(S, S);
+  x.fillStyle = '#d9a514'; x.fillRect(0, 0, S, S); x.fillStyle = '#1b1a18';
+  for (let i = -S; i < S * 2; i += S / 2) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i + S / 4, 0); x.lineTo(i + S / 4 - S, S); x.lineTo(i - S, S); x.fill(); }
+  for (let i = 0; i < 400; i++) { x.fillStyle = `rgba(${r() < 0.5 ? '90,80,70' : '160,150,140'},${r() * 0.5})`; x.fillRect(r() * S, r() * S, 2 + r() * 14, 1 + r() * 5); }
+  m.map = tex(c, { repeat: [2.5, 2.5] });
+};
+// blacha ryflowana (łezki) — rampy i podesty
+RECIPES.treadPlate = (m) => {
+  const S = 256, [c, x] = canvas(S, S), r = rng(19);
+  x.fillStyle = '#000'; x.fillRect(0, 0, S, S);
+  for (let j = 0; j < 8; j++) for (let i = 0; i < 8; i++) {
+    const cx = (i + 0.5 + (j % 2) * 0.5) * S / 8, cy = (j + 0.5) * S / 8, a = (i + j) % 2 ? Math.PI / 4 : -Math.PI / 4;
+    x.save(); x.translate(cx, cy); x.rotate(a); const g = x.createLinearGradient(-5, 0, 5, 0); g.addColorStop(0, '#666'); g.addColorStop(0.5, '#fff'); g.addColorStop(1, '#666');
+    x.fillStyle = g; x.beginPath(); x.ellipse(0, 0, 4, 11, 0, 0, 7); x.fill(); x.restore();
+  }
+  m.bumpMap = tex(c, { srgb: false, repeat: [6, 6] }); m.bumpScale = 3;
+  const [c2, x2] = canvas(S, S); x2.fillStyle = '#8b9196'; x2.fillRect(0, 0, S, S);
+  for (let i = 0; i < 300; i++) { x2.fillStyle = `rgba(${r() < 0.3 ? '110,60,30' : '50,50,50'},${r() * 0.25})`; x2.fillRect(r() * S, r() * S, 2 + r() * 20, 2 + r() * 10); }
+  m.map = tex(c2, { repeat: [6, 6] });
 };
 
 export function applyTextures() {

@@ -23,6 +23,25 @@ export const DEFS = {
   cardboard: { color: '#ffffff', roughness: 0.95, metalness: 0, tex: 'cardboard' },
   cardboardPlain: { color: '#ffffff', roughness: 0.95, metalness: 0, tex: 'cardboardPlain' },
   cardboardEdge: { color: '#b78f5c', roughness: 0.95, metalness: 0, tex: 'corrugated' },
+  // otoczenie i maszyny (MatKit z GameLaboratory: js/render/matkit.js; UV w metrach, tile — metry na kafelek)
+  concrete: { color: '#ffffff', roughness: 1, metalness: 0, tex: 'matkit', kit: { kind: 'concrete', color: '#a6a39a', color2: '#77746c', tile: 2, roughness: 0.9, metalness: 0, pores: 0.5, wear: 0.15, dirt: 0.45, seed: 3 } },
+  concreteDark: { color: '#ffffff', roughness: 1, metalness: 0, tex: 'matkit', kit: { kind: 'concrete', color: '#7d7a72', color2: '#56534d', tile: 2, roughness: 0.92, metalness: 0, pores: 0.6, wear: 0.2, dirt: 0.6, seed: 4 } },
+  hazard: { color: '#ffffff', roughness: 0.6, metalness: 0.3, tex: 'hazard' },
+  steelPlate: { color: '#ffffff', roughness: 1, metalness: 1, tex: 'matkit', kit: { kind: 'plate', color: '#7c8388', color2: '#3d4246', tile: 2, roughness: 0.55, metalness: 0.85, wear: 0.35, dirt: 0.4, rust: 0.25, panels: 2, rivets: 1, seed: 5 } },
+  rusty: { color: '#ffffff', roughness: 1, metalness: 1, tex: 'matkit', kit: { kind: 'plate', color: '#6d6a66', color2: '#3a2f28', tile: 2, roughness: 0.6, metalness: 0.7, wear: 0.4, dirt: 0.4, rust: 0.7, panels: 3, seed: 6 } },
+  paintYellow: { color: '#ffffff', roughness: 1, metalness: 1, tex: 'matkit', kit: { kind: 'paint', color: '#d9a21b', color2: '#8a6a20', tile: 2, roughness: 0.5, metalness: 0.3, wear: 0.3, dirt: 0.35, rust: 0.15, seed: 7 } },
+  paintGreen: { color: '#ffffff', roughness: 1, metalness: 1, tex: 'matkit', kit: { kind: 'paint', color: '#3d5a46', color2: '#2a3a30', tile: 2, roughness: 0.55, metalness: 0.3, wear: 0.3, dirt: 0.4, rust: 0.2, seed: 8 } },
+  paintRed: { color: '#ffffff', roughness: 1, metalness: 1, tex: 'matkit', kit: { kind: 'paint', color: '#a83a26', color2: '#5a2418', tile: 2, roughness: 0.5, metalness: 0.3, wear: 0.3, dirt: 0.35, rust: 0.2, seed: 9 } },
+  paintGrey: { color: '#ffffff', roughness: 1, metalness: 1, tex: 'matkit', kit: { kind: 'paint', color: '#6c7176', color2: '#40444a', tile: 2, roughness: 0.5, metalness: 0.4, wear: 0.3, dirt: 0.35, rust: 0.15, seed: 10 } },
+  galvanized: { color: '#ffffff', roughness: 1, metalness: 1, tex: 'matkit', kit: { kind: 'metal', color: '#a9afb3', tile: 1, roughness: 0.45, metalness: 0.95, brushed: 0.1, wear: 0.2, dirt: 0.3, seed: 11 } },
+  treadPlate: { color: '#ffffff', roughness: 0.5, metalness: 0.9, tex: 'treadPlate' },
+  dirt: { color: '#ffffff', roughness: 1, metalness: 0, tex: 'matkit', kit: { kind: 'rock', color: '#6b5a45', color2: '#3e3326', tile: 4, roughness: 0.97, metalness: 0, cracks: 0.1, grains: 0.9, dirt: 0.6, seed: 12 } },
+  copper: { color: '#c27a4a', roughness: 0.35, metalness: 1, tex: 'brushed' },
+  refractory: { color: '#ffffff', roughness: 1, metalness: 0, tex: 'matkit', kit: { kind: 'brick', color: '#b9a48a', color2: '#5e5246', tile: 1, roughness: 0.92, metalness: 0, bricks: 6, wear: 0.3, dirt: 0.5, seed: 13 } },
+  glass: { color: '#9fb4bf', roughness: 0.08, metalness: 0.2, tex: null },
+  rubberBlack: { color: '#151515', roughness: 0.8, metalness: 0, tex: 'rubber' },
+  glowOrange: { color: '#ff7a1a', roughness: 1, metalness: 0, tex: null, emissive: '#ff6a10', emissiveIntensity: 3 },
+  lampLens: { color: '#fff6dc', roughness: 0.2, metalness: 0, tex: null, emissive: '#fff1c8', emissiveIntensity: 2 },
   tape: { color: '#b88c4e', roughness: 0.28, metalness: 0, tex: null },
 };
 
@@ -38,6 +57,7 @@ export function mat(id) {
   const d = DEFS[id];
   if (!d) throw new Error('nieznany materiał: ' + id);
   m = new THREE.MeshStandardMaterial({ color: new THREE.Color(d.color), roughness: d.roughness, metalness: d.metalness });
+  if (d.emissive) { m.emissive = new THREE.Color(d.emissive); m.emissiveIntensity = d.emissiveIntensity ?? 1; }
   m.name = id; m.userData.def = d;
   cache.set(id, m);
   return m;

@@ -70,3 +70,11 @@ Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zacz
 - Wieko i dno osobnymi krążkami z płaskim UV i własną teksturą (pierścienie usztywniające, rdza przy brzegu).
 - Korki gwintowane z kołnierzem i 8 żeberkami; 2 wgniecenia ścianki (losowe, stałe dla wariantu).
 - Farba: zacieki, rysy, odpryski, łaty rdzy (mapa szorstkości i metaliczności), rdza wzdłuż rąbków i obręczy.
+
+## Otoczenie
+
+### Platforma (`world/platform.js`)
+- Podest 26 × 18 × 0,5 m (beton), nawierzchnia z 117 płyt 2 × 2 m z fugami 2 cm, losowe osiadanie i przesunięcie tekstury.
+- Krawężnik 25 × 10 cm i pas na pionowej krawędzi w pasy ostrzegawcze; przerwa na rampę (5 × 7 m, ~4,6°).
+- 4 maszty kratowe 9 m (rury ocynkowane, krzyżulce co 1 m) z dwoma naświetlaczami.
+- `colliders()` — prostopadłościan podestu i bryła wypukła rampy; `TOP` — wysokość nawierzchni (0,56 m).
