@@ -1,0 +1,5 @@
+// Spis modeli: podgląd modeli (models.html) i doktor modeli (tools/doctor.mjs) biorą listę stąd.
+// Każdy wpis: { id, label, group, load: () => import(moduł) } — moduł eksportuje build(lod) i info.
+export const MODELS = [
+  { id: 'tire-car', label: 'Opona samochodowa', group: 'Przedmioty', load: () => import('./items/tire-car.js') },
+];
