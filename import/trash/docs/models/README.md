@@ -86,3 +86,9 @@ Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zacz
 - Otwór 1,2 × 0,8 m na wysokości 1,1 m; taca pochylona do otworu — położony przedmiot zsuwa się na ruszt.
 - `LAYOUT.burn` — strefa spalania (przedmioty z papieru i tektury w niej płoną), `LAYOUT.fire` — miejsce ognia.
 - `colliders()` — ściany z otworem, dach, ruszt, taca, komin.
+
+### Zgniatarka do puszek (`machines/can-crusher.js`)
+- Lej 2,2 × 1,6 m (zasyp ręczny z podestu lub chwytakiem) nad komorą 1,6 × 1,0 × 1,0 m.
+- Tłok poziomy (grupa `tłok`, ruch w x), siła 9 kN, prędkość 0,25 m/s; zasuwa (grupa `zasuwa`, ruch w y) otwiera wylot do zsypu i kosza.
+- `LAYOUT` — komora, tłok (start, koniec, siła), zasuwa, przycisk, kosz; `colliders()` — części nieruchome.
+- 9 kN zgniata puszki, opony rowerowe, kartony; beczki, garnki i opony samochodowe są za mocne.
