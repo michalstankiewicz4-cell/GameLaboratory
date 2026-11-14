@@ -13,4 +13,5 @@ export const MODELS = [
   { id: 'platform', label: 'Platforma', group: 'Otoczenie', load: () => import('./world/platform.js') },
   { id: 'furnace-paper', label: 'Piec na papier', group: 'Maszyny', load: () => import('./machines/furnace-paper.js') },
   { id: 'can-crusher', label: 'Zgniatarka do puszek', group: 'Maszyny', load: () => import('./machines/can-crusher.js') },
+  { id: 'metal-crusher', label: 'Zgniatarka do metalu', group: 'Maszyny', load: () => import('./machines/metal-crusher.js') },
 ];

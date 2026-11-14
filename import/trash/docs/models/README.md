@@ -91,4 +91,9 @@ Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zacz
 - Lej 2,2 × 1,6 m (zasyp ręczny z podestu lub chwytakiem) nad komorą 1,6 × 1,0 × 1,0 m.
 - Tłok poziomy (grupa `tłok`, ruch w x), siła 9 kN, prędkość 0,25 m/s; zasuwa (grupa `zasuwa`, ruch w y) otwiera wylot do zsypu i kosza.
 - `LAYOUT` — komora, tłok (start, koniec, siła), zasuwa, przycisk, kosz; `colliders()` — części nieruchome.
-- 9 kN zgniata puszki, opony rowerowe, kartony; beczki, garnki i opony samochodowe są za mocne.
+- 9 kN zgniata puszki, kartony, opony rowerowe i samochodowe, garnki; beczki, gazety i opony traktorowe są za mocne.
+
+### Zgniatarka do metalu (`machines/metal-crusher.js`)
+- Prasa pionowa: płyta dociskowa (grupa `płyta dociskowa`, ruch w y od 4,15 do 0,65 m), siła 400 kN — zgniata wszystko.
+- Komora otwarta od góry (załadunek chwytakiem lub z podestu po prawej), brama z przodu (grupa `brama`, ruch w y) do wyjęcia kostki.
+- Siłowniki na poprzecznicy, tłoczyska chowają się w cylindrach (całość 9,4 m wysokości).
