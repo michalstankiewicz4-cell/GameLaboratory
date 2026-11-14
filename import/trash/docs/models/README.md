@@ -78,3 +78,11 @@ Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zacz
 - Krawężnik 25 × 10 cm i pas na pionowej krawędzi w pasy ostrzegawcze; przerwa na rampę (5 × 7 m, ~4,6°).
 - 4 maszty kratowe 9 m (rury ocynkowane, krzyżulce co 1 m) z dwoma naświetlaczami.
 - `colliders()` — prostopadłościan podestu i bryła wypukła rampy; `TOP` — wysokość nawierzchni (0,56 m).
+
+## Maszyny
+
+### Piec na papier i drewno (`machines/furnace-paper.js`)
+- Skrzynia 2,4 × 2,2 × 2,0 m (blacha zardzewiała), wnętrze z cegły szamotowej 10 cm, ruszt 14 prętów nad świecącym żarem.
+- Otwór 1,2 × 0,8 m na wysokości 1,1 m; taca pochylona do otworu — położony przedmiot zsuwa się na ruszt.
+- `LAYOUT.burn` — strefa spalania (przedmioty z papieru i tektury w niej płoną), `LAYOUT.fire` — miejsce ognia.
+- `colliders()` — ściany z otworem, dach, ruszt, taca, komin.

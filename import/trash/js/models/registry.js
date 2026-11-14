@@ -11,4 +11,5 @@ export const MODELS = [
   { id: 'box', label: 'Karton zamknięty', group: 'Przedmioty', load: () => import('./items/box.js') },
   { id: 'barrel', label: 'Beczka metalowa', group: 'Przedmioty', load: () => import('./items/barrel.js') },
   { id: 'platform', label: 'Platforma', group: 'Otoczenie', load: () => import('./world/platform.js') },
+  { id: 'furnace-paper', label: 'Piec na papier', group: 'Maszyny', load: () => import('./machines/furnace-paper.js') },
 ];
