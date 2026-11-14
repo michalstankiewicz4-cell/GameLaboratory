@@ -18,7 +18,7 @@ export const LAYOUT = {
   boomLen: 6.2, stickLen: 4.4,
   cab: [-0.75, 2.35, 0.6], eye: [-0.75, 3.35, 0.75],
   grappleHang: 0.55,                        // od końca ramienia do osi szczęk
-  jawHinge: 0.36, jaws: 4, jawOpen: 0.95, jawClosed: -0.12,
+  jawHinge: 0.36, jaws: 4, jawOpen: -1.0, jawClosed: -0.1,   // kąt szczęki wokół sworznia: ujemny — otwarta
 };
 const box = (w, h, d, x, y, z, rx = 0, ry = 0, rz = 0) => { const g = new THREE.BoxGeometry(w, h, d); uvMeters(g, 1); return place(g, [x, y, z], [rx, ry, rz]); };
 const cyl = (r, h, x, y, z, s = 20, rx = 0, ry = 0, rz = 0) => { const g = new THREE.CylinderGeometry(r, r, h, s); uvMeters(g, 1); return place(g, [x, y, z], [rx, ry, rz]); };

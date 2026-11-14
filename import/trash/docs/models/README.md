@@ -121,7 +121,7 @@ Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zacz
 ## Pojazd
 
 ### Przeładowarka z chwytakiem (`vehicle/grapple-truck.js`)
-- Grupy ruchome: `podwozie` › `koło 0…3`; `nadwozie` (obrót y w `LAYOUT.slew`) › `wysięgnik` (x, 6,2 m) › `ramię` (x, 4,4 m) › `chwytak` › `szczęka 0…3` (x, otwarte 0,95 rad, zamknięte −0,12).
+- Grupy ruchome: `podwozie` › `koło 0…3`; `nadwozie` (obrót y w `LAYOUT.slew`) › `wysięgnik` (x, 6,2 m) › `ramię` (x, 4,4 m) › `chwytak` › `szczęka 0…3` (x, otwarte −1,0 rad, zamknięte −0,1).
 - Szczęki: zakrzywione trójkąty (szerokie 0,5 m przy sworzniu, ostre na końcu), grubość malejąca, żebro wzdłuż.
 - Lewe koła: obrót o 180° wpisany w geometrię (doktor modeli źle ocenia obrócone grupy — test `facing`).
 - Doktor: LOD 1 czysty; LOD 0 — jedno zgłoszenie `facing` na korpusie opony w całym pojeździe (sama opona i każde koło osobno są czyste).

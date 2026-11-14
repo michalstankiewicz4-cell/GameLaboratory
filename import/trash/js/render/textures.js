@@ -324,7 +324,7 @@ RECIPES.cast = (m) => {
 // siatka plecionka: romby z drutu (kanał alfa), oczko 5 cm — tekstura 20 oczek na metr
 RECIPES.chainLink = (m) => {
   const S = 256, [c, x] = canvas(S, S);
-  x.clearRect(0, 0, S, S); x.strokeStyle = '#ffffff'; x.lineWidth = 3.2; x.lineCap = 'round';
+  x.clearRect(0, 0, S, S); x.strokeStyle = '#ffffff'; x.lineWidth = 6; x.lineCap = 'round';
   const n = 5, s = S / n;
   for (let i = -1; i <= n; i++) { x.beginPath(); x.moveTo(i * s, 0); x.lineTo(i * s + S, S); x.stroke(); x.beginPath(); x.moveTo(i * s + S, 0); x.lineTo(i * s, S); x.stroke(); }
   m.map = tex(c, { repeat: [4, 4] }); m.alphaMap = null;

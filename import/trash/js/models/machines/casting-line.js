@@ -26,6 +26,11 @@ function trough() {
   steel.push(along(TW + 0.1, 0.02, L, 0, -TD / 2 - 0.035), along(0.01, TD + 0.08, L, -TW / 2 - 0.045, 0), along(0.01, TD + 0.08, L, TW / 2 + 0.045, 0));
   lin.push(along(TW + 0.08, 0.04, L, 0, -TD / 2 - 0.005), along(0.04, TD + 0.04, L, -TW / 2 - 0.02, 0.01), along(0.04, TD + 0.04, L, TW / 2 + 0.02, 0.01));
   lin.push(box(TW + 0.08, TD + 0.04, 0.04, 0, Y_A + 0.01, -0.02));   // ścianka czołowa (zamknięty początek)
+  // dysza spustowa na końcu rynny: lejek i krótka rura w dół nad formę
+  const ny = Y_B - TD / 2 - 0.02, nz = MZ;
+  steel.push(box(TW + 0.1, 0.02, MZ - TL + 0.1, 0, ny + 0.01, (TL + MZ) / 2 - 0.02));
+  steel.push(place(new THREE.CylinderGeometry(0.05, 0.035, ny - MY - 0.03, 16, 1, true), [0, (ny + MY + 0.03) / 2, nz]));
+  lin.push(place(new THREE.CylinderGeometry(0.036, 0.025, ny - MY - 0.031, 16), [0, (ny + MY + 0.03) / 2, nz]));
   for (const z of [0.25, TL - 0.35]) { const y = Y_A - (Y_A - Y_B) * z / TL; steel.push(box(0.06, y - 0.1, 0.06, -0.12, (y - 0.1) / 2, z), box(0.06, y - 0.1, 0.06, 0.12, (y - 0.1) / 2, z), box(0.3, 0.04, 0.06, 0, y - 0.12, z), box(0.4, 0.015, 0.25, 0, 0.0075, z)); }
   return { steel: merge(steel), lining: merge(lin) };
 }
@@ -98,4 +103,4 @@ export function colliders() {
   return c;
 }
 
-export const info = { id: 'casting-line', name: 'Rynna i przenośnik z formami', version: '1.0.0' };
+export const info = { id: 'casting-line', name: 'Rynna i przenośnik z formami', version: '1.0.1' };
