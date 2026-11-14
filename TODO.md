@@ -25,6 +25,10 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 - [ ] **Opisy statków i rzeczy w grze** (właściciel, 2026-11-13): opisy modeli i przedmiotów (nazwa, historia, dane)
   pisane przy laboratorium i podpinane pod prefabrykaty — do wiki, podpowiedzi i ekranów gry; może część
   laboratorium scenariusza.
+- [ ] **Automatyczna wiki gry** (właściciel, 2026-11-14): wiki tworzona sama z tego, co jest w grze (scena,
+  prefabrykaty, zasoby) — wszystkie modele, postacie, rośliny, pojazdy, efekty, drzewka; każda strona: nazwa, opis
+  (z „Opisów statków i rzeczy”), miniatura renderowana z modelu, dane (wymiary, prędkość, środowisko, zachowania),
+  kategoria, powiązania; łączy się z „Wiki w menu Pomoc” (wiki silnika) i z obrazami z laboratorium sztuki.
 - [ ] **Laboratorium animacji** (do rozważenia): chód ludzi i stworów jako zachowanie, animacje modeli.
 - [ ] **Grawitacja statków w kosmosie** (propozycja do decyzji): statki w scenie przyciągane przez ciała niebieskie,
   jak orbity.
