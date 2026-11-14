@@ -9,6 +9,7 @@ Materiały — `js/models/materials.js` (dane), tekstury proceduralne — `js/re
 |---|---|---|---|---|---|---|
 | tire-car | Opona samochodowa 205/55 R16 | Ø 632 × 214 mm | 8,6 kg | pierścień 203–316 mm, h 205 | 4,5 · 2,2 · 4,5 | 1.0.0 |
 | tire-bike | Opona rowerowa 700×35C (ETRTO 37-622) | Ø 695 × 37 mm | 0,55 kg | pierścień 311–348 mm, h 35 | 0,08 · 0,05 · 0,08 | 1.0.0 |
+| tire-tractor | Opona traktorowa 18.4-38 (R-1) | Ø 1790 × 470 mm | 190 kg | pierścień 483–895 mm, h 470 | 35 · 18 · 35 | 1.0.0 |
 
 Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zaczyna się zgniatać wzdłuż danej osi;
 `minScale` — do ilu procent wymiaru da się go zgnieść.
@@ -23,3 +24,8 @@ Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zacz
 - Trekkingowa 700×35C: przekrój prawie okrągły, ścianki 1,4 mm, boki z beżowej gumy, czarny pas bieżnika (mapa barwy na korpusie).
 - Bieżnik: 120 podziałek, środek z małych klocków na przemian, kostki barkowe co drugą podziałkę; napisy rozmiaru i ciśnienia.
 - Bardzo mały opór zgniecenia — zgniata się w każdej zgniatarce.
+
+### Opona traktorowa (`items/tire-tractor.js`)
+- Rolnicza 18.4-38 (R-1, dętkowa): łapy 58 mm szer., 38 mm wys., w łuku ~30–50°, strony przesunięte o pół podziałki.
+- Łapy budowane jako przekrój trapezowy wzdłuż ścieżki na powierzchni korpusu (`add.lug`), osadzone w korpusie.
+- 190 kg — za ciężka do noszenia, przenosi się ją pojazdem z chwytakiem.

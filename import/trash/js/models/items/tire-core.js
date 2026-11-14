@@ -83,7 +83,7 @@ export function buildTire(spec, lod = 0) {
     if (ay <= Wt / 2) return Rg - 0.004 * H / 0.1 * Math.pow(ay / (Wt / 2), 2) - 0.0015;
     // bark: interpolacja z przekroju
     for (let i = 1; i < hs.length; i++) if (hs[i][0] >= ay) { const [y0, r0_] = hs[i - 1], [y1, r1_] = hs[i]; return r0_ + (r1_ - r0_) * (ay - y0) / (y1 - y0) - 0.0015; }
-    return Rb;
+    return hs.reduce((m, p) => (p[0] > m[0] ? p : m))[1] - 0.0015;   // poza najszerszym miejscem: jak w najszerszym
   };
   const P = (th, y, r) => V(r * Math.sin(th), y, r * Math.cos(th));
   const blocks = [];
@@ -118,7 +118,7 @@ export function buildTire(spec, lod = 0) {
         let ds = (b[0] - a[0]) * R, dy = b[1] - a[1]; const l = Math.hypot(ds, dy) || 1; ds /= l; dy /= l;
         const ox = -dy * w / 2, oy = ds * w / 2;   // prostopadle, w łuku i y
         const L = [th + ox / R, y + oy], Rr = [th - ox / R, y - oy];
-        const rb = (yy) => baseR(yy) - 0.004, rt = (yy) => baseR(yy) + 0.0015 + h;
+        const rb = (yy) => baseR(yy) - Math.max(0.004, h * 0.3), rt = (yy) => baseR(yy) + 0.0015 + h;
         const tp = 0.18;   // zwężenie łapy ku górze (trapez)
         const Lt = [th + ox * (1 - tp) / R, y + oy * (1 - tp)], Rt = [th - ox * (1 - tp) / R, y - oy * (1 - tp)];
         rings.push([P(L[0], L[1], rb(L[1])), P(Rr[0], Rr[1], rb(Rr[1])), P(Rt[0], Rt[1], rt(Rt[1])), P(Lt[0], Lt[1], rt(Lt[1]))]);

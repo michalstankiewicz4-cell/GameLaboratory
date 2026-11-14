@@ -3,4 +3,5 @@
 export const MODELS = [
   { id: 'tire-car', label: 'Opona samochodowa', group: 'Przedmioty', load: () => import('./items/tire-car.js') },
   { id: 'tire-bike', label: 'Opona rowerowa', group: 'Przedmioty', load: () => import('./items/tire-bike.js') },
+  { id: 'tire-tractor', label: 'Opona traktorowa', group: 'Przedmioty', load: () => import('./items/tire-tractor.js') },
 ];
