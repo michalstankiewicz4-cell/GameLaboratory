@@ -97,3 +97,9 @@ Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zacz
 - Prasa pionowa: płyta dociskowa (grupa `płyta dociskowa`, ruch w y od 4,15 do 0,65 m), siła 400 kN — zgniata wszystko.
 - Komora otwarta od góry (załadunek chwytakiem lub z podestu po prawej), brama z przodu (grupa `brama`, ruch w y) do wyjęcia kostki.
 - Siłowniki na poprzecznicy, tłoczyska chowają się w cylindrach (całość 9,4 m wysokości).
+
+### Piec indukcyjny (`machines/induction-furnace.js`)
+- Tygiel Ø 1,1 × 1,2 m, wnętrze Ø 0,7 × 0,95 m (~365 l) — po zgnieceniu mieści się więcej złomu.
+- Grupa `tygiel` obraca się wokół osi x przy wylewie (`LAYOUT.pivot`, do 1,75 rad); `LAYOUT.inner` — wnętrze, `LAYOUT.spout` — dzióbek.
+- `crucibleColliders()` — dno i 12 wycinków ścianki (obracają się z tyglem), `colliders()` — reszta.
+- Część `stopiony metal` — powierzchnia wytopu (gra ustawia poziom i shader lawy).

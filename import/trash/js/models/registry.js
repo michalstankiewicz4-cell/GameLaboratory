@@ -14,4 +14,5 @@ export const MODELS = [
   { id: 'furnace-paper', label: 'Piec na papier', group: 'Maszyny', load: () => import('./machines/furnace-paper.js') },
   { id: 'can-crusher', label: 'Zgniatarka do puszek', group: 'Maszyny', load: () => import('./machines/can-crusher.js') },
   { id: 'metal-crusher', label: 'Zgniatarka do metalu', group: 'Maszyny', load: () => import('./machines/metal-crusher.js') },
+  { id: 'induction-furnace', label: 'Piec indukcyjny', group: 'Maszyny', load: () => import('./machines/induction-furnace.js') },
 ];
