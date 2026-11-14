@@ -15,4 +15,6 @@ export const MODELS = [
   { id: 'can-crusher', label: 'Zgniatarka do puszek', group: 'Maszyny', load: () => import('./machines/can-crusher.js') },
   { id: 'metal-crusher', label: 'Zgniatarka do metalu', group: 'Maszyny', load: () => import('./machines/metal-crusher.js') },
   { id: 'induction-furnace', label: 'Piec indukcyjny', group: 'Maszyny', load: () => import('./machines/induction-furnace.js') },
+  { id: 'ingot', label: 'Sztabka', group: 'Przedmioty', load: () => import('./items/ingot.js') },
+  { id: 'casting-line', label: 'Linia odlewnicza', group: 'Maszyny', load: () => import('./machines/casting-line.js') },
 ];

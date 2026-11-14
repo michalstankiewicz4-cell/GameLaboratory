@@ -314,6 +314,13 @@ RECIPES.treadPlate = (m) => {
   m.map = tex(c2, { repeat: [6, 6] });
 };
 
+// powierzchnia odlewu: chropowata (szum w szorstkości i wypukłości), lekkie przebarwienia
+RECIPES.cast = (m) => {
+  const S = 256, n = fbm(S, S, [32, 8, 2], 41);
+  m.roughnessMap = tex(grayCanvas(S, S, n.map((v) => 0.6 + v * 0.4)), { srgb: false, repeat: [3, 3] });
+  m.bumpMap = tex(grayCanvas(S, S, fbm(S, S, [16, 4], 43)), { srgb: false, repeat: [3, 3] }); m.bumpScale = 0.6;
+};
+
 export function applyTextures() {
   for (const m of allMaterials()) {
     if (m.userData.textured) continue;

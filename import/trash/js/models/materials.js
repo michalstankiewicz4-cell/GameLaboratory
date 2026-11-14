@@ -38,6 +38,7 @@ export const DEFS = {
   dirt: { color: '#ffffff', roughness: 1, metalness: 0, tex: 'matkit', kit: { kind: 'rock', color: '#6b5a45', color2: '#3e3326', tile: 4, roughness: 0.97, metalness: 0, cracks: 0.1, grains: 0.9, dirt: 0.6, seed: 12 } },
   copper: { color: '#c27a4a', roughness: 0.35, metalness: 1, tex: 'brushed' },
   refractory: { color: '#ffffff', roughness: 1, metalness: 0, tex: 'matkit', kit: { kind: 'brick', color: '#b9a48a', color2: '#5e5246', tile: 1, roughness: 0.92, metalness: 0, bricks: 6, wear: 0.3, dirt: 0.5, seed: 13 } },
+  castIron: { color: '#ffffff', roughness: 1, metalness: 1, tex: 'matkit', kit: { kind: 'metal', color: '#4a4c4e', tile: 0.5, roughness: 0.75, metalness: 0.8, brushed: 0, wear: 0.4, dirt: 0.5, rust: 0.3, seed: 14 } },
   glass: { color: '#9fb4bf', roughness: 0.08, metalness: 0.2, tex: null },
   rubberBlack: { color: '#151515', roughness: 0.8, metalness: 0, tex: 'rubber' },
   glowOrange: { color: '#ff7a1a', roughness: 1, metalness: 0, tex: null, emissive: '#ff6a10', emissiveIntensity: 3 },

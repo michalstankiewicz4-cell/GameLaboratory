@@ -16,6 +16,7 @@ Materiały — `js/models/materials.js` (dane), tekstury proceduralne — `js/re
 | newspapers | Gazety związane sznurkiem | 420 × 300 × 220 mm | 12,5 kg | prostopadłościan | 25 · 60 · 25 | 1.0.1 |
 | box | Karton zamknięty (F0201) | 400 × 300 × 300 mm | 4 kg | prostopadłościan | 1 · 1,6 · 1 | 1.0.0 |
 | barrel | Beczka stalowa 200 l (1A1) | Ø 585 × 880 mm | 18 kg | walec r 292, h 880 | 12 · 45 · 12 | 1.0.0 |
+| ingot | Sztabka (aluminium / stal / mieszanka) | 400 × 120 × 80 mm | 8,6 / 25 / 16,6 kg | bryła wypukła | — | 1.0.0 |
 
 Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zaczyna się zgniatać wzdłuż danej osi;
 `minScale` — do ilu procent wymiaru da się go zgnieść.
@@ -103,3 +104,8 @@ Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zacz
 - Grupa `tygiel` obraca się wokół osi x przy wylewie (`LAYOUT.pivot`, do 1,75 rad); `LAYOUT.inner` — wnętrze, `LAYOUT.spout` — dzióbek.
 - `crucibleColliders()` — dno i 12 wycinków ścianki (obracają się z tyglem), `colliders()` — reszta.
 - Część `stopiony metal` — powierzchnia wytopu (gra ustawia poziom i shader lawy).
+
+### Linia odlewnicza (`machines/casting-line.js`) i sztabka (`items/ingot.js`)
+- Rynna 2,45 m ze spadkiem 0,4 m (wnętrze 13 × 10 cm), ustawiona pod wylewem przechylonego pieca.
+- Przenośnik z 8 formami (podziałka 0,5 m, grupa `formy`); forma pod końcem rynny (`LAYOUT.pour`) napełnia się, potem przenośnik przesuwa formy o podziałkę.
+- Wnęka formy = kształt sztabki (`INGOT`, 3,2 l); masa sztabki zależy od metalu (gęstość wariantu).
