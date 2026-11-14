@@ -9,13 +9,15 @@ import * as newspapers from '../models/items/newspapers.js';
 import * as box from '../models/items/box.js';
 import * as barrel from '../models/items/barrel.js';
 import * as ingot from '../models/items/ingot.js';
+import * as ingotSmall from '../models/items/ingot-small.js';
 
+// sell: cena w skupie (zł/kg) dla przedmiotów skupowanych w całości (opony); sztabki — cennik wg składu (buyback.js)
 // metal: rodzaj stopu do pieca indukcyjnego (temperatura topnienia °C, gęstość kg/m³); burn: pali się w piecu na papier
 export const METALS = { aluminium: { melt: 660, density: 2700 }, steel: { melt: 1450, density: 7850 } };
 export const KINDS = {
-  'tire-car': { mod: tireCar, label: 'opona samochodowa' },
-  'tire-bike': { mod: tireBike, label: 'opona rowerowa' },
-  'tire-tractor': { mod: tireTractor, label: 'opona traktorowa' },
+  'tire-car': { mod: tireCar, label: 'opona samochodowa', sell: 0.3 },
+  'tire-bike': { mod: tireBike, label: 'opona rowerowa', sell: 0.3 },
+  'tire-tractor': { mod: tireTractor, label: 'opona traktorowa', sell: 0.3 },
   can: { mod: can, label: 'puszka', metal: 'aluminium', crushTo: 'can-crushed' },
   'can-crushed': { mod: canCrushed, label: 'puszka zgnieciona', metal: 'aluminium' },
   pot: { mod: pot, label: 'garnek', metal: 'steel' },
@@ -23,6 +25,7 @@ export const KINDS = {
   box: { mod: box, label: 'karton', burn: 18 },
   barrel: { mod: barrel, label: 'beczka', metal: 'steel' },
   ingot: { mod: ingot, label: 'sztabka', ingot: true },
+  'ingot-small': { mod: ingotSmall, label: 'mała sztabka', ingot: true },
 };
 export const STACK_KINDS = ['tire-car', 'tire-bike', 'tire-tractor', 'can', 'can-crushed', 'pot', 'newspapers', 'box', 'barrel'];
 export const variantsOf = (k) => KINDS[k].mod.info.variants || 1;

@@ -18,7 +18,8 @@ export class MetalFlow {
     this.tn = new THREE.Vector3(0, this.tdir.z, -this.tdir.y);   // normalna dna (w górę)
     this.floorH = -T.depth / 2 + 0.015 - 0.005; this.halfW = T.width / 2;
     this.sinks = [];                                      // formy: { x (lokalnie), y góry, z, add(dV, al, dens) }
-    this.wasted = 0; this.m4 = new THREE.Matrix4(); this.q = new THREE.Quaternion(); this.tmp = new THREE.Vector3();
+    this.wasted = 0; this.held = []; this.small = false;   // rozdzielacz: false — duże formy (LAYOUT.pour), true — małe (LAYOUT.pour2)
+     this.m4 = new THREE.Matrix4(); this.q = new THREE.Quaternion(); this.tmp = new THREE.Vector3();
   }
   emit(worldPos, worldVel, mix) {
     if (this.n >= MAX) return;
@@ -28,6 +29,11 @@ export class MetalFlow {
   kill(k) { const j = --this.n; if (k !== j) { this.p.copyWithin(k * 3, j * 3, j * 3 + 3); this.v.copyWithin(k * 3, j * 3, j * 3 + 3); this.al[k] = this.al[j]; this.dens[k] = this.dens[j]; } }
   step(dt) {
     const P = this.p, Vv = this.v, d = this.tmp;
+    // metal zatrzymany w dyszy na czas przesuwu przenośnika — wypuszczany, gdy forma stoi pod dyszą
+    if (!this.blocked && this.held.length && this.n < MAX) {
+      const z = (this.small ? this.L.pour2 : this.L.pour)[2], y = this.L.moldTop + 0.12;
+      for (let r = 0; r < 3 && this.held.length; r++) { const [al, dens] = this.held.shift(), k = this.n++; this.p.set([(Math.random() - 0.5) * 0.03, y, z], k * 3); this.v.set([0, -0.8, 0], k * 3); this.al[k] = al; this.dens[k] = dens; }
+    }
     for (let k = this.n - 1; k >= 0; k--) {
       const i = k * 3;
       Vv[i + 1] -= 9.81 * dt;
@@ -37,8 +43,10 @@ export class MetalFlow {
       const s = d.dot(this.tdir), h = d.dot(this.tn), x = P[i];
       // dysza na końcu rynny: metal spływa pionowo w dół do formy pod nią
       if (s >= this.tlen / 2 && s < this.tlen / 2 + 0.12 && Math.abs(x) < this.halfW + 0.06 && h < this.floorH + 0.18 && h > this.floorH - 0.12) {
-        P[i] = (Math.random() - 0.5) * 0.03; P[i + 2] = this.L.pour[2] + (Math.random() - 0.5) * 0.02;
+        P[i] = (Math.random() - 0.5) * 0.03; P[i + 2] = (this.small ? this.L.pour2 : this.L.pour)[2] + (Math.random() - 0.5) * 0.02;
         const sp = Math.hypot(Vv[i], Vv[i + 1], Vv[i + 2]); Vv[i] = 0; Vv[i + 2] = 0; Vv[i + 1] = -Math.max(0.6, sp * 0.4);
+        // przenośnik pod dyszą jedzie: metal czeka w dyszy (nie leje się między formy)
+        if (this.blocked) { this.held.push([this.al[k], this.dens[k]]); this.kill(k); }
         continue;
       }
       if (Math.abs(s) < this.tlen / 2 && Math.abs(x) < this.halfW + 0.06 && h < this.floorH + 0.18 && h > this.floorH - 0.08) {
@@ -57,7 +65,7 @@ export class MetalFlow {
         if (Math.abs(P[i] - m.x()) < m.hx && Math.abs(P[i + 2] - m.z) < m.hz && P[i + 1] < m.y + 0.01) { m.add(this.dV, this.al[k], this.dens[k]); this.kill(k); done = true; break; }
       }
       if (done) continue;
-      if (P[i + 1] < this.L.moldTop - 0.02 && Math.abs(P[i + 2] - this.L.moldZ) < 0.36 && P[i] > this.L.conveyor.x0 - 0.1 && P[i] < this.L.conveyor.x1 + 0.1) { this.kill(k); this.wasted += this.dV; continue; }
+      if (P[i + 1] < this.L.moldTop - 0.02 && (Math.abs(P[i + 2] - this.L.moldZ) < 0.36 || Math.abs(P[i + 2] - this.L.moldZ2) < 0.36) && P[i] > this.L.conveyor.x0 - 0.1 && P[i] < this.L.conveyor.x1 + 0.1) { this.kill(k); this.wasted += this.dV; continue; }
       if (P[i + 1] < 0.01) { this.kill(k); this.wasted += this.dV; }
     }
     // rysowanie: kulki rozciągnięte wzdłuż prędkości

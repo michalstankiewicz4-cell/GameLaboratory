@@ -68,7 +68,7 @@ export class InductionFurnace {
     // wylewanie: próg przechyłu zależy od zapełnienia; szybkość rośnie z przechyłem
     const fill = Math.min(1, this.melt.volume / this.cap), th0 = (1 - fill) * 1.25 + 0.1;
     if (this.tilt > th0 && this.melt.volume > 0) {
-      const rate = Math.min(this.melt.volume, (this.tilt - th0) * 0.006 * dt);   // m³
+      const rate = Math.min(this.melt.volume, (this.tilt - th0) * 0.004 * dt);   // m³
       this.pourAcc += rate;
       const mix = this.mix(), m = this.melt.mass, tot = m.aluminium + m.steel, massOut = rate * mix.density;
       m.aluminium -= massOut * (tot ? m.aluminium / tot : 1); m.steel -= massOut * (tot ? m.steel / tot : 0);
