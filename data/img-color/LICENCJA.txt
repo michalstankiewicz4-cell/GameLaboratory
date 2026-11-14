@@ -19,7 +19,7 @@ Z każdej kategorii wzięto pierwsze 600 zdjęć ze zbioru treningowego. Każde 
 - powiększono ×2 do 64×40 (bicubic),
 - sprowadzono do 256 kolorów wspólnej palety (median cut z próbki wszystkich kategorii, bez ditheringu).
 Obrazki ułożono w siatkę po 25 w wierszu, jeden plik PNG z paletą na kategorię. Paleta jest też
-w manifest.json. Robi to skrypt tools/img/build_cifar.py.
+w manifest.json. Robi to skrypt tools/img/build-cifar.py.
 
 KATEGORIE
 ---------

@@ -7,7 +7,7 @@ require('wabt')().then(w => {
   mod.validate();
   const { buffer } = mod.toBinary({});
   const b64 = Buffer.from(buffer).toString('base64');
-  const out = `// Wygenerowane przez tools/lang/build_wasm.js z tools/lang/matmul.wat. Nie edytuj ręcznie.
+  const out = `// Wygenerowane przez tools/lang/build-wasm.js z tools/lang/matmul.wat. Nie edytuj ręcznie.
 // Mnożenie macierzy w WebAssembly z SIMD (f32x4). ${buffer.length} bajtów.
 const WASM_MATMUL_B64 = '${b64}';
 `;

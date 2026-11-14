@@ -1,4 +1,4 @@
-// Zombie Generator page (pixel/zombies.html): original zombies from a seed, every trait adjustable, animated in 12
+// Zombie Generator page (labs/zombies.html): original zombies from a seed, every trait adjustable, animated in 12
 // frames from any of eight directions, exported as sprite sheets for Unity (512×512 frames in a 6×2 grid, pivot at
 // the feet, 100 pixels per unit) with a JSON description and an editor script that slices them — realistic, or as
 // pixel art through the Pixel Studio pipeline (palette, majority downsampling, selective outline, clean-up).

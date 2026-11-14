@@ -125,8 +125,8 @@ async function loadData() {
   });
   const p = document.createElement('p'); p.className = 'note';
   p.textContent = COLOR
-    ? 'Każdy plik PNG to siatka obrazków 64×40 z jedną wspólną paletą 256 kolorów, dokładnie to, z czego uczy się sieć. Robi je skrypt tools/img/build_cifar.py: bierze pierwsze 600 zdjęć każdej kategorii z CIFAR-10 (32×32), wycina środkowy pas 32×20, powiększa ×2 i przypisuje każdy piksel najbliższemu kolorowi palety. Statystyka i transformer zgadują numer koloru (1 z 256), VAE, GAN i dyfuzja rysują R, G, B, a my wybieramy najbliższy kolor palety. Ostatnie 10% obrazków każdej kategorii służy tylko do sprawdzania.'
-    : 'Każdy plik PNG to siatka rysunków 16×16, dokładnie to, z czego uczy się sieć. Robi je skrypt tools/img/build_quickdraw.py: pobiera pierwsze 2000 rysunków każdej kategorii z Quick, Draw!, pomniejsza je z 28×28 do 16×16 i sprowadza do 16 odcieni. Ostatnie 10% rysunków każdej kategorii służy tylko do sprawdzania.';
+    ? 'Każdy plik PNG to siatka obrazków 64×40 z jedną wspólną paletą 256 kolorów, dokładnie to, z czego uczy się sieć. Robi je skrypt tools/img/build-cifar.py: bierze pierwsze 600 zdjęć każdej kategorii z CIFAR-10 (32×32), wycina środkowy pas 32×20, powiększa ×2 i przypisuje każdy piksel najbliższemu kolorowi palety. Statystyka i transformer zgadują numer koloru (1 z 256), VAE, GAN i dyfuzja rysują R, G, B, a my wybieramy najbliższy kolor palety. Ostatnie 10% obrazków każdej kategorii służy tylko do sprawdzania.'
+    : 'Każdy plik PNG to siatka rysunków 16×16, dokładnie to, z czego uczy się sieć. Robi je skrypt tools/img/build-quickdraw.py: pobiera pierwsze 2000 rysunków każdej kategorii z Quick, Draw!, pomniejsza je z 28×28 do 16×16 i sprowadza do 16 odcieni. Ostatnie 10% rysunków każdej kategorii służy tylko do sprawdzania.';
   $('files').replaceChildren(p, ul);
   $('genCat').innerHTML = ''; catData.forEach((c, i) => $('genCat').add(new Option(c.name, i)));
   worker.postMessage({ cmd: 'data', cats: catData.map(c => ({ name: c.name, pix: c.pix })), cfg: { w: W, h: H, levels: LV, palette: COLOR ? man.palette : null } });

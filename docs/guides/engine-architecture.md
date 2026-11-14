@@ -29,7 +29,7 @@ i edytor ją pokazują, AI ją zmienia.
  zasoby, mat.  UI gry                      i przeglądarka terenu           i gra przez API
 ```
 
-Oznaczenia: bez znaku — działa, `~` — częściowo, `…` — w planie (stan 0.65.0; co zostało do połączenia: `TODO.md`,
+Oznaczenia: bez znaku — działa, `~` — częściowo, `…` — w planie (stan 0.71.0; co zostało do połączenia: `TODO.md`,
 „Pełne połączenie laboratoriów”).
 
 Ten schemat narysowany ramkami: menu **Pomoc → Schemat silnika** na każdej stronie (`ui/shell/menubar.js`, `engineMap`).

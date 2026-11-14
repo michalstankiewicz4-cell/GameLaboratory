@@ -6,7 +6,7 @@ Strona: `editor/index.html` · wersja: `ui/data/versions.js` (klucz `editor/inde
 
 Scena złożona z modeli laboratoriów: okręty, samochody, czołg, autobus, tramwaj, pociąg, samolot, budowle, broń —
 na morzu albo na lądzie. Model dodaje się w oknie Scena: zakładki kategorii, pod nimi modele — przycisk + (albo dwuklik) stawia model w scenie (moduły bazy: budowa — hologram pod kursorem, turkusowy gdy pasuje, kliknięcie stawia, R obraca, Esc kończy); przesuwa, obraca i skaluje uchwytem albo liczbami, a zamienia
-na inny jednym wyborem z listy. Środowisko: powierzchnia (morze / ląd), morze (zasób z laboratorium wody), światło (pora dnia i pogoda z laboratoriów
+na inny jednym wyborem z listy. Środowisko: powierzchnia (morze / ląd / kosmos / podziemie — w jaskini z laboratorium jaskiń), morze (zasób z laboratorium wody), światło (pora dnia i pogoda z laboratoriów
 wodnych) i wygląd kamery (profil z laboratorium filtrów). Szczegóły modelu robi się w jego laboratorium:
 „Otwórz w laboratorium” we Właściwościach. Edytor jest pierwszym krokiem do silnika: laboratoria będą się do niego
 dostosowywać (zasoby z nazwą, wspólne zachowania).

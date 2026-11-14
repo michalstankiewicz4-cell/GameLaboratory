@@ -3,6 +3,20 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.71.1 · generator zombie 1.2.1 — 2026-11-14 (porządek plików i dokumentacji)
+
+### Zmienione
+- Nazwy plików według zasady „małe litery, słowa łączone myślnikiem”: `docs/labs/walkers/roadmap.md`,
+  `docs/labs/walkers/img/hud-done.png`, `tools/img/build-cifar.py`, `tools/img/build-quickdraw.py`,
+  `tools/lang/build-wasm.js` (odwołania poprawione, także błędna ścieżka `img/tools/`). Pliki `LICENCJA.txt` przy
+  danych zostają wielkimi literami, jak pliki licencji.
+- Generator zombie: skrypt we własnym folderze `js/labs/zombies/zombies.js` (był w folderze Pixel Studio), dokument
+  `docs/labs/zombies.md` (był w `docs/labs/pixel/`), ścieżki `pixel/zombies.html` → `labs/zombies.html`.
+- Dokumentacja: mapa `docs/README.md` w kolejności kategorii z grupami, lekarz sceny i transformator wśród narzędzi,
+  pełna lista zachowań; jaskinie i efekty w rozbiorze laboratoriów, silnik sceny (jaskinia jako obiekt i teren, strzał,
+  skan i uszkodzenia statków przez efekty), edytor (podziemie), laboratorium lądu (grupa „Teren”), martwe odnośniki
+  w `docs/models/train/grafika.md`.
+
 ## Program 0.71.0 · jaskinie 1.3.0 · ląd 1.7.1 · edytor sceny 0.33.0 — 2026-11-14 (jaskinia jako teren)
 
 ### Dodane

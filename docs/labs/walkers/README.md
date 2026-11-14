@@ -55,7 +55,7 @@ js/labs/lang/data.js        przykładowy tekst, słownik liter
 js/labs/lang/bpe.js         tokenizer BPE: nauka sklejeń, kodowanie i dekodowanie
 js/labs/lang/worker.js      trening w tle (Web Worker): bigram, sieć z oknem, RNN/GRU, najlepsza wersja, zapis/wczytanie modelu
 js/labs/lang/lang.js        strona: dane, wykres, wizualizacje, porównanie
-tools/lang/                 matmul.wat (źródło WASM) i build_wasm.js (kompilacja: npm install wabt@1.0.36, potem node tools/lang/build_wasm.js)
+tools/lang/                 matmul.wat (źródło WASM) i build-wasm.js (kompilacja: npm install wabt@1.0.36, potem node tools/lang/build-wasm.js)
 data/lang/                  zestawy przykładowe: grabinski/, wikipedia/, rozmowy/ (manifest.json, opis i licencje w README)
 ```
 
@@ -81,8 +81,8 @@ js/labs/img/img.js          strona: dane z PNG, graf modelu, nauka, rysowanie, m
 js/labs/img/worker.js       trening w tle: statystyka pikseli, transformer piksel po pikselu (CPU/GPU, KV cache), VAE, GAN, dyfuzja
 data/img/                   rysunki do nauki: jeden PNG na kategorię (siatka 16×16), manifest.json, LICENCJA.txt
 data/img-color/             obrazki 64×40 × 256 kolorów: PNG z paletą na kategorię, manifest.json (z paletą), LICENCJA.txt
-tools/img/build_quickdraw.py  robi data/img/ z Quick, Draw! (pobiera tylko pierwsze 2000 rysunków każdej kategorii)
-tools/img/build_cifar.py    robi data/img-color/ z CIFAR-10 (kopia JPEG: github.com/YoongiKim/CIFAR-10-images)
+tools/img/build-quickdraw.py  robi data/img/ z Quick, Draw! (pobiera tylko pierwsze 2000 rysunków każdej kategorii)
+tools/img/build-cifar.py    robi data/img-color/ z CIFAR-10 (kopia JPEG: github.com/YoongiKim/CIFAR-10-images)
 ```
 
 ## Struktura
@@ -122,7 +122,7 @@ Skrypty są zwykłymi `<script>` (bez modułów ES) i dzielą zmienne globalne, 
 
 ## Plany i notatki
 
-Plan: `docs/labs/walkers/ROADMAP.md`. Historia zmian: `CHANGELOG.md` (od przeniesienia) i `docs/history/walkers.md` (NeuroLabPA). Konwencje pracy, zmierzone wyniki, decyzje i sprawy otwarte: `docs/labs/walkers/notatki/`.
+Plan: `docs/labs/walkers/roadmap.md`. Historia zmian: `CHANGELOG.md` (od przeniesienia) i `docs/history/walkers.md` (NeuroLabPA). Konwencje pracy, zmierzone wyniki, decyzje i sprawy otwarte: `docs/labs/walkers/notatki/`.
 
 ## Wersjonowanie
 

@@ -3,7 +3,7 @@
 ## Wersje i historia
 - Jedno źródło numeru wersji: w NeuroLabPA js/version.js (APP_VERSION); w GameLaboratory `ui/data/versions.js`. Zmieniany razem z wpisem w `CHANGELOG.md`.
 - Schemat `0.MINOR.PATCH`: MINOR przy nowej funkcji, PATCH przy poprawce lub zmianie ustawień. W SDF Walkers zmiana listy wejść sieci zawsze podnosi MINOR, bo unieważnia wyeksportowane modele.
-- `ROADMAP.md`: plan, `CHANGELOG.md`: co się zmieniło, `notatki/`: reszta.
+- `roadmap.md`: plan, `CHANGELOG.md`: co się zmieniło, `notatki/`: reszta.
 
 ## Commity i GitHub
 - Repo: `michalstankiewicz4-cell/NeuroLabPA`, gałąź `main`, publiczne. Strona: GitHub Pages (`.github/workflows/static.yml`), odświeża się 1–2 min po pushu.
@@ -18,8 +18,8 @@
 
 ## Budowanie
 - Wersja SDF Walkers jako jeden plik na claude.ai: `python3 tools/build_artifact.py` → `dist/sdf-walkers.html`.
-- Moduł WASM (mnożenie macierzy i uwaga): źródło `tools/lang/matmul.wat`. Kompilacja: `npm install wabt@1.0.36` w dowolnym katalogu, potem `NODE_PATH=…/node_modules node tools/lang/build_wasm.js` → `js/labs/lang/wasm.js` (base64, nie edytować ręcznie).
-- Dane laboratorium obrazów: `python3 img/tools/build_quickdraw.py` (numpy, pillow; potrzebny dostęp do `storage.googleapis.com`). Pobiera tylko pierwsze 2000 rysunków każdej kategorii przez zapytania o fragment pliku.
+- Moduł WASM (mnożenie macierzy i uwaga): źródło `tools/lang/matmul.wat`. Kompilacja: `npm install wabt@1.0.36` w dowolnym katalogu, potem `NODE_PATH=…/node_modules node tools/lang/build-wasm.js` → `js/labs/lang/wasm.js` (base64, nie edytować ręcznie).
+- Dane laboratorium obrazów: `python3 tools/img/build-quickdraw.py` (numpy, pillow; potrzebny dostęp do `storage.googleapis.com`). Pobiera tylko pierwsze 2000 rysunków każdej kategorii przez zapytania o fragment pliku.
 - Dane laboratorium języka: pliki z Wolnych Lektur i Wikipedii są już w `data/lang/`. Każdy zestaw ma `LICENCJA.txt`, a lista jest w `manifest.json`.
 
 ## Testy

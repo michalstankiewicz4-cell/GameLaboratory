@@ -7,7 +7,7 @@ do 16×16 (średnia z obszaru), przypisuje do 16 odcieni (0 = tło, 15 = kreska)
 obrazek PNG na kategorię: siatka 50 kolumn, rysunek obok rysunku. Te pliki widać w folderze i w nich
 dokładnie to, z czego uczy się sieć.
 
-Uruchomienie (z katalogu repo):  python3 img/tools/build_quickdraw.py
+Uruchomienie (z katalogu repo):  python3 tools/img/build-quickdraw.py
 Wymaga: numpy, pillow.
 """
 import json, os, sys, urllib.request

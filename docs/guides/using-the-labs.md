@@ -196,7 +196,7 @@ Details: `docs/labs/pixel/README.md`.
 **Zombie Generator** (`labs/zombies.html`): choose *GPU* or *CPU* in the top bar,
 then *Another zombie* or a seed and any trait on
 the left; animation, direction, camera, light, style (realistic or pixel art) and the sheet on the right; *PNG sheet*,
-*JSON*, *GIF preview*, *All 8 directions (ZIP)* and *Unity slicer (.cs)*. Nothing renders until you press *Start render*. Details: `docs/labs/pixel/zombies.md`.
+*JSON*, *GIF preview*, *All 8 directions (ZIP)* and *Unity slicer (.cs)*. Nothing renders until you press *Start render*. Details: `docs/labs/zombies.md`.
 
 ## When something looks wrong
 

@@ -49,7 +49,7 @@ dla edytora; **priorytet** — 1 teraz (edytor tego potrzebuje), 2 potem, 3 kied
 | **Układy** (`labs/systems.html`, 556 l.) | SystemKit, BodyKit | gotowe tła (`SKIES`) w SystemKit; ruch po orbitach (SystemKit `orbitPoint`) tylko w laboratorium | tła → katalog nieb w środowisku; orbity → zachowanie „orbita” (kosmos) | **układ** (słońca, orbity, ciała) | 3 |
 | **Skala** (`labs/scale.html`, 357 l.) | dane gry Space (`js/envs/space/`) | układ gry Space, własny widok 2D/3D | zostaje narzędziem (pokazuje skalę) | — | 3 |
 | **Powierzchnia** (`labs/surface.html`, 320 l.) | SurfaceKit, BodyKit, BaseKit, ShipKit | zejście, jazda, skok i budowa bazy — mechaniki gry w SurfaceKit (`ground.js`); własne niebo i pogoda (`surfacekit/sky.js`, `weather.js`) | grunt planety → środowisko; zejście, jazda, skok → zachowania; budowa → narzędzie edytora | **planeta (grunt)**; baza (układ modułów) | 3 |
-| **Jaskinie** (`labs/caves.html`, 119 l.) | CaveKit, freecam | — (małe) | jaskinia → prefabrykat albo środowisko „podziemie” | **jaskinia** (ziarno, wielkość) | 2 |
+| **Jaskinie** (`labs/caves.html`, 119 l.) | CaveKit, freecam | — (małe) | jaskinia → prefabrykat (pole `asset`) i powierzchnia „podziemie” (`env.cave`) — zrobione w 0.71.0; grupa „Teren” z lądem | **jaskinia** (jest) | — |
 
 ### Pojazdy
 
@@ -78,6 +78,7 @@ dla edytora; **priorytet** — 1 teraz (edytor tego potrzebuje), 2 potem, 3 kied
 | **Materiały** (`labs/materials.html`, 219 l., 0.63.0) | MatKit (`js/render/materials/`) | — | materiały modeli i sceny z MatKit; powierzchnie 2D sztuki | **materiał** (jest) | 1 |
 | **Sztuka** (`labs/art.html`, 252 l., 0.57.0) | ArtKit, silnik ekspertyzy (`js/render/art/exam/`) | powierzchnie 2D (papier, drewno, metal) liczone osobno od MatKit | powierzchnie → MatKit; obraz → zasób i obiekt sceny (tryb 3D) | **obraz** (w planie) | 2 |
 | **UI gry** (`labs/gameui.html`, 326 l., 0.61.0) | `js/gameui/` (ekrany, HUD, okna, dialog, skórki) | — | w scenie `env.ui`, nakładka w ▶ Graj (0.62.0) | **UI gry**, **skórka UI** (są) | — |
+| **Efekty** (`labs/effects.html`, 204 l., 0.67.0–0.70.0) | EffectKit (`js/render/effects/`): 22 efekty z Hive Hunger i ShipKit, odznaki | strzał, skan i uszkodzenia statków ShipKit przeniesione do efektów (0.68.0–0.70.0) | polecenie API `effect`, zdarzenie `effect`, pole `shot` obiektu | **efekt** (jest) | — |
 | **Bloki** (`labs/blocks.html`, 220 l., 0.64.0) | BlockKit (`js/models/blocks/`), ciecze i gaz (`js/behaviors/space/`), MatKit | — | bryły → prefabrykaty; bryła z laboratorium → zasób z nazwą, pole `asset` obiektu (0.66.0) | **bryła z bloków** (jest) | — |
 
 ### Zostają, jakie są (narzędzia)

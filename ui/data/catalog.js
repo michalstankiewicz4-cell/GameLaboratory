@@ -405,7 +405,7 @@ window.GameLabCatalog =
       "cat": "life",
       "name": "Zombie Generator",
       "namePl": "Generator zombie",
-      "doc": "docs/labs/pixel/zombies.md",
+      "doc": "docs/labs/zombies.md",
       "desc": "Original zombies from a seed, animated in 8 directions, exported as Unity sprite sheets (JSON, slicer script, ZIP).",
       "descPl": "Oryginalne zombie z ziarna, animowane w 8 kierunkach, eksportowane jako arkusze sprite'ów dla Unity (JSON, skrypt cięcia, ZIP).",
       "kind": "lab",

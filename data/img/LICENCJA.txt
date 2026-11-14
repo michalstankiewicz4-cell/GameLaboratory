@@ -20,7 +20,7 @@ Z każdej z 12 kategorii wzięto pierwsze 2000 rysunków z plików „numpy_bitm
 - sprowadzono do 16 odcieni (0 = tło, 15 = kreska),
 - odwrócono kolory przy zapisie (ciemna kreska na jasnym tle).
 Rysunki ułożono w siatkę po 50 w wierszu, jeden plik PNG na kategorię.
-Robi to skrypt img/tools/build_quickdraw.py (pobrano 1 listopada 2026).
+Robi to skrypt tools/img/build-quickdraw.py (pobrano 1 listopada 2026).
 
 KATEGORIE
 ---------

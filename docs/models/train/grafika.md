@@ -29,7 +29,7 @@ Współrzędne UV liczone w skali świata, żeby faktura miała tę samą wielko
 
 ## Ląd, las i pogoda
 
-Teren, morze i las — [lad.md](lad.md); niebo z chmurami, deszcz i pioruny — [pogoda.md](pogoda.md). Odbicia i światło otoczenia materiałów liczone są z tego samego nieba co widać (odświeżane przy zmianie pogody i pory dnia).
+Teren, morze i las — [laboratorium lądu](../../labs/land.md); niebo z chmurami, deszcz i pioruny — [laboratorium wyglądu](../../labs/look.md). Odbicia i światło otoczenia materiałów liczone są z tego samego nieba co widać (odświeżane przy zmianie pogody i pory dnia).
 
 ## Filtry i wygląd kamery
 

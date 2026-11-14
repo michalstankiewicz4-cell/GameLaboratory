@@ -11,7 +11,7 @@ zbioru, jak tryb 256 kolorów w starych kartach graficznych. Zapis: jeden PNG z 
 Źródło zdjęć: kopia CIFAR-10 jako pliki JPEG w repozytorium github.com/YoongiKim/CIFAR-10-images
 (train/<kategoria>/NNNN.jpg). Uruchomienie (z katalogu repo):
   git clone --depth 1 https://github.com/YoongiKim/CIFAR-10-images /tmp/cifar
-  python3 tools/img/build_cifar.py /tmp/cifar
+  python3 tools/img/build-cifar.py /tmp/cifar
 Wymaga: pillow.
 """
 import json, os, sys

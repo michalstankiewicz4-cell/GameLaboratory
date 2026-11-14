@@ -69,7 +69,7 @@ text* writes it, *Text → drawing* reads it — sprites can be written, read an
 
 ## Zombie Generator
 
-`pixel/zombies.html` — original zombies as Unity sprite sheets, realistic or pixel art: see `docs/labs/pixel/zombies.md`.
+`labs/zombies.html` — original zombies as Unity sprite sheets, realistic or pixel art: see `docs/labs/zombies.md`.
 
 ## Known limits / next
 

@@ -54,8 +54,11 @@ Wpis: `{ id, label, family, surface, lab, build() → { root, kit, dispose } }`.
 - `build()`: `root` — grupa Three.js; `kit` — obiekt zwrócony przez kit (wymiary, linie kadłuba, `update` ruchomych
   części), z niego korzystają zachowania; `dispose` — zwolnienie geometrii.
 - Rośliny: `plants/<gatunek>` (PlantKit, `SPECIES`) — jedna roślina gatunku (ziarno 1, wielkość 1), `tick` przesuwa czas
-  wiatru; jaskinia: `caves/cave` (CaveKit, `CAVE_DEFAULTS`; budowa ok. sekundy; ściany patrzą do środka — z zewnątrz
-  widać wnętrze).
+  wiatru; jaskinia: `caves/cave` (CaveKit, `CAVE_DEFAULTS` albo zapisana jaskinia — pole `asset`, zasób `cave`; budowa ok.
+  sekundy; ściany patrzą do środka — z zewnątrz widać wnętrze). Jaskinia jako teren całej planszy — powierzchnia
+  `underground` i `env.cave` (świat edytora, `editor/js/world/world.js`).
+- Statki ShipKit: strzał, skan i uszkodzenia rysuje laboratorium efektów — `model.onShot` (pole `shot` obiektu: efekt
+  strzału), `model.onScan`, `model.onDamage` i `model.damageView()` ([`../labs/effects.md`](../labs/effects.md)).
 - Nowy model: wpis tutaj (jedna linia na kit); kity ze Space (ShipKit, VehicleKit, MarineKit, BaseKit) ładuje `space.js`.
 - Ciała niebieskie: `bodies/<ciało>` (BodyKit, wszystkie grupy poza niebem: planety, olbrzymy, pierścienie, pulsar,
   słońce, kometa, planetoida, czarna dziura) — promień 50 m (model, nie prawdziwa skala); `tick(t, dt, { sunDir, center })`

@@ -3,7 +3,7 @@
 
 # Notatki projektu
 
-Pamięć projektu: to, czego nie widać w kodzie ani w historii zmian. `ROADMAP.md` to plan, `CHANGELOG.md` to historia wersji, a tutaj jest reszta.
+Pamięć projektu: to, czego nie widać w kodzie ani w historii zmian. `roadmap.md` to plan, `CHANGELOG.md` to historia wersji, a tutaj jest reszta.
 
 | Plik | Co zawiera |
 |---|---|

@@ -5,6 +5,10 @@ map that wraps around (a torus) or is bounded by a barrier, under the SkyKit sky
 surf, waves dying on the shore) and the transformer's ORP Błyskawica to sail through it. Settings are kept in the
 browser (`gameLab.land.v1`) and copied as JSON; the same seed and settings always give the same map.
 
+In the **Terrain** group with the cave lab (land · caves: one switch on the bar, one glow in the menu): a cave is
+terrain too — in the scene editor the whole level can be a cave (Surface → Underground, [`caves.md`](caves.md)). Joining
+the two (a cave entrance cut into the land) and the scene doctor's seam rules are planned (`TODO.md`).
+
 ## Generator (`generateTerrain`)
 
 1. **Periodic noise**: gradient noise whose lattice repeats across the map at every octave, warped by more periodic
