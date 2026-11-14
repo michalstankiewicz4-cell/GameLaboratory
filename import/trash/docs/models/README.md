@@ -110,6 +110,7 @@ Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zacz
 - Rynna 2,45 m ze spadkiem 0,4 m (wnętrze 13 × 10 cm), ustawiona pod wylewem przechylonego pieca.
 - Przenośnik z 8 formami (podziałka 0,5 m, grupa `formy`); forma pod końcem rynny (`LAYOUT.pour`) napełnia się, potem przenośnik przesuwa formy o podziałkę.
 - Wnęka formy = kształt sztabki (`INGOT`, 3,2 l); masa sztabki zależy od metalu (gęstość wariantu).
+- Od v1.1.0: drugi przenośnik z 10 małymi formami (`INGOT_SMALL`, 0,82 l) na aluminium; rozdzielacz z zasuwą (grupa `zasuwa rozdzielacza`) i dźwignia (grupa `dźwignia`, `LAYOUT.lever`) wybierają dyszę (`LAYOUT.pour` / `LAYOUT.pour2`).
 
 ### Ogrodzenie (`world/fence.js`)
 - Plac 80 × 80 m, brama 6 m od strony +z (zamknięta — nie da się wyjść); 4 ściany zderzaczy po 4 m wysokości.
