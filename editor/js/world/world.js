@@ -143,7 +143,8 @@ export function createWorld(container, store, onWarn) {
     let light = LIGHTS[env.light] ? env.light : env.light ? getAsset('weather', env.light) : null;
     if (!light) { if (env.light && onWarn) onWarn('light:' + env.light); light = 'afternoon'; }
     stage.setLight(light);
-    if (env.surface === 'underground') { stage.sun.intensity = 0; stage.hemi.intensity = 0.35; stage.hemi.color.setRGB(0.75, 0.78, 0.85); stage.hemi.groundColor.setRGB(0.12, 0.1, 0.09); }
+    if (env.surface === 'underground') { stage.sun.intensity = 0; stage.hemi.intensity = env.caveGlow === false ? 0 : 0.35;   // poświata (env.caveGlow) albo ciemność
+      stage.hemi.color.setRGB(0.75, 0.78, 0.85); stage.hemi.groundColor.setRGB(0.12, 0.1, 0.09); }
     // morze: zasób z laboratorium wody (po nazwie) albo domyślne; brak zasobu w tej przeglądarce — domyślne i ostrzeżenie
     const sea = env.sea ? getAsset('sea', env.sea) : null, seaKey = JSON.stringify(sea);
     if (env.sea && !sea && onWarn) onWarn('sea:' + env.sea);

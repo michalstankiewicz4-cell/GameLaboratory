@@ -115,7 +115,8 @@ export function createPanels(store, actions) {
       $('caveAsset').replaceChildren(el('option', { value: '', textContent: t('env.caveDefault') }), ...caves.map((n) => el('option', { value: n, textContent: n })),
         ...(curCave && !caves.includes(curCave) ? [el('option', { value: curCave, textContent: t('env.seaMissing', { name: curCave }) })] : []));
       $('caveAsset').value = curCave;
-      $('caveRow').hidden = $('caveNote').hidden = S.env.surface !== 'underground';
+      $('caveRow').hidden = $('caveNote').hidden = $('caveGlowRow').hidden = S.env.surface !== 'underground';
+      $('caveGlow').checked = S.env.caveGlow !== false;
       $('skyRow').hidden = $('skyNote').hidden = S.env.surface === 'underground';   // w jaskini nie ma nieba   // morze: też wokół terenu
       // ląd: płaski grunt albo teren z laboratorium lądu
       const lands = listAssets('land'), curLand = S.env.land || '';
@@ -202,6 +203,7 @@ export function createPanels(store, actions) {
   $('orbitPeriod').addEventListener('input', () => { const o = store.selected, v = parseFloat($('orbitPeriod').value); if (o && v > 0) store.update(o.id, { orbit: { ...(o.orbit || {}), period: v } }); });
   $('surface').addEventListener('change', () => store.setEnv({ surface: $('surface').value }));
   $('landAsset').addEventListener('change', () => actions.build(() => store.setEnv({ land: $('landAsset').value })));
+  $('caveGlow').addEventListener('change', () => store.setEnv({ caveGlow: $('caveGlow').checked }));
   $('caveAsset').addEventListener('change', () => actions.build(() => store.setEnv({ cave: $('caveAsset').value })));
   $('skyAsset').addEventListener('change', () => store.setEnv({ sky: $('skyAsset').value }));
   $('seaAsset').addEventListener('change', () => store.setEnv({ sea: $('seaAsset').value }));

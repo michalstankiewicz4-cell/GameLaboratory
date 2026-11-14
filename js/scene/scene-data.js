@@ -9,7 +9,9 @@
 //          sky: '' | 'day' | 'preset:<id>' | nazwa zasobu „niebo” (każda powierzchnia; '' — domyślne: morze i ląd —
 //          dzienne, kosmos — Deep field; js/scene/space.js),
 //          ui: '' | nazwa zasobu „ui” (UI gry z laboratorium UI gry — nakładka w ▶ Graj; '' — bez UI),
-//          cave: '' | nazwa zasobu „cave” (podziemie: jaskinia z laboratorium jaskiń jako teren planszy; '' — domyślna) },
+//          cave: '' | nazwa zasobu „cave” (podziemie: jaskinia z laboratorium jaskiń jako teren planszy; '' — domyślna),
+//          caveGlow: true | false (podziemie: słaba poświata, żeby było widać jaskinię; false — prawdziwa ciemność:
+//          światło dają tylko lawa i to, co przyniesie gracz) },
 //   objects: [{ id, name, prefab, pos: [x, y, z], rot: [x, y, z] (stopnie), scale, behavior?, orbit? { around, period }, asset?, shot? }]
 // }
 // prefab: id z js/scene/prefabs.js; behavior: id z js/scene/behaviors.js, '' = bez zachowania, brak pola = domyślne
@@ -20,7 +22,7 @@
 export const FORMAT = 'gamelab-scene', VERSION = 1;
 
 export function emptyScene(name = 'New scene') {
-  return { format: FORMAT, version: VERSION, name, env: { surface: 'sea', light: 'afternoon', look: '', sea: '', sky: '', land: '', ui: '', cave: '' }, objects: [] };
+  return { format: FORMAT, version: VERSION, name, env: { surface: 'sea', light: 'afternoon', look: '', sea: '', sky: '', land: '', ui: '', cave: '', caveGlow: true }, objects: [] };
 }
 
 let seq = 0;

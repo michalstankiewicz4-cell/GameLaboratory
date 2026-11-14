@@ -3,6 +3,11 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.33.1 — 2026-11-14
+
+### Dodane
+- Podziemie: „Poświata w jaskini” (domyślnie włączona; wyłączona — prawdziwa ciemność).
+
 ## 0.33.0 — 2026-11-14 (podziemie)
 
 ### Dodane

@@ -30,7 +30,7 @@ Zasada: **dane są jedynym źródłem prawdy.** Okna edytora, uchwyt, API i plik
 ```
 
 - `env.surface`: `sea` | `land` | `space` | `underground` (podziemie: cała plansza to jaskinia z `env.cave` — zasób
-  „cave” z laboratorium jaskiń, `""` — domyślna; bez nieba, morza, gruntu i słońca, słaba poświata; prawa lądu); `env.sky` (każda powierzchnia): `""` (domyślne) | `"day"` | `"preset:<id>"` | nazwa zasobu „niebo”; `env.light`: `afternoon` | `noon` | `dusk` | `overcast` (oświetlenia sceny bazowej
+  „cave” z laboratorium jaskiń, `""` — domyślna; bez nieba, morza, gruntu i słońca; `env.caveGlow` — słaba poświata, domyślnie `true`, `false` — prawdziwa ciemność; prawa lądu); `env.sky` (każda powierzchnia): `""` (domyślne) | `"day"` | `"preset:<id>"` | nazwa zasobu „niebo”; `env.light`: `afternoon` | `noon` | `dusk` | `overcast` (oświetlenia sceny bazowej
   `js/labs/shared/stage.js`); `env.look`: profil z laboratorium filtrów albo `""`; `env.sea`: zasób „morze” albo `""`.
 - `pos` w metrach (Y w górę), `rot` w stopniach (kolejność YXZ: kurs, pochylenie, przechył), `scale` — mnożnik.
 - `behavior` (nieobowiązkowe): id zachowania; bez pola — domyślne dla modelu, `""` — stoi w miejscu.

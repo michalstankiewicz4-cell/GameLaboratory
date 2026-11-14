@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.72.1 · edytor sceny 0.33.1 — 2026-11-14 (poświata w jaskini)
+
+### Dodane
+- Podziemie: pole wyboru **Poświata w jaskini** (okno Środowisko, `env.caveGlow`, domyślnie włączone) — słabe światło,
+  żeby jaskinię było widać; wyłączone — prawdziwa ciemność, świecą tylko lawa i światła gracza. Zapisane w scenie,
+  działa przy edycji i w ▶ Graj; w API `env` z `caveGlow`.
+
 ## Program 0.72.0 · rośliny 1.4.0 — 2026-11-14 (roślina jako zasób z nazwą)
 
 ### Dodane

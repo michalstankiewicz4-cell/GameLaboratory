@@ -49,8 +49,8 @@ In the scene editor a saved cave is used two ways:
 
 - **an object**: the model *Cave* (`caves/cave`) with the field `asset` — a cave standing in the scene;
 - **the whole level**: Surface → **Underground** (`env.surface: "underground"`, `env.cave`: the cave's name, `""` —
-  the default): the level is the cave — no sky, no sea, no ground, no sun, a faint glow so it shows in the editor; the
-  lava lights by itself. Behaviours follow the land's laws; the scene doctor warns about ships and aircraft in a cave.
+  the default): the level is the cave — no sky, no sea, no ground, no sun; *Glow in the cave* (`env.caveGlow`, on by default) gives a
+  faint light so the cave shows — off, it is truly dark: only the lava and the player's lights. Behaviours follow the land's laws; the scene doctor warns about ships and aircraft in a cave.
 
 Later (`TODO.md`): a large cave split into pieces generated round the player, and a cave's entrance cut into the land.
 

@@ -101,6 +101,7 @@
   'env.underground': 'Underground',
   'env.caveAsset': 'Cave',
   'env.caveDefault': 'The default cave',
+  'env.caveGlow': "Glow in the cave (off: true darkness — only lava and the player's lights)",
   'env.caveNote': 'Inside a cave: the whole level is a cave saved in the cave lab — no sky, no sun.',
   'status.noCave': "Cave \"{name}\" is not saved in this browser: the default cave is shown.",
   'env.skyDefaultDay': "Default: day sky",

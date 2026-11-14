@@ -100,6 +100,7 @@
   'env.underground': 'Podziemie',
   'env.caveAsset': 'Jaskinia',
   'env.caveDefault': 'Jaskinia domyślna',
+  'env.caveGlow': 'Poświata w jaskini (wyłączona: prawdziwa ciemność — tylko lawa i światła gracza)',
   'env.caveNote': 'W jaskini: cała plansza to jaskinia zapisana w laboratorium jaskiń — bez nieba i słońca.',
   'status.noCave': "Jaskini „{name}” nie ma w tej przeglądarce: widać jaskinię domyślną.",
   'env.skyDefaultDay': "Domyślne: niebo dzienne",
