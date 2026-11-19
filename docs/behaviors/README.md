@@ -145,13 +145,21 @@ w repo Trash); tu przepisana na fizykę GameLaboratory, z liczbami z gry:
   zamykanie), bezwładność szczęki 25 kg; koniec szczęki z kształtu jej zderzacza w grze (łuk R 0,95 m); kontakt sprężysty
   z tłumieniem z przedmiotem i z gruntem (krok 1/3840 s); przedmiot jest trzymany, dopóki tarcie μ·ΣN (μ 0,7) przenosi
   jego ciężar razem z przyspieszeniem chwytaka — inaczej wyślizguje się i spada;
-- **ugięcie** — wysięgnik i ramię uginają się od momentu ładunku (podatność z gry, sprężyna 1,6 Hz z tłumieniem 0,12).
+- **ugięcie** — wysięgnik i ramię uginają się od momentu ładunku (podatność z gry, sprężyna 1,6 Hz z tłumieniem 0,12);
+- **zawieszenie** — podwozie (14 t, jak ciało w grze) na 4 sprężynach kół z liczbami kontrolera Rapier z gry: sztywność
+  60 i tłumienie 4,4 (ściskanie) / 2,3 (rozprężanie) razy masa podwozia, najwyżej 110 kN na koło, skok 0,32 m. Trzy
+  stopnie swobody (unoszenie, pochylenie, przechył; bezwładność z zderzaczy podwozia): przeciwwaga 4 t i chwytak
+  (700 kg) z ładunkiem w końcu ramienia (siły jak w grze, obracają się z nadwoziem) oraz siła bezwładności z
+  przyspieszeń jazdy (1 m nad gruntem) przechylają maszynę; koło bez nacisku odrywa się;
+- **zderzenia przedmiotów** — prostopadłościany przedmiotów (OBB) ze sobą, z pojazdem (zderzacze z gry: podwozie,
+  nadwozie, wysięgnik, ramię, koła, głowica chwytaka) i z gruntem: test SAT (15 osi), rozdzielenie po osi najmniejszego
+  wnikania w proporcji odwrotności mas, zderzenie niesprężyste, tarcie Coulomba (μ 0,7); przedmioty leżą na sobie.
 
-Uproszczenia względem gry: podwozie nie przechyla się od ciężaru (drive.js liczy w płaszczyźnie gruntu), przedmioty nie
-zderzają się ze sobą ani z pojazdem (spadają na grunt i leżą z tarciem), obrót chwytaka wokół pionu idzie za ramieniem,
-wysięgnik nie wygina się w łuk (w grze shader) — ugięcie zmienia tylko kąty.
+Uproszczenia względem gry: przedmioty nie obracają się od zderzeń (leżą prosto, obrót tylko wokół pionu), pojazd nie
+odczuwa zderzeń z przedmiotami (18 t wobec najwyżej 190 kg), obrót chwytaka wokół pionu idzie za ramieniem, wysięgnik
+nie wygina się w łuk (w grze shader) — ugięcie zmienia tylko kąty.
 
-`createGrapple(model, { x, z, yaw, ground, scene })` → `{ drive, arm, jaws, items, held, payload, closed, step(dt, c),
+`createGrapple(model, { x, z, yaw, ground, scene })` → `{ drive, arm, susp, jaws, items, held, payload, closed, step(dt, c),
 sync(), setJaws(), toggleJaws(), addItem({ mesh, mass, half, name, at }) }`; `c`: `throttle`, `steer`, `brake`, `slew`,
 `boom`, `stick` (−1…1).
 

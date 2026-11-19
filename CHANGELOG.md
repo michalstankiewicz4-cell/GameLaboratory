@@ -3,6 +3,20 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.77.0 · pojazdy (ląd) 1.20.0 — 2026-11-19 (przeładowarka: zawieszenie i zderzenia)
+
+### Dodane
+- Zachowanie przeładowarki (`js/behaviors/land/grapple.js`): **zawieszenie** — podwozie na 4 sprężynach z liczbami
+  kontrolera Rapier z gry (sztywność 60 i tłumienie 4,4 / 2,3 × masa podwozia, do 110 kN na koło, skok 0,32 m);
+  pochylenie, przechył i unoszenie od przeciwwagi, chwytaka z ładunkiem (obracają się z nadwoziem) i przyspieszeń
+  jazdy; koło bez nacisku odrywa się.
+- **Zderzenia przedmiotów** ze sobą, z pojazdem (zderzacze z gry) i z gruntem: SAT na prostopadłościanach, zderzenie
+  niesprężyste z tarciem; przedmioty leżą na sobie, pojazd je pcha.
+- Laboratorium pojazdów (ląd): odczyt pochylenia i przechyłu oraz nacisku na każde koło.
+
+### Uproszczenia
+- Przedmioty nie obracają się od zderzeń; pojazd nie odczuwa zderzeń z przedmiotami.
+
 ## Program 0.76.0 · pojazdy (ląd) 1.19.0 — 2026-11-19 (przeładowarka jeździ i chwyta)
 
 ### Dodane

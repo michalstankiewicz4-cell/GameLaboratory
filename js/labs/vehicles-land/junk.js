@@ -23,7 +23,8 @@ function start(lab) {
   const jawBtn = el("button", "tBtn", "CLOSE THE GRAPPLE"), resetBtn = el("button", "tBtn", "PUT IT ALL BACK");
   const two = el("div", "twoBtns"); two.append(jawBtn, resetBtn); panel.append(two);
   readout("speed", "Speed"); readout("jaws", "Grapple"); readout("payload", "Load"); readout("sag", "Boom / stick bend");
-  panel.append(el("p", "note", "Physics in GameLaboratory: driving by forces (land/drive.js) with the game's numbers, the grapple as a pendulum on a ball joint, the jaws on motors pressing on what they hold — it stays in the grapple while friction carries its weight. Items fall on the ground; they do not collide with each other or with the loader."));
+  readout("tilt", "Pitch / roll"); readout("wheels", "Wheel loads (FR · FL · RR · RL)");
+  panel.append(el("p", "note", "Physics in GameLaboratory: driving by forces (land/drive.js) with the game's numbers, the grapple as a pendulum on a ball joint, the jaws on motors pressing on what they hold — it stays in the grapple while friction carries its weight. The chassis rides on four springs (the game's suspension numbers) and leans under the counterweight, the load and the driving; the items collide with each other, with the loader and with the ground, and stack — they do not tumble."));
   jawBtn.addEventListener("click", () => { if (grab) { grab.toggleJaws(); jawBtn.blur(); } });
   resetBtn.addEventListener("click", () => { resetBtn.blur(); placePile(); });
 
@@ -49,7 +50,7 @@ function start(lab) {
       const mod = mods[id], m = mod.build(0), box = new THREE.Box3().setFromObject(m), c = box.getCenter(new THREE.Vector3()), size = box.getSize(new THREE.Vector3());
       m.position.sub(c); m.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
       const holder = new THREE.Group(); holder.add(m); holder.rotation.y = yaw; world.add(holder);
-      grab.addItem({ mesh: holder, mass: mod.info.mass, half: [size.x / 2, size.y / 2, size.z / 2], name: id, at: [x, 0, z] }).yaw = yaw;
+      grab.addItem({ mesh: holder, mass: mod.info.mass, half: [size.x / 2, size.y / 2, size.z / 2], name: id, at: [x, 0, z] });
     }
     applyTextures();
   }
@@ -89,7 +90,10 @@ function start(lab) {
       if (lab.controls) { lab.controls.target.x += dx; lab.controls.target.z += dz; lab.camera.position.x += dx; lab.camera.position.z += dz; }
       if (lab.sun) { lab.sun.position.set(g.drive.state.x + 30, 40, g.drive.state.z + 20); lab.sun.target.position.set(g.drive.state.x, 0, g.drive.state.z); lab.sun.target.updateMatrixWorld(); }
       const $ = (id) => document.getElementById(id), kmh = (g.drive.state.u * 3.6).toFixed(1) + " km/h";
-      $("nowSpeed").textContent = kmh; $("nowTilt").textContent = "0° / 0°";
+      const tilt = (g.susp.th * 57.2958).toFixed(1) + "° / " + (g.susp.ph * 57.2958).toFixed(1) + "°";
+      $("nowSpeed").textContent = kmh; $("nowTilt").textContent = tilt;
+      ui.tilt.textContent = tilt;
+      ui.wheels.textContent = g.susp.F.map((f) => (f / 1000).toFixed(0)).join(" · ") + " kN";
       ui.speed.textContent = kmh;
       ui.jaws.textContent = (g.closed ? "closed" : "open") + (g.held.size ? " · holding " + [...g.held].map((it) => it.name).join(", ") : "");
       ui.payload.textContent = Math.round(g.payload) + " kg";
