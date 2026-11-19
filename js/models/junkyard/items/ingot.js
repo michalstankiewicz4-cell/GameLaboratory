@@ -1,7 +1,7 @@
 // Sztabka (gąska) odlana w formie linii odlewniczej: ostrosłup ścięty 400 × 120 mm u góry, 360 × 90 u dołu,
 // wys. 80 mm (~3,2 l), zaokrąglone krawędzie, chropowata powierzchnia odlewu, na górze wklęsły skurcz metalu.
 // Warianty: 0 — aluminium (2,7 kg/l), 1 — stal (7,85 kg/l), 2 — mieszanka (ciemniejsza, z nalotem).
-import * as THREE from '../../../vendor/three/three.module.js';
+import * as THREE from '../../../../vendor/three/three.module.js';
 import { part, loft, V, uvMeters } from '../geom.js';
 import { mat, defineMat } from '../materials.js';
 

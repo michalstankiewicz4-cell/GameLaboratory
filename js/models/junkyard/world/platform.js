@@ -1,7 +1,7 @@
 // Platforma na środku wysypiska (jak na zrzucie): podest z betonu 26 × 18 m, wys. 0,5 m, nawierzchnia z płyt
 // 2 × 2 m z fugami (każda płyta trochę inaczej osiadła), krawężnik w pasy ostrzegawcze, rampa z blachy ryflowanej
 // (dla pojazdu) i 4 kratowe maszty z naświetlaczami w narożnikach.
-import * as THREE from '../../../vendor/three/three.module.js';
+import * as THREE from '../../../../vendor/three/three.module.js';
 import { merge, part, place, rng, uvMeters, roundedBox } from '../geom.js';
 import { mat } from '../materials.js';
 

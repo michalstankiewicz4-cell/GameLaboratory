@@ -1,7 +1,7 @@
 // Wspólny generator opon (samochód, rower, traktor): korpus z grubością (bryła obrotowa z przekroju opony zdjętej
 // z felgi — w środku widać pustą komorę między stopkami) i bieżnik z osobnych klocków lub łap na koronie.
 // Oś opony = lokalna oś Y. Wymiary w metrach. LOD 0 — pełne szczegóły, LOD 1 — daleko (bez klocków, mniej segmentów).
-import * as THREE from '../../../vendor/three/three.module.js';
+import * as THREE from '../../../../vendor/three/three.module.js';
 import { lathe, smooth2, loft, merge, part, V } from '../geom.js';
 import { mat, defineMat } from '../materials.js';
 

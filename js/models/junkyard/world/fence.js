@@ -1,7 +1,7 @@
 // Ogrodzenie wysypiska: siatka plecionka (oczko 5 cm) 2,4 m na słupkach ocynkowanych co 3,5 m, rura górna,
 // wysięgniki z 3 drutami kolczastymi, brama dwuskrzydłowa (zamknięta, z kłódką i tablicą) od strony +z.
 // Nie da się przez nie wyjść (zderzacze 4 m wysokości). Rozmiar placu: FENCE.size (środek w (0,0,0)).
-import * as THREE from '../../../vendor/three/three.module.js';
+import * as THREE from '../../../../vendor/three/three.module.js';
 import { merge, part, place, uvMeters } from '../geom.js';
 import { mat } from '../materials.js';
 

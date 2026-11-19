@@ -1,7 +1,7 @@
 // Materiały modeli jako dane (bez DOM). mat(id) zwraca wspólny MeshStandardMaterial (jeden na rodzaj — mało przełączeń
 // stanu na GPU). Tekstury proceduralne dokłada przeglądarka: js/render/textures.js (applyTextures) według pola `tex`.
 // W Node (doktor modeli) materiały zostają bez tekstur — doktor ich nie potrzebuje.
-import * as THREE from '../../vendor/three/three.module.js';
+import * as THREE from '../../../vendor/three/three.module.js';
 
 export const DEFS = {
   // guma

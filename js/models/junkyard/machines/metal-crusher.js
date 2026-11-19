@@ -2,7 +2,7 @@
 // otwarta od góry, z podnoszoną bramą z przodu do wyjmowania kostki; 4 kolumny 0,35 m, poprzecznica u góry,
 // 2 siłowniki Ø 300 mm, płyta dociskowa 2,9 × 0,35 × 1,9 m z żebrami i pasami ostrzegawczymi, agregat z chłodnicą,
 // pulpit sterowniczy, podest ze schodami przy komorze. Układ: środek podstawy w (0,0,0), brama od strony +z.
-import * as THREE from '../../../vendor/three/three.module.js';
+import * as THREE from '../../../../vendor/three/three.module.js';
 import { merge, part, place, uvMeters, roundedBox } from '../geom.js';
 import { mat } from '../materials.js';
 

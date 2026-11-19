@@ -397,6 +397,6 @@ $("groundSrc").addEventListener("change", () => {
 rebuildGround(); applyLight(); resize(); load();
 controls.target.set(0, heightAt(0, 0) + 1.5, 0);
 frame();
-window.vehicleLab = { state, drv, G, heightAt, groundAt, setGround, get world() { return world; }, load, get veh() { return veh; }, camera, controls, applyLight, scene, sun, addMode, setMode, modes, row };
+window.vehicleLab = { state, drv, G, heightAt, groundAt, setGround, get world() { return world; }, load, get veh() { return veh; }, camera, controls, applyLight, scene, sun, renderer, addMode, setMode, modes, row };
 window.dispatchEvent(new Event("vehiclelab:ready"));
 })();

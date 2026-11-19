@@ -3,6 +3,14 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.34.0 — 2026-11-19 (złomowisko)
+
+### Dodane
+- Rodzina modeli **Złomowisko** (JunkKit, z gry Złomowisko): przedmioty (opony, puszki, garnek, gazety, karton, beczka,
+  sztabki), maszyny (piec na papier, zgniatarki, piec indukcyjny, linia odlewnicza), platforma, ogrodzenie z bramą,
+  punkt skupu i przeładowarka z chwytakiem; spód modelu w punkcie obiektu; „Otwórz w laboratorium” — przedmioty,
+  budowle albo pojazdy (ląd).
+
 ## 0.33.1 — 2026-11-14
 
 ### Dodane

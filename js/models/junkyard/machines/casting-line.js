@@ -3,7 +3,7 @@
 // 8 żeliwnych form o jedną podziałkę, gdy forma pod rynną jest pełna; metal stygnie w formach, gotowe sztabki
 // się wyjmuje. Drugi przenośnik z 10 mniejszymi formami na aluminium; rozdzielacz z zasuwą (dźwignia) wybiera przenośnik.
 // Układ: początek rynny nad (0,0,0); rynna biegnie w +z, przenośnik w +x; forma 0 pod końcem rynny.
-import * as THREE from '../../../vendor/three/three.module.js';
+import * as THREE from '../../../../vendor/three/three.module.js';
 import { merge, part, place, uvMeters, roundedBox } from '../geom.js';
 import { mat } from '../materials.js';
 import { INGOT } from '../items/ingot.js';

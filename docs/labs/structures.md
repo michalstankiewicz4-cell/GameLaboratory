@@ -37,6 +37,13 @@ them) and return `heightAt(x, z)` and `bounds` (the lab bakes the heights into a
   crown, green helideck perimeter lights.
 - **Info**: name, specifications, reconstruction note, sources; **Parts** toggles every part.
 
+## The junkyard, on land (1.4.0)
+
+The group *Junkyard (on land)* in the list: the junkyard game's machines (paper furnace, can crusher, metal crusher,
+induction furnace, casting line) and surroundings (platform, fence with a gate, buyback point) — JunkKit
+(`js/models/junkyard/`, [../models/junkyard.md](../models/junkyard.md)). The sea goes away and the seabed becomes dry
+ground at y = 0; the model's top-level parts can be switched off; cameras from its size. `?structure=junk:<id>` opens one.
+
 ## Check
 
 `py tools/lab-check.py` builds every quay and breakwater type (units placed, heights baked, Błyskawica moored),

@@ -308,11 +308,11 @@ window.GameLabCatalog =
       "name": "Structures lab",
       "namePl": "Laboratorium budowli",
       "doc": "docs/labs/structures.md",
-      "desc": "Waterside structures at real scale: a jack-up drilling rig, a quay, a breakwater.",
-      "descPl": "Budowle nad wodą w prawdziwej skali: platforma wiertnicza typu jack-up, nabrzeże, falochron.",
+      "desc": "Structures at real scale: by the water a jack-up drilling rig, a quay, a breakwater; on land the junkyard's machines, platform, fence and buyback point.",
+      "descPl": "Budowle w prawdziwej skali: nad wodą platforma wiertnicza typu jack-up, nabrzeże, falochron; na lądzie maszyny, platforma, ogrodzenie i punkt skupu ze złomowiska.",
       "kind": "lab",
       "kit": "StructKit",
-      "phrases": ["woda", "ląd", "budowle", "platforma", "nabrzeże"],
+      "phrases": ["woda", "ląd", "budowle", "platforma", "nabrzeże", "złom"],
       "saved": ["gameLab.structures."],
       "art": {
         "img": "assets/labs/structures.jpg"
@@ -332,6 +332,23 @@ window.GameLabCatalog =
       "saved": ["gameLab.plants."],
       "art": {
         "img": "assets/labs/plants.jpg"
+      }
+    },
+    {
+      "file": "labs/items.html",
+      "cat": "world",
+      "name": "Items lab",
+      "namePl": "Laboratorium przedmiotów",
+      "doc": "docs/labs/items.md",
+      "desc": "Everyday junk at real scale and mass, from the junkyard: tyres, cans, a pot, newspapers, a box, a drum, ingots — near and far models, collision shapes, crush resistance.",
+      "descPl": "Codzienne śmieci w prawdziwej skali i masie, ze Złomowiska: opony, puszki, garnek, gazety, karton, beczka, sztabki — modele z bliska i z daleka, kształty zderzeń, opór na zgniecenie.",
+      "kind": "lab",
+      "kit": "JunkKit",
+      "phrases": ["ląd", "przedmioty", "śmieci", "złom", "opony"],
+      "saved": ["gameLab.items."],
+      "art": {
+        "bg": ["#3a352c", "#1b1915"],
+        "svg": "<ellipse cx=\"100\" cy=\"92\" rx=\"80\" ry=\"9\" fill=\"#141210\" opacity=\".6\"/><circle cx=\"62\" cy=\"60\" r=\"30\" fill=\"#1c1c1e\"/><circle cx=\"62\" cy=\"60\" r=\"16\" fill=\"#2a2620\"/><circle cx=\"62\" cy=\"60\" r=\"27\" fill=\"none\" stroke=\"#2c2c2f\" stroke-width=\"3\" stroke-dasharray=\"3 3\"/><rect x=\"104\" y=\"38\" width=\"34\" height=\"52\" rx=\"3\" fill=\"#1f4f8f\"/><rect x=\"104\" y=\"50\" width=\"34\" height=\"3\" fill=\"#163a6a\"/><rect x=\"104\" y=\"74\" width=\"34\" height=\"3\" fill=\"#163a6a\"/><rect x=\"146\" y=\"70\" width=\"10\" height=\"20\" rx=\"2\" fill=\"#b3121b\"/><rect x=\"146\" y=\"70\" width=\"10\" height=\"3\" fill=\"#c8ccd0\"/><rect x=\"160\" y=\"74\" width=\"26\" height=\"16\" fill=\"#d8d2c2\"/><path d=\"M160 82H186M173 74V90\" stroke=\"#b89a6a\" stroke-width=\"1.5\"/>"
       }
     },
     {
@@ -730,6 +747,10 @@ window.GameLabCatalog =
     "dialogi": "dialogues",
     "gra": "game",
     "drzewko": "tech tree",
+    "przedmioty": "items",
+    "śmieci": "junk",
+    "złom": "scrap",
+    "opony": "tyres",
     "ulepszenia": "upgrades",
     "badania": "research",
     "sztuka": "art",

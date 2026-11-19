@@ -4,7 +4,7 @@
 // i 4 trójkątnymi, zakrzywionymi szczękami (każda na sworzniu z własnym siłownikiem).
 // Grupy ruchome (nazwy): podwozie › koło 0…3; nadwozie (obrót wokół y) › wysięgnik (x) › ramię (x) › chwytak › szczęka 0…3 (x).
 // Układ: środek podwozia na ziemi w (0,0,0), przód +z.
-import * as THREE from '../../../vendor/three/three.module.js';
+import * as THREE from '../../../../vendor/three/three.module.js';
 import { merge, part, place, uvMeters, roundedBox, lathe, loft, V } from '../geom.js';
 import { mat } from '../materials.js';
 import { buildTire } from '../items/tire-core.js';

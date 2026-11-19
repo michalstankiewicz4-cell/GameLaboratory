@@ -2,7 +2,7 @@
 // otwór wsadowy 1,2 × 0,8 m z otwartymi drzwiami i pochyłą tacą (przedmiot położony na tacy zsuwa się do środka),
 // ruszt z żarem pod spodem, szuflada popielnika, komin Ø 40 cm z daszkiem, żaluzje, termometr, nity na krawędziach.
 // Układ lokalny: środek podstawy w (0,0,0), front w stronę +z.
-import * as THREE from '../../../vendor/three/three.module.js';
+import * as THREE from '../../../../vendor/three/three.module.js';
 import { merge, part, place, uvMeters, roundedBox, lathe } from '../geom.js';
 import { mat } from '../materials.js';
 

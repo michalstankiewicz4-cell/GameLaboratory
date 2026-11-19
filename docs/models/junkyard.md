@@ -1,7 +1,15 @@
-# Modele
+# Złomowisko — modele (JunkKit, `js/models/junkyard/`)
 
-Modele budowane kodem (`js/models/`), bez DOM. Każdy moduł eksportuje `build(lod)` i `info`.
-Materiały — `js/models/materials.js` (dane), tekstury proceduralne — `js/render/textures.js`.
+Modele z gry Złomowisko (repo Trash), przeniesione z historią (`js/models/` → `js/models/junkyard/`,
+`js/render/textures.js` → `textures.js`, `js/physics/shapes.js` → `shapes.js`). Budowane kodem, bez DOM (działają
+w Node — doktor modeli). Każdy moduł eksportuje `build(lod)` i `info`; spis z nazwami EN/PL: `registry.js` (`MODELS`,
+`GROUPS`). Materiały — `materials.js` (dane), tekstury proceduralne — `textures.js` (`applyTextures`, MatKit z
+`js/render/materials/matkit.js`), zderzacz → części wypukłe — `shapes.js`. Logika gry (fizyka Rapier, jazda pojazdu,
+maszyny w działaniu) została w grze.
+
+Gdzie oglądane: przedmioty — [laboratorium przedmiotów](../labs/items.md); maszyny i otoczenie — laboratorium budowli
+(grupa „Junkyard (on land)”); przeładowarka — laboratorium pojazdów, ląd (ruchome części suwakami). W edytorze sceny:
+rodzina „Junkyard”. Doktor modeli: `tools/doctor/sources/junkyard.js`.
 
 ## Przedmioty
 

@@ -1,9 +1,9 @@
 // Tekstury proceduralne (canvas 2D) dla materiałów z js/models/materials.js — tylko w przeglądarce.
 // applyTextures() dokłada mapy wszystkim utworzonym materiałom wg pola `tex` ich opisu (raz na materiał).
-import * as THREE from '../../vendor/three/three.module.js';
-import { allMaterials } from '../models/materials.js';
-import { rng } from '../models/geom.js';
-import { makeMaterial } from './matkit.js';
+import * as THREE from '../../../vendor/three/three.module.js';
+import { allMaterials } from './materials.js';
+import { rng } from './geom.js';
+import { makeMaterial } from '../../render/materials/matkit.js';
 
 let maxAniso = 8;
 export function setAnisotropy(n) { maxAniso = n; }

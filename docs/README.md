@@ -46,6 +46,7 @@ W kolejności kategorii z menu Narzędzia i strony startowej (`ui/data/catalog.j
 | | Filtry | `labs/filters.html` | [labs/filters.md](labs/filters.md) |
 | | Budowle | `labs/structures.html` | [labs/structures.md](labs/structures.md), [labs/structures/coastal.md](labs/structures/coastal.md), [labs/structures/super300.md](labs/structures/super300.md) |
 | | Rośliny | `labs/plants.html` | [labs/plants.md](labs/plants.md) |
+| | Przedmioty (złomowisko) | `labs/items.html`, `js/models/junkyard/` | [labs/items.md](labs/items.md), [models/junkyard.md](models/junkyard.md) |
 | Życie i postacie | Życie, edytor stworów | `labs/life.html`, `labs/creator.html` | [labs/life.md](labs/life.md) |
 | | Człowiek | `labs/human.html` | [labs/human.md](labs/human.md) |
 | | Przedmioty bohatera | `labs/gear.html` | [labs/gear.md](labs/gear.md) |

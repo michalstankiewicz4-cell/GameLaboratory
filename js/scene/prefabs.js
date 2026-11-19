@@ -19,6 +19,7 @@ import * as THREE from '../../vendor/three/three.module.js';
 import { SPECIES, SPECIES_IDS, growPlant, plantMaterials, windUniforms } from '../models/plants/plantkit.js';
 import { buildCave } from '../models/caves/cavekit.js';
 import { buildBody as buildBlocks, SHAPES as BLOCK_SHAPES } from '../models/blocks/blockkit.js';
+import { MODELS as JUNK } from '../models/junkyard/registry.js';
 
 // family: grupa na liście; surface: gdzie stoi ('sea' — na wodzie, 'land' — na gruncie, 'air' — w powietrzu)
 export const FAMILIES = {
@@ -38,6 +39,7 @@ export const FAMILIES = {
   humans: { label: 'Humans', labelPl: 'Ludzie' },
   creatures: { label: 'Creatures', labelPl: 'Stwory' },
   blocks: { label: 'Blocks', labelPl: 'Bloki' },
+  junkyard: { label: 'Junkyard', labelPl: 'Złomowisko' },
 };
 
 const P = [];
@@ -143,6 +145,19 @@ function buildLife(id) {
   const b = buildBlocks(opts && opts.asset ? opts.asset : { shape: id, radius: id === 'belt' ? 6 : 8 });
   return { root: b.group, kit: b, dispose: () => b.dispose(), tick: (t) => b.update(t) };
 }, { assetKind: 'blocks' }));
+
+// złomowisko (JunkKit, z gry Złomowisko): przedmioty, maszyny, otoczenie i przeładowarka z chwytakiem, w prawdziwej
+// skali; spód modelu w punkcie obiektu (przedmioty mają środek masy w zerze); tekstury proceduralne tylko w przeglądarce
+const JUNK_MODS = await Promise.all(JUNK.map((m) => m.load()));
+let junkTex = null;
+const JUNK_LAB = { items: 'labs/items.html?item=', machines: 'labs/structures.html?structure=junk:', world: 'labs/structures.html?structure=junk:', vehicle: 'labs/vehicles-land.html' };
+JUNK.forEach((m, i) => add('junkyard/' + m.id, m.name, 'junkyard', 'land', JUNK_LAB[m.group] + (m.group === 'vehicle' ? '' : m.id), () => {
+  const model = JUNK_MODS[i].build(0), root = new THREE.Group();
+  if (typeof document !== 'undefined') (junkTex || (junkTex = import('../models/junkyard/textures.js'))).then((t) => t.applyTextures());
+  model.updateMatrixWorld(true); model.position.y -= new THREE.Box3().setFromObject(model).min.y; root.add(model);
+  root.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  return { root, kit: { info: JUNK_MODS[i].info }, dispose: () => model.traverse((o) => { if (o.isMesh) o.geometry.dispose(); }) };
+}));
 
 export const PREFABS = P;
 export const prefab = (id) => P.find((p) => p.id === id) || null;

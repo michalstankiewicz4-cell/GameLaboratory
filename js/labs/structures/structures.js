@@ -3,6 +3,8 @@
 // three constructions (with ORP Błyskawica moored alongside if wanted) and breakwaters in three types. Each structure's
 // own settings come from its PARAMS; its height function is baked into a texture so the sea shows shallows and surf
 // along slopes and walls. Info panel with specifications, sources and parts.
+// On land: the junkyard's machines and surroundings (JunkKit, js/models/junkyard/ — from the junkyard game, with history):
+// the sea goes away and the seabed becomes dry ground at the water line.
 import * as THREE from '../../../vendor/three/three.module.js';
 import { STRUCTURE_IDS, buildStructure, structureInfo, structureParams } from '../../models/structures/index.js';
 import { heightTexture, landUniforms, setLand, GLSL_LAND } from '../../envs/land/landkit.js';
@@ -10,6 +12,8 @@ import { transformShip } from '../../models/ships-sea/transform.js';
 import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment } from '../../envs/sky/skykit.js';
 import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, LOOKS } from '../../envs/water/waterkit.js';
 import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
+import { MODELS as JUNK, junkEntry } from '../../models/junkyard/registry.js';
+import { applyTextures as junkTextures, setAnisotropy as junkAniso } from '../../models/junkyard/textures.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -19,6 +23,7 @@ const KEY = 'gameLab.structures.v1';
 let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { saved = null; }
 const S = { id: STRUCTURE_IDS[0], depth: 60, air: 18, jspeed: 400, canti: 0, cranes: false, weather: 'fair', time: 'Day', params: {}, moor: true, ...(saved || {}) };
 S.params = S.params || {};
+{ const q = new URLSearchParams(location.search).get('structure'); if (q) S.id = q; }   // „Open in the lab” from the scene editor
 S.depths = { super300: 60, quay: 11, breakwater: 11, ...(S.depths || {}) };     // each structure keeps its own water depth
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { /* private mode */ } };
 
@@ -44,6 +49,10 @@ const water = new THREE.Mesh(polarGrid(192, 160, 0.6, 16000), waterMaterial(WU, 
 water.material.side = THREE.DoubleSide; water.frustumCulled = false; water.renderOrder = 1; scene.add(water);
 WU.uShipFx.value.set(0, 0, 0, 0); WU.uWetOn.value = 0; WU.uAlpha.value = 0.9;
 const seabed = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000, 1, 1).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x8a7d62, roughness: 1 }));
+junkAniso(renderer.capabilities.getMaxAnisotropy());
+const JUNK_STRUCT = JUNK.filter((m) => m.group === 'machines' || m.group === 'world');   // on land (the junkyard)
+const isJunk = (id) => String(id).startsWith('junk:');
+let onLand = false;   // a junkyard structure is shown: no sea, the ground is dry at y = 0
 seabed.receiveShadow = true; scene.add(seabed);
 let waves = [];
 function seaFor(wind) {
@@ -72,7 +81,48 @@ function updateSky() {
 /* ---------------- structure ---------------- */
 let st = null, buildMs = 0;
 const jack = { legs: 1, air: S.air, target: 'up', phase: '' };
+function setLandMode(on) {
+  onLand = on; water.visible = !on;
+  seabed.material.color.setHex(on ? 0x6b604e : 0x8a7d62);
+  for (const id of ['depth']) $(id).closest('.row').hidden = on;
+}
+// a junkyard machine or surrounding (JunkKit): built at real scale, standing on dry ground
+let junkSeq = 0;
+async function rebuildJunk() {
+  const seq = ++junkSeq, e = junkEntry(S.id.slice(5)); if (!e) return;
+  const t0 = performance.now(), mod = await e.load(); if (seq !== junkSeq) return;
+  if (st) { scene.remove(st.group); st.group.traverse((o) => { if (o.isMesh) o.geometry.dispose(); }); }
+  const g = mod.build(0); junkTextures();
+  const b0 = new THREE.Box3().setFromObject(g); g.position.y -= b0.min.y;
+  const parts = {}; g.children.forEach((c, i) => { parts[c.name || `part ${i + 1}`] = c; });
+  st = { group: g, parts, junk: true };
+  buildMs = Math.round(performance.now() - t0);
+  scene.add(g);
+  g.traverse((o) => { if (o.isMesh && !o.material.isMeshBasicMaterial) { o.castShadow = true; o.receiveShadow = true; } });
+  window.LabPerf.model(g, buildMs);
+  const b = new THREE.Box3().setFromObject(g), sz = b.getSize(new THREE.Vector3()), I = mod.info || {};
+  $('sName').textContent = e.name; $('sSub').textContent = `Junkyard · ${e.group === 'machines' ? 'machine' : 'surroundings'} · model ${I.version || ''}`;
+  $('sNote').textContent = `${I.name || e.namePl} — from the junkyard game (JunkKit, js/models/junkyard/), built from code at real scale.`;
+  const specs = [['Size', `${sz.x.toFixed(2)} × ${sz.y.toFixed(2)} × ${sz.z.toFixed(2)} m`]];
+  if (I.mass) specs.push(['Mass', `${I.mass.toLocaleString('en')} kg`]);
+  let tris = 0; g.traverse((o) => { if (o.isMesh) tris += (o.geometry.index ? o.geometry.index.count : o.geometry.attributes.position.count) / 3; });
+  specs.push(['Triangles', Math.round(tris).toLocaleString('en')]);
+  $('specs').replaceChildren(...specs.map(([k, v]) => el('tr', {}, el('td', { textContent: k }), el('td', { textContent: v }))));
+  $('sources').replaceChildren();
+  $('parts').replaceChildren(...Object.entries(parts).map(([k, o]) => {
+    const c = el('input', { type: 'checkbox', checked: true }); c.onchange = () => { o.visible = c.checked; };
+    return el('label', { className: 'chk' }, c, k);
+  }));
+  $('rigPanel').hidden = true; $('paramPanel').hidden = true; $('moorRow').hidden = true;
+  setLandMode(true); seabed.position.y = 0; bakeShore(); placeShip();
+  const r = Math.max(sz.x, sz.y, sz.z), c = b.getCenter(new THREE.Vector3()), cy = sz.y * 0.4;
+  junkCams = [['Overview', [c.x, cy, c.z], r * 1.9, 0.8, 0.3], ['Front', [c.x, cy, c.z], r * 1.6, 0, 0.1], ['Side', [c.x, cy, c.z], r * 1.6, Math.PI / 2, 0.1], ['High', [c.x, 0, c.z], r * 2.6, 0.6, 1.1]];
+  setCams();
+}
+let junkCams = null;
 function rebuild() {
+  if (isJunk(S.id)) { rebuildJunk(); return; }
+  setLandMode(false); junkCams = null;
   if (st) { scene.remove(st.group); st.group.traverse((o) => { if (o.isMesh) o.geometry.dispose(); }); }
   const t0 = performance.now();
   S.depth = S.depths[S.id] ?? S.depth; $('depth').value = S.depth; $('depthV').textContent = S.depth + ' m';
@@ -101,7 +151,7 @@ function rebuild() {
 }
 function applyPose() {
   if (!st) return;
-  seabed.position.y = -S.depth;
+  seabed.position.y = onLand ? 0 : -S.depth;
   if (!st.pose) return;
   st.pose({ depth: S.depth, air: jack.air, legsDown: jack.legs });
   st.cantilever.position.z = -S.canti;
@@ -153,6 +203,7 @@ function fillParams(P, own) {
 /* ---------------- UI ---------------- */
 for (const id of STRUCTURE_IDS) $('structure').append(el('option', { value: id, textContent: structureInfo(id).name }));
 for (const t of ['Piers and jetties (soon)', 'Harbours (soon)', 'Lighthouses (soon)']) $('structure').append(el('option', { textContent: t, disabled: true }));
+{ const og = el('optgroup', { label: 'Junkyard (on land)' }); JUNK_STRUCT.forEach((m) => og.append(el('option', { value: 'junk:' + m.id, textContent: m.name }))); $('structure').append(og); }
 $('structure').value = S.id; $('structure').onchange = () => { S.id = $('structure').value; rebuild(); save(); };
 for (const [k, w] of Object.entries(WEATHER)) $('weather').append(el('option', { value: k, textContent: w.label }));
 $('weather').value = S.weather; $('weather').onchange = () => { S.weather = $('weather').value; updateSky(); save(); };
@@ -160,7 +211,7 @@ for (const t of Object.keys(TIMES)) $('times').append(el('button', { type: 'butt
 const markTimes = () => [...$('times').children].forEach((b) => b.classList.toggle('on', b.textContent === S.time));
 const bind = (id, fmt, fn) => { const r = $(id), o = $(id + 'V'); r.value = S[id]; o.textContent = fmt(+r.value); r.addEventListener('input', () => { S[id] = +r.value; o.textContent = fmt(S[id]); if (fn) fn(); save(); }); };
 let depthTimer = 0;
-bind('depth', (v) => v + ' m', () => { S.depths[S.id] = S.depth; applyPose(); if (st && !st.pose) { clearTimeout(depthTimer); depthTimer = setTimeout(rebuild, 250); } });
+bind('depth', (v) => v + ' m', () => { if (onLand) return; S.depths[S.id] = S.depth; applyPose(); if (st && !st.pose) { clearTimeout(depthTimer); depthTimer = setTimeout(rebuild, 250); } });
 $('moor').checked = S.moor; $('moor').onchange = () => { S.moor = $('moor').checked; placeShip(); save(); };
 bind('air', (v) => v + ' m', () => { if (jack.target === 'up' && !jack.phase) jack.air = S.air; applyPose(); });
 bind('jspeed', (v) => '×' + v);
@@ -187,6 +238,7 @@ function stepJack(dt) {
 const orbit = { target: new THREE.Vector3(0, 20, 0), dist: 210, yaw: 2.4, pitch: 0.18, want: null };
 // camera presets per structure: [label, target, distance, yaw, pitch] (yaw: 0 looks from +z, π/2 from the sea side +x)
 function camsFor() {
+  if (onLand && junkCams) return junkCams;
   const own = S.params[S.id] || {}, L = own.length || 200, z1 = L / 2, cope = own.cope || 2.6, crest = own.crest || 4.5;
   if (S.id === 'quay') return [['Overview', [-12, 2, 0], Math.max(160, L * 0.8), 1.1, 0.35], ['From the sea', [0, 3, 0], 95, 1.45, 0.05], ['Along the quay', [0, 4, 0], L * 0.62, 2.9, 0.07],
     ['Bollard and fender', [0, cope, -L / 2 + 15], 10, 1.0, 0.25], ['Underwater', [8, -6, 0], 45, 1.3, -0.1], ['High', [-20, 0, 0], Math.max(380, L * 1.4), 1.2, 0.9]];
@@ -232,10 +284,10 @@ function frame(now) {
   }
   const c = Math.cos(orbit.pitch);
   camera.position.set(orbit.target.x + Math.sin(orbit.yaw) * c * orbit.dist, orbit.target.y + Math.sin(orbit.pitch) * orbit.dist, orbit.target.z + Math.cos(orbit.yaw) * c * orbit.dist);
-  camera.position.y = Math.max(camera.position.y, -S.depth + 2);
+  camera.position.y = Math.max(camera.position.y, onLand ? 0.3 : -S.depth + 2);
   camera.lookAt(orbit.target);
   // under the surface: blue-green murk instead of the sky's haze
-  const under = camera.position.y < heightAt(waves, camera.position.x, camera.position.z, simT) - 0.2;
+  const under = !onLand && camera.position.y < heightAt(waves, camera.position.x, camera.position.z, simT) - 0.2;
   sky.visible = !under;
   if (under) { scene.fog.color.setRGB(0.04 * (0.2 + dayNow), 0.16 * (0.2 + dayNow), 0.2 * (0.2 + dayNow)); scene.fog.density = 0.02; scene.background = scene.fog.color; }
   else { scene.background = null; const fk = fogBase / (1 + Math.max(0, camera.position.y - 40) / 300); scene.fog.density = fk; WU.uFogDen.value = fk; if (envDirty === false) scene.fog.color.copy(WU.uFogCol.value); }

@@ -2,7 +2,7 @@
 // poziomy tłok hydrauliczny (siłownik Ø 125 mm, skok 1,35 m), podnoszona zasuwa wylotowa, zsyp do kosza
 // z siatki, agregat hydrauliczny z silnikiem i zbiornikiem, przewody, szafka sterownicza z przyciskami,
 // podest ze schodkami i barierką do zasypywania ręcznego. Układ: środek podstawy w (0,0,0), oś tłoka = +x.
-import * as THREE from '../../../vendor/three/three.module.js';
+import * as THREE from '../../../../vendor/three/three.module.js';
 import { merge, part, place, uvMeters, roundedBox, lathe } from '../geom.js';
 import { mat } from '../materials.js';
 

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Items Lab — tyres, cans, drums, newspapers at real scale | GameLaboratory</title>
+<meta name="description" content="GameLaboratory items lab: everyday junk built from code at real scale and mass — car, bicycle and tractor tyres, aluminium cans (whole and crushed), a cooking pot, tied newspapers, a cardboard box, a steel drum, ingots — with near and far detail, variants, collision shapes and how hard each one is to crush.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/items.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Items Lab — junk at real scale">
+<meta property="og:description" content="Tyres, cans, drums and newspapers built from code: real sizes and masses, collision shapes, crush resistance.">
+<meta property="og:url" content="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/items.html">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../ui/style/sea.css">
+<link rel="stylesheet" href="../ui/ui.css">
+</head>
+<!-- Laboratorium przedmiotów (js/labs/items/): przedmioty JunkKit (js/models/junkyard/, ze Złomowiska). -->
+<body class="lab viewFits">
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/shell/menubar.js"></script>
+<script src="../ui/shell/loader.js"></script>
+<div id="view"></div>
+<div class="bar">
+  <select id="item" aria-label="Item" title="An item from the junkyard"></select>
+  <select id="variant" aria-label="Variant" title="The item's variant"></select>
+  <span class="sp"></span>
+  <span class="dimtxt" id="status"></span>
+</div>
+<aside class="panel" data-std="info">
+  <h2 class="stdName" id="itName"></h2>
+  <p class="stdText" id="itNote">Junk built from code at real scale and mass: the near model (LOD 0) and the far one (LOD 1), its collision shape and how hard it is to crush along each axis.</p>
+</aside>
+<aside class="panel" data-window="item" data-title="Item" data-title-pl="Przedmiot">
+  <div class="stats" id="itStats"></div>
+  <h3>Show</h3>
+  <label class="chk"><input type="checkbox" id="lod1"> Far model (LOD 1)</label>
+  <label class="chk"><input type="checkbox" id="wire"> Wireframe</label>
+  <label class="chk"><input type="checkbox" id="coll"> Collision shape (convex parts)</label>
+  <label class="chk"><input type="checkbox" id="pair" checked> Near and far side by side</label>
+  <p class="note">The collision shape is the one a physics engine gets: convex parts (a tyre — a ring with flat sides, a pot — an open cup). The crush resistance: the force from which the item starts to give way along the axis; the minimum scale — how far it can be crushed.</p>
+</aside>
+<aside class="panel" data-std="camera">
+  <div class="btns" id="cams"></div>
+  <p class="note">Drag to orbit, wheel to zoom.</p>
+</aside>
+<aside class="panel" data-std="light">
+  <div class="row"><span>Weather</span><select id="weather"></select><output></output></div>
+  <div class="row"><span>Sun height</span><input type="range" id="sunEl" min="-6" max="70" step="1"><output id="sunElV"></output></div>
+  <div class="row"><span>Sun bearing</span><input type="range" id="sunAz" min="0" max="360" step="2"><output id="sunAzV"></output></div>
+</aside>
+<aside class="panel" data-std="perf">
+  <div class="stats" id="stats"></div>
+</aside>
+<div class="foot">
+  <span id="fps"></span>
+  <span class="sp"></span>
+  <span>GameLaboratory</span>
+</div>
+<script src="../ui/shell/perf.js"></script>
+<script src="../ui/shell/labwin.js"></script>
+<script src="../ui/shell/windows.js"></script>
+<script type="module" src="../js/labs/items/items.js"></script>
+</body>
+</html>

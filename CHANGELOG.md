@@ -3,6 +3,25 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.75.0 · przedmioty 1.0.0 · budowle 1.4.0 · pojazdy (ląd) 1.18.0 · edytor 0.34.0 — 2026-11-19 (złomowisko)
+
+### Dodane
+- **Modele ze Złomowiska** (repo Trash, z historią) jako JunkKit `js/models/junkyard/`: przedmioty, maszyny, otoczenie
+  i pojazd w prawdziwej skali i masie, z LOD 0 / 1, opisem zderzacza (`shapes.js`) i oporem na zgniecenie; materiały
+  jako dane (`materials.js`), tekstury proceduralne przez MatKit (`textures.js`); spis `registry.js` z nazwami EN/PL.
+  Opis: `docs/models/junkyard.md`.
+- **Laboratorium przedmiotów** (`labs/items.html`, kategoria Świat): opony samochodowa, rowerowa i traktorowa, puszka
+  (cała i zgnieciona), garnek, gazety, karton, beczka, sztabki — model z bliska i z daleka obok siebie, warianty,
+  siatka, kształt zderzenia z części wypukłych, wymiary, masa, opór na zgniecenie; `ItemsApi`.
+- **Laboratorium budowli**: grupa „Junkyard (on land)” — piec na papier, zgniatarki do puszek i metalu, piec
+  indukcyjny, linia odlewnicza, platforma, ogrodzenie z bramą, punkt skupu; bez morza, na suchym gruncie, części
+  do włączania i wyłączania.
+- **Laboratorium pojazdów (ląd)**: przeładowarka z chwytakiem — obrót nadwozia, wysięgnik, ramię, obrót chwytaka
+  i szczęki suwakami (bez jazdy: jazda i chwytanie przez fizykę zostały w grze).
+- **Edytor sceny**: rodzina prefabrykatów „Junkyard” (20 modeli).
+- Doktor modeli: źródło `tools/doctor/sources/junkyard.js`; wzorzec uzupełniony o 20 modeli (inne bez zmian).
+- `vendor/three/addons`: `ConvexGeometry` i `ConvexHull` (r186, do rysowania zderzaczy).
+
 ## Program 0.74.0 · drzewka 1.1.0 · UI gry 1.2.0 · sztuka 1.3.0 — 2026-11-19 (laboratorium drzewek, etap 2)
 
 ### Dodane

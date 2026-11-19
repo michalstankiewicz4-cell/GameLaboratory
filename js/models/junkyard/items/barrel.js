@@ -1,7 +1,7 @@
 // Beczka stalowa 200 l (typ 1A1, zamknięta): Ø 572 mm (rąbki 585 mm), wys. 880 mm, blacha 1 mm. Dwa obręcze
 // toczne (przetłoczenia), zwijane rąbki dna i wieka, wieko wpuszczone z dwoma korkami gwintowanymi (2" i 3/4")
 // z żeberkami, wgniecenia, łuszcząca się farba z rdzą na krawędziach. Warianty farby: niebieska, czerwona, oliwkowa.
-import * as THREE from '../../../vendor/three/three.module.js';
+import * as THREE from '../../../../vendor/three/three.module.js';
 import { lathe, merge, part, place, rng } from '../geom.js';
 import { mat, defineMat, DEFS } from '../materials.js';
 

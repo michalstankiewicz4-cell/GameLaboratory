@@ -1,6 +1,6 @@
 // Związany stos gazet (makulatura): ~60 gazet w formacie tabloidu złożonych na pół (42 × 30 cm), w warstwach lekko
 // przesuniętych i skręconych, na wierzchu pierwsza strona; obwiązany sznurkiem jutowym na krzyż z supłem na górze.
-import * as THREE from '../../../vendor/three/three.module.js';
+import * as THREE from '../../../../vendor/three/three.module.js';
 import { merge, part, place, roundedBox, rng } from '../geom.js';
 import { mat } from '../materials.js';
 

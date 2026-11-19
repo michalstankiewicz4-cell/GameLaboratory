@@ -3,7 +3,7 @@
 // rama przechyłu na dwóch stojakach z łożyskami (oś obrotu przy wylewie — strumień nie ucieka przy przechylaniu),
 // siłownik przechyłu z tyłu, szafa zasilania (falownik) z miernikami, szyny prądowe i węże chłodzenia, podest ze
 // schodami za piecem. Grupa `tygiel` obraca się wokół osi x w punkcie LAYOUT.pivot.
-import * as THREE from '../../../vendor/three/three.module.js';
+import * as THREE from '../../../../vendor/three/three.module.js';
 import { merge, part, place, uvMeters, roundedBox, lathe } from '../geom.js';
 import { mat } from '../materials.js';
 

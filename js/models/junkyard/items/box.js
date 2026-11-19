@@ -1,7 +1,7 @@
 // Karton zamknięty (klapowy, typ F0201), 40 × 30 × 30 cm, tektura falista 4 mm: ścianki lekko wybrzuszone,
 // jeden górny róg wgnieciony, klapy górne z widoczną szczeliną, taśma pakowa przez szczelinę zawinięta na boki,
 // zakładka klejona na jednym narożniku; nadruki (strzałki „góra”, szkło, recykling, pieczątka wymiarów).
-import * as THREE from '../../../vendor/three/three.module.js';
+import * as THREE from '../../../../vendor/three/three.module.js';
 import { merge, part, place, roundedBox } from '../geom.js';
 import { mat } from '../materials.js';
 

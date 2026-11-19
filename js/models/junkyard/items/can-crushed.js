@@ -1,7 +1,7 @@
 // Puszka zgnieciona: ta sama puszka 0,33 l (js/models/items/can.js) sprasowana wzdłuż osi do ~38 mm — ścianka
 // złożona w harmonijkę (fałdy wybrzuszone na zewnątrz, nierówne wokół), wieczko przekrzywione i przesunięte.
 // Nadruk zostaje na pogniecionej ściance (te same UV). Warianty jak w puszce.
-import * as THREE from '../../../vendor/three/three.module.js';
+import * as THREE from '../../../../vendor/three/three.module.js';
 import { buildCan, VARIANTS } from './can.js';
 import { rng } from '../geom.js';
 

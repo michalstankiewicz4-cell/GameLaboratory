@@ -118,3 +118,10 @@ The ShipKit spacecraft with motion numbers (Codewing, Scribe, Swarmer) are on th
 planet brings the planet's (Luna: weak gravity, no air). The ship starts 40 m up with the lift thrusters off. AUTO is a
 controller that holds 1.5 m/s down and sets it on its four landing pads; by hand: Space — lift thrusters, W / S — the
 main engine, A / D — yaw. Touching down faster than 5 m/s breaks it.
+
+## The grapple loader from the junkyard (1.18.0)
+
+*Junkyard · grapple loader* in the list: JunkKit's wheeled scrap loader (`js/models/junkyard/vehicle/grapple-truck.js`,
+from the junkyard game) as a family of its own (`js/labs/vehicles-land/junk.js`): its moving groups — the upper body
+slews, the boom and the stick swing, the grapple hangs plumb and rotates, four jaws open — on sliders. It does not drive
+here: in the game it drives and grabs by Rapier physics, which stayed there.

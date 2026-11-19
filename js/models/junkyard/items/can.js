@@ -2,7 +2,7 @@
 // do stawiania, zwężenie dolne, ścianka z nadrukiem, szyjka zwężona do wieczka Ø 54 mm, podwójny zawijany szew,
 // wieczko z wgłębieniem, nit, języczek (stay-on tab) z otworem i otwór wlewu (ciemny, kształt łezki).
 // Warianty nadruku: 0 — piwo jasne (złoto-zielona), 1 — napój cola (czerwona), 2 — woda gazowana (niebieska).
-import * as THREE from '../../../vendor/three/three.module.js';
+import * as THREE from '../../../../vendor/three/three.module.js';
 import { lathe, merge, part, place, smooth2 } from '../geom.js';
 import { mat, defineMat, DEFS } from '../materials.js';
 

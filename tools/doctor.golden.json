@@ -14,6 +14,280 @@
    "triangles": 19735
   }
  },
+ "junkyard/barrel": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 3,
+   "size": [
+    0.59,
+    0.88,
+    0.59
+   ],
+   "triangles": 11200
+  }
+ },
+ "junkyard/box": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 4,
+   "materials": 3,
+   "size": [
+    0.41,
+    0.3,
+    0.31
+   ],
+   "triangles": 1044
+  }
+ },
+ "junkyard/buyback": {
+  "counts": {
+   "floating": 1
+  },
+  "fingerprint": {
+   "drawCalls": 11,
+   "materials": 8,
+   "size": [
+    4.81,
+    4.05,
+    6.4
+   ],
+   "triangles": 1224
+  }
+ },
+ "junkyard/can": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 4,
+   "materials": 3,
+   "size": [
+    0.07,
+    0.12,
+    0.07
+   ],
+   "triangles": 4671
+  }
+ },
+ "junkyard/can-crushed": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 4,
+   "materials": 3,
+   "size": [
+    0.08,
+    0.04,
+    0.08
+   ],
+   "triangles": 10079
+  }
+ },
+ "junkyard/can-crusher": {
+  "counts": {
+   "floating": 2
+  },
+  "fingerprint": {
+   "drawCalls": 16,
+   "materials": 10,
+   "size": [
+    5.32,
+    3.18,
+    2.8
+   ],
+   "triangles": 5492
+  }
+ },
+ "junkyard/casting-line": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 27,
+   "materials": 6,
+   "size": [
+    4.85,
+    1.58,
+    3.73
+   ],
+   "triangles": 3940
+  }
+ },
+ "junkyard/fence": {
+  "counts": {
+   "sliver": 2,
+   "zfight": 1
+  },
+  "fingerprint": {
+   "drawCalls": 6,
+   "materials": 4,
+   "size": [
+    80.7,
+    3.14,
+    80.63
+   ],
+   "triangles": 10822
+  }
+ },
+ "junkyard/furnace-paper": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 9,
+   "materials": 5,
+   "size": [
+    2.5,
+    8.77,
+    3.34
+   ],
+   "triangles": 5848
+  }
+ },
+ "junkyard/grapple-truck": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 33,
+   "materials": 9,
+   "size": [
+    3.05,
+    5.99,
+    13.18
+   ],
+   "triangles": 68412
+  }
+ },
+ "junkyard/induction-furnace": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 17,
+   "materials": 11,
+   "size": [
+    5.11,
+    2.32,
+    3.12
+   ],
+   "triangles": 18520
+  }
+ },
+ "junkyard/ingot": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    0.39,
+    0.08,
+    0.12
+   ],
+   "triangles": 392
+  }
+ },
+ "junkyard/ingot-small": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    0.25,
+    0.05,
+    0.08
+   ],
+   "triangles": 392
+  }
+ },
+ "junkyard/metal-crusher": {
+  "counts": {
+   "floating": 1,
+   "sliver": 1,
+   "zfight": 3
+  },
+  "fingerprint": {
+   "drawCalls": 15,
+   "materials": 10,
+   "size": [
+    6.18,
+    9.4,
+    4.31
+   ],
+   "triangles": 7124
+  }
+ },
+ "junkyard/newspapers": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 3,
+   "materials": 3,
+   "size": [
+    0.44,
+    0.24,
+    0.32
+   ],
+   "triangles": 21996
+  }
+ },
+ "junkyard/platform": {
+  "counts": {
+   "sliver": 1,
+   "zfight": 4
+  },
+  "fingerprint": {
+   "drawCalls": 17,
+   "materials": 8,
+   "size": [
+    26.22,
+    10.23,
+    25.46
+   ],
+   "triangles": 34112
+  }
+ },
+ "junkyard/pot": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 23,
+   "materials": 1,
+   "size": [
+    0.35,
+    0.15,
+    0.24
+   ],
+   "triangles": 12192
+  }
+ },
+ "junkyard/tire-bike": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 2,
+   "size": [
+    0.69,
+    0.04,
+    0.69
+   ],
+   "triangles": 35168
+  }
+ },
+ "junkyard/tire-car": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 2,
+   "size": [
+    0.63,
+    0.21,
+    0.63
+   ],
+   "triangles": 38948
+  }
+ },
+ "junkyard/tire-tractor": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 2,
+   "size": [
+    1.79,
+    0.47,
+    1.79
+   ],
+   "triangles": 32272
+  }
+ },
  "road/abrams": {
   "counts": {
    "sliver": 7

@@ -1,7 +1,7 @@
 // Garnek ze stali nierdzewnej 6 l (Ø 24 cm, wys. 15 cm), bez pokrywki: ścianka 1 mm z zawiniętym brzegiem,
 // dno kapsułowe (warstwowe, grubsze, mniejszej średnicy), dwa uchwyty pałąkowe przynitowane do ścianki
 // (płytka, 2 nity z łbami w środku garnka). Otwarty — w środku mieszczą się mniejsze przedmioty.
-import * as THREE from '../../../vendor/three/three.module.js';
+import * as THREE from '../../../../vendor/three/three.module.js';
 import { lathe, merge, part, place, roundedBox } from '../geom.js';
 import { mat } from '../materials.js';
 

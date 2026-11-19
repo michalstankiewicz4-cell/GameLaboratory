@@ -1,7 +1,7 @@
 // Mała sztabka aluminiowa z osobnych, mniejszych form linii odlewniczej: ostrosłup ścięty 250 × 80 mm u góry,
 // 220 × 60 mm u dołu, wys. 50 mm (~0,83 l ≈ 2,2 kg aluminium), zaokrąglone krawędzie, skurcz na górze.
 // Wygląd i budowa jak dużej sztabki (js/models/items/ingot.js); warianty składu te same.
-import * as THREE from '../../../vendor/three/three.module.js';
+import * as THREE from '../../../../vendor/three/three.module.js';
 import { part } from '../geom.js';
 import { mat, defineMat } from '../materials.js';
 import { ingotGeometry, VARIANTS } from './ingot.js';

@@ -1,6 +1,6 @@
 // Narzędzia geometrii dla modeli budowanych kodem (bez DOM — działają też w Node, w doktorze modeli).
 // Wszystko w metrach, oś Y w górę. Zamknięte bryły są zawsze zwracane ścianami na zewnątrz (orientOutward).
-import * as THREE from '../../vendor/three/three.module.js';
+import * as THREE from '../../../vendor/three/three.module.js';
 
 const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
 
