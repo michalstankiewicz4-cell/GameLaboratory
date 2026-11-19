@@ -124,11 +124,13 @@ let tramAcc = 0;
 const dust = VK.makeDust(0xc9a27c); scene.add(dust.points);
 // other model families (e.g. the train, js/labs/vehicles-land/train.js) show here instead
 // of a VehicleKit vehicle: { name, role, build(scene) → group, rows(), target, camera,
-// panel (their own controls, in place of DRIVE / GROUND), update(dt, t) (their behaviour, each frame) }
+// panel (their own controls, in place of DRIVE / GROUND), update(dt, t) (their behaviour, each frame),
+// prepare() (optional, async: loads what build needs, before the first build), leave() (optional: shown no more) }
 let mode = null;
 const modes = [];
 function setMode(m) {
   if (mode && mode.group) mode.group.visible = false;
+  if (mode && mode !== m && mode.leave) mode.leave();   // the family stops listening to its keys
   mode = m;
   const on = !!m;
   ground.visible = !on && !world; if (world) stage.setSurface(on ? "none" : "land"); dust.points.visible = !on; if (veh) veh.group.visible = !on;
@@ -201,7 +203,7 @@ LIST.forEach(({ def: d }, i) => $("vehicle").appendChild(new Option(d.name, "v:"
 $("vehicle").addEventListener("change", () => {
   const [k, i] = $("vehicle").value.split(":");
   const m = k === "m" ? modes[+i] : null;   // a family built the first time it is shown (the train: a few seconds) gets the loading card
-  if (m && !m.group) LabLoad.run(`Building the ${(m.tabName || m.name).toLowerCase()}…`, async (step) => { await step("Model and track", 0.3); setMode(m); });
+  if (m && !m.group) LabLoad.run(`Building the ${(m.tabName || m.name).toLowerCase()}…`, async (step) => { await step("Model and track", 0.3); if (m.prepare) await m.prepare(); setMode(m); });
   else if (m) setMode(m); else { state.index = +i; load(); }
 });
 

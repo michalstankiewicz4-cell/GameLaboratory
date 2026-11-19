@@ -119,9 +119,11 @@ planet brings the planet's (Luna: weak gravity, no air). The ship starts 40 m up
 controller that holds 1.5 m/s down and sets it on its four landing pads; by hand: Space — lift thrusters, W / S — the
 main engine, A / D — yaw. Touching down faster than 5 m/s breaks it.
 
-## The grapple loader from the junkyard (1.18.0)
+## The grapple loader from the junkyard (1.18.0, 1.19.0)
 
 *Junkyard · grapple loader* in the list: JunkKit's wheeled scrap loader (`js/models/junkyard/vehicle/grapple-truck.js`,
-from the junkyard game) as a family of its own (`js/labs/vehicles-land/junk.js`): its moving groups — the upper body
-slews, the boom and the stick swing, the grapple hangs plumb and rotates, four jaws open — on sliders. It does not drive
-here: in the game it drives and grabs by Rapier physics, which stayed there.
+from the junkyard game) as a family of its own (`js/labs/vehicles-land/junk.js`) with the behaviour *grapple loader*
+(`js/behaviors/land/grapple.js`, [../behaviors/README.md](../behaviors/README.md)): it drives by forces, slews, swings
+the boom and the stick, the grapple hangs on a ball joint and its four jaws press on what they grab. The junkyard's
+items lie in front of it (tyres, drums, newspapers, a box, a pot, a tractor tyre). Keys as in the game: W/S, A/D,
+←/→ slew, ↑/↓ boom, R/F stick, Space the grapple; PUT IT ALL BACK lays the items out again.

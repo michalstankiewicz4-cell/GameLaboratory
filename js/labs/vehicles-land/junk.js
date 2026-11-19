@@ -1,68 +1,102 @@
 // Laboratorium pojazdów — rodzina „złomowisko”: przeładowarka z chwytakiem z JunkKit (js/models/junkyard/, z gry
-// Złomowisko, z historią). Model w prawdziwej skali z ruchomymi grupami (nadwozie, wysięgnik, ramię, chwytak, szczęki):
-// tu poruszane suwakami, bez jazdy (jazda i chwytanie przez fizykę zostały w grze — zachowanie do przeniesienia później).
+// Złomowisko, z historią) z zachowaniem „przeładowarka” (js/behaviors/land/grapple.js, środowisko ląd): jazda siłami
+// (land/drive.js), hydraulika ramienia, chwytak na przegubie kulowym (wahadło), szczęki z silnikami i kontaktem —
+// przedmioty ze złomowiska (JunkKit) leżą przed nią do chwytania. Sterowanie jak w grze: W/S jazda, A/D skręt,
+// ←/→ obrót nadwozia, ↑/↓ wysięgnik, R/F ramię, Spacja chwytak.
 import { build as buildTruck, LAYOUT } from "../../models/junkyard/vehicle/grapple-truck.js";
+import { MODELS as JUNK } from "../../models/junkyard/registry.js";
 import { applyTextures, setAnisotropy } from "../../models/junkyard/textures.js";
+import { createGrapple } from "../../behaviors/land/grapple.js";
 const THREE = window.THREE;
 
 const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+// przedmioty do chwytania: [id, x, z, obrót] przed przeładowarką (przód +z)
+const PILE = [["tire-car", -1.4, 8.2, 0], ["tire-car", 1.6, 9.6, 0.4], ["barrel", 0.2, 9.0, 0], ["barrel", -2.6, 10.4, 0.9], ["newspapers", 2.8, 7.6, 0.3],
+  ["box", -0.6, 11.2, 0.2], ["tire-tractor", 3.6, 11.6, 0], ["pot", -3.2, 7.4, 0]];
 
 function start(lab) {
-  let truck = null, g = null;
-  const J = { slew: 0, boom: 0.55, stick: 1.35, rot: 0, jaws: 0.5 };
-  const panel = el("div", "hidden"), ui = {};
-  function slider(key, label, min, max, step, fmt) {
-    const l = el("label", "sl"), b = el("b"); l.append(el("span", null, label), b);
-    const r = Object.assign(el("input"), { type: "range", min, max, step, value: J[key] });
-    const show = () => { b.textContent = fmt(+r.value); if (window.LabKit) LabKit.paintSlider(r); };
-    r.addEventListener("input", () => { J[key] = +r.value; show(); pose(); });
-    show(); ui[key] = r; panel.append(l, r); return r;
-  }
-  const deg = (v) => Math.round(v * 57.2958) + "°";
-  panel.append(el("div", "secHd", "WORK"));
-  slider("slew", "Slew (upper body)", -Math.PI, Math.PI, 0.01, deg);
-  slider("boom", "Boom", 0.1, 1.1, 0.01, deg);
-  slider("stick", "Stick", 0.5, 2.3, 0.01, deg);
-  slider("rot", "Grapple rotation", -Math.PI, Math.PI, 0.01, deg);
-  slider("jaws", "Jaws open", 0, 1, 0.01, (v) => Math.round(v * 100) + "%");
-  const note = el("p", "note", "The loader's moving parts as the junkyard game drives them: the upper body slews, the boom and the stick swing, the grapple hangs plumb and rotates, four jaws open and close. Driving is not here yet.");
-  panel.append(note);
+  let truck = null, g = null, grab = null, world = null;
+  const keys = {}, panel = el("div", "hidden"), ui = {};
+  const readout = (key, label) => { const r = el("div", "row"), b = el("b", null, "–"); r.append(el("span", null, label), b); ui[key] = b; panel.append(r); };
+  panel.append(el("div", "secHd", "DRIVE AND WORK"));
+  panel.append(el("p", "note", "W / S drive, A / D steer · ← / → slew · ↑ / ↓ boom · R / F stick · Space opens and closes the grapple."));
+  const jawBtn = el("button", "tBtn", "CLOSE THE GRAPPLE"), resetBtn = el("button", "tBtn", "PUT IT ALL BACK");
+  const two = el("div", "twoBtns"); two.append(jawBtn, resetBtn); panel.append(two);
+  readout("speed", "Speed"); readout("jaws", "Grapple"); readout("payload", "Load"); readout("sag", "Boom / stick bend");
+  panel.append(el("p", "note", "Physics in GameLaboratory: driving by forces (land/drive.js) with the game's numbers, the grapple as a pendulum on a ball joint, the jaws on motors pressing on what they hold — it stays in the grapple while friction carries its weight. Items fall on the ground; they do not collide with each other or with the loader."));
+  jawBtn.addEventListener("click", () => { if (grab) { grab.toggleJaws(); jawBtn.blur(); } });
+  resetBtn.addEventListener("click", () => { resetBtn.blur(); placePile(); });
 
-  // the joints: the grapple hangs plumb (the game sets it by physics; here the boom and stick angles are compensated)
-  function pose() {
-    if (!truck) return;
-    const up = truck.getObjectByName("nadwozie"), bm = truck.getObjectByName("wysięgnik"), st = truck.getObjectByName("ramię"), gr = truck.getObjectByName("chwytak");
-    up.rotation.y = J.slew; bm.rotation.x = -J.boom; st.rotation.x = J.stick;
-    gr.rotation.set(-(bm.rotation.x + st.rotation.x), J.rot, 0, "XYZ");
-    for (let k = 0; k < LAYOUT.jaws; k++) truck.getObjectByName("szczęka " + k).rotation.x = LAYOUT.jawClosed + (LAYOUT.jawOpen - LAYOUT.jawClosed) * J.jaws;
+  let active = false;
+  const typing = (e) => e.target.closest && e.target.closest("input, textarea, select");
+  addEventListener("keydown", (e) => {
+    if (!active || typing(e)) return;
+    if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Space"].includes(e.code)) e.preventDefault();
+    if (e.code === "Space" && !e.repeat && grab) grab.toggleJaws();
+    keys[e.code] = true;
+  });
+  addEventListener("keyup", (e) => { keys[e.code] = false; });
+  addEventListener("blur", () => { for (const k in keys) keys[k] = false; });
+  const axis = (a, b) => (keys[a] ? 1 : 0) - (keys[b] ? 1 : 0);
+
+  const mods = {};
+  async function loadItems() { for (const [id] of PILE) if (!mods[id]) mods[id] = await JUNK.find((m) => m.id === id).load(); }
+  function placePile() {
+    if (!grab) return;
+    for (const it of grab.items) world.remove(it.mesh);
+    grab.items.length = 0; grab.held.clear();
+    for (const [id, x, z, yaw] of PILE) {
+      const mod = mods[id], m = mod.build(0), box = new THREE.Box3().setFromObject(m), c = box.getCenter(new THREE.Vector3()), size = box.getSize(new THREE.Vector3());
+      m.position.sub(c); m.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+      const holder = new THREE.Group(); holder.add(m); holder.rotation.y = yaw; world.add(holder);
+      grab.addItem({ mesh: holder, mass: mod.info.mass, half: [size.x / 2, size.y / 2, size.z / 2], name: id, at: [x, 0, z] }).yaw = yaw;
+    }
+    applyTextures();
   }
 
   lab.addMode({
     name: "Grapple loader", tabName: "Junkyard · grapple loader",
-    role: "A wheeled scrap loader from the junkyard game (JunkKit): four industrial tyres, outriggers, a slewing upper body with a raised cab, a box boom, a stick and an orange-peel grapple with four jaws.",
-    target: [0, 3.2, 1.5], camera: [12, 7.5, 13],
+    role: "A wheeled scrap loader from the junkyard game (JunkKit) with its behaviour: it drives by forces, slews, swings the boom and the stick, and picks up the junkyard's items with a four-jaw grapple hanging on a ball joint.",
+    target: [0, 2.5, 4], camera: [11, 8, -6],
     panel,
+    async prepare() { await loadItems(); },
     build() {
-      g = new THREE.Group();
+      world = new THREE.Group();
       setAnisotropy(lab.renderer ? lab.renderer.capabilities.getMaxAnisotropy() : 8);
       truck = buildTruck(0); applyTextures();
       truck.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
       const flat = new THREE.Mesh(new THREE.CircleGeometry(600, 96).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x6b604e, roughness: 0.97 }));
-      flat.receiveShadow = true; g.add(flat, truck);
-      pose();
-      return g;
+      flat.receiveShadow = true; world.add(flat, truck);
+      grab = createGrapple(truck, { scene: world });
+      g = grab; window.__grapple = grab;   // (testy)
+      placePile(); grab.sync();
+      return world;
     },
     rows() {
-      let n = 0; if (truck) truck.traverse((m) => { if (m.isMesh) n += (m.geometry.index ? m.geometry.index.count : m.geometry.attributes.position.count) / 3; });
+      let n = 0; if (truck) world.traverse((m) => { if (m.isMesh) n += (m.geometry.index ? m.geometry.index.count : m.geometry.attributes.position.count) / 3; });
       return [["Mass", (LAYOUT.mass / 1000).toFixed(0) + " t"], ["Wheelbase / track", (LAYOUT.wheels[0][2] * 2).toFixed(2) + " / " + (LAYOUT.wheels[1][0] * 2).toFixed(2) + " m"],
-        ["Tyres", "industrial 18-19.5, Ø " + Math.round(LAYOUT.wheelRadius * 2000) + " mm"], ["Boom / stick", LAYOUT.boomLen + " / " + LAYOUT.stickLen + " m"],
-        ["Grapple", LAYOUT.jaws + " jaws (orange peel)"], ["Triangles", Math.round(n).toLocaleString("en-US")]];
+        ["Drive", "26 kN at start · up to 14 m/s"], ["Tyres", "industrial 18-19.5, Ø " + Math.round(LAYOUT.wheelRadius * 2000) + " mm"],
+        ["Boom / stick", LAYOUT.boomLen + " / " + LAYOUT.stickLen + " m"], ["Grapple", LAYOUT.jaws + " jaws (orange peel)"], ["Triangles", Math.round(n).toLocaleString("en-US")]];
     },
-    update() {
-      if (lab.sun) { lab.sun.position.set(30, 40, 20); lab.sun.target.position.set(0, 0, 0); lab.sun.target.updateMatrixWorld(); }
-      const $ = (id) => document.getElementById(id);
-      $("nowSpeed").textContent = "0 km/h (standing)"; $("nowTilt").textContent = "0° / 0°";
+    update(dt) {
+      active = true;
+      if (!g) return;
+      const s0x = g.drive.state.x, s0z = g.drive.state.z;
+      g.step(Math.min(dt, 0.05), { throttle: axis("KeyW", "KeyS"), steer: axis("KeyA", "KeyD"), slew: axis("ArrowLeft", "ArrowRight"), boom: axis("ArrowUp", "ArrowDown"), stick: axis("KeyF", "KeyR") });
+      g.sync();
+      // kamera jedzie z pojazdem
+      const dx = g.drive.state.x - s0x, dz = g.drive.state.z - s0z;
+      if (lab.controls) { lab.controls.target.x += dx; lab.controls.target.z += dz; lab.camera.position.x += dx; lab.camera.position.z += dz; }
+      if (lab.sun) { lab.sun.position.set(g.drive.state.x + 30, 40, g.drive.state.z + 20); lab.sun.target.position.set(g.drive.state.x, 0, g.drive.state.z); lab.sun.target.updateMatrixWorld(); }
+      const $ = (id) => document.getElementById(id), kmh = (g.drive.state.u * 3.6).toFixed(1) + " km/h";
+      $("nowSpeed").textContent = kmh; $("nowTilt").textContent = "0° / 0°";
+      ui.speed.textContent = kmh;
+      ui.jaws.textContent = (g.closed ? "closed" : "open") + (g.held.size ? " · holding " + [...g.held].map((it) => it.name).join(", ") : "");
+      ui.payload.textContent = Math.round(g.payload) + " kg";
+      ui.sag.textContent = (g.arm.sagB * LAYOUT.boomLen * 100).toFixed(1) + " / " + (g.arm.sagS * LAYOUT.stickLen * 100).toFixed(1) + " cm";
+      jawBtn.textContent = g.closed ? "OPEN THE GRAPPLE" : "CLOSE THE GRAPPLE";
     },
+    leave() { active = false; for (const k in keys) keys[k] = false; },
   });
 }
 if (window.vehicleLab) start(window.vehicleLab); else window.addEventListener("vehiclelab:ready", () => start(window.vehicleLab), { once: true });

@@ -3,6 +3,22 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.76.0 · pojazdy (ląd) 1.19.0 — 2026-11-19 (przeładowarka jeździ i chwyta)
+
+### Dodane
+- Zachowanie **przeładowarka z chwytakiem** (`js/behaviors/land/grapple.js`, środowisko ląd) — z gry Złomowisko,
+  przepisane z Rapier na fizykę GameLaboratory z liczbami z gry: jazda siłami (`land/drive.js`: 18 t, 26 kN, 14 m/s,
+  skręt 0,55 rad), hydraulika nadwozia, wysięgnika i ramienia (prędkości i zakresy z gry), chwytak jako wahadło na
+  przegubie kulowym (Verlet, tłumienie 3/s), 4 szczęki na silnikach położenia z kontaktem sprężystym z przedmiotem
+  i gruntem — przedmiot trzyma tarcie μ·ΣN, dopóki przenosi jego ciężar; ugięcie wysięgnika i ramienia od ładunku.
+- **Laboratorium pojazdów (ląd)**: przeładowarka jeździ i chwyta (W/S, A/D, ←/→, ↑/↓, R/F, Spacja — jak w grze);
+  przed nią przedmioty ze złomowiska (opony, beczki, gazety, karton, garnek, opona traktorowa); odczyty: prędkość,
+  chwytak, ładunek, ugięcie. Rodziny w laboratorium mogą mieć `prepare()` (ładowanie przed budową) i `leave()`.
+
+### Uproszczenia (opis w `docs/behaviors/README.md`)
+- Podwozie nie przechyla się od ciężaru, przedmioty nie zderzają się ze sobą ani z pojazdem, chwytak obraca się wokół
+  pionu za ramieniem, wysięgnik nie wygina się w łuk (ugięcie zmienia kąty).
+
 ## Program 0.75.0 · przedmioty 1.0.0 · budowle 1.4.0 · pojazdy (ląd) 1.18.0 · edytor 0.34.0 — 2026-11-19 (złomowisko)
 
 ### Dodane

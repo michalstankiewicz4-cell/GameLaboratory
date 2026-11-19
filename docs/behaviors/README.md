@@ -18,6 +18,7 @@ Zasada (CLAUDE.md): fizyka jest prawdziwa — start, ruch, skręt i zatrzymanie 
 | ciecze w kosmosie | `space/liquids.js` (siatka `space/grid3d.js`, shader `js/render/liquid.js`) | kosmos | laboratorium bloków (krople wody i lawy) |
 | gaz w kosmosie | `space/gases.js` | kosmos | laboratorium bloków (chmura gazu) |
 | koło na szynie — tramwaj | `rail/tram.js`, `rail/path.js` | ląd | laboratorium pojazdów — ląd (Swing na pętli toru; liczby w TramKit: `js/models/train/trams/swing.js`, `phys`) |
+| przeładowarka z chwytakiem | `land/grapple.js` (jazda: `land/drive.js`) | ląd | laboratorium pojazdów — ląd (przeładowarka JunkKit z przedmiotami ze złomowiska) |
 
 ## Okręt na wodzie (`water/ship.js`)
 
@@ -128,6 +129,31 @@ sprężyny, zderzaki, sprzęgi; sieć torowa z rozjazdami: `js/models/structures
 `rail.js` — `attachRail(train, sim)` podpina symulację do składu TrainKit; `tram.js` — `createTramSim(track, info, s0)`
 dla tramwaju TramKit (człony na wózkach i podwieszone) na torze z dowolnej ścieżki (`path.js`, `pathTrack`).
 Szczegóły: [`../models/train/fizyka.md`](../models/train/fizyka.md). W edytorze sceny jeszcze nie: potrzebuje toru w scenie.
+
+## Przeładowarka z chwytakiem (`land/grapple.js`)
+
+Dla modelu JunkKit `vehicle/grapple-truck.js` (gra Złomowisko). W grze liczona silnikiem Rapier (`js/vehicle/truck.js`
+w repo Trash); tu przepisana na fizykę GameLaboratory, z liczbami z gry:
+
+- **jazda** — `land/drive.js` (`grappleDriveDef()`): 18 t, 26 kN przy ruszaniu (moc 65 kW na kołach), prędkość graniczna
+  14 m/s (tyle daje 26 kN przy tłumieniu 0,1/s w Rapier), skręt przednich kół do 0,55 rad;
+- **hydraulika** — nadwozie, wysięgnik i ramię sztywne (w grze kinematyczne), prędkości i zakresy siłowników z gry
+  (obrót 0,5 rad/s, wysięgnik 0,35 rad/s w −0,25…1,25, ramię 0,45 rad/s w 0,6…2,6);
+- **chwytak** — wahadło sferyczne pod końcem ramienia (przegub kulowy): Verlet z grawitacją, więz długości, tłumienie
+  kątowe 3/s jak w grze; ruch końca ramienia rozbuja chwytak;
+- **szczęki** — 4 zawiasy z silnikami położenia (sztywność / tłumienie z gry: 12 000 / 1 200 otwieranie, 60 000 / 3 000
+  zamykanie), bezwładność szczęki 25 kg; koniec szczęki z kształtu jej zderzacza w grze (łuk R 0,95 m); kontakt sprężysty
+  z tłumieniem z przedmiotem i z gruntem (krok 1/3840 s); przedmiot jest trzymany, dopóki tarcie μ·ΣN (μ 0,7) przenosi
+  jego ciężar razem z przyspieszeniem chwytaka — inaczej wyślizguje się i spada;
+- **ugięcie** — wysięgnik i ramię uginają się od momentu ładunku (podatność z gry, sprężyna 1,6 Hz z tłumieniem 0,12).
+
+Uproszczenia względem gry: podwozie nie przechyla się od ciężaru (drive.js liczy w płaszczyźnie gruntu), przedmioty nie
+zderzają się ze sobą ani z pojazdem (spadają na grunt i leżą z tarciem), obrót chwytaka wokół pionu idzie za ramieniem,
+wysięgnik nie wygina się w łuk (w grze shader) — ugięcie zmienia tylko kąty.
+
+`createGrapple(model, { x, z, yaw, ground, scene })` → `{ drive, arm, jaws, items, held, payload, closed, step(dt, c),
+sync(), setJaws(), toggleJaws(), addItem({ mesh, mass, half, name, at }) }`; `c`: `throttle`, `steer`, `brake`, `slew`,
+`boom`, `stick` (−1…1).
 
 ## Ciecze i gaz w kosmosie (`space/liquids.js`, `space/gases.js`)
 
