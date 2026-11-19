@@ -13,7 +13,7 @@ export const LAYOUT = {
   door: { x: CX / 2 + 0.03, closedY: Y0 + CY / 2, openY: Y0 + CY / 2 + CY + 0.05, size: [0.03, CY + 0.02, CZ + 0.02] },
   hopper: { top: Y0 + CY + 0.8, size: [2.2, 1.6] },
   button: [-1.25, 1.15, CZ / 2 + 0.45],
-  bin: { center: [CX / 2 + 1.25, 0.45, 0], half: [0.55, 0.45, 0.6] },
+  bin: { center: [CX / 2 + 1.25, 0.45, 0], half: [0.55, 0.45, 0.6], low: 0.38 },   // low: ścianka od strony zgniatarki (pod zsypem)
   size: [4.2, 2.8, 2.6],
 };
 const box = (w, h, d, x, y, z, rx = 0, ry = 0, rz = 0) => { const g = new THREE.BoxGeometry(w, h, d); uvMeters(g, 1); return place(g, [x, y, z], [rx, ry, rz]); };
@@ -95,23 +95,26 @@ function controlBox() {   // szafka sterownicza na słupku: 2 przyciski (zielony
 }
 function door() { const g = roundedBox(...LAYOUT.door.size, 0.006, 1); uvMeters(g, 1); return g; }
 function chuteAndBin(lod) {
-  const o = [], mesh = [], { center: [bx, by, bz], half: [hx, hy, hz] } = LAYOUT.bin;
+  const o = [], mesh = [], { center: [bx, by, bz], half: [hx, hy, hz], low } = LAYOUT.bin;
   // zsyp: blacha pochyła z burtami od zasuwy do kosza
   const L = 1.0, ang = 0.62, cx = CX / 2 + 0.12 + Math.cos(ang) * L / 2, cy = Y0 - 0.02 - Math.sin(ang) * L / 2;
   o.push(box(L, T, CZ, cx, cy, 0, 0, 0, -ang));
   for (const s of [-1, 1]) o.push(box(L, 0.15, T, cx, cy + 0.07, s * CZ / 2, 0, 0, -ang));
   for (const s of [-1, 1]) o.push(box(0.05, cy, 0.05, cx + 0.3, cy / 2, s * (CZ / 2 - 0.03)));
-  // kosz: rama z kątowników + ścianki z siatki (cienkie pręty)
+  // kosz: rama z kątowników + ścianki z siatki (cienkie pręty); ścianka od strony zgniatarki niższa (low) — zsyp
+  // przechodzi nad nią, puszki zsuwają się do kosza
+  const wallH = (sx) => (sx < 0 ? low : hy * 2);
   for (const sx of [-1, 1]) for (const sz of [-1, 1]) o.push(box(0.04, hy * 2, 0.04, bx + sx * hx, by, bz + sz * hz));
-  for (const y of [0.02, hy * 2]) { o.push(box(hx * 2, 0.04, 0.04, bx, y, bz - hz), box(hx * 2, 0.04, 0.04, bx, y, bz + hz), box(0.04, 0.04, hz * 2, bx - hx, y, bz), box(0.04, 0.04, hz * 2, bx + hx, y, bz)); }
+  for (const y of [0.02, hy * 2]) o.push(box(hx * 2, 0.04, 0.04, bx, y, bz - hz), box(hx * 2, 0.04, 0.04, bx, y, bz + hz));
+  for (const sx of [-1, 1]) for (const y of [0.02, wallH(sx)]) o.push(box(0.04, 0.04, hz * 2, bx + sx * hx, y, bz));
   o.push(box(hx * 2, 0.02, hz * 2, bx, 0.03, bz));
   const n = lod ? 4 : 10;
   for (let i = 1; i < n; i++) {
     const t = i / n;
     for (const sz of [-1, 1]) mesh.push(box(0.008, hy * 2, 0.008, bx - hx + t * hx * 2, by, bz + sz * hz));
-    for (const sx of [-1, 1]) mesh.push(box(0.008, hy * 2, 0.008, bx + sx * hx, by, bz - hz + t * hz * 2));
+    for (const sx of [-1, 1]) mesh.push(box(0.008, wallH(sx), 0.008, bx + sx * hx, wallH(sx) / 2, bz - hz + t * hz * 2));
     for (const sz of [-1, 1]) mesh.push(box(hx * 2, 0.008, 0.008, bx, t * hy * 2, bz + sz * hz));
-    for (const sx of [-1, 1]) mesh.push(box(0.008, 0.008, hz * 2, bx + sx * hx, t * hy * 2, bz));
+    for (const sx of [-1, 1]) if (t * hy * 2 < wallH(sx) - 0.02) mesh.push(box(0.008, 0.008, hz * 2, bx + sx * hx, t * hy * 2, bz));
   }
   return { steel: merge(o), mesh: merge(mesh) };
 }
@@ -165,9 +168,9 @@ export function colliders() {
   const L = 1.0, ang = 0.62, cx = CX / 2 + 0.12 + Math.cos(ang) * L / 2, cy = Y0 - 0.02 - Math.sin(ang) * L / 2;
   b(L, 0.03, CZ, cx, cy, 0, 0, 0, -ang);
   for (const s of [-1, 1]) b(L, 0.15, 0.03, cx, cy + 0.07, s * CZ / 2, 0, 0, -ang);
-  const { center: [bx, by, bz], half: [hx, hy, hz] } = LAYOUT.bin;
+  const { center: [bx, by, bz], half: [hx, hy, hz], low } = LAYOUT.bin;
   b(hx * 2, 0.04, hz * 2, bx, 0.03, bz);
-  for (const s of [-1, 1]) { b(hx * 2, hy * 2, 0.03, bx, by, bz + s * hz); b(0.03, hy * 2, hz * 2, bx + s * hx, by, bz); }
+  for (const s of [-1, 1]) { const h = s < 0 ? low + 0.02 : hy * 2; b(hx * 2, hy * 2, 0.03, bx, by, bz + s * hz); b(0.03, h, hz * 2, bx + s * hx, h / 2, bz); }   // od zgniatarki niższa
   b(1.6, 0.04, 0.7, 0.2, 1.15, CZ / 2 + 0.85);                                        // podest
   for (let i = 0; i < 6; i++) { const t = (i + 1) / 7; b(0.6, 0.03 + 1.15 * t, 0.22, 1.25 + (1 - t) * 1.0, 1.15 * t / 2, CZ / 2 + 0.85); }
   b(1.6, 1.0, 0.04, 0.2, 1.65, CZ / 2 + 1.18);                                        // barierka
@@ -177,4 +180,4 @@ export function colliders() {
   return c;
 }
 
-export const info = { id: 'can-crusher', name: 'Zgniatarka do puszek', version: '1.0.0' };
+export const info = { id: 'can-crusher', name: 'Zgniatarka do puszek', version: '1.0.1' };
