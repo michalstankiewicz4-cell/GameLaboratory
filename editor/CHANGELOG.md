@@ -3,6 +3,11 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.35.1 — 2026-11-19
+
+### Poprawione
+- Zgniatarka do puszek (JunkKit v1.0.1): niższa ścianka kosza od strony zgniatarki — w grze puszki z zsypu wpadają do kosza.
+
 ## 0.35.0 — 2026-11-19 (złomowisko w grze)
 
 ### Dodane

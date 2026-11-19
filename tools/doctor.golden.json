@@ -83,8 +83,7 @@
  },
  "junkyard/can-crusher": {
   "counts": {
-   "floating": 2,
-   "pierce": 1
+   "floating": 2
   },
   "fingerprint": {
    "drawCalls": 16,
@@ -94,7 +93,7 @@
     3.18,
     2.8
    ],
-   "triangles": 5492
+   "triangles": 5420
   }
  },
  "junkyard/casting-line": {

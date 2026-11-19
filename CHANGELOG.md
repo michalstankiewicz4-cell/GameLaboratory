@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.78.1 · budowle 1.5.1 · edytor sceny 0.35.1 — 2026-11-19 (zgniatarka do puszek: niższa ścianka kosza)
+
+### Poprawione
+- JunkKit, zgniatarka do puszek v1.0.1 (z gry Złomowisko 0.4.2, commit przeniesiony z historią): ścianka kosza od
+  strony zgniatarki niższa (0,38 m) — zsyp przechodził przez nią (test `pierce` doktora modeli) i wypchnięte puszki
+  stawały na ściance; teraz zsyp jest nad nią i puszki zsuwają się do kosza (w próbie 22 z 25). Wzorzec doktora:
+  bez wyniku `pierce`, 5420 trójkątów zamiast 5492 (mniej prętów siatki w niższej ściance).
+
 ## Doktor modeli 1.3.0 — 2026-11-19 (test „pierce”)
 
 ### Dodane
