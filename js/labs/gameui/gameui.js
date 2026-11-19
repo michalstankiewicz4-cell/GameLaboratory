@@ -40,7 +40,8 @@ ui.on((a, arg) => {
   if (a === 'event' || a === 'quit') { ui.log(a === 'quit' ? 'Quit pressed (the game decides what it means)' : `Event: ${arg}`, 'info'); status(`action: ${a}${arg ? ' ' + arg : ''}`); }
   if (a === 'choice') $('dRes').textContent = arg >= 0 ? `Chosen: ${arg + 1}` : 'Line read.';
   if (a === 'screen' || a === 'resume') fillScreens();
-  if (window.LabLog && a !== 'screen') window.LabLog.add('info', `Game UI: ${a}${arg != null ? ' ' + arg : ''}`);
+  if (a === 'buy') { state = ui.state; syncSliders(); ui.log(`Bought: ${arg.id} (level ${arg.level}, ${arg.cost})`, 'info'); status(`bought ${arg.id} in ${arg.tree}`); }
+  if (window.LabLog && a !== 'screen') window.LabLog.add('info', `Game UI: ${a}${arg != null ? ' ' + (typeof arg === 'object' ? JSON.stringify(arg) : arg) : ''}`);
 });
 
 /* ---------------- Interfejs ---------------- */
@@ -163,11 +164,15 @@ onAssetsChange(() => { fillDefSel(); fillSkinSel(); });
 
 /* ---------------- dla AI ---------------- */
 // GameUIApi: load(def) — definicja 'gamelab-ui'; set(stan) — stan gry (łączony); show(ekran) / hide(); open(okno);
-// say({ who, text, choices }) → Promise<wybór>; log(tekst, rodzaj); banner(tekst, podpis); def — obecna definicja
+// say({ who, text, choices }) → Promise<wybór>; log(tekst, rodzaj); banner(tekst, podpis); def — obecna definicja;
+// tree(nazwa), buy(nazwa, węzeł) — drzewka w oknach gry
 window.GameUIApi = {
   load: (d) => { apply(d); return ui.def; }, set: (s) => { state = { ...state, ...s }; ui.set(state); syncSliders(); return state; },
   show: (id) => ui.show(id), hide: () => ui.hide(), open: (id) => ui.open(id), close: (id) => ui.close(id),
   say: (o) => ui.say(o), log: (m, k) => ui.log(m, k), banner: (t, s) => ui.banner(t, s),
+  // drzewka w oknach (blok tree): tree('nazwa') — poziomy, wydane, efekty; buy('nazwa', 'węzeł') — kupno za punkty ze stanu
+  tree: (n) => { const t = ui.tree(n); return t && { ...t.toJSON(), effects: t.effects() }; },
+  buy: (n, id) => { const r = ui.buy(n, id); state = ui.state; syncSliders(); return r; },
   get def() { return clone(ui.def); }, get state() { return clone(state); }, samples: Object.keys(SAMPLES), skins: Object.keys(SKINS), empty: () => emptyUI(),
 };
 function apiTab() {
@@ -177,11 +182,11 @@ function apiTab() {
   ta.value = '{"method": "say", "arg": {"who": "Station AI", "text": "Docking clamps released.", "choices": ["Undock", "Wait"]}}';
   const go = document.createElement('button'); go.type = 'button'; go.textContent = 'Run';
   const out = document.createElement('p'); out.className = 'note';
-  out.textContent = 'JSON: { "method": "load" | "set" | "show" | "hide" | "open" | "close" | "say" | "log" | "banner", "arg": … } (log and banner: "arg": [text, kind]). The same in code: GameUIApi.<method>(arg).';
+  out.textContent = 'JSON: { "method": "load" | "set" | "show" | "hide" | "open" | "close" | "say" | "log" | "banner" | "tree" | "buy", "arg": … } (log and banner: "arg": [text, kind]). The same in code: GameUIApi.<method>(arg).';
   go.onclick = async () => {
     try {
       const c = JSON.parse(ta.value), f = window.GameUIApi[c.method];
-      if (typeof f !== 'function') throw new Error('method: load, set, show, hide, open, close, say, log, banner');
+      if (typeof f !== 'function') throw new Error('method: load, set, show, hide, open, close, say, log, banner, tree, buy');
       const r = await (Array.isArray(c.arg) ? f(...c.arg) : f(c.arg)); out.textContent = 'Result: ' + (JSON.stringify(r) || 'done').slice(0, 300);
     } catch (e) { out.textContent = 'Error: ' + e.message; }
   };

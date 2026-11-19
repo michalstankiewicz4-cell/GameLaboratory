@@ -34,7 +34,8 @@ export class RadialView {
    * @param {HTMLElement} root  element widoku (rozmiar widoku = jego rozmiar)
    * @param {{ getTree: () => object, getState: () => import('./tree.js').TreeState, getPoints: () => number,
    *   onBuy?: (id: string) => void, onPick?: (id: string|null, e: PointerEvent) => void, pl?: () => boolean,
-   *   pointsName?: () => string, editing?: () => boolean }} opts  editing: podpowiedź pokazuje poziom i kąt zamiast stanu
+   *   pointsName?: () => string, editing?: () => boolean, getBackground?: () => string|null }} opts  editing: podpowiedź
+   *   pokazuje poziom i kąt zamiast stanu; getBackground: adres obrazu tła (zasób „image”, background.js)
    */
   constructor(root, opts) {
     this.root = root; this.opts = opts; this.hover = null; this.selected = null; this.marked = new Set(); this.t = 0;
@@ -46,12 +47,13 @@ export class RadialView {
     this.canvas.addEventListener('pointermove', (e) => this.onMove(e));
     this.canvas.addEventListener('pointerleave', () => { this.hover = null; this.tip.hidden = true; });
     this.canvas.addEventListener('click', (e) => this.onClick(e));
-    new ResizeObserver(() => this.layout()).observe(root);
+    this.ro = new ResizeObserver(() => this.layout()); this.ro.observe(root);
     const loop = () => { this.t++; this.draw(); this.raf = requestAnimationFrame(loop); };
     this.raf = requestAnimationFrame(loop);
   }
 
   get tree() { return this.opts.getTree(); }
+  destroy() { cancelAnimationFrame(this.raf); this.ro.disconnect(); this.canvas.remove(); this.tip.remove(); }
 
   /** Płótno w pikselach sztuki i położenia węzłów; wołać po zmianie drzewka (głębokość, kąt, nowe węzły). */
   layout() {
@@ -89,7 +91,7 @@ export class RadialView {
   }
 
   /** Rozmiar po rodzaju: rdzeń, jednostka (sześciokąt) większa, cecha (romb; z ikoną większa), cecha jednostki (kółko). */
-  size(n) { return { core: 11, unit: 8, trait: n.icon ? 7 : 5, prop: 3 }[n.kind] ?? 4; }
+  size(n) { return { core: 11, hub: 4, unit: 8, trait: n.icon ? 7 : 5, prop: 3 }[n.kind] ?? 4; }
 
   // --- pomocnicze (piksele sztuki na wejściu, piksele ekranu na wyjściu) ---
   sx(x) { return Math.round(x * this.P + this.P / 2) + 0.5; }
@@ -112,6 +114,7 @@ export class RadialView {
     const shape = (KINDS[n.kind] || KINDS.trait).shape;
     if (shape === 'hexagon') { this.poly(x, y, r, 6, -Math.PI / 2, fill, outline, glow); this.poly(x, y, 3, 6, -Math.PI / 2, outline, outline, null); }
     else if (shape === 'circle') this.poly(x, y, r, 24, 0, fill, outline, glow);
+    else if (shape === 'ring') { this.poly(x, y, r, 24, 0, rgb(BG), outline, glow); this.px(x, y, outline); }   // rozgałęzienie: pusty pierścień
     else this.poly(x, y, r, 4, -Math.PI / 2, fill, outline, glow);
   }
   digit(d, x, y, c) { const rows = DIGITS[d]; if (rows) for (let j = 0; j < 5; j++) for (let i = 0; i < 3; i++) if (rows[j][i] === '#') this.px(x + i, y + j, c); }
@@ -122,7 +125,11 @@ export class RadialView {
     const tree = this.tree, state = this.opts.getState(); if (!tree || !state || !this.pos) return;
     const points = this.opts.getPoints(), { ctx, W, H, cx, cy } = this, byId = state.byId;
     const coreC = hex(nodeColor(tree, tree.nodes.find((n) => n.kind === 'core') || tree.nodes[0]));
-    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); ctx.fillStyle = rgb(BG, 0.94); ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    const bg = this.bgImage();   // obraz tła (na całe płótno, przycięty), pod przyciemnieniem — drzewko zostaje czytelne
+    if (bg) { const cw = this.canvas.width, ch = this.canvas.height, k = Math.max(cw / bg.width, ch / bg.height); ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(bg, (cw - bg.width * k) / 2, (ch - bg.height * k) / 2, bg.width * k, bg.height * k); }
+    ctx.fillStyle = rgb(BG, bg ? 0.62 : 0.94); ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     // pierścienie poziomów (łuki) za drzewkiem, ponumerowane po lewej
     for (let d = 1; d <= this.maxDepth; d++) {
       const r = this.radius(d);
@@ -159,7 +166,7 @@ export class RadialView {
       let fill, outline, glow = null, iconC;
       if (st === 'owned') { fill = rgb(col); outline = rgb(mix(col, [255, 255, 255], 0.55)); glow = rgb(col, 0.35); iconC = rgb(DARK); }
       else if (st === 'available') {
-        const ok = points >= n.cost; fill = rgb(mix(DARK, col, 0.18)); outline = rgb(ok && blink ? mix(col, [255, 255, 255], 0.4) : col);
+        const ok = state.canBuy(n.id, points); fill = rgb(mix(DARK, col, 0.18)); outline = rgb(ok && blink ? mix(col, [255, 255, 255], 0.4) : col);
         glow = ok ? rgb(col, blink ? 0.45 : 0.2) : null; iconC = rgb(col);
       } else if (st === 'soon') { fill = rgb(mix(DARK, col, 0.12)); outline = rgb(mix(col, BG, 0.45)); iconC = rgb(mix(col, BG, 0.45)); }
       else { fill = rgb(DARK); outline = rgb(LOCKED); iconC = rgb(LOCKED); }
@@ -168,7 +175,16 @@ export class RadialView {
       if (this.hover === n.id) outline = rgb([255, 255, 255]);
       this.node(n, x, y, r, fill, outline, glow);
       if (n.icon) this.icon(n.icon, x, y, iconC);
+      if (n.levels > 1 && n.kind !== 'core' && n.kind !== 'hub' && state.level(n.id) > 0)   // poziomy: kreski pod węzłem
+        for (let k = 0; k < Math.min(n.levels, 12); k++) this.px(x - Math.min(n.levels, 12) + k * 2 + 1, y + r + 3, k < state.level(n.id) ? rgb(col) : rgb(LOCKED));
     }
+  }
+
+  // obraz tła z adresu (wczytany raz na adres)
+  bgImage() {
+    const url = this.opts.getBackground?.() || '';
+    if (url !== this.bgUrl) { this.bgUrl = url; this.bg = null; if (url) { const im = new Image(); im.onload = () => { if (this.bgUrl === url) this.bg = im; }; im.src = url; } }
+    return this.bg;
   }
 
   // --- wejście ---
@@ -204,13 +220,15 @@ export class RadialView {
     const status = this.opts.editing?.() ? `${T('level', 'poziom')} ${n.depth} · ${T('angle', 'kąt')} ${n.angle}°${n.soon ? T(' · soon', ' · wkrótce') : ''}${n.note ? ` — ${n.note}` : ''}`
       : n.kind === 'core' ? '' : st === 'owned' ? T('Owned', 'Kupione') : st === 'soon' ? T('Coming soon', 'Wkrótce')
       : st === 'locked' ? T(`Locked — buy ${names(n.parents).join(n.all ? ' and ' : ' or ')} first`, `Zablokowane — najpierw kup ${names(n.parents).join(n.all ? ' i ' : ' albo ')}`)
-      : points >= n.cost ? T('Click to buy', 'Kliknij, żeby kupić') : T(`Need ${(n.cost - points).toLocaleString('en')} more ${pts}`, `Brakuje ${(n.cost - points).toLocaleString('pl')} (${pts})`);
+      : n.kind === 'hub' ? T('Opens with its parent', 'Otwiera się z rodzicem')
+      : state.canBuy(id, points) ? T('Click to buy', 'Kliknij, żeby kupić') : T(`Need ${(state.costOf(id) - points).toLocaleString('en')} more ${pts}`, `Brakuje ${(state.costOf(id) - points).toLocaleString('pl')} (${pts})`);
+    const next = state.costOf(id), lvl = n.levels > 1 && n.kind !== 'core' && n.kind !== 'hub' ? T(`level ${state.level(id)} / ${n.levels}`, `poziom ${state.level(id)} / ${n.levels}`) : '';
     const div = (cls, text) => { const d = document.createElement('div'); if (cls) d.className = cls; d.textContent = text; return d; };
     const head = div('tree-tip-head', ''), name = document.createElement('span'), cost = document.createElement('span');
     name.textContent = nodeName(n, pl); name.style.color = nodeColor(tree, n);
-    cost.className = 'tree-tip-cost'; cost.textContent = n.cost ? `${n.cost.toLocaleString(pl ? 'pl' : 'en')} ${pts}` : '';
+    cost.className = 'tree-tip-cost'; cost.textContent = next ? `${next.toLocaleString(pl ? 'pl' : 'en')} ${pts}` : lvl ? 'MAX' : '';
     head.append(name, cost);
-    const br = tree.branches[n.branch], kids = [head, div('tree-tip-branch', branchName(br, pl)), div('', nodeText(n, pl))];
+    const br = tree.branches[n.branch], kids = [head, div('tree-tip-branch', branchName(br, pl) + (lvl ? ` · ${lvl}` : '')), div('', nodeText(n, pl))];
     if (Object.keys(n.effect).length) kids.push(div('tree-tip-effect', Object.entries(n.effect).map(([k, v]) => (v === true ? k : `${k} ${v > 0 ? '+' : ''}${v}`)).join(' · ')));
     kids.push(div(`tree-tip-status is-${st}`, status));
     this.tip.replaceChildren(...kids); this.tip.hidden = false;

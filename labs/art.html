@@ -99,6 +99,11 @@
   <div class="row"><span>Text</span><input type="text" id="text" maxlength="24" placeholder="value on a stamp, e.g. 50"><output></output></div>
   <h3>Export</h3>
   <div class="btns"><button type="button" id="png">Save PNG</button><button type="button" id="redraw">Paint again</button></div>
+  <h3>Save</h3>
+  <div class="row"><span>Saved</span><select id="savedSel" title="Images saved under a name: pick one to load it"></select><output></output></div>
+  <div class="row"><span>Name</span><input type="text" id="saveName" maxlength="40"><output></output></div>
+  <div class="btns"><button type="button" id="saveImg">Save under this name</button><button type="button" id="delImg">Delete saved</button></div>
+  <p class="note" id="saveMsg">A saved image is its spec (a named asset: image), painted again where it is used — e.g. a tech tree's background. An uploaded picture is not saved.</p>
   <h3>Spec (JSON)</h3>
   <div class="btns"><button type="button" id="specCopy">Copy spec</button><button type="button" id="specApply">Apply pasted spec</button><button type="button" id="specReset">Reset</button></div>
   <textarea id="specText" class="mono" rows="8" spellcheck="false"></textarea>

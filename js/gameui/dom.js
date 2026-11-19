@@ -33,3 +33,12 @@ export function pick(state, path) {
   if (path == null || path === '') return undefined;
   return String(path).split('.').reduce((o, k) => (o == null ? undefined : o[k]), state);
 }
+
+// stan z nową wartością po ścieżce (kopie po drodze, reszta bez zmian): place(S, 'ship.hp', 5)
+export function place(state, path, value) {
+  const keys = String(path).split('.'), out = { ...(state || {}) };
+  let o = out;
+  keys.slice(0, -1).forEach((k) => { o[k] = Array.isArray(o[k]) ? [...o[k]] : { ...(o[k] || {}) }; o = o[k]; });
+  o[keys[keys.length - 1]] = value;
+  return out;
+}

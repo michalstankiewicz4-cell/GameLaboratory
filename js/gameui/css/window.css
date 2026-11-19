@@ -18,3 +18,4 @@
 .gui .gList{margin:0;padding:0;list-style:none}
 .gui .gList li{display:flex;justify-content:space-between;padding:.3em 0;border-top:1px solid color-mix(in srgb,var(--g-line) 60%,transparent);color:var(--g-text)}
 .gui .gList li:first-child{border-top:0}
+.gui .gWin.wide{width:min(62em,calc(100% - 32px));max-height:92%}   /* okno z drzewkiem (blok tree, css/tree.css) */

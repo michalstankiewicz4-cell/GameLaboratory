@@ -51,7 +51,10 @@ Strona z UI gry linkuje `js/gameui/css/gameui.css` (CSP: style tylko z `'self'`;
   — ścieżka w stanie gry; `max` — liczba albo ścieżka; `color` — `ok`, `accent`, `warn`, `err`; `low` — próg barwy
   ostrzeżenia paska; `steps` — etykiety telegrafu; minimapa — punkty `{ x, y, kind: me | ally | enemy }` (metry od gracza).
 - **Okna:** `key` — klawisz otwierający; `at` — `c`, `l`, `r`; treść: `text`, `value` (`label`, `bind`, `unit`),
-  `stats` (obiekt → wiersze), `list` (napisy albo `{ name, n }`). Esc zamyka okna.
+  `stats` (obiekt → wiersze), `list` (napisy albo `{ name, n }`), `tree` (drzewko ulepszeń: `{ type: 'tree', tree:
+  'nazwa', points: 'ścieżka' }` — zasób `tree` albo przykład o tej nazwie, widok z pola drzewka `view`; kliknięcie kupuje
+  za punkty ze stanu gry i odejmuje je, akcja `buy` z `{ tree, id, level, cost, effects }`; okno z drzewkiem jest
+  szersze; `ui.tree(nazwa)` — stan gracza, `ui.buy(nazwa, węzeł)`; opis: [trees.md](trees.md)). Esc zamyka okna.
 - **Okno dialogowe:** `ui.say({ who, text, choices, side })` → wybór (indeks) albo −1; bez `who` — narrator (kursywą,
   na środku). Tekst pisany po literze; klik, Enter albo spacja — dalej; wybory klikiem albo 1–9.
 
@@ -75,7 +78,7 @@ pod nazwą jako zasób **uiskin**; całe UI — zasób **ui** (`js/scene/assets.
 
 ## API dla AI
 
-`window.GameUIApi`: `load(def)`, `set(stan)` (łączony z obecnym), `show(ekran)`, `hide()`, `open(okno)`, `close(okno)`,
+`window.GameUIApi`: `load(def)`, `set(stan)` (łączony z obecnym), `show(ekran)`, `hide()`, `open(okno)`, `close(okno)`, `tree(nazwa)`, `buy(nazwa, węzeł)`,
 `say({ who, text, choices })` → wybór, `log(tekst, rodzaj)`, `banner(tekst, podpis)`, `def`, `state`, `samples`,
 `skins`, `empty()`. Zakładka **API** w konsoli: `{ "method": "say", "arg": { … } }`.
 

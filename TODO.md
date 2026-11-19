@@ -13,9 +13,10 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
     (`js/ui/TreeView.js`, dane `js/core/SkillTree.js`); tryb próby (punkty, kupowanie, co się odblokowuje; koszt
     całości, najdłuższa ścieżka); sprawdzanie drzewka (węzły nieosiągalne, pętle, brak opisu, efekt bez znaczenia);
     przykład: drzewko Hive Hunger.
-  - [ ] **Etap 2:** widok „płytka drukowana” z badań Space (`js/ui/windows/techTree.js`, `techTreeData.js`) z jego dwoma
-    drzewkami; drzewko jako okno w UI gry (nowy rodzaj okna w laboratorium UI gry) i w API; tło drzewka z obrazu
-    z laboratorium sztuki (zasób `image` — ten sam co „Sztuka → scena”).
+  - [x] **Etap 2** (0.74.0): widok „płytka drukowana” z badań Space (`js/ui/windows/techTree.js`, `techTreeData.js`,
+    z historią) z jego dwoma drzewkami (poziomy ulepszeń i rozgałęzienia w formacie); drzewko jako okno w UI gry (blok
+    `tree`, okno Research w przykładzie Space command) i w API (`GameUIApi.tree`, `buy`); tło drzewka z obrazu
+    z laboratorium sztuki (zasób `image`).
 - [ ] Punkt 9 — materiał z PatientZero (z historią): środowisko „organizm”, laboratorium tkanek, laboratorium patogenów.
 
 ## Pomysły (właściciel, czekają na decyzję)
@@ -65,7 +66,7 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
   obrazów); w scenie i w API pole materiału obiektu (podmiana np. kadłuba na zardzewiałą stal).
 - [ ] **Materiały ↔ sztuka:** powierzchnie 2D laboratorium sztuki z generatora MatKit (ten sam papier, drewno, metal
   w 2D i 3D).
-- [ ] **Sztuka → scena:** obraz z laboratorium sztuki jako zasób i obiekt sceny (płaszczyzna z fakturą farby, rama 3D
+- [ ] **Sztuka → scena:** obraz z laboratorium sztuki jako zasób (zrobione w 0.74.0: zasób `image`) i obiekt sceny (płaszczyzna z fakturą farby, rama 3D
   ze złoceniem — tryb 3D sztuki).
 - [x] **Bloki:** bryła z laboratorium bloków jako zasób z nazwą (0.66.0; pole `asset` obiektu).
 - [x] **Jaskinie:** zasób „cave” (0.71.0) — w scenie jako obiekt (pole `asset`) albo teren całej planszy (powierzchnia

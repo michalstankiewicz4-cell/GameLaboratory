@@ -3,6 +3,27 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.74.0 · drzewka 1.1.0 · UI gry 1.2.0 · sztuka 1.3.0 — 2026-11-19 (laboratorium drzewek, etap 2)
+
+### Dodane
+- **Widok „płytka drukowana”** drzewka (`js/gameui/tree/pcb.js`) z okna Badania Space, z historią (`techTree.js`,
+  `research.css` → `js/gameui/css/tree.css`, tło z horyzontem planety `js/gameui/tree/img/research-bg.jpg`): ścieżki
+  miedzi z impulsami, węzły w obręczach z nitami, poziom jako pierścień, koszt w pigułce. Dla dowolnego drzewka; głębsze
+  niż 3 poziomy ściska się do widoku. Bez innerHTML i atrybutów style (ikony przez DOMParser, style przez CSSOM).
+- **Dwa drzewka Space** jako przykłady (`samples/space.js`, z `techTreeData.js`): rój (prędkość, siła żucia, odporności,
+  wielkość roju — koszty i poziomy z `config.js`) i programowanie (całe „wkrótce”); teksty EN/PL z i18n Space.
+  Rejestr przykładów `samples/index.js`.
+- Format `gamelab-tree`: pole **`view`** (`radial` | `pcb`), węzeł z **poziomami** (`levels`, `growth`: koszt poziomu L =
+  round(cost · growth^L), efekt na poziom) i rodzaj **`hub`** (rozgałęzienie: nie kupowane, otwarte z rodzicem).
+  `TreeState`: `level`, `costOf`, zapis `{ levels, spent }` (dawny `{ owned }` się wczytuje).
+- **Drzewko jako okno w UI gry**: blok `{ type: 'tree', tree, points }` (`js/gameui/gameui.js`) — kupno za punkty ze stanu
+  gry, akcja `buy`, `ui.tree()`, `ui.buy()`; w laboratorium UI gry okno **Research** (R) w przykładzie Space command,
+  `GameUIApi.tree`, `GameUIApi.buy`.
+- **Tło drzewka z laboratorium sztuki**: nowy zasób z nazwą **`image`** (opis ArtKit; zapis w oknie Format and export,
+  `ArtApi.save/load/saved`), malowany od nowa w tle drzewka (`js/gameui/tree/background.js`) — w obu widokach.
+- Laboratorium drzewek: wybór widoku na pasku, okno Węzeł z poziomami i wzrostem kosztu, ikony obu widoków, tło z listy
+  obrazów, `TreeApi.view`, `TreeApi.background`; widok promienisty pokazuje poziomy i rozgałęzienia.
+
 ## Program 0.73.0 · drzewka 1.0.0 — 2026-11-14 (laboratorium drzewek, etap 1)
 
 ### Dodane

@@ -136,7 +136,8 @@ scena trzyma tylko nazwę. Inna karta widzi zmianę od razu (`onAssetsChange`).
 | `look` | filtry ([`../labs/filters.md`](../labs/filters.md)) | profil potoku kamery (`LOOK_DEFAULTS` w `js/render/sea/look.js`); dawny klucz `gameLab.lookProfiles.v1` przenosi się sam |
 | `sky` | ciała niebieskie ([`../labs/bodies.md`](../labs/bodies.md)), Niebo | wszystkie liczby nieba BodyKit (mgławice, pas, pył, gwiazdy, barwy, ziarno) |
 | `ui`, `uiskin` | UI gry ([`../labs/gameui.md`](../labs/gameui.md)) | definicja `gamelab-ui`; skórka: `base`, `tokens` |
-| `tree` | drzewka ([`../labs/trees.md`](../labs/trees.md)) | definicja `gamelab-tree`: gałęzie, węzły, punkty, tło, notatki |
+| `tree` | drzewka ([`../labs/trees.md`](../labs/trees.md)) | definicja `gamelab-tree`: gałęzie, węzły, punkty, widok, tło, notatki |
+| `image` | sztuka ([`../labs/art.md`](../labs/art.md)) | opis obrazu ArtKit (temat, technika, ziarno, powierzchnia, konwersje…), malowany od nowa tam, gdzie potrzebny |
 | `material` | materiały ([`../labs/materials.md`](../labs/materials.md)) | opis MatKit |
 | `plant` | rośliny ([`../labs/plants.md`](../labs/plants.md)) | `species`, `seed`, `size`, `detail`, `season`; w scenie pole `asset` obiektu `plants/<gatunek>` |
 | `cave` | jaskinie ([`../labs/caves.md`](../labs/caves.md)) | ustawienia CaveKit (`seed`, `length`, `branches`, `width`, `winding`, `chambers`, `rough`, `cell`, `drips`, `rubble`, `lakes`, `lava`, `rock`, `wet`, `relief`); w scenie pole `asset` obiektu `caves/cave` albo `env.cave` podziemia |

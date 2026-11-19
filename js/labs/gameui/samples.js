@@ -31,6 +31,7 @@ export const SAMPLES = {
       windows: [
         { id: 'cargo', title: 'Cargo', key: 'I', at: 'l', body: [{ type: 'text', text: 'What the ship carries.' }, { type: 'list', bind: 'cargo' }] },
         { id: 'ship', title: 'Ship', key: 'C', at: 'r', body: [{ type: 'value', label: 'Hull', bind: 'ship.hull', unit: 'pts' }, { type: 'stats', bind: 'ship.stats' }] },
+        { id: 'research', title: 'Research', key: 'R', at: 'c', body: [{ type: 'tree', tree: 'Space — swarm', points: 'credits' }] },
       ],
     },
   },

@@ -1,23 +1,26 @@
-// Tech Tree Lab (labs/trees.html): drzewko 'gamelab-tree' (js/gameui/tree/tree.js) w widoku promienistym (radial.js).
+// Tech Tree Lab (labs/trees.html): drzewko 'gamelab-tree' (js/gameui/tree/tree.js) w widoku promienistym (radial.js, z Hive
+// Hunger) albo „płytka drukowana” (pcb.js, z badań Space) — widok to pole drzewka `view`; tło — obraz z laboratorium sztuki.
 // Z edytora drzewka Hive Hunger (tools/tree-editor.html): tryby Wybierz / Dodaj / Połącz, przeciąganie węzła (poziom co 0,1
 // i kąt), okno węzła, kolory gałęzi, notatki, eksport i import JSON. Do tego: tryb Próba (punkty, kupowanie, zsumowane
 // efekty), sprawdzanie drzewka, liczby drzewka, zapis jako zasób z nazwą „tree” (js/scene/assets.js), TreeApi dla AI.
-import { KINDS, emptyTree, normalizeTree, cloneTree, TreeState, checkTree, treeStats, nodeName } from '../../gameui/tree/tree.js';
-import { RadialView, ICONS } from '../../gameui/tree/radial.js';
+import { KINDS, VIEWS, emptyTree, normalizeTree, cloneTree, TreeState, checkTree, treeStats, nodeName } from '../../gameui/tree/tree.js';
+import { RadialView, ICONS as PIXEL_ICONS } from '../../gameui/tree/radial.js';
+import { PcbView, ICONS as PCB_ICONS } from '../../gameui/tree/pcb.js';
+import { backgroundWatcher } from '../../gameui/tree/background.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
-import HIVE_HUNGER from '../../gameui/tree/samples/hive-hunger.js';
+import { TREE_SAMPLES as SAMPLES } from '../../gameui/tree/samples/index.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
 const PL = () => (window.LabMenu || {}).LANG === 'pl';
-const SAMPLES = { 'Hive Hunger': HIVE_HUNGER };
 const STORE = 'gamelab.trees';
-const TREE_KEYS = ['format', 'version', 'name', 'background', 'points', 'branches', 'nodes', 'notes'];
+const TREE_KEYS = ['format', 'version', 'name', 'view', 'background', 'points', 'branches', 'nodes', 'notes'];
 
 /* ---------------- stan (ta przeglądarka) ---------------- */
-let L = { tree: null, source: 'sample:Hive Hunger', mode: 'edit', tool: 'select', addKind: 'trait', budget: 500, owned: [], nextId: 1 };
+let L = { tree: null, source: 'sample:Hive Hunger', mode: 'edit', tool: 'select', addKind: 'trait', budget: 500, levels: {}, nextId: 1 };
 try { const s = JSON.parse(localStorage.getItem(STORE)); if (s && s.tree) L = { ...L, ...s }; } catch { /* nic zapisanego */ }
-L.tree = normalizeTree(L.tree || HIVE_HUNGER);
+if (Array.isArray(L.owned)) { L.levels = Object.fromEntries(L.owned.map((id) => [id, 1])); delete L.owned; }   // zapis z 1.0.0
+L.tree = normalizeTree(L.tree || SAMPLES['Hive Hunger']);
 let saveT = 0;
 const save = () => { clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(STORE, JSON.stringify(L)); } catch { /* pełno */ } }, 200); };
 const status = (t) => { $('status').textContent = t; };
@@ -26,18 +29,26 @@ const byId = (id) => L.tree.nodes.find((n) => n.id === id);
 // stan do widoku: w edycji wszystko „kupione” (kolory gałęzi), „wkrótce” przygaszone; w próbie — prawdziwy stan gracza
 let trial = new TreeState(L.tree), preview = new TreeState(L.tree);
 function rebuildStates() {
-  const owned = L.owned.filter((id) => byId(id));
-  trial = new TreeState(L.tree); trial.load({ owned: [...new Set([...trial.owned, ...owned])], spent: owned.reduce((a, id) => a + (byId(id).kind === 'core' ? 0 : byId(id).cost), 0) });
-  preview = new TreeState(L.tree); preview.owned = new Set(L.tree.nodes.filter((n) => !n.soon).map((n) => n.id));
+  trial = new TreeState(L.tree); trial.load({ levels: L.levels });
+  preview = new TreeState(L.tree); preview.load({ levels: Object.fromEntries(L.tree.nodes.filter((n) => !n.soon).map((n) => [n.id, n.levels])) });
 }
 const points = () => Math.max(0, L.budget - trial.spent);
 
-let selected = null, linkFrom = null, drag = null;
-const view = new RadialView($('view'), {
-  getTree: () => L.tree, getState: () => (L.mode === 'trial' ? trial : preview), getPoints: () => (L.mode === 'trial' ? points() : Infinity),
-  onBuy: (id) => { if (trial.buy(id, points())) { L.owned = [...trial.owned]; save(); showTrial(); status(`Bought: ${nodeName(byId(id), PL())}.`); } },
-  pl: PL, pointsName: () => (PL() && L.tree.points.labelPl) || L.tree.points.label, editing: () => L.mode === 'edit',
-});
+let selected = null, linkFrom = null, drag = null, view = null;
+const bg = backgroundWatcher(() => L.tree.background, () => { if (view instanceof PcbView) view.layout(); });
+const buyNode = (id) => { const ok = trial.buy(id, points()); if (ok) { L.levels = { ...trial.levels }; save(); showTrial(); } return ok; };
+// widok według pola drzewka `view`: przy zmianie stary znika, nowy dostaje te same zdarzenia edytora
+function makeView() {
+  const want = L.tree.view === 'pcb' ? PcbView : RadialView;
+  if (view instanceof want) return;
+  if (view) view.destroy();
+  view = new want($('view'), {
+    getTree: () => L.tree, getState: () => (L.mode === 'trial' ? trial : preview), getPoints: () => (L.mode === 'trial' ? points() : Infinity),
+    onBuy: (id) => { if (buyNode(id)) status(`Bought: ${nodeName(byId(id), PL())} (level ${trial.level(id)}).`); },
+    pl: PL, pointsName: () => (PL() && L.tree.points.labelPl) || L.tree.points.label, editing: () => L.mode === 'edit', getBackground: () => bg.get(),
+  });
+  attachEdit(view); view.layout(); if (L.tool) setTool(L.tool);
+}
 
 /* ---------------- zmiany drzewka ---------------- */
 // po każdej zmianie: układ, stany, okna, sprawdzenie
@@ -46,8 +57,8 @@ function changed({ form = true } = {}) {
   if (form) showNode(); showBranches(); showChecks(); showTrial(); save();
 }
 function setTree(def, source) {
-  L.tree = normalizeTree(def); L.source = source; L.owned = []; selected = null; linkFrom = null;
-  L.nextId = 1; showTreeForm(); changed();
+  L.tree = normalizeTree(def); L.source = source; L.levels = {}; selected = null; linkFrom = null;
+  L.nextId = 1; makeView(); showTreeForm(); changed();
 }
 
 /* ---------------- pasek: drzewko, tryb, narzędzie ---------------- */
@@ -85,35 +96,41 @@ function hint() {
 }
 document.querySelectorAll('#modes button').forEach((b) => { b.onclick = () => setMode(b.dataset.mode); });
 document.querySelectorAll('#tools button').forEach((b) => { b.onclick = () => setTool(b.dataset.tool); });
+Object.entries(VIEWS).forEach(([k, x]) => $('viewSel').append(el('option', { value: k, textContent: x.label })));
+$('viewSel').onchange = () => { L.tree.view = $('viewSel').value; makeView(); changed({ form: false }); status(`View: ${VIEWS[L.tree.view].label} (saved with the tree).`); };
 Object.entries(KINDS).filter(([k]) => k !== 'core').forEach(([k, x]) => $('addKind').append(el('option', { value: k, textContent: x.label })));
 $('addKind').value = L.addKind; $('addKind').onchange = () => { L.addKind = $('addKind').value; save(); };
 
 /* ---------------- mysz w edycji ---------------- */
-view.opts.onPick = () => {};   // kliknięcie obsługuje pointerdown poniżej (w próbie — kupowanie widoku)
-const pickHandler = view.opts.onPick;
-function syncPick() { view.opts.onPick = L.mode === 'edit' ? pickHandler : null; }
-view.canvas.addEventListener('pointerdown', (e) => {
-  syncPick(); if (L.mode !== 'edit') return;
-  const id = view.nodeAt(e);
-  if (L.tool === 'add') { addNode(view.polar(e)); return; }
-  if (L.tool === 'link') { if (id) linkClick(id); return; }
-  selected = id; view.selected = id; showNode();
-  if (id && byId(id).kind !== 'core') { drag = { id, moved: false }; view.canvas.setPointerCapture(e.pointerId); }
-});
-view.canvas.addEventListener('pointermove', (e) => {
-  if (!drag) return;
-  const n = byId(drag.id), q = view.polar(e);
-  const depth = Math.max(0.5, Math.min(8, Math.round(q.depth * 10) / 10)), angle = Math.round(q.angle);   // przy przeciąganiu co 0,1 poziomu
-  if (n.depth !== depth || n.angle !== angle) { n.depth = depth; n.angle = angle; drag.moved = true; view.pos[n.id] = view.place(depth, angle); view.tip.hidden = true; }
-});
-view.canvas.addEventListener('pointerup', () => { if (drag && drag.moved) changed(); drag = null; });
+// w edycji kliknięcie obsługuje pointerdown poniżej (onPick — nic), w próbie — kupowanie przez widok
+function attachEdit(v) {
+  const c = v.canvas;
+  c.addEventListener('pointerdown', (e) => {
+    v.opts.onPick = L.mode === 'edit' ? () => {} : null; if (L.mode !== 'edit') return;
+    const id = v.nodeAt(e);
+    if (L.tool === 'add') { addNode(v.polar(e)); return; }
+    if (L.tool === 'link') { if (id) linkClick(id); return; }
+    selected = id; v.selected = id; showNode();
+    if (id && byId(id).kind !== 'core') { drag = { id, moved: false }; c.setPointerCapture(e.pointerId); }
+  });
+  c.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const n = byId(drag.id), q = v.polar(e);
+    const depth = Math.max(0.5, Math.min(8, Math.round(q.depth * 10) / 10)), angle = Math.round(q.angle);   // przy przeciąganiu co 0,1 poziomu
+    if (n.depth !== depth || n.angle !== angle) {
+      n.depth = depth; n.angle = angle; drag.moved = true; v.tip.hidden = true;
+      if (v instanceof PcbView) v.layout(); else v.pos[n.id] = v.place(depth, angle);   // płytka rysuje się od nowa, piksele — co klatkę
+    }
+  });
+  c.addEventListener('pointerup', () => { if (drag && drag.moved) changed(); drag = null; });
+}
 
 function addNode({ depth, angle }) {
   let id; do id = `new${L.nextId++}`; while (byId(id));
   const parent = selected && byId(selected) ? selected : (L.tree.nodes.find((n) => n.kind === 'core') || {}).id;
   const pb = parent ? byId(parent).branch : 'core';
   L.tree.nodes.push({ id, name: 'New node', namePl: '', kind: L.addKind, branch: pb, parents: parent ? [parent] : [], all: false,
-    depth: Math.max(0.5, Math.round(depth * 2) / 2), angle: Math.round(angle), cost: 100, effect: {}, text: '', textPl: '', icon: null, soon: false, color: null, note: '' });
+    depth: Math.max(0.5, Math.round(depth * 2) / 2), angle: Math.round(angle), cost: L.addKind === 'hub' ? 0 : 100, levels: 1, growth: 1, effect: {}, text: '', textPl: '', icon: null, soon: false, color: null, note: '' });
   selected = id; setTool('select'); changed(); status(`Added ${id}: fill it in in the Node window.`);
 }
 function linkClick(id) {
@@ -141,12 +158,18 @@ addEventListener('keydown', (e) => {
 /* ---------------- okno Drzewko ---------------- */
 function showTreeForm() {
   $('treeName').value = L.tree.name; $('ptsEn').value = L.tree.points.label; $('ptsPl').value = L.tree.points.labelPl;
-  $('bg').value = L.tree.background; $('notes').value = L.tree.notes || '';
+  fillBg(); $('notes').value = L.tree.notes || ''; $('viewSel').value = L.tree.view;
+}
+// tło: obrazy zapisane w laboratorium sztuki (zasób „image”); zapisane w drzewku imię, którego już nie ma, zostaje na liście
+function fillBg() {
+  const s = $('bg'), names = listAssets('image'); s.replaceChildren(el('option', { value: '', textContent: L.tree.view === 'pcb' ? '(the planet horizon)' : '(none)' }));
+  [...new Set([...names, ...(L.tree.background ? [L.tree.background] : [])])].forEach((n) => s.append(el('option', { value: n, textContent: names.includes(n) ? n : `${n} (missing)` })));
+  s.value = L.tree.background;
 }
 $('treeName').oninput = () => { L.tree.name = $('treeName').value; save(); };
 $('ptsEn').oninput = () => { L.tree.points.label = $('ptsEn').value || 'points'; save(); showTrial(); };
 $('ptsPl').oninput = () => { L.tree.points.labelPl = $('ptsPl').value; save(); };
-$('bg').oninput = () => { L.tree.background = $('bg').value.trim(); save(); };
+$('bg').onchange = () => { L.tree.background = $('bg').value; save(); view.layout(); status(L.tree.background ? `Background: ${L.tree.background} (painting it…).` : 'No background image.'); };
 $('notes').oninput = () => { L.tree.notes = $('notes').value; save(); };
 function saveTree(name) {
   const n = String(name || L.tree.name || '').trim(); if (!n) throw new Error('a tree needs a name');
@@ -191,16 +214,23 @@ function showNode() {
     const v = id.value.trim(); if (!v || v === n.id) { id.value = n.id; return; }
     if (byId(v)) { status(`There already is a node "${v}".`); id.value = n.id; return; }
     for (const x of L.tree.nodes) x.parents = x.parents.map((p) => (p === n.id ? v : p));
-    L.owned = L.owned.map((p) => (p === n.id ? v : p)); n.id = v; selected = v; changed();
+    if (L.levels[n.id]) { L.levels[v] = L.levels[n.id]; delete L.levels[n.id]; } n.id = v; selected = v; changed();
   };
   f.append(row('Id', id), row('Name (EN)', input('text', n.name, set('name'))), row('Name (PL)', input('text', n.namePl, set('namePl'))));
   if (n.kind !== 'core') f.append(row('Kind', select(Object.entries(KINDS).filter(([k]) => k !== 'core').map(([k, x]) => [k, x.label]), n.kind, (s) => { n.kind = s.value; changed({ form: false }); })));
   f.append(row('Branch', select(Object.entries(L.tree.branches).map(([k, b]) => [k, b.label]), n.branch, (s) => { n.branch = s.value; changed({ form: false }); })));
-  f.append(row('Icon', select([['', '(none)'], ...Object.keys(ICONS).map((k) => [k, k])], n.icon || '', (s) => { n.icon = s.value || null; changed({ form: false }); })));
+  // ikony obu widoków: pixel art (promienisty) i obrys (płytka); ikona tylko z jednego zestawu — w drugim widoku bez ikony
+  const icons = [...new Set([...Object.keys(PIXEL_ICONS), ...Object.keys(PCB_ICONS)])].filter((k) => k !== 'lock').sort()
+    .map((k) => [k, PIXEL_ICONS[k] && PCB_ICONS[k] ? k : `${k} (${PIXEL_ICONS[k] ? 'pixel art' : 'circuit board'} only)`]);
+  f.append(row('Icon', select([['', '(none)'], ...icons], n.icon || '', (s) => { n.icon = s.value || null; changed({ form: false }); })));
   const col = input('color', n.color || L.tree.branches[n.branch].color, (i) => { n.color = i.value; changed({ form: false }); });
   f.append(row('Own colour', col), check("the branch's colour", (v) => { n.color = v ? null : col.value; changed(); }, !n.color));
   if (n.kind !== 'core') {
-    f.append(row('Cost', input('number', n.cost, set('cost'), { min: 0, step: 10 })));
+    if (n.kind !== 'hub') {
+      f.append(row('Cost', input('number', n.cost, set('cost'), { min: 0, step: 10 })));
+      f.append(row('Levels', input('number', n.levels, (i) => { n.levels = Math.max(1, Math.min(99, Math.round(+i.value || 1))); changed({ form: false }); }, { min: 1, max: 99, step: 1, title: 'How many times it can be bought' })));
+      f.append(row('Cost growth', input('number', n.growth, (i) => { n.growth = Math.max(1, Math.min(10, +i.value || 1)); changed({ form: false }); }, { min: 1, max: 10, step: 0.05, title: 'Level L costs round(cost × growth^L)' })));
+    }
     f.append(row('Level', input('number', n.depth, set('depth'), { min: 0.5, max: 8, step: 0.1 })), row('Angle', input('number', n.angle, set('angle'), { min: -110, max: 110, step: 1 })));
     f.append(el('h3', { textContent: 'Grows from' }));
     const list = el('div', { className: 'parents' });
@@ -208,8 +238,10 @@ function showNode() {
     if (!n.parents.length) list.append(el('span', { className: 'note', textContent: 'nothing (Link: click a parent, then this node)' }));
     f.append(list, row('Needs', select([['any', 'any one of them'], ['all', 'all of them']], n.all ? 'all' : 'any', (s) => { n.all = s.value === 'all'; changed({ form: false }); })));
     f.append(check('Coming soon (shown, not for sale yet)', (v) => { n.soon = v; changed({ form: false }); }, n.soon));
-    f.append(el('h3', { textContent: 'Effect' }), el('p', { className: 'note', textContent: 'One per line: a game stat and a number (they add up), or just a name (on). E.g. "count 10", "bolt".' }));
-    const ef = el('textarea', { rows: 3, spellcheck: false, value: effectText(n.effect) }); ef.oninput = () => { n.effect = parseEffect(ef.value); changed({ form: false }); }; f.append(ef);
+    if (n.kind !== 'hub') {
+      f.append(el('h3', { textContent: 'Effect' }), el('p', { className: 'note', textContent: 'One per line, per level: a game stat and a number (they add up), or just a name (on). E.g. "count 10", "bolt".' }));
+      const ef = el('textarea', { rows: 3, spellcheck: false, value: effectText(n.effect) }); ef.oninput = () => { n.effect = parseEffect(ef.value); changed({ form: false }); }; f.append(ef);
+    }
   }
   f.append(el('h3', { textContent: 'Text (EN)' }));
   const tx = el('textarea', { rows: 2, value: n.text }); tx.oninput = () => { n.text = tx.value; changed({ form: false }); }; f.append(tx);
@@ -242,20 +274,21 @@ $('branchAdd').onclick = () => {
 /* ---------------- okno Próba ---------------- */
 const kv = (k, v) => [el('span', { textContent: k }), el('b', { textContent: v })];
 function showTrial() {
-  const pts = L.tree.points.label, buy = L.tree.nodes.filter((n) => n.kind !== 'core' && !n.soon);
+  const pts = L.tree.points.label, buy = L.tree.nodes.filter((n) => n.kind !== 'core' && n.kind !== 'hub' && !n.soon);
+  const lv = buy.reduce((a, n) => a + trial.level(n.id), 0), lvAll = buy.reduce((a, n) => a + n.levels, 0);
   $('trialStats').replaceChildren(...kv('Left', `${points().toLocaleString('en')} ${pts}`), ...kv('Spent', trial.spent.toLocaleString('en')),
-    ...kv('Bought', `${buy.filter((n) => trial.has(n.id)).length} / ${buy.length}`));
+    ...kv('Bought', `${buy.filter((n) => trial.has(n.id)).length} / ${buy.length}${lvAll > buy.length ? ` (levels ${lv} / ${lvAll})` : ''}`));
   const e = trial.effects();
   $('effects').replaceChildren(...(Object.keys(e).length ? Object.entries(e).flatMap(([k, v]) => kv(k, v === true ? 'on' : String(+v.toFixed(3)))) : kv('—', 'nothing yet')));
   const s = treeStats(L.tree), nm = (r) => (r ? `${byId(r.id).name} (${r.steps} steps, ${r.cost.toLocaleString('en')})` : '—');
-  $('treeStats').replaceChildren(...kv('Nodes', `${s.nodes} (for sale ${s.buyable}, soon ${s.soon})`), ...kv('All for sale', `${s.total.toLocaleString('en')} ${pts}`),
+  $('treeStats').replaceChildren(...kv('Nodes', `${s.nodes} (for sale ${s.buyable}, soon ${s.soon})`), ...kv('All for sale', `${s.total.toLocaleString('en')} ${pts}${s.levels > s.buyable ? ` (${s.levels} levels)` : ''}`),
     ...kv('Longest way', nm(s.longest)), ...kv('Dearest way', nm(s.dearest)));
   $('budget').value = L.budget; if (L.mode === 'trial') hint();
 }
 $('budget').oninput = () => { L.budget = Math.max(0, +$('budget').value || 0); save(); showTrial(); };
 $('plus100').onclick = () => { L.budget += 100; save(); showTrial(); };
 $('plus1000').onclick = () => { L.budget += 1000; save(); showTrial(); };
-$('trialReset').onclick = () => { L.owned = []; rebuildStates(); save(); showTrial(); status('Everything sold: the points are back.'); };
+$('trialReset').onclick = () => { L.levels = {}; rebuildStates(); save(); showTrial(); status('Everything sold: the points are back.'); };
 
 /* ---------------- okno Sprawdzenie ---------------- */
 function showChecks() {
@@ -276,8 +309,10 @@ window.TreeApi = {
   load: (d) => { const def = typeof d === 'string' ? SAMPLES[d] || getAsset('tree', d) : d; if (!def) throw new Error(`no tree "${d}"`); setTree(cloneTree(def), typeof d === 'string' ? (SAMPLES[d] ? `sample:${d}` : `asset:${d}`) : 'new'); fillTreeSel(); return window.TreeApi.check(); },
   check: () => checkTree(L.tree), stats: () => treeStats(L.tree),
   points: (n) => { if (n != null) { L.budget = Math.max(0, +n || 0); save(); showTrial(); } return points(); },
-  buy: (id) => { const ok = trial.buy(id, points()); if (ok) { L.owned = [...trial.owned]; save(); showTrial(); } return { bought: ok, state: trial.state(id), left: points() }; },
-  effects: () => trial.effects(), reset: () => { L.owned = []; rebuildStates(); save(); showTrial(); },
+  buy: (id) => { const ok = buyNode(id); return { bought: ok, level: trial.level(id), state: trial.state(id), next: trial.costOf(id), left: points() }; },
+  effects: () => trial.effects(), reset: () => { L.levels = {}; rebuildStates(); save(); showTrial(); },
+  view: (v) => { if (v) { if (!VIEWS[v]) throw new Error(`view: ${Object.keys(VIEWS).join(' | ')}`); L.tree.view = v; makeView(); changed({ form: false }); showTreeForm(); } return L.tree.view; },
+  background: (n) => { if (n !== undefined) { L.tree.background = String(n || ''); save(); showTreeForm(); view.layout(); } return L.tree.background; },
   mode: (m) => { if (m) setMode(m); return L.mode; },
   save: (name) => ({ saved: saveTree(name) }), saved: () => listAssets('tree'), samples: () => Object.keys(SAMPLES),
 };
@@ -289,11 +324,11 @@ function apiTab() {
     const m = /^\s*TreeApi\.(\w+)\((.*)\)\s*$/s.exec(ta.value);
     try { if (!m || !window.TreeApi[m[1]]) throw new Error('write TreeApi.<method>(JSON arguments)'); const args = m[2].trim() ? JSON.parse(`[${m[2]}]`) : []; out.textContent = JSON.stringify(window.TreeApi[m[1]](...args), null, 1).slice(0, 4000); } catch (e) { out.textContent = `Error: ${e.message}`; }
   };
-  box.append(ta, go, el('p', { className: 'note', textContent: 'Methods: get, load(tree | "name"), check, stats, points(n), buy("id"), effects, reset, mode("edit" | "trial"), save("name"), saved, samples.' }), out);
+  box.append(ta, go, el('p', { className: 'note', textContent: 'Methods: get, load(tree | "name"), check, stats, points(n), buy("id"), effects, reset, mode("edit" | "trial"), view("radial" | "pcb"), background("image name"), save("name"), saved, samples.' }), out);
   window.LabConsole.addTab({ id: 'treeapi', title: 'API', titlePl: 'API', el: box });
 }
 if (window.LabConsole) apiTab(); else addEventListener('load', apiTab);
 
 /* ---------------- start ---------------- */
-onAssetsChange(fillTreeSel);
-fillTreeSel(); showTreeForm(); setMode(L.mode); showNode();
+onAssetsChange(() => { fillTreeSel(); fillBg(); });
+rebuildStates(); makeView(); fillTreeSel(); showTreeForm(); setMode(L.mode); showNode();

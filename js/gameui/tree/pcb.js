@@ -1,24 +1,22 @@
-import { TREE } from "../../config.js";
-import { state, cost } from "../../core/gameState.js";
-import { t } from "../../i18n.js";
-import { TECH_TREES } from "./techTreeData.js";
+// Widok „płytka drukowana” drzewka — z okna Badania Space (js/ui/windows/techTree.js), dla dowolnego drzewka
+// 'gamelab-tree' (tree.js). Jedno SVG: horyzont planety na dole (obraz tła img/research-bg.jpg albo obraz z zasobu
+// „image”, background.js), pień z wiązki ścieżek miedzi, gałęzie prowadzone jak ścieżki płytki (prosto, potem 45°)
+// z biegnącymi impulsami światła na żywych, okrągłe węzły w metalowych obręczach z nitami; poziom kupionego — pierścień
+// wokół obręczy. Położenie z pola węzła: depth → pierścień (jak w Space: 0, 205, 365, 470, dalej co 105), angle — stopnie
+// od pionu; drzewko głębsze niż 3 poziomy ściska się, żeby zmieściło się w widoku (węzły mniejsze). Interfejs jak RadialView (radial.js): layout(), place(), polar(), nodeAt(), pos, selected, marked, tip.
+// Bez innerHTML i bez atrybutów style (CSP): elementy przez DOM, style przez CSSOM; wygląd: js/gameui/css/tree.css.
+import { KINDS, nodeName, nodeText } from './tree.js';
 
-// The Research window's tree view (#techTree): one tree at a time from
-// techTreeData.js, ◀ ▶ to switch. Drawn as one SVG: a planet's horizon at
-// the bottom, the trunk (a bundle of circuit traces) growing out of it,
-// branches routed like PCB traces (straight, then 45°) with light pulses
-// running along the live ones, round metal-rimmed nodes. The layout is
-// computed from the data (see layout()); nothing here knows a specific
-// node. Buying is research.js's job (onBuy). The picture behind it all:
-// background().
 const W = 1100, H = 640;
 const ROOT = { x: W / 2, y: 452 };
-const RING = [0, 205, 365, 470];            // radius per depth
-const FAN = [170, 10];                      // leaves spread between these angles (deg, 0 = right, 90 = up)
-const HORIZON_Y = 590;                      // the planet's highest point
+const RING = [0, 205, 365, 470];            // promień na poziom (dalej co 105)
+const HORIZON_Y = 590;                      // najwyższy punkt planety
 const R = { root: 50, branch: 40, leaf: 31 };
+const NS = 'http://www.w3.org/2000/svg';
+const BG = { href: new URL('./img/research-bg.jpg', import.meta.url).href, w: 1248, h: 832, horizon: 579 };   // obraz z AI (Space), horyzont na 69,6 % wysokości
 
-const ICONS = {
+// ikony 24 × 24 (pole „icon” węzła) — obrys, klasa f: wypełnienie
+export const ICONS = {
   core: '<path d="M8 5L3 12L8 19M16 5L21 12L16 19"/><circle class="f" cx="12" cy="8.5" r="1.7"/><circle class="f" cx="9.8" cy="14.6" r="1.7"/><circle class="f" cx="14.2" cy="14.6" r="1.7"/>',
   code: '<path d="M8 7L3 12L8 17M16 7L21 12L16 17M14 4L10 20"/>',
   shield: '<path d="M12 3L19 6V11C19 16 16 19 12 21C8 19 5 16 5 11V6Z"/>',
@@ -40,253 +38,252 @@ const ICONS = {
   range: '<circle class="f" cx="12" cy="12" r="1.8"/><circle cx="12" cy="12" r="5.5" stroke-dasharray="3 2"/><circle cx="12" cy="12" r="9.5" stroke-dasharray="3 3"/>',
   parallel: '<path d="M4 7H16M4 12H20M4 17H13M14 4L17 7L14 10M17 14L20 17L17 20"/>',
   sync: '<path d="M19 8A8 8 0 0 0 5 9M5 16A8 8 0 0 0 19 15M19 4V8H15M5 20V16H9"/>',
-  lock: '<rect x="6" y="11" width="12" height="9" rx="1.5"/><path d="M8.5 11V8A3.5 3.5 0 0 1 15.5 8V11"/>'
+  lock: '<rect x="6" y="11" width="12" height="9" rx="1.5"/><path d="M8.5 11V8A3.5 3.5 0 0 1 15.5 8V11"/>',
 };
-
-let current = 0;                 // the tree shown
-let onBuyFn = null;
-
-function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-
-// ---------- layout: leaves in a fan, parents over their children ----------
-function layout(root){
-  const leaves = [];
-  (function collect(n, depth, parent){
-    n._depth = depth; n._parent = parent;
-    if(!n.children || !n.children.length) leaves.push(n);
-    (n.children || []).forEach(function(c){ collect(c, depth + 1, n); });
-  })(root, 0, null);
-  const a0 = FAN[0], a1 = FAN[1];
-  leaves.forEach(function(l, i){ l._angle = leaves.length === 1 ? 90 : a0 + (a1 - a0) * i / (leaves.length - 1); });
-  (function angle(n){
-    if(n.children && n.children.length){
-      n.children.forEach(angle);
-      n._angle = n.children.reduce(function(s, c){ return s + c._angle; }, 0) / n.children.length;
-    }
-  })(root);
-  const all = [];
-  (function place(n){
-    const r = RING[Math.min(n._depth, RING.length - 1)];
-    const a = n._angle * Math.PI / 180;
-    n._x = ROOT.x + Math.cos(a) * r;
-    n._y = ROOT.y - Math.sin(a) * r;
-    all.push(n);
-    (n.children || []).forEach(place);
-  })(root);
-  return all;
+const iconCache = {};
+function iconNodes(key) {   // znaczniki ikony → elementy SVG (DOMParser, bez innerHTML)
+  if (!ICONS[key]) return [];
+  if (!iconCache[key]) iconCache[key] = new DOMParser().parseFromString(`<svg xmlns="${NS}">${ICONS[key]}</svg>`, 'image/svg+xml').documentElement;
+  return [...iconCache[key].childNodes].map((c) => c.cloneNode(true));
 }
-
-// ---------- node state ----------
-function info(n){
-  if(n.kind === "upgrade"){
-    const node = TREE[n.upgrade];
-    const lvl = state.levels[n.upgrade], c = cost(node);
-    return { name: t("upgrades." + n.upgrade), desc: t("upgrades.tree." + n.id + "Desc"), lvl: lvl, max: node.maxLvl, cost: c,
-      affordable: c !== null && c <= state.points, maxed: c === null };
-  }
-  return { name: t("upgrades.tree." + n.id), desc: t("upgrades.tree." + n.id + "Desc") };
+function S(tag, attrs = {}, parent = null) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) if (v != null) e.setAttribute(k, String(v));
+  if (parent) parent.append(e);
+  return e;
 }
-
-function stateClass(n, i){
-  if(n.kind === "root") return "root";
-  if(n.kind === "soon") return "soon";
-  if(n.kind === "hub") return "hub";
-  return i.maxed ? "maxed" : i.affordable ? "affordable" : i.lvl > 0 ? "owned" : "poor";
-}
-
-// ---------- drawing ----------
-// A PCB-style route from a to b: straight along the longer axis, then 45°.
-function trace(a, b){
-  const dx = b._x - a._x, dy = b._y - a._y, ax = Math.abs(dx), ay = Math.abs(dy);
-  let mx, my;
-  if(ay > ax){ mx = a._x; my = a._y + Math.sign(dy) * (ay - ax); }
-  else { mx = a._x + Math.sign(dx) * (ax - ay); my = a._y; }
-  return "M" + a._x.toFixed(1) + " " + a._y.toFixed(1) + " L" + mx.toFixed(1) + " " + my.toFixed(1) + " L" + b._x.toFixed(1) + " " + b._y.toFixed(1);
-}
-
-function icon(key, x, y, size){
-  const s = size / 24;
-  return '<g class="ic" transform="translate(' + (x - size / 2).toFixed(1) + " " + (y - size / 2).toFixed(1) + ") scale(" + s.toFixed(3) + ')">' + (ICONS[key] || "") + "</g>";
-}
-
-function wrap(text, max){
-  const words = String(text).split(" "), lines = [];
-  let line = "";
-  words.forEach(function(w){ if((line + " " + w).trim().length > max && line){ lines.push(line); line = w; } else line = (line + " " + w).trim(); });
-  if(line) lines.push(line);
+function wrap(text, max) {
+  const words = String(text).split(' '), lines = []; let line = '';
+  words.forEach((w) => { if ((line + ' ' + w).trim().length > max && line) { lines.push(line); line = w; } else line = (line + ' ' + w).trim(); });
+  if (line) lines.push(line);
   return lines.slice(0, 3);
 }
+const ringR = (d) => { if (d <= 0) return 0; const i = Math.floor(d), f = d - i, r = (k) => (k < RING.length ? RING[k] : RING[RING.length - 1] + 105 * (k - RING.length + 1)); return r(i) + (r(i + 1) - r(i)) * f; };
 
-// Seeded stars, the same every time the window opens (over the picture's
-// own: a few, some twinkling).
-function stars(){
-  let s = 7, out = "";
-  function rnd(){ s = (s * 16807) % 2147483647; return s / 2147483647; }
-  for(let i = 0; i < 70; i++){
-    const x = rnd() * W, y = rnd() * (HORIZON_Y - 10), r = rnd() < 0.1 ? 1.4 : 0.8, o = 0.25 + rnd() * 0.6;
-    out += '<circle cx="' + x.toFixed(0) + '" cy="' + y.toFixed(0) + '" r="' + r + '" fill="#dfe6ff" opacity="' + o.toFixed(2) + '"' + (rnd() < 0.25 ? ' class="tw" style="animation-delay:' + (rnd() * 4).toFixed(1) + 's"' : "") + "/>";
+export class PcbView {
+  /** @param {HTMLElement} root  @param {object} opts  jak RadialView (radial.js) + getBackground?: () => string|null (adres obrazu tła) */
+  constructor(root, opts) {
+    this.root = root; this.opts = opts; this.hover = null; this.selected = null; this.marked = new Set(); this.pos = {};
+    this.svg = S('svg', { class: 'pcb-svg', viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: 'xMidYMid meet' });
+    this.tip = document.createElement('div'); this.tip.className = 'pcb-tip'; this.tip.hidden = true;
+    root.append(this.svg, this.tip);
+    this.svg.view = this; this.canvas = this.svg;   // (laboratorium i testy: ten sam element zdarzeń co w RadialView)
+    this.svg.addEventListener('pointermove', (e) => this.onMove(e));
+    this.svg.addEventListener('pointerleave', () => { this.hover = null; this.tip.hidden = true; });
+    this.svg.addEventListener('click', (e) => this.onClick(e));
+    const loop = () => { this.check(); this.raf = requestAnimationFrame(loop); };
+    this.raf = requestAnimationFrame(loop);
+    this.layout();
   }
-  return out;
-}
 
-// The backdrop: an AI-generated picture (css/ui/windows/researchBg.jpg,
-// 1248x832, made from a prompt at the user's request) — a planet's
-// horizon with circuit lines on its surface, a nebula, hexagon corners —
-// placed so its horizon (at 69.6% of its height, measured) meets the
-// trunk's base at HORIZON_Y. Twinkling stars on top keep it alive.
-const BG = { href: "css/ui/windows/researchBg.jpg", w: 1248, h: 832, horizon: 579 };
-function background(){
-  const scale = W / BG.w, h = BG.h * scale, y = HORIZON_Y - BG.horizon * scale;
-  return (
-    '<defs>' +
-      '<linearGradient id="ttRimGold" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#ffe7b0"/><stop offset=".45" stop-color="#f8bb56"/><stop offset=".7" stop-color="#9a6127"/><stop offset="1" stop-color="#e9ab55"/></linearGradient>' +
-      '<linearGradient id="ttRimSteel" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#a8b3d8"/><stop offset=".5" stop-color="#4c5680"/><stop offset=".75" stop-color="#262c48"/><stop offset="1" stop-color="#7580ad"/></linearGradient>' +
-      '<radialGradient id="ttFace" cx="0.4" cy="0.3" r="0.8"><stop offset="0" stop-color="#16214f"/><stop offset=".6" stop-color="#070c24"/><stop offset="1" stop-color="#02040f"/></radialGradient>' +
-      // worn copper: edges wobbled by noise, darker oxidised patches on top
-      '<filter id="ttRough" x="-2%" y="-2%" width="104%" height="104%">' +
-        '<feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" seed="3" result="n"/>' +
-        '<feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G" result="d"/>' +
-        '<feTurbulence type="fractalNoise" baseFrequency="0.18" numOctaves="3" seed="11" result="n2"/>' +
-        '<feColorMatrix in="n2" type="matrix" values="0 0 0 0 0.06  0 0 0 0 0.03  0 0 0 0 0.01  1.9 0 0 0 -0.78" result="spots"/>' +
-        '<feComposite in="spots" in2="d" operator="in" result="spotsIn"/>' +
-        '<feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="1" seed="5" result="grain"/>' +
-        '<feColorMatrix in="grain" type="matrix" values="0 0 0 0 1  0 0 0 0 0.85  0 0 0 0 0.6  1.2 0 0 0 -0.82" result="glints"/>' +
-        '<feComposite in="glints" in2="d" operator="in" result="glintsIn"/>' +
-        '<feMerge><feMergeNode in="d"/><feMergeNode in="spotsIn"/><feMergeNode in="glintsIn"/></feMerge>' +
-      '</filter>' +
-    '</defs>' +
-    '<rect width="' + W + '" height="' + H + '" fill="#080b1a"/>' +
-    '<image href="' + BG.href + '" x="0" y="' + y.toFixed(1) + '" width="' + W + '" height="' + h.toFixed(1) + '" preserveAspectRatio="none"/>' +
-    stars()
-  );
-}
+  get tree() { return this.opts.getTree(); }
+  destroy() { cancelAnimationFrame(this.raf); this.svg.remove(); this.tip.remove(); }
 
-// The trunk: a bundle of traces from the horizon up to the root, spreading
-// into roots along the surface.
-function trunk(){
-  const parts = { metal: "", core: "" };
-  const offs = [-2, -1, 0, 1, 2];
-  offs.forEach(function(o, i){
-    const x0 = ROOT.x + o * 11, xb = ROOT.x + o * 20;
-    const d = "M" + x0 + " " + (ROOT.y + R.root - 4) + " L" + x0 + " " + (HORIZON_Y - 40) + " L" + xb + " " + (HORIZON_Y - 10) + " L" + xb + " " + (HORIZON_Y + 6);
-    addTrace(parts, d, "");
-    // roots along the surface
-    const dir = o === 0 ? (i % 2 ? 1 : -1) : Math.sign(o), len = 60 + Math.abs(o) * 35;
-    const root = "M" + xb + " " + (HORIZON_Y + 6) + " L" + (xb + dir * len) + " " + (HORIZON_Y + 6 + len * 0.18) + " L" + (xb + dir * (len + 40)) + " " + (HORIZON_Y + 6 + len * 0.18);
-    addTrace(parts, root, "root");
-  });
-  parts.core += '<path class="pulse up" d="M' + ROOT.x + " " + (HORIZON_Y + 6) + " L" + ROOT.x + " " + (ROOT.y + R.root) + '"/>';
-  return parts;
-}
-
-// One copper trace: a dark edge, the copper, a highlight along its crown
-// (these three get the worn-metal filter) and the lit core on top.
-function addTrace(parts, d, cls){
-  parts.metal += '<path class="tr-edge ' + cls + '" d="' + d + '"/><path class="tr-base ' + cls + '" d="' + d + '"/><path class="tr-hi ' + cls + '" d="' + d + '"/>';
-  parts.core += '<path class="tr-core ' + cls + '" d="' + d + '"/>';
-}
-
-function nodeSvg(n, i){
-  const cls = stateClass(n, i);
-  const r = n.kind === "root" ? R.root : (n.children && n.children.length) ? R.branch : R.leaf;
-  const x = n._x, y = n._y;
-  const rim = cls === "soon" ? "url(#ttRimSteel)" : "url(#ttRimGold)";
-  let out = '<g class="tt-node ' + cls + (n.children && n.children.length && n.kind !== "root" ? " branch" : "") + '" data-id="' + esc(n.id) + '" tabindex="0">';
-  out += '<circle class="halo" cx="' + x + '" cy="' + y + '" r="' + (r + 10) + '"/>';
-  out += '<circle class="rim" cx="' + x + '" cy="' + y + '" r="' + r + '" fill="url(#ttFace)" stroke="' + rim + '" stroke-width="5"/>';
-  out += '<circle class="inner" cx="' + x + '" cy="' + y + '" r="' + (r - 6) + '"/>';
-  // rivets on the rim, like the concept art's bolted metal plates
-  [45, 135, 225, 315].forEach(function(a){
-    const rad = a * Math.PI / 180;
-    out += '<circle class="rivet" cx="' + (x + Math.cos(rad) * r).toFixed(1) + '" cy="' + (y + Math.sin(rad) * r).toFixed(1) + '" r="1.7"/>';
-  });
-  if(n.kind === "upgrade"){
-    // the level as a ring around the rim
-    const circ = 2 * Math.PI * (r + 6), frac = i.lvl / i.max;
-    out += '<circle class="ring-bg" cx="' + x + '" cy="' + y + '" r="' + (r + 6) + '"/>';
-    out += '<circle class="ring" cx="' + x + '" cy="' + y + '" r="' + (r + 6) + '" stroke-dasharray="' + (circ * frac).toFixed(1) + " " + circ.toFixed(1) + '" transform="rotate(-90 ' + x + " " + y + ')"/>';
+  place(depth, angle) {
+    const a = ((90 - angle) * Math.PI) / 180, r = ringR(depth) * (this.k || 1);
+    return { x: ROOT.x + Math.cos(a) * r, y: ROOT.y - Math.sin(a) * r };
   }
-  if(n.kind === "root"){
-    out += '<circle class="spin" cx="' + x + '" cy="' + y + '" r="' + (r + 12) + '"/>';
-    out += icon(n.icon, x, y - 10, 34);
-    // a long name gets a smaller font so it stays inside the circle
-    const fs = Math.min(17, 150 / Math.max(1, i.name.length));
-    out += '<text class="lbl-in root" x="' + x + '" y="' + (y + 24) + '" style="font-size:' + fs.toFixed(1) + 'px">' + esc(i.name) + "</text>";
-  } else if(n.children && n.children.length){
-    out += icon(n.icon, x, y - 13, 20);
-    wrap(i.name, 12).forEach(function(line, k, arr){
-      out += '<text class="lbl-in" x="' + x + '" y="' + (y + 8 + (k - (arr.length - 1) / 2) * 13 + (arr.length > 1 ? 4 : 0)) + '">' + esc(line) + "</text>";
-    });
-  } else {
-    out += icon(cls === "soon" ? n.icon : n.icon, x, y - (n.kind === "upgrade" ? 6 : 0), 26);
-    if(n.kind === "upgrade") out += '<text class="lvl" x="' + x + '" y="' + (y + 20) + '">' + i.lvl + "/" + i.max + "</text>";
-    wrap(i.name, 16).forEach(function(line, k){ out += '<text class="lbl" x="' + x + '" y="' + (y + r + 22 + k * 14) + '">' + esc(line) + "</text>"; });
-    if(n.kind === "upgrade"){
-      const lines = wrap(i.name, 16).length;
-      const txt = i.maxed ? t("upgrades.max") : i.cost + " " + t("upgrades.pts");
-      const ty = y + r + 22 + lines * 14 + 4, w = 12 + txt.length * 6.6;
-      out += '<rect class="cost-bg" x="' + (x - w / 2) + '" y="' + (ty - 12) + '" width="' + w + '" height="17" rx="8.5"/>';
-      out += '<text class="cost" x="' + x + '" y="' + (ty + 1) + '">' + esc(txt) + "</text>";
+
+  svgXY(e) {
+    const m = this.svg.getScreenCTM(); if (!m) return { x: 0, y: 0 };
+    const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse());
+    return { x: p.x, y: p.y };
+  }
+
+  polar(e) {
+    const { x, y } = this.svgXY(e), dx = x - ROOT.x, dy = ROOT.y - y, r = Math.hypot(dx, dy);
+    let depth = 0;
+    for (let d = 0; d < 12; d++) { const r0 = ringR(d) * this.k, r1 = ringR(d + 1) * this.k; if (r <= r1) { depth = d + (r - r0) / (r1 - r0); break; } depth = d + 1; }
+    return { depth: Math.max(0, depth), angle: Math.max(-110, Math.min(110, 90 - (Math.atan2(dy, dx) * 180) / Math.PI)) };
+  }
+
+  hasKids(id) { return this.tree.nodes.some((n) => n.parents.includes(id)); }
+  radius(n) { return (n.kind === 'core' ? R.root : this.hasKids(n.id) ? R.branch : R.leaf) * (n.kind === 'core' ? 1 : this.nk); }
+
+  nodeAt(e) {
+    const { x, y } = this.svgXY(e); let best = null, bestD = Infinity;
+    for (const n of this.tree.nodes) { const p = this.pos[n.id]; if (!p) continue; const d = Math.hypot(x - p.x, y - p.y); if (d <= this.radius(n) + 6 && d < bestD) { bestD = d; best = n.id; } }
+    return best;
+  }
+
+  /** Położenia z drzewka i rysunek od nowa (po zmianie drzewka). */
+  layout() {
+    // dopasowanie: najgłębszy pierścień nie dalej niż trzeci w Space (470); węzły maleją razem z nim, nie mniej niż do 55 %
+    const deep = Math.max(3, ...this.tree.nodes.map((n) => n.depth)); this.k = Math.min(1, ringR(3) / ringR(deep)); this.nk = Math.max(0.55, this.k);
+    this.pos = {}; for (const n of this.tree.nodes) this.pos[n.id] = this.place(n.depth, n.angle); this.key = null; this.check(); }
+
+  // przerysowanie, gdy zmienił się stan (poziomy, punkty, wybór, oznaczone, tło)
+  check() {
+    const st = this.opts.getState(); if (!st) return;
+    const pts = this.opts.getPoints(), bg = this.opts.getBackground?.() || '';
+    const key = JSON.stringify([st.levels, Number.isFinite(pts) ? pts : -1, this.selected, [...this.marked], bg.length, this.opts.editing?.() || false]);
+    if (key !== this.key) { this.key = key; this.draw(); }
+  }
+
+  cls(n, st, pts) {
+    if (n.kind === 'core') return 'root';
+    const s = st.state(n.id);
+    if (n.kind === 'hub') return s === 'owned' ? 'hub' : 'locked';
+    if (s === 'soon') return 'soon';
+    if (s === 'locked') return 'locked';
+    if (s === 'owned') return 'maxed';
+    return st.canBuy(n.id, pts) ? 'affordable' : st.level(n.id) > 0 ? 'owned' : 'poor';
+  }
+
+  // tło: czerń, obraz (horyzont na wysokości HORIZON_Y; własny obraz — na cały widok), gwiazdy, definicje
+  background(svg) {
+    const defs = S('defs', {}, svg);
+    const grad = (tag, id, attrs, stops) => { const g = S(tag, { id, ...attrs }, defs); stops.forEach(([o, c]) => S('stop', { offset: o, 'stop-color': c }, g)); };
+    grad('linearGradient', 'ttRimGold', { x1: 0, y1: 0, x2: 0.3, y2: 1 }, [[0, '#ffe7b0'], [0.45, '#f8bb56'], [0.7, '#9a6127'], [1, '#e9ab55']]);
+    grad('linearGradient', 'ttRimSteel', { x1: 0, y1: 0, x2: 0.3, y2: 1 }, [[0, '#a8b3d8'], [0.5, '#4c5680'], [0.75, '#262c48'], [1, '#7580ad']]);
+    grad('radialGradient', 'ttFace', { cx: 0.4, cy: 0.3, r: 0.8 }, [[0, '#16214f'], [0.6, '#070c24'], [1, '#02040f']]);
+    // zużyta miedź: krawędzie poruszone szumem, ciemniejsze plamy utlenienia, iskierki
+    const f = S('filter', { id: 'ttRough', x: '-2%', y: '-2%', width: '104%', height: '104%' }, defs);
+    S('feTurbulence', { type: 'fractalNoise', baseFrequency: 0.09, numOctaves: 2, seed: 3, result: 'n' }, f);
+    S('feDisplacementMap', { in: 'SourceGraphic', in2: 'n', scale: 2.6, xChannelSelector: 'R', yChannelSelector: 'G', result: 'd' }, f);
+    S('feTurbulence', { type: 'fractalNoise', baseFrequency: 0.18, numOctaves: 3, seed: 11, result: 'n2' }, f);
+    S('feColorMatrix', { in: 'n2', type: 'matrix', values: '0 0 0 0 0.06  0 0 0 0 0.03  0 0 0 0 0.01  1.9 0 0 0 -0.78', result: 'spots' }, f);
+    S('feComposite', { in: 'spots', in2: 'd', operator: 'in', result: 'spotsIn' }, f);
+    S('feTurbulence', { type: 'fractalNoise', baseFrequency: 1.1, numOctaves: 1, seed: 5, result: 'grain' }, f);
+    S('feColorMatrix', { in: 'grain', type: 'matrix', values: '0 0 0 0 1  0 0 0 0 0.85  0 0 0 0 0.6  1.2 0 0 0 -0.82', result: 'glints' }, f);
+    S('feComposite', { in: 'glints', in2: 'd', operator: 'in', result: 'glintsIn' }, f);
+    const m = S('feMerge', {}, f); ['d', 'spotsIn', 'glintsIn'].forEach((x) => S('feMergeNode', { in: x }, m));
+    S('rect', { width: W, height: H, fill: '#080b1a' }, svg);
+    const own = this.opts.getBackground?.();
+    if (own) S('image', { href: own, x: 0, y: 0, width: W, height: H, preserveAspectRatio: 'xMidYMid slice' }, svg);
+    else { const sc = W / BG.w, h = BG.h * sc; S('image', { href: BG.href, x: 0, y: HORIZON_Y - BG.horizon * sc, width: W, height: h, preserveAspectRatio: 'none' }, svg); }
+    // gwiazdy z ziarnem, te same za każdym razem (część migocze)
+    let s = 7; const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+    for (let i = 0; i < 70; i++) {
+      const x = rnd() * W, y = rnd() * (HORIZON_Y - 10), r = rnd() < 0.1 ? 1.4 : 0.8, o = 0.25 + rnd() * 0.6;
+      const c = S('circle', { cx: x.toFixed(0), cy: y.toFixed(0), r, fill: '#dfe6ff', opacity: o.toFixed(2) }, svg);
+      if (rnd() < 0.25) { c.classList.add('tw'); c.style.animationDelay = `${(rnd() * 4).toFixed(1)}s`; }
     }
   }
-  if(cls === "soon") out += icon("lock", x + r * 0.72, y - r * 0.72, 16);
-  return out + "</g>";
-}
 
-function draw(){
-  const tree = TECH_TREES[current];
-  const nodes = layout(tree);
-  const infos = {};
-  nodes.forEach(function(n){ infos[n.id] = info(n); });
-  const parts = trunk();
-  nodes.forEach(function(n){
-    if(!n._parent) return;
-    const d = trace(n._parent, n);
-    const cls = stateClass(n, infos[n.id]);
-    const live = cls === "owned" || cls === "affordable" || cls === "maxed" || cls === "hub" || (n.kind === "hub");
-    addTrace(parts, d, cls === "soon" ? "dim" : "");
-    if(live) parts.core += '<path class="pulse" d="' + d + '" style="animation-delay:' + (-(n._angle % 7) * 0.4).toFixed(2) + 's"/>';
-  });
-  let nodeMarkup = "";
-  nodes.slice().reverse().forEach(function(n){ nodeMarkup += nodeSvg(n, infos[n.id]); });
-  const svg = document.getElementById("ttSvg");
-  svg.innerHTML = background() + '<g filter="url(#ttRough)">' + parts.metal + "</g>" + parts.core + nodeMarkup;
-  svg.querySelectorAll(".tt-node").forEach(function(g){
-    const n = nodes.find(function(x){ return x.id === g.dataset.id; });
-    g.addEventListener("mouseenter", function(){ showTip(n, infos[n.id]); });
-    g.addEventListener("mouseleave", hideTip);
-    g.addEventListener("click", function(){ if(n.kind === "upgrade" && onBuyFn) onBuyFn(n.upgrade); });
-  });
-  document.getElementById("ttTitle").textContent = t("upgrades.tree." + tree.id);
-  document.getElementById("ttPage").textContent = (current + 1) + " / " + TECH_TREES.length;
-  document.getElementById("ttPoints").textContent = t("upgrades.tree.points")(state.points);
-}
-
-// ---------- tooltip ----------
-function showTip(n, i){
-  const tip = document.getElementById("ttTip");
-  let html = "<b>" + esc(i.name) + "</b>";
-  if(i.desc) html += "<p>" + esc(i.desc) + "</p>";
-  if(n.kind === "upgrade"){
-    html += "<p class='k'>" + esc(t("upgrades.level")(i.lvl, i.max)) + "</p>";
-    html += "<p class='c'>" + esc(i.maxed ? t("upgrades.max") : (i.cost + " " + t("upgrades.pts") + (i.affordable ? " — " + t("upgrades.tree.clickToBuy") : " — " + t("upgrades.tree.notEnough")))) + "</p>";
-  } else if(n.kind === "soon"){
-    html += "<p class='s'>" + esc(t("upgrades.tree.soon")) + "</p>";
+  // jedna ścieżka miedzi: ciemna krawędź, miedź, odblask (filtr zużycia) i świecący rdzeń na wierzchu
+  trace(metal, core, d, cls = '') {
+    for (const k of ['tr-edge', 'tr-base', 'tr-hi']) S('path', { class: `${k} ${cls}`.trim(), d }, metal);
+    S('path', { class: `tr-core ${cls}`.trim(), d }, core);
   }
-  tip.innerHTML = html;
-  tip.classList.remove("hidden");
-  // above the node (SVG viewBox units -> percentage of the box)
-  tip.style.left = (n._x / W * 100) + "%";
-  tip.style.top = (n._y / H * 100) + "%";
-}
-function hideTip(){ document.getElementById("ttTip").classList.add("hidden"); }
 
-export function renderTechTree(onBuy){
-  onBuyFn = onBuy;
-  draw();
-}
+  // pień: wiązka ścieżek od horyzontu do rdzenia, rozchodząca się korzeniami po powierzchni
+  trunk(metal, core, root) {
+    if (!root) return;
+    const R0 = this.pos[root.id];
+    [-2, -1, 0, 1, 2].forEach((o, i) => {
+      const x0 = R0.x + o * 11, xb = R0.x + o * 20;
+      this.trace(metal, core, `M${x0} ${R0.y + R.root - 4} L${x0} ${HORIZON_Y - 40} L${xb} ${HORIZON_Y - 10} L${xb} ${HORIZON_Y + 6}`);
+      const dir = o === 0 ? (i % 2 ? 1 : -1) : Math.sign(o), len = 60 + Math.abs(o) * 35;
+      this.trace(metal, core, `M${xb} ${HORIZON_Y + 6} L${xb + dir * len} ${HORIZON_Y + 6 + len * 0.18} L${xb + dir * (len + 40)} ${HORIZON_Y + 6 + len * 0.18}`, 'root');
+    });
+    S('path', { class: 'pulse up', d: `M${R0.x} ${HORIZON_Y + 6} L${R0.x} ${R0.y + R.root}` }, core);
+  }
 
-export function initTechTree(){
-  document.getElementById("ttPrev").addEventListener("click", function(){ current = (current - 1 + TECH_TREES.length) % TECH_TREES.length; hideTip(); draw(); });
-  document.getElementById("ttNext").addEventListener("click", function(){ current = (current + 1) % TECH_TREES.length; hideTip(); draw(); });
+  // droga jak na płytce: prosto wzdłuż dłuższej osi, potem 45°
+  route(a, b) {
+    const dx = b.x - a.x, dy = b.y - a.y, ax = Math.abs(dx), ay = Math.abs(dy);
+    const [mx, my] = ay > ax ? [a.x, a.y + Math.sign(dy) * (ay - ax)] : [a.x + Math.sign(dx) * (ax - ay), a.y];
+    return `M${a.x.toFixed(1)} ${a.y.toFixed(1)} L${mx.toFixed(1)} ${my.toFixed(1)} L${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
+  }
+
+  icon(g, key, x, y, size) {
+    const nodes = iconNodes(key); if (!nodes.length) return;
+    const s = size / 24, ic = S('g', { class: 'ic', transform: `translate(${(x - size / 2).toFixed(1)} ${(y - size / 2).toFixed(1)}) scale(${s.toFixed(3)})` }, g);
+    ic.append(...nodes);
+  }
+
+  draw() {
+    const tree = this.tree, st = this.opts.getState(), pts = this.opts.getPoints(), pl = !!this.opts.pl?.();
+    const svg = this.svg; svg.replaceChildren();
+    this.background(svg);
+    const metal = S('g', { filter: 'url(#ttRough)' }, svg), core = S('g', {}, svg);
+    this.trunk(metal, core, tree.nodes.find((n) => n.kind === 'core'));
+    const byId = st.byId, cls = {};
+    for (const n of tree.nodes) cls[n.id] = this.cls(n, st, pts);
+    for (const n of tree.nodes) for (const pid of n.parents) {
+      const a = this.pos[pid], b = this.pos[n.id]; if (!a || !b || !byId[pid]) continue;
+      const c = cls[n.id], d = this.route(a, b), dim = c === 'soon' || c === 'locked';
+      this.trace(metal, core, d, dim ? 'dim' : '');
+      if (!dim && c !== 'poor') { const p = S('path', { class: 'pulse', d }, core); p.style.animationDelay = `${(-(((90 - n.angle) % 7 + 7) % 7) * 0.4).toFixed(2)}s`; }
+    }
+    // węzły od końca (rdzeń na wierzchu, jak w Space)
+    const pts2 = this.opts.pointsName?.() || (pl ? 'pkt' : 'pts');
+    for (const n of [...tree.nodes].reverse()) {
+      const p = this.pos[n.id], c = cls[n.id], r = n.kind === 'core' ? R.root : this.hasKids(n.id) ? R.branch : R.leaf, kids = this.hasKids(n.id), x = p.x, y = p.y;
+      const g0 = S('g', { transform: n.kind === 'core' || this.nk === 1 ? null : `translate(${x} ${y}) scale(${this.nk.toFixed(3)}) translate(${-x} ${-y})` }, svg);
+      const g = S('g', { class: `tt-node ${c}${kids && n.kind !== 'core' ? ' branch' : ''}${this.selected === n.id ? ' sel' : ''}${this.marked.has(n.id) ? ' marked' : ''}`, 'data-id': n.id }, g0);
+      S('circle', { class: 'halo', cx: x, cy: y, r: r + 10 }, g);
+      S('circle', { class: 'rim', cx: x, cy: y, r, fill: 'url(#ttFace)', stroke: c === 'soon' || c === 'locked' ? 'url(#ttRimSteel)' : 'url(#ttRimGold)', 'stroke-width': 5 }, g);
+      S('circle', { class: 'inner', cx: x, cy: y, r: r - 6 }, g);
+      [45, 135, 225, 315].forEach((a) => { const rad = (a * Math.PI) / 180; S('circle', { class: 'rivet', cx: (x + Math.cos(rad) * r).toFixed(1), cy: (y + Math.sin(rad) * r).toFixed(1), r: 1.7 }, g); });
+      const buyable = n.kind !== 'core' && n.kind !== 'hub', lvl = st.level(n.id), name = nodeName(n, pl);
+      if (buyable && !n.soon) {   // poziom jako pierścień wokół obręczy
+        const circ = 2 * Math.PI * (r + 6);
+        S('circle', { class: 'ring-bg', cx: x, cy: y, r: r + 6 }, g);
+        S('circle', { class: 'ring', cx: x, cy: y, r: r + 6, 'stroke-dasharray': `${(circ * lvl / n.levels).toFixed(1)} ${circ.toFixed(1)}`, transform: `rotate(-90 ${x} ${y})` }, g);
+      }
+      if (this.selected === n.id) S('circle', { class: 'selring', cx: x, cy: y, r: r + 15 }, g);
+      if (this.marked.has(n.id)) S('circle', { class: 'markring', cx: x, cy: y, r: r + 19 }, g);
+      if (n.kind === 'core') {
+        S('circle', { class: 'spin', cx: x, cy: y, r: r + 12 }, g);
+        this.icon(g, n.icon, x, y - 10, 34);
+        const t = S('text', { class: 'lbl-in root', x, y: y + 24 }, g); t.textContent = name;
+        t.style.fontSize = `${Math.min(17, 150 / Math.max(1, name.length)).toFixed(1)}px`;   // długa nazwa — mniejsza czcionka
+      } else if (kids) {
+        this.icon(g, n.icon, x, y - 13, 20);
+        wrap(name, 12).forEach((line, k, arr) => { const t = S('text', { class: 'lbl-in', x, y: y + 8 + (k - (arr.length - 1) / 2) * 13 + (arr.length > 1 ? 4 : 0) }, g); t.textContent = line; });
+      } else {
+        this.icon(g, n.icon, x, y - (buyable && n.levels > 1 ? 6 : 0), 26);
+        if (buyable && n.levels > 1) { const t = S('text', { class: 'lvl', x, y: y + 20 }, g); t.textContent = `${lvl}/${n.levels}`; }
+        wrap(name, 16).forEach((line, k) => { const t = S('text', { class: 'lbl', x, y: y + r + 22 + k * 14 }, g); t.textContent = line; });
+      }
+      if (buyable && !n.soon) {   // koszt następnego poziomu (albo MAX) w pigułce pod węzłem
+        const lines = kids ? 0 : wrap(name, 16).length, cost = st.costOf(n.id);
+        const txt = cost === null ? 'MAX' : `${cost.toLocaleString(pl ? 'pl' : 'en')} ${pts2}`;
+        const ty = y + r + 22 + lines * 14 + 4, w = 12 + txt.length * 6.6;
+        S('rect', { class: 'cost-bg', x: x - w / 2, y: ty - 12, width: w, height: 17, rx: 8.5 }, g);
+        const t = S('text', { class: 'cost', x, y: ty + 1 }, g); t.textContent = txt;
+      }
+      if (c === 'soon' || c === 'locked') this.icon(g, 'lock', x + r * 0.72, y - r * 0.72, 16);
+    }
+  }
+
+  onMove(e) {
+    this.hover = this.nodeAt(e);
+    if (!this.hover) { this.tip.hidden = true; return; }
+    this.showTip(this.hover);
+  }
+
+  onClick(e) {
+    const id = this.nodeAt(e);
+    if (this.opts.onPick) { this.opts.onPick(id, e); return; }
+    if (!id) return;
+    if (this.opts.getState().canBuy(id, this.opts.getPoints())) this.opts.onBuy?.(id);
+    setTimeout(() => this.showTip(id), 50);
+  }
+
+  showTip(id) {
+    const st = this.opts.getState(), n = st.byId[id]; if (!n) return;
+    const pl = !!this.opts.pl?.(), T = (en, p) => (pl ? p : en), pts = this.opts.pointsName?.() || T('pts', 'pkt'), points = this.opts.getPoints();
+    const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; e.textContent = text; return e; };
+    const kids = [el('b', '', nodeName(n, pl))], text = nodeText(n, pl);
+    if (text) kids.push(el('p', '', text));
+    const s = st.state(id), buyable = n.kind !== 'core' && n.kind !== 'hub';
+    if (this.opts.editing?.()) kids.push(el('p', 'k', `${T('level', 'poziom')} ${n.depth} · ${T('angle', 'kąt')} ${n.angle}° · ${(KINDS[n.kind] || {})[pl ? 'labelPl' : 'label'] || n.kind}${n.note ? ` — ${n.note}` : ''}`));
+    else if (s === 'soon') kids.push(el('p', 's', T('Coming in a future update.', 'Pojawi się w przyszłej aktualizacji.')));
+    else if (s === 'locked') kids.push(el('p', 's', T(`Locked — first ${n.parents.map((p) => nodeName(st.byId[p] || { name: p }, pl)).join(n.all ? ' and ' : ' or ')}`, `Zablokowane — najpierw ${n.parents.map((p) => nodeName(st.byId[p] || { name: p }, pl)).join(n.all ? ' i ' : ' albo ')}`)));
+    else if (buyable) {
+      if (n.levels > 1) kids.push(el('p', 'k', T(`level ${st.level(id)} / ${n.levels}`, `poziom ${st.level(id)} / ${n.levels}`)));
+      const cost = st.costOf(id);
+      kids.push(el('p', 'c', cost === null ? 'MAX' : `${cost.toLocaleString(pl ? 'pl' : 'en')} ${pts} — ${points >= cost ? T('click to buy', 'kliknij, aby kupić') : T('not enough points', 'za mało punktów')}`));
+    }
+    if (Object.keys(n.effect).length && buyable) kids.push(el('p', 'k', Object.entries(n.effect).map(([k, v]) => (v === true ? k : `${k} ${v > 0 ? '+' : ''}${v}`)).join(' · ')));
+    this.tip.replaceChildren(...kids); this.tip.hidden = false;
+    // nad węzłem: punkt SVG → piksele elementu widoku
+    const m = this.svg.getScreenCTM(), box = this.root.getBoundingClientRect(), p = this.pos[id];
+    if (!m) return;
+    const q = new DOMPoint(p.x, p.y).matrixTransform(m);
+    this.tip.style.left = `${q.x - box.left}px`; this.tip.style.top = `${q.y - box.top}px`;
+  }
 }

@@ -2,6 +2,7 @@
 // drag to pan, double click to fit) so brush strokes and the support can be seen — controls bound to the spec,
 // an ordered list of conversions, PNG export and the spec as JSON. For an AI: window.ArtApi and a console tab.
 import { SUBJECTS, TECHNIQUES, SURFACES, CONVERSIONS, FORMATS, PALETTES, VIEWS, DEFAULTS, normalize, render } from '../../render/art/artkit.js';
+import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 // Examine: objects from the art examination engine (js/render/art/exam/, classic scripts, loaded on first use) —
 // a painting by a fictional artist or a stamp, coin, banknote, manuscript; original or forgery; views under the lamps
 
@@ -150,6 +151,23 @@ $('specCopy').onclick = async () => { $('specText').value = JSON.stringify(spec,
 $('specApply').onclick = () => { try { spec = normalize(JSON.parse($('specText').value)); show(); paintSoon(0); $('specMsg').textContent = 'Applied.'; } catch (e) { $('specMsg').textContent = 'Not a valid spec: ' + e.message; } };
 $('specReset').onclick = () => { spec = normalize(DEFAULTS); show(); paintSoon(0); };
 
+/* ---------------- saved under a name (asset „image”: the spec) ---------------- */
+const IMAGE_KEYS = ['size', 'aspect', 'seed', 'subject', 'palette', 'technique', 'stroke', 'detail', 'surface', 'relief', 'light', 'varnish', 'cracks', 'age', 'view', 'convert', 'format', 'text'];
+function fillSaved(sel) {
+  const s = $('savedSel'), names = listAssets('image'); s.replaceChildren(new Option(names.length ? '—' : '(none yet)', ''));
+  names.forEach((n) => s.append(new Option(n, n))); s.value = sel && names.includes(sel) ? sel : '';
+}
+function saveImage(name) {
+  const n = String(name || '').trim(); if (!n) throw new Error('give the image a name');
+  if (spec.subject === 'image') throw new Error('an uploaded picture is not saved: pick a painted subject');
+  const s = normalize(spec); saveAsset('image', n, JSON.parse(JSON.stringify(Object.fromEntries(IMAGE_KEYS.map((k) => [k, s[k]]))))); fillSaved(n); $('saveName').value = n; return n;
+}
+function loadImage(n) { const d = getAsset('image', n); if (!d) throw new Error(`no image "${n}"`); setMode('paint'); spec = normalize({ ...DEFAULTS, ...d }); show(); paintSoon(0); $('saveName').value = n; return n; }
+$('saveImg').onclick = () => { try { $('saveMsg').textContent = `Saved: ${saveImage($('saveName').value)}.`; } catch (e) { $('saveMsg').textContent = e.message; } };
+$('delImg').onclick = () => { const n = $('savedSel').value; if (!n) { $('saveMsg').textContent = 'Pick a saved image first.'; return; } removeAsset('image', n); fillSaved(); $('saveMsg').textContent = `Deleted: ${n}.`; };
+$('savedSel').onchange = () => { if ($('savedSel').value) loadImage($('savedSel').value); };
+onAssetsChange(() => fillSaved($('savedSel').value)); fillSaved();
+
 /* ---------------- for an AI ---------------- */
 // ArtApi.render(spec) → PNG as a data URL (and shows it); ArtApi.spec() — the current spec; ArtApi.lists — what can be chosen
 window.ArtApi = {
@@ -165,6 +183,8 @@ window.ArtApi = {
     exShow(); return { object: o, views: out };
   },
   examInfo: async (kind) => { await loadExam(); return kind ? window.ArtExam.info(kind) : window.ArtExam.kinds(); },
+  // save('name') — the current spec as the named asset „image”; load('name'); saved()
+  save: (n) => ({ saved: saveImage(n) }), load: (n) => loadImage(n), saved: () => listAssets('image'),
 };
 function apiTab() {
   if (!window.LabConsole) return;

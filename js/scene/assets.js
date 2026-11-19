@@ -29,8 +29,10 @@
 //         w scenie pole „asset” obiektu z prefabrykatem roślin (js/models/plants/plantkit.js)
 //   effect — efekt z laboratorium efektów: { kind (shot, orb, debris, bolt, zap, bubble, hole), scale (metry na jednostkę
 //         efektu), values — liczby efektu EffectKit (js/render/effects/effects.js) }; w scenie: polecenie API „effect”
-//   tree — drzewko ulepszeń z laboratorium drzewek: definicja 'gamelab-tree' (gałęzie, węzły, punkty, tło, notatki;
+//   tree — drzewko ulepszeń z laboratorium drzewek: definicja 'gamelab-tree' (gałęzie, węzły, punkty, widok, tło, notatki;
 //         js/gameui/tree/tree.js)
+//   image — obraz z laboratorium sztuki: opis ArtKit (temat, technika, ziarno…; js/render/art/artkit.js), malowany od nowa
+//         tam, gdzie potrzebny (ten sam opis i ziarno — ten sam obraz); temat „image” (wgrany obraz) się nie zapisuje
 export const KEY = 'gameLab.assets.v1';
 
 export const ASSET_KINDS = {
@@ -45,7 +47,8 @@ export const ASSET_KINDS = {
   plant: { label: 'Plant', labelPl: 'Roślina', lab: 'labs/plants.html', keys: ['species', 'seed', 'size', 'detail', 'season'] },
   cave: { label: 'Cave', labelPl: 'Jaskinia', lab: 'labs/caves.html', keys: ['seed', 'length', 'branches', 'width', 'winding', 'chambers', 'rough', 'cell', 'drips', 'rubble', 'lakes', 'lava', 'rock', 'wet', 'relief'] },
   effect: { label: 'Effect', labelPl: 'Efekt', lab: 'labs/effects.html', keys: ['kind', 'scale', 'values'] },
-  tree: { label: 'Tech tree', labelPl: 'Drzewko', lab: 'labs/trees.html', keys: ['format', 'version', 'name', 'background', 'points', 'branches', 'nodes', 'notes'] },
+  tree: { label: 'Tech tree', labelPl: 'Drzewko', lab: 'labs/trees.html', keys: ['format', 'version', 'name', 'view', 'background', 'points', 'branches', 'nodes', 'notes'] },
+  image: { label: 'Image', labelPl: 'Obraz', lab: 'labs/art.html', keys: ['size', 'aspect', 'seed', 'subject', 'palette', 'technique', 'stroke', 'detail', 'surface', 'relief', 'light', 'varnish', 'cracks', 'age', 'view', 'convert', 'format', 'text'] },
   blocks: { label: 'Block body', labelPl: 'Bryła z bloków', lab: 'labs/blocks.html', keys: ['shape', 'radius', 'voxel', 'seed', 'text', 'layers', 'mats', 'matRefs'] },
 };
 

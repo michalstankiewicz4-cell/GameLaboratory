@@ -75,6 +75,12 @@ wejściu w Examine. `exam.js` zastępuje części gry, których nie przeniesiono
 widoków) i daje API. Teksty obiektów (nazwy zdrad i profili) są po polsku, jak w grze. Historia gry:
 [../history/artchecker.md](../history/artchecker.md).
 
+## Zapis pod nazwą (zasób `image`)
+
+Okno **Format and export** → Save: obecny opis (bez wgranego obrazu — temat `image` się nie zapisuje) jako zasób
+z nazwą `image` (`js/scene/assets.js`). Kto go używa, maluje go od nowa z opisu (ten sam opis i ziarno — ten sam
+obraz): tło drzewka (`js/gameui/tree/background.js`). `ArtApi.save('nazwa')`, `ArtApi.load('nazwa')`, `ArtApi.saved()`.
+
 ## Spec (JSON) i API dla AI
 
 Każdy obraz to spec — ten sam spec z tym samym ziarnem daje ten sam obraz:

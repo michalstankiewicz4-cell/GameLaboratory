@@ -1,14 +1,6 @@
-/* Laboratorium drzewek (labs/trees.html): widok promienisty (js/gameui/tree/radial.js) i okna laboratorium. */
+/* Laboratorium drzewek (labs/trees.html): okna laboratorium. Widoki drzewka i ich podpowiedzi: js/gameui/css/tree.css. */
+#view .pcb-svg{width:100%;height:100%}
 #view{overflow:hidden;background:var(--bg)}
-#view .tree-canvas{display:block;image-rendering:pixelated;cursor:pointer}
-#view .tree-canvas.adding{cursor:crosshair}
-#view .tree-canvas.linking{cursor:alias}
-.tree-tip{position:absolute;z-index:5;max-width:260px;padding:7px 9px;background:var(--glass);border:1px solid var(--line2);border-radius:var(--r2);font-size:12px;color:var(--text);pointer-events:none}
-.tree-tip-head{display:flex;justify-content:space-between;gap:10px;font-weight:600;color:var(--head)}
-.tree-tip-cost,.tree-tip-effect{font-family:var(--mono);color:var(--dim)}
-.tree-tip-branch{color:var(--dim);font-size:11px;margin-bottom:3px}
-.tree-tip-status{margin-top:4px;color:var(--dim)}
-.tree-tip-status.is-available,.tree-tip-status.is-owned{color:var(--accent)}
 .panel textarea{width:100%;box-sizing:border-box;background:var(--field);border:1px solid var(--line);border-radius:var(--r2);color:var(--text);font-size:11px;resize:vertical}
 .parents{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0}
 .parents button{background:var(--field);border:1px solid var(--line);border-radius:var(--r2);padding:1px 7px;font-size:11.5px;cursor:pointer}

@@ -8,7 +8,9 @@
 //   start: '<id ekranu>' | '' (od razu gra), pause: '<id ekranu>' (Esc w grze),
 //   screens: { id: ekran (screens.js) }, hud: [element (hud.js)],
 //   windows: [{ id, title, key?, at?: 'c' | 'l' | 'r', body: [{ type: 'text', text } | { type: 'value', label, bind, unit? }
-//             | { type: 'stats', bind } (obiekt → wiersze) | { type: 'list', bind } (lista napisów albo { name, n })] }] }
+//             | { type: 'stats', bind } (obiekt → wiersze) | { type: 'list', bind } (lista napisów albo { name, n })
+//             | { type: 'tree', tree, points } (drzewko ulepszeń: zasób „tree” albo przykład o tej nazwie, js/gameui/tree/;
+//               points — ścieżka punktów w stanie gry: kupno je odejmuje; widok z pola drzewka `view`)] }] }
 //
 // createGameUI(parent, def, { state, keys }) → ui:
 //   ui.set(stan | (stan) => stan)   stan gry (HUD, okna, ustawienia menu)
@@ -16,9 +18,18 @@
 //   ui.open(okno), ui.close(okno), ui.toggle(okno)             okna gry
 //   ui.say({ who, text, choices?, side? }) → Promise<indeks wyboru | -1>   okno dialogowe (postać, narrator: who '')
 //   ui.log(tekst, rodzaj?, idDziennika?), ui.banner(tekst, podpis?, czas?)
-//   ui.on((akcja, arg) => …)        akcje: 'event' (arg — nazwa), 'quit', 'screen', 'resume', 'window', 'choice'
+//   ui.on((akcja, arg) => …)        akcje: 'event' (arg — nazwa), 'quit', 'screen', 'resume', 'window', 'choice',
+//                                   'buy' (arg — { tree, id, level, cost, effects }: kupiony węzeł drzewka)
+//   ui.buy(drzewko, węzeł) → { bought, level, cost, effects } — jak kliknięcie w oknie drzewka
+//   ui.tree(nazwa) → TreeState drzewka (poziomy, effects(), toJSON(); zapis gry — load({ levels, spent }))
 //   ui.load(def), ui.skin(skórka), ui.tick(dt), ui.destroy(), ui.def, ui.state
-import { h, btn, pick } from './dom.js';
+import { h, btn, pick, place } from './dom.js';
+import { normalizeTree, TreeState } from './tree/tree.js';
+import { RadialView } from './tree/radial.js';
+import { PcbView } from './tree/pcb.js';
+import { backgroundWatcher } from './tree/background.js';
+import { TREE_SAMPLES } from './tree/samples/index.js';
+import { getAsset } from '../scene/assets.js';
 import { createHud } from './hud.js';
 import { createScreens } from './screens.js';
 import { applySkin } from './skins.js';
@@ -53,9 +64,45 @@ export function createGameUI(parent, def0, { state = {}, keys = true } = {}) {
 
   /* ---- okna gry (wygląd okien ze Space: ramka, kwadracik przy nagłówku, linia, przewijana treść) ---- */
   const winLayer = h('div', { class: 'gWins' }); root.append(winLayer);
-  const wins = new Map();   // id → { d, el, body }
-  function winBody(w) {
-    return (w.body || []).map((b) => {
+  const wins = new Map();   // id → { d, el, body, keep }
+  /* drzewka: definicja i stan gracza na nazwę (wspólne dla okien z tym samym drzewkiem); widok żyje razem z oknem */
+  const trees = new Map();   // nazwa → { def, state }
+  function treeOf(name) {
+    if (!trees.has(name)) {
+      const d = getAsset('tree', name) || TREE_SAMPLES[name];
+      let def = null; try { def = d ? normalizeTree(d) : null; } catch { def = null; }
+      trees.set(name, def ? { def, state: new TreeState(def) } : null);
+    }
+    return trees.get(name);
+  }
+  // kupno węzła: punkty ze ścieżki pierwszego bloku z tym drzewkiem (jego `points`), odjęte w stanie gry
+  function buyTree(name, id) {
+    const t = treeOf(name), b = def.windows.flatMap((w) => w.body || []).find((x) => x.type === 'tree' && x.tree === name);
+    if (!t) return null;
+    const path = b && b.points, pts = path ? +pick(S, path) || 0 : Infinity, cost = t.state.costOf(id);
+    if (!t.state.buy(id, pts)) return { bought: false, state: t.state.state(id), next: cost };
+    if (path) S = place(S, path, pts - cost);
+    refresh(); const r = { tree: name, id, level: t.state.level(id), cost, effects: t.state.effects() }; emit('buy', r);
+    return { bought: true, ...r };
+  }
+  function treeBlock(b) {
+    const t = treeOf(b.tree);
+    if (!t) return h('p', {}, `No tree "${b.tree}".`);
+    const pts = () => +pick(S, b.points) || 0, pl = () => (document.documentElement.lang || '').startsWith('pl');
+    const name = () => (pl() && t.def.points.labelPl) || t.def.points.label;
+    const head = h('div', { class: 'gTreePts' }), box = h('div', { class: 'gTree' });
+    const bg = backgroundWatcher(() => t.def.background, () => { if (view instanceof PcbView) view.layout(); });
+    const View = t.def.view === 'pcb' ? PcbView : RadialView;
+    const view = new View(box, { getTree: () => t.def, getState: () => t.state, getPoints: pts, pl, pointsName: name, getBackground: () => bg.get(),
+      onBuy: (id) => buyTree(b.tree, id) });
+    const el = h('div', { class: 'gTreeWrap' }, head, box);
+    el.update = () => { head.textContent = `${pts().toLocaleString(pl() ? 'pl' : 'en')} ${name()}`; };
+    el.dispose = () => view.destroy();
+    return el;
+  }
+  function winBody(w, keep) {
+    return (w.body || []).map((b, i) => {
+      if (b.type === 'tree') { if (!keep[i]) keep[i] = treeBlock(b); keep[i].update(); return keep[i]; }
       if (b.type === 'text') return h('p', {}, b.text || '');
       if (b.type === 'value') { const x = pick(S, b.bind); return h('div', { class: 'st' }, h('span', {}, b.label || b.bind), h('b', {}, (typeof x === 'number' ? +x.toFixed(2) : x ?? '—') + (b.unit ? ' ' + b.unit : ''))); }
       if (b.type === 'stats') { const o = pick(S, b.bind) || {}; return h('div', { class: 'gStats' }, Object.entries(o).map(([k, v]) => h('div', { class: 'st' }, h('span', {}, k), h('b', {}, String(v))))); }
@@ -65,17 +112,18 @@ export function createGameUI(parent, def0, { state = {}, keys = true } = {}) {
   }
   function drawWin(id) {
     const w = wins.get(id); if (!w) return;
-    w.body.replaceChildren(...winBody(w.d));
+    const kids = winBody(w.d, w.keep);
+    if (kids.length !== w.body.children.length || kids.some((k, i) => k !== w.body.children[i])) w.body.replaceChildren(...kids);   // widok drzewka zostaje na miejscu
   }
   function buildWins() {
-    for (const w of wins.values()) w.el.remove(); wins.clear();
+    for (const w of wins.values()) { w.el.remove(); w.keep.forEach((k) => k && k.dispose && k.dispose()); } wins.clear(); trees.clear();
     for (const d of def.windows) {
-      const body = h('div', { class: 'gWinBody' });
-      const el = h('div', { class: 'gWin at-' + (d.at || 'c'), hidden: true, 'data-id': d.id },
+      const body = h('div', { class: 'gWinBody' }), wide = (d.body || []).some((b) => b.type === 'tree');
+      const el = h('div', { class: 'gWin at-' + (d.at || 'c') + (wide ? ' wide' : ''), hidden: true, 'data-id': d.id },
         h('div', { class: 'gWinHead' }, h('i', { class: 'gSq' }), h('b', { class: 'gHd' }, d.title || d.id), d.key ? h('kbd', {}, d.key) : null,
           btn('×', () => ui.close(d.id), 'gClose')),
         h('div', { class: 'gLine' }), body);
-      winLayer.append(el); wins.set(d.id, { d, el, body });
+      winLayer.append(el); wins.set(d.id, { d, el, body, keep: [] });
     }
   }
 
@@ -143,11 +191,12 @@ export function createGameUI(parent, def0, { state = {}, keys = true } = {}) {
     open(id) { const w = wins.get(id); if (!w) return false; w.el.hidden = false; drawWin(id); emit('window', id); return true; },
     close(id) { const w = wins.get(id); if (w) w.el.hidden = true; },
     toggle(id) { const w = wins.get(id); if (!w) return false; return w.el.hidden ? ui.open(id) : (ui.close(id), true); },
+    tree: (name) => (treeOf(name) || {}).state || null, buy: (name, id) => buyTree(name, id),
     say, log: (m, k, id) => hud.log(m, k, id), banner: (t, s, time) => hud.banner(t, s, time),
     on(f) { listeners.add(f); return () => listeners.delete(f); },
     tick(dt) { hud.tick(dt); },
     get menuOpen() { return screens.open; }, get screen() { return screens.current; },
-    destroy() { if (keys) removeEventListener('keydown', onKey); ro.disconnect(); root.remove(); listeners.clear(); },
+    destroy() { if (keys) removeEventListener('keydown', onKey); ro.disconnect(); for (const w of wins.values()) w.keep.forEach((k) => k && k.dispose && k.dispose()); root.remove(); listeners.clear(); },
   };
   ui.load(def);
   return ui;
