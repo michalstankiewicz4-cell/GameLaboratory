@@ -37,7 +37,12 @@ export function testBench() {
   return {
     root, measured: { triangles: 999999, drawCalls: 999, materials: 4 },
     opts: { mounts: [{ name: 'test gun', group: mount, train: mount, guns: [gun], arc: 90 }], waterline: true, below: (n) => n.startsWith('hull'),
-      hullSide: (z) => (Math.abs(z) < 10 ? 2 : -1), deck: () => 2, budget: { triangles: 1000, drawCalls: 10, measured: { triangles: 999999, drawCalls: 999 } } },
+      hullSide: (z) => (Math.abs(z) < 10 ? 2 : -1), deck: () => 2, budget: { triangles: 1000, drawCalls: 10, measured: { triangles: 999999, drawCalls: 999 } },
+      // colliders for "pierce": a sloped chute through the middle of a wall (found), two sheets overlapping at a corner
+      // and a wall standing on a floor (not found)
+      colliders: [{ at: [0, 1, 0], half: [0.02, 1, 1], name: 'test wall' }, { at: [0, 1.2, 0], half: [1, 0.02, 0.6], rot: [0, 0, -0.5], name: 'test chute' },
+        { at: [5, 1, 0], half: [1, 1, 0.02], name: 'test sheet A' }, { at: [5.9, 1, 0.6], half: [0.02, 1, 1], name: 'test sheet B' },
+        { at: [10, 0, 0], half: [2, 0.05, 2], name: 'test floor' }, { at: [10, 1.05, 0], half: [0.05, 1, 2], name: 'test wall on the floor' }] },
   };
 }
 

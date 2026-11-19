@@ -83,7 +83,8 @@
  },
  "junkyard/can-crusher": {
   "counts": {
-   "floating": 2
+   "floating": 2,
+   "pierce": 1
   },
   "fingerprint": {
    "drawCalls": 16,
@@ -791,6 +792,7 @@
    "hidden": 1,
    "inverted": 1,
    "nan": 1,
+   "pierce": 1,
    "poke": 1,
    "seethrough": 3,
    "sliver": 1,

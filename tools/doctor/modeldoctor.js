@@ -19,6 +19,8 @@
 //   waterline  a piece above the hull reaching below the waterline (y < 0)                    warning
 //   poke       a fitting sticking out through the hull side below the deck edge               warning
 //   budget     the merged model is over the game's per-ship budget (triangles, draw calls)    warning
+//   pierce     one collider box passes right through a thin one (a chute through a wall: what slides down     warning
+//              stops at the wall) — it sticks out on both sides of the plate, inside the plate's face
 //   hidden     a piece entirely inside another one — drawn for nothing                        info
 //   speck      a piece too small to ever be seen — a draw call (or triangles) for nothing     info
 //   sliver     long, thin triangles that shade badly (needles)                                info
@@ -36,10 +38,12 @@
 //   opts.waterline   true: run "waterline"; opts.below(name) → true for pieces allowed under water (hull, screws…)
 //   opts.hullSide    (z, y) → half-breadth of the hull for "poke"; opts.outboard(name) → true when allowed
 //   opts.budget      { triangles, drawCalls, measured: { triangles, drawCalls } } for "budget"
+//   opts.colliders   [{ at: [x,y,z], half: [hx,hy,hz], rot?: [rx,ry,rz], name? }] — the model's collider boxes in its
+//                    own frame, for "pierce"; opts.pierceOk(a, b) → true for crossings that are meant
 import * as THREE from '../../vendor/three/three.module.js';
 
-export const CHECKS = ['nan', 'inverted', 'facing', 'seethrough', 'arc', 'zfight', 'floating', 'waterline', 'poke', 'budget', 'hidden', 'speck', 'sliver'];
-export const SEVERITY = { nan: 'error', inverted: 'error', facing: 'error', seethrough: 'error', arc: 'warning', zfight: 'warning', floating: 'warning', waterline: 'warning', poke: 'warning', budget: 'warning', hidden: 'info', speck: 'info', sliver: 'info' };
+export const CHECKS = ['nan', 'inverted', 'facing', 'seethrough', 'arc', 'zfight', 'floating', 'waterline', 'poke', 'budget', 'pierce', 'hidden', 'speck', 'sliver'];
+export const SEVERITY = { nan: 'error', inverted: 'error', facing: 'error', seethrough: 'error', arc: 'warning', zfight: 'warning', floating: 'warning', waterline: 'warning', poke: 'warning', budget: 'warning', pierce: 'warning', hidden: 'info', speck: 'info', sliver: 'info' };
 export const ABOUT = {
   nan: 'positions that are not numbers (broken maths)',
   inverted: 'closed shape built inside-out: its outside is culled',
@@ -51,6 +55,7 @@ export const ABOUT = {
   waterline: 'piece above the hull reaches below the waterline',
   poke: 'fitting sticks out through the hull side',
   budget: 'over the per-ship budget of the game',
+  pierce: 'a collider passes right through a thin one (things moving along it stop there)',
   hidden: 'piece entirely inside another, drawn for nothing',
   speck: 'piece too small to ever be seen',
   sliver: 'needle triangles that shade badly',
@@ -522,6 +527,66 @@ export function examine(root, opts = {}) {
     if (measured.drawCalls > drawCalls) over.push(`${measured.drawCalls} draw calls > ${drawCalls}`);
     if (over.length) add('budget', [], `over the in-game ship budget: ${over.join(', ')} (needs a lower level of detail for the game)`);
   }
+
+  // pierce: collider boxes (opts.colliders). A thin box (a plate: its thinnest half-size under a fifth of the next) is
+  // pierced by another box when points of the other, inside the plate's face, lie clearly on both sides of it — the
+  // other goes through, not just up to it (a joint, a wall standing on a floor, a beam ending in a wall)
+  t = performance.now();
+  if (run.has('pierce') && opts.colliders && opts.colliders.length > 1) {
+    const B = opts.colliders.map((c, i) => {
+      const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(...(c.rot || [0, 0, 0])));
+      const ax = [0, 1, 2].map((k) => new THREE.Vector3(k === 0 ? 1 : 0, k === 1 ? 1 : 0, k === 2 ? 1 : 0).applyQuaternion(q));
+      const name = c.name || `collider ${i} (${c.half.map((h) => (2 * h).toFixed(2)).join('×')} @ ${c.at.map((x) => (+x).toFixed(2)).join(', ')})`;
+      return { c: new THREE.Vector3(...c.at), ax, e: c.half, name, src: c };
+    });
+    const span = new THREE.Box3(); B.forEach((b) => span.expandByPoint(b.c));
+    const Lc = Math.max(1e-3, span.getSize(v0).length()), d = new THREE.Vector3(), p = new THREE.Vector3(), N = 9, seen = new Set();
+    for (const b of B) {
+      const ord = [0, 1, 2].sort((i, j) => b.e[i] - b.e[j]), [kn, ku, kv] = ord;
+      if (b.e[kn] > 0.2 * b.e[ku]) continue;                                     // not a plate
+      const nrm = b.ax[kn], u = b.ax[ku], v = b.ax[kv];
+      for (const a of B) {
+        if (a === b) continue;
+        if (a.c.distanceTo(b.c) > Math.hypot(...a.e) + Math.hypot(...b.e)) continue;
+        // how far the other sticks out on each side of the plate, measured inside the plate's face; where it crosses
+        // the plate's mid-plane (zero crossings between neighbouring samples)
+        const clear = Math.max(4 * (Math.min(...a.e) + b.e[kn]), 0.01 * Lc);
+        let front = 0, back = 0;
+        const S = new Float32Array(N * N * N), U = new Float32Array(N * N * N), Vv = new Float32Array(N * N * N), IN = new Uint8Array(N * N * N), at = (i, j, k) => (i * N + j) * N + k;
+        for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) for (let k = 0; k < N; k++) {
+          p.copy(a.c).addScaledVector(a.ax[0], a.e[0] * (2 * i / (N - 1) - 1)).addScaledVector(a.ax[1], a.e[1] * (2 * j / (N - 1) - 1)).addScaledVector(a.ax[2], a.e[2] * (2 * k / (N - 1) - 1));
+          d.copy(p).sub(b.c);
+          const q = at(i, j, k), su = d.dot(u) / b.e[ku], sv = d.dot(v) / b.e[kv], sn = d.dot(nrm);
+          S[q] = sn; U[q] = su; Vv[q] = sv; IN[q] = Math.abs(su) <= 0.98 && Math.abs(sv) <= 0.98 ? 1 : 0;
+          if (!IN[q]) continue;
+          if (sn > b.e[kn]) front = Math.max(front, sn - b.e[kn]); else if (sn < -b.e[kn]) back = Math.max(back, -sn - b.e[kn]);
+        }
+        if (!(front > clear && back > clear) || (opts.pierceOk && opts.pierceOk(a.src, b.src))) continue;
+        // the crossing line on the plate's face: across the face — a pass-through; along an edge of the face (the outer
+        // quarter) — a corner where two plates overlap (a hopper's sheets), not reported
+        const cu = [], cv = [];
+        for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) for (let k = 0; k < N; k++) {
+          const q = at(i, j, k);
+          for (const r of [i + 1 < N ? at(i + 1, j, k) : -1, j + 1 < N ? at(i, j + 1, k) : -1, k + 1 < N ? at(i, j, k + 1) : -1]) {
+            if (r < 0 || !(IN[q] && IN[r]) || S[q] * S[r] >= 0) continue;
+            const f = S[q] / (S[q] - S[r]); cu.push(U[q] + (U[r] - U[q]) * f); cv.push(Vv[q] + (Vv[r] - Vv[q]) * f);
+          }
+        }
+        if (cu.length) {
+          const range = (l) => Math.max(...l) - Math.min(...l), mean = (l) => Math.abs(l.reduce((x, y) => x + y, 0) / l.length);
+          const where = range(cu) < range(cv) ? mean(cu) : mean(cv);
+          if (where > 0.75) continue;
+        }
+        const pair = [a.name, b.name].sort().join('|');
+        if (seen.has(pair)) continue;
+        seen.add(pair);
+        const corners = (o) => { const out = []; for (const x of [-1, 1]) for (const y of [-1, 1]) for (const z of [-1, 1]) out.push(o.c.clone().addScaledVector(o.ax[0], x * o.e[0]).addScaledVector(o.ax[1], y * o.e[1]).addScaledVector(o.ax[2], z * o.e[2]).toArray()); return out; };
+        findings.push({ check: 'pierce', severity: SEVERITY.pierce, parts: [a.name, b.name], meshes: [], src: [], extra: { boxes: [corners(a), corners(b)] },   // corners in the model's frame (the page draws them)
+          detail: `${a.name} passes through ${b.name} (sticks out ${(front * 100).toFixed(0)} and ${(back * 100).toFixed(0)} cm on its two sides)` });
+      }
+    }
+  }
+  lap('pierce', t);
 
   // hidden: every sampled vertex inside another closed piece
   t = performance.now();

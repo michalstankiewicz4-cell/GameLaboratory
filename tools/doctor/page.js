@@ -56,6 +56,10 @@ scene.add(new THREE.HemisphereLight(0xdde8f0, 0x2a3440, 1.6));
 const sunL = new THREE.DirectionalLight(0xffffff, 2.2); sunL.position.set(0.6, 1, 0.4); scene.add(sunL);
 const fireLine = new THREE.Line(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0xff3040, depthTest: false }));
 fireLine.renderOrder = 10; fireLine.visible = false; scene.add(fireLine);
+// collider boxes of a "pierce" finding: their edges (corners from the finding, in the model's frame)
+const boxLines = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0xff3040, depthTest: false }));
+boxLines.renderOrder = 10; boxLines.visible = false; scene.add(boxLines);
+const EDGES = [[0, 1], [2, 3], [4, 5], [6, 7], [0, 2], [1, 3], [4, 6], [5, 7], [0, 4], [1, 5], [2, 6], [3, 7]];
 const waterPlane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ color: 0x2b6f9a, transparent: true, opacity: 0.18, side: THREE.DoubleSide, depthWrite: false }));
 waterPlane.rotation.x = -Math.PI / 2; scene.add(waterPlane);
 
@@ -97,7 +101,7 @@ function show(id) {
 function restoreMaterials() {
   if (!shown) return;
   shown.traverse((o) => { if (o.isMesh && o.userData.docMat) { o.material = o.userData.docMat; delete o.userData.docMat; } });
-  fireLine.visible = false;
+  fireLine.visible = false; boxLines.visible = false;
   const b = built[current.id];
   (b.opts.mounts || []).forEach((mt) => { if (mt.__rot !== undefined) { mt.train.rotation.y = mt.__rot; delete mt.__rot; } });
 }
@@ -120,6 +124,11 @@ function highlight(f) {
     }
   }
   const box = new THREE.Box3(); f.meshes.forEach((o) => box.expandByObject(o));
+  if (f.extra && f.extra.boxes && shown) {
+    const pts = [];
+    for (const c of f.extra.boxes) for (const [i, j] of EDGES) pts.push(new THREE.Vector3(...c[i]).applyMatrix4(shown.matrixWorld), new THREE.Vector3(...c[j]).applyMatrix4(shown.matrixWorld));
+    boxLines.geometry.setFromPoints(pts); boxLines.visible = true; pts.forEach((p) => box.expandByPoint(p));
+  }
   if (!box.isEmpty()) { orbit.target.copy(box.getCenter(new THREE.Vector3())); orbit.dist = Math.max(box.getSize(new THREE.Vector3()).length() * 3, built[current.id].gameBudget ? 8 : 0.8); }
 }
 

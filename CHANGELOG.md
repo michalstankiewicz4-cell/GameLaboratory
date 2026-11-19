@@ -3,6 +3,17 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Doktor modeli 1.3.0 — 2026-11-19 (test „pierce”)
+
+### Dodane
+- Test **`pierce`** (ostrzeżenie): zderzacz przechodzi na wylot przez cienki zderzacz (płytę) — wystaje z obu jej stron
+  w obrębie jej powierzchni, a linia przecięcia biegnie przez płytę, nie przy jej krawędzi (zachodzące blachy w rogu
+  i ściana na podłodze nie są błędem). Działa, gdy źródło poda zderzacze (`opts.colliders`); złomowisko podaje
+  `colliders()` maszyn i otoczenia. Strona rysuje oba zderzacze krawędziami. Stanowisko testowe: zsyp przez ścianę
+  (znaleziony), blachy w rogu i ściana na podłodze (nie).
+- Wzorzec: nowy wynik w zgniatarce do puszek — zsyp przechodzi przez ściankę kosza (puszki wypchnięte na zsyp stają na
+  ściance), i na stanowisku testowym.
+
 ## Program 0.78.0 · pojazdy (ląd) 1.21.0 · budowle 1.5.0 · edytor sceny 0.35.0 — 2026-11-19 (złomowisko w działaniu)
 
 ### Dodane

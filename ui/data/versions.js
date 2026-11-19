@@ -33,7 +33,7 @@
     "labs/blocks.html": "1.2.0",
     "labs/effects.html": "1.3.0",
     "labs/zombies.html": "1.2.1",
-    "tools/doctor.html": "1.2.5",
+    "tools/doctor.html": "1.3.0",
     "labs/transform.html": "1.3.0",
     "tools/kitcheck.html": "1.0.6",
     "labs/filters.html": "0.6.0",

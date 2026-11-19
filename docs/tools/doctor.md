@@ -28,6 +28,13 @@ ma wszystkie testy wersji ze Space i więcej.
 | `tools/doctor/sources/common.js` | wspólne: koszt rysowania (trójkąty, wywołania, materiały) |
 | `tools/doctor.py` | doktor bez okna (Playwright): porównuje z `tools/doctor.golden.json` |
 
+**`pierce`** działa, gdy źródło poda zderzacze modelu: `opts.colliders` — prostopadłościany `{ at, half, rot?, name? }`
+w układzie modelu (złomowisko: `colliders()` maszyn i otoczenia, `colliderBoxes` z `js/behaviors/land/machines/statics.js`).
+Płyta (najmniejszy półwymiar poniżej 1/5 następnego) jest przebita, gdy inny zderzacz wystaje z obu jej stron w obrębie
+jej powierzchni, wyraźnie (więcej niż 4 × grubości i 1 % modelu), a linia przecięcia biegnie przez powierzchnię płyty —
+przecięcie przy krawędzi (zewnętrzna ćwierć: zachodzące na siebie blachy w rogu leja, ściana stojąca na podłodze) nie
+jest błędem. Wyjątki: `opts.pierceOk(a, b)`. Strona rysuje oba zderzacze krawędziami.
+
 Nowe źródło modeli: plik w `sources/`, który eksportuje listę `{ id, label, sub, family, water?, build() }`;
 `build()` zwraca `{ root, measured, opts, gameBudget? }`. Model budowany **bez scalania**, żeby każdy wynik
 wskazywał jedną część.
@@ -46,6 +53,7 @@ wskazywał jedną część.
 | `waterline` | ostrzeżenie | część nad kadłubem sięga pod linię wody (`opts.waterline`) |
 | `poke` | ostrzeżenie | element wystaje przez burtę (`opts.hullSide`) |
 | `budget` | ostrzeżenie | model przekracza budżet gry (`opts.budget`) |
+| `pierce` | ostrzeżenie | zderzacz przechodzi na wylot przez cienki zderzacz — np. zsyp przez ściankę kosza: to, co się zsuwa, staje na ściance (`opts.colliders`) |
 | `hidden` | info | część w całości wewnątrz innej |
 | `speck` | info | część za mała, by ją zobaczyć |
 | `sliver` | info | trójkąty-igły, które źle się cieniują |
