@@ -86,6 +86,10 @@ Wpis: `{ id, label, family, surface, lab, build() → { root, kit, dispose } }`.
 | `construct` | `base/*` | „budowa”: moduł rośnie od gruntu przez czas budowy BaseKit (`MODULES[].build`, `setProgress`) | — |
 | `orbit` | `bodies/*` | „orbita” (`js/behaviors/space/orbit.js`): środek `orbit.around` (id) albo najbliższe cięższe ciało (`bodyRank`: czarna dziura 4, słońce i pulsar 3, olbrzym i pierścienie 2, planeta 1, księżyc, planetoida, kometa 0), okres `orbit.period` (s, domyślnie 60) | — (ciało krąży samo) |
 | `flight` | `air/*` | „lot w atmosferze” (`js/behaviors/air/flight.js`), krok fizyki 1/240 s, grunt na wysokości 0 | `throttle` 0…1, `elevator`, `aileron`, `rudder`, `brake`, `gear`, `flaps` |
+| `grapple` | `junkyard/grapple-truck` | „przeładowarka z chwytakiem” (`js/behaviors/land/grapple.js`) na wspólnym świecie przedmiotów (`world.items`) — chwyta przedmioty złomowiska ze sceny; akcja `grab` | `throttle` (pedał), `rudder` (skręt), `aileron` (obrót ←/→), `elevator` (wysięgnik ↑/↓), `stick` (ramię R/F), `lift` (spacja: chwytak) |
+| `item` | `junkyard/<przedmiot>` | „luźny przedmiot”: bryła sztywna świata przedmiotów (`js/behaviors/land/items.js`), półwymiary zderzacza gry, masa × skala³ | — |
+| `machine` | `junkyard/<maszyna>` | „maszyna złomowiska w działaniu” (`js/behaviors/land/machines/`): zgniatarki, piec na papier, piec indukcyjny (wylewa do linii odlewniczej ze sceny), linia odlewnicza; akcje `run`, `power`, `pour`, `diverter` | — (akcje 1…9) |
+| `solid` | `junkyard/platform`, `fence`, `buyback` | „bryła”: zderzacze modelu (`colliders()`) — przedmioty na niej leżą | — |
 
 - Okręty: liczby ruchu z `SHIP_NUMBERS` (masa, moc, prędkość maksymalna), reszta z modelu (`shipDef`: długość,
   szerokość, dziób i rufa).
@@ -95,6 +99,10 @@ Wpis: `{ id, label, family, surface, lab, build() → { root, kit, dispose } }`.
 - `behaviorsFor(prefabId)` — pasujące zachowania; `defaultBehavior` — pierwsze pasujące; `behaviorOf(obj, surface)` —
   zachowanie obiektu w grze (pole albo domyślne, tylko pasujące; bez pola — pierwsze działające w środowisku powierzchni:
   statek nad lądem — lądowanie).
+- Złomowisko: przedmioty, maszyny i przeładowarka dzielą jeden świat przedmiotów (`world.items`, tworzony przy pierwszej
+  potrzebie w grze edytora i liczony raz na klatkę po zachowaniach); przedmioty powstałe w grze (sztabki, puszki
+  zgniecione) znikają po „Stop”, spalone i stopione wracają. Uproszczenie: zderzacze maszyn nie skalują się ze skalą
+  obiektu.
 - Nowe zachowanie: plik w `js/behaviors/<środowisko>/` (fizyka, bez sceny) i adapter tutaj.
 
 ## API sceny (`api.js`)

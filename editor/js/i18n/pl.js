@@ -65,6 +65,7 @@
   'play.crashed': 'ROZBITY',
   'play.stall': 'przeciągnięcie',
   'play.aground': 'na mieliźnie',
+  'play.load': 'ładunek',
   'api.input': "Polecenie API (JSON)",
   'api.run': "Wykonaj",
   'api.run.tip': "Wykonaj polecenie (Ctrl+Enter)",

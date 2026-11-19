@@ -3,6 +3,29 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.78.0 · pojazdy (ląd) 1.21.0 · budowle 1.5.0 · edytor sceny 0.35.0 — 2026-11-19 (złomowisko w działaniu)
+
+### Dodane
+- Zachowanie **przedmioty na lądzie** (`js/behaviors/land/items.js`): luźne przedmioty jako bryły sztywne — grawitacja,
+  grunt, zderzenia ze sobą, z bryłami nieruchomymi i ruchomymi (SAT, impulsy sekwencyjne, tarcie jak w grze: guma 0,9,
+  reszta 0,55), **obroty od uderzeń** (przewracanie się, toczenie po krawędzi), usypianie stosów, zgniatanie skalą.
+- **Maszyny złomowiska w działaniu** (`js/behaviors/land/machines/`, z gry Złomowisko z historią): zgniatarka do puszek
+  i prasa 400 kN (tłok pcha przedmioty, zgniata najsłabszy wg `crush` / `minScale`, puszka → puszka zgnieciona), piec na
+  papier (papier i tektura płoną, ogień i dym), piec indukcyjny (nagrzewanie, topnienie do kąpieli, przechył i wylew),
+  linia odlewnicza (strumień metalu w rynnie, formy na dwóch przenośnikach, rozdzielacz, sztabki wg składu). Zasady gry
+  (skup, ceny) zostały w grze.
+- JunkKit: właściwości przedmiotów `js/models/junkyard/properties.js` (metal, topnienie, gęstość, palenie, guma; bryły
+  z zderzaczy gry, `itemKit` — tworzenie, zamiana, żarzenie), wygląd ognia `fire.js` i stopionego metalu `lava.js`.
+- **Laboratorium budowli 1.5.0**: maszyny złomowiska pracują — sekcja *At work* w oknie Budowla: przyciski maszyny,
+  wsad przedmiotów, odczyty; piec indukcyjny stoi razem z linią odlewniczą (jak w grze).
+- **Edytor sceny 0.35.0**: w grze (▶ Graj) przeładowarka jeździ i chwyta (`grapple`), przedmioty złomowiska są bryłami
+  (`item`), maszyny pracują (`machine`, akcje 1…9), platforma, ogrodzenie i skup są bryłami (`solid`) — wszystko na
+  wspólnym świecie przedmiotów; klawisz R (z F) — ramię przeładowarki.
+
+### Zmienione
+- **Laboratorium pojazdów (ląd) 1.21.0**: przedmioty przed przeładowarką przewracają się i obracają od uderzeń;
+  przeładowarka na wspólnym świecie przedmiotów (bez własnych zderzeń), chwyta też przedmioty leżące przewrócone.
+
 ## Program 0.77.0 · pojazdy (ląd) 1.20.0 — 2026-11-19 (przeładowarka: zawieszenie i zderzenia)
 
 ### Dodane

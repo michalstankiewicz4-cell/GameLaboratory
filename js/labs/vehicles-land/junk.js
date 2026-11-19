@@ -4,7 +4,7 @@
 // przedmioty ze złomowiska (JunkKit) leżą przed nią do chwytania. Sterowanie jak w grze: W/S jazda, A/D skręt,
 // ←/→ obrót nadwozia, ↑/↓ wysięgnik, R/F ramię, Spacja chwytak.
 import { build as buildTruck, LAYOUT } from "../../models/junkyard/vehicle/grapple-truck.js";
-import { MODELS as JUNK } from "../../models/junkyard/registry.js";
+import { itemKit } from "../../models/junkyard/properties.js";
 import { applyTextures, setAnisotropy } from "../../models/junkyard/textures.js";
 import { createGrapple } from "../../behaviors/land/grapple.js";
 const THREE = window.THREE;
@@ -24,7 +24,7 @@ function start(lab) {
   const two = el("div", "twoBtns"); two.append(jawBtn, resetBtn); panel.append(two);
   readout("speed", "Speed"); readout("jaws", "Grapple"); readout("payload", "Load"); readout("sag", "Boom / stick bend");
   readout("tilt", "Pitch / roll"); readout("wheels", "Wheel loads (FR · FL · RR · RL)");
-  panel.append(el("p", "note", "Physics in GameLaboratory: driving by forces (land/drive.js) with the game's numbers, the grapple as a pendulum on a ball joint, the jaws on motors pressing on what they hold — it stays in the grapple while friction carries its weight. The chassis rides on four springs (the game's suspension numbers) and leans under the counterweight, the load and the driving; the items collide with each other, with the loader and with the ground, and stack — they do not tumble."));
+  panel.append(el("p", "note", "Physics in GameLaboratory: driving by forces (land/drive.js) with the game's numbers, the grapple as a pendulum on a ball joint, the jaws on motors pressing on what they hold — it stays in the grapple while friction carries its weight. The chassis rides on four springs (the game's suspension numbers) and leans under the counterweight, the load and the driving; the items are rigid bodies (land/items.js): they collide with each other, with the loader and with the ground, stack, topple and tumble from impacts."));
   jawBtn.addEventListener("click", () => { if (grab) { grab.toggleJaws(); jawBtn.blur(); } });
   resetBtn.addEventListener("click", () => { resetBtn.blur(); placePile(); });
 
@@ -40,19 +40,17 @@ function start(lab) {
   addEventListener("blur", () => { for (const k in keys) keys[k] = false; });
   const axis = (a, b) => (keys[a] ? 1 : 0) - (keys[b] ? 1 : 0);
 
-  const mods = {};
-  async function loadItems() { for (const [id] of PILE) if (!mods[id]) mods[id] = await JUNK.find((m) => m.id === id).load(); }
+  // przedmioty JunkKit jako bryły świata przedmiotów (półwymiary zderzacza gry — js/models/junkyard/properties.js)
+  let kit = null;
+  async function loadItems() { if (!kit) kit = await itemKit(); }
+  const Y = new THREE.Vector3(0, 1, 0);
   function placePile() {
     if (!grab) return;
-    for (const it of grab.items) world.remove(it.mesh);
-    grab.items.length = 0; grab.held.clear();
-    for (const [id, x, z, yaw] of PILE) {
-      const mod = mods[id], m = mod.build(0), box = new THREE.Box3().setFromObject(m), c = box.getCenter(new THREE.Vector3()), size = box.getSize(new THREE.Vector3());
-      m.position.sub(c); m.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
-      const holder = new THREE.Group(); holder.add(m); holder.rotation.y = yaw; world.add(holder);
-      grab.addItem({ mesh: holder, mass: mod.info.mass, half: [size.x / 2, size.y / 2, size.z / 2], name: id, at: [x, 0, z] });
-    }
-    applyTextures();
+    for (const it of [...grab.held]) it.held = false;
+    grab.held.clear();
+    for (const it of [...grab.items.list]) grab.items.remove(it);
+    for (const [id, x, z, yaw] of PILE) kit.spawn(grab.items, id, { at: [x, null, z], q: new THREE.Quaternion().setFromAxisAngle(Y, yaw), parent: world });
+    grab.items.sync(); applyTextures();
   }
 
   lab.addMode({
@@ -68,6 +66,7 @@ function start(lab) {
       truck.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
       const flat = new THREE.Mesh(new THREE.CircleGeometry(600, 96).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x6b604e, roughness: 0.97 }));
       flat.receiveShadow = true; world.add(flat, truck);
+      if (grab) grab.dispose();
       grab = createGrapple(truck, { scene: world });
       g = grab; window.__grapple = grab;   // (testy)
       placePile(); grab.sync();

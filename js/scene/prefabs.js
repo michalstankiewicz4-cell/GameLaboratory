@@ -156,7 +156,7 @@ JUNK.forEach((m, i) => add('junkyard/' + m.id, m.name, 'junkyard', 'land', JUNK_
   if (typeof document !== 'undefined') (junkTex || (junkTex = import('../models/junkyard/textures.js'))).then((t) => t.applyTextures());
   model.updateMatrixWorld(true); model.position.y -= new THREE.Box3().setFromObject(model).min.y; root.add(model);
   root.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
-  return { root, kit: { info: JUNK_MODS[i].info }, dispose: () => model.traverse((o) => { if (o.isMesh) o.geometry.dispose(); }) };
+  return { root, kit: { info: JUNK_MODS[i].info, mod: JUNK_MODS[i], model, id: m.id, group: m.group }, dispose: () => model.traverse((o) => { if (o.isMesh) o.geometry.dispose(); }) };
 }));
 
 export const PREFABS = P;

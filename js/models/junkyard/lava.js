@@ -1,7 +1,8 @@
-// Materiał stopionego metalu: shader lawy z GameLaboratory (js/render/liquid.js, lavaColor). uHeat 1 — ciekły, żółto-pomarańczowy;
-// 0 — zastygły (szary metal). Wspólny zegar LIQUID_TIME przesuwa wzór (gra dodaje czas w pętli).
-import * as THREE from '../../vendor/three/three.module.js';
-import { LIQUID_TIME, LIQUID_GLSL } from './liquid.js';
+// Materiał stopionego metalu (z gry Złomowisko, js/render/lava.js — z historią): shader lawy GameLaboratory
+// (js/render/liquid.js, lavaColor). uHeat 1 — ciekły, żółto-pomarańczowy; 0 — zastygły (szary metal). Wspólny zegar
+// LIQUID_TIME przesuwa wzór (laboratorium dodaje czas w pętli). Piec indukcyjny, strumień metalu i formy linii odlewniczej.
+import * as THREE from '../../../vendor/three/three.module.js';
+import { LIQUID_TIME, LIQUID_GLSL } from '../../render/liquid.js';
 
 export { LIQUID_TIME };
 export function lavaMaterial({ heat = 1, scale = 6, metal = '#9a9ea2' } = {}) {

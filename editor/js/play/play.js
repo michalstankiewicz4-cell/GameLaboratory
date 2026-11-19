@@ -1,7 +1,9 @@
 // Gra w edytorze („Graj” / „Stop”): zachowania z js/scene/behaviors.js ruszają modele sceny, gracz steruje jednym z nich
 // klawiaturą (play/input.js), kamera jedzie za nim (orbita zostaje: można się obracać wokół). Dane sceny się nie
 // zmieniają — zachowania ustawiają tylko modele w świecie 3D; po „Stop” modele wracają na miejsca z danych.
-import { BEHAVIORS, behaviorOf, bodyRank } from '../../../js/scene/behaviors.js';
+import { BEHAVIORS, behaviorOf, bodyRank, JUNK_KIT } from '../../../js/scene/behaviors.js';
+import { createItems } from '../../../js/behaviors/land/items.js';
+import { LIQUID_TIME } from '../../../js/render/liquid.js';
 import { createInput } from './input.js';
 import { createPlayUI } from './gameui-play.js';
 
@@ -29,7 +31,7 @@ export function createPlay(store, world, controls, actions, events) {
     const a = me.run.actions()[n - 1]; if (!a) return;
     e.preventDefault(); act(me.obj.id, a.id);
   });
-  let runs = [], me = null, last = null, hudT = 0;
+  let runs = [], me = null, last = null, hudT = 0, items = null, machines = [];
 
   function start() {
     if (runs.length) return;
@@ -38,7 +40,10 @@ export function createPlay(store, world, controls, actions, events) {
       // orbita: inne obiekty sceny i ich bieżące położenie, kierunek słońca, kamera
       objects: store.scene.objects, objectPos: (id) => { const b = world.built.get(id); return b ? b.root.position.toArray() : null; },
       get gravity() { return world.stage.gravity; }, get airDensity() { return world.stage.airDensity; },   // lądowanie: prawa planety
-      get sunDir() { return world.stage.sunDir; }, get cameraPos() { return world.camera.position; } };
+      get sunDir() { return world.stage.sunDir; }, get cameraPos() { return world.camera.position; },
+      // złomowisko: wspólny świat przedmiotów (land/items.js) — przedmioty, maszyny, przeładowarka; liczony w frame()
+      get items() { return items || (items = createItems({ ground: { height: (x, z) => { const h = world.stage.terrainAt(x, z); return h == null ? 0 : h; } } })); },
+      scene: world.root, machines };
     runs = store.scene.objects.map((o) => {
       const id = behaviorOf(o, store.scene.env.surface), b = world.built.get(o.id); if (!id || !b) return null;
       const run = BEHAVIORS[id].create(o, b, env);
@@ -61,6 +66,9 @@ export function createPlay(store, world, controls, actions, events) {
   function stop() {
     if (!runs.length) return;
     runs.forEach((r) => { if (r.run.reset) r.run.reset(); r.b.driven = false; });
+    // przedmioty powstałe w grze (sztabki, puszki zgniecione) znikają ze świata
+    if (items) for (const it of [...items.list]) if (it.spawned) items.remove(it);
+    items = null; machines.length = 0;
     runs = []; me = null; input.release(); playUI.stop();
     controls.setPlaying(false); document.body.classList.remove('playing');
     world.syncPlaces(); controls.attach();
@@ -72,12 +80,14 @@ export function createPlay(store, world, controls, actions, events) {
     if (!runs.length) return;
     const c = input.read(dt);
     runs.forEach((r) => r.run.step(dt, r === me ? c : {}, time));
+    if (items) { items.step(dt); items.sync(); JUNK_KIT.glow(items); if (machines.length) LIQUID_TIME.value += dt; }
     const p = me.b.root.position, d = p.clone().sub(last); last.copy(p);
     controls.orbit.target.add(d); world.camera.position.add(d);
     if ((hudT -= dt) <= 0) { hudT = 0.2; actions.status(hudText(me.run.hud())); }
     playUI.frame(dt, me, runs);
   }
   function hudText(h) {
+    if (h.machine) return [me.obj.name, ...h.machine.map(([k, v]) => `${k} ${v}`)].join(' · ');
     const parts = h.progress != null ? [me.obj.name, `${t('play.build')} ${Math.round(h.progress * 100)}%`]
       : [me.obj.name, `${t('play.speed')} ${h.speed.toFixed(h.unit === 'kn' ? 1 : 0)} ${h.unit}`, `${t('play.throttle')} ${Math.round(h.throttle * 100)}%`];
     if (h.alt != null) parts.push(`${t('play.alt')} ${h.alt.toFixed(0)} m`);
@@ -85,6 +95,7 @@ export function createPlay(store, world, controls, actions, events) {
     if (h.landed) parts.push(t('play.landed'));
     if (h.crashed) parts.push(t('play.crashed')); else if (h.stall) parts.push(t('play.stall'));
     if (h.aground) parts.push(t('play.aground'));
+    if (h.load != null) parts.push(`${t('play.load')} ${Math.round(h.load)} kg`);
     return parts.join(' · ');
   }
   const subs = new Set(), changed = () => subs.forEach((f) => f(!!runs.length));

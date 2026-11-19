@@ -3,6 +3,16 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.35.0 — 2026-11-19 (złomowisko w grze)
+
+### Dodane
+- W grze (▶ Graj): **przeładowarka z chwytakiem** jeździ i chwyta (zachowanie `grapple`: W/S, A/D, ←/→ obrót, ↑/↓
+  wysięgnik, R/F ramię, Spacja chwytak; akcja `grab`), **przedmioty** złomowiska są bryłami sztywnymi (`item`: spadają,
+  przewracają się, układają), **maszyny** pracują (`machine`: zgniatarki, piece, linia odlewnicza; akcje `run`, `power`,
+  `pour`, `diverter`; piec indukcyjny wylewa do linii odlewniczej stojącej przy wylewie), platforma, ogrodzenie i skup
+  są bryłami (`solid`). Wszystko na wspólnym świecie przedmiotów; sztabki i puszki zgniecione znikają po „Stop”.
+- Linia stanu: ładunek przeładowarki; stan maszyny, gdy gracz ją wybrał.
+
 ## 0.34.0 — 2026-11-19 (złomowisko)
 
 ### Dodane

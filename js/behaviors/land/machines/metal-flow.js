@@ -1,8 +1,12 @@
-// Strumień ciekłego metalu: cząstki (każda = dV metalu ze składem) z grawitacją, spływające rynną linii
-// odlewniczej i wpadające do form. Rynna i formy jako proste kształty analityczne w układzie linii (szybko na CPU,
-// bez zderzaczy Rapier). Rysowane jednym InstancedMesh z shaderem lawy, rozciągane wzdłuż prędkości.
-import * as THREE from '../../vendor/three/three.module.js';
-import { lavaMaterial } from '../render/lava.js';
+// Zachowanie „strumień ciekłego metalu” (środowisko: ląd) — z gry Złomowisko (js/machines/metal-flow.js, z historią):
+// cząstki (każda = dV metalu ze składem) z grawitacją, spływające rynną linii odlewniczej i wpadające do form. Rynna
+// i formy jako proste kształty analityczne w układzie linii (szybko na CPU, bez zderzaczy). Rysowane jednym
+// InstancedMesh z shaderem lawy (js/models/junkyard/lava.js), rozciągane wzdłuż prędkości. step(dt) — ruch cząstek
+// (w krokach świata przedmiotów), draw() — rysowanie (raz na klatkę).
+import * as THREE from '../../../../vendor/three/three.module.js';
+import { lavaMaterial } from '../../../models/junkyard/lava.js';
+
+export const ENVIRONMENTS = ['land'];
 
 const MAX = 1500;
 export class MetalFlow {
@@ -68,7 +72,11 @@ export class MetalFlow {
       if (P[i + 1] < this.L.moldTop - 0.02 && (Math.abs(P[i + 2] - this.L.moldZ) < 0.36 || Math.abs(P[i + 2] - this.L.moldZ2) < 0.36) && P[i] > this.L.conveyor.x0 - 0.1 && P[i] < this.L.conveyor.x1 + 0.1) { this.kill(k); this.wasted += this.dV; continue; }
       if (P[i + 1] < 0.01) { this.kill(k); this.wasted += this.dV; }
     }
-    // rysowanie: kulki rozciągnięte wzdłuż prędkości
+  }
+  dispose() { if (this.mesh.parent) this.mesh.parent.remove(this.mesh); this.mesh.geometry.dispose(); this.mesh.material.dispose(); }
+  /** Rysowanie: kulki rozciągnięte wzdłuż prędkości. */
+  draw() {
+    const P = this.p, Vv = this.v, d = this.tmp;
     for (let k = 0; k < this.n; k++) {
       const i = k * 3; d.set(Vv[i], Vv[i + 1], Vv[i + 2]); const sp = d.length();
       this.q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), sp > 1e-3 ? d.normalize() : new THREE.Vector3(0, 1, 0));

@@ -66,6 +66,7 @@
   'play.crashed': 'CRASHED',
   'play.stall': 'stall',
   'play.aground': 'aground',
+  'play.load': 'load',
   'api.input': "API command (JSON)",
   'api.run': "Run",
   'api.run.tip': "Run the command (Ctrl+Enter)",

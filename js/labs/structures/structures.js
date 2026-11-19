@@ -4,7 +4,8 @@
 // own settings come from its PARAMS; its height function is baked into a texture so the sea shows shallows and surf
 // along slopes and walls. Info panel with specifications, sources and parts.
 // On land: the junkyard's machines and surroundings (JunkKit, js/models/junkyard/ — from the junkyard game, with history):
-// the sea goes away and the seabed becomes dry ground at the water line.
+// the sea goes away and the seabed becomes dry ground at the water line. The machines work (junk-work.js: the game's
+// machine behaviours, js/behaviors/land/machines/, on the item world js/behaviors/land/items.js).
 import * as THREE from '../../../vendor/three/three.module.js';
 import { STRUCTURE_IDS, buildStructure, structureInfo, structureParams } from '../../models/structures/index.js';
 import { heightTexture, landUniforms, setLand, GLSL_LAND } from '../../envs/land/landkit.js';
@@ -14,6 +15,7 @@ import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, L
 import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
 import { MODELS as JUNK, junkEntry } from '../../models/junkyard/registry.js';
 import { applyTextures as junkTextures, setAnisotropy as junkAniso } from '../../models/junkyard/textures.js';
+import { createJunkWork } from './junk-work.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -52,6 +54,7 @@ const seabed = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000, 1, 1).rotateX(
 junkAniso(renderer.capabilities.getMaxAnisotropy());
 const JUNK_STRUCT = JUNK.filter((m) => m.group === 'machines' || m.group === 'world');   // on land (the junkyard)
 const isJunk = (id) => String(id).startsWith('junk:');
+const work = createJunkWork(scene);   // junkyard machines at work
 let onLand = false;   // a junkyard structure is shown: no sea, the ground is dry at y = 0
 seabed.receiveShadow = true; scene.add(seabed);
 let waves = [];
@@ -115,6 +118,7 @@ async function rebuildJunk() {
   }));
   $('rigPanel').hidden = true; $('paramPanel').hidden = true; $('moorRow').hidden = true;
   setLandMode(true); seabed.position.y = 0; bakeShore(); placeShip();
+  work.start(e.id, g, mod);
   const r = Math.max(sz.x, sz.y, sz.z), c = b.getCenter(new THREE.Vector3()), cy = sz.y * 0.4;
   junkCams = [['Overview', [c.x, cy, c.z], r * 1.9, 0.8, 0.3], ['Front', [c.x, cy, c.z], r * 1.6, 0, 0.1], ['Side', [c.x, cy, c.z], r * 1.6, Math.PI / 2, 0.1], ['High', [c.x, 0, c.z], r * 2.6, 0.6, 1.1]];
   setCams();
@@ -122,7 +126,7 @@ async function rebuildJunk() {
 let junkCams = null;
 function rebuild() {
   if (isJunk(S.id)) { rebuildJunk(); return; }
-  setLandMode(false); junkCams = null;
+  setLandMode(false); junkCams = null; work.stop();
   if (st) { scene.remove(st.group); st.group.traverse((o) => { if (o.isMesh) o.geometry.dispose(); }); }
   const t0 = performance.now();
   S.depth = S.depths[S.id] ?? S.depth; $('depth').value = S.depth; $('depthV').textContent = S.depth + ' m';
@@ -273,6 +277,7 @@ function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now; simT += dt;
   WU.uTime.value = simT; skyU.uCloudOff.value.x += dt * 0.006;
   stepJack(dt);
+  work.frame(dt);
   // afloat: the hull rides the waves (heave only, the legs ride with it)
   if (st && st.pose && jack.air < 0 && !jack.phase) { st.hull.position.y = jack.air + heightAt(waves, 0, 0, simT) * 0.8; }
   if (st && st.cranes && S.cranes) st.cranes.forEach((c, i) => { c.slew.rotation.y = c.yaw0 + Math.sin(simT * 0.08 + i * 2) * 0.9; c.boom.rotation.x = -0.32 - 0.25 * (0.5 + 0.5 * Math.sin(simT * 0.11 + i)); });
@@ -303,6 +308,7 @@ function frame(now) {
   frames++;
   if (now - fpsT > 500) {
     frames = 0; fpsT = now;
+    work.hud();
     const legTop = st && st.legs ? st.legs[0].group.position.y + st.legs[0].len : 0;
     if (st && st.pose) $('jackStatus').textContent = jack.phase ? `Jacking: ${jack.phase}…` : jack.air < 0 ? `Afloat, draught ${(-jack.air).toFixed(1)} m — legs raised for tow` : `Elevated: air gap ${jack.air.toFixed(1)} m, legs ${Math.max(0, legTop - jack.air - st.dim.D).toFixed(0)} m above the deck`;
     $('stats').replaceChildren(...[['Camera height', `${Math.round(camera.position.y)} m`]]
@@ -313,5 +319,5 @@ function frame(now) {
 
 jack.air = S.air; markTimes(); updateSky(); rebuild(); resize();
 $('status').textContent = 'built from code at real scale';
-window.__structures = { S, jack, camera, orbit, get st() { return st; }, rebuild, applyPose };
+window.__structures = { S, jack, camera, orbit, get st() { return st; }, rebuild, applyPose, work };
 requestAnimationFrame(frame);

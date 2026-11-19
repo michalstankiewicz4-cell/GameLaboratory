@@ -13,6 +13,25 @@ import { createDrive, driveDef } from '../behaviors/land/drive.js';
 import { createCraft, craftDef } from '../behaviors/water/craft.js';
 import { createOrbit, orbitMu, circularVelocity } from '../behaviors/space/orbit.js';
 import { createLander, landerDef } from '../behaviors/land/lander.js';
+import { createGrapple } from '../behaviors/land/grapple.js';
+import { halfExtents, propsOf, itemKit } from '../models/junkyard/properties.js';
+import { createMachine, connect, MACHINE_IDS } from '../behaviors/land/machines/machines.js';
+import { addModelStatics } from '../behaviors/land/machines/statics.js';
+
+// złomowisko: przedmioty, maszyny i przeładowarka dzielą jeden świat przedmiotów gry (world.items — land/items.js;
+// liczy go gra raz na klatkę po zachowaniach); moduły przedmiotów (do zgniatania i odlewania sztabek) ładowane raz
+const JUNK_KIT = await itemKit();
+export { JUNK_KIT };
+const isJunk = (prefabId, group) => prefabId.startsWith('junkyard/') && (!group || JUNK_GROUP[prefabId.slice(9)] === group);
+const JUNK_GROUP = { 'grapple-truck': 'vehicle', platform: 'world', fence: 'world', buyback: 'world' };
+for (const id of MACHINE_IDS) JUNK_GROUP[id] = 'machines';
+for (const id of Object.keys(JUNK_KIT.mods)) JUNK_GROUP[id] = 'items';
+// model JunkKit w obiekcie sceny: obiekt (grupa) w zerze, model w świecie (zachowanie ustawia go samo)
+function junkModel(built) {
+  const k = built.kit || {}, root = built.root;
+  root.position.set(0, 0, 0); root.quaternion.identity(); root.scale.set(1, 1, 1); root.updateMatrixWorld(true);
+  return k.model;
+}
 
 const D2R = Math.PI / 180;
 const quatOf = (q, o = new THREE.Quaternion()) => o.set(q[1], q[2], q[3], q[0]);   // [w, x, y, z] → THREE
@@ -240,6 +259,90 @@ export const BEHAVIORS = {
         hud: () => ({ speed: s.speed, unit: 'm/s', throttle: 0 }),
         reset() {},
       };
+    },
+  },
+  grapple: {
+    label: 'Grapple loader', labelPl: 'Przeładowarka z chwytakiem', env: 'land', throttle: [-1, 1], lever: false,
+    fits: (prefabId) => prefabId === 'junkyard/grapple-truck',
+    keys: 'W / S: drive · A / D: steer · ← / →: slew · ↑ / ↓: boom · R / F: stick · Space: grapple',
+    keysPl: 'W / S: jazda · A / D: skręt · ← / →: obrót · ↑ / ↓: wysięgnik · R / F: ramię · Spacja: chwytak',
+    // land/grapple.js (jazda siłami, hydraulika, wahadło chwytaka, szczęki z kontaktem, zawieszenie) na świecie
+    // przedmiotów gry — chwyta przedmioty złomowiska ze sceny
+    create(obj, built, world) {
+      const k = built.kit || {}; if (!k.model || !world.items) return null;
+      const yaw = obj.rot[1] * D2R, place = { x: obj.pos[0], z: obj.pos[2], yaw };
+      const model = junkModel(built), ground = { height: (x, z) => { const h = world.terrainAt ? world.terrainAt(x, z) : 0; return h == null ? 0 : h; } };
+      const g = createGrapple(model, { ...place, ground, scene: world.scene || built.root.parent, items: world.items });
+      let space = false, pedal = 0;
+      return {
+        state: g.drive.state,
+        step(dt, c) {
+          if (c.lift && !space) g.toggleJaws(); space = !!c.lift;   // spacja: zamknij / otwórz
+          pedal = c.throttle || 0;
+          g.step(dt, { throttle: pedal, steer: -(c.rudder || 0), brake: c.brake || 0, slew: -(c.aileron || 0), boom: -(c.elevator || 0), stick: c.stick || 0 });
+          g.sync();
+        },
+        actions: () => [{ id: 'grab', label: 'Grapple', kind: 'toggle', on: g.closed }],
+        act(id, on) { if (id === 'grab') g.setJaws(on == null ? !g.closed : on); },
+        hud: () => ({ speed: g.drive.state.u * 3.6, unit: 'km/h', throttle: pedal, load: g.payload }),
+        reset() { g.dispose(); },
+      };
+    },
+  },
+  item: {
+    label: 'Loose item (physics)', labelPl: 'Luźny przedmiot (fizyka)', env: 'land', throttle: [0, 0],
+    fits: (prefabId) => isJunk(prefabId, 'items'),
+    keys: 'falls, rolls over, stacks; machines and the grapple loader work it', keysPl: 'spada, przewraca się, układa; obrabiają go maszyny i przeładowarka',
+    // bryła sztywna w świecie przedmiotów (land/items.js): półwymiary zderzacza gry, masa z modelu (× skala³)
+    create(obj, built, world) {
+      const k = built.kit || {}; if (!k.info || !world.items) return null;
+      const s = obj.scale || 1, half = halfExtents(k.info, [s, s, s]), root = built.root;
+      root.updateMatrixWorld(true);
+      const q = root.quaternion.clone(), at = root.position.clone().add(new THREE.Vector3(0, half[1], 0).applyQuaternion(q));
+      const it = world.items.add({ mesh: root, mass: k.info.mass * s * s * s, half, kind: k.id, name: obj.name, at: at.toArray(), q, rubber: !!propsOf(k.id).rubber,
+        anchor: [0, -1, 0], meshScale: s, onRemove: () => { root.visible = false; } });
+      return {
+        state: it,
+        step() {},
+        hud: () => ({ speed: it.v.length(), unit: 'm/s', throttle: 0 }),
+        reset() { root.visible = true; if (it.glowMats) for (const m of it.glowMats) { m.m.emissive.copy(m.e); m.m.color.copy(m.c); } },
+      };
+    },
+  },
+  machine: {
+    label: 'Junkyard machine at work', labelPl: 'Maszyna złomowiska w działaniu', env: 'land', throttle: [0, 0],
+    fits: (prefabId) => isJunk(prefabId, 'machines'),
+    keys: 'actions 1…9: start / stop, power, tilt to pour, diverter', keysPl: 'akcje 1…9: start / stop, zasilanie, przechył do wylewu, rozdzielacz',
+    // zachowania maszyn z gry Złomowisko (land/machines/): zgniatarki, piece, linia odlewnicza; piec indukcyjny wylewa
+    // do linii odlewniczej ze sceny (gdy stoi przy wylewie)
+    create(obj, built, world) {
+      const k = built.kit || {}; if (!k.mod || !world.items) return null;
+      built.root.updateMatrixWorld(true);
+      const m = createMachine(k.id, k.model, { W: world.items, kit: JUNK_KIT, scene: world.scene || built.root.parent, mod: k.mod }); if (!m) return null;
+      const list = world.machines || [];
+      const ind = m.id === 'induction-furnace' ? m : list.find((x) => x.id === 'induction-furnace'), cast = m.id === 'casting-line' ? m : list.find((x) => x.id === 'casting-line');
+      if (ind && cast) connect(ind, cast);
+      list.push(m);
+      return {
+        state: {},
+        step(dt) { m.frame(dt); },
+        actions: () => m.actions().map((a) => ({ ...a, label: a.label })),
+        act(id, on) { m.act(id, on); },
+        hud: () => ({ speed: 0, unit: '', throttle: 0, machine: m.hud(false) }),
+        reset() { m.dispose(); const i = list.indexOf(m); if (i >= 0) list.splice(i, 1); },
+      };
+    },
+  },
+  solid: {
+    label: 'Solid (items collide)', labelPl: 'Bryła (przedmioty się zderzają)', env: 'land', throttle: [0, 0],
+    fits: (prefabId) => isJunk(prefabId, 'world'),
+    keys: 'items lie on it and bump into it', keysPl: 'przedmioty na nim leżą i się o nie zderzają',
+    // zderzacze nieruchome modelu (colliders() — jak w grze): platforma, ogrodzenie, punkt skupu
+    create(obj, built, world) {
+      const k = built.kit || {}; if (!k.mod || !k.mod.colliders || !world.items) return null;
+      built.root.updateMatrixWorld(true);
+      const off = addModelStatics(world.items, k.mod.colliders(), k.model);
+      return { state: {}, step() {}, hud: () => ({ speed: 0, unit: '', throttle: 0 }), reset() { off(); } };
     },
   },
 };

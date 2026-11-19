@@ -1,16 +1,24 @@
-// Zgniatarka (wspólna logika: puszki — tłok poziomy, metal — płyta pionowa).
-// Tłok jest ciałem kinematycznym: sam przesuwa przedmioty (fizyka). Gdy przedmioty zablokują drogę (stos wzdłuż osi
-// tłoka dłuższy niż wolne miejsce w danej kolumnie przekroju), tłok zgniata najsłabszy przedmiot w tej kolumnie:
-// opór = opór przedmiotu wzdłuż lokalnej osi najbardziej zgodnej z osią tłoka × utwardzenie (rośnie przy zgniataniu).
-// Za mocny przedmiot (opór > siła tłoka) zatrzymuje tłok — po chwili cofa się.
-import * as THREE from '../../vendor/three/three.module.js';
-import { R, G, groups, STEP } from '../physics/world.js';
+// Zachowanie „zgniatarka” (środowisko: ląd) — z gry Złomowisko (js/machines/crusher.js, z historią), na świecie
+// przedmiotów GameLaboratory (land/items.js) zamiast Rapier. Wspólna logika: puszki — tłok poziomy, metal — płyta pionowa.
+// Tłok (i zasuwa / brama) jest bryłą ruchomą (kinematyczną): sam przesuwa przedmioty (fizyka). Gdy przedmioty zablokują
+// drogę (stos wzdłuż osi tłoka dłuższy niż wolne miejsce w danej kolumnie przekroju), tłok zgniata najsłabszy przedmiot
+// w tej kolumnie: opór = opór przedmiotu wzdłuż lokalnej osi najbardziej zgodnej z osią tłoka (info.crush, kN)
+// × utwardzenie (rośnie przy zgniataniu, do info.minScale). Za mocny przedmiot (opór > siła tłoka) zatrzymuje tłok —
+// po chwili cofa się. Zgnieciona o połowę puszka staje się puszką zgniecioną (właściwość crushTo).
+// Liczy się w krokach świata przedmiotów (W.hook, 1/240 s).
+import * as THREE from '../../../../vendor/three/three.module.js';
+import { obbFrom, newObb } from '../items.js';
+import { propsOf } from '../../../models/junkyard/properties.js';
+
+export const ENVIRONMENTS = ['land'];
+export const STATUS = { idle: 'ready', close: 'closing the gate', press: 'crushing', hold: 'holding', open: 'opening', eject: 'pushing out', retract: 'retracting' };
+export const STATUS_PL = { idle: 'gotowa', close: 'zamyka bramę', press: 'zgniata', hold: 'docisk', open: 'otwiera', eject: 'wypycha', retract: 'cofa tłok' };
 
 const CELLS = 4;
 export class Crusher {
   /**
-   * cfg: { name, ph, items, root (Group maszyny w świecie), layout (LAYOUT modelu), axis ('x' | '-y'),
-   *        ramGroup, doorGroup, doorAxis ('y'), eject (zgniatarka puszek: wypycha przez zasuwę), wall (u ściany końcowej) }
+   * cfg: { name, W (świat przedmiotów), kit (itemKit), root (Group maszyny w świecie), layout (LAYOUT modelu), axis ('x' | '-y'),
+   *        ramGroup, doorGroup, eject (zgniatarka puszek: wypycha przez zasuwę), wall (u ściany końcowej) }
    */
   constructor(cfg) {
     Object.assign(this, cfg);
@@ -28,56 +36,51 @@ export class Crusher {
     // ciało tłoka (kinematyczne): płyta jako prostopadłościan
     const ch = L.chamber.half, rs = L.ram.size || [L.ram.thickness, ch[1] * 2 - 0.03, ch[2] * 2 - 0.03];
     const half = cfg.axis === 'x' ? [L.ram.thickness / 2, rs[1] / 2, rs[2] / 2] : [rs[0] / 2, rs[1] / 2, rs[2] / 2];
-    this.ram = this.ph.world.createRigidBody(R.RigidBodyDesc.kinematicPositionBased());
-    this.ph.world.createCollider(R.ColliderDesc.cuboid(...half).setCollisionGroups(groups(G.WORLD, G.ITEM | G.PLAYER | G.VEHICLE | G.HELD)).setFriction(0.6), this.ram);
+    this.ram = newObb(); this.ramHalf = half;
     this.ramBase = this.ramGroup.position.clone();
     if (this.doorGroup) {
       const ds = L.door.size;
-      this.door = this.ph.world.createRigidBody(R.RigidBodyDesc.kinematicPositionBased());
-      this.ph.world.createCollider(R.ColliderDesc.cuboid(ds[0] / 2, ds[1] / 2, ds[2] / 2).setCollisionGroups(groups(G.WORLD, G.ITEM | G.PLAYER | G.VEHICLE | G.HELD)), this.door);
+      this.door = newObb(); this.doorHalf = [ds[0] / 2, ds[1] / 2, ds[2] / 2];
       this.doorClosed = this.doorGroup.position.y; this.doorOpen = this.doorClosed + (L.door.openY - L.door.closedY); this.doorY = this.doorClosed;
     }
     // ściana końcowa: zasuwa / dno (u na osi a)
     this.wall = cfg.wall;
     this.chamber = L.chamber;
     this.place(true);
+    this.unKin = this.W.addKinematic([this.ram, this.door].filter(Boolean));
+    this.unHook = this.W.hook((h) => this.step(h));
   }
+  dispose() { this.unKin(); this.unHook(); }
   get busy() { return this.state !== 'idle'; }
   start() { if (this.state === 'idle') { this.state = this.doorGroup && !this.eject && this.doorY > this.doorClosed + 0.01 ? 'close' : 'press'; this.t = 0; this.stall = 0; this.crushed = 0; } }
   stop() { if (this.state !== 'idle') this.state = 'retract'; }
-  status() {
-    return { idle: 'gotowa', close: 'zamyka bramę', press: 'zgniata', hold: 'docisk', open: 'otwiera', eject: 'wypycha', retract: 'cofa tłok' }[this.state];
-  }
+  status(pl = false) { return (pl ? STATUS_PL : STATUS)[this.state]; }
 
-  /** Ustawia ciała kinematyczne i grupy modelu wg u i położenia drzwi. */
-  place(now = false) {
+  /** Ustawia bryły ruchome i grupy modelu wg u i położenia drzwi (prędkość bryły z przesunięcia w kroku h). */
+  place(now = false, h = 0) {
     const local = this.a.clone().multiplyScalar(this.u);
     if (this.axis === 'x') this.ramGroup.position.set(local.x, this.ramBase.y, this.ramBase.z);
     else this.ramGroup.position.set(this.ramBase.x, -this.u, this.ramBase.z);
-    const w = this.ramGroup.position.clone().applyMatrix4(this.M);
-    const q = this.qRoot;
-    if (now) { this.ram.setTranslation(w, true); this.ram.setRotation(q, true); }
-    this.ram.setNextKinematicTranslation(w); this.ram.setNextKinematicRotation(q);
-    if (this.door) {
-      this.doorGroup.position.y = this.doorY;
-      const dw = this.doorGroup.position.clone().applyMatrix4(this.M);
-      if (now) { this.door.setTranslation(dw, true); this.door.setRotation(q, true); }
-      this.door.setNextKinematicTranslation(dw); this.door.setNextKinematicRotation(q);
-    }
+    const set = (box, group, half) => {
+      const c0 = box.c.clone(); obbFrom(this.M, group.position.toArray(), half, null, box);
+      if (now || !h) box.v.set(0, 0, 0); else box.v.copy(box.c).sub(c0).divideScalar(h);
+    };
+    set(this.ram, this.ramGroup, this.ramHalf);
+    if (this.door) { this.doorGroup.position.y = this.doorY; set(this.door, this.doorGroup, this.doorHalf); }
   }
 
   /** Przedmioty w komorze z ich zasięgiem wzdłuż osi tłoka i w przekroju (układ maszyny). */
   contents() {
     const ch = this.chamber, cen = new THREE.Vector3(...ch.center), out = [];
     const qi = this.qRoot.clone().invert();
-    for (const it of this.items.list) {
+    for (const it of this.W.list) {
       if (it.held) continue;
-      const t = it.body.translation(), p = new THREE.Vector3(t.x, t.y, t.z).applyMatrix4(this.Mi);
+      const p = it.p.clone().applyMatrix4(this.Mi);
       const d = p.clone().sub(cen);
       if (Math.abs(d.x) > ch.half[0] + 0.1 || Math.abs(d.y) > ch.half[1] + 0.6 || Math.abs(d.z) > ch.half[2] + 0.1) continue;
-      const r = it.body.rotation(), q = new THREE.Quaternion(r.x, r.y, r.z, r.w).premultiply(qi);
+      const q = it.q.clone().premultiply(qi);
       const ax = [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1)].map((v) => v.applyQuaternion(q));
-      const h = this.items.halfExtents(it);
+      const h = it.half.slice();
       const ext = (v) => ax.reduce((s, A, k) => s + Math.abs(A.dot(v)) * h[k], 0);
       out.push({ it, p, ax, h, ea: ext(this.a), eb: ext(this.b), ec: ext(this.c), ua: p.dot(this.a), ub: p.dot(this.b), uc: p.dot(this.c) });
     }
@@ -100,7 +103,7 @@ export class Crusher {
       this.u = Math.max(this.u0, this.u - this.speed * 2 * dt);
       if (this.u <= this.u0 + 1e-4) { this.state = 'idle'; if (!this.eject && this.door) this.opened = true; }
     }
-    this.place();
+    this.place(false, dt);
   }
 
   press(dt) {
@@ -125,7 +128,7 @@ export class Crusher {
       let best = null;
       for (const e of worst.list) {
         const k = [0, 1, 2].reduce((m, i) => (Math.abs(e.ax[i].dot(this.a)) > Math.abs(e.ax[m].dot(this.a)) ? i : m), 0);
-        const info = this.items.info(e.it.kind), key = 'xyz'[k], min = info.minScale[key], s = e.it.scale[k];
+        const info = this.kit.info(e.it.kind), key = 'xyz'[k], min = info.minScale[key], s = e.it.scale[k];
         if (s <= min + 1e-3) continue;
         const harden = 1 + 3 * (1 - s) / Math.max(0.05, 1 - min);
         const res = info.crush[key] * 1000 * harden;
@@ -138,10 +141,10 @@ export class Crusher {
         const s = e.it.scale.slice(), h0 = e.h[k] / s[k];
         s[k] = Math.max(min, (e.h[k] - dh) / h0);
         this.crushed++;
-        const kind = this.items.info(e.it.kind).id;
+        const to = propsOf(e.it.kind).crushTo;
         // cała puszka zgnieciona o połowę → model puszki zgniecionej (oś Y wzdłuż osi tłoka)
-        if (kind === 'can' && s[k] < 0.5) this.items.replace(e.it, 'can-crushed', this.a.clone().applyQuaternion(this.qRoot));
-        else this.items.setScale(e.it, s);
+        if (to && s[k] < 0.5) this.kit.replace(this.W, e.it, to, this.a.clone().applyQuaternion(this.qRoot));
+        else this.W.setScale(e.it, s);
         this.u = Math.max(this.u, Math.min(want, free - this.half + 0.004));
         this.stall = 0;
       } else {

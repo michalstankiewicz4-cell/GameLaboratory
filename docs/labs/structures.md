@@ -37,12 +37,27 @@ them) and return `heightAt(x, z)` and `bounds` (the lab bakes the heights into a
   crown, green helideck perimeter lights.
 - **Info**: name, specifications, reconstruction note, sources; **Parts** toggles every part.
 
-## The junkyard, on land (1.4.0)
+## The junkyard, on land (1.4.0 – 1.5.0)
 
 The group *Junkyard (on land)* in the list: the junkyard game's machines (paper furnace, can crusher, metal crusher,
 induction furnace, casting line) and surroundings (platform, fence with a gate, buyback point) — JunkKit
 (`js/models/junkyard/`, [../models/junkyard.md](../models/junkyard.md)). The sea goes away and the seabed becomes dry
 ground at y = 0; the model's top-level parts can be switched off; cameras from its size. `?structure=junk:<id>` opens one.
+
+Since 1.5.0 the machines work — the game's machine behaviours (`js/behaviors/land/machines/`,
+[../behaviors/README.md](../behaviors/README.md)) on the shared item world (`js/behaviors/land/items.js`), in the
+*At work* section of the Structure window (`js/labs/structures/junk-work.js`):
+
+- **buttons of the machine** — crushers: Start / Stop; induction furnace: Power, Tilt to pour (toggle) and Tilt to pour /
+  Tilt back while held (also R / F); casting line: the diverter (large or small moulds);
+- **feed** — JunkKit items drop into the hopper (cans), the press chamber (a drum, pots and tyres, boxes and papers),
+  the furnace's burning zone (papers, boxes, a pot that does not burn), the crucible (cans — aluminium, pots — steel);
+  Clear the items;
+- **readouts** — the machine's state (crush steps, burning and burnt, power, tilt, the melt and its aluminium / steel,
+  metal in the trough, ingots made, metal spilt) and the number of items.
+
+The induction furnace and the casting line always stand together, as in the game (the line 0.62 m in front of the
+furnace): the melt pours down the trough into the moulds and sets into ingots, which lie in the world as items.
 
 ## Check
 

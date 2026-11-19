@@ -4,12 +4,16 @@ Modele z gry Złomowisko (repo Trash), przeniesione z historią (`js/models/` �
 `js/render/textures.js` → `textures.js`, `js/physics/shapes.js` → `shapes.js`). Budowane kodem, bez DOM (działają
 w Node — doktor modeli). Każdy moduł eksportuje `build(lod)` i `info`; spis z nazwami EN/PL: `registry.js` (`MODELS`,
 `GROUPS`). Materiały — `materials.js` (dane), tekstury proceduralne — `textures.js` (`applyTextures`, MatKit z
-`js/render/materials/matkit.js`), zderzacz → części wypukłe — `shapes.js`. Logika gry (fizyka Rapier, jazda pojazdu,
-maszyny w działaniu) została w grze.
+`js/render/materials/matkit.js`), zderzacz → części wypukłe — `shapes.js`. Właściwości przedmiotów (metal, topnienie,
+gęstość, palenie, zgniatanie do innego modelu, guma) i ich bryły (`halfExtents`, `itemKit`) — `properties.js` (z katalogu
+gry, bez cen skupu); wygląd ognia i dymu pieca — `fire.js`, stopionego metalu — `lava.js`. Fizyka i maszyny w działaniu
+są zachowaniami ([../behaviors/README.md](../behaviors/README.md)): przeładowarka `land/grapple.js`, przedmioty
+`land/items.js`, maszyny `land/machines/`. Zasady gry (skup, ceny) zostały w grze.
 
 Gdzie oglądane: przedmioty — [laboratorium przedmiotów](../labs/items.md); maszyny i otoczenie — laboratorium budowli
-(grupa „Junkyard (on land)”); przeładowarka — laboratorium pojazdów, ląd (ruchome części suwakami). W edytorze sceny:
-rodzina „Junkyard”. Doktor modeli: `tools/doctor/sources/junkyard.js`.
+(grupa „Junkyard (on land)”, maszyny w działaniu); przeładowarka — laboratorium pojazdów, ląd (jeździ i chwyta). W edytorze
+sceny: rodzina „Junkyard” (w grze edytora: przeładowarka, przedmioty, maszyny i bryły otoczenia na wspólnym świecie
+przedmiotów). Doktor modeli: `tools/doctor/sources/junkyard.js`.
 
 ## Przedmioty
 
