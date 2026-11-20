@@ -9,6 +9,7 @@
 //   jednorazowe (loop: false) — play(); ciągłe (loop: true) — start() → { set(params), stop() }
 // Dźwięk jako dane (zasób „sound”): { sound: id, params, gain }; tło miejsca (zasób „ambience”): { layers: [{ sound,
 //   params, level, every: [od, do] s — dla jednorazowych (np. ptaki), spread — rozrzut miejsc 0…1 }] }
+// Mechanizmy (drzwi, właz, hydraulika) — dźwięki modeli (zdarzenia onSound, js/models/shared/sound-events.js).
 // play(opis, { at, ref, bus, gain, when }) · start(opis, { at, ref, bus, gain }) → { set(params, poziom), move(at), volume(v), stop() }
 // · ambience(opis | id) → { set(warstwa, poziom), stop() }
 // AMBIENCES — gotowe tła: las, park w mieście, brzeg morza, burza, noc, ognisko.
@@ -16,7 +17,7 @@ import { mixer } from '../mixer.js';
 
 const P = (label, min, max, step, def) => [label, min, max, step, def];
 export const CATS = { boom: ['Explosions and shots', 'Wybuchy i strzały'], water: ['Water', 'Woda'], impact: ['Impacts', 'Uderzenia'],
-  weather: ['Weather', 'Pogoda'], nature: ['Nature', 'Przyroda'], machine: ['Machines and city', 'Maszyny i miasto'], ui: ['Interface', 'Interfejs'] };
+  weather: ['Weather', 'Pogoda'], nature: ['Nature', 'Przyroda'], machine: ['Machines and city', 'Maszyny i miasto'], mech: ['Mechanisms', 'Mechanizmy'], ui: ['Interface', 'Interfejs'] };
 export const SOUNDS = {
   explosion: { label: 'Explosion', labelPl: 'Wybuch', cat: 'boom', params: { size: P('Size', 0, 1, 0.01, 0.6), distance: P('Distance', 0, 1, 0.01, 0.2), debris: P('Debris', 0, 1, 0.01, 0.5) } },
   gunshot: { label: 'Gunshot / cannon', labelPl: 'Strzał / działo', cat: 'boom', params: { calibre: P('Calibre', 0, 1, 0.01, 0.2), distance: P('Distance', 0, 1, 0.01, 0.1), room: P('Echo', 0, 1, 0.01, 0.3) } },
@@ -25,6 +26,8 @@ export const SOUNDS = {
   impact: { label: 'Impact', labelPl: 'Uderzenie', cat: 'impact', params: { material: P('Material (metal · wood · heavy · chain)', 0, 3, 1, 0), strength: P('Strength', 0.05, 1, 0.01, 0.7) } },
   hit: { label: 'Shell hit', labelPl: 'Trafienie', cat: 'impact', params: { armour: P('Armour', 0, 1, 0.01, 0.5), strength: P('Strength', 0, 1, 0.01, 0.6) } },
   bird: { label: 'Bird', labelPl: 'Ptak', cat: 'nature', params: { species: P('Species (sparrow · tit · blackbird · gull · crow · owl)', 0, 5, 1, 2), pitch: P('Pitch', 0.7, 1.4, 0.01, 1) } },
+  door: { label: 'Door / hatch', labelPl: 'Drzwi / właz', cat: 'mech', params: { kind: P('Kind (car · hatch · bus · wooden)', 0, 3, 1, 0), action: P('Action (open · close)', 0, 1, 1, 1), force: P('Force', 0.1, 1, 0.01, 0.6) } },
+  hydraulic: { label: 'Hydraulics / servo', labelPl: 'Hydraulika / serwo', cat: 'mech', params: { time: P('Time (s)', 0.3, 6, 0.1, 2), pitch: P('Pitch', 0.5, 2, 0.01, 1), lock: P('Lock at the end', 0, 1, 0.01, 0.6) } },
   ui: { label: 'Interface', labelPl: 'Interfejs', cat: 'ui', params: { kind: P('Kind (click · bell · repair · alarm)', 0, 3, 1, 0) } },
   wind: { label: 'Wind', labelPl: 'Wiatr', cat: 'weather', loop: true, params: { strength: P('Strength', 0, 1, 0.01, 0.4), gusts: P('Gusts', 0, 1, 0.01, 0.5) } },
   rain: { label: 'Rain', labelPl: 'Deszcz', cat: 'weather', loop: true, params: { intensity: P('Intensity', 0, 1, 0.01, 0.5) } },
@@ -38,6 +41,11 @@ export const SOUNDS = {
   hum: { label: 'Electric hum', labelPl: 'Buczenie prądu', cat: 'machine', loop: true, params: { freq: P('Mains (Hz)', 50, 60, 10, 50), level: P('Level', 0, 1, 0.01, 0.4) } },
 };
 export const SOUND_IDS = Object.keys(SOUNDS);
+// odległość pełnej głośności [m] dźwięku w miejscu (dalej cichnie jak 1/odległość): głośne słychać daleko, ciche —
+// z bliska; reszta 6 m
+export const REF = { explosion: 40, thunder: 60, gunshot: 25, hit: 12, impact: 8, splash: 10, bird: 10, ui: 3, door: 8, hydraulic: 8,
+  engine: 10, fire: 6, sea: 30, wind: 30, rain: 30, stream: 10, crickets: 10, city: 40, squeal: 15 };
+export const refOf = (id) => REF[id] || 6;
 export const defaults = (id) => Object.fromEntries(Object.entries((SOUNDS[id] || {}).params || {}).map(([k, v]) => [k, v[4]]));
 export function normalizeSound(d = {}) {
   const id = SOUNDS[d.sound] ? d.sound : 'explosion', P0 = SOUNDS[id].params, p = { ...defaults(id), ...(d.params || {}) };
@@ -172,6 +180,44 @@ const ONE = {
     for (const [dt, d] of [[0, 0.35], [0.6, 0.9]]) { const o = ctx.createOscillator(), g = ctx.createGain(), tt = t + dt; o.frequency.setValueAtTime(390 * k, tt); o.frequency.linearRampToValueAtTime(360 * k, tt + d);
       g.gain.setValueAtTime(0.0001, tt); g.gain.exponentialRampToValueAtTime(0.2, tt + 0.08); g.gain.exponentialRampToValueAtTime(0.0001, tt + d); o.connect(g); g.connect(out); o.start(tt); o.stop(tt + d + 0.05); }
     return 1.7;
+  },
+  door(ctx, out, t, p) {   // nowy: zamek i zawiasy; zamknięcie — uderzenie skrzydła o ramę (rezonans blachy / drewna)
+    const f = p.force, k = Math.round(p.kind), shut = p.action >= 0.5;
+    if (k === 2) {   // autobus: drzwi pneumatyczne — syk powietrza, przesuw, gumowe dobicie
+      burst(ctx, out, t, { freq: 5200, type: 'bandpass', q: 0.8, dur: 0.9, gain: 0.4 * (0.5 + f), attack: 0.02, sweep: 0.7 });
+      burst(ctx, out, t + 0.15, { kind: 'brown', freq: 260, dur: 0.9, gain: 0.25, attack: 0.15 });
+      if (shut) { noiseHit(ctx, out, t + 1, 160, 0.8, 0.12, 0.45 * f, 'lowpass'); partials(ctx, out, t + 1, [[95, 1, 0.12], [210, 0.5, 0.08]], 0.4 * f, 0.05, f); }
+      return 1.4;
+    }
+    if (k === 3) {   // drewniane: skrzypienie zawiasu (piła przez rezonans, falujący ton), stuk drewna
+      const len = shut ? 0.5 : 0.9, o = ctx.createOscillator(), bp = filt(ctx, 'bandpass', 1400, 9), g = ctx.createGain();
+      o.type = 'sawtooth'; o.frequency.setValueAtTime(38, t); for (let i = 1; i <= 8; i++) o.frequency.linearRampToValueAtTime(30 + Math.random() * 30, t + len * i / 8);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.35, t + 0.08); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+      o.connect(bp); bp.connect(g); g.connect(out); o.start(t); o.stop(t + len + 0.05);
+      if (shut) { partials(ctx, out, t + len, [[72, 1, 0.12], [148, 0.8, 0.07], [263, 0.6, 0.05], [417, 0.35, 0.035]], 0.9 * f, 0.15, f); noiseHit(ctx, out, t + len, 600, 1, 0.05, 0.5 * f); }
+      return len + 0.4;
+    }
+    // samochód (0) i właz (1): klamka i zamek, przy zamknięciu uderzenie blachy (właz — cięższy, niżej, dłużej)
+    const heavy = k === 1, lat = heavy ? [[620, 1, 0.08], [1480, 0.6, 0.05], [2900, 0.3, 0.03]] : [[1250, 1, 0.04], [2600, 0.7, 0.03], [4300, 0.4, 0.02]];
+    if (!shut) { partials(ctx, out, t, lat, 0.25, 0.1, 0.7); noiseHit(ctx, out, t + 0.03, heavy ? 1800 : 3200, 2, 0.04, 0.2);
+      if (heavy) burst(ctx, out, t + 0.1, { freq: 900, type: 'bandpass', q: 2, dur: 0.7, gain: 0.08, attack: 0.1 });   // zawias włazu
+      return 0.6; }
+    burst(ctx, out, t, { kind: 'brown', freq: heavy ? 180 : 320, dur: heavy ? 0.6 : 0.35, gain: 0.7 * f, attack: 0.003, rate: 1 });   // powietrze i uderzenie
+    partials(ctx, out, t, heavy ? [[48, 1, 0.5], [97, 0.7, 0.35], [233, 0.4, 0.25], [520, 0.2, 0.15]] : [[95, 1, 0.18], [190, 0.6, 0.12], [410, 0.4, 0.08], [880, 0.2, 0.05]], 0.7 * f, 0.06, f);
+    partials(ctx, out, t + 0.012, lat, 0.3 * f, 0.1, f);   // zatrzask
+    return heavy ? 1 : 0.6;
+  },
+  hydraulic(ctx, out, t, p) {   // nowy: pompa (piła przez filtr, ton rośnie przy ruszeniu i opada na końcu), przepływ, blokada
+    const T = p.time, f0 = 140 * p.pitch, o = ctx.createOscillator(), o2 = ctx.createOscillator(), lp = filt(ctx, 'lowpass', 900 * p.pitch, 2), g = ctx.createGain();
+    o.type = 'sawtooth'; o2.type = 'square';
+    o.frequency.setValueAtTime(f0 * 0.6, t); o.frequency.linearRampToValueAtTime(f0, t + 0.25); o.frequency.setValueAtTime(f0, t + T - 0.2); o.frequency.linearRampToValueAtTime(f0 * 0.7, t + T);
+    o2.frequency.setValueAtTime(f0 * 0.6 * 2.01, t); o2.frequency.linearRampToValueAtTime(f0 * 2.01, t + 0.25); o2.frequency.setValueAtTime(f0 * 2.01, t + T - 0.2); o2.frequency.linearRampToValueAtTime(f0 * 1.4, t + T);
+    const g2 = gainN(ctx, 0.25); o2.connect(g2); g2.connect(lp); o.connect(lp); lp.connect(g); g.connect(out);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.16, t + 0.15); g.gain.setValueAtTime(0.16, t + T - 0.15); g.gain.exponentialRampToValueAtTime(0.0001, t + T);
+    o.start(t); o2.start(t); o.stop(t + T + 0.05); o2.stop(t + T + 0.05);
+    burst(ctx, out, t, { kind: 'pink', freq: 2200, type: 'bandpass', q: 1.2, dur: T, gain: 0.07, attack: 0.2, rate: 1 });   // olej w przewodach
+    if (p.lock > 0) { partials(ctx, out, t + T, [[55, 1, 0.28], [118, 0.6, 0.16], [390, 0.35, 0.18], [910, 0.15, 0.1]], 0.8 * p.lock, 0.08, p.lock); noiseHit(ctx, out, t + T, 420, 0.8, 0.06, 0.4 * p.lock, 'lowpass'); }   // blokada (aTrain: zderzak)
+    return T + 0.5;
   },
   ui(ctx, out, t, p) {   // Battle: click, bell, repair; alarm — nowy
     switch (Math.round(p.kind)) {

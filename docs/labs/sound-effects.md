@@ -18,6 +18,8 @@ ciągłe i tła na szynie otoczenia. Grupa dźwięku: muzyka ([`sound.md`](sound
 | trafienie | pancerz, siła | Battle (`hit`) + dzwonienie pancerza |
 | ptak | gatunek (wróbel, bogatka, kos, mewa, wrona, sowa), wysokość | nowy |
 | interfejs | klik, dzwonek, naprawa, alarm | Battle (`click`, `bell`, `repair`) + alarm |
+| drzwi / właz | rodzaj (samochód, właz, autobus — pneumatyka, drewniane), otwarcie / zamknięcie, siła | nowy: zamek, zawias, uderzenie skrzydła o ramę; dźwięki modeli |
+| hydraulika / serwo | czas, ton, blokada na końcu | nowy: pompa, olej w przewodach, blokada (aTrain: zderzak); podwozie, klapy |
 | wiatr ∿ | siła, porywy | nowy |
 | deszcz ∿ | natężenie | szum + krople (jak warstwa deszczu MusicKit) |
 | fale morza ∿ | siła, okres fali | nowy |
@@ -30,6 +32,10 @@ ciągłe i tła na szynie otoczenia. Grupa dźwięku: muzyka ([`sound.md`](sound
 | buczenie prądu ∿ | sieć 50 / 60 Hz, poziom | nowy |
 
 ∿ — dźwięk ciągły (Start / Stop, parametry na żywo); pozostałe — jednorazowe (Play, spacja; „Repeat every 2 s”).
+
+Kategoria **Mechanizmy** (drzwi, hydraulika) — dźwięki, które modele zgłaszają zdarzeniami (`onSound`,
+[`../audio/README.md`](../audio/README.md)). Każdy dźwięk ma w kicie odległość pełnej głośności (`REF`: wybuch 40 m,
+strzał 25 m, drzwi 8 m…) — w scenie cichnie z odległością od kamery.
 
 ## Tła miejsc
 

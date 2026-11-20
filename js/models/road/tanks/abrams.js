@@ -7,6 +7,7 @@ import * as THREE from '../../../../vendor/three/three.module.js';
 import { roundBox, sideExtrude, prism, capFan } from '../geom.js';
 import { roadMaterials, mattePaint, noiseMap, decal } from '../materials.js';
 import { makeTrack } from '../tracks.js';
+import { soundChannel, withSound } from '../../shared/sound-events.js';
 
 export const info = {
   id: 'abrams', name: 'M1A2 Abrams', role: 'Czołg podstawowy · 4 załogi · armata 120 mm',
@@ -19,6 +20,8 @@ export const info = {
   doorAt: { x: 2.3, z: 1.2 },            // przy lewej burcie, przy przednim błotniku
   gunPivot: { y: 1.93, z: 2.25 },        // czop armaty względem kadłuba (przy wieży na wprost)
   turretAt: { z: 0.35 },
+  // dźwięki (js/models/shared/sound-events.js): silnik (w oryginale turbina — tu tłokowy), właz — zamek, ciężkie dobicie
+  sounds: { engine: { cylinders: 8, idle: 700, redline: 3000 }, 'work-open': { sound: 'door', params: { kind: 1, action: 0 } }, 'work-shut': { sound: 'door', params: { kind: 1, action: 1, force: 0.8 } } },
 };
 
 const ZF = 3.97, ZB = -3.96;           // przód / tył kadłuba
@@ -243,6 +246,7 @@ export function build({ paint = info.paints[0][1], detail = 1, searchlight = fal
 
   // ---------- ruch: gąsienice, zawieszenie na podłożu, kołysanie kadłuba, wieża i armata, właz ----------
   const st = { y: 0, vy: 0, pitch: 0, vp: 0, roll: 0, vr: 0, last: 0, ax: 0, turret: 0, gun: 0, hatch: 0 };
+  const snd = soundChannel(info.sounds), hatchSnd = snd.motion('work', hatch);
   function update(t, dt, opts = {}) {
     dt = Math.min(dt, 0.05);
     const v = opts.speed || 0, w = opts.turn || 0, contact = opts.contact || (() => 0);
@@ -277,7 +281,7 @@ export function build({ paint = info.paints[0][1], detail = 1, searchlight = fal
     st.turret += Math.max(-0.8 * dt, Math.min(0.8 * dt, d)); turret.rotation.y = st.turret;
     st.gun += Math.max(-0.4 * dt, Math.min(0.4 * dt, tg - st.gun)); gun.rotation.x = -st.gun;
     // właz dowódcy
-    st.hatch += ((opts.work ? 1 : 0) - st.hatch) * Math.min(1, 3 * dt); hatch.rotation.x = -1.9 * st.hatch * st.hatch * (3 - 2 * st.hatch);
+    st.hatch += ((opts.work ? 1 : 0) - st.hatch) * Math.min(1, 3 * dt); hatchSnd.step(opts.work ? 1 : 0, st.hatch); hatch.rotation.x = -1.9 * st.hatch * st.hatch * (3 - 2 * st.hatch);
     // światła
     lamp.emissiveIntensity = opts.lights ? 3 : 0; spot.intensity = opts.lights ? 50 : 0;
     if (sl) { sl.lens.emissiveIntensity = opts.searchlight ? 8 : 0; sl.beam.intensity = opts.searchlight ? 40000 : 0; }
@@ -285,10 +289,10 @@ export function build({ paint = info.paints[0][1], detail = 1, searchlight = fal
   }
   update(0, 0.016, {});
   group.traverse((o) => { if (o.isMesh && o.geometry && !o.geometry.boundingSphere) o.geometry.computeBoundingSphere(); });
-  return {
+  return withSound({
     def: info, group, body, turret, gun, hatch, searchlight: sl, parts: { body, turret, gun, hatch, sides, tracks: sides },
     materials: { armour: A, armourDark: Ad, nonskid }, update, rig: { state: st },
     setPaint(c) { for (const [m, k] of [[A, 1], [Ad, 0.84], [nonskid, 0.8]]) { const x = mattePaint(new THREE.Color(c).multiplyScalar(k).getHex(), { dirt: 0.18, rough: 0.86, seed: 5 }); m.map = x.map; m.needsUpdate = true; } },
     dispose() { group.traverse((o) => { if (o.isMesh) o.geometry.dispose(); }); },
-  };
+  }, snd);
 }

@@ -3,6 +3,26 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.86.0 · pojazdy — ląd 1.23.0 · efekty dźwiękowe 1.1.0 · edytor sceny 0.42.0 — 2026-11-20 (dźwięki modeli)
+
+### Dodane
+- **Dźwięki modeli jako zdarzenia** (`js/models/shared/sound-events.js`): model nie gra dźwięku, zgłasza ruch części
+  (`onSound`: drzwi zaczynają się otwierać, podwozie doszło do końca…), a opis dźwięku ma w swoich danych
+  (`info.sounds`). Słucha laboratorium albo gra (`js/audio/model-sounds.js`; w edytorze sceny — ▶ Graj).
+  Polonez: zamek i trzaśnięcie drzwi; Urbino 18: syk drzwi pneumatycznych; Abrams: właz; Spitfire: hydraulika
+  i blokada podwozia, klapy, owiewka.
+- Dane silników w modelach (`info.sounds.engine`: cylindry, obroty, napęd elektryczny) — Polonez, Abrams, Spitfire,
+  Błyskawica, Orzeł, barka; Urbino 18, nurek i łaziki — elektryczne. Dźwięk silnika w scenie bierze je stąd.
+- SfxKit: **drzwi / właz** (samochód, właz, autobus, drewniane; otwarcie, zamknięcie) i **hydraulika / serwo** (czas,
+  ton, blokada) w nowej kategorii Mechanizmy; odległość pełnej głośności każdego dźwięku (`REF`) w kicie.
+- Laboratorium pojazdów lądowych słucha modeli (część robocza, podwozie, klapy).
+- ▶ Graj: część robocza modelu (drzwi, właz, owiewka, rampa) jako akcja **work** jazdy, lotu i małej jednostki.
+- Edytor sceny: **podgląd zasięgu dźwięku** — przy zaznaczonym obiekcie z dźwiękiem dwie kule (pełna głośność
+  i granica 10%), suwak **Zasięg dźwięku** w oknie Właściwości (pole `soundRange`, także w API).
+
+### Zmienione
+- Urbino 18 jest elektryczny — w 0.85.0 grał jak diesel.
+
 ## Program 0.85.0 · edytor sceny 0.41.0 — 2026-11-20 (dźwięk w scenie)
 
 ### Dodane

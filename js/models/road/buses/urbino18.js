@@ -7,6 +7,7 @@
 import * as THREE from '../../../../vendor/three/three.module.js';
 import { roundBox, sideExtrude, wheel } from '../geom.js';
 import { roadMaterials, sidewallMap, fabricMap, textMap, noiseMap, decal } from '../materials.js';
+import { soundChannel, withSound } from '../../shared/sound-events.js';
 
 export const info = {
   id: 'urbino18', name: 'Solaris Urbino 18 electric', role: 'Autobus przegubowy MZA · 4 pary drzwi · ok. 140 miejsc',
@@ -20,6 +21,8 @@ export const info = {
   joint: -4.5,                                 // obrotnica przegubu (z w członie przednim)
   axle3: -4.5,                                 // oś 3 za obrotnicą
   rearLength: 7.845, frontLength: 10.155,
+  // dźwięki (js/models/shared/sound-events.js): napęd elektryczny, drzwi pneumatyczne (syk przy ruszeniu)
+  sounds: { engine: { electric: true }, 'door-open': { sound: 'door', params: { kind: 2, action: 0 } }, 'door-close': { sound: 'door', params: { kind: 2, action: 1, force: 0.6 } } },
 };
 
 const HW = 1.275, ZF = 5.655, ZFB = -4.2;      // połowa szerokości, przód i koniec członu przedniego
@@ -251,6 +254,7 @@ export function build({ paint = info.paints[0][1], detail = 1 } = {}) {
   const inner2 = new THREE.PointLight(0xfff4e0, 0, 10, 1.5); inner2.position.set(0, 2.2, -3.5); rear.add(inner2);
 
   // ---------- ruch: przegub (kinematyka), zawieszenie pneumatyczne, drzwi, światła ----------
+  const snd = soundChannel(info.sounds), doorSnd = snd.motion('door', doors[0] ? doors[0].g : front);   // dźwięk: przednie drzwi
   const st = { phi: 0, y: 0, vy: 0, p: 0, vp: 0, r: 0, vr: 0, ry: 0, rvy: 0, rp: 0, rvp: 0, rr: 0, rvr: 0, door: 0, last: 0, ax: 0, blink: 0 };
   const steerMax = 0.72, L1 = AX[0] - AX[1], C = AX[1] - ZJ, L2 = -AX3;
   const spring = (k, c, vel, x, target) => (target - x) * k - vel * c;
@@ -293,7 +297,7 @@ export function build({ paint = info.paints[0][1], detail = 1 } = {}) {
       W.group.position.y = WR + Math.max(-0.08, Math.min(0.08, hs[i] - body));
     });
     // drzwi: odskok na zewnątrz, potem przesuw wzdłuż burty
-    st.door += ((opts.work ? 1 : 0) - st.door) * Math.min(1, 2.5 * dt);
+    st.door += ((opts.work ? 1 : 0) - st.door) * Math.min(1, 2.5 * dt); doorSnd.step(opts.work ? 1 : 0, st.door);
     const o1 = Math.min(1, st.door * 2), o2 = Math.max(0, st.door * 2 - 1);
     for (const d of doors) { d.g.position.x = -HW - 0.01 - 0.09 * o1; d.g.position.z = d.zc + d.dir * (d.w - 0.08) * o2 * 0.92; }
     // światła
@@ -306,11 +310,11 @@ export function build({ paint = info.paints[0][1], detail = 1 } = {}) {
   }
   update(0, 0.016, {});
   group.traverse((o) => { if (o.isMesh && o.geometry && !o.geometry.boundingSphere) o.geometry.computeBoundingSphere(); });
-  return {
+  return withSound({
     def: info, group, body: front, front, rear, rearPivot, wheels, parts: { front, rear, wheels: wheels.map((w) => w.group) },
     materials: M, update, rig: { state: st },
     articulation: () => st.phi,
     setPaint(c) { yellow.color.set(c); },
     dispose() { group.traverse((o) => { if (o.isMesh) o.geometry.dispose(); }); },
-  };
+  }, snd);
 }

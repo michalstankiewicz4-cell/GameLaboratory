@@ -134,6 +134,11 @@ Polecenia (`help`, `describe`, `prefabs`, `assets`, `add`, `set`, `move`, `remov
   `seaside`, `storm`, `night`, `campfire`) albo zasób `sound` / `ambience` z laboratorium efektów dźwiękowych; '' — bez.
   W ▶ Graj gra w miejscu obiektu i idzie za nim (jednorazowe — co kilka sekund). Okno Właściwości: lista **Dźwięk**;
   API: `set { sound }`; lekarz sceny: brakujący zapisany dźwięk.
+- **Zasięg** (`soundRange`, m): odległość pełnej głośności; dalej cichnie (ok. 8,5 × dalej — 10%). Bez pola —
+  domyślny rodzaju dźwięku (`rangeOf`: SfxKit `REF`, tło miejsca 15 m). Edytor pokazuje go przy zaznaczonym obiekcie
+  dwiema kulami (wewnętrzna — pełna głośność, zewnętrzna — 10%, `editor/js/world/sound-range.js`), suwak **Zasięg
+  dźwięku** w oknie Właściwości; API `set { soundRange }` (0 — domyślny).
+- Dźwięki modeli (drzwi, właz, podwozie — `onSound`) w ▶ Graj: `sounds.model(e)` ([../audio/README.md](../audio/README.md)).
 - Silniki z zachowań (`ENGINES`): jazda (biegi), okręt, mała jednostka, lot, przeładowarka — dźwięk silnika z obrotami
   i obciążeniem z prędkości i dźwigni; łaziki i nurek — buczenie napędu elektrycznego; ciąg w próżni i lądowanie —
   huk ognia z mocą; rozbicie — wybuch.

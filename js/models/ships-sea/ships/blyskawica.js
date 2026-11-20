@@ -11,6 +11,7 @@ import * as P from '../parts.js';
 export const info = {
   id: 'blyskawica',
   name: 'ORP Błyskawica',
+  sounds: { engine: { cylinders: 12, idle: 600, redline: 1400 } },   // dźwięk silnika (js/models/shared/sound-events.js); w oryginale turbiny parowe
   year: '1937 (as built)',
   type: 'Destroyer, Grom class',
   builder: 'J. Samuel White & Co., Cowes (Isle of Wight); launched 1 Oct 1936, commissioned 25 Nov 1937',

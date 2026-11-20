@@ -5,6 +5,8 @@ import { LIGHTS, readProfiles } from '../world/world.js';
 import { listAssets, ASSET_KINDS } from '../../../js/scene/assets.js';
 import { FX_KINDS, FX_BADGES } from '../../../js/render/effects/effects.js';
 import { SOUNDS, AMBIENCES, CATS } from '../../../js/audio/sfx/sfxkit.js';
+import { rangeOf } from '../../../js/scene/sounds.js';
+import { audible } from '../../../js/audio/mixer.js';
 import { skyPresets, SKY_PRESET, SKY_DAY } from '../../../js/scene/space.js';
 import { BEHAVIORS, behaviorsFor, behaviorOf, ORBIT_PERIOD } from '../../../js/scene/behaviors.js';
 
@@ -172,6 +174,9 @@ export function createPanels(store, actions) {
         ...(sp.length ? [el('optgroup', { label: t('obj.soundSavedPlaces') }, ...sp.map((n) => opt(n, n)))] : []),
         ...(cur && !SOUNDS[cur] && !AMBIENCES[cur] && !sv.includes(cur) && !sp.includes(cur) ? [opt(cur, t('env.seaMissing', { name: cur }))] : []));
       $('oSound').value = cur; $('oSound').disabled = document.body.classList.contains('playing');
+      // zasięg: odległość pełnej głośności (kule w widoku); domyślny — z rodzaju dźwięku
+      const r = rangeOf(o); $('oSoundRangeRow').hidden = $('oSoundRangeNote').hidden = r == null;
+      if (r != null) { $('oSoundRange').value = Math.min(200, r); $('oSoundRangeOut').textContent = `${+r.toFixed(1)} m`; $('oSoundRangeNote').textContent = t('obj.soundRangeNote', { r: +r.toFixed(1), auto: o.soundRange ? '' : t('obj.soundRangeAuto'), far: Math.round(audible(r)) }); $('oSoundRange').disabled = document.body.classList.contains('playing'); }
     }
     // zasób modelu (prefabrykat z assetKind, np. bryła z laboratorium bloków): zapisane pod nazwą albo model domyślny
     const pk = prefab(o.prefab), ak = pk && pk.assetKind; $('oAssetRow').hidden = !ak;
@@ -215,6 +220,7 @@ export function createPanels(store, actions) {
   $('oBehavior').addEventListener('change', () => { const o = store.selected; if (o) store.update(o.id, { behavior: $('oBehavior').value }); });
   $('oShot').addEventListener('change', () => { const o = store.selected; if (o) store.update(o.id, { shot: $('oShot').value }); });
   $('oSound').addEventListener('change', () => { const o = store.selected; if (o) store.update(o.id, { sound: $('oSound').value }); });
+  $('oSoundRange').addEventListener('input', () => { const o = store.selected; if (o) store.update(o.id, { soundRange: +$('oSoundRange').value }); });
   $('oAsset').addEventListener('change', () => { const o = store.selected; if (o) actions.build(() => store.update(o.id, { asset: $('oAsset').value })); });
   $('orbitAround').addEventListener('change', () => { const o = store.selected; if (o) store.update(o.id, { orbit: { ...(o.orbit || {}), around: $('orbitAround').value } }); });
   $('orbitPeriod').addEventListener('input', () => { const o = store.selected, v = parseFloat($('orbitPeriod').value); if (o && v > 0) store.update(o.id, { orbit: { ...(o.orbit || {}), period: v } }); });

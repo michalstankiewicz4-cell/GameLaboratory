@@ -19,6 +19,10 @@
 //   stream             MediaStream całości (nagrywanie: MediaRecorder)
 export const BUSES = ['music', 'ambience', 'sfx', 'voice'];
 export const BUS_LABELS = { master: ['Master', 'Ogólna'], music: ['Music', 'Muzyka'], ambience: ['Ambience', 'Otoczenie'], sfx: ['Effects', 'Efekty'], voice: ['Speech', 'Mowa'] };
+// dźwięk w miejscu: głośność ref / (ref + ROLLOFF · (d − ref)) — pełna do ref [m], dalej maleje; audible(ref, poziom) —
+// odległość, na której zostaje dany ułamek głośności (domyślnie 10%: granica słyszalności w podglądzie zasięgu)
+export const ROLLOFF = 1.2;
+export const audible = (ref, level = 0.1) => ref + (ref / level - ref) / ROLLOFF;
 export const AUDIO_DEFAULTS = { master: 0.8, music: 0.7, ambience: 0.8, sfx: 0.9, voice: 1, mute: false };
 
 let M = null;
@@ -82,7 +86,7 @@ export function mixer() {
         L.upX.setValueAtTime(up[0], t); L.upY.setValueAtTime(up[1], t); L.upZ.setValueAtTime(up[2], t);
       } else { L.setPosition(...pos); L.setOrientation(...fwd, ...up); }
     },
-    at(pos, name = 'sfx', { ref = 3, rolloff = 1.2, max = 2000 } = {}) {
+    at(pos, name = 'sfx', { ref = 3, rolloff = ROLLOFF, max = 2000 } = {}) {
       ensure();
       const p = ctx.createPanner(); p.panningModel = 'HRTF'; p.distanceModel = 'inverse'; p.refDistance = ref; p.rolloffFactor = rolloff; p.maxDistance = max;
       M.move(p, pos); p.connect(M.bus(name)); return p;

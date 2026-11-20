@@ -22,7 +22,7 @@ const COMMANDS = {
   describe: { args: '', does: 'the whole scene as data (format gamelab-scene) and a short summary' },
   prefabs: { args: '[family]', does: 'the models that can be added: id, name, family, where it stands, behaviours, and the kind of asset it takes (asset)' },
   add: { args: 'prefab, [name], [pos [x,y,z] m], [rot [pitch,heading,roll] °], [scale], [behavior], [asset], [shot], [sound]', does: 'adds a model; returns its id (asset — a named asset of the kind the model takes, e.g. a block body from the blocks lab)' },
-  set: { args: 'id | name, then any of: newName (with id also name), prefab, pos, rot, scale, behavior, orbit { around: id | name ("" — the nearest heavier body), period: s } (the orbit behaviour), asset (a named asset of the kind the model takes; "" — the default model), shot (a ship that shoots: the look of its shots — an effect id or a saved effect from the effects lab; "" — the shot), sound (a sound at the object during play: a ready sound — fire, engine, bird…, a ready place ambience — forest, park, seaside, storm, night, campfire, or a sound / ambience asset from the sound effects lab; "" — none)', does: 'changes an object' },
+  set: { args: 'id | name, then any of: newName (with id also name), prefab, pos, rot, scale, behavior, orbit { around: id | name ("" — the nearest heavier body), period: s } (the orbit behaviour), asset (a named asset of the kind the model takes; "" — the default model), shot (a ship that shoots: the look of its shots — an effect id or a saved effect from the effects lab; "" — the shot), sound (a sound at the object during play: a ready sound — fire, engine, bird…, a ready place ambience — forest, park, seaside, storm, night, campfire, or a sound / ambience asset from the sound effects lab; "" — none), soundRange (m: full volume up to it, then it fades — about 8.5× further it is at 10%; 0 — the default of the sound)', does: 'changes an object' },
   move: { args: 'id | name, by [dx,dy,dz] m', does: 'moves an object by an offset' },
   remove: { args: 'id | name', does: 'removes an object' },
   env: { args: 'any of: surface (sea | land | space | underground — inside a cave), cave (underground: a cave asset name from the cave lab, "" — the default cave), caveGlow (underground: true — a faint glow to see the cave, false — true darkness), light (a ready light or a weather asset name), look, ui (a game UI asset name, "" — none), land (a land asset name, "" — the plain ground), sea (a sea asset name, "" — the default sea), sky (any surface: "" — the default for the surface, "day" — the day sky, "preset:<id>" — a ready space sky, or a sky asset name)', does: 'changes the environment' },
@@ -89,6 +89,9 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
       if (n !== '' && hooks.soundNames && !all.includes(n)) fail(`sound: one of ${all.join(', ')}; "" — none`);
       p.sound = n;
     }
+    if (c.soundRange != null) {   // zasięg dźwięku [m] — odległość pełnej głośności; 0 — domyślny rodzaju
+      p.soundRange = num(c.soundRange, 'soundRange'); if (p.soundRange < 0 || p.soundRange > 2000) fail('soundRange: 0…2000 m (0 — the default of the sound)');
+    }
     if (c.orbit != null) {   // zachowanie „orbita”: { around: id albo nazwa obiektu ("" — sam wybiera), period: s }
       const o = c.orbit, x = {};
       if (o.around != null) x.around = o.around === '' ? '' : target(typeof o.around === 'string' && !store.scene.objects.some((q) => q.id === o.around) ? { name: o.around } : { id: o.around }).id;
@@ -99,7 +102,7 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
   }
   // punkt: [x, y, z] m albo obiekt (id albo nazwa) — jego położenie teraz (w grze: tam, gdzie go niesie zachowanie)
   const place = (p, f) => (Array.isArray(p) ? vec3(p, f) : (() => { const o = target(store.scene.objects.some((q) => q.id === p) ? { id: p } : { name: p }); return hooks.objectPos ? hooks.objectPos(o) : o.pos; })());
-  const summary = (o) => ({ id: o.id, name: o.name, prefab: o.prefab, pos: o.pos, rot: o.rot, scale: o.scale, ...(o.behavior != null ? { behavior: o.behavior } : {}), ...(o.orbit ? { orbit: o.orbit } : {}), ...(o.asset ? { asset: o.asset } : {}), ...(o.shot ? { shot: o.shot } : {}), ...(o.sound ? { sound: o.sound } : {}) });
+  const summary = (o) => ({ id: o.id, name: o.name, prefab: o.prefab, pos: o.pos, rot: o.rot, scale: o.scale, ...(o.behavior != null ? { behavior: o.behavior } : {}), ...(o.orbit ? { orbit: o.orbit } : {}), ...(o.asset ? { asset: o.asset } : {}), ...(o.shot ? { shot: o.shot } : {}), ...(o.sound ? { sound: o.sound } : {}), ...(o.soundRange ? { soundRange: o.soundRange } : {}) });
 
   const run1 = {
     help: () => ({ commands: COMMANDS, notes: 'Units: metres, degrees. Y is up; heading 0 looks along +Z. An object is named by "id" or "name". A list of commands runs in order.' }),

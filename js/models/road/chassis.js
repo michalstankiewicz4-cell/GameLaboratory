@@ -49,7 +49,7 @@ export function makeRig({ wheels, body, wheelbase, track, lamps, door, steerMax 
       lamps.set({ lights: L, brake: br, reverse: rev, left: (opts.indicator === 'left' || opts.indicator === 'hazard') && on, right: (opts.indicator === 'right' || opts.indicator === 'hazard') && on });
     }
     // drzwi kierowcy
-    if (door) { st.door += ((opts.work ? 1 : 0) - st.door) * Math.min(1, 4 * dt); door.set(st.door); }
+    if (door) { st.door += ((opts.work ? 1 : 0) - st.door) * Math.min(1, 4 * dt); door.set(st.door, opts.work ? 1 : 0); }   // drugi argument: cel (dźwięk drzwi)
   }
   return { update, state: st };
 }

@@ -37,6 +37,7 @@ export function createPlay(store, world, controls, actions, events) {
   const sounds = createSceneSounds({ positionOf });
   world.onShot = (o, s) => sounds.shot(s, o.shot || 'shot');   // strzał statku (ShipKit onShot) — także poza grą
   world.onDamage = (o, e) => sounds.damage(e);   // wybuch statku (ShipKit onDamage { type: 'blast' })
+  world.onSound = (o, e) => sounds.model(e);   // dźwięk modelu (onSound: drzwi, właz, podwozie, klapy)
   let lightT = 0, fpsN = 0, fpsT = 0;
   playUI.onQuit = () => stop();
   // akcje modelu (statki kosmiczne: ogień, skan, druk, wyłączenie, zniszczenie) — zdarzenie „action” na szynie; słucha

@@ -35,6 +35,16 @@ function junkModel(built) {
 }
 
 const D2R = Math.PI / 180;
+// część robocza modelu (info.work: drzwi kierowcy, właz, owiewka, rampa…): akcja „work” — przełącznik; model rusza
+// nią w update(opts.work) i zgłasza jej dźwięk (onSound)
+function workPart(k) {
+  const label = ((k && (k.def || k.info)) || {}).work; let on = false;
+  return {
+    get on() { return on; },
+    actions: () => (label ? [{ id: 'work', label, kind: 'toggle', on }] : []),
+    act(id, v) { if (id === 'work' && label) on = v == null ? !on : !!v; },
+  };
+}
 const quatOf = (q, o = new THREE.Quaternion()) => o.set(q[1], q[2], q[3], q[0]);   // [w, x, y, z] → THREE
 
 // liczby ruchu okrętów (gdy model ich nie podaje): masa [kg], moc na śrubach [W], prędkość maksymalna [m/s]
@@ -86,7 +96,7 @@ export const BEHAVIORS = {
       const sim = createFlight(F, mass, { p: [obj.pos[0], onGround ? rest.y : obj.pos[1], obj.pos[2]], yaw: obj.rot[1] * D2R, pitch: onGround ? -rest.pitch : 0 });
       const s = sim.state, root = built.root;
       if (!onGround) { const fwd = sim.qRot(s.q, [0, 0, 1]), v0 = (info.maxSpeed || 120) * 0.6; s.v = fwd.map((x) => x * v0); }   // w powietrzu: start w locie
-      let thr = onGround ? 0 : 0.7, tAcc = 0;
+      let thr = onGround ? 0 : 0.7, tAcc = 0; const work = workPart(k);
       return {
         state: s,
         step(dt, c) {
@@ -97,9 +107,10 @@ export const BEHAVIORS = {
           const gh = world.groundAt || (() => 0);   // teren z laboratorium lądu albo poziom 0
           for (let i = 0; i < n; i++) sim.step(h, ctrl, gh);
           root.position.fromArray(s.p); quatOf(s.q, root.quaternion);
-          tAcc += dt; if (k.update) k.update(tAcc, dt, { ...ctrl, gear: ctrl.gear === 1, speed: s.V });   // śmigło, stery, podwozie
+          tAcc += dt; if (k.update) k.update(tAcc, dt, { ...ctrl, gear: ctrl.gear === 1, speed: s.V, work: work.on ? 1 : 0 });   // śmigło, stery, podwozie, owiewka
         },
         // po „Stop”: części modelu jak na postoju (podwozie wypuszczone, klapy schowane, śmigło stoi)
+        actions: work.actions, act: work.act,
         reset() { if (k.update) for (let i = 0; i < 200; i++) k.update(0, 0.05, { throttle: 0, gear: true, flaps: 0 }); },
         hud: () => ({ speed: s.ias * 3.6, unit: 'km/h', alt: s.p[1], throttle: thr, stall: s.stall, crashed: s.crashed, onGround: s.onGround }),
       };
@@ -115,7 +126,7 @@ export const BEHAVIORS = {
       const s = sim.state, root = built.root;
       // grunt i woda ze sceny bazowej: teren z laboratorium lądu, płaski grunt; na morzu dno głęboko — auto tonie i staje
       const ground = { height: (x, z) => { const h = world.terrainAt ? world.terrainAt(x, z) : 0; return h == null ? 0 : h; }, water: (x, z) => (world.waterLevel ? world.waterLevel(x, z) : null) };
-      let tAcc = 0, pedal = 0;
+      let tAcc = 0, pedal = 0; const work = workPart(k);
       return {
         state: s,
         step(dt, c) {
@@ -126,11 +137,12 @@ export const BEHAVIORS = {
           root.position.set(s.x, gy, s.z); root.rotation.set(0, s.yaw, 0, 'YXZ');
           const cy = Math.cos(s.yaw), sy = Math.sin(s.yaw);
           tAcc += dt;
-          if (k.update) k.update(tAcc, dt, { speed: s.speed, steer: input.steer, turn: (s.yaw - yaw0) / Math.max(1e-4, dt),
+          if (k.update) k.update(tAcc, dt, { speed: s.speed, steer: input.steer, turn: (s.yaw - yaw0) / Math.max(1e-4, dt), work: work.on ? 1 : 0,
             contact: (x, z) => ground.height(s.x + x * cy + z * sy, s.z - x * sy + z * cy) - gy });   // koła, zawieszenie, światła hamowania
         },
         hud: () => ({ speed: s.speed * 3.6, unit: 'km/h', throttle: pedal, aground: s.depth > 0.5 }),   // aground: w wodzie
-        reset() { if (k.update) k.update(0, 0.05, { speed: 0, steer: 0, turn: 0 }); },
+        actions: work.actions, act: work.act,   // drzwi kierowcy, właz
+        reset() { if (k.update) for (let i = 0; i < 100; i++) k.update(0, 0.05, { speed: 0, steer: 0, turn: 0 }); },
       };
     },
   },
@@ -146,7 +158,7 @@ export const BEHAVIORS = {
       // woda (z falami) i grunt / dno ze sceny bazowej; bez wody — sam grunt (amfibia jedzie, reszta leży)
       const env = { surface: (x, z) => { const w = world.waterAt ? world.waterAt(x, z) : 0; return w == null ? -1e9 : w; },
         floor: (x, z) => { const g = world.terrainAt ? world.terrainAt(x, z) : -30; return g == null ? -1e9 : g; } };
-      let tAcc = 0, dive = 0, lever = 0;
+      let tAcc = 0, dive = 0, lever = 0; const work = workPart(k);
       return {
         state: s,
         step(dt, c) {
@@ -156,10 +168,11 @@ export const BEHAVIORS = {
           root.position.set(s.x, 0, s.z); root.rotation.set(0, s.yaw, 0);
           tAcc += dt;
           if (k.update) k.update(tAcc, dt, { pose: { y: s.y, pitch: s.pitch, roll: s.roll, lift: s.lift, depth: s.depth, onLand: s.onLand, vd: -s.vy },
-            speed: s.speed, steer: input.steer, dive });
+            speed: s.speed, steer: input.steer, dive, work: work.on ? 1 : 0 });
         },
         hud: () => ({ speed: s.speed * 1.94384, unit: 'kn', throttle: lever, alt: def.maxDepth ? -s.depth : undefined, aground: s.onLand > 0.5 }),   // nurek: wysokość = −głębokość
-        reset() { if (k.update) k.update(0, 0.05, {}); },
+        actions: work.actions, act: work.act,   // rampa, próbnik
+        reset() { if (k.update) for (let i = 0; i < 100; i++) k.update(0, 0.05, {}); },
       };
     },
   },

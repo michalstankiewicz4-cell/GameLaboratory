@@ -15,6 +15,7 @@ import * as P from '../parts.js';
 export const info = {
   id: 'orzel',
   name: 'ORP Orzeł',
+  sounds: { engine: { cylinders: 8, idle: 600, redline: 1150 } },   // dźwięk silnika (js/models/shared/sound-events.js): diesle
   year: '1939 (as delivered)',
   type: 'Submarine, Orzeł class (ocean-going, double hull)',
   builder: 'N.V. Koninklijke Maatschappij De Schelde, Vlissingen (yard no. 205); laid down 14 Aug 1936, launched 15 Jan 1938, commissioned 2 Feb 1939',

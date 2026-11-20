@@ -49,6 +49,7 @@ export function createWorld(container, store, onWarn) {
       local: lb.isEmpty() ? null : { min: lb.min.toArray(), max: lb.max.toArray() }, cost: costOf(g) });
     root.add(g);
     wireShots(o, b.kit);
+    if (b.kit && 'onSound' in b.kit) b.kit.onSound = (e) => { if (world.onSound) world.onSound(o, e); };   // dźwięki modelu (drzwi, podwozie…)
   }
   // koszt modelu: trójkąty (instancje razem) i wywołania rysowania (siatka × grupy materiałów)
   function costOf(g) {
@@ -242,7 +243,7 @@ export function createWorld(container, store, onWarn) {
   }
   const world = {
     renderer, scene, camera, root, built, stage, look, pending, syncObjects, syncPlaces, syncEnv, bounds, effect,
-    onShot: null, onDamage: null,   // (obiekt, strzał | uszkodzenie statku) → dźwięk (editor/js/play/play.js)
+    onShot: null, onDamage: null, onSound: null,   // (obiekt, strzał | uszkodzenie statku | dźwięk modelu) → dźwięk (editor/js/play/play.js)
     gameGfx: null,   // ▶ Graj: settings.gfx gracza (js/core/settings.js) — potok kamery z nimi; null — wygląd edytora
     clearEffects: () => fxLib.dispose(), forgetEffect: (n) => fxLib.forget(n),
     objectRoot: (id) => (built.get(id) || {}).root || null,

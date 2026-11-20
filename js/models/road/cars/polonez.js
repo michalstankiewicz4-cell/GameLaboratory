@@ -9,6 +9,7 @@ import * as THREE from '../../../../vendor/three/three.module.js';
 import { curve, lin, smooth, loftParts, offsetAlongNormals, ribbon, roundBox, sweepFlat, capFan, fixOutward, wheel } from '../geom.js';
 import { roadMaterials, plateMaterial, decal } from '../materials.js';
 import { makeRig } from '../chassis.js';
+import { soundChannel, withSound } from '../../shared/sound-events.js';
 
 export const info = {
   id: 'polonez', name: 'FSO Polonez 1500', role: 'Liftback, 5 drzwi, 5 miejsc · FSO Warszawa, 1978',
@@ -18,6 +19,8 @@ export const info = {
   paints: [['Czerwony', 0x8e1c1a], ['Kość słoniowa', 0xd9cba6], ['Biały', 0xe4e2db], ['Niebieski', 0x274a7c], ['Zielony', 0x37503b], ['Brąz', 0x523523], ['Srebrny', 0xa9adb0]],
   seat: { x: 0.36, y: 0.62, z: -0.05 },   // miejsce kierowcy (wsiadanie)
   doorAt: { x: 1.25, z: 0.45 },           // gdzie stanąć, by wsiąść (lewa strona)
+  // dźwięki (js/models/shared/sound-events.js): silnik 4-cylindrowy, drzwi — zamek przy otwarciu, trzaśnięcie
+  sounds: { engine: { cylinders: 4, idle: 850, redline: 5600 }, 'door-open': { sound: 'door', params: { kind: 0, action: 0 } }, 'door-shut': { sound: 'door', params: { kind: 0, action: 1, force: 0.7 } } },
 };
 
 const ZF = 2.05, ZR = -2.05;                     // przód / tył blach nadwozia (zderzaki wystają do ±2.136)
@@ -190,7 +193,8 @@ export function build({ paint = info.paints[0][1], plate = 'WAP 1978', detail = 
   const arm = add(mir, roundBox(0.09, 0.025, 0.04, 0.01, 0.004), M.black, 'mirror arm'); arm.position.set(0.04, 0, 0);
   const head = add(mir, roundBox(0.15, 0.09, 0.06, 0.03, 0.008), M.black, 'mirror housing'); head.position.set(0.12, 0.02, 0);
   const mglass = add(mir, new THREE.PlaneGeometry(0.13, 0.07), M.chrome, 'mirror glass'); mglass.position.set(0.12, 0.02, -0.036); mglass.rotation.y = Math.PI;
-  const doorCtl = { set(t) { door.rotation.y = -1.15 * smooth(t); } };
+  const snd = soundChannel(info.sounds), doorSnd = snd.motion('door', door);
+  const doorCtl = { set(t, target) { door.rotation.y = -1.15 * smooth(t); doorSnd.step(target, t); } };
 
   // ---------- linie podziału blach (wstęgi 4 mm, ciemne) ----------
   const ptOn = (z, b, f = 0, side = 1) => { const P = section(z), a = P[b], c = P[Math.min(13, b + 1)]; return new THREE.Vector3(side * (a[0] + (c[0] - a[0]) * f), a[1] + (c[1] - a[1]) * f, z); };
@@ -335,10 +339,10 @@ export function build({ paint = info.paints[0][1], plate = 'WAP 1978', detail = 
 
   // nazwy części do doktora i list: wszystkie siatki mają nazwy; grupy z userData.part
   group.traverse((o) => { if (o.isMesh && o.geometry && !o.geometry.boundingSphere) o.geometry.computeBoundingSphere(); });
-  return {
+  return withSound({
     def: info, group, body, wheels, door, parts: { wheels: wheels.map((w) => w.group), body, door },
     materials: M, update: rig.update, rig,
     setPaint(c) { M.paint.color.set(c); },
     dispose() { group.traverse((o) => { if (o.isMesh) { o.geometry.dispose(); } }); },
-  };
+  }, snd);
 }

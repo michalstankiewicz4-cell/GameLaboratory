@@ -14,6 +14,7 @@ import { createSceneApi } from '../../js/scene/api.js';
 import { behaviorsFor, behaviorOf, bodyRank, BEHAVIORS } from '../../js/scene/behaviors.js';
 import { checkScene } from '../../js/scene/doctor.js';
 import { allSoundNames } from '../../js/scene/sounds.js';
+import { createSoundRange } from './world/sound-range.js';
 import { createDoctorPanel } from './ui/doctor-panel.js';
 import { onAssetsChange, listAssets, ASSET_KINDS } from '../../js/scene/assets.js';
 import { emptyScene, makeObject } from '../../js/scene/scene-data.js';
@@ -115,7 +116,8 @@ onAssetsChange(() => { panels.renderProps(); world.syncEnv(); world.syncObjects(
 step(t('load.models'), 0.3);
 world.syncObjects(); world.syncEnv(); controls.attach(); panels.renderTree(); panels.renderProps(); controls.frameAll();
 step(t('load.first'), 0.95);
-world.start((dt, time) => { actions.play.frame(dt, time); placer.frame(dt); controls.update(); });
+const soundRange = createSoundRange(world, store);   // kule zasięgu dźwięku zaznaczonego obiektu
+world.start((dt, time) => { actions.play.frame(dt, time); placer.frame(dt); controls.update(); soundRange.frame(actions.play.playing); });
 requestAnimationFrame(() => window.LabLoad && window.LabLoad.done());
 // gotowe tła kosmosu na liście Niebo (też nad morzem i lądem): kity ze Space w tle, chwilę po starcie
 setTimeout(() => { if (!spaceReady()) loadSpace().then(() => panels.renderProps()).catch(() => {}); }, 2500);

@@ -126,6 +126,7 @@ function lamp(g, m, x, y, z, dirZ = 1) {
 const VEHICLES = [
   { id: "scout", name: "SCOUT", role: "Explores and maps: six wheels on rockers, a camera mast, solar deck.",
     length: 3.4, width: 2.7, height: 2.6, maxSpeed: 16, accel: 4, turnRadius: 4, cargo: 0.2, work: "Scan",
+    sounds: { engine: { electric: true } },   // engine sound (js/models/shared/sound-events.js): electric drive
     make(b, m, seg) {
       b.add(box(2.1, 0.62, 2.8, m.hull, 0, 0.62, 0));
       b.add(box(2.2, 0.08, 2.9, m.dark, 0, 0.3, 0));
@@ -150,6 +151,7 @@ const VEHICLES = [
     } },
   { id: "hauler", name: "HAULER", role: "Carries materials between the mine, the refinery and the base: eight wheels, a tipping bed.",
     length: 7.2, width: 3.2, height: 3.1, maxSpeed: 20, accel: 2.5, turnRadius: 9, cargo: 18, work: "Tip the bed",
+    sounds: { engine: { electric: true } },   // engine sound (js/models/shared/sound-events.js): electric drive
     make(b, m, seg) {
       b.add(box(2.6, 0.5, 6.8, m.dark, 0, 0.45, 0));                         // the chassis
       // the front: a sensor pod, not a cabin
@@ -170,6 +172,7 @@ const VEHICLES = [
     } },
   { id: "crawler", name: "CRAWLER", role: "Digs where wheels sink: two tracks, a drill arm. Slow, turns on the spot.",
     length: 6.0, width: 3.4, height: 3.0, maxSpeed: 7, accel: 1.8, turnRadius: 0, cargo: 4, work: "Drill",
+    sounds: { engine: { electric: true } },   // engine sound (js/models/shared/sound-events.js): electric drive
     make(b, m, seg) {
       const tracks = [];
       for (const s of [-1, 1]) {
@@ -202,6 +205,7 @@ const VEHICLES = [
     } },
   { id: "constructor", name: "CONSTRUCTOR", role: "Builds the base: lifts modules into place with its crane.",
     length: 5.6, width: 3.4, height: 4.2, maxSpeed: 12, accel: 2, turnRadius: 6, cargo: 6, work: "Swing the crane",
+    sounds: { engine: { electric: true } },   // engine sound (js/models/shared/sound-events.js): electric drive
     make(b, m, seg) {
       b.add(box(2.4, 0.8, 4.6, m.hull, 0, 0.7, 0));
       b.add(box(2.5, 0.12, 4.7, m.dark, 0, 0.28, 0));

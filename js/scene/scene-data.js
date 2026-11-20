@@ -12,13 +12,14 @@
 //          cave: '' | nazwa zasobu „cave” (podziemie: jaskinia z laboratorium jaskiń jako teren planszy; '' — domyślna),
 //          caveGlow: true | false (podziemie: słaba poświata, żeby było widać jaskinię; false — prawdziwa ciemność:
 //          światło dają tylko lawa i to, co przyniesie gracz) },
-//   objects: [{ id, name, prefab, pos: [x, y, z], rot: [x, y, z] (stopnie), scale, behavior?, orbit? { around, period }, asset?, shot?, sound? }]
+//   objects: [{ id, name, prefab, pos: [x, y, z], rot: [x, y, z] (stopnie), scale, behavior?, orbit? { around, period }, asset?, shot?, sound?, soundRange? }]
 // }
 // prefab: id z js/scene/prefabs.js; behavior: id z js/scene/behaviors.js, '' = bez zachowania, brak pola = domyślne
 // dla prefabrykatu; asset: nazwa zasobu rodzaju prefabrykatu (prefab.assetKind, np. bryła z bloków z laboratorium
 // bloków; brak — model domyślny prefabrykatu); shot: efekt strzału statku (prefab.shoots) — rodzaj efektu albo nazwa
 // zasobu „effect” z laboratorium efektów (brak — strzał); sound: dźwięk przy obiekcie w grze (js/scene/sounds.js) — gotowy
-// dźwięk lub tło miejsca SfxKit albo nazwa zasobu „sound” / „ambience” z laboratorium efektów dźwiękowych; look: wygląd kamery — zasób „look” z laboratorium filtrów (js/scene/assets.js), '' = zwykły obraz.
+// dźwięk lub tło miejsca SfxKit albo nazwa zasobu „sound” / „ambience” z laboratorium efektów dźwiękowych; soundRange:
+// zasięg dźwięku [m] — odległość pełnej głośności (brak — domyślny rodzaju dźwięku); look: wygląd kamery — zasób „look” z laboratorium filtrów (js/scene/assets.js), '' = zwykły obraz.
 
 export const FORMAT = 'gamelab-scene', VERSION = 1;
 
@@ -46,6 +47,7 @@ export function normalize(d) {
     ...(typeof o.asset === 'string' && o.asset ? { asset: o.asset.slice(0, 40) } : {}),
     ...(typeof o.shot === 'string' && o.shot ? { shot: o.shot.slice(0, 40) } : {}),
     ...(typeof o.sound === 'string' && o.sound ? { sound: o.sound.slice(0, 40) } : {}),
+    ...(+o.soundRange > 0 ? { soundRange: Math.min(2000, +o.soundRange) } : {}),
     ...(o.orbit && typeof o.orbit === 'object' ? { orbit: { ...(typeof o.orbit.around === 'string' ? { around: o.orbit.around } : {}), ...(+o.orbit.period > 0 ? { period: +o.orbit.period } : {}) } } : {}),
   }));
   return s;

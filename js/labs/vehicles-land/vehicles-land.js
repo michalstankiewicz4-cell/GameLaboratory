@@ -16,6 +16,8 @@ import { WEATHER } from "../../envs/sky/skykit.js";
 import { LOOKS } from "../../envs/water/waterkit.js";
 import { sampleHeight, TERRAIN_DEFAULTS } from "../../envs/land/landkit.js";
 import { WORLD_DEFAULTS } from "../../envs/land/regionkit.js";
+import { hearModel } from "../../audio/model-sounds.js";
+import { mixer } from "../../audio/mixer.js";
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 (() => {
@@ -154,6 +156,7 @@ function load() {
   const { def, kit } = LIST[state.index];
   veh = kit === "ship" ? shipVehicle(def) : kit === "mk" ? MK.buildVessel(def.id, { detail: 1 }) : kit === "rk" ? RK.buildVehicle(def.id, {}) : kit === "tram" ? TK.buildTram(def.id, {}) : kit === "air" ? AK.buildAircraft(def.id, {}) : VK.buildVehicle(def.id, { detail: 1 });
   veh.kit = kit;
+  hearModel(veh);   // model sounds (doors, hatch, gear, flaps — onSound) through the engine mixer, at the part
   sim = kit === "vk" || kit === "rk" ? createDrive(driveDef(def), { x: drv.x, z: drv.z, yaw: drv.yaw })
     : kit === "mk" ? createCraft(craftDef(def), { x: drv.x, z: drv.z, yaw: drv.yaw, y: groundAt(drv.x, drv.z) + 1.5 }) : null;
   if (kit === "tram") {
@@ -347,6 +350,7 @@ function frame() {
   renderer.info.reset();
   LabKit.render(renderer, scene, camera);
   LabPerf.end(renderer, performance.now() - t0);   // the Performance window (ui/shell/perf.js)
+  if (mixer().started) mixer().listen(camera.position.toArray(), camera.getWorldDirection(delta.clone()).toArray(), camera.up.toArray());   // the listener: the camera
   requestAnimationFrame(frame);
 }
 // the land lab's settings saved in this browser (gameLab.land.v1: map, water, weather; its defaults if nothing is saved)

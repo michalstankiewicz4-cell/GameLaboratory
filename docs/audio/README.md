@@ -11,6 +11,7 @@ trzy kity robią dźwięki. Laboratoria — grupa dźwięku (przełącznik na pa
 | `musickit/musickit.js` | MusicKit — muzyka (nastroje, muzyka ambientowa, piosenki) |
 | `sfx/sfxkit.js` | SfxKit — efekty (wybuchy, strzały, woda, uderzenia, ptaki…), dźwięki ciągłe, tła miejsc |
 | `voice/voicekit.js` | VoiceKit — mowa: synteza przeglądarki, głos z formantów, szept, efekty głosu |
+| `model-sounds.js` | słuchanie modeli: zdarzenia dźwięku modelu (`onSound`) grane przez SfxKit w miejscu części |
 
 ## Mikser (`mixer.js`)
 
@@ -40,6 +41,34 @@ w laboratoriach dźwięku (`js/labs/shared/mixer-window.js`) zmienia te same ust
 - **SfxKit** — `play(opis, { at })` (szyna efektów), `start(opis)` (szyna otoczenia), `ambience(tło)`.
 - **VoiceKit** — `say(ctx, mixer().bus('voice'), tekst, głos, { mix })`; mowa przeglądarki gra poza grafem Web Audio,
   więc jej głośność to szyna mowy × ogólna (bez efektów, nie do nagrania).
+
+## Dźwięki modeli (`js/models/shared/sound-events.js`, `model-sounds.js`)
+
+Model nie gra dźwięku — nie wie, gdzie jest ani czy ktoś słucha (zasada modeli). Zgłasza zdarzenie, jak strzał
+(ShipKit `onShot`): „ta część rusza, tutaj”. Gra ten, kto słucha — laboratorium, edytor sceny, gra.
+
+- Model: `const snd = soundChannel(info.sounds)`; ruch części 0…1 — `snd.motion('door', część).step(cel, stan)` co
+  klatkę zgłasza `door-open` (rusza w stronę 1), `door-close` (w stronę 0), `door-opened` (doszło do 1), `door-shut`
+  (doszło do 0); pojedyncze zdarzenie — `snd.emit(id, część)`. Na końcu `withSound(model, snd)`: model dostaje
+  `onSound` (słuchacz) i `sounds` (opisy z danych).
+- Dane modelu (`info.sounds`): `{ '<id zdarzenia>': { sound: id SfxKit, params, gain?, ref? }, engine: { cylinders,
+  idle, redline } | { electric: true } }` — które zdarzenia mają dźwięk i jaki; `engine` — silnik dla zachowań
+  (`js/scene/sounds.js`). Zdarzenie bez opisu jest ciche.
+- Słuchacz: `hearModel(model)` (`js/audio/model-sounds.js`) gra opis przez SfxKit w miejscu części; edytor sceny —
+  w ▶ Graj (`world.onSound` → `sounds.model`).
+
+| Model | Zdarzenia z dźwiękiem | Silnik |
+|---|---|---|
+| FSO Polonez | drzwi kierowcy: zamek przy otwarciu, trzaśnięcie po zamknięciu | 4 cyl., 850–5600 obr/min |
+| Solaris Urbino 18 | drzwi: syk pneumatyki przy otwieraniu i zamykaniu | elektryczny |
+| M1A2 Abrams | właz dowódcy: zamek, ciężkie dobicie | 8 cyl. (w oryginale turbina) |
+| Spitfire | podwozie: hydraulika i blokada w końcu ruchu; klapy; owiewka | V12, 900–3000 |
+| ORP Błyskawica, ORP Orzeł | — | 12 cyl. (turbiny), 8 cyl. (diesle) |
+| barka (MarineKit) / nurek, łaziki (VehicleKit) | — | 6 cyl. / elektryczny |
+
+Część robocza modelu (`info.work`: drzwi, właz, owiewka, rampa) jest w ▶ Graj akcją **work** (klawisze 1…9, API `act`)
+zachowań jazdy, lotu i małej jednostki. Laboratorium pojazdów lądowych słucha modeli (przycisk części roboczej,
+podwozie, klapy).
 
 ## Zasoby z nazwą (`js/scene/assets.js`)
 

@@ -7,6 +7,7 @@
 import * as THREE from '../../../vendor/three/three.module.js';
 import { loftParts, roundBox, capFan } from '../road/geom.js';
 import { decal, noiseMap } from '../road/materials.js';
+import { soundChannel, withSound } from '../shared/sound-events.js';
 
 export const info = {
   id: 'spitfire', name: 'Supermarine Spitfire Mk I', role: 'Myśliwiec · 1940 · Rolls-Royce Merlin III 1030 KM',
@@ -23,6 +24,13 @@ export const info = {
   rest: { pitch: -0.222, y: 1.71 },   // na ziemi: oparty na kołach głównych i ogonowym (nos w górę ok. 12,7°)
   seat: { x: 0, y: 0.62, z: -0.75 },
   doorAt: { x: 1.4, z: -0.6 },
+  // dźwięki (js/models/shared/sound-events.js): Merlin V12; podwozie — hydraulika i blokada w końcu ruchu, klapy —
+  // krótka hydraulika, owiewka — przesuw
+  sounds: { engine: { cylinders: 12, idle: 900, redline: 3000 },
+    'gear-open': { sound: 'hydraulic', params: { time: 4, pitch: 0.9, lock: 0 } }, 'gear-close': { sound: 'hydraulic', params: { time: 4, pitch: 0.9, lock: 0 } },
+    'gear-opened': { sound: 'impact', params: { material: 2, strength: 0.6 } }, 'gear-shut': { sound: 'impact', params: { material: 2, strength: 0.5 } },
+    'flaps-open': { sound: 'hydraulic', params: { time: 1.6, pitch: 1.2, lock: 0.2 } }, 'flaps-close': { sound: 'hydraulic', params: { time: 1.6, pitch: 1.2, lock: 0.2 } },
+    'work-open': { sound: 'hydraulic', params: { time: 0.8, pitch: 1.8, lock: 0.3 } }, 'work-shut': { sound: 'door', params: { kind: 0, action: 1, force: 0.3 } } },
 };
 
 // ---------- profil NACA 4-cyfrowy: punkty wokół (od krawędzi spływu górą do noska i dołem z powrotem) ----------
@@ -252,6 +260,7 @@ export function build({ detail = 1 } = {}) {
 
   // ---------- ruch: śmigło, stery, klapy, podwozie, owiewka, płomienie wydechu ----------
   const st = { prop: 0, gear: 1, flap: 0, hood: 0, ail: 0, ele: 0, rud: 0 };
+  const snd = soundChannel(info.sounds), gearSnd = snd.motion('gear', gear[0].pivot, 1), flapSnd = snd.motion('flaps', movers.flap[0] || body), hoodSnd = snd.motion('work', hood);
   const q = new THREE.Quaternion();
   function update(t, dt, o = {}) {
     dt = Math.min(dt, 0.05);
@@ -264,10 +273,12 @@ export function build({ detail = 1 } = {}) {
     for (const e of movers.elevator) e.rotation.x = -st.ele * 0.4;
     for (const r of movers.rudder) r.rotation.y = st.rud * 0.45;
     st.flap += ((o.flaps ? 1 : 0) - st.flap) * Math.min(1, 1.2 * dt);
+    flapSnd.step(o.flaps ? 1 : 0, st.flap);
     for (const f of movers.flap) { q.setFromAxisAngle(f.userData.axis, (f.position.x > 0 ? 1 : -1) * st.flap * 1.4); f.quaternion.copy(q); }
     st.gear += ((o.gear === false ? 0 : 1) - st.gear) * Math.min(1, 0.7 * dt);
     for (const g of gear) g.pivot.rotation.z = g.sx * (1 - st.gear) * 1.62;   // chowanie na zewnątrz
-    st.hood += ((o.work ? 1 : 0) - st.hood) * Math.min(1, 2 * dt); hood.position.z = -0.55 - 0.7 * st.hood;
+    gearSnd.step(o.gear === false ? 0 : 1, st.gear);
+    st.hood += ((o.work ? 1 : 0) - st.hood) * Math.min(1, 2 * dt); hood.position.z = -0.55 - 0.7 * st.hood; hoodSnd.step(o.work ? 1 : 0, st.hood);
     stick.rotation.set(-st.ele * 0.25, 0, st.ail * 0.25);
     exhaust.emissiveIntensity = o.lights || (o.throttle || 0) > 0.7 ? 0.6 + (o.throttle || 0) : 0;
     lightR.emissiveIntensity = lightG.emissiveIntensity = o.lights ? 2.5 : 0.2;
@@ -276,10 +287,10 @@ export function build({ detail = 1 } = {}) {
   }
   update(0, 0.016, { throttle: 0 });
   group.traverse((o) => { if (o.isMesh && o.geometry && !o.geometry.boundingSphere) o.geometry.computeBoundingSphere(); });
-  return {
+  return withSound({
     def: info, group, body, parts: { propeller: propG, gear: gear.map((g) => g.pivot), tailWheel: tw, hood, ...movers }, materials: { camo, sky },
     update, rig: { state: st },
     setPaint() {},
     dispose() { group.traverse((o) => { if (o.isMesh) o.geometry.dispose(); }); },
-  };
+  }, snd);
 }

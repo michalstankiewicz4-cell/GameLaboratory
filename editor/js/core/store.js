@@ -68,6 +68,7 @@ export function createStore(firstScene) {
       if (!o.asset) delete o.asset;
       if (!o.shot) delete o.shot;
       if (!o.sound) delete o.sound;
+      if (!(o.soundRange > 0)) delete o.soundRange;
       emit(rebuild ? 'objects' : 'place');
     },
     setEnv(patch) { record('env:' + Object.keys(patch).sort().join()); Object.assign(S.env, patch); emit('env'); },

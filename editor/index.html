@@ -83,6 +83,8 @@
     <div class="row" id="oShotRow" hidden><span data-i18n="obj.shot">Shot effect</span><select id="oShot"></select><output></output></div>
     <div class="row" id="oAssetRow" hidden><span id="oAssetLabel">Asset</span><select id="oAsset"></select><output></output></div>
     <div class="row"><span data-i18n="obj.sound">Sound</span><select id="oSound"></select><output></output></div>
+    <div class="row" id="oSoundRangeRow" hidden><span data-i18n="obj.soundRange">Sound range</span><input type="range" id="oSoundRange" min="0" max="200" step="1"><output id="oSoundRangeOut"></output></div>
+    <p class="note" id="oSoundRangeNote" hidden data-i18n="obj.soundRangeNote">Full volume inside the inner sphere, fading to 10% at the outer one. At 0 — the default of the sound.</p>
     <div class="row" id="orbitAroundRow" hidden><span data-i18n="obj.orbitAround">Orbits</span><select id="orbitAround"></select><output></output></div>
     <div class="row" id="orbitPeriodRow" hidden><span data-i18n="obj.orbitPeriod">Period</span><input type="number" id="orbitPeriod" min="1" step="5"><output>s</output></div>
     <div class="row"><span data-i18n="obj.x">Position X</span><input type="number" id="pX" step="0.5"><output>m</output></div>

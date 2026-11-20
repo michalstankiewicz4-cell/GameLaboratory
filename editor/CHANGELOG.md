@@ -3,6 +3,15 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.42.0 — 2026-11-20
+
+### Dodane
+- ▶ Graj: dźwięki modeli (drzwi, właz, podwozie, klapy — zdarzenia `onSound`) w miejscu części; część robocza modelu
+  (drzwi, właz, owiewka, rampa) jako akcja **work** (klawisze 1…9, API `act`).
+- Silniki pojazdów z danych modeli (`info.sounds.engine`).
+- Podgląd zasięgu dźwięku: przy zaznaczonym obiekcie z dźwiękiem dwie kule — pełna głośność i granica słyszalności
+  (10%); suwak **Zasięg dźwięku** w oknie Właściwości (pole `soundRange`; 0 — domyślny dla dźwięku), API `set { soundRange }`.
+
 ## 0.41.0 — 2026-11-20
 
 ### Dodane

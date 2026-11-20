@@ -14,6 +14,7 @@ Prawdziwe pojazdy drogowe do gier (dla gry CityExplorer — Warszawa 3D): samoch
 | `cars/polonez.js` | FSO Polonez 1500 (MR'78) — [polonez.md](polonez.md) |
 | `tanks/abrams.js` | M1A2 Abrams — [abrams.md](abrams.md) |
 | `buses/urbino18.js` | Solaris Urbino 18 electric, MZA Warszawa — [urbino18.md](urbino18.md) |
+| dźwięki | drzwi i właz zgłaszają dźwięk (`onSound`, `js/models/shared/sound-events.js`), silnik w `info.sounds.engine` — [../../audio/README.md](../../audio/README.md) |
 | `tracks.js` | gąsienice: pas ogniw (instancje) po obwiedni kół, przesuw z prędkością gąsienicy |
 
 ## Układ i API

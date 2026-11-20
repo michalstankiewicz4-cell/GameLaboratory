@@ -159,6 +159,7 @@ const VESSELS = [
     } },
   { id: "barge", name: "BARGE", role: "Moves materials by sea: containers on deck, azimuth thrusters, a bow ramp for vehicles.",
     length: 20, width: 6.2, height: 5.5, maxSpeed: 7, accel: 0.8, turnRadius: 40, cargo: 240, work: "Lower the ramp",
+    sounds: { engine: { cylinders: 6, idle: 650, redline: 2000 } },   // engine sound (js/models/shared/sound-events.js)
     azimuth: true,                       // azimuth thrusters: it turns on the spot too
     float: [[2.4, 7.5], [-2.4, 7.5], [2.4, -8.5], [-2.4, -8.5], [0, 0]],
     make(b, m, seg) {
@@ -190,6 +191,7 @@ const VESSELS = [
     } },
   { id: "diver", name: "DIVER", role: "Works under water: four vectored thrusters, lamps, a grabbing arm, sonar.",
     length: 6, width: 2.6, height: 2.2, maxSpeed: 9, accel: 2, turnRadius: 6, cargo: 1, maxDepth: 200, work: "Sample + sonar",
+    sounds: { engine: { electric: true } },   // engine sound (js/models/shared/sound-events.js): electric thrusters
     float: [[0.6, 2], [-0.6, 2], [0.6, -2], [-0.6, -2]],
     make(b, m, seg) {
       const core = new THREE.Group(); core.position.y = -0.35; b.add(core);
