@@ -33,7 +33,7 @@ Wersje oznaczone ⚠ zmieniają listę wejść sieci, więc modele wyeksportowan
 
 ## 0.24.1
 - Laboratorium obrazów: domyślnie 3000 kroków (do wyboru 1000–12 000) i temperatura 0,8. Podgląd w trakcie nauki rysuje wszystkie 12 kategorii.
-- Pomiar postępu na procesorze (2×48, 4 głowy, temperatura 0,8): 1000 kroków 1,47 bita na piksel (kreski w poziomie), 3000 kroków 1,26 (drzewo, gwiazda), 6000 kroków 1,16 (dom, ryba, księżyc, gwiazda). Rysunki z kolejnych etapów: `docs/img/img-lab-postep.png`.
+- Pomiar postępu na procesorze (2×48, 4 głowy, temperatura 0,8): 1000 kroków 1,47 bita na piksel (kreski w poziomie), 3000 kroków 1,26 (drzewo, gwiazda), 6000 kroków 1,16 (dom, ryba, księżyc, gwiazda). Rysunki z kolejnych etapów: `docs/labs/walkers/img/img-lab-postep.png`.
 - Widok neuronów na całą szerokość strony, podpisy kolumn bez nachodzenia.
 
 ## 0.24.0

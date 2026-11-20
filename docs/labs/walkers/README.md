@@ -105,7 +105,7 @@ js/labs/walkers/roll.js                  losowanie (zwykłe i sterowane siecią)
 js/labs/walkers/hud.js                   panel Network view
 js/labs/walkers/walkers.js                  start i podpięcie zdarzeń
 docs/labs/morgue/sdf-morgue-original.html     pierwsza wersja: sama głowa zombie
-docs/labs/walkers/img/                   zrzuty z kolejnych etapów
+docs/labs/walkers/img/                   zrzuty laboratorium obrazów (do docs/history/walkers.md)
 data/walkers/                            oceny Claude'a i sieć wytrenowana na nich (przycisk Load repo model)
 ```
 

@@ -1,5 +1,8 @@
 # GameLaboratory — dokumentacja
 
+**Dla AI, które korzysta z GameLaboratory: [guides/ai.md](guides/ai.md)** — jak pracować, co jest, API sceny
+i laboratoriów, przepisy, granice.
+
 Mapa dokumentacji. Zasady pracy: [`../CLAUDE.md`](../CLAUDE.md); zmiany: [`../CHANGELOG.md`](../CHANGELOG.md);
 UI (paski, okna, konsola, karta ładowania, style): [`../ui/README.md`](../ui/README.md).
 
@@ -84,6 +87,7 @@ W kolejności kategorii z menu Narzędzia i strony startowej (`ui/data/catalog.j
 
 ## Przewodniki
 
+- Przewodnik dla AI (jak pracować, opcje i możliwości, API, przepisy): [guides/ai.md](guides/ai.md)
 - Jak korzystać z laboratoriów z Battle: [guides/using-the-labs.md](guides/using-the-labs.md)
 - Renderowanie modeli ShipKit i BodyKit, niebo: [guides/rendering.md](guides/rendering.md)
 - Znane pułapki: [guides/gotchas.md](guides/gotchas.md)

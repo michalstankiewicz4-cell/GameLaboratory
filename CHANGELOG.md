@@ -18,6 +18,9 @@ Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` 
   (`docs/history/`) i notatki SDF Walkers z NeuroLabPA (`docs/labs/walkers/notatki/`) — zostają w historii git.
   Plan rozbioru laboratoriów (`docs/guides/lab-breakdown.md`) skrócony do tego, co zostało; przewodnik po
   laboratoriach z Battle oczyszczony z nieaktualnych zdań.
+- **Przewodnik dla AI** (`docs/guides/ai.md`): jak pracować z GameLaboratory, co tworzy każde laboratorium, API
+  sceny i laboratoriów z przykładami, przepisy (sprawdzone w edytorze), granice; podlinkowany na górze mapy dokumentacji.
+  Usunięte nieużywane zrzuty SDF Walkers (`docs/labs/walkers/img/`).
 
 ## Program 0.87.0 · UI gry 1.6.0 · efekty dźwiękowe 1.2.0 · muzyka 1.3.1 · mowa 1.0.1 · edytor sceny 0.43.0 — 2026-11-20 (dźwięki UI, pełny reset)
 

@@ -27,7 +27,7 @@
 - `js/render/`, `js/labkit/` — wspólne warstwy. Materiały (PBR, starzenie): MatKit `js/render/materials/matkit.js`, laboratorium `labs/materials.html` — nowe materiały brać stąd.
 - `js/gameui/` — UI gry jako dane (ekrany menu, HUD, okna gry, okno dialogowe; format `gamelab-ui`), ze skórkami gier (`js/gameui/skins.js`, arkusze `js/gameui/css/`) i ich dźwiękami (`js/gameui/sounds.js`, szyna interfejsu miksera; głosy postaci w dialogu z VoiceKit) oddzielonymi od wyglądu laboratoriów; laboratorium: `labs/gameui.html` (opis `docs/labs/gameui.md`).
 - `tools/` — narzędzia (doktor modeli, kitcheck, `paths.py` — sprawdzanie ścieżek).
-- `docs/` — dokumentacja w układzie kodu (mapa: `docs/README.md`): `docs/labs/` (laboratoria), `docs/models/` (modele), `docs/scene/` (silnik sceny), `docs/behaviors/` (zachowania), `docs/tools/` (narzędzia), `docs/guides/` (przewodniki, renderowanie, pułapki), `docs/history/` (historia sprzed przeniesienia: laboratoria Space, SDF Walkers, artchecker).
+- `docs/` — dokumentacja w układzie kodu (mapa: `docs/README.md`): `docs/labs/` (laboratoria), `docs/models/` (modele), `docs/scene/` (silnik sceny), `docs/behaviors/` (zachowania), `docs/tools/` (narzędzia), `docs/guides/` (przewodniki — dla AI korzystającego z silnika `docs/guides/ai.md`, renderowanie, pułapki), `docs/history/` (historia sprzed przeniesienia: laboratoria Space, SDF Walkers, artchecker).
 - Nazwy plików i folderów małymi literami, słowa łączone myślnikiem (`solar-system.js`, `vehicles-water.html`); w kodzie nazwy mówią, co robią teraz (np. `LabKit.autoHideWindows`, nie dawne „hud”).
 
 ## Fizyka
