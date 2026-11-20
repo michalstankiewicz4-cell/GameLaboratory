@@ -2,9 +2,11 @@
 // z addytywnym mieszaniem, ruch liczony w shaderze z czasu narodzin (bez aktualizacji tablic co klatkę — tylko emisja
 // nowych). Siła ognia (0…1) zmienia rozmiar i liczbę cząstek. dispose() — zdejmuje ze sceny.
 import * as THREE from '../../../vendor/three/three.module.js';
+import { fxCount } from '../../render/quality.js';
 
 export class Fire {
-  constructor(scene, pos, { count = 260, spread = [0.7, 0.5], smoke = false } = {}) {
+  constructor(scene, pos, { count: count0 = 260, spread = [0.7, 0.5], smoke = false } = {}) {
+    const count = fxCount(count0);   // gęstość efektów silnika (js/render/quality.js)
     this.n = count; this.i = 0; this.time = 0; this.power = 0.3; this.pos = pos.clone(); this.spread = spread; this.acc = 0;
     const g = new THREE.BufferGeometry();
     this.born = new Float32Array(count).fill(-99); this.seed = new Float32Array(count * 3); this.org = new Float32Array(count * 3);

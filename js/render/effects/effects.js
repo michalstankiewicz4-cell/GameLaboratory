@@ -21,8 +21,11 @@ import { Bubbles } from './bubbles.js';
 import { BlackHoles } from './black-holes.js';
 import { createSwarmEffects, SWARM_DEFAULTS, SWARM_KINDS } from './swarm-fx.js';
 import { DamageFx, DAMAGE_DEFAULTS } from './damage.js';
+import { QUALITY, fxCount } from '../quality.js';
 
 export const STEP = 1 / 60;
+// pola liczby cząstek w ustawieniach efektów (gęstość efektów — QUALITY.fx)
+const DENSE = ['n', 'tailPerFrame', 'streaks', 'count', 'particles', 'perFrame'];
 const VOXEL = 0.5;   // blok Hive Hunger: rozmiary efektów są w tych jednostkach
 
 // liczby z Hive Hunger (js/config.js: swarm.sniper, swarm.orb, debris, Swarm3D storm, swarm.support, swarm.splasher, holes)
@@ -66,6 +69,9 @@ const clone = (o) => JSON.parse(JSON.stringify(o));
 export function createEffects(scene, { scale = 1, settings = {} } = {}) {
   const root = new THREE.Group(); root.name = 'effects'; root.scale.setScalar(scale); scene.add(root);
   const S = clone(FX_DEFAULTS); for (const k of Object.keys(S)) Object.assign(S[k], settings[k] || {});
+  // gęstość efektów silnika (js/render/quality.js): liczby cząstek mniejsze przy niższej jakości (zbudowane od nowa
+  // po zmianie: lib.dispose / fx.clear)
+  if (QUALITY.fx < 1) for (const c of Object.values(S)) for (const k of DENSE) if (typeof c[k] === 'number') c[k] = fxCount(c[k]);
   let fx = null;
   const v = (p) => (p && p.isVector3 ? p.clone() : new THREE.Vector3(...(p || [0, 0, 0]))).divideScalar(scale);   // metry sceny → jednostki efektów
   function make() {

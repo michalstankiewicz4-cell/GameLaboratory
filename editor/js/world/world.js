@@ -5,6 +5,7 @@ import { worldBox } from '../../../js/scene/doctor.js';
 import * as THREE from '../../../vendor/three/three.module.js';
 import { LookPipeline, LOOK_DEFAULTS } from '../../../js/render/sea/look.js';
 import { lookParams } from '../../../js/render/game-graphics.js';
+import { QUALITY } from '../../../js/render/quality.js';
 import { createStage, LIGHTS } from '../../../js/labs/shared/stage.js';
 import { prefab } from '../../../js/scene/prefabs.js';
 import { getAsset, listAssets } from '../../../js/scene/assets.js';
@@ -43,6 +44,7 @@ export function createWorld(container, store, onWarn) {
     const lb = new THREE.Box3().setFromObject(g);   // obrys w układzie obiektu (g jeszcze bez położenia) — lekarz sceny
     g.traverse((m) => { if (m.isMesh && !(m.material && m.material.isMeshBasicMaterial)) { m.castShadow = true; m.receiveShadow = true; } });
     built.set(o.id, { prefab: o.prefab, key: keyOf(o), root: g, kit: b.kit || null, tick: b.tick || null, driven: false, dispose: b.dispose, size: new THREE.Box3().setFromObject(b.root).getSize(new THREE.Vector3()).length(),
+      near: b.root, far: null, farB: null, lod: !!p.lod, showFar: false,
       local: lb.isEmpty() ? null : { min: lb.min.toArray(), max: lb.max.toArray() }, cost: costOf(g) });
     root.add(g);
     wireShots(o, b.kit);
@@ -58,9 +60,31 @@ export function createWorld(container, store, onWarn) {
     });
     return { tris: Math.round(tris), draws };
   }
+  // poziom szczegółów (LOD): model z wersją daleką (prefab.lod) przełącza się z odległości od kamery — próg z wielkości
+  // modelu × QUALITY.lodBias (ustawienia gracza w grze, js/render/quality.js), z zapasem (bez migotania); wersja daleka
+  // budowana przy pierwszej potrzebie (najwyżej jedna na klatkę); model, który rusza zachowanie (gra), zostaje bliski
+  const camP = new THREE.Vector3();
+  function updateLod() {
+    let builds = 1; camP.copy(camera.position);
+    built.forEach((r, id) => {
+      if (!r.lod) return;
+      const T = Math.max(40, r.size * 6) * QUALITY.lodBias, d = camP.distanceTo(r.root.position) / Math.max(1e-3, r.root.scale.x);
+      const want = !(r.driven && !r.lodFree) && (r.showFar ? d > T * 0.9 : d > T * 1.1);   // lodFree: zachowanie nie rusza części modelu
+      if (want === r.showFar) return;
+      if (want && !r.far) {
+        if (!builds) return; builds--;
+        const o = store.scene.objects.find((x) => x.id === id), p = o && prefab(o.prefab); if (!p) { r.lod = false; return; }
+        try { r.farB = p.build({ asset: assetData(o), detail: 0.5 }); } catch { r.lod = false; return; }
+        r.far = r.farB.root; r.far.traverse((m) => { if (m.isMesh && !(m.material && m.material.isMeshBasicMaterial)) { m.castShadow = true; m.receiveShadow = true; } });
+        r.root.add(r.far);
+      }
+      r.showFar = want; r.near.visible = !want; if (r.far) r.far.visible = want;
+    });
+  }
   function drop(id) {
     const r = built.get(id); if (!r) return;
     if (r.dmg) r.dmg.dispose();
+    if (r.farB && r.farB.dispose) { try { r.farB.dispose(); } catch { /* bez zwalniania */ } }
     root.remove(r.root); if (r.dispose) { try { r.dispose(); } catch { /* bez zwalniania */ } }
     built.delete(id);
   }
@@ -163,7 +187,7 @@ export function createWorld(container, store, onWarn) {
   function fitShadow() {
     const box = bounds(null);
     if (box.isEmpty()) { stage.fitShadow(new THREE.Vector3(), 60); return; }
-    stage.fitShadow(box.getCenter(new THREE.Vector3()), Math.min(600, box.getSize(new THREE.Vector3()).length() * 0.6 + 10));
+    stage.fitShadow(box.getCenter(new THREE.Vector3()), Math.min(600 * QUALITY.view, box.getSize(new THREE.Vector3()).length() * 0.6 + 10));   // zasięg cieni: jakość silnika
   }
   // the view's own size: with Panels (ui/shell/windows.js) it is the free middle between the panels and the console
   function resize() {
@@ -194,7 +218,9 @@ export function createWorld(container, store, onWarn) {
     if (stage.space) built.forEach((r) => { if (!sunB && r.prefab === 'bodies/sol') sunB = r; if (!holeB && r.prefab === 'bodies/abyss') holeB = r; });
     if (sunB) stage.aimSun(sunB.root.position.clone().sub(camera.position).normalize());   // światło od słońca w scenie
     const at = { sunDir: stage.sunDir, sunPos: sunB ? sunB.root.position : null, center: camera.position };   // dla ciał niebieskich: światło, kamera
-    built.forEach((r) => { if (r.tick && !r.driven) r.tick(t, dt, at); });   // części na postoju (statki kosmiczne, ciała niebieskie)
+    updateLod();
+    // części na postoju (statki kosmiczne, ciała niebieskie); wersja daleka ma swój tick (np. światło ciała niebieskiego)
+    built.forEach((r) => { if (r.driven) return; const tk = r.showFar && r.farB ? r.farB.tick : r.tick; if (tk) tk(t, dt, at); });
     if (skyBody && skyBody.group.visible) skyBody.update(t, dt, { center: camera.position, renderer });
     const rad = (r) => (r.kit && r.kit.radius ? r.kit.radius : 50) * r.root.scale.x;
     look.space = stage.space && (sunB || holeB) ? {
@@ -213,7 +239,7 @@ export function createWorld(container, store, onWarn) {
   }
   const world = {
     renderer, scene, camera, root, built, stage, look, pending, syncObjects, syncPlaces, syncEnv, bounds, effect,
-    gameGfx: null,   // ▶ Graj: settings.gfx gracza (js/gameui/settings.js) — potok kamery z nimi; null — wygląd edytora
+    gameGfx: null,   // ▶ Graj: settings.gfx gracza (js/core/settings.js) — potok kamery z nimi; null — wygląd edytora
     clearEffects: () => fxLib.dispose(), forgetEffect: (n) => fxLib.forget(n),
     objectRoot: (id) => (built.get(id) || {}).root || null,
     // lekarz sceny (js/scene/doctor.js): obrys w świecie z danych obiektu i koszt zbudowanego modelu; null — niezbudowany

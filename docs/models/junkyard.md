@@ -5,7 +5,7 @@ Modele z gry Złomowisko (repo Trash), przeniesione z historią (`js/models/` �
 w Node — doktor modeli). Każdy moduł eksportuje `build(lod)` i `info`; spis z nazwami EN/PL: `registry.js` (`MODELS`,
 `GROUPS`). Materiały — `materials.js` (dane), tekstury proceduralne — `textures.js` (`applyTextures`, MatKit z
 `js/render/materials/matkit.js`), zderzacz → części wypukłe — `shapes.js`. Właściwości przedmiotów (metal, topnienie,
-gęstość, palenie, zgniatanie do innego modelu, guma) i ich bryły (`halfExtents`, `itemKit`) — `properties.js` (z katalogu
+gęstość, palenie, zgniatanie do innego modelu, guma) i kształt bryły (`halfExtents`, `shapeOf`) — `properties.js` (z katalogu
 gry, bez cen skupu); wygląd ognia i dymu pieca — `fire.js`, stopionego metalu — `lava.js`, wygięcie wysięgnika i ramienia przeładowarki
 w łuk — `vehicle/bow.js` (z gry). Kształt bryły przedmiotu (`shapeOf`): walec dla opon, beczek, puszek i garnków. Fizyka i maszyny w działaniu
 są zachowaniami ([../behaviors/README.md](../behaviors/README.md)): przeładowarka `land/grapple.js`, przedmioty

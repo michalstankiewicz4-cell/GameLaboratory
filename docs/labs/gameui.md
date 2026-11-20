@@ -35,8 +35,9 @@ Strona z UI gry linkuje `js/gameui/css/gameui.css` (CSP: style tylko z `'self'`;
       { "label": "New game", "do": "resume" }, { "label": "Options", "do": "screen:options" }, { "label": "About", "do": "screen:about", "sub": true }] },
     "options": { "title": "Options", "items": [
       { "type": "slider", "label": "Music", "bind": "settings.music", "min": 0, "max": 1, "step": 0.05 },
-      { "type": "choice", "label": "Graphics", "bind": "settings.gfx", "options": ["Light", "High"] },
-      { "type": "toggle", "label": "Show the minimap", "bind": "settings.minimap" }, { "label": "Back", "do": "back" }] } },
+      { "label": "Graphics", "do": "screen:graphics" }, { "label": "Controls", "do": "screen:controls" },
+      { "type": "toggle", "label": "Show the minimap", "bind": "settings.minimap" }, { "label": "Back", "do": "back" }] },
+    "graphics": "standard", "controls": "standard" },
   "hud": [
     { "id": "hull", "type": "bar", "at": "bl", "label": "Hull", "bind": "ship.hull", "max": "ship.hullMax", "low": 0.3 },
     { "id": "events", "type": "log", "at": "tr", "label": "Event log", "fade": 0 },
@@ -82,17 +83,21 @@ pod nazwą jako zasób **uiskin**; całe UI — zasób **ui** (`js/scene/assets.
 `say({ who, text, choices })` → wybór, `log(tekst, rodzaj)`, `banner(tekst, podpis)`, `def`, `state`, `samples`,
 `skins`, `empty()`. Zakładka **API** w konsoli: `{ "method": "say", "arg": { … } }`.
 
-## Ustawienia gry: grafika i sterowanie (1.3.0)
+## Ustawienia gry: grafika i sterowanie (1.3.0 – 1.4.0)
 
-Ustawienia gracza są w magazynie silnika `js/gameui/settings.js` (z Battle, `js/core/settings.js`, z historią):
+Ustawienia gracza są w magazynie silnika `js/core/settings.js` (z Battle — tam pod tą samą ścieżką — z historią):
 `createSettings()` — zapis w przeglądarce (`gamelab.settings.v1`, wspólny dla laboratorium UI gry i ▶ Graj edytora),
 każda zmiana przez `sanitize()` (liczby w zakresie, znane słowa).
 
 - **`settings.gfx`** — `scale` (rozdzielczość obrazu 0,5…1), `aa` (wygładzanie), `shadows` (cienie), `shadowQuality`
   (`high` / `low` — mapa cieni 2048 / 1024), `lights` (oświetlenie dynamiczne: światła punktowe i reflektory — ogień,
   lampy, światła pozycyjne; słońce i niebo zostają), `bloom` (poświata), `bright` (jasność 0,6…2), `sat` (nasycenie
-  0…1,6), `showFps` (licznik klatek w rogu UI). Zestawy `GFX_PRESETS`: **high** i **light** (Battle; light — dla słabszych
-  komputerów).
+  0…1,6), `showFps` (licznik klatek w rogu UI); **poziom jakości silnika** (`js/render/quality.js`, opis:
+  [../guides/rendering.md](../guides/rendering.md), „Poziom jakości silnika”): `lod` (odległość szczegółów modeli
+  0,5…2), `texture` (`high` / `low` — tekstury; rozdzielczość map od następnego wczytania, filtrowanie od razu), `fx`
+  (gęstość efektów 0,25…1), `water` (detal wody), `view` (zasięg widzenia 0,5…1), `smallShadows` (cienie drobnych
+  części). Zestawy `GFX_PRESETS`: **high** i **light** (Battle; light — dla słabszych komputerów: także bliższe
+  przełączanie szczegółów, tekstury niskie, połowa efektów, woda bez detalu, zasięg 0,7, bez cieni drobnych części).
 - **`settings.mouse`** — `rotSens`, `zoomSens` (czułość obracania i przybliżania kamery 0,2…3).
 - **`settings.keys`** — czynność → kod klawisza (`KeyboardEvent.code`, niezależny od układu klawiatury): `forward`,
   `back`, `left`, `right`, `yawLeft`, `yawRight`, `up`, `down`, `rollLeft`, `rollRight`, `brake`, `lift`, `gear`,

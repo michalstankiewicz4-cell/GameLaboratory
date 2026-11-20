@@ -43,24 +43,27 @@ export const FAMILIES = {
 };
 
 const P = [];
-// extra: needs ('space' — kity ze Space), shoots (strzela: efekt strzału w polu „shot” obiektu), assetKind (rodzaj zasobu, który obiekt może wskazać polem „asset”; build({ asset }))
+// extra: needs ('space' — kity ze Space), shoots (strzela: efekt strzału w polu „shot” obiektu), assetKind (rodzaj zasobu, który obiekt może wskazać polem „asset”; build({ asset })),
+//   lod (model ma wersję daleką: build({ detail: 0,5 }) — mniej odcinków, LOD 1 kitu; świat przełącza z odległości)
 const add = (id, label, family, surface, lab, build, extra) => P.push({ id, label, family, surface, lab, build, ...extra });
+const det = (o) => (o && o.detail) || 1;   // szczegółowość: 1 — blisko, 0,5 — wersja daleka (LOD)
+const LOD = { lod: true };
 const g = (v) => ({ root: v.group, kit: v, dispose: v.dispose ? () => v.dispose() : null });   // kit: to, co zwrócił kit (dane do zachowań)
 
-Object.keys(SHIPS).forEach((id) => add('sea/' + id, SHIPS[id].info.name, 'sea', 'sea', 'labs/vehicles-water.html?ship=' + id, () => g(buildShip(id, { detail: 1 }))));
+Object.keys(SHIPS).forEach((id) => add('sea/' + id, SHIPS[id].info.name, 'sea', 'sea', 'labs/vehicles-water.html?ship=' + id, (o) => g(buildShip(id, { detail: det(o) })), LOD));
 VEHICLE_IDS.forEach((id) => add('road/' + id, vehicleInfo(id).name, 'road', 'land', 'labs/vehicles-land.html', () => g(buildRoad(id, {}))));
 TRAM_IDS.forEach((id) => add('tram/' + id, tramInfo(id).name, 'rail', 'land', 'labs/vehicles-land.html', () => g(buildTram(id, {}))));
 DEFAULT_TRAIN.forEach((c) => add('train/' + c.body, BODIES[c.body].name, 'rail', 'land', 'labs/vehicles-land.html', () => ({ root: buildRail(c.body, { ...c, lights: false }), dispose: null })));
 AIRCRAFT_IDS.forEach((id) => add('air/' + id, aircraftInfo(id).name, 'air', 'air', 'labs/vehicles-land.html', () => g(buildAircraft(id, {}))));
-STRUCTURE_IDS.forEach((id) => add('structures/' + id, structureInfo(id).name, 'structures', id === 'super300' ? 'sea' : 'land', 'labs/structures.html', () => g(buildStructure(id, { detail: 1 }))));
+STRUCTURE_IDS.forEach((id) => add('structures/' + id, structureInfo(id).name, 'structures', id === 'super300' ? 'sea' : 'land', 'labs/structures.html', (o) => g(buildStructure(id, { detail: det(o) })), LOD));
 WEAPON_IDS.forEach((id) => add('weapons/' + id, weaponInfo(id).name, 'weapons', 'land', 'labs/human.html', () => g(buildWeapon(id, {}))));
 
 // rośliny (PlantKit): jedna roślina gatunku (ziarno 1, wielkość 1 — jak w laboratorium roślin na starcie) albo roślina
 // zapisana w laboratorium roślin (zasób „plant”, pole „asset”: gatunek, ziarno, wielkość, szczegółowość, pora roku);
 // z wiatrem w shaderze (tick przesuwa czas wiatru); podstawa w punkcie obiektu
-function buildPlant(id0, a) {
+function buildPlant(id0, a, d = 1) {
   const id = a && SPECIES[a.species] ? a.species : id0;
-  const wind = windUniforms(), pl = growPlant(id, { seed: a ? +a.seed || 1 : 1, size: a ? +a.size || 1 : 1, detail: a ? +a.detail || 1 : 1 }), mats = plantMaterials(id, wind);
+  const wind = windUniforms(), pl = growPlant(id, { seed: a ? +a.seed || 1 : 1, size: a ? +a.size || 1 : 1, detail: (a ? +a.detail || 1 : 1) * d }), mats = plantMaterials(id, wind);
   wind.uSeason.value = a ? +a.season || 0 : 0;
   const root = new THREE.Group();
   for (const [geo, m, dm] of [[pl.bark, mats.bark, mats.barkDepth], [pl.leaf, mats.leaf, mats.leafDepth]]) {
@@ -70,7 +73,7 @@ function buildPlant(id0, a) {
   return { root, kit: pl, tick: (t) => { wind.uTime.value = t; },
     dispose: () => { for (const x of [pl.bark, pl.leaf]) if (x) x.dispose(); for (const m of Object.values(mats)) { if (m.map) m.map.dispose(); m.dispose(); } } };
 }
-SPECIES_IDS.forEach((id) => add('plants/' + id, SPECIES[id].name, 'plants', 'land', 'labs/plants.html', (opts) => buildPlant(id, opts && opts.asset), { assetKind: 'plant' }));
+SPECIES_IDS.forEach((id) => add('plants/' + id, SPECIES[id].name, 'plants', 'land', 'labs/plants.html', (opts) => buildPlant(id, opts && opts.asset, det(opts)), { assetKind: 'plant', ...LOD }));
 // jaskinia (CaveKit) z ustawień domyślnych laboratorium jaskiń (CAVE_DEFAULTS): korytarze, komory, nacieki, jeziorka;
 // budowa trwa (pole odległości, ok. sekundy)
 // jaskinia jako obiekt: domyślna albo zapisana w laboratorium jaskiń (zasób „cave”, pole „asset”); jaskinia jako teren
@@ -79,40 +82,40 @@ add('caves/cave', 'Cave', 'caves', 'land', 'labs/caves.html', (opts) => { const 
 
 // statki kosmiczne, dron i stacja (ShipKit); nazwy jak w ShipKit (SHIP_DEFS), żeby lista była bez ładowania kitu
 const SPACE = [['codewing', 'SP-01 Codewing'], ['scribe', 'DR-01 Scribe (drone)'], ['swarmer', 'SW-01 Swarmer'], ['haven', 'ST-04 Haven (station)']];
-function buildSpace(id) {
+function buildSpace(id, d = 1) {
   const SK = window.ShipKit; if (!SK) throw new Error('ShipKit is not loaded (js/scene/space.js loadSpace())');
-  const m = SK.buildShipModel(id, { detail: 1 }), holder = SK.makeGameHolder(m, m.size.x);   // +X dziób → +Z, skala 1
+  const m = SK.buildShipModel(id, { detail: d }), holder = SK.makeGameHolder(m, m.size.x);   // +X dziób → +Z, skala 1
   return { root: holder, kit: m, dispose: () => SK.disposeShipModel(m), tick: (t, dt) => m.update(t, dt, { power: 0 }) };
 }
 // shoots: statek strzela (akcja „fire”) — wygląd strzału to efekt z laboratorium efektów, pole „shot” obiektu
 const SHOOTS = new Set(['codewing', 'scribe', 'swarmer']);
-SPACE.forEach(([id, name]) => add('space/' + id, name, 'space', 'space', 'labs/vehicles-space.html', () => buildSpace(id), { needs: 'space', ...(SHOOTS.has(id) ? { shoots: true } : {}) }));
+SPACE.forEach(([id, name]) => add('space/' + id, name, 'space', 'space', 'labs/vehicles-space.html', (o) => buildSpace(id, det(o)), { needs: 'space', ...LOD, ...(SHOOTS.has(id) ? { shoots: true } : {}) }));
 // roboty morskie (MarineKit ze Space, ładowany jak ShipKit): ślizgacz, barka, nurek, amfibia; na postoju unoszą się
 // na płaskiej wodzie (sprężyny modelu), w grze — zachowanie „mała jednostka na wodzie” (pozę daje zachowanie)
 const MARINE = [['skimmer', 'Skimmer'], ['barge', 'Barge'], ['diver', 'Diver'], ['amphibian', 'Amphibian']];
-function buildMarine(id) {
+function buildMarine(id, d = 1) {
   const MK = window.MarineKit; if (!MK) throw new Error('MarineKit is not loaded (js/scene/space.js loadSpace())');
-  const v = MK.buildVessel(id, { detail: 1 });
+  const v = MK.buildVessel(id, { detail: d });
   return { root: v.group, kit: v, dispose: () => MK.disposeVessel(v), tick: (t, dt) => v.update(t, dt, {}) };
 }
-MARINE.forEach(([id, name]) => add('marine/' + id, name, 'marine', 'sea', 'labs/vehicles-water.html?ship=' + id, () => buildMarine(id), { needs: 'space' }));
+MARINE.forEach(([id, name]) => add('marine/' + id, name, 'marine', 'sea', 'labs/vehicles-water.html?ship=' + id, (o) => buildMarine(id, det(o)), { needs: 'space', ...LOD }));
 // łaziki (VehicleKit ze Space): zwiadowca, transporter, gąsienicowy, budowniczy; w grze — jazda po lądzie (siłami)
 const ROVERS = [['scout', 'Scout'], ['hauler', 'Hauler'], ['crawler', 'Crawler'], ['constructor', 'Constructor']];
-function buildRover(id) {
+function buildRover(id, d = 1) {
   const VK = window.VehicleKit; if (!VK) throw new Error('VehicleKit is not loaded (js/scene/space.js loadSpace())');
-  const v = VK.buildVehicle(id, { detail: 1 });
+  const v = VK.buildVehicle(id, { detail: d });
   return { root: v.group, kit: v, dispose: () => VK.disposeVehicle(v) };
 }
-ROVERS.forEach(([id, name]) => add('rovers/' + id, name, 'rovers', 'land', 'labs/vehicles-land.html', () => buildRover(id), { needs: 'space' }));
+ROVERS.forEach(([id, name]) => add('rovers/' + id, name, 'rovers', 'land', 'labs/vehicles-land.html', (o) => buildRover(id, det(o)), { needs: 'space', ...LOD }));
 // moduły bazy planetarnej (BaseKit ze Space, ładowany jak ShipKit): gotowe (budowa 1), bez hologramu; tick — światła,
 // wiertło i obracające się części; nazwy jak w BaseKit.MODULES
 const BASE = [['pad', 'Landing pad'], ['hab', 'Habitat'], ['solar', 'Solar array'], ['drill', 'Mine'], ['refinery', 'Refinery'], ['depot', 'Depot']];
-function buildBase(id) {
+function buildBase(id, d = 1) {
   const BK = window.BaseKit; if (!BK) throw new Error('BaseKit is not loaded (js/scene/space.js loadSpace())');
-  const m = BK.buildModule(id, { detail: 1 }); m.setProgress(1);
+  const m = BK.buildModule(id, { detail: d }); m.setProgress(1);
   return { root: m.group, kit: m, dispose: () => BK.disposeModule(m), tick: (t, dt) => m.update(t, dt) };
 }
-BASE.forEach(([id, name]) => add('base/' + id, name, 'base', 'land', 'labs/buildings.html', () => buildBase(id), { needs: 'space' }));
+BASE.forEach(([id, name]) => add('base/' + id, name, 'base', 'land', 'labs/buildings.html', (o) => buildBase(id, det(o)), { needs: 'space', ...LOD }));
 // ciała niebieskie (BodyKit ze Space, ładowany jak ShipKit): każde ciało z grup laboratorium ciał niebieskich (bez nieba).
 // Model, nie prawdziwa skala: promień 50 m (wielkość — skalą obiektu); tick(t, dt, { sunDir, center }) — oświetlenie od
 // słońca sceny, obrót, błyski pulsara w stronę kamery. Lista jak BodyKit.GROUPS (bez ładowania kitu).
@@ -122,21 +125,21 @@ const BODY_LIST = [['lava', 'cinder', 'Cinder'], ['lava', 'magma', 'Magma'], ['e
   ['giants', 'neptune', 'Neptune'], ['rings', 'halo', 'Halo (rings)'], ['rings', 'filament', 'Filament (rings)'], ['rings', 'gossamer', 'Gossamer (rings)'],
   ['rings', 'shards', 'Shard belt'], ['pulsars', 'metronome', 'Metronome (pulsar)'], ['suns', 'sol', 'Sol (sun)'], ['comets', 'comet', 'Comet'],
   ['rocks', 'ferrum', 'Ferrum (asteroid)'], ['blackholes', 'abyss', 'Abyss (black hole)']];
-function buildBody(groupId, bodyId) {
+function buildBody(groupId, bodyId, d = 1) {
   const BK = window.BodyKit; if (!BK) throw new Error('BodyKit is not loaded (js/scene/space.js loadSpace())');
-  const b = BK.buildBody(groupId, bodyId, { detail: 1 }); b.setRadius(50);
+  const b = BK.buildBody(groupId, bodyId, { detail: d }); b.setRadius(50);
   return { root: b.group, kit: b, dispose: () => BK.disposeBody(b), tick: (t, dt, at = {}) => b.update(t, dt, at.sunPos ? { sunPosition: at.sunPos, center: at.center } : { sunDir: at.sunDir, center: at.center }) };
 }
-BODY_LIST.forEach(([g, id, name]) => add('bodies/' + id, name, 'bodies', 'space', 'labs/bodies.html', () => buildBody(g, id), { needs: 'space' }));
+BODY_LIST.forEach(([g, id, name]) => add('bodies/' + id, name, 'bodies', 'space', 'labs/bodies.html', (o) => buildBody(g, id, det(o)), { needs: 'space', ...LOD }));
 // ludzie i stwory (LifeKit ze Space, ładowany jak ShipKit): parametry domyślne kreatury (jak na starcie laboratorium);
 // na postoju — chód „idle” (oddech, rozglądanie); chodzenie jako zachowanie — później
-function buildLife(id) {
+function buildLife(id, d = 1) {
   const LK = window.LifeKit; if (!LK) throw new Error('LifeKit is not loaded (js/scene/space.js loadSpace())');
-  const c = LK.build(id, {}, { detail: 1 });
+  const c = LK.build(id, {}, { detail: d });
   return { root: c.group, kit: c, dispose: () => c.dispose(), tick: (t, dt) => c.animate(t, dt, { gait: 'idle', speed: 0, lively: true, layers: {} }) };
 }
-[['humanBust', 'Human I'], ['humanHead', 'Human II']].forEach(([id, name]) => add('humans/' + id, name, 'humans', 'land', 'labs/human.html', () => buildLife(id), { needs: 'space' }));
-[['strider', 'Plains strider']].forEach(([id, name]) => add('creatures/' + id, name, 'creatures', 'land', 'labs/life.html', () => buildLife(id), { needs: 'space' }));
+[['humanBust', 'Human I'], ['humanHead', 'Human II']].forEach(([id, name]) => add('humans/' + id, name, 'humans', 'land', 'labs/human.html', (o) => buildLife(id, det(o)), { needs: 'space', ...LOD }));
+[['strider', 'Plains strider']].forEach(([id, name]) => add('creatures/' + id, name, 'creatures', 'land', 'labs/life.html', (o) => buildLife(id, det(o)), { needs: 'space', ...LOD }));
 
 // bryły z bloków (BlockKit, z Hive Hunger): kształt z warstwami domyślnymi laboratorium bloków; w kosmosie.
 // assetKind: obiekt może wskazać zasób „blocks” (bryła zapisana w laboratorium bloków, pole „asset”) — wtedy
@@ -151,13 +154,13 @@ function buildLife(id) {
 const JUNK_MODS = await Promise.all(JUNK.map((m) => m.load()));
 let junkTex = null;
 const JUNK_LAB = { items: 'labs/items.html?item=', machines: 'labs/structures.html?structure=junk:', world: 'labs/structures.html?structure=junk:', vehicle: 'labs/vehicles-land.html' };
-JUNK.forEach((m, i) => add('junkyard/' + m.id, m.name, 'junkyard', 'land', JUNK_LAB[m.group] + (m.group === 'vehicle' ? '' : m.id), () => {
-  const model = JUNK_MODS[i].build(0), root = new THREE.Group();
+JUNK.forEach((m, i) => add('junkyard/' + m.id, m.name, 'junkyard', 'land', JUNK_LAB[m.group] + (m.group === 'vehicle' ? '' : m.id), (o) => {
+  const model = JUNK_MODS[i].build(det(o) < 0.75 ? 1 : 0), root = new THREE.Group();   // wersja daleka — LOD 1 modelu
   if (typeof document !== 'undefined') (junkTex || (junkTex = import('../models/junkyard/textures.js'))).then((t) => t.applyTextures());
   model.updateMatrixWorld(true); model.position.y -= new THREE.Box3().setFromObject(model).min.y; root.add(model);
   root.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
   return { root, kit: { info: JUNK_MODS[i].info, mod: JUNK_MODS[i], model, id: m.id, group: m.group }, dispose: () => model.traverse((o) => { if (o.isMesh) o.geometry.dispose(); }) };
-}));
+}, LOD));
 
 export const PREFABS = P;
 export const prefab = (id) => P.find((p) => p.id === id) || null;

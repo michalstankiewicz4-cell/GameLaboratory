@@ -3,6 +3,13 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.38.0 — 2026-11-20
+
+### Dodane
+- Szczegóły z odległości (LOD): modele z wersją daleką przełączają się na nią daleko od kamery (próg z wielkości modelu
+  × ustawienie gracza w grze); w grze także poziom jakości silnika gracza (tekstury, gęstość efektów, detal wody,
+  zasięg widzenia, cienie drobnych części) — po Stop pełna jakość.
+
 ## 0.37.0 — 2026-11-20
 
 ### Dodane

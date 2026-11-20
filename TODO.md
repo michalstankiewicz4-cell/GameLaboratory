@@ -45,7 +45,7 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
   i przeciwników) i matematyka gry (wzory, modyfikatory — np. z drzewek i przedmiotów), połączone z zapisem stanu gry
   (statystyki, położenie obiektów i ich zmiany w czasie). Na schemacie silnika: moduły Rules i Save/Load.
 - [x] **Ustawienia gry: grafika i sterowanie** (właściciel, 2026-11-14): zrobione w 0.80.0 — magazyn ustawień
-  (`js/gameui/settings.js`), ekrany Grafika i Sterowanie w UI gry, grafika na scenie (`js/render/game-graphics.js`),
+  (`js/core/settings.js`), ekrany Grafika i Sterowanie w UI gry, grafika na scenie (`js/render/game-graphics.js`),
   klawisze i mysz w ▶ Graj edytora.
 - [ ] **Laboratorium animacji** (do rozważenia): chód ludzi i stworów jako zachowanie, animacje modeli.
 - [ ] **Grawitacja statków w kosmosie** (propozycja do decyzji): statki w scenie przyciągane przez ciała niebieskie,

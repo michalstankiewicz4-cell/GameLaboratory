@@ -51,8 +51,12 @@ Wpis: `{ id, label, family, surface, lab, build() → { root, kit, dispose } }`.
 - `family`: grupa na liście (`FAMILIES`, nazwy EN/PL); `surface`: gdzie stoi (`sea`, `land`, `air` — nowy samolot
   stawiany jest 30 m nad powierzchnią).
 - `lab`: laboratorium, w którym model się robi („Otwórz w laboratorium”).
-- `build()`: `root` — grupa Three.js; `kit` — obiekt zwrócony przez kit (wymiary, linie kadłuba, `update` ruchomych
-  części), z niego korzystają zachowania; `dispose` — zwolnienie geometrii.
+- `build({ asset, detail })`: `root` — grupa Three.js; `kit` — obiekt zwrócony przez kit (wymiary, linie kadłuba,
+  `update` ruchomych części), z niego korzystają zachowania; `dispose` — zwolnienie geometrii. `lod: true` — model ma
+  wersję daleką (`detail: 0.5`: mniej odcinków w kitach z `detail`, LOD 1 w JunkKit): świat edytora przełącza ją
+  z odległości (próg z wielkości modelu × jakość silnika, [`../guides/rendering.md`](../guides/rendering.md), „Poziom
+  jakości silnika”). Mają ją okręty, budowle, rośliny, statki kosmiczne, roboty morskie, łaziki, moduły bazy, ciała
+  niebieskie, ludzie i stwory, złomowisko.
 - Rośliny: `plants/<gatunek>` (PlantKit, `SPECIES`) — jedna roślina gatunku (ziarno 1, wielkość 1) albo zapisana w
   laboratorium roślin (pole `asset`, zasób `plant`: gatunek, ziarno, wielkość, szczegółowość, pora roku), `tick` przesuwa czas
   wiatru; jaskinia: `caves/cave` (CaveKit, `CAVE_DEFAULTS` albo zapisana jaskinia — pole `asset`, zasób `cave`; budowa ok.
@@ -73,7 +77,10 @@ Wpis: `{ id, label, family, surface, lab, build() → { root, kit, dispose } }`.
 
 ## Zachowania w scenie (`behaviors.js`)
 
-`BEHAVIORS[id] = { label, labelPl, env, throttle: [min, max], fits(prefabId), keys, keysPl, create(obj, built, world) }`.
+`BEHAVIORS[id] = { label, labelPl, env, throttle: [min, max], fits(prefabId), keys, keysPl, lodFree?, create(obj, built, world) }`
+(`lodFree` — zachowanie rusza całym modelem, nie jego częściami: model może przejść na wersję daleką). Klawisze gracza
+z ustawień (`js/core/settings.js`, `settings.keys`, menu Sterowanie UI gry); w grze działa też jego grafika i poziom
+jakości silnika, po Stop — wygląd edytora.
 `create` zwraca `{ state, step(dt, input, t), hud(), reset() }` albo `null` (model bez potrzebnych danych).
 
 | id | Dla | Zachowanie | Sterowanie (`input`) |

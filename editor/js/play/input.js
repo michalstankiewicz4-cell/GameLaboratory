@@ -1,11 +1,11 @@
 // Klawiatura gracza w trybie gry: z wciśniętych klawiszy sterowanie dla zachowań (js/scene/behaviors.js).
-// Klawisze czynności z ustawień gry gracza (js/gameui/settings.js, settings.keys — kody KeyboardEvent.code, niezależne
+// Klawisze czynności z ustawień gry gracza (js/core/settings.js, settings.keys — kody KeyboardEvent.code, niezależne
 // od układu klawiatury; zmienia je menu Sterowanie UI gry). Domyślnie: W / S gaz, A / D skręt, Q / E ster kierunku,
 // strzałki — nos i przechył (przeładowarka: wysięgnik i obrót), B hamulec, spacja — silniki podnośne / chwytak,
 // G podwozie, F klapy, R / F ramię przeładowarki.
 // Maszyny / gaz to dźwignia: zostaje, gdzie ją ustawić (pojazd lądowy: pedał — działa, póki wciśnięty); stery wracają
 // na środek po puszczeniu klawisza; podwozie i klapy przełączają. Zakres dźwigni podaje zachowanie (throttle: [min, max]).
-import { DEFAULTS } from '../../../js/gameui/settings.js';
+import { DEFAULTS } from '../../../js/core/settings.js';
 
 export function createInput(getKeys = () => DEFAULTS.keys) {
   const down = new Set();   // wciśnięte kody

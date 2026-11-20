@@ -19,7 +19,7 @@ Zasada (CLAUDE.md): fizyka jest prawdziwa — start, ruch, skręt i zatrzymanie 
 | gaz w kosmosie | `space/gases.js` | kosmos | laboratorium bloków (chmura gazu) |
 | koło na szynie — tramwaj | `rail/tram.js`, `rail/path.js` | ląd | laboratorium pojazdów — ląd (Swing na pętli toru; liczby w TramKit: `js/models/train/trams/swing.js`, `phys`) |
 | przeładowarka z chwytakiem | `land/grapple.js` (jazda: `land/drive.js`) | ląd | laboratorium pojazdów — ląd (przeładowarka JunkKit z przedmiotami ze złomowiska), edytor sceny (`grapple`) |
-| przedmioty na lądzie (bryły sztywne) | `land/items.js` | ląd | przeładowarka, maszyny złomowiska, edytor sceny (`item`) |
+| przedmioty na lądzie (bryły sztywne) | `land/items.js` (przedmioty złomowiska w nim: `land/junk-items.js` — `itemKit`) | ląd | przeładowarka, maszyny złomowiska, edytor sceny (`item`) |
 | maszyny złomowiska | `land/machines/` (`machines.js`: zgniatarka `crusher.js`, piec na papier `furnace.js`, piec indukcyjny `induction.js`, linia odlewnicza `casting.js` + strumień metalu `metal-flow.js`, zderzacze `statics.js`) | ląd | laboratorium budowli (maszyny złomowiska w działaniu), edytor sceny (`machine`, `solid`) |
 
 ## Okręt na wodzie (`water/ship.js`)

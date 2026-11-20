@@ -4,6 +4,7 @@ import * as THREE from '../../../vendor/three/three.module.js';
 import { allMaterials } from './materials.js';
 import { rng } from './geom.js';
 import { makeMaterial } from '../../render/materials/matkit.js';
+import { anisotropy } from '../../render/quality.js';
 
 let maxAniso = 8;
 export function setAnisotropy(n) { maxAniso = n; }
@@ -12,7 +13,7 @@ function canvas(w, h) { const c = document.createElement('canvas'); c.width = w;
 function tex(c, { srgb = true, repeat = [1, 1] } = {}) {
   const t = new THREE.CanvasTexture(c);
   t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(...repeat);
-  t.anisotropy = maxAniso; if (srgb) t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = Math.min(maxAniso, anisotropy(maxAniso)); if (srgb) t.colorSpace = THREE.SRGBColorSpace;   // jakość tekstur silnika
   return t;
 }
 /** Szum wartości 2D, bezszwowy w okresie (px, py). */
@@ -287,7 +288,7 @@ RECIPES.drumPaint = (m, d) => {
 // materiały PBR z MatKit (GameLaboratory): mapy barwy, normalnych i ORM; UV modelu w metrach (uvMeters)
 RECIPES.matkit = (m, d) => {
   const k = makeMaterial(d.kit, { res: 512 }), km = k.material, rep = 1 / (d.kit.tile || 1);
-  for (const key of ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'aoMap']) { m[key] = km[key]; if (m[key]) { m[key].repeat.set(rep, rep); m[key].anisotropy = maxAniso; } }
+  for (const key of ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'aoMap']) { m[key] = km[key]; if (m[key]) { m[key].repeat.set(rep, rep); m[key].anisotropy = Math.min(maxAniso, anisotropy(maxAniso)); } }
   m.roughness = 1; m.metalness = 1; m.aoMapIntensity = 0.8;
   if (m.normalMap) m.normalScale.set(1, 1);
 };

@@ -6,7 +6,9 @@
 // settings.gfx:   scale (rozdzielczość obrazu 0,5…1), aa (wygładzanie krawędzi), shadows (cienie), shadowQuality
 //                 ('high' | 'low' — mapa cieni 2048 / 1024), lights (oświetlenie dynamiczne: światła punktowe
 //                 i reflektory — ogień, lampy, światła pozycyjne), bloom (poświata), bright (jasność 0,6…2), sat
-//                 (nasycenie 0…1,6), showFps (licznik klatek w grze)
+//                 (nasycenie 0…1,6), showFps (licznik klatek w grze); poziom jakości silnika (js/render/quality.js):
+//                 lod (odległość szczegółów modeli 0,5…2), texture ('high' | 'low' — tekstury), fx (gęstość efektów
+//                 0,25…1), water (detal wody), view (zasięg widzenia 0,5…1), smallShadows (cienie drobnych części)
 // settings.mouse: rotSens, zoomSens (czułość obracania i przybliżania kamery 0,2…3)
 // settings.keys:  czynność → kod klawisza (KeyboardEvent.code, niezależny od układu klawiatury); czynności: KEY_ACTIONS
 // inne pola najwyższego poziomu (liczby, napisy, tak / nie — np. music, sound, minimap) — ustawienia danej gry, zostają
@@ -33,14 +35,15 @@ export const KEY_ACTIONS = [
   { id: 'stickOut', label: 'Stick out', labelPl: 'Ramię od siebie', key: 'KeyF' },
 ];
 export const DEFAULTS = {
-  gfx: { scale: 1, aa: true, shadows: true, shadowQuality: 'high', lights: true, bloom: true, bright: 1, sat: 1, showFps: false },
+  gfx: { scale: 1, aa: true, shadows: true, shadowQuality: 'high', lights: true, bloom: true, bright: 1, sat: 1, showFps: false,
+    lod: 1, texture: 'high', fx: 1, water: true, view: 1, smallShadows: true },
   mouse: { rotSens: 1, zoomSens: 1 },
   keys: Object.fromEntries(KEY_ACTIONS.map((a) => [a.id, a.key])),
 };
 // Graphics presets for the Options buttons (light = for weaker computers).
 export const GFX_PRESETS = {
-  high: { scale: 1, aa: true, shadows: true, shadowQuality: 'high', lights: true, bloom: true },
-  light: { scale: 0.7, aa: false, shadows: false, shadowQuality: 'low', lights: false, bloom: false },
+  high: { scale: 1, aa: true, shadows: true, shadowQuality: 'high', lights: true, bloom: true, lod: 1, texture: 'high', fx: 1, water: true, view: 1, smallShadows: true },
+  light: { scale: 0.7, aa: false, shadows: false, shadowQuality: 'low', lights: false, bloom: false, lod: 0.6, texture: 'low', fx: 0.5, water: false, view: 0.7, smallShadows: false },
 };
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const bool = (v, d) => (typeof v === 'boolean' ? v : d);
@@ -61,6 +64,12 @@ export function sanitize(s) {
       bright: num(g.bright, d.gfx.bright, 0.6, 2),
       sat: num(g.sat, d.gfx.sat, 0, 1.6),
       showFps: !!g.showFps,
+      lod: num(g.lod, d.gfx.lod, 0.5, 2),
+      texture: g.texture === 'low' || g.texture === 'high' ? g.texture : d.gfx.texture,
+      fx: num(g.fx, d.gfx.fx, 0.25, 1),
+      water: bool(g.water, d.gfx.water),
+      view: num(g.view, d.gfx.view, 0.5, 1),
+      smallShadows: bool(g.smallShadows, d.gfx.smallShadows),
     },
     mouse: { rotSens: num(m.rotSens, 1, 0.2, 3), zoomSens: num(m.zoomSens, 1, 0.2, 3) },
     keys: Object.fromEntries(KEY_ACTIONS.map((a) => [a.id, code(k[a.id], a.key)])),
@@ -85,7 +94,13 @@ export const SETTINGS_SCREENS = {
     { type: 'toggle', label: 'Anti-aliasing', bind: 'settings.gfx.aa' },
     { type: 'toggle', label: 'Shadows', bind: 'settings.gfx.shadows' },
     { type: 'choice', label: 'Shadow quality', bind: 'settings.gfx.shadowQuality', options: [{ value: 'low', label: 'Low' }, { value: 'high', label: 'High' }] },
+    { type: 'toggle', label: 'Small parts cast shadows', bind: 'settings.gfx.smallShadows' },
     { type: 'toggle', label: 'Dynamic lighting (lamps, fire, lights)', bind: 'settings.gfx.lights' },
+    { type: 'slider', label: 'Model detail distance', bind: 'settings.gfx.lod', min: 0.5, max: 2, step: 0.1 },
+    { type: 'choice', label: 'Textures (from the next load)', bind: 'settings.gfx.texture', options: [{ value: 'low', label: 'Low' }, { value: 'high', label: 'High' }] },
+    { type: 'slider', label: 'Effects density', bind: 'settings.gfx.fx', min: 0.25, max: 1, step: 0.05 },
+    { type: 'toggle', label: 'Water detail', bind: 'settings.gfx.water' },
+    { type: 'slider', label: 'View distance', bind: 'settings.gfx.view', min: 0.5, max: 1, step: 0.05 },
     { type: 'toggle', label: 'Glow', bind: 'settings.gfx.bloom' },
     { type: 'slider', label: 'Brightness', bind: 'settings.gfx.bright', min: 0.6, max: 2, step: 0.05 },
     { type: 'slider', label: 'Saturation', bind: 'settings.gfx.sat', min: 0, max: 1.6, step: 0.05 },

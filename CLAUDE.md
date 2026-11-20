@@ -62,6 +62,7 @@
 - Preferowana grafika: ta z laboratoriów wodnych (Battle: potok kamery `js/render/sea/look.js`, niebo, woda), nie ze Space.
 - Wspólna scena bazowa (`js/labs/shared/stage.js`: niebo SkyKit, światło z pogodą, mgła, morze, teren): edytor sceny i laboratoria filtrów, wyglądu, lądu, wody i pojazdów (kosmos, woda, ląd). Laboratorium dokłada tylko swoje (opis: `docs/scene/README.md`).
 - Laboratoria Space w grafice Battle (zawsze, przez `three-global.js`). Moce świateł pisane pod r128 mnożyć przez `THREE.LIGHT_SCALE`, kolory sRGB z kodu przez `THREE.srgbColor()`, renderować przez `LabKit.imageEffects` / `LabKit.render`. Własny shader, który już oddaje kolor liniowy: `material.userData.linearOutput = true`.
+- Ustawienia gracza (grafika, mysz, klawisze): `js/core/settings.js`; poziom jakości silnika (szczegóły modeli z odległości, tekstury, gęstość efektów, detal wody, zasięg, cienie drobnych części): `js/render/quality.js` — modele, materiały, efekty i woda czytają go stąd; stosowanie: `js/render/game-graphics.js` (opis: `docs/guides/rendering.md`). Nowy model w scenie z wersją daleką: prefabrykat z `lod: true` i `build({ detail })`.
 
 ## Okna z opcjami
 

@@ -24,7 +24,9 @@ Układ folderów jest taki sam jak w kodzie:
 | Edytor sceny („Warsztat”, `editor/index.html`): obsługa, budowa, format sceny, API dla AI | [../editor/README.md](../editor/README.md), zmiany: [../editor/CHANGELOG.md](../editor/CHANGELOG.md) |
 | Silnik sceny (`js/scene/`) | [scene/README.md](scene/README.md) |
 | Lekarz sceny (`js/scene/doctor.js`) | [scene/doctor.md](scene/doctor.md) |
-| Zachowania (`js/behaviors/`): okręt i mała jednostka na wodzie, jazda po lądzie, lądowanie, lot, koło na szynie, ciąg w próżni, orbita, ciecze i gaz w kosmosie | [behaviors/README.md](behaviors/README.md) |
+| Zachowania (`js/behaviors/`): okręt i mała jednostka na wodzie, jazda po lądzie, lądowanie, lot, koło na szynie, ciąg w próżni, orbita, ciecze i gaz w kosmosie, przeładowarka, przedmioty na lądzie (bryły sztywne), maszyny złomowiska | [behaviors/README.md](behaviors/README.md) |
+| Ustawienia gracza (`js/core/settings.js`: grafika, mysz, klawisze) i ich menu w UI gry | [labs/gameui.md](labs/gameui.md), „Ustawienia gry” |
+| Poziom jakości silnika (`js/render/quality.js`: szczegóły modeli z odległości, tekstury, efekty, woda, zasięg, cienie) | [guides/rendering.md](guides/rendering.md), „Poziom jakości silnika” |
 
 ## Laboratoria
 

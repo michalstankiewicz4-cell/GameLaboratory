@@ -5,7 +5,7 @@ import * as THREE from '../../../vendor/three/three.module.js';
 import { createStage } from '../shared/stage.js';
 import { LookPipeline, LOOK_DEFAULTS } from '../../render/sea/look.js';
 import { createGameUI, normalizeUI, emptyUI } from '../../gameui/gameui.js';
-import { createSettings } from '../../gameui/settings.js';
+import { createSettings } from '../../core/settings.js';
 import { applyGraphics, lookParams } from '../../render/game-graphics.js';
 import { SKINS, TOKENS, FONTS, resolveSkin } from '../../gameui/skins.js';
 import { HUD_TYPES, ANCHORS } from '../../gameui/hud.js';
@@ -40,7 +40,7 @@ const startDef = () => {
 // ustawienia gry (grafika, mysz, klawisze): wspólne z ▶ Graj edytora sceny — menu Opcje UI pisze tutaj, a scena za UI
 // pokazuje grafikę od razu (js/render/game-graphics.js)
 const settings = createSettings();
-const gfxApply = () => { applyGraphics({ renderer, look, scene, sun: stage.sun }, settings.data.gfx); look.set(lookParams({ ...LOOK_DEFAULTS }, settings.data.gfx), 'A'); };
+const gfxApply = () => { applyGraphics({ renderer, look, scene, sun: stage.sun, stage, camera }, settings.data.gfx); look.set(lookParams({ ...LOOK_DEFAULTS }, settings.data.gfx), 'A'); };
 const ui = createGameUI($('view'), startDef(), { state, settings });
 gfxApply();
 ui.on((a, arg) => {

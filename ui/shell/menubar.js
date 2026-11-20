@@ -142,26 +142,26 @@ function engineMap() {
   labs.appendChild(el("div", "emTitle", t("LABS: editors of the engine's parts", "LABORATORIA: edytory części silnika")));
   const lrow = el("div", "emLabRow");
   lrow.append(
-    node("emLab", t("Models ▶ prefabs", "Modele ▶ prefabrykaty"), t("vehicles (space, water, land), celestial bodies, base, structures, plants, caves, creatures, humans, weapons", "pojazdy (kosmos, woda, ląd), ciała niebieskie, baza, budowle, rośliny, jaskinie, stwory, ludzie, broń")),
-    node("emLab", t("Settings ▶ named assets", "Ustawienia ▶ zasoby z nazwą"), t("sea (water), land, weather and light (look), camera look (filters), space sky (bodies), game UI", "morze (woda), ląd, pogoda i światło (wygląd), wygląd kamery (filtry), niebo kosmosu (ciała niebieskie), UI gry")),
-    node("emLab", t("Materials (MatKit)", "Materiały (MatKit)"), t("saved as assets; models do not use them yet", "zapisywane jako zasoby; modele jeszcze z nich nie korzystają"), "part"),
-    node("emLab", t("Not connected yet", "Jeszcze niepołączone"), t("art, systems, skins, surface, gear, sound, creature editor, transformer, SDF and pixel art, scale", "sztuka, układy, skórki, powierzchnia, przedmioty, dźwięk, edytor stworów, transformator, SDF i pixel art, skala"), "plan"));
+    node("emLab", t("Models ▶ prefabs", "Modele ▶ prefabrykaty"), t("vehicles (space, water, land), celestial bodies, base, structures, junkyard (machines, items), plants, caves, creatures, humans, weapons; far versions (LOD)", "pojazdy (kosmos, woda, ląd), ciała niebieskie, baza, budowle, złomowisko (maszyny, przedmioty), rośliny, jaskinie, stwory, ludzie, broń; wersje dalekie (LOD)")),
+    node("emLab", t("Settings ▶ named assets", "Ustawienia ▶ zasoby z nazwą"), t("sea (water), land, weather and light (look), camera look (filters), space sky (bodies), game UI, cave, plant, blocks, effect, tech tree, picture (art)", "morze (woda), ląd, pogoda i światło (wygląd), wygląd kamery (filtry), niebo kosmosu (ciała niebieskie), UI gry, jaskinia, roślina, bryła z bloków, efekt, drzewko, obraz (sztuka)")),
+    node("emLab", t("Materials (MatKit)", "Materiały (MatKit)"), t("saved as assets; the junkyard's and the blocks' textures use them, other models not yet", "zapisywane jako zasoby; korzystają z nich tekstury złomowiska i bloków, inne modele jeszcze nie"), "part"),
+    node("emLab", t("Not connected yet", "Jeszcze niepołączone"), t("systems, skins, surface, gear, sound, creature editor, transformer, SDF and pixel art, scale", "układy, skórki, powierzchnia, przedmioty bohatera, dźwięk, edytor stworów, transformator, SDF i pixel art, skala"), "plan"));
   labs.appendChild(lrow);
   m.appendChild(labs);
   m.appendChild(el("div", "emDown", t("▼ prefabs and assets go into the scene", "▼ prefabrykaty i zasoby trafiają do sceny")));
   // input → the engine
   const top = el("div", "emTop");
-  top.append(node("emInput", t("Input", "Wejście"), t("keyboard, mouse (pad, touch: planned)", "klawiatura, mysz (pad, dotyk: w planie)"), "part"), arrow(t("events ▶", "zdarzenia ▶")));
+  top.append(node("emInput", t("Input", "Wejście"), t("actions, not keys: keyboard (keys set in the game's Controls), mouse sensitivity (pad, touch: planned)", "czynności, nie klawisze: klawiatura (klawisze z menu Sterowanie gry), czułość myszy (pad, dotyk: w planie)"), "part"), arrow(t("events ▶", "zdarzenia ▶")));
   const eng = el("div", "emEngine");
   eng.appendChild(el("div", "emTitle", t("ENGINE: loop, time, life cycle", "ENGINE: pętla, czas, cykl życia")));
   const pipe = el("div", "emPipe");
-  [["Rules", t("game rules", "reguły gry"), "plan"], [t("Behaviours", "Zachowania"), t("drive, sail, fly, thrust, orbit, land, build", "jazda, pływanie, lot, ciąg, orbita, lądowanie, budowa")],
-    [t("Physics", "Fizyka"), t("of the environment: vacuum, water, land; rail", "środowiska: próżnia, woda, ląd; szyny"), "part"], [t("Animation", "Animacje"), t("idle only", "tylko postój"), "part"],
-    ["Render", "Three.js r186"], [t("Camera look", "Wygląd kamery"), t("tone, glow, lens, space effects", "ton, poświata, obiektyw, efekty kosmosu")], [t("screen", "ekran")]]
+  [["Rules", t("game rules", "reguły gry"), "plan"], [t("Behaviours", "Zachowania"), t("drive, sail, fly, thrust, orbit, land, build, grapple loader, junkyard machines", "jazda, pływanie, lot, ciąg, orbita, lądowanie, budowa, przeładowarka, maszyny złomowiska")],
+    [t("Physics", "Fizyka"), t("of the environment: vacuum, water, land; rail; rigid bodies on land (items: tumbling, rolling, stacking)", "środowiska: próżnia, woda, ląd; szyny; bryły sztywne na lądzie (przedmioty: przewracanie, toczenie, stosy)"), "part"], [t("Animation", "Animacje"), t("idle; bending in a shader", "postój; wyginanie w shaderze"), "part"],
+    ["Render", t("Three.js r186 · quality level (LOD, textures, effects, water, range, shadows)", "Three.js r186 · poziom jakości (LOD, tekstury, efekty, woda, zasięg, cienie)")], [t("Camera look", "Wygląd kamery"), t("tone, glow, lens, space effects", "ton, poświata, obiektyw, efekty kosmosu")], [t("screen", "ekran")]]
     .forEach(([a, b, st], i, all) => { if (i) pipe.appendChild(arrow("▶")); pipe.appendChild(node(i === all.length - 1 ? "emScreen" : "", a, b, st)); });
   eng.appendChild(pipe);
   const over = el("div", "emOver");
-  over.append(node("emUi", t("Game UI", "UI gry"), t("menu, HUD, windows, dialogue — over the screen, from the game state and events", "menu, HUD, okna, dialogi — nad ekranem, ze stanu gry i zdarzeń")),
+  over.append(node("emUi", t("Game UI", "UI gry"), t("menu, HUD, windows, dialogue, tech trees, Options: graphics and controls — over the screen, from the game state and events", "menu, HUD, okna, dialogi, drzewka, Opcje: grafika i sterowanie — nad ekranem, ze stanu gry i zdarzeń")),
     node("", "Audio", t("music and sounds of events", "muzyka i odgłosy zdarzeń"), "plan"));
   eng.appendChild(over);
   eng.appendChild(el("div", "emFlow", t("▼ behaviours and physics change the scene · render draws it ▲", "▼ zachowania i fizyka zmieniają scenę · render ją rysuje ▲")));
@@ -177,7 +177,7 @@ function engineMap() {
   [["Assets", t("kits, prefabs, named assets, materials, loading progress", "kity, prefabrykaty, zasoby z nazwą, materiały, postęp ładowania")],
     ["Events", t("one bus: actions of ships, the game UI", "jedna szyna: akcje statków, UI gry")],
     ["Network", t("scene state, events (WebRTC, Supabase…)", "stan sceny, zdarzenia (WebRTC, Supabase…)"), "plan"],
-    ["Save/Load", t("scene as JSON: file and the browser (IndexedDB: planned)", "scena jako JSON: plik i przeglądarka (IndexedDB: w planie)"), "part"],
+    ["Save/Load", t("scene as JSON: file and the browser; player's settings (graphics, controls); game state: planned", "scena jako JSON: plik i przeglądarka; ustawienia gracza (grafika, sterowanie); stan gry: w planie"), "part"],
     ["Jobs/Workers", t("physics, AI, terrain generation", "fizyka, AI, generowanie terenu"), "plan"],
     [t("Editor + API for AI", "Edytor + API dla AI"), t("hierarchy, properties, ▶ Play, console; AI builds and plays the scene through the API", "hierarchia, właściwości, ▶ Graj, konsola; AI buduje i gra scenę przez API")],
     [t("Doctors", "Lekarze"), t("model doctor (one model), scene doctor (the whole scene)", "doktor modeli (jeden model), lekarz sceny (cała scena)")]]

@@ -5,12 +5,12 @@
 // pozycja: przycisk { label, do, sub? } albo ustawienie { type: 'slider' | 'toggle' | 'choice', label, bind, min?, max?,
 //   step?, options? } (wartość w stanie gry, bind np. 'settings.gfx.scale'; opcja wyboru: napis albo { value, label })
 //   albo { type: 'presets', label, bind, presets? } (zestawy wartości naraz, np. grafika: wysoka / lekka — domyślnie
-//   GFX_PRESETS z js/gameui/settings.js) albo { type: 'keys', bind } (klawisze czynności: klik i wciśnięcie klawisza,
-//   Esc — bez zmiany; czynności — KEY_ACTIONS z js/gameui/settings.js)
+//   GFX_PRESETS z js/core/settings.js) albo { type: 'keys', bind } (klawisze czynności: klik i wciśnięcie klawisza,
+//   Esc — bez zmiany; czynności — KEY_ACTIONS z js/core/settings.js)
 // do: 'screen:<id>' (następny ekran), 'back', 'resume' (zamyka menu — gra), 'window:<id>' (okno gry), 'event:<nazwa>'
 //     (zdarzenie dla gry), 'quit' (zdarzenie quit), 'reset:<część>' (ustawienia domyślne: gfx, mouse, keys)
 import { h, btn, pick } from './dom.js';
-import { GFX_PRESETS, KEY_ACTIONS, keyName } from './settings.js';
+import { GFX_PRESETS, KEY_ACTIONS, keyName } from '../core/settings.js';
 
 const pl = () => (document.documentElement.lang || '').startsWith('pl');
 

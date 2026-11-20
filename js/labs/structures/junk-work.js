@@ -4,7 +4,7 @@
 // stoi razem z linią odlewniczą (jak w grze: linia 0,62 m przed piecem) — metal z tygla spływa rynną do form.
 import * as THREE from '../../../vendor/three/three.module.js';
 import { createItems } from '../../behaviors/land/items.js';
-import { itemKit } from '../../models/junkyard/properties.js';
+import { itemKit } from '../../behaviors/land/junk-items.js';
 import { createMachine, connect, MACHINE_IDS, CASTING_FROM_INDUCTION } from '../../behaviors/land/machines/machines.js';
 import { junkEntry } from '../../models/junkyard/registry.js';
 import { applyTextures } from '../../models/junkyard/textures.js';

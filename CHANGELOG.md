@@ -3,6 +3,35 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.81.0 · UI gry 1.4.0 · edytor sceny 0.38.0 — 2026-11-20 (poziom jakości silnika)
+
+### Dodane
+- **Poziom jakości silnika** (`js/render/quality.js`): jedno miejsce, z którego czytają modele, materiały, efekty,
+  woda i scena — ustawiany z ustawień grafiki gracza (`applyGraphics`), bez nich pełna jakość.
+  - **Szczegóły modeli z odległości (LOD):** prefabrykaty z wersją daleką (`lod: true`, `build({ detail: 0.5 })` —
+    okręty, budowle, rośliny, statki kosmiczne, roboty morskie, łaziki, moduły bazy, ciała niebieskie, ludzie i stwory,
+    złomowisko); świat edytora przełącza je z odległości (próg z wielkości modelu × odległość szczegółów gracza),
+    wersja daleka budowana przy pierwszej potrzebie, z własnym `tick`; model, którego części rusza zachowanie, zostaje
+    bliski (`lodFree` — przedmiot, bryła — może być daleki).
+  - **Tekstury:** niska jakość — mapy MatKit w połowie rozdzielczości (od następnego wczytania), filtrowanie
+    anizotropowe 1 (od razu, wszystkie tekstury sceny).
+  - **Gęstość efektów:** liczby cząstek EffectKit (odłamki, iskry, ogon kuli plazmy, holowanie…) i ognia pieca.
+  - **Detal wody:** siatka morza 192 × 160 albo 96 × 80, drobne zmarszczki × 0,5 (`stage.setWaterDetail`).
+  - **Zasięg widzenia:** daleka płaszczyzna kamery i zasięg cieni × 0,5…1.
+  - **Cienie drobnych części:** siatki do 0,25 m bez cienia przy niższej jakości.
+- Ustawienia gracza: `lod`, `texture`, `fx`, `water`, `view`, `smallShadows` w `settings.gfx`, w zestawach (lekki:
+  0,6 · niskie · 0,5 · bez detalu · 0,7 · bez) i na ekranie Grafika.
+- **Schemat silnika** (Pomoc → Schemat silnika, `docs/guides/engine-architecture.md`): stan 0.81.0 — fizyka brył na
+  lądzie, przeładowarka i maszyny, wejście z klawiszami gracza, poziom jakości w renderze, drzewka i Opcje w UI gry,
+  ustawienia gracza w zapisie, nowe zasoby z nazwą.
+
+### Zmienione
+- Magazyn ustawień przeniesiony do `js/core/settings.js` (warstwa wspólna — UI gry, edytor i render zależą od niego,
+  nie od UI gry); przedmioty złomowiska w świecie przedmiotów (`itemKit`) — z modeli do zachowań
+  (`js/behaviors/land/junk-items.js`; modele nie wiedzą o świecie fizyki).
+- Dokumentacja: poziom jakości (`docs/guides/rendering.md`), prefabrykaty z LOD i `lodFree` (`docs/scene/README.md`),
+  ustawienia gry (`docs/labs/gameui.md`), mapa dokumentacji, `CLAUDE.md` (Grafika), edytor (`editor/README.md`).
+
 ## Program 0.80.0 · UI gry 1.3.0 · edytor sceny 0.37.0 — 2026-11-20 (ustawienia gry: grafika i sterowanie)
 
 ### Dodane

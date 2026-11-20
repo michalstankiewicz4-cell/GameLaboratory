@@ -13,12 +13,14 @@ i edytor ją pokazują, AI ją zmienia.
 
 ```
             ┌──────────── LABORATORIA: edytory części silnika ─────────────────────────────────┐
-            │ Modele ▶ prefabrykaty │ Ustawienia ▶ zasoby z nazwą │ Materiały ~ │ niepołączone … │
+            │ Modele ▶ prefabrykaty (z LOD) │ Ustawienia ▶ zasoby z nazwą │ Materiały ~ │ niepołączone … │
             └────────────────────────────── ▼ do sceny ────────────────────────────────────────┘
                          ┌────────────────────── ENGINE: pętla, czas, cykl życia ───────────────────────┐
  [Input ~] ──► zdarzenia ►│  Rules … ─► Zachowania ─► Fizyka ~ ─► Animacje ~ ─► Render ─► Wygląd kamery ─► ekran │
- klawiatura, mysz         │  [UI gry: menu, HUD, okna, dialogi — nad ekranem]          [Audio …]          │
- (pad, dotyk …)           │   └──────── zmieniają ───────► [SCENA (dane, JSON)] ◄──── rysuje ─────┘        │
+ czynności, nie klawisze: │                                         (poziom jakości: LOD, tekstury,         │
+ klawiatura, mysz         │                                          efekty, woda, zasięg, cienie)          │
+ (pad, dotyk …)           │  [UI gry: menu, HUD, okna, dialogi, drzewka, Opcje — nad ekranem]  [Audio …]   │
+                         │   └──────── zmieniają ───────► [SCENA (dane, JSON)] ◄──── rysuje ─────┘        │
                          │   obiekty: prefabrykat, położenie, zachowanie (kolizja, cząsteczki, dźwięk …)  │
                          │   środowisko: powierzchnia, niebo, morze, ląd, światło i pogoda, kamera, UI gry │
                          └──────────────────────────────┬───────────────────────────────────────────────┘
@@ -26,11 +28,15 @@ i edytor ją pokazują, AI ją zmienia.
  [Assets]      [Events]      [Network …]  [Save/Load ~]  [Jobs/Workers …]  [Edytor + API dla AI]  [Lekarze]
  kity,         jedna szyna:  stan sceny,   scena jako    fizyka, AI,       hierarchia, ▶ Graj,    doktor modeli,
  prefabrykaty, akcje,        zdarzenia     JSON: plik    generowanie       konsola; AI buduje     lekarz sceny
- zasoby, mat.  UI gry                      i przeglądarka terenu           i gra przez API
+ zasoby, mat.  UI gry                      i przeglądarka; terenu          i gra przez API
+                                           ustawienia gracza
 ```
 
-Oznaczenia: bez znaku — działa, `~` — częściowo, `…` — w planie (stan 0.71.0; co zostało do połączenia: `TODO.md`,
-„Pełne połączenie laboratoriów”).
+Oznaczenia: bez znaku — działa, `~` — częściowo, `…` — w planie (stan 0.81.0; co zostało do połączenia: `TODO.md`,
+„Pełne połączenie laboratoriów”). Od 0.71.0: fizyka — bryły sztywne na lądzie (przedmioty złomowiska) i maszyny
+złomowiska; zachowania — przeładowarka, maszyny; wejście — czynności z klawiszami z ustawień gracza (menu
+Sterowanie); render — poziom jakości silnika (`js/render/quality.js`); UI gry — drzewka i Opcje (grafika, sterowanie);
+zapis — ustawienia gracza (`js/core/settings.js`); zasoby z nazwą — także roślina, drzewko, obraz.
 
 Ten schemat narysowany ramkami: menu **Pomoc → Schemat silnika** na każdej stronie (`ui/shell/menubar.js`, `engineMap`).
 
@@ -61,7 +67,9 @@ Ten schemat narysowany ramkami: menu **Pomoc → Schemat silnika** na każdej st
 | Assets | modele i kity: `js/models/` |
 | Scene (środowiska) | `js/envs/` (niebo, woda, ląd, prawa) |
 | Scripts | zachowania: `js/behaviors/` (koło na szynie, okręt na wodzie, lot) — [opis](../behaviors/README.md) |
-| Graphics + FX | `js/render/` (wygląd kamery, filtry, widzenie) |
+| Graphics + FX | `js/render/` (wygląd kamery, filtry, widzenie; poziom jakości `quality.js`, ustawienia grafiki gracza `game-graphics.js`) |
+| Input | `editor/js/play/input.js` — czynności z klawiszami z ustawień gracza (`js/core/settings.js`, `settings.keys`) |
+| Physics | prawa środowisk w zachowaniach (`js/behaviors/`), bryły sztywne na lądzie `js/behaviors/land/items.js` |
 | Audio | `js/audio/` (MusicKit) |
 | UI i Debug | `ui/shell/` (okna, `LabPerf`, konsola, `LabLog`, karta ładowania) |
 | Jobs/Workers | wątki nauki w laboratoriach języka i obrazów |
@@ -72,7 +80,7 @@ Ten schemat narysowany ramkami: menu **Pomoc → Schemat silnika** na każdej st
 | Debug + Editor | edytor sceny `editor/` (hierarchia, właściwości, uchwyt, zapis do pliku, ▶ Graj) — [opis](../../editor/README.md) |
 
 Brakuje: jednej pętli silnika dla gier (edytor ma swoją, z trybem gry), laboratoriów na wspólnej scenie (dziś każde buduje własną
-scenę Three.js; widok w wolnym środku mają już wszystkie, 0.35.0), warstwy Input, szyny zdarzeń i sieci.
+scenę Three.js; widok w wolnym środku mają już wszystkie, 0.35.0), pada i dotyku w warstwie Input, sieci, zapisu stanu gry.
 
 ## Kolejność (propozycja, do decyzji właściciela)
 

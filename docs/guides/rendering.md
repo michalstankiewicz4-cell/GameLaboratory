@@ -95,6 +95,25 @@ how the labs draw today (Three.js r186, the graphics of the labs from Battle): C
   readable).
 
 
+## Poziom jakości silnika (0.81.0)
+
+Jedno miejsce, z którego czytają modele, materiały, efekty, woda i scena — `js/render/quality.js` (`QUALITY`,
+`setQuality(gfx)`, `onQuality(fn)`). Ustawia go gra z ustawień gracza (`js/core/settings.js`, `settings.gfx`) przez
+`applyGraphics` (`js/render/game-graphics.js`); bez ustawień — pełna jakość (laboratoria, edytor poza grą).
+
+| Pole | Co zmienia | Gdzie |
+|---|---|---|
+| `lodBias` (`gfx.lod`, 0,5…2) | odległość przełączania modelu na wersję daleką: próg = max(40 m, 6 × wielkość modelu) × `lodBias`, z zapasem ±10 % (bez migotania) | świat edytora (`editor/js/world/world.js`, `updateLod`); prefabrykat z `lod: true` buduje wersję daleką przez `build({ detail: 0.5 })` — kity z `detail` (mniej odcinków) albo LOD 1 (JunkKit), budowana przy pierwszej potrzebie, z własnym `tick`; model, którego części rusza zachowanie, zostaje bliski (zachowanie z `lodFree` — przedmiot, bryła — pozwala na daleki) |
+| `texture` (`gfx.texture`) | `low`: mapy MatKit generowane w połowie rozdzielczości (od następnego wczytania), filtrowanie anizotropowe 1 zamiast do 8 (od razu, wszystkie tekstury sceny) | `js/render/materials/matkit.js` (`textureRes`, `anisotropy`), tekstury JunkKit, `refresh()` |
+| `fx` (`gfx.fx`, 0,25…1) | liczby cząstek efektów: pola `n`, `tailPerFrame`, `streaks`, `count`, `particles`, `perFrame` (odłamki, iskry, ogon kuli plazmy, holowanie…), ogień i dym pieca | `js/render/effects/effects.js` (przy budowie kitu — edytor buduje efekty od nowa po zmianie), `js/models/junkyard/fire.js` |
+| `water` (`gfx.water`) | siatka morza 192 × 160 albo 96 × 80, drobne zmarszczki × 1 / × 0,5 | `js/labs/shared/stage.js` (`setWaterDetail`) |
+| `view` (`gfx.view`, 0,5…1) | daleka płaszczyzna kamery × `view`, zasięg cieni × `view` | `applyGraphics` (kamera), świat edytora (`fitShadow`) |
+| `smallShadows` (`gfx.smallShadows`) | siatki o promieniu kuli opisanej do 0,25 m nie rzucają cienia | `refresh()` |
+
+Reszta ustawień grafiki (rozdzielczość obrazu, wygładzanie, cienie i mapa cieni, światła dynamiczne, poświata,
+jasność, nasycenie) — renderer i potok kamery (`applyGraphics`, `lookParams`). `refresh(scene, gfx)` poprawia to, co
+pojawiło się później (ogień, lampy, wersje dalekie modeli) — ▶ Graj woła je co 0,5 s.
+
 ## Efekty kosmosu w potoku kamery (0.54.0)
 
 `js/render/space-fx.js` — soczewkowanie grawitacyjne (czarna dziura: obiekt ukryty, obraz zagięty wokół niej,

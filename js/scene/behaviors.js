@@ -14,7 +14,8 @@ import { createCraft, craftDef } from '../behaviors/water/craft.js';
 import { createOrbit, orbitMu, circularVelocity } from '../behaviors/space/orbit.js';
 import { createLander, landerDef } from '../behaviors/land/lander.js';
 import { createGrapple } from '../behaviors/land/grapple.js';
-import { halfExtents, shapeOf, propsOf, itemKit } from '../models/junkyard/properties.js';
+import { halfExtents, shapeOf, propsOf } from '../models/junkyard/properties.js';
+import { itemKit } from '../behaviors/land/junk-items.js';
 import { createMachine, connect, MACHINE_IDS } from '../behaviors/land/machines/machines.js';
 import { addModelStatics } from '../behaviors/land/machines/statics.js';
 
@@ -290,7 +291,7 @@ export const BEHAVIORS = {
     },
   },
   item: {
-    label: 'Loose item (physics)', labelPl: 'Luźny przedmiot (fizyka)', env: 'land', throttle: [0, 0],
+    label: 'Loose item (physics)', labelPl: 'Luźny przedmiot (fizyka)', env: 'land', throttle: [0, 0], lodFree: true,   // rusza całym modelem, nie jego częściami
     fits: (prefabId) => isJunk(prefabId, 'items'),
     keys: 'falls, rolls over, stacks; machines and the grapple loader work it', keysPl: 'spada, przewraca się, układa; obrabiają go maszyny i przeładowarka',
     // bryła sztywna w świecie przedmiotów (land/items.js): półwymiary zderzacza gry, masa z modelu (× skala³)
@@ -334,7 +335,7 @@ export const BEHAVIORS = {
     },
   },
   solid: {
-    label: 'Solid (items collide)', labelPl: 'Bryła (przedmioty się zderzają)', env: 'land', throttle: [0, 0],
+    label: 'Solid (items collide)', labelPl: 'Bryła (przedmioty się zderzają)', env: 'land', throttle: [0, 0], lodFree: true,
     fits: (prefabId) => isJunk(prefabId, 'world'),
     keys: 'items lie on it and bump into it', keysPl: 'przedmioty na nim leżą i się o nie zderzają',
     // zderzacze nieruchome modelu (colliders() — jak w grze): platforma, ogrodzenie, punkt skupu

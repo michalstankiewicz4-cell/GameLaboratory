@@ -6,23 +6,24 @@ import { createItems } from '../../../js/behaviors/land/items.js';
 import { LIQUID_TIME } from '../../../js/render/liquid.js';
 import { createInput } from './input.js';
 import { createPlayUI } from './gameui-play.js';
-import { createSettings } from '../../../js/gameui/settings.js';
-import { applyGraphics, lights } from '../../../js/render/game-graphics.js';
+import { createSettings } from '../../../js/core/settings.js';
+import { applyGraphics, refresh } from '../../../js/render/game-graphics.js';
 
 const { t, lang } = window.EditorI18n;
 
 export function createPlay(store, world, controls, actions, events) {
-  // ustawienia gry gracza (js/gameui/settings.js; te same co w laboratorium UI gry): grafika i mysz w czasie gry,
+  // ustawienia gry gracza (js/core/settings.js; te same co w laboratorium UI gry): grafika i mysz w czasie gry,
   // klawisze czynności dla sterowania; menu Opcje UI gry zmienia je w biegu
   const settings = createSettings();
   const input = createInput(() => settings.data.keys);
   const playUI = createPlayUI(store, world, events, settings);   // UI gry ze sceny (env.ui) jako nakładka w czasie gry
   const orbit0 = { rot: controls.orbit.rotateSpeed, zoom: controls.orbit.zoomSpeed };
-  const gfxTarget = () => ({ renderer: world.renderer, look: world.look, scene: world.scene, sun: world.stage.sun });
+  const gfxTarget = () => ({ renderer: world.renderer, look: world.look, scene: world.scene, sun: world.stage.sun, stage: world.stage, camera: world.camera });
   function gameGraphics(on) {
     const d = settings.data;
     world.gameGfx = on ? d.gfx : null;
-    applyGraphics(gfxTarget(), on ? d.gfx : null); world.syncEnv();
+    const changed = applyGraphics(gfxTarget(), on ? d.gfx : null); world.syncEnv();   // syncEnv: potok kamery i zasięg cieni
+    if (changed.includes('fx')) world.clearEffects();   // efekty zbudowane od nowa z nową gęstością
     controls.orbit.rotateSpeed = orbit0.rot * (on ? d.mouse.rotSens : 1); controls.orbit.zoomSpeed = orbit0.zoom * (on ? d.mouse.zoomSens : 1);
   }
   settings.onChange(() => { if (runs.length) gameGraphics(true); });
@@ -62,7 +63,7 @@ export function createPlay(store, world, controls, actions, events) {
     runs = store.scene.objects.map((o) => {
       const id = behaviorOf(o, store.scene.env.surface), b = world.built.get(o.id); if (!id || !b) return null;
       const run = BEHAVIORS[id].create(o, b, env);
-      if (run) b.driven = true;   // ruch i części daje zachowanie (świat nie wywołuje tick)
+      if (run) { b.driven = true; b.lodFree = !!BEHAVIORS[id].lodFree; }   // ruch i części daje zachowanie (świat nie wywołuje tick); lodFree — wersja daleka może zostać
       return run && { obj: o, id, b, run };
     }).filter(Boolean);
     runs.sort((a, b) => bodyRank(b.obj.prefab) - bodyRank(a.obj.prefab));   // środki orbit przed ciałami, które wokół nich krążą
@@ -81,7 +82,7 @@ export function createPlay(store, world, controls, actions, events) {
   }
   function stop() {
     if (!runs.length) return;
-    runs.forEach((r) => { if (r.run.reset) r.run.reset(); r.b.driven = false; });
+    runs.forEach((r) => { if (r.run.reset) r.run.reset(); r.b.driven = false; r.b.lodFree = false; });
     // przedmioty powstałe w grze (sztabki, puszki zgniecione) znikają ze świata
     if (items) for (const it of [...items.list]) if (it.spawned) items.remove(it);
     items = null; machines.length = 0;
@@ -102,7 +103,7 @@ export function createPlay(store, world, controls, actions, events) {
     controls.orbit.target.add(d); world.camera.position.add(d);
     if ((hudT -= dt) <= 0) { hudT = 0.2; actions.status(hudText(me.run.hud())); }
     playUI.frame(dt, me, runs);
-    if ((lightT += dt) > 0.5) { lightT = 0; lights(world.scene, settings.data.gfx); }   // światła dodane w grze (ogień, lampy)
+    if ((lightT += dt) > 0.5) { lightT = 0; refresh(world.scene, settings.data.gfx, world.renderer.capabilities.getMaxAnisotropy()); }   // to, co pojawiło się w grze (ogień, lampy, wersje dalekie modeli)
     fpsN++; if ((fpsT += dt) >= 1) { if (playUI.ui) playUI.ui.fps(fpsN / fpsT); fpsN = 0; fpsT = 0; }
   }
   function hudText(h) {

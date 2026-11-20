@@ -37,6 +37,7 @@ export function createStage(renderer, scene, opts = {}) {
   // morze domyślne: umiarkowane, północny Atlantyk; setSea(zasób „morze” z laboratorium wody) zmienia je
   const SEA0 = { Hs: 1.2, Lp: 34, chop: 0.5, spread: 35, n: 12, dir: 30 }, L0 = LOOKS.atlantic;
   let waves = null, shine0 = L0.shine, seaDef = {};
+  let waterDetail = true, ripples0 = WU.uRipples.value;   // detal wody (setWaterDetail)
   function setSea(p = {}) {
     seaDef = p;
     if (land && land.T.lavaSea) p = { ...SEAS.lava, ...LOOKS.lava, dir: 30 };   // morze lawy planety: zawsze lawa
@@ -51,7 +52,7 @@ export function createStage(renderer, scene, opts = {}) {
       }
     }
     setWaves(WU, waves);
-    WU.uDeep.value.set(q.deep); WU.uScatter.value.set(q.scatter); WU.uRipples.value = q.ripples; WU.uCrest.value = q.crest;
+    WU.uDeep.value.set(q.deep); WU.uScatter.value.set(q.scatter); ripples0 = q.ripples; WU.uRipples.value = ripples0 * (waterDetail ? 1 : 0.5); WU.uCrest.value = q.crest;
     if (WU.uReflect) WU.uReflect.value = q.reflect;
     shine0 = q.shine; WU.uShine.value = shine0 * 1.8; envDirty = true;
   }
@@ -77,8 +78,15 @@ export function createStage(renderer, scene, opts = {}) {
     for (const c of [skyU.uSkyHor.value, skyU.uSkyZen.value, skyU.uSkyLow.value, hemi.color, scene.fog.color, WU.uFogCol.value]) tint(c);
     scene.fog.density *= 0.3 + 0.7 * k; fogBase = scene.fog.density; WU.uFogDen.value = fogBase;   // rzadka atmosfera — mniej mgiełki
   }
+  // detal wody (jakość silnika, js/render/quality.js): siatka morza 192 × 160 albo 96 × 80, drobne zmarszczki × 1 / × 0,5
+  function setWaterDetail(on) {
+    if (on === waterDetail) return;
+    waterDetail = on; const old = water.geometry;
+    water.geometry = on ? polarGrid(192, 160, 0.6, opts.seaRadius || 6000) : polarGrid(96, 80, 0.6, opts.seaRadius || 6000); old.dispose();
+    WU.uRipples.value = ripples0 * (on ? 1 : 0.5);
+  }
   const stage = {
-    skyU, WU, sun, hemi, water, ground, setSea,
+    skyU, WU, sun, hemi, water, ground, setSea, setWaterDetail, get waterDetail() { return waterDetail; },
     // wiatr [m/s] dla dryfu chmur (null — stały, wolny dryf)
     wind: null,
     get time() { return t; }, get shift() { return shift; },

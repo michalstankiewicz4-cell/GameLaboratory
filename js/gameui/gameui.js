@@ -13,7 +13,7 @@
 //               points — ścieżka punktów w stanie gry: kupno je odejmuje; widok z pola drzewka `view`)] }] }
 //
 // createGameUI(parent, def, { state, keys, settings }) → ui:
-//   settings — magazyn ustawień gry (createSettings, js/gameui/settings.js): jego dane są w stanie gry pod `settings`
+//   settings — magazyn ustawień gry (createSettings, js/core/settings.js): jego dane są w stanie gry pod `settings`
 //   (grafika `settings.gfx.*`, mysz `settings.mouse.*`, klawisze `settings.keys`), menu Opcje pisze do niego, a gra
 //   słucha akcji 'settings' (albo store.onChange) i stosuje grafikę i klawisze
 //   ui.set(stan | (stan) => stan)   stan gry (HUD, okna, ustawienia menu)
@@ -38,7 +38,7 @@ import { getAsset } from '../scene/assets.js';
 import { createHud } from './hud.js';
 import { createScreens } from './screens.js';
 import { applySkin } from './skins.js';
-import { SETTINGS_SCREENS } from './settings.js';
+import { SETTINGS_SCREENS } from '../core/settings.js';
 
 export const FORMAT = 'gamelab-ui', VERSION = 1;
 
@@ -51,7 +51,7 @@ export function normalizeUI(d) {
   const u = emptyUI(String(d.name || 'Game UI'));
   u.skin = d.skin || 'space'; u.start = String(d.start || ''); u.pause = String(d.pause || '');
   u.screens = d.screens && typeof d.screens === 'object' ? { ...d.screens } : {};
-  // gotowe ekrany ustawień gry: { graphics: 'standard', controls: 'standard' } (js/gameui/settings.js)
+  // gotowe ekrany ustawień gry: { graphics: 'standard', controls: 'standard' } (js/core/settings.js)
   for (const [id, v] of Object.entries(u.screens)) if (v === 'standard') { if (SETTINGS_SCREENS[id]) u.screens[id] = JSON.parse(JSON.stringify(SETTINGS_SCREENS[id])); else delete u.screens[id]; }
   u.hud = Array.isArray(d.hud) ? d.hud.filter((x) => x && typeof x.type === 'string') : [];
   u.windows = Array.isArray(d.windows) ? d.windows.filter((x) => x && x.id) : [];

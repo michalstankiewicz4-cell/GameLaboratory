@@ -13,6 +13,7 @@
 //     tile — ile metrów ma jeden kafelek (domyślnie def.tile); materiał.userData.tile — do ustawienia powtórzeń UV
 //   canvases(maps) → { albedo, normal, rough, metal, ao } — podglądy map (canvas 2D)
 import * as THREE from '../../../vendor/three/three.module.js';
+import { textureRes, anisotropy } from '../quality.js';
 
 export const KINDS = {
   metal: { label: 'Metal (smooth or brushed)', fields: ['brushed'] },
@@ -239,11 +240,12 @@ function ormData(m) {
 }
 const dataTex = (data, res, srgb) => {
   const t = new THREE.DataTexture(data, res, res, THREE.RGBAFormat); t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.magFilter = THREE.LinearFilter; t.minFilter = THREE.LinearMipmapLinearFilter; t.generateMipmaps = true; t.anisotropy = 8;
+  t.magFilter = THREE.LinearFilter; t.minFilter = THREE.LinearMipmapLinearFilter; t.generateMipmaps = true; t.anisotropy = anisotropy();
   if (srgb) t.colorSpace = THREE.SRGBColorSpace; t.needsUpdate = true; return t;
 };
 
-export function makeMaterial(def, { res = 512, tile } = {}) {
+export function makeMaterial(def, { res: res0 = 512, tile } = {}) {
+  const res = textureRes(res0);   // jakość tekstur silnika (js/render/quality.js): niska — połowa rozdzielczości
   const maps = generate(def, res), d = maps.def;
   const map = dataTex(new Uint8Array(maps.albedo.buffer.slice(0)), res, true), normalMap = dataTex(normalData(maps), res), orm = dataTex(ormData(maps), res);
   const material = new THREE.MeshStandardMaterial({ map, normalMap, roughnessMap: orm, metalnessMap: orm, aoMap: orm, roughness: 1, metalness: 1, aoMapIntensity: 1 });

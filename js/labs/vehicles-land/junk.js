@@ -4,7 +4,7 @@
 // przedmioty ze złomowiska (JunkKit) leżą przed nią do chwytania. Sterowanie jak w grze: W/S jazda, A/D skręt,
 // ←/→ obrót nadwozia, ↑/↓ wysięgnik, R/F ramię, Spacja chwytak.
 import { build as buildTruck, LAYOUT } from "../../models/junkyard/vehicle/grapple-truck.js";
-import { itemKit } from "../../models/junkyard/properties.js";
+import { itemKit } from "../../behaviors/land/junk-items.js";
 import { applyTextures, setAnisotropy } from "../../models/junkyard/textures.js";
 import { createGrapple } from "../../behaviors/land/grapple.js";
 const THREE = window.THREE;

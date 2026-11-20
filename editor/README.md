@@ -24,9 +24,12 @@ dostosowywać (zasoby z nazwą, wspólne zachowania).
   wybranym modelem (albo pierwszym z zachowaniem), kamera jedzie za nim. Okręt: W / S maszyny, A / D ster. Pojazd drogowy: W / S gaz i hamulec / wstecz (pedał), A / D skręt. Robot morski: W / S maszyny, A / D ster, ↓ ↑ głębiej / płycej (nurek). Statek kosmiczny: W / S silnik główny i wsteczny, ↑ ↓ pochylenie, ← → kurs,
   Q / E przechył. Samolot:
   W / S gaz, ↑ ↓ ster wysokości (na rozbiegu trzymać ↓), ← → lotki, Q / E ster kierunku, B hamulce, G podwozie, F klapy.
-  To klawisze domyślne: gracz zmienia je w menu Sterowanie UI gry (ustawienia gry, `js/gameui/settings.js` — te same
+  To klawisze domyślne: gracz zmienia je w menu Sterowanie UI gry (ustawienia gry, `js/core/settings.js` — te same
   w laboratorium UI gry); w grze działają też jego ustawienia grafiki (rozdzielczość, wygładzanie, cienie, światła
-  dynamiczne, poświata, jasność, nasycenie) i czułość myszy — po Stop edytor wraca do swojego wyglądu.
+  dynamiczne, poświata, jasność, nasycenie, poziom jakości silnika) i czułość myszy — po Stop edytor wraca do swojego wyglądu.
+- **Szczegóły z odległości (LOD):** model z wersją daleką (prefabrykat z `lod: true`) przełącza się na nią daleko od
+  kamery — próg z wielkości modelu × ustawienie gracza „odległość szczegółów” (w edytorze poza grą × 1); model, którego
+  części rusza zachowanie w grze, zostaje bliski ([../docs/guides/rendering.md](../docs/guides/rendering.md)).
   Edycja w tym czasie wyłączona; dane sceny się nie zmieniają, po Stop modele wracają na swoje miejsca.
 - **API** (zakładka w konsoli i `window.sceneApi.run(…)`): polecenia JSON na scenie — opis niżej, „API dla AI”.
 - Scena zapisuje się sama w przeglądarce (`localStorage["gameLab.scene.v1"]`); plik: `nazwa.scene.json`.
