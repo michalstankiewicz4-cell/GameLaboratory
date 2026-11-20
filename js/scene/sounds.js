@@ -11,6 +11,8 @@
 //    okręt, samolot, mała jednostka, przeładowarka; napęd elektryczny — buczenie; silniki rakietowe (ciąg w próżni,
 //    lądowanie) — huk ognia z mocą. Rozbicie (hud().crashed) — wybuch.
 // 4. Dźwięki modeli (drzwi, właz, podwozie, klapy — zdarzenia onSound, js/models/shared/sound-events.js): model(e).
+// 5. Dźwięk zachowania (run.sound(): maszyny złomowiska — agregat, zgniatanie, ogień, cewka, przenośnik; przeładowarka —
+//    hydraulika, szczęki, ładunek): ciągłe po kluczu, jednorazowe od razu, w miejscu obiektu.
 // 3. Efekty ze zdarzeń: strzały statków (ShipKit onShot) i zdarzenie „effect” (polecenie API „effect”) — dźwięk
 //    rodzaju efektu (EFFECT_SOUNDS: strzał, wybuch, odłamki, piorun), wybuch statku (ShipKit onDamage, „blast”);
 //    polecenie API „sound” — dowolny dźwięk w miejscu.
@@ -48,7 +50,7 @@ export const allSoundNames = (list = listAssets) => { const n = soundNames(list)
 /* ---------------- silniki pojazdów ---------------- */
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 // silnik z danych modelu (info.sounds.engine — js/models/shared/sound-events.js): { cylinders, idle, redline [obr/min],
-// electric: true — napęd elektryczny }; bez danych — zwykły silnik zachowania (domyślne niżej)
+// electric: true — napęd elektryczny, kind: 'turbine' (size 0 mała gazowa … 1 wielka parowa) — turbina }; bez danych — zwykły silnik zachowania (domyślne niżej)
 export function engineOf(kit) {
   const k = kit || {}, s = k.sounds || (k.def && k.def.sounds) || (k.info && k.info.sounds) || {};
   return s.engine || {};
@@ -68,8 +70,10 @@ function gearRpm(v, thr, idle, red) {
 }
 const electric = (h) => ({ sound: 'hum', params: { freq: 60, level: 0.15 + Math.abs(h.throttle || 0) * 0.6 } });
 // silnik tłokowy: obroty od wolnych do maksymalnych z dźwignią (lever) albo z biegami (gears)
+const turbine = (h, e) => { const thr = Math.abs(h.throttle || 0); return { sound: 'turbine', params: { spool: 0.25 + thr * 0.75, load: thr, size: e.size ?? 0.3 } }; };
 const piston = (h, e, d, gears) => {
   if (e.electric) return electric(h);
+  if (e.kind === 'turbine') return turbine(h, e);
   const idle = e.idle || d.idle, red = e.redline || d.redline, thr = Math.abs(h.throttle || 0);
   return { sound: 'engine', params: { rpm: gears ? gearRpm(Math.abs(h.speed), thr, idle, red) : idle + thr * (red * 0.92 - idle), load: thr, cylinders: e.cylinders || d.cylinders } };
 };
@@ -100,7 +104,7 @@ const pt = (p) => (p && p.toArray ? p.toArray() : Array.isArray(p) && p.length =
 // onLoud(rodzaj) — głośne zdarzenie (wybuch, strzał, piorun, rozbicie): np. muzyka akcji (js/scene/music.js)
 const LOUD = new Set(['explosion', 'gunshot', 'thunder']);
 export function createSceneSounds({ positionOf, get = getAsset, onLoud = null }) {
-  let sources = [], engines = [], live = false;   // live: w grze (dźwięki modeli tylko wtedy — po „Stop” części wracają na miejsce po cichu)
+  let sources = [], engines = [], voiced = [], live = false;   // voiced: zachowania z własnym dźwiękiem (run.sound — maszyny, przeładowarka)   // live: w grze (dźwięki modeli tylko wtedy — po „Stop” części wracają na miejsce po cichu)
   const near = (id) => positionOf(id) || [0, 0, 0];
   function effectSound(kind, e) {
     const m = EFFECT_SOUNDS[kind]; if (!m) return;
@@ -124,6 +128,7 @@ export function createSceneSounds({ positionOf, get = getAsset, onLoud = null })
         const h = startSound({ sound: e0.sound, params: e0.params }, { at: near(r.obj.id), ref: refOf(e0.sound), bus: 'sfx', gain: e0.level ?? 1 });
         engines.push({ r, f, h, eng, crashed: false });
       }
+      for (const r of runs) if (r.run.sound) voiced.push({ r, loops: new Map() });
     },
     // klatka: źródła idą za obiektami, silniki — obroty z zachowania, rozbicie — wybuch
     frame() {
@@ -135,8 +140,19 @@ export function createSceneSounds({ positionOf, get = getAsset, onLoud = null })
         if (h.crashed && !e.crashed && p) { playSound({ sound: 'explosion', params: { size: 0.7, distance: 0.1, debris: 0.7 } }, { at: p, ref: refOf('explosion') }); if (onLoud) onLoud('crash'); }
         e.crashed = !!h.crashed;
       }
+      // dźwięk zachowania: ciągłe po kluczu (start przy pierwszym głośnym, cisza = poziom 0), jednorazowe od razu
+      for (const v of voiced) {
+        const d = v.r.run.sound(); if (!d) continue;
+        const p = positionOf(v.r.obj.id) || [0, 0, 0];
+        for (const l of d.loops || []) {
+          let h = v.loops.get(l.key);
+          if (!h && l.level > 0) { h = startSound({ sound: l.sound, params: l.params }, { at: p, ref: refOf(l.sound), bus: 'sfx', gain: 0 }); v.loops.set(l.key, h); }
+          if (h) { h.move(p); h.set(l.params || {}, l.level); }
+        }
+        for (const x of d.shots || []) { try { playSound(x, { at: p, ref: refOf(x.sound) }); } catch (err) { if (window.LabLog) window.LabLog.add('warn', 'Sound: ' + err.message); } }
+      }
     },
-    stop() { live = false; for (const s of sources) s.h.stop(0.6); for (const e of engines) e.h.stop(0.4); sources = []; engines = []; },
+    stop() { live = false; for (const s of sources) s.h.stop(0.6); for (const e of engines) e.h.stop(0.4); for (const v of voiced) for (const h of v.loops.values()) h.stop(0.3); sources = []; engines = []; voiced = []; },
     // strzał statku (ShipKit onShot: { from, to, dir }) z efektem obiektu (pole „shot”)
     // (rodzaj efektu albo zapisany efekt; rodzaj bez dźwięku — zwykły strzał)
     shot(s, choice = 'shot') { const k = EFFECT_SOUNDS[choice] ? choice : (get('effect', choice) || {}).kind; effectSound(EFFECT_SOUNDS[k] ? k : 'shot', s); },

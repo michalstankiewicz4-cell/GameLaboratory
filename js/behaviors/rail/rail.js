@@ -61,7 +61,8 @@ export function attachRail(train, sim = createSim()) {
     let n = 0;
     if (!sim.broken) { while (acc >= H && n < 140) { sim.step(); acc -= H; n++; if (sim.broken) break; } }
     if (n >= 140 || sim.broken) acc = 0;
-    sim.events.length = 0;            // zdarzenia akustyczne: bez dźwięku w laboratorium
+    if (sim.listen) sim.listen(sim, n);   // zdarzenia akustyczne: słuchacz (np. js/audio/rail-sounds.js) przed wyczyszczeniem
+    sim.events.length = 0;
     if (!sim.broken) sync();
     return n;
   }

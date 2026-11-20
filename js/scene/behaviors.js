@@ -1,6 +1,7 @@
 // Zachowania w scenie: podpięcie zachowań z js/behaviors/ do obiektów sceny (prefabrykatów). Silnik, wspólny dla edytora
 // i gier. Obiekt sceny wybiera zachowanie polem `behavior` (id stąd); bez niego stoi w miejscu.
-// Adapter: create(obj, built, world) → { step(dt, input, t), state, hud(), reset() }; built — model w scenie ({ root, kit }:
+// Adapter: create(obj, built, world) → { step(dt, input, t), state, hud(), reset(), actions?(), act?(), sound?() };
+// sound() → { loops: [{ key, sound, params, level }], shots: [{ sound, params }] } — dźwięk zachowania (js/scene/sounds.js); built — model w scenie ({ root, kit }:
 // root — grupa obiektu, kit — to, co zwrócił kit), world — { surface, waves } ze sceny bazowej, t — czas fal. Adapter ustawia root (położenie, obrót)
 // i ruchome części modelu; dane sceny (pos, rot) zostają nietknięte — po „Stop” obiekt wraca na swoje miejsce.
 // Sterowanie (input): { throttle, rudder, elevator, aileron, flaps, gear, brake } z klawiatury gracza; obiekty, którymi
@@ -287,16 +288,25 @@ export const BEHAVIORS = {
       const yaw = obj.rot[1] * D2R, place = { x: obj.pos[0], z: obj.pos[2], yaw };
       const model = junkModel(built), ground = { height: (x, z) => { const h = world.terrainAt ? world.terrainAt(x, z) : 0; return h == null ? 0 : h; } };
       const g = createGrapple(model, { ...place, ground, scene: world.scene || built.root.parent, items: world.items });
-      let space = false, pedal = 0;
+      let space = false, pedal = 0, hyd = 0, jaws = null, load = 0;
       return {
         state: g.drive.state,
         step(dt, c) {
           if (c.lift && !space) g.toggleJaws(); space = !!c.lift;   // spacja: zamknij / otwórz
           pedal = c.throttle || 0;
           g.step(dt, { throttle: pedal, steer: -(c.rudder || 0), brake: c.brake || 0, slew: -(c.aileron || 0), boom: -(c.elevator || 0), stick: c.stick || 0 });
+          hyd = Math.max(Math.abs(c.aileron || 0), Math.abs(c.elevator || 0), Math.abs(c.stick || 0));   // hydraulika: obrót, wysięgnik, ramię
           g.sync();
         },
         actions: () => [{ id: 'grab', label: 'Grapple', kind: 'toggle', on: g.closed }],
+        // dźwięk: hydraulika ramienia z wychyleniem drążków; szczęki — stuk łańcucha i stali; złapany ładunek — dobicie
+        sound() {
+          const shots = [];
+          if (jaws != null && g.closed !== jaws) shots.push({ sound: 'impact', params: { material: 3, strength: 0.7 } }, { sound: 'hydraulic', params: { time: 0.6, pitch: 1.3, lock: 0.5 } });
+          if (g.payload > load + 1) shots.push({ sound: 'impact', params: { material: 2, strength: Math.min(1, 0.4 + g.payload / 400) } });
+          jaws = g.closed; load = g.payload;
+          return { loops: [{ key: 'hydraulics', sound: 'pump', params: { load: 0.3 + hyd * 0.7 }, level: hyd > 0.05 ? 0.4 + hyd * 0.6 : 0 }], shots };
+        },
         act(id, on) { if (id === 'grab') g.setJaws(on == null ? !g.closed : on); },
         hud: () => ({ speed: g.drive.state.u * 3.6, unit: 'km/h', throttle: pedal, load: g.payload }),
         reset() { g.dispose(); },
@@ -342,6 +352,7 @@ export const BEHAVIORS = {
         step(dt) { m.frame(dt); },
         actions: () => m.actions().map((a) => ({ ...a, label: a.label })),
         act(id, on) { m.act(id, on); },
+        sound: () => (m.sound ? m.sound() : null),   // dźwięk maszyny (js/scene/sounds.js)
         hud: () => ({ speed: 0, unit: '', throttle: 0, machine: m.hud(false) }),
         reset() { m.dispose(); const i = list.indexOf(m); if (i >= 0) list.splice(i, 1); },
       };

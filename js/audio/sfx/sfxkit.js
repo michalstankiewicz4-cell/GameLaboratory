@@ -24,6 +24,7 @@ export const SOUNDS = {
   thunder: { label: 'Thunder', labelPl: 'Grzmot', cat: 'weather', params: { distance: P('Distance', 0, 1, 0.01, 0.4) } },
   splash: { label: 'Splash', labelPl: 'Plusk', cat: 'water', params: { size: P('Size', 0, 1, 0.01, 0.5) } },
   impact: { label: 'Impact', labelPl: 'Uderzenie', cat: 'impact', params: { material: P('Material (metal · wood · heavy · chain)', 0, 3, 1, 0), strength: P('Strength', 0.05, 1, 0.01, 0.7) } },
+  crunch: { label: 'Crushing', labelPl: 'Zgniatanie', cat: 'impact', params: { material: P('Material (can · scrap · paper)', 0, 2, 1, 1), strength: P('Strength', 0.1, 1, 0.01, 0.7) } },
   hit: { label: 'Shell hit', labelPl: 'Trafienie', cat: 'impact', params: { armour: P('Armour', 0, 1, 0.01, 0.5), strength: P('Strength', 0, 1, 0.01, 0.6) } },
   bird: { label: 'Bird', labelPl: 'Ptak', cat: 'nature', params: { species: P('Species (sparrow · tit · blackbird · gull · crow · owl)', 0, 5, 1, 2), pitch: P('Pitch', 0.7, 1.4, 0.01, 1) } },
   door: { label: 'Door / hatch', labelPl: 'Drzwi / właz', cat: 'mech', params: { kind: P('Kind (car · hatch · bus · wooden)', 0, 3, 1, 0), action: P('Action (open · close)', 0, 1, 1, 1), force: P('Force', 0.1, 1, 0.01, 0.6) } },
@@ -37,13 +38,16 @@ export const SOUNDS = {
   crickets: { label: 'Crickets', labelPl: 'Świerszcze', cat: 'nature', loop: true, params: { density: P('Density', 0, 1, 0.01, 0.5) } },
   city: { label: 'City traffic', labelPl: 'Ruch w mieście', cat: 'machine', loop: true, params: { traffic: P('Traffic', 0, 1, 0.01, 0.5) } },
   engine: { label: 'Engine', labelPl: 'Silnik', cat: 'machine', loop: true, params: { rpm: P('RPM', 600, 7000, 10, 1800), load: P('Load', 0, 1, 0.01, 0.4), cylinders: P('Cylinders', 1, 12, 1, 4) } },
+  pump: { label: 'Hydraulic power pack', labelPl: 'Agregat hydrauliczny', cat: 'mech', loop: true, params: { load: P('Load', 0, 1, 0.01, 0.5) } },
+  turbine: { label: 'Turbine', labelPl: 'Turbina', cat: 'machine', loop: true, params: { spool: P('Spool (0 idle … 1 full)', 0, 1, 0.01, 0.4), load: P('Load', 0, 1, 0.01, 0.4), size: P('Size (small gas · big steam)', 0, 1, 0.01, 0.3) } },
+  rail: { label: 'Wheels on rails', labelPl: 'Koła na szynach', cat: 'machine', loop: true, params: { speed: P('Speed (m/s)', 0, 40, 0.1, 12), joint: P('Rail length (m)', 12, 60, 1, 25), bogie: P('Bogie wheelbase (m)', 1.5, 3, 0.1, 2.5), clacks: P('Joint clacks (0 — the physics gives them)', 0, 1, 1, 1) } },
   squeal: { label: 'Wheel on rail (squeal)', labelPl: 'Koło na szynie (pisk)', cat: 'machine', loop: true, params: { strength: P('Strength', 0, 1, 0.01, 0.5) } },
   hum: { label: 'Electric hum', labelPl: 'Buczenie prądu', cat: 'machine', loop: true, params: { freq: P('Mains (Hz)', 50, 60, 10, 50), level: P('Level', 0, 1, 0.01, 0.4) } },
 };
 export const SOUND_IDS = Object.keys(SOUNDS);
 // odległość pełnej głośności [m] dźwięku w miejscu (dalej cichnie jak 1/odległość): głośne słychać daleko, ciche —
 // z bliska; reszta 6 m
-export const REF = { explosion: 40, thunder: 60, gunshot: 25, hit: 12, impact: 8, splash: 10, bird: 10, ui: 3, door: 8, hydraulic: 8,
+export const REF = { explosion: 40, thunder: 60, gunshot: 25, hit: 12, impact: 8, crunch: 10, pump: 6, turbine: 25, rail: 15, splash: 10, bird: 10, ui: 3, door: 8, hydraulic: 8,
   engine: 10, fire: 6, sea: 30, wind: 30, rain: 30, stream: 10, crickets: 10, city: 40, squeal: 15 };
 export const refOf = (id) => REF[id] || 6;
 export const defaults = (id) => Object.fromEntries(Object.entries((SOUNDS[id] || {}).params || {}).map(([k, v]) => [k, v[4]]));
@@ -142,6 +146,19 @@ const ONE = {
       case 3: partials(ctx, d, t, [[1900, 1, 0.14], [3150, 0.8, 0.12], [4700, 0.6, 0.09], [6300, 0.4, 0.07]], 0.18 * s, 0.25, s); noiseHit(ctx, d, t, 4000 + 2500 * s, 3, 0.02, 0.25 * s ** 1.4); return 0.3;
       default: partials(ctx, d, t, [[180, 1, 0.55], [431, 0.7, 0.42], [812, 0.5, 0.3], [1490, 0.35, 0.22], [2630, 0.2, 0.12]], 0.55 * s, 0.06, s); noiseHit(ctx, d, t, 800 + 1500 * s, 0.8, 0.035, 0.6 * s ** 1.4); return 1;
     }
+  },
+  crunch(ctx, out, t, p) {   // nowy: zgniatanie — trzaski blachy (krótkie szumy w paśmie), niski jęk i stuk końcowy; papier — szelest
+    const f = p.strength, m = Math.round(p.material), n = m === 2 ? 26 : 12 + Math.round(f * 12), len = 0.5 + f * 0.6;
+    for (let i = 0; i < n; i++) {
+      const tt = t + Math.pow(Math.random(), 0.7) * len;
+      if (m === 2) noiseHit(ctx, out, tt, 2500 + Math.random() * 4000, 1.5, 0.03 + Math.random() * 0.05, 0.08 + Math.random() * 0.1);
+      else noiseHit(ctx, out, tt, (m === 0 ? 2600 : 1400) + Math.random() * 2500, 3 + Math.random() * 4, 0.02 + Math.random() * 0.04, (0.15 + Math.random() * 0.3) * f);
+    }
+    if (m !== 2) {
+      tone(ctx, out, t, m === 0 ? 210 : 95, len, 0.12 * f, 'sawtooth', m === 0 ? 150 : 70);   // jęk blachy
+      partials(ctx, out, t + len, m === 0 ? [[780, 1, 0.1], [1530, 0.6, 0.07]] : [[55, 1, 0.28], [118, 0.6, 0.16], [390, 0.35, 0.18]], 0.6 * f, 0.1, f);   // dobicie
+    }
+    return len + 0.4;
   },
   hit(ctx, out, t, p) {   // Battle: hit — trafienie w pancerz (wyżej) albo w nadbudówkę (niżej)
     const k = 0.3 + p.strength * 0.5;
@@ -314,6 +331,46 @@ const LOOP = {
       lp.frequency.setTargetAtTime(300 + p.load * 1800 + f * 2, t, tc); ng.gain.setTargetAtTime(0.05 + p.load * 0.2, t, tc); g.gain.setTargetAtTime(0.1 + p.load * 0.14, t, tc); };
     apply(0.001);
     return { set(q) { p = q; apply(); }, tick() {}, nodes: [o, sub, n] };
+  },
+  pump(ctx, out, p) {   // nowy: agregat hydrauliczny — silnik (piła ~ 25 Hz × 4 bieguny przez filtr), pompa łopatkowa (wyższy ton), szum oleju
+    const o = ctx.createOscillator(), o2 = ctx.createOscillator(), lp = filt(ctx, 'lowpass', 500, 1.5), g = gainN(ctx, 0), g2 = gainN(ctx, 0.12);
+    o.type = 'sawtooth'; o2.type = 'triangle'; o.connect(lp); o2.connect(g2); g2.connect(lp); lp.connect(g);
+    const n = src(ctx, 'pink', true), bp = filt(ctx, 'bandpass', 1800, 1), ng = gainN(ctx, 0); n.connect(bp); bp.connect(ng); ng.connect(g); g.connect(out); o.start(); o2.start(); n.start();
+    const apply = (tc = 0.1) => { const t = ctx.currentTime, f = 96 - p.load * 10;
+      o.frequency.setTargetAtTime(f, t, tc); o2.frequency.setTargetAtTime(f * 9, t, tc); lp.frequency.setTargetAtTime(380 + p.load * 900, t, tc);
+      ng.gain.setTargetAtTime(0.04 + p.load * 0.18, t, tc); g.gain.setTargetAtTime(0.12 + p.load * 0.12, t, tc); };
+    apply(0.001);
+    return { set(q) { p = q; apply(); }, tick() {}, nodes: [o, o2, n] };
+  },
+  turbine(ctx, out, p) {   // nowy: turbina — gwizd łopatek (sinusy wysoko, rosną z obrotami), szum przepływu, niski huk spalania / pary
+    const w1 = ctx.createOscillator(), w2 = ctx.createOscillator(), wg = gainN(ctx, 0), n = src(ctx, 'pink', true), bp = filt(ctx, 'bandpass', 1200, 0.7), ng = gainN(ctx, 0);
+    const r = src(ctx, 'brown', true), lp = filt(ctx, 'lowpass', 220), rg = gainN(ctx, 0), g = gainN(ctx, 1);
+    w1.type = 'sine'; w2.type = 'sine'; w1.connect(wg); w2.connect(wg); wg.connect(g); n.connect(bp); bp.connect(ng); ng.connect(g); r.connect(lp); lp.connect(rg); rg.connect(g); g.connect(out);
+    w1.start(); w2.start(); n.start(); r.start();
+    const apply = (tc = 0.4) => { const t = ctx.currentTime, k = 1 - p.size * 0.6, f = (900 + p.spool * 2600) * k;
+      w1.frequency.setTargetAtTime(f, t, tc); w2.frequency.setTargetAtTime(f * 1.5 + 37, t, tc); wg.gain.setTargetAtTime(0.012 + p.spool * 0.03, t, tc);
+      bp.frequency.setTargetAtTime((500 + p.spool * 2200) * k, t, tc); ng.gain.setTargetAtTime(0.06 + p.spool * 0.2 + p.load * 0.1, t, tc);
+      rg.gain.setTargetAtTime(0.1 + p.load * 0.35 + p.size * 0.15, t, tc); };
+    apply(0.001);
+    return { set(q) { p = q; apply(0.4); }, tick() {}, nodes: [w1, w2, n, r] };
+  },
+  rail(ctx, out, p) {   // aTrain: toczenie (szum brązowy rośnie z prędkością) i stuki na stykach szyn — para kół wózka, potem drugi wózek
+    const n = src(ctx, 'brown', true), lp = filt(ctx, 'lowpass', 300), ng = gainN(ctx, 0), hum = src(ctx, 'pink', true), bp = filt(ctx, 'bandpass', 900, 2), hg = gainN(ctx, 0);
+    n.connect(lp); lp.connect(ng); ng.connect(out); hum.connect(bp); bp.connect(hg); hg.connect(out); n.start(); hum.start();
+    let next = 0;
+    const apply = (tc = 0.2) => { const t = ctx.currentTime, v = p.speed; ng.gain.setTargetAtTime(Math.min(0.5, v * 0.02), t, tc); lp.frequency.setTargetAtTime(160 + v * 12, t, tc);
+      hg.gain.setTargetAtTime(Math.min(0.12, v * 0.004), t, tc); bp.frequency.setTargetAtTime(500 + v * 25, t, tc); };
+    apply(0.001);
+    const clack = (t, s) => { partials(ctx, out, t, [[180, 1, 0.08], [431, 0.7, 0.06], [812, 0.4, 0.04]], 0.5 * s, 0.08, s); noiseHit(ctx, out, t, 1200, 1, 0.025, 0.35 * s); };
+    return {
+      set(q) { p = q; apply(); },
+      tick(t) {   // styk co joint / speed s: dwa koła wózka (rozstaw bogie) — stuk-stuk
+        const v = p.speed; if (v < 0.5 || !p.clacks) { next = 0; return; }
+        if (!next) next = t + 0.05;
+        while (next < t + 0.15) { const s = Math.min(1, 0.3 + v / 30), dt = p.bogie / v; clack(next, s); clack(next + dt, s * 0.9); next += p.joint / v; }
+      },
+      nodes: [n, hum],
+    };
   },
   squeal(ctx, out, p) {   // aTrain: pisk obrzeża koła — szum w paśmie i piła 2600–4000 Hz z drżeniem przez wąskie pasmo
     const s = src(ctx, 'white', true), bp = filt(ctx, 'bandpass', 900, 1.2), g1 = gainN(ctx, 0); s.connect(bp); bp.connect(g1); g1.connect(out); s.start();

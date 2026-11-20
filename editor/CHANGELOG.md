@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.45.0 — 2026-11-20
+
+### Dodane
+- ▶ Graj: dźwięki maszyn złomowiska (agregat, zgniatanie, ogień, cewka pieca, wylew, przenośnik, sztabki) i przeładowarki
+  (hydraulika, szczęki, ładunek); Błyskawica i Abrams z dźwiękiem turbiny.
+
 ## 0.44.0 — 2026-11-20
 
 ### Dodane

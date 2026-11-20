@@ -3,6 +3,23 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.89.0 · pojazdy — ląd 1.24.0 · efekty dźwiękowe 1.3.0 · edytor sceny 0.45.0 — 2026-11-20 (dźwięki maszyn, turbiny, szyn)
+
+### Dodane
+- SfxKit: **agregat hydrauliczny** (ciągły, obciążenie), **turbina** (obroty, obciążenie, wielkość: mała gazowa … wielka
+  parowa), **koła na szynach** (toczenie i stuki na stykach z prędkością, długość szyny, rozstaw wózka) i **zgniatanie**
+  (puszka, złom, papier).
+- **Dźwięki maszyn złomowiska** w ▶ Graj (`m.sound()` w `js/behaviors/land/machines/machines.js`): zgniatarki — agregat
+  w ruchu, trzask każdego zgniecenia, dobicie przy docisku; piec na papier — ogień z jego mocą; piec indukcyjny —
+  buczenie cewki pod prądem, hydraulika przechyłu, syk wylewu; linia odlewnicza — silnik przenośnika, stuk gotowej
+  sztabki i rozdzielacza. **Przeładowarka**: hydraulika ramienia z drążkami, stuk szczęk, dobicie złapanego ładunku.
+  Dźwięk zachowania (`run.sound()`) gra dźwięk sceny (`js/scene/sounds.js`) w miejscu obiektu.
+- **Turbiny**: ORP Błyskawica (parowe) i M1A2 Abrams (gazowa) grają turbiną zamiast silnika tłokowego (dane modeli
+  `info.sounds.engine.kind`).
+- **Pociąg i tramwaj** w laboratorium pojazdów lądowych: zdarzenia akustyczne fizyki z aTrain (styk szyn, podkład,
+  sprzęg, łańcuch, zderzak) wreszcie grają (`js/audio/rail-sounds.js`), do tego toczenie z prędkością i pisk obrzeży
+  kół z mocy tarcia obrzeża; słuchacz — kamera.
+
 ## Program 0.88.0 · muzyka 1.4.0 · edytor sceny 0.44.0 — 2026-11-20 (muzyka w scenie)
 
 ### Dodane

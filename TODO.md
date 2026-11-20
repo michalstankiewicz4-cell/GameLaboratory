@@ -94,7 +94,6 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
 - [ ] Przetłumaczyć okna laboratoriów na polski (teraz po polsku są pasek menu, strona startowa, tytuły okien standardowych, konsola i okno Wydajność).
 
 ## Pociąg (zachowanie „koło na szynie”)
-- [ ] Dźwięki pociągu z aTrain (tarcie kół, łańcuch, sprzęg, styki szyn, zderzaki, koło o podkład).
 - [ ] Dym i iskry z aTrain.
 - [ ] Teren z aTrain: góra, skarpa, morze, las (fizyka zna go przez `sim.groundH`).
 - [ ] Pogoda z aTrain.

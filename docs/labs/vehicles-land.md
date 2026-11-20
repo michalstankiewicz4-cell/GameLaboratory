@@ -119,6 +119,11 @@ planet brings the planet's (Luna: weak gravity, no air). The ship starts 40 m up
 controller that holds 1.5 m/s down and sets it on its four landing pads; by hand: Space — lift thrusters, W / S — the
 main engine, A / D — yaw. Touching down faster than 5 m/s breaks it.
 
+## Rail sounds (1.24.0)
+
+The train and the tram sound from the physics: aTrain's acoustic events (rail joints, sleepers, the knuckle, the chain,
+the buffers) play at their place, with the rolling and the flange squeal (`js/audio/rail-sounds.js`).
+
 ## Model sounds (1.23.0)
 
 The lab listens to the models (`hearModel`, `js/audio/model-sounds.js`): the work part's button (the Polonez's door, the

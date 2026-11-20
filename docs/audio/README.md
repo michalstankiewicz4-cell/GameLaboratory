@@ -11,6 +11,7 @@ trzy kity robią dźwięki. Laboratoria — grupa dźwięku (przełącznik na pa
 | `musickit/musickit.js` | MusicKit — muzyka (nastroje, muzyka ambientowa, piosenki) |
 | `sfx/sfxkit.js` | SfxKit — efekty (wybuchy, strzały, woda, uderzenia, ptaki…), dźwięki ciągłe, tła miejsc |
 | `voice/voicekit.js` | VoiceKit — mowa: synteza przeglądarki, głos z formantów, szept, efekty głosu |
+| `rail-sounds.js` | dźwięk szyn: zdarzenia akustyczne fizyki „koło na szynie” (styk, podkład, sprzęg, łańcuch, zderzak), toczenie, pisk obrzeży |
 | `model-sounds.js` | słuchanie modeli: zdarzenia dźwięku modelu (`onSound`) grane przez SfxKit w miejscu części |
 
 ## Mikser (`mixer.js`)
@@ -62,14 +63,24 @@ Model nie gra dźwięku — nie wie, gdzie jest ani czy ktoś słucha (zasada mo
 |---|---|---|
 | FSO Polonez | drzwi kierowcy: zamek przy otwarciu, trzaśnięcie po zamknięciu | 4 cyl., 850–5600 obr/min |
 | Solaris Urbino 18 | drzwi: syk pneumatyki przy otwieraniu i zamykaniu | elektryczny |
-| M1A2 Abrams | właz dowódcy: zamek, ciężkie dobicie | 8 cyl. (w oryginale turbina) |
+| M1A2 Abrams | właz dowódcy: zamek, ciężkie dobicie | turbina gazowa (`size: 0.15`) |
 | Spitfire | podwozie: hydraulika i blokada w końcu ruchu; klapy; owiewka | V12, 900–3000 |
-| ORP Błyskawica, ORP Orzeł | — | 12 cyl. (turbiny), 8 cyl. (diesle) |
+| ORP Błyskawica, ORP Orzeł | — | turbina parowa (`kind: 'turbine'`, `size: 1`), 8 cyl. (diesle) |
 | barka (MarineKit) / nurek, łaziki (VehicleKit) | — | 6 cyl. / elektryczny |
 
 Część robocza modelu (`info.work`: drzwi, właz, owiewka, rampa) jest w ▶ Graj akcją **work** (klawisze 1…9, API `act`)
 zachowań jazdy, lotu i małej jednostki. Laboratorium pojazdów lądowych słucha modeli (przycisk części roboczej,
 podwozie, klapy).
+
+## Dźwięk zachowań i szyn
+
+- **Zachowanie z dźwiękiem** (`run.sound()` → `{ loops: [{ key, sound, params, level }], shots: [{ sound, params }] }`):
+  dźwięk sceny gra dźwięki ciągłe po kluczu (poziom 0 — cisza) i jednorazowe w miejscu obiektu. Maszyny złomowiska
+  (`m.sound()`): zgniatarki (agregat `pump`, `crunch`, dobicie), piec na papier (`fire`), piec indukcyjny (`hum` cewki,
+  `pump` przechyłu, `fire` wylewu), linia odlewnicza (`hum` przenośnika, stuki); przeładowarka (`pump`, szczęki, ładunek).
+- **Szyny** (`createRailSounds().listen(sim, kroki)` — `sim.listen` w `js/behaviors/rail/rail.js` albo po krokach
+  tramwaju): zdarzenia fizyki z aTrain → `impact` (styk, zderzak — ciężki; podkład — drewno; sprzęg — metal; łańcuch),
+  `rail` (toczenie, bez własnych stuków), `squeal` z mocy tarcia obrzeży (`b.flangeP`). W laboratorium pojazdów lądowych.
 
 ## Muzyka w scenie (`js/scene/music.js`)
 

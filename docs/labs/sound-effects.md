@@ -19,6 +19,10 @@ ciągłe i tła na szynie otoczenia. Grupa dźwięku: muzyka ([`sound.md`](sound
 | ptak | gatunek (wróbel, bogatka, kos, mewa, wrona, sowa), wysokość | nowy |
 | interfejs | rodzaj (klik, dzwonek, naprawa, alarm, pik, tyk, przekaźnik, otwarcie, zamknięcie, klawisz, potwierdzenie, odmowa), ton, poziom | Battle (`click`, `bell`, `repair`) + nowe; dźwięki skórek UI gry ([gameui.md](gameui.md)) |
 | drzwi / właz | rodzaj (samochód, właz, autobus — pneumatyka, drewniane), otwarcie / zamknięcie, siła | nowy: zamek, zawias, uderzenie skrzydła o ramę; dźwięki modeli |
+| agregat hydrauliczny ∿ | obciążenie | nowy: silnik, pompa łopatkowa, szum oleju; maszyny, przeładowarka |
+| turbina ∿ | obroty, obciążenie, wielkość (gazowa … parowa) | nowy: gwizd łopatek, przepływ, huk; Błyskawica, Abrams |
+| koła na szynach ∿ | prędkość, długość szyny, rozstaw wózka, stuki | aTrain: toczenie i stuk-stuk na stykach |
+| zgniatanie | materiał (puszka, złom, papier), siła | nowy: trzaski blachy, jęk, dobicie; zgniatarki |
 | hydraulika / serwo | czas, ton, blokada na końcu | nowy: pompa, olej w przewodach, blokada (aTrain: zderzak); podwozie, klapy |
 | wiatr ∿ | siła, porywy | nowy |
 | deszcz ∿ | natężenie | szum + krople (jak warstwa deszczu MusicKit) |

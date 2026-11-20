@@ -20,8 +20,8 @@ export const info = {
   doorAt: { x: 2.3, z: 1.2 },            // przy lewej burcie, przy przednim błotniku
   gunPivot: { y: 1.93, z: 2.25 },        // czop armaty względem kadłuba (przy wieży na wprost)
   turretAt: { z: 0.35 },
-  // dźwięki (js/models/shared/sound-events.js): silnik (w oryginale turbina — tu tłokowy), właz — zamek, ciężkie dobicie
-  sounds: { engine: { cylinders: 8, idle: 700, redline: 3000 }, 'work-open': { sound: 'door', params: { kind: 1, action: 0 } }, 'work-shut': { sound: 'door', params: { kind: 1, action: 1, force: 0.8 } } },
+  // dźwięki (js/models/shared/sound-events.js): turbina gazowa AGT1500, właz — zamek, ciężkie dobicie
+  sounds: { engine: { kind: 'turbine', size: 0.15 }, 'work-open': { sound: 'door', params: { kind: 1, action: 0 } }, 'work-shut': { sound: 'door', params: { kind: 1, action: 1, force: 0.8 } } },
 };
 
 const ZF = 3.97, ZB = -3.96;           // przód / tył kadłuba

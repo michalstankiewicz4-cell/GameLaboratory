@@ -18,6 +18,8 @@ import { sampleHeight, TERRAIN_DEFAULTS } from "../../envs/land/landkit.js";
 import { WORLD_DEFAULTS } from "../../envs/land/regionkit.js";
 import { hearModel } from "../../audio/model-sounds.js";
 import { mixer } from "../../audio/mixer.js";
+import { createRailSounds } from "../../audio/rail-sounds.js";
+const tramSounds = createRailSounds();   // the tram's wheels on rails: the physics' acoustic events (aTrain)
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 (() => {
@@ -133,7 +135,7 @@ const modes = [];
 function setMode(m) {
   if (mode && mode.group) mode.group.visible = false;
   if (mode && mode !== m && mode.leave) mode.leave();   // the family stops listening to its keys
-  mode = m;
+  mode = m; if (m) tramSounds.stop();
   const on = !!m;
   ground.visible = !on && !world; if (world) stage.setSurface(on ? "none" : "land"); dust.points.visible = !on; if (veh) veh.group.visible = !on;
   $("vkPanel").classList.toggle("hidden", on);
@@ -151,7 +153,7 @@ function addMode(m) {
   $("vehicle").appendChild(new Option(m.tabName || m.name, "m:" + (modes.length - 1)));
 }
 function load() {
-  setMode(null);
+  setMode(null); tramSounds.stop();
   if (veh) { if (veh.kit === "mk") MK.disposeVessel(veh); else if (veh.kit === "rk") RK.disposeVehicle(veh); else if (veh.kit === "tram") TK.disposeTram(veh); else if (veh.kit === "air") AK.disposeAircraft(veh); else if (veh.kit === "ship") { scene.remove(veh.group); ShipKit.disposeShipModel(veh.m); } else VK.disposeVehicle(veh); }
   const { def, kit } = LIST[state.index];
   veh = kit === "ship" ? shipVehicle(def) : kit === "mk" ? MK.buildVessel(def.id, { detail: 1 }) : kit === "rk" ? RK.buildVehicle(def.id, {}) : kit === "tram" ? TK.buildTram(def.id, {}) : kit === "air" ? AK.buildAircraft(def.id, {}) : VK.buildVehicle(def.id, { detail: 1 });
@@ -248,6 +250,8 @@ function resize() {
 window.addEventListener("resize", resize);
 const clock = new THREE.Timer(), prev = new THREE.Vector3(), delta = new THREE.Vector3();
 let wander = 0;
+// the sound listener: the camera (model sounds, the rails)
+const listen = () => { if (mixer().started) mixer().listen(camera.position.toArray(), camera.getWorldDirection(new THREE.Vector3()).toArray(), camera.up.toArray()); };
 function frame() {
   const t0 = performance.now(), dt = Math.min(clock.update().getDelta(), 0.05), t = clock.getElapsed();
   stage.tick(dt);   // the stage's waves and clouds
@@ -256,6 +260,7 @@ function frame() {
     controls.update(); stage.follow(camera);
     renderer.info.reset(); LabKit.render(renderer, scene, camera);
     LabPerf.end(renderer, performance.now() - t0);   // the Performance window (ui/shell/perf.js)
+    listen();
     requestAnimationFrame(frame); return;
   }
   const def = veh.def;
@@ -280,6 +285,7 @@ function frame() {
     tramAcc += Math.min(dt, 1 / 20); let n = 0;
     if (!sim.broken) while (tramAcc >= RAIL_H && n < 140) { sim.step(); tramAcc -= RAIL_H; n++; if (sim.broken) break; }
     if (n >= 140) tramAcc = 0;
+    tramSounds.listen(sim, n);
     sim.events.length = 0;
     tramPoses(sim, groundAt, tramPose, THREE);
     const P = tramPose[0], fw = new THREE.Vector3(0, 0, 1).applyQuaternion(P.q);
@@ -350,7 +356,7 @@ function frame() {
   renderer.info.reset();
   LabKit.render(renderer, scene, camera);
   LabPerf.end(renderer, performance.now() - t0);   // the Performance window (ui/shell/perf.js)
-  if (mixer().started) mixer().listen(camera.position.toArray(), camera.getWorldDirection(delta.clone()).toArray(), camera.up.toArray());   // the listener: the camera
+  listen();
   requestAnimationFrame(frame);
 }
 // the land lab's settings saved in this browser (gameLab.land.v1: map, water, weather; its defaults if nothing is saved)

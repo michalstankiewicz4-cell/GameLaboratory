@@ -6,6 +6,7 @@ import { buildTrain, DEFAULT_TRAIN, BODIES, data } from "../../models/train/trai
 import { buildNetwork } from "../../models/structures/railway/network.js";
 import { trainMaterials } from "../../models/train/materials.js";
 import { attachRail, railAnchor, ANCHOR_OFFSET } from "../../behaviors/rail/rail.js";
+import { createRailSounds } from "../../audio/rail-sounds.js";
 const THREE = window.THREE;
 
 const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
@@ -86,12 +87,14 @@ function start(lab) {
   }
 
   const role = "Rail: a shunting diesel and two covered wagons — a knuckle coupler, then a chain on a hook — on an oval with two turnouts and a loop. Real wheel–rail physics (from aTrain): nothing holds the train on the track but the contact of the wheels with the rails.";
+  const sounds = createRailSounds(); let active = false;   // dźwięk szyn: tylko gdy pociąg jest pokazany
   lab.addMode({
     name: "Train", tabName: "Train", role, panel,
     target: [-1, 1.6, -50], camera: [-14, 7, -30],
     build() {
       const g = new THREE.Group(); g.name = "pociąg na torze";
       train = buildTrain(DEFAULT_TRAIN); rail = attachRail(train); sim = rail.sim;
+      sim.listen = (s, n) => { if (active) sounds.listen(s, n); };   // dźwięk szyn z zdarzeń fizyki (aTrain)
       this.rail = rail;   // do testów i narzędzi (sim, sync)
       const flat = new THREE.Mesh(new THREE.PlaneGeometry(1200, 600), trainMaterials().ground);
       flat.rotation.x = -Math.PI / 2; flat.position.set(sim.TRACK.hl + 120, -0.45, 0); flat.receiveShadow = true; g.add(flat);
@@ -109,7 +112,9 @@ function start(lab) {
         ["Couplers", "knuckle · chain on hook"], ["Curve radius", sim ? sim.TRACK.R + " m" : "–"],
         ["Physics step", "1/2400 s"], ["Triangles", v ? Math.round(tris(train)).toLocaleString("en-US") : "–"]];
     },
+    leave() { active = false; sounds.stop(); },
     update(dt) {
+      active = true;
       if (follow) { offLocal.copy(cam.position).sub(controls.target); rotY(offLocal, -follow.last.yaw); }
       rail.update(dt);
       for (let i = 0; i < 2; i++) { const t = swLabel(i); if (ui["sw" + i].textContent !== t) ui["sw" + i].textContent = t; }

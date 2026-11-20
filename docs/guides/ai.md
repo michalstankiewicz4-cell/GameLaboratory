@@ -132,7 +132,7 @@ wybór gracza przychodzi jako zdarzenie (`events`).
   wszystko.
 - **Dźwięk zaczyna grać po pierwszym kliknięciu albo klawiszu** (zasada przeglądarek); mowa przeglądarki nie jest
   w grafie Web Audio (bez efektów, poziom 0 na miernikach).
-- **Jeszcze nie ma:** chodu ludzi i stworów, drugiego etapu budynków dla CityExplorer — lista: [`../../TODO.md`](../../TODO.md), plan:
+- **Jeszcze nie ma:** chodu ludzi i stworów, pociągu w scenie (potrzebny tor), drugiego etapu budynków dla CityExplorer — lista: [`../../TODO.md`](../../TODO.md), plan:
   [`lab-breakdown.md`](lab-breakdown.md), [`engine-architecture.md`](engine-architecture.md).
 - **Fizyka jest prawdziwa** (siły, nie skrypty): samolot z kółkiem ogonowym rozbije się, jeśli na rozbiegu nie trzymać
   steru wysokości; okręt osiądzie na mieliźnie. To wynik sił, nie błąd.
