@@ -56,6 +56,9 @@
 <aside class="panel" data-window="skin" data-title="Skin" data-title-pl="Skórka">
   <div class="row"><span>Based on</span><select id="skinBase"></select><output></output></div>
   <div id="tokens"></div>
+  <h3>Sounds</h3>
+  <div id="skinSounds"></div>
+  <p class="note">What each event of the UI sounds like (the engine mixer's Interface bus — Options → Sound). ▶ plays it.</p>
   <div class="row"><span>Save as</span><input type="text" id="skinName" maxlength="40" placeholder="My skin"><output></output></div>
   <div class="btns"><button type="button" id="skinSave">Save the skin</button><button type="button" id="skinReset">Back to the base</button></div>
   <p class="note">A saved skin is a named asset: any UI (and later a game in the scene editor) can use it.</p>
@@ -79,6 +82,8 @@
 Hold position
 Ask for more data</textarea>
   <div class="row"><span>Where</span><select id="dSide"><option value="b">Bottom</option><option value="t">Top</option></select><output></output></div>
+  <div class="row"><span>Voice</span><select id="dVoice"></select><output></output></div>
+  <p class="note">Without a voice the text is typed with the skin's sound. Voices: ready ones and those saved in the speech lab.</p>
   <div class="btns"><button type="button" id="dSay">Say</button><button type="button" id="dNarr">Narrator line</button></div>
   <p class="note" id="dRes"></p>
 </aside>

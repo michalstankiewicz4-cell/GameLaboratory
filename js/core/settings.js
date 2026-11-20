@@ -10,7 +10,7 @@
 //                 lod (odległość szczegółów modeli 0,5…2), texture ('high' | 'low' — tekstury), fx (gęstość efektów
 //                 0,25…1), water (detal wody), view (zasięg widzenia 0,5…1), smallShadows (cienie drobnych części)
 // settings.mouse: rotSens, zoomSens (czułość obracania i przybliżania kamery 0,2…3)
-// settings.audio: master, music, ambience, sfx, voice (głośności 0…1 — szyny miksera js/audio/mixer.js), mute (wyciszenie)
+// settings.audio: master, music, ambience, sfx, voice, ui (głośności 0…1 — szyny miksera js/audio/mixer.js), mute (wyciszenie)
 // settings.keys:  czynność → kod klawisza (KeyboardEvent.code, niezależny od układu klawiatury); czynności: KEY_ACTIONS
 // inne pola najwyższego poziomu (liczby, napisy, tak / nie — np. minimap) — ustawienia danej gry, zostają
 //
@@ -39,7 +39,7 @@ export const DEFAULTS = {
   gfx: { scale: 1, aa: true, shadows: true, shadowQuality: 'high', lights: true, bloom: true, bright: 1, sat: 1, showFps: false,
     lod: 1, texture: 'high', fx: 1, water: true, view: 1, smallShadows: true },
   mouse: { rotSens: 1, zoomSens: 1 },
-  audio: { master: 0.8, music: 0.7, ambience: 0.8, sfx: 0.9, voice: 1, mute: false },
+  audio: { master: 0.8, music: 0.7, ambience: 0.8, sfx: 0.9, voice: 1, ui: 0.7, mute: false },
   keys: Object.fromEntries(KEY_ACTIONS.map((a) => [a.id, a.key])),
 };
 // Graphics presets for the Options buttons (light = for weaker computers).
@@ -74,7 +74,7 @@ export function sanitize(s) {
       smallShadows: bool(g.smallShadows, d.gfx.smallShadows),
     },
     mouse: { rotSens: num(m.rotSens, 1, 0.2, 3), zoomSens: num(m.zoomSens, 1, 0.2, 3) },
-    audio: { ...Object.fromEntries(['master', 'music', 'ambience', 'sfx', 'voice'].map((x) => [x, num(a[x], d.audio[x], 0, 1)])), mute: bool(a.mute, false) },
+    audio: { ...Object.fromEntries(['master', 'music', 'ambience', 'sfx', 'voice', 'ui'].map((x) => [x, num(a[x], d.audio[x], 0, 1)])), mute: bool(a.mute, false) },
     keys: Object.fromEntries(KEY_ACTIONS.map((a) => [a.id, code(k[a.id], a.key)])),
     ...extra(s),
   };
@@ -120,6 +120,7 @@ export const SETTINGS_SCREENS = {
     { type: 'slider', label: 'Ambience', bind: 'settings.audio.ambience', min: 0, max: 1, step: 0.05 },
     { type: 'slider', label: 'Effects', bind: 'settings.audio.sfx', min: 0, max: 1, step: 0.05 },
     { type: 'slider', label: 'Speech', bind: 'settings.audio.voice', min: 0, max: 1, step: 0.05 },
+    { type: 'slider', label: 'Interface', bind: 'settings.audio.ui', min: 0, max: 1, step: 0.05 },
     { type: 'toggle', label: 'Mute', bind: 'settings.audio.mute' },
     { label: 'Default sound', do: 'reset:audio', sub: true }, { label: 'Back', do: 'back', sub: true }] },
 };

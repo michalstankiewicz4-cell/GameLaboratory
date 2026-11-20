@@ -19,18 +19,19 @@ trzy kity robią dźwięki. Laboratoria — grupa dźwięku (przełącznik na pa
 music ─┐
 ambience ─┤
 sfx ───┼─► master (kompresor) ─► głośność ogólna × wyciszenie ─► głośniki (+ strumień do nagrań)
-voice ─┘
+voice ─┤
+ui ────┘
 ```
 
 - `mixer()` — wspólny mikser (tworzony raz); kontekst (`ctx`) powstaje przy pierwszym użyciu, a przeglądarka gra
   dopiero po geście — mikser sam wznawia kontekst przy pierwszym kliknięciu albo klawiszu (`unlock()` — wprost).
-- `bus('music' | 'ambience' | 'sfx' | 'voice')` — wejście szyny; `setVolumes({ master, music, ambience, sfx, voice,
-  mute })`; `bindSettings(store)` — głośności z ustawień gracza na żywo; `level(szyna)` — poziom do mierników.
+- `bus('music' | 'ambience' | 'sfx' | 'voice' | 'ui')` — wejście szyny (`ui` — dźwięki interfejsu gry, `js/gameui/sounds.js`);
+  `setVolumes({ master, music, ambience, sfx, voice, ui, mute })`; `bindSettings(store)` — głośności z ustawień gracza na żywo; `level(szyna)` — poziom do mierników.
 - Dźwięk przestrzenny: `listen(pos, fwd, up)` — słuchacz (kamera; ▶ Graj edytora ustawia go co klatkę),
   `at(pos, szyna)` — źródło w miejscu (PannerNode, HRTF, odległość odwrotna; jak w aTrain), `move(źródło, pos)`.
 - `noise()` — wspólny bufor szumu; `stream` — strumień całości (MediaRecorder).
 
-**Ustawienia gracza:** `settings.audio` w `js/core/settings.js` (master, music, ambience, sfx, voice 0…1, mute) —
+**Ustawienia gracza:** `settings.audio` w `js/core/settings.js` (master, music, ambience, sfx, voice, ui 0…1, mute) —
 gotowy ekran Opcji **Dźwięk** UI gry (`screens: { audio: 'standard' }`, obok Grafiki i Sterowania). Okno **Mikser**
 w laboratoriach dźwięku (`js/labs/shared/mixer-window.js`) zmienia te same ustawienia i pokazuje poziomy szyn.
 

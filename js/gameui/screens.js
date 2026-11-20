@@ -101,8 +101,8 @@ export function createScreens(root, { onAction, getState, setState }) {
     current = id; el.hidden = false; draw(id); onAction('screen', id);
     return true;
   }
-  function back() { if (history.length) { current = history.pop(); draw(current); onAction('screen', current); } else hide(); }
-  function hide() { if (waiting) waiting(); el.hidden = true; current = null; history.length = 0; onAction('resume'); }
+  function back() { if (history.length) { current = history.pop(); draw(current); onAction('screen', current, 'back'); } else hide(); }   // 'back' — dźwięk powrotu
+  function hide() { const was = !el.hidden; if (waiting) waiting(); el.hidden = true; current = null; history.length = 0; onAction('resume', null, was ? 'closed' : ''); }   // 'closed' — menu było otwarte (dźwięk)
   return {
     el, show, back, hide,
     build(screens = {}) { defs = screens; if (current && !defs[current]) hide(); else if (current) draw(current); },

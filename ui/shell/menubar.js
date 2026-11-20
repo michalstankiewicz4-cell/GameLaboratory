@@ -64,9 +64,6 @@ try {
     localStorage.removeItem(k);
   }
 } catch (e) { /* storage blocked */ }
-// what each page keeps in this browser (OPTIONS → Reset saved settings)
-const SAVED = { "index.html": (CAT.start && CAT.start.saved) || [] };
-for (const c of CAT.labs.concat(CAT.tools)) if (c.saved) SAVED[c.file] = c.saved;
 const all = LABS.concat(TOOLS);
 const isTool = DIR === "tools";
 const me = all.find((x) => x.file === PAGE) || null;
@@ -196,8 +193,18 @@ function engineMap() {
 }
 
 // ---------- the menus ----------
+// OPTIONS → Reset saved settings: everything this site keeps in this browser — local and session storage (settings of
+// every page, window layouts, named assets, scenes, the language), IndexedDB, Cache Storage, service workers, cookies
+async function wipeBrowser() {
+  try { localStorage.clear(); } catch (e) { /* storage blocked */ }
+  if (window.LabLog) window.LabLog.clear();   // the log saves itself on pagehide: empty first
+  try { sessionStorage.clear(); } catch (e) { /* storage blocked */ }
+  try { if (indexedDB.databases) for (const d of await indexedDB.databases()) if (d.name) indexedDB.deleteDatabase(d.name); } catch (e) { /* none or blocked */ }
+  try { if (window.caches) for (const k of await caches.keys()) await caches.delete(k); } catch (e) { /* none or blocked */ }
+  try { if (navigator.serviceWorker) for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister(); } catch (e) { /* none */ }
+  try { for (const c of document.cookie.split(";")) { const n = c.split("=")[0].trim(); if (n) document.cookie = n + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/"; } } catch (e) { /* none */ }
+}
 function options() {
-  const keys = (SAVED[PAGE] || []).concat(START ? [] : ["gamelab.windows:" + PAGE]);
   return [
     action(t("Full screen", "Pełny ekran"), () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(() => {}); },
       { on: !!document.fullscreenElement }),
@@ -214,11 +221,9 @@ function options() {
       }, { on: LANG_CHOICE === k && !LANGS[URL_LANG] })),
     el("div", "lmSep"),
     action(t("Reset saved settings…", "Wyczyść zapisane ustawienia…"), () => {
-      const what = START ? t("the start screen's order, pin and visit counts", "kolejność, przypięcie i licznik odwiedzin strony startowej")
-        : t("this page's settings and where its windows stand", "ustawienia tej strony i układ jej okien");
-      if (!confirm(t("Forget ", "Zapomnieć ") + what + t(" in this browser and reload?", " w tej przeglądarce i odświeżyć?"))) return;
-      try { Object.keys(localStorage).forEach((k) => { if (keys.some((p) => k.startsWith(p))) localStorage.removeItem(k); }); } catch (e) { /* storage blocked */ }
-      location.reload();
+      if (!confirm(t("Forget everything GameLaboratory keeps in this browser — the settings of every lab and tool, window layouts, the bars, the language, assets saved under a name, scenes, the start screen's order — and reload? This cannot be undone.",
+        "Zapomnieć wszystko, co GameLaboratory trzyma w tej przeglądarce — ustawienia wszystkich laboratoriów i narzędzi, układ okien, paski, język, zasoby zapisane pod nazwą, sceny, kolejność na stronie startowej — i odświeżyć? Tego nie da się cofnąć."))) return;
+      wipeBrowser().finally(() => location.reload());
     }),
   ];
 }

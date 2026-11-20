@@ -3,6 +3,25 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.87.0 · UI gry 1.6.0 · efekty dźwiękowe 1.2.0 · muzyka 1.3.1 · mowa 1.0.1 · edytor sceny 0.43.0 — 2026-11-20 (dźwięki UI, pełny reset)
+
+### Dodane
+- **Dźwięki UI gry** (`js/gameui/sounds.js`): kliknięcie i najechanie na przycisk, otwarcie i zamknięcie ekranu
+  menu albo okna, powrót, pisanie tekstu dialogu, wybór, kupno i odmowa w drzewku, baner, wpis w dzienniku — każda
+  skórka ma swój zestaw (space: piknięcia, battle: metalowe przekaźniki i klawisze, engine: ciche tyknięcia), własny
+  w polu `sounds` skórki (zasób uiskin); laboratorium UI: okno Skórka → **Sounds** z odsłuchem.
+- **Głosy postaci w dialogu**: `say({ who, text, voice })` albo `voices: { postać: głos }` w definicji UI — gotowy
+  głos VoiceKit albo zapisany w laboratorium mowy; laboratorium UI: okno Dialog → **Voice**; API sceny `ui say { voice }`.
+- Mikser: szyna **interfejsu** (`ui`) z głośnością gracza `settings.audio.ui` — suwak **Interface** w Opcje → Dźwięk
+  i w oknach Mikser laboratoriów dźwięku.
+- SfxKit, dźwięk interfejsu: nowe rodzaje (pik, tyk, przekaźnik, otwarcie, zamknięcie, klawisz, potwierdzenie,
+  odmowa), ton i poziom.
+
+### Zmienione
+- OPCJE → **Wyczyść zapisane ustawienia** czyści całą pamięć GameLaboratory w przeglądarce: localStorage
+  i sessionStorage (ustawienia wszystkich stron, układ okien, paski, język, zasoby z nazwą, sceny, dziennik),
+  IndexedDB, pamięć podręczną, service workery i ciasteczka — wcześniej tylko ustawienia bieżącej strony.
+
 ## Program 0.86.0 · pojazdy — ląd 1.23.0 · efekty dźwiękowe 1.1.0 · edytor sceny 0.42.0 — 2026-11-20 (dźwięki modeli)
 
 ### Dodane

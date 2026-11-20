@@ -28,7 +28,7 @@ export const SOUNDS = {
   bird: { label: 'Bird', labelPl: 'Ptak', cat: 'nature', params: { species: P('Species (sparrow · tit · blackbird · gull · crow · owl)', 0, 5, 1, 2), pitch: P('Pitch', 0.7, 1.4, 0.01, 1) } },
   door: { label: 'Door / hatch', labelPl: 'Drzwi / właz', cat: 'mech', params: { kind: P('Kind (car · hatch · bus · wooden)', 0, 3, 1, 0), action: P('Action (open · close)', 0, 1, 1, 1), force: P('Force', 0.1, 1, 0.01, 0.6) } },
   hydraulic: { label: 'Hydraulics / servo', labelPl: 'Hydraulika / serwo', cat: 'mech', params: { time: P('Time (s)', 0.3, 6, 0.1, 2), pitch: P('Pitch', 0.5, 2, 0.01, 1), lock: P('Lock at the end', 0, 1, 0.01, 0.6) } },
-  ui: { label: 'Interface', labelPl: 'Interfejs', cat: 'ui', params: { kind: P('Kind (click · bell · repair · alarm)', 0, 3, 1, 0) } },
+  ui: { label: 'Interface', labelPl: 'Interfejs', cat: 'ui', params: { kind: P('Kind (click · bell · repair · alarm · blip · tick · relay · open · close · key · confirm · deny)', 0, 11, 1, 0), pitch: P('Pitch', 0.5, 2, 0.01, 1), level: P('Level', 0.1, 1.5, 0.01, 1) } },
   wind: { label: 'Wind', labelPl: 'Wiatr', cat: 'weather', loop: true, params: { strength: P('Strength', 0, 1, 0.01, 0.4), gusts: P('Gusts', 0, 1, 0.01, 0.5) } },
   rain: { label: 'Rain', labelPl: 'Deszcz', cat: 'weather', loop: true, params: { intensity: P('Intensity', 0, 1, 0.01, 0.5) } },
   sea: { label: 'Sea waves', labelPl: 'Fale morza', cat: 'water', loop: true, params: { strength: P('Strength', 0, 1, 0.01, 0.5), period: P('Wave period (s)', 3, 14, 0.5, 7) } },
@@ -219,12 +219,21 @@ const ONE = {
     if (p.lock > 0) { partials(ctx, out, t + T, [[55, 1, 0.28], [118, 0.6, 0.16], [390, 0.35, 0.18], [910, 0.15, 0.1]], 0.8 * p.lock, 0.08, p.lock); noiseHit(ctx, out, t + T, 420, 0.8, 0.06, 0.4 * p.lock, 'lowpass'); }   // blokada (aTrain: zderzak)
     return T + 0.5;
   },
-  ui(ctx, out, t, p) {   // Battle: click, bell, repair; alarm — nowy
+  ui(ctx, out, t, p) {   // Battle: click, bell, repair; reszta nowa — dźwięki interfejsu gry (skórki UI, js/gameui/skins.js)
+    const k = p.pitch, o = p.level === 1 ? out : (() => { const g = gainN(ctx, p.level); g.connect(out); return g; })();
     switch (Math.round(p.kind)) {
-      case 1: tone(ctx, out, t, 988, 0.5, 0.12); tone(ctx, out, t + 0.35, 988, 0.5, 0.12); return 1;
-      case 2: tone(ctx, out, t, 660, 0.15, 0.12); tone(ctx, out, t + 0.12, 880, 0.2, 0.12); return 0.4;
-      case 3: for (let i = 0; i < 4; i++) tone(ctx, out, t + i * 0.5, 880, 0.4, 0.12, 'square', 660); return 2;
-      default: tone(ctx, out, t, 1200, 0.05, 0.05); return 0.1;
+      case 1: tone(ctx, o, t, 988 * k, 0.5, 0.12); tone(ctx, o, t + 0.35, 988 * k, 0.5, 0.12); return 1;
+      case 2: tone(ctx, o, t, 660 * k, 0.15, 0.12); tone(ctx, o, t + 0.12, 880 * k, 0.2, 0.12); return 0.4;
+      case 3: for (let i = 0; i < 4; i++) tone(ctx, o, t + i * 0.5, 880 * k, 0.4, 0.12, 'square', 660 * k); return 2;
+      case 4: tone(ctx, o, t, 1500 * k, 0.07, 0.07, 'sine', 1900 * k); return 0.1;   // pik (elektronika)
+      case 5: noiseHit(ctx, o, t, 5200 * k, 2.5, 0.015, 0.6); return 0.05;   // tyk (cichy klik)
+      case 6: partials(ctx, o, t, [[1900 * k, 1, 0.05], [3150 * k, 0.8, 0.04], [4700 * k, 0.5, 0.03]], 0.12, 0.25, 0.6); noiseHit(ctx, o, t, 3000 * k, 2, 0.015, 0.15); return 0.1;   // przekaźnik (metal)
+      case 7: burst(ctx, o, t, { kind: 'pink', freq: 700 * k, type: 'bandpass', q: 1.4, dur: 0.28, gain: 0.4, attack: 0.12, sweep: 3, rate: 1 }); return 0.3;   // otwarcie (szum w górę)
+      case 8: burst(ctx, o, t, { kind: 'pink', freq: 2100 * k, type: 'bandpass', q: 1.4, dur: 0.25, gain: 0.35, attack: 0.03, sweep: 0.33, rate: 1 }); return 0.3;   // zamknięcie (szum w dół)
+      case 9: noiseHit(ctx, o, t, (2600 + Math.random() * 900) * k, 3, 0.025, 0.3); tone(ctx, o, t, (420 + Math.random() * 60) * k, 0.03, 0.06, 'square'); return 0.05;   // klawisz (pisanie)
+      case 10: tone(ctx, o, t, 880 * k, 0.1, 0.09, 'sine'); tone(ctx, o, t + 0.08, 1320 * k, 0.16, 0.09, 'sine'); return 0.3;   // potwierdzenie
+      case 11: tone(ctx, o, t, 150 * k, 0.22, 0.12, 'sawtooth', 120 * k); tone(ctx, o, t + 0.02, 157 * k, 0.2, 0.08, 'square', 125 * k); return 0.3;   // odmowa (brzęczyk)
+      default: tone(ctx, o, t, 1200 * k, 0.05, 0.05); return 0.1;
     }
   },
 };

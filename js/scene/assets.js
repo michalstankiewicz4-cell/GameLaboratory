@@ -18,7 +18,7 @@
 //   ui — UI gry z laboratorium UI: definicja 'gamelab-ui' (ekrany menu, HUD, okna gry; js/gameui/gameui.js)
 //   material — materiał z laboratorium materiałów: opis MatKit (rodzaj, barwy, kafelek, szorstkość, metaliczność,
 //         nierówność, starzenie; js/render/materials/matkit.js)
-//   uiskin — skórka UI gry z laboratorium UI: { base: 'space' | 'battle' | 'engine', tokens } (js/gameui/skins.js)
+//   uiskin — skórka UI gry z laboratorium UI: { base: 'space' | 'battle' | 'engine', tokens, sounds } (js/gameui/skins.js)
 //   blocks — bryła z bloków z laboratorium bloków: opis BlockKit (kształt, rozmiar, blok, ziarno, napis, warstwy,
 //         mats — materiały bloków stałych jako opisy MatKit, matRefs — co było wybrane w laboratorium);
 //         w scenie: pole „asset” obiektu z prefabrykatem bloków (js/models/blocks/blockkit.js)
@@ -51,7 +51,7 @@ export const ASSET_KINDS = {
   sky: { label: 'Space sky', labelPl: 'Niebo kosmosu', lab: 'labs/bodies.html', keys: null },   // null: każda liczba
   ui: { label: 'Game UI', labelPl: 'UI gry', lab: 'labs/gameui.html', keys: ['format', 'version', 'name', 'skin', 'start', 'pause', 'screens', 'hud', 'windows'] },
   material: { label: 'Material', labelPl: 'Materiał', lab: 'labs/materials.html', keys: ['label', 'kind', 'color', 'color2', 'tile', 'seed', 'roughness', 'metalness', 'bump', 'wear', 'dirt', 'rust', 'brushed', 'panels', 'rivets', 'planks', 'grain', 'cracks', 'grains', 'pores', 'bricks', 'fibres', 'threads', 'trowel'] },
-  uiskin: { label: 'Game UI skin', labelPl: 'Skórka UI gry', lab: 'labs/gameui.html', keys: ['base', 'tokens'] },
+  uiskin: { label: 'Game UI skin', labelPl: 'Skórka UI gry', lab: 'labs/gameui.html', keys: ['base', 'tokens', 'sounds'] },
   plant: { label: 'Plant', labelPl: 'Roślina', lab: 'labs/plants.html', keys: ['species', 'seed', 'size', 'detail', 'season'] },
   cave: { label: 'Cave', labelPl: 'Jaskinia', lab: 'labs/caves.html', keys: ['seed', 'length', 'branches', 'width', 'winding', 'chambers', 'rough', 'cell', 'drips', 'rubble', 'lakes', 'lava', 'rock', 'wet', 'relief'] },
   effect: { label: 'Effect', labelPl: 'Efekt', lab: 'labs/effects.html', keys: ['kind', 'scale', 'values'] },

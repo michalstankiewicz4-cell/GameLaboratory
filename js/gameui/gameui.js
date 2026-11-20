@@ -6,7 +6,8 @@
 // definicja (format 'gamelab-ui'):
 // { format: 'gamelab-ui', version: 1, name, skin: 'space' | 'battle' | 'engine' | { base, tokens },
 //   start: '<id ekranu>' | '' (od razu gra), pause: '<id ekranu>' (Esc w grze),
-//   screens: { id: ekran (screens.js) albo 'standard' — gotowy ekran ustawień: graphics, controls }, hud: [element (hud.js)],
+//   screens: { id: ekran (screens.js) albo 'standard' — gotowy ekran ustawień: graphics, controls, audio }, hud: [element (hud.js)],
+//   voices: { postać: głos } — głosy postaci w dialogu (gotowy głos VoiceKit albo zasób „voice” z laboratorium mowy),
 //   windows: [{ id, title, key?, at?: 'c' | 'l' | 'r', body: [{ type: 'text', text } | { type: 'value', label, bind, unit? }
 //             | { type: 'stats', bind } (obiekt → wiersze) | { type: 'list', bind } (lista napisów albo { name, n })
 //             | { type: 'tree', tree, points } (drzewko ulepszeń: zasób „tree” albo przykład o tej nazwie, js/gameui/tree/;
@@ -19,7 +20,10 @@
 //   ui.set(stan | (stan) => stan)   stan gry (HUD, okna, ustawienia menu)
 //   ui.show(ekran), ui.back(), ui.hide()                        menu
 //   ui.open(okno), ui.close(okno), ui.toggle(okno)             okna gry
-//   ui.say({ who, text, choices?, side? }) → Promise<indeks wyboru | -1>   okno dialogowe (postać, narrator: who '')
+//   ui.say({ who, text, choices?, side?, voice? }) → Promise<indeks wyboru | -1>   okno dialogowe (postać, narrator: who '');
+//                                   voice — głos kwestii (bez niego: voices[who]); bez głosu — dźwięk pisania skórki
+// Dźwięki UI (js/gameui/sounds.js): zdarzenia (klik, najechanie, ekran, okno, dialog, kupno…) grają dźwięki skórki;
+//   ui.sounds — { on, play(zdarzenie), voice(), stopVoice() }
 //   ui.log(tekst, rodzaj?, idDziennika?), ui.banner(tekst, podpis?, czas?)
 //   ui.on((akcja, arg) => …)        akcje: 'event' (arg — nazwa), 'quit', 'screen', 'resume', 'window', 'choice',
 //                                   'buy' (arg — { tree, id, level, cost, effects }: kupiony węzeł drzewka),
@@ -39,6 +43,7 @@ import { createHud } from './hud.js';
 import { createScreens } from './screens.js';
 import { applySkin } from './skins.js';
 import { SETTINGS_SCREENS } from '../core/settings.js';
+import { uiSounds } from './sounds.js';
 
 export const FORMAT = 'gamelab-ui', VERSION = 1;
 
@@ -55,6 +60,7 @@ export function normalizeUI(d) {
   for (const [id, v] of Object.entries(u.screens)) if (v === 'standard') { if (SETTINGS_SCREENS[id]) u.screens[id] = JSON.parse(JSON.stringify(SETTINGS_SCREENS[id])); else delete u.screens[id]; }
   u.hud = Array.isArray(d.hud) ? d.hud.filter((x) => x && typeof x.type === 'string') : [];
   u.windows = Array.isArray(d.windows) ? d.windows.filter((x) => x && x.id) : [];
+  if (d.voices && typeof d.voices === 'object') u.voices = { ...d.voices };
   return u;
 }
 
@@ -74,9 +80,16 @@ export function createGameUI(parent, def0, { state = {}, keys = true, settings =
     S = { ...S, settings: copy(settings.data) }; emit('settings', settings.data);
   }
 
+  // dźwięki UI: skórka definicji; kliknięcia i najechania na przyciski — z całej nakładki
+  const snd = uiSounds(() => def.skin);
+  root.addEventListener('click', (e) => { if (e.target.closest && e.target.closest('button')) snd.play('click'); }, true);
+  let hovered = null;
+  root.addEventListener('pointerover', (e) => { const b = e.target.closest && e.target.closest('button'); if (b && b !== hovered && !b.disabled) snd.play('hover'); hovered = b || null; });
   const hud = createHud(root);
   const screens = createScreens(root, {
-    onAction: (a, arg) => {
+    onAction: (a, arg, how) => {
+      if (a === 'screen') snd.play(how === 'back' ? 'back' : 'open');
+      else if (a === 'resume' && how === 'closed') snd.play('close');
       if (a === 'window') ui.open(arg);
       else if (a === 'reset' && settings) { syncing = true; settings.reset(arg); syncing = false; S = { ...S, settings: copy(settings.data) }; screens.refresh(); emit('settings', settings.data); }
       else emit(a, arg);
@@ -104,7 +117,8 @@ export function createGameUI(parent, def0, { state = {}, keys = true, settings =
     const t = treeOf(name), b = def.windows.flatMap((w) => w.body || []).find((x) => x.type === 'tree' && x.tree === name);
     if (!t) return null;
     const path = b && b.points, pts = path ? +pick(S, path) || 0 : Infinity, cost = t.state.costOf(id);
-    if (!t.state.buy(id, pts)) return { bought: false, state: t.state.state(id), next: cost };
+    if (!t.state.buy(id, pts)) { snd.play('deny'); return { bought: false, state: t.state.state(id), next: cost }; }
+    snd.play('buy');
     if (path) S = place(S, path, pts - cost);
     refresh(); const r = { tree: name, id, level: t.state.level(id), cost, effects: t.state.effects() }; emit('buy', r);
     return { bought: true, ...r };
@@ -157,15 +171,16 @@ export function createGameUI(parent, def0, { state = {}, keys = true, settings =
   root.append(dlg);
   let dlgDone = null, typing = 0, full = '';
   function finishTyping() { if (typing) { clearInterval(typing); typing = 0; dlgText.textContent = full; } }
-  function say({ who = '', text = '', choices = [], side = 'b', speed = 40 } = {}) {
+  function say({ who = '', text = '', choices = [], side = 'b', speed = 40, voice = null } = {}) {
     if (dlgDone) dlgDone(-1);
+    const spoken = snd.voice(String(text), voice || (def.voices && def.voices[who]));   // głos postaci — wtedy bez dźwięku pisania
     dlg.hidden = false; dlg.dataset.side = side; dlg.classList.toggle('narrator', !who);
     dlgWho.textContent = who; full = String(text); dlgText.textContent = ''; dlgChoices.replaceChildren(); dlgMore.hidden = choices.length > 0;
     let i = 0; finishTyping();
-    if (speed > 0) typing = setInterval(() => { i += 1; dlgText.textContent = full.slice(0, i); if (i >= full.length) finishTyping(); }, 1000 / speed);
+    if (speed > 0) typing = setInterval(() => { i += 1; dlgText.textContent = full.slice(0, i); if (!spoken && /\S/.test(full[i - 1] || '')) snd.play('type'); if (i >= full.length) finishTyping(); }, 1000 / speed);
     else dlgText.textContent = full;
     return new Promise((res) => {
-      const end = (k) => { dlg.hidden = true; finishTyping(); dlgDone = null; emit('choice', k); res(k); };
+      const end = (k) => { dlg.hidden = true; finishTyping(); dlgDone = null; if (k >= 0) snd.play('choice'); snd.stopVoice(); emit('choice', k); res(k); };
       dlgDone = end;
       choices.forEach((c, k) => dlgChoices.append(btn(`${k + 1}. ${c}`, () => end(k))));
       dlg.onclick = (e) => { if (e.target.closest('button')) return; if (typing) finishTyping(); else if (!choices.length) end(-1); };
@@ -213,17 +228,17 @@ export function createGameUI(parent, def0, { state = {}, keys = true, settings =
     set(s) { S = typeof s === 'function' ? s(S) : { ...S, ...s }; if (settings) S.settings = copy(settings.data); refresh(); },
     show: (id) => { const ok = screens.show(id); hud.visible = !screens.open; return ok; },
     back: () => screens.back(), hide: () => screens.hide(),
-    open(id) { const w = wins.get(id); if (!w) return false; w.el.hidden = false; drawWin(id); emit('window', id); return true; },
-    close(id) { const w = wins.get(id); if (w) w.el.hidden = true; },
+    open(id) { const w = wins.get(id); if (!w) return false; if (w.el.hidden) snd.play('open'); w.el.hidden = false; drawWin(id); emit('window', id); return true; },
+    close(id) { const w = wins.get(id); if (w && !w.el.hidden) { w.el.hidden = true; snd.play('close'); } },
     toggle(id) { const w = wins.get(id); if (!w) return false; return w.el.hidden ? ui.open(id) : (ui.close(id), true); },
     tree: (name) => (treeOf(name) || {}).state || null, buy: (name, id) => buyTree(name, id),
-    say, log: (m, k, id) => hud.log(m, k, id), banner: (t, s, time) => hud.banner(t, s, time),
+    say, log: (m, k, id) => { snd.play('log'); return hud.log(m, k, id); }, banner: (t, s, time) => { snd.play('banner'); return hud.banner(t, s, time); }, sounds: snd,
     on(f) { listeners.add(f); return () => listeners.delete(f); },
     tick(dt) { hud.tick(dt); },
     fps(n) { const on = !!pick(S, 'settings.gfx.showFps'); fpsEl.hidden = !on; if (on) fpsEl.textContent = Math.round(n) + ' fps'; },
     get settings() { return settings; },
     get menuOpen() { return screens.open; }, get screen() { return screens.current; },
-    destroy() { if (keys) removeEventListener('keydown', onKey); if (offSettings) offSettings(); ro.disconnect(); for (const w of wins.values()) w.keep.forEach((k) => k && k.dispose && k.dispose()); root.remove(); listeners.clear(); },
+    destroy() { snd.stopVoice(); if (keys) removeEventListener('keydown', onKey); if (offSettings) offSettings(); ro.disconnect(); for (const w of wins.values()) w.keep.forEach((k) => k && k.dispose && k.dispose()); root.remove(); listeners.clear(); },
   };
   ui.load(def);
   return ui;

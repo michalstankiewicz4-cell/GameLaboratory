@@ -17,7 +17,7 @@ ciągłe i tła na szynie otoczenia. Grupa dźwięku: muzyka ([`sound.md`](sound
 | uderzenie | materiał (metal, drewno, ciężki, łańcuch), siła | aTrain: stuk sprzęgu, podkładu, zderzaka, łańcucha — składowe nieharmoniczne, siła zmienia barwę |
 | trafienie | pancerz, siła | Battle (`hit`) + dzwonienie pancerza |
 | ptak | gatunek (wróbel, bogatka, kos, mewa, wrona, sowa), wysokość | nowy |
-| interfejs | klik, dzwonek, naprawa, alarm | Battle (`click`, `bell`, `repair`) + alarm |
+| interfejs | rodzaj (klik, dzwonek, naprawa, alarm, pik, tyk, przekaźnik, otwarcie, zamknięcie, klawisz, potwierdzenie, odmowa), ton, poziom | Battle (`click`, `bell`, `repair`) + nowe; dźwięki skórek UI gry ([gameui.md](gameui.md)) |
 | drzwi / właz | rodzaj (samochód, właz, autobus — pneumatyka, drewniane), otwarcie / zamknięcie, siła | nowy: zamek, zawias, uderzenie skrzydła o ramę; dźwięki modeli |
 | hydraulika / serwo | czas, ton, blokada na końcu | nowy: pompa, olej w przewodach, blokada (aTrain: zderzak); podwozie, klapy |
 | wiatr ∿ | siła, porywy | nowy |

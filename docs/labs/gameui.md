@@ -67,6 +67,24 @@ Gotowe: **space** (niebieski materiał z ziarnem, poświata, Antonio i Roboto Co
 czcionka o stałej szerokości), **engine** (wygląd laboratoriów). Własna skórka = podstawa + zmienione tokeny, zapisana
 pod nazwą jako zasób **uiskin**; całe UI — zasób **ui** (`js/scene/assets.js`).
 
+## Dźwięki UI (1.6.0)
+
+`js/gameui/sounds.js`: zdarzenia UI grają dźwięki skórki przez SfxKit (dźwięk `ui`: rodzaj, ton, poziom) na szynie
+**interfejsu** miksera silnika (Opcje → Dźwięk → Interface, `settings.audio.ui`).
+
+- Zdarzenia (`UI_EVENTS`): kliknięcie przycisku, najechanie na przycisk, otwarcie ekranu menu albo okna, zamknięcie
+  okna albo menu, powrót w menu, pisanie tekstu dialogu (co literę, z odstępem), wybór w dialogu, kupione ulepszenie,
+  nie da się kupić, baner, wpis w dzienniku.
+- Zestawy skórek (`SKIN_SOUNDS`): **space** — piknięcia, szum otwarcia i zamknięcia; **battle** — metalowe przekaźniki
+  i klawisze dalekopisu; **engine** — ciche tyknięcia. Rodzaje (`UI_KINDS`): klik, dzwonek, naprawa, alarm, pik, tyk,
+  przekaźnik, otwarcie, zamknięcie, klawisz, potwierdzenie, odmowa. Własne — pole `sounds` skórki (zasób uiskin;
+  `null` — cisza); w laboratorium okno **Skórka → Sounds** (lista na zdarzenie, ▶ — odsłuch).
+- **Głosy postaci**: `say({ who, text, voice })` — głos kwestii (gotowy VoiceKit: narrator, robot, villager, child,
+  giant, radio, android, ghost, albo zasób **voice** z laboratorium mowy); bez `voice` — `voices[who]` z definicji UI
+  (`"voices": { "Station AI": "android" }`); bez głosu — dźwięk pisania skórki. Głos gra na szynie mowy, milknie przy
+  następnej kwestii albo wyborze. Laboratorium: okno **Dialog → Voice**; API sceny: `ui { say: { who, text, voice } }`.
+- `ui.sounds` — `{ on, play(zdarzenie), voice(tekst, głos), stopVoice() }` (`on = false` — UI bez dźwięku).
+
 ## Laboratorium
 
 - Pasek: definicja (przykłady i zapisane), skórka, **Menu** (ekran startowy), **Game** (gra z HUD).

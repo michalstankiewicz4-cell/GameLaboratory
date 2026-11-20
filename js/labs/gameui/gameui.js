@@ -7,7 +7,10 @@ import { LookPipeline, LOOK_DEFAULTS } from '../../render/sea/look.js';
 import { createGameUI, normalizeUI, emptyUI } from '../../gameui/gameui.js';
 import { createSettings } from '../../core/settings.js';
 import { applyGraphics, lookParams } from '../../render/game-graphics.js';
-import { SKINS, TOKENS, FONTS, resolveSkin } from '../../gameui/skins.js';
+import { SKINS, TOKENS, FONTS, resolveSkin, UI_EVENTS, UI_KINDS } from '../../gameui/skins.js';
+import { play as playSfx } from '../../audio/sfx/sfxkit.js';
+import { mixer } from '../../audio/mixer.js';
+import { VOICE_PRESETS } from '../../audio/voice/voicekit.js';
 import { HUD_TYPES, ANCHORS } from '../../gameui/hud.js';
 import { SAMPLES, sampleState } from './samples.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
@@ -40,6 +43,7 @@ const startDef = () => {
 // ustawienia gry (grafika, mysz, klawisze): wspólne z ▶ Graj edytora sceny — menu Opcje UI pisze tutaj, a scena za UI
 // pokazuje grafikę od razu (js/render/game-graphics.js)
 const settings = createSettings();
+mixer().bindSettings(settings);   // Opcje → Dźwięk UI: głośności szyn miksera (także Interface — dźwięki skórki)
 const gfxApply = () => { applyGraphics({ renderer, look, scene, sun: stage.sun, stage, camera }, settings.data.gfx); look.set(lookParams({ ...LOOK_DEFAULTS }, settings.data.gfx), 'A'); };
 const ui = createGameUI($('view'), startDef(), { state, settings });
 gfxApply();
@@ -115,7 +119,7 @@ $('playBtn').onclick = () => ui.hide();
 
 /* ---------------- Skórka ---------------- */
 Object.entries(SKINS).forEach(([id, s]) => $('skinBase').append(new Option(s.label, id)));
-function curSkin() { const s = ui.def.skin; return typeof s === 'string' ? { base: s, tokens: {} } : { base: s.base, tokens: { ...(s.tokens || {}) }, ...(s.name ? { name: s.name } : {}) }; }
+function curSkin() { const s = ui.def.skin; return typeof s === 'string' ? { base: s, tokens: {} } : { base: s.base, tokens: { ...(s.tokens || {}) }, ...(s.sounds ? { sounds: { ...s.sounds } } : {}), ...(s.name ? { name: s.name } : {}) }; }
 function showTokens() {
   const s = curSkin(), full = resolveSkin(s).tokens, box = $('tokens'); box.replaceChildren();
   $('skinBase').value = s.base;
@@ -131,19 +135,40 @@ function showTokens() {
     inp.onchange = () => setToken(k, inp.value);
     row.append(l, inp, out); box.append(row);
   }
+  showSounds();
+}
+// dźwięki skórki: zdarzenie → rodzaj dźwięku interfejsu (albo cisza), ▶ — odsłuch (szyna interfejsu)
+const PL = () => window.LabMenu && window.LabMenu.LANG === 'pl';
+function showSounds() {
+  const snds = resolveSkin(curSkin()).sounds, box = $('skinSounds'); box.replaceChildren();
+  for (const [ev, [en, pl]] of Object.entries(UI_EVENTS)) {
+    const row = document.createElement('div'); row.className = 'row';
+    const l = document.createElement('span'); l.textContent = PL() ? pl : en;
+    const sel = document.createElement('select'); sel.append(new Option(PL() ? '— cisza' : '— silent', ''));
+    UI_KINDS.forEach(([a, b], i) => sel.append(new Option(PL() ? b : a, String(i))));
+    const d = snds[ev]; sel.value = d && d.sound === 'ui' ? String(d.params.kind) : '';
+    const out = document.createElement('output'), test = document.createElement('button'); test.type = 'button'; test.className = 'btn'; test.textContent = '▶';
+    test.onclick = () => { const x = resolveSkin(curSkin()).sounds[ev]; if (x) playSfx(x, { bus: 'ui' }); };
+    sel.onchange = () => {
+      const s = curSkin(), old = resolveSkin(s).sounds[ev], p = old && old.sound === 'ui' ? old.params : { pitch: 1, level: 1 };
+      s.sounds = { ...(s.sounds || {}), [ev]: sel.value === '' ? null : { sound: 'ui', params: { ...p, kind: +sel.value } } };
+      ui.skin(s); $('jsonText').value = JSON.stringify(ui.def, null, 1); test.click();
+    };
+    out.append(test); row.append(l, sel, out); box.append(row);
+  }
 }
 function setToken(k, v) { const s = curSkin(); s.tokens[k] = v; ui.skin(s); $('jsonText').value = JSON.stringify(ui.def, null, 1); }
 $('skinBase').onchange = () => { ui.skin({ base: $('skinBase').value, tokens: {} }); showTokens(); fillSkinSel(); $('jsonText').value = JSON.stringify(ui.def, null, 1); };
 $('skinReset').onclick = () => { ui.skin(curSkin().base); showTokens(); fillSkinSel(); };
 $('skinSel').onchange = () => {
   const v = $('skinSel').value;
-  if (v.startsWith('asset:')) { const a = getAsset('uiskin', v.slice(6)); if (a) ui.skin({ base: a.base, tokens: a.tokens || {}, name: v.slice(6) }); }
+  if (v.startsWith('asset:')) { const a = getAsset('uiskin', v.slice(6)); if (a) ui.skin({ base: a.base, tokens: a.tokens || {}, ...(a.sounds ? { sounds: a.sounds } : {}), name: v.slice(6) }); }
   else ui.skin(v);
   showTokens(); $('jsonText').value = JSON.stringify(ui.def, null, 1);
 };
 $('skinSave').onclick = () => {
   const n = $('skinName').value.trim(); if (!n) { status('Give the skin a name first.'); return; }
-  const s = curSkin(); saveAsset('uiskin', n, { base: s.base, tokens: resolveSkin(s).tokens }); ui.skin({ base: s.base, tokens: resolveSkin(s).tokens, name: n });
+  const s = curSkin(), r = resolveSkin(s); saveAsset('uiskin', n, { base: s.base, tokens: r.tokens, sounds: r.sounds }); ui.skin({ base: s.base, tokens: r.tokens, sounds: r.sounds, name: n });
   fillSkinSel(); status(`Skin saved: ${n} (asset "uiskin").`);
 };
 
@@ -161,14 +186,22 @@ $('bannerBtn').onclick = () => ui.banner('WAVE 4', 'Five enemies incoming');
 $('dSay').onclick = async () => {
   const choices = $('dChoices').value.split('\n').map((s) => s.trim()).filter(Boolean);
   $('dRes').textContent = '…';
-  await ui.say({ who: $('dWho').value, text: $('dText').value, choices, side: $('dSide').value });
+  await ui.say({ who: $('dWho').value, text: $('dText').value, choices, side: $('dSide').value, voice: $('dVoice').value || null });
 };
-$('dNarr').onclick = () => ui.say({ who: '', text: 'Night fell over the station. Somewhere in the outer ring, something woke up.', side: $('dSide').value });
+$('dNarr').onclick = () => ui.say({ who: '', text: 'Night fell over the station. Somewhere in the outer ring, something woke up.', side: $('dSide').value, voice: $('dVoice').value || null });
+// głos kwestii: bez (dźwięk pisania skórki), gotowe głosy VoiceKit, zapisane w laboratorium mowy (zasób „voice”)
+function fillVoices() {
+  const s = $('dVoice'), cur = s.value; s.replaceChildren(new Option(PL() ? '— bez głosu' : '— no voice', ''));
+  const g1 = document.createElement('optgroup'); g1.label = PL() ? 'Gotowe' : 'Ready'; Object.keys(VOICE_PRESETS).forEach((k) => g1.append(new Option(k, k))); s.append(g1);
+  const saved = listAssets('voice'); if (saved.length) { const g2 = document.createElement('optgroup'); g2.label = PL() ? 'Zapisane (laboratorium mowy)' : 'Saved (speech lab)'; saved.forEach((n) => g2.append(new Option(n, n))); s.append(g2); }
+  s.value = cur;
+}
+fillVoices();
 
 /* ---------------- Definicja (JSON) ---------------- */
 $('jsonApply').onclick = () => { try { apply(JSON.parse($('jsonText').value), 'Definition applied.'); $('jsonMsg').textContent = 'Applied.'; } catch (e) { $('jsonMsg').textContent = 'Not applied: ' + e.message; } };
 $('jsonCopy').onclick = async () => { try { await navigator.clipboard.writeText(JSON.stringify(ui.def, null, 1)); $('jsonMsg').textContent = 'Copied.'; } catch { $('jsonMsg').textContent = 'Copy it from the box.'; } };
-onAssetsChange(() => { fillDefSel(); fillSkinSel(); });
+onAssetsChange(() => { fillDefSel(); fillSkinSel(); fillVoices(); });
 
 /* ---------------- dla AI ---------------- */
 // GameUIApi: load(def) — definicja 'gamelab-ui'; set(stan) — stan gry (łączony); show(ekran) / hide(); open(okno);

@@ -17,13 +17,13 @@
 //   at(pos, nazwa, opts)  źródło w przestrzeni: PannerNode (HRTF, odległość odwrotna) do szyny — dźwięk tam podłączyć
 //   noise()            bufor białego szumu (2 s, wspólny)
 //   stream             MediaStream całości (nagrywanie: MediaRecorder)
-export const BUSES = ['music', 'ambience', 'sfx', 'voice'];
-export const BUS_LABELS = { master: ['Master', 'Ogólna'], music: ['Music', 'Muzyka'], ambience: ['Ambience', 'Otoczenie'], sfx: ['Effects', 'Efekty'], voice: ['Speech', 'Mowa'] };
+export const BUSES = ['music', 'ambience', 'sfx', 'voice', 'ui'];
+export const BUS_LABELS = { master: ['Master', 'Ogólna'], music: ['Music', 'Muzyka'], ambience: ['Ambience', 'Otoczenie'], sfx: ['Effects', 'Efekty'], voice: ['Speech', 'Mowa'], ui: ['Interface', 'Interfejs'] };
 // dźwięk w miejscu: głośność ref / (ref + ROLLOFF · (d − ref)) — pełna do ref [m], dalej maleje; audible(ref, poziom) —
 // odległość, na której zostaje dany ułamek głośności (domyślnie 10%: granica słyszalności w podglądzie zasięgu)
 export const ROLLOFF = 1.2;
 export const audible = (ref, level = 0.1) => ref + (ref / level - ref) / ROLLOFF;
-export const AUDIO_DEFAULTS = { master: 0.8, music: 0.7, ambience: 0.8, sfx: 0.9, voice: 1, mute: false };
+export const AUDIO_DEFAULTS = { master: 0.8, music: 0.7, ambience: 0.8, sfx: 0.9, voice: 1, ui: 0.7, mute: false };
 
 let M = null;
 export function mixer() {
