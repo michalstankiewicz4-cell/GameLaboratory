@@ -1,9 +1,8 @@
 # Doktor modeli (`tools/doctor.html`, `tools/doctor/`)
 
 Jeden doktor dla wszystkich modeli laboratorium: kosmos (Space), morze (Battle), ląd i tabor (TrainKit).
-Szuka powtarzających się błędów modeli budowanych kodem. Scalony z dwóch wersji: doktora ze Space
-(`../history/doctor-space.md`) i jego rozszerzonej wersji z Battle (`../history/doctor-sea.md`). Logika to wersja z Battle —
-ma wszystkie testy wersji ze Space i więcej.
+Szuka powtarzających się błędów modeli budowanych kodem. Scalony z dwóch wersji: doktora ze Space i jego rozszerzonej
+wersji z Battle (historia obu — w git). Logika to wersja z Battle — ma wszystkie testy wersji ze Space i więcej.
 
 ## Zasady
 

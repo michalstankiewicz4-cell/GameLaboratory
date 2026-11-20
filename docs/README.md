@@ -14,7 +14,7 @@ Układ folderów jest taki sam jak w kodzie:
 | `audio/` | dźwięk silnika: mikser, kity dźwięku, dźwięk w scenie, dźwięki modeli i UI | `js/audio/` |
 | `tools/` | narzędzia | `tools/` |
 | `guides/` | jak korzystać z laboratoriów, renderowanie, znane pułapki | — |
-| `history/` | historia sprzed przeniesienia i wykonany remanent | — |
+| `history/` | historia sprzed przeniesienia (laboratoria Space, SDF Walkers, artchecker) | — |
 
 ## Silnik i edytor sceny
 
@@ -56,7 +56,7 @@ W kolejności kategorii z menu Narzędzia i strony startowej (`ui/data/catalog.j
 | | Człowiek | `labs/human.html` | [labs/human.md](labs/human.md) |
 | | Przedmioty bohatera | `labs/gear.html` | [labs/gear.md](labs/gear.md) |
 | | Kostnica SDF | `labs/morgue.html` | [labs/morgue.md](labs/morgue.md) |
-| | SDF Walkers | `labs/walkers.html` | [labs/walkers/README.md](labs/walkers/README.md), [labs/walkers/roadmap.md](labs/walkers/roadmap.md), [labs/walkers/notatki/](labs/walkers/notatki/README.md) |
+| | SDF Walkers | `labs/walkers.html` | [labs/walkers/README.md](labs/walkers/README.md), [labs/walkers/roadmap.md](labs/walkers/roadmap.md) |
 | Materiały i grafika | Materiały (MatKit: PBR, starzenie) | `labs/materials.html`, `js/render/materials/` | [labs/materials.md](labs/materials.md) |
 | | Sztuka (obrazy 2D, ekspertyza) | `labs/art.html`, `js/render/art/` | [labs/art.md](labs/art.md) (obiekty: [labs/art/](labs/art/)) |
 | | Pixel Studio | `labs/pixel.html` | [labs/pixel/README.md](labs/pixel/README.md) |
@@ -93,7 +93,5 @@ W kolejności kategorii z menu Narzędzia i strony startowej (`ui/data/catalog.j
 ## Historia
 
 - Laboratoria Space sprzed przeniesienia: [history/space-labs.md](history/space-labs.md)
-- Mapa laboratoriów z Battle (październik 2026): [history/labs-sea-map.md](history/labs-sea-map.md)
-- Doktor: [history/doctor-space.md](history/doctor-space.md), [history/doctor-sea.md](history/doctor-sea.md)
 - SDF Walkers (NeuroLabPA): [history/walkers.md](history/walkers.md)
-- Remanent kodu i dokumentacji (listopad 2026, wykonany): [history/audit-2026-11.md](history/audit-2026-11.md)
+- Silnik ekspertyzy (artchecker): [history/artchecker.md](history/artchecker.md)

@@ -1,9 +1,7 @@
-> Przeniesione z repozytorium Battle (docs/GUIDE.md), z adresami stron GameLaboratory (w Battle: labs/vehicles-space.html, labs/doctor.html, pixel/, pixel/zombies.html).
-
 # Labs guide — how to use them
 
-These labs were the workshop behind the game *Steel Salvo* (repository Battle): each one tries out one part (a ship, the
-sea, the look, the land) with every option switchable, so a choice can be made. This guide says what
+The labs from the game *Steel Salvo* (repository Battle) each try out one part (a ship, the sea, the look, the land)
+with every option switchable, so a choice can be made. This guide says what
 each lab is for, how to drive it and what to try. Technical details are in the per-lab documents (`docs/*.md`).
 It covers the labs that came from Battle; every other lab (and the scene editor) has its own document — the map:
 [`../README.md`](../README.md).
@@ -21,15 +19,14 @@ It covers the labs that came from Battle; every other lab (and the scene editor)
 | Action | How |
 |---|---|
 | Orbit the camera | drag with the left mouse button |
-| Pan | drag with the right mouse button (Ship, Water, Look, Transformer) |
+| Pan | drag with the right mouse button |
 | Zoom | mouse wheel |
 | Camera presets | the buttons in the **Camera** window |
-| Windows | OPTIONS → Windows opens and closes them; every lab has **Description** (left), its own windows, **Camera**, **Light and weather** and **Performance** (right) |
-| Windows or panels | by default the windows are **panels** at the edges (the view in the free middle); the pin on a title bar undocks one, **Windows \| Panels** on the toolbar switches all |
+| Windows | OPTIONS → Windows opens and closes them; every lab has **Description** (left), its own windows, **Camera**, **Light and weather** and **Performance** (right). By default they are **panels** at the edges (the view in the free middle); the pin on a title bar undocks one, **Windows \| Panels** on the toolbar switches all |
 | Forget everything | OPTIONS → **Reset saved settings** clears all GameLaboratory keeps in this browser (settings, windows, assets, scenes) |
 | Hide the windows (clean view, screenshots) | **H** |
 | The log | **Console** on the right of the top bar: errors, warnings, loading steps, newest first |
-| Keep a result | **Copy settings (JSON)** — paste it into the chat; it is what moves into the game |
+| Keep a result | **Save** under a name where the lab has it (an asset the scene editor picks from a list), or **Copy settings (JSON)** |
 | Settings survive a reload | yes (stored in the browser); "Reset" buttons where they exist |
 | Sound | the sound group (music · effects · speech); the volumes in **Mixer** windows are the game's (Options → Sound) |
 
@@ -65,7 +62,7 @@ The ship on a procedural sea; two variants **A** and **B** side by side.
   low shores), *River* (silty, narrow, with a **current** that slows the ship over the ground — watch the banks),
   *Harbour water* (murky, with oil sheen), *Ice and pack ice* (floes, the lane the ship breaks). *Width*,
   *Walls / banks*, *Current*, *Oil sheen*, *Ice cover*, *Floe size* and *Ice above water* adjust it (oil and ice work
-  on any body). Quays, piers, breakwaters and harbours will be in the waterside-buildings lab.
+  on any body). Quays and breakwaters are in the structures lab.
 - **Sea state**: presets from calm to gale or each value (wave height, length, choppiness, spread, direction, count).
 - **Look**: water colours, sun glitter, ripples, crest foam, reflection, planar reflection (ship and shores mirrored),
   translucent water.
@@ -90,7 +87,6 @@ one in the top bar; *Water depth* is kept per structure.
   *Armour unit* (2–25 t); cameras Overview, Seaward slope, Head and light, On the crest, Underwater, High.
 
 The jack-up rig:
-
 
 - **Jacking**: *Afloat (under tow)* and *Jack up* run the whole sequence (legs down to the seabed, hull up to the air
   gap — or the reverse); *Jacking speed* multiplies the real ≈ 90 ft per hour; *Water depth* and *Air gap*.
@@ -130,7 +126,7 @@ Procedural land and sea from a seed; sail through it.
   the same map.
 - **Biome**: *Northern*, *Plains* (flat, gently rolling lowland with meadows and fields), *Desert* (dunes, stony
   plateaus, mesas with cliffs) or *Zones* (all three by region; *Zone transition* sets how wide the blend is). Ground
-  only — plants and rocks as objects come in their own labs.
+  only — plants come from the plants lab, rocks as objects later.
 - **Water bodies**: *Layout* — one water body everywhere (pick it in *Water*), a river mouth, a lake with a canal, a
   fjord entrance over its sill, a sheltered bay behind a spit, an ice edge, or *Mixed from the seed* (lakes, fjords,
   *Rivers* 0–6, *Ice from the north*). *Transition* sets how wide the blend between two waters is. The list under it
@@ -177,11 +173,12 @@ The lab ship made game-ready: levels of detail and hitboxes.
 
 ## Model Doctor — `tools/doctor.html`
 
-Checks every lab and game ship for the mistakes that keep coming back.
+Checks every model built from code (ships, vehicles, aircraft, trains, structures, buildings, junkyard, bodies…) for
+the mistakes that keep coming back. Details: [`../tools/doctor.md`](../tools/doctor.md).
 
-- **Models**: pick a model (lab ship, its LOD levels, game ships, the test bench).
+- **Models**: pick a model (or its LOD levels, or the test bench).
 - **Checks**: the list of findings by severity; click one to light up the pieces (and the source line that added them).
-- **Options** and **Budget**: what is checked and the game's limits per ship.
+- **Options** and **Budget**: what is checked and the game's limits per model.
 - From the command line: `python3 tools/doctor.py` (compares with the golden file).
 
 ## Pixel Studio — `labs/pixel.html`

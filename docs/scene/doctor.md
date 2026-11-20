@@ -3,7 +3,7 @@
 Sprawdza **układ sceny** — to, czego nie widać w pojedynczym modelu (pojedynczy model sprawdza doktor modeli,
 [`../tools/doctor.md`](../tools/doctor.md)). Jak doktor modeli: uniwersalny (reguły dla rodzin i środowisk, nie dla
 jednego modelu), **zgłasza i proponuje poprawki, niczego nie przestawia sam**. Silnik bez Three.js i bez DOM: działa
-w edytorze, w API dla AI i w grach. Plan: [`../guides/lab-breakdown.md`](../guides/lab-breakdown.md), punkt 7.
+w edytorze, w API dla AI i w grach. Zrobiony w 0.60.0 (dawny punkt 7 planu rozbioru laboratoriów).
 
 ## Gdzie
 

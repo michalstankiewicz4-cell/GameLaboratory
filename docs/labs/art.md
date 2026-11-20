@@ -108,7 +108,6 @@ Każdy obraz to spec — ten sam spec z tym samym ziarnem daje ten sam obraz:
   pociągnięcia, ziarno pigmentu); rama 3D — profil listwy wyciągnięty wzdłuż prostokąta, UV wzdłuż listwy, złocenie
   (złoto płatkowe na czerwonym bolusie prześwitującym na wytartych krawędziach, patyna w zagłębieniach). Po scaleniu
   ze sceną — obraz w ramie jako obiekt na ścianę.
-- **Ilustracje do wiki** w menu Pomoc (plan: [../guides/lab-breakdown.md](../guides/lab-breakdown.md), „Pomysły na
-  później”) — małe obrazki z `ArtApi.render` i `ArtApi.exam`.
+- **Ilustracje do wiki** w menu Pomoc (plan: [`../../TODO.md`](../../TODO.md), „Pomysły”) — małe obrazki z `ArtApi.render` i `ArtApi.exam`.
 - Z banku pomysłów gry artchecker (bank pomysłów i roadmapa w dokumentacji gry, nie przeniesione): meble, datowanie
   archeologiczne, przekrój warstw malarskich, tryb konserwatora — nowe obiekty dopiero, gdy powstaną w grze.

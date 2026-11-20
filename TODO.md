@@ -2,7 +2,7 @@
 
 Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHANGELOG.md`.
 
-## Następne w planie (`docs/guides/lab-breakdown.md`, „Kolejność”)
+## Następne w planie (`docs/guides/lab-breakdown.md`, „Kolejność — następne”)
 - [ ] **Kreator budynków** (właściciel, 2026-11-20) — dla CityExplorer i innych gier (etap 1 — laboratorium miasta, budynki Warszawy z OSM: 0.82.0–0.83.0):
   - [ ] **Etap 2**: CityExplorer — budynki z obrysów OSM z CityKit (kopia do folderu `lab/` gry jej skryptem sync-lab).
 - [ ] Punkt 9 — materiał z PatientZero (z historią): środowisko „organizm”, laboratorium tkanek, laboratorium patogenów.
@@ -121,7 +121,7 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
 ## Testy
 - [ ] Pełny kitcheck po wersji 0.5.0 (przerwany; doktor przeszedł).
 
-## Z remanentu (do decyzji — `docs/history/audit-2026-11.md`, „Stan wykonania”)
+## Z remanentu (listopad 2026, do decyzji)
 - [ ] D6: wspólne pomocnicze `$()` / `el()` (np. nowy plik w `js/labkit/`).
 - [ ] F3: dane głowy człowieka jako plik `.bin` (wczytywany asynchronicznie).
 - [ ] F4: kity Space jako importy ES zamiast globali `window.*`.

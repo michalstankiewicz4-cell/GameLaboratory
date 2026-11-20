@@ -1,7 +1,7 @@
 > **W GameLaboratory** (przeniesione z repozytorium NeuroLabPA, z historią): SDF Walkers to `labs/walkers.html`
 > (skrypty `js/labs/walkers/`, model — shadery, cechy, render — `js/models/human/zombie/walkers/`, dane `data/walkers/`),
 > laboratorium języka to `labs/lang.html` (`js/labs/lang/`, teksty `data/lang/`, narzędzia `tools/lang/`), laboratorium obrazów
-> to `labs/img.html` (`js/labs/img/`, rysunki `data/img/`, narzędzie `tools/img/`), notatki z NeuroLabPA — `docs/labs/walkers/notatki/`.
+> to `labs/img.html` (`js/labs/img/`, rysunki `data/img/`, narzędzie `tools/img/`).
 > Pierwotne SDF Morgue: `docs/labs/morgue/sdf-morgue-original.html`. Ścieżki niżej są obecne (po przeniesieniu).
 
 # SDF Walkers
@@ -105,7 +105,7 @@ js/labs/walkers/roll.js                  losowanie (zwykłe i sterowane siecią)
 js/labs/walkers/hud.js                   panel Network view
 js/labs/walkers/walkers.js                  start i podpięcie zdarzeń
 docs/labs/morgue/sdf-morgue-original.html     pierwsza wersja: sama głowa zombie
-docs/walkers/img/                        zrzuty z kolejnych etapów
+docs/labs/walkers/img/                   zrzuty z kolejnych etapów
 data/walkers/                            oceny Claude'a i sieć wytrenowana na nich (przycisk Load repo model)
 ```
 
@@ -120,9 +120,9 @@ Skrypty są zwykłymi `<script>` (bez modułów ES) i dzielą zmienne globalne, 
 - Ocena Good uczy wszystkie części „OK”. Bad z tagami uczy wskazane części. Bad bez tagów uczy tylko `good`; wyjścia części są wtedy maskowane.
 - Jakość mierzy 5-krotna walidacja krzyżowa: jak często sieć zgadza się z ocenami, których nie widziała.
 
-## Plany i notatki
+## Plany
 
-Plan: `docs/labs/walkers/roadmap.md`. Historia zmian: `CHANGELOG.md` (od przeniesienia) i `docs/history/walkers.md` (NeuroLabPA). Konwencje pracy, zmierzone wyniki, decyzje i sprawy otwarte: `docs/labs/walkers/notatki/`.
+Plan: `docs/labs/walkers/roadmap.md`. Historia zmian: `CHANGELOG.md` (od przeniesienia) i `docs/history/walkers.md` (NeuroLabPA).
 
 ## Wersjonowanie
 

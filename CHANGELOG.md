@@ -14,6 +14,10 @@ Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` 
   `vehicles.html`) zamienione na obecne; z `TODO.md` usunięte zrobione punkty (są tu, w zmianach); z opisu MarineKit
   usunięta historia morza usuniętego z kitu; w edytorze — powtórzony, nieaktualny opis środowiska i zrobione
   propozycje; mapa dokumentacji: dźwięk (`docs/audio/`) i narzędzia sprawdzające.
+- Usunięte (decyzja właściciela): historia doktorów ze Space i Battle, mapa laboratoriów z Battle, wykonany remanent
+  (`docs/history/`) i notatki SDF Walkers z NeuroLabPA (`docs/labs/walkers/notatki/`) — zostają w historii git.
+  Plan rozbioru laboratoriów (`docs/guides/lab-breakdown.md`) skrócony do tego, co zostało; przewodnik po
+  laboratoriach z Battle oczyszczony z nieaktualnych zdań.
 
 ## Program 0.87.0 · UI gry 1.6.0 · efekty dźwiękowe 1.2.0 · muzyka 1.3.1 · mowa 1.0.1 · edytor sceny 0.43.0 — 2026-11-20 (dźwięki UI, pełny reset)
 
