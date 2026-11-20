@@ -4,6 +4,7 @@
 import { worldBox } from '../../../js/scene/doctor.js';
 import * as THREE from '../../../vendor/three/three.module.js';
 import { LookPipeline, LOOK_DEFAULTS } from '../../../js/render/sea/look.js';
+import { lookParams } from '../../../js/render/game-graphics.js';
 import { createStage, LIGHTS } from '../../../js/labs/shared/stage.js';
 import { prefab } from '../../../js/scene/prefabs.js';
 import { getAsset, listAssets } from '../../../js/scene/assets.js';
@@ -151,7 +152,7 @@ export function createWorld(container, store, onWarn) {
     if (seaKey !== lastSea) { stage.setSea(sea || {}); lastSea = seaKey; }
     look.sunVisible = stage.sunSeen;
     const L = { ...LOOK_DEFAULTS, ...((env.look && readProfiles()[env.look]) || {}) };
-    look.set(L, 'A'); look.set({ ...LOOK_DEFAULTS, exposure: L.exposure }, 'B');
+    look.set(lookParams(L, world.gameGfx), 'A'); look.set({ ...LOOK_DEFAULTS, exposure: L.exposure }, 'B');   // w grze: ustawienia grafiki gracza (poświata, jasność, nasycenie)
     fitShadow();
   }
   function bounds(id) {
@@ -211,7 +212,8 @@ export function createWorld(container, store, onWarn) {
     requestAnimationFrame(frame);
   }
   const world = {
-    renderer, scene, camera, root, built, stage, pending, syncObjects, syncPlaces, syncEnv, bounds, effect,
+    renderer, scene, camera, root, built, stage, look, pending, syncObjects, syncPlaces, syncEnv, bounds, effect,
+    gameGfx: null,   // ▶ Graj: settings.gfx gracza (js/gameui/settings.js) — potok kamery z nimi; null — wygląd edytora
     clearEffects: () => fxLib.dispose(), forgetEffect: (n) => fxLib.forget(n),
     objectRoot: (id) => (built.get(id) || {}).root || null,
     // lekarz sceny (js/scene/doctor.js): obrys w świecie z danych obiektu i koszt zbudowanego modelu; null — niezbudowany

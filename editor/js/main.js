@@ -121,3 +121,4 @@ setTimeout(() => { if (!spaceReady()) loadSpace().then(() => panels.renderProps(
 // do sprawdzania z konsoli i testów
 window.sceneEditor = { store, world, controls, play: actions.play, doctor };
 window.sceneApi = api;   // dla AI sterującej przeglądarką: window.sceneApi.run({ cmd: 'help' })
+window.__editor = { world, play: actions.play };   // (testy)

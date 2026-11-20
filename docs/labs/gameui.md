@@ -82,6 +82,36 @@ pod nazwą jako zasób **uiskin**; całe UI — zasób **ui** (`js/scene/assets.
 `say({ who, text, choices })` → wybór, `log(tekst, rodzaj)`, `banner(tekst, podpis)`, `def`, `state`, `samples`,
 `skins`, `empty()`. Zakładka **API** w konsoli: `{ "method": "say", "arg": { … } }`.
 
+## Ustawienia gry: grafika i sterowanie (1.3.0)
+
+Ustawienia gracza są w magazynie silnika `js/gameui/settings.js` (z Battle, `js/core/settings.js`, z historią):
+`createSettings()` — zapis w przeglądarce (`gamelab.settings.v1`, wspólny dla laboratorium UI gry i ▶ Graj edytora),
+każda zmiana przez `sanitize()` (liczby w zakresie, znane słowa).
+
+- **`settings.gfx`** — `scale` (rozdzielczość obrazu 0,5…1), `aa` (wygładzanie), `shadows` (cienie), `shadowQuality`
+  (`high` / `low` — mapa cieni 2048 / 1024), `lights` (oświetlenie dynamiczne: światła punktowe i reflektory — ogień,
+  lampy, światła pozycyjne; słońce i niebo zostają), `bloom` (poświata), `bright` (jasność 0,6…2), `sat` (nasycenie
+  0…1,6), `showFps` (licznik klatek w rogu UI). Zestawy `GFX_PRESETS`: **high** i **light** (Battle; light — dla słabszych
+  komputerów).
+- **`settings.mouse`** — `rotSens`, `zoomSens` (czułość obracania i przybliżania kamery 0,2…3).
+- **`settings.keys`** — czynność → kod klawisza (`KeyboardEvent.code`, niezależny od układu klawiatury): `forward`,
+  `back`, `left`, `right`, `yawLeft`, `yawRight`, `up`, `down`, `rollLeft`, `rollRight`, `brake`, `lift`, `gear`,
+  `flaps`, `stickIn`, `stickOut` (`KEY_ACTIONS` — nazwy EN / PL i klawisze domyślne).
+- Inne proste pola (np. `music`, `sound`, `minimap`) — ustawienia danej gry, zostają w magazynie.
+
+**Menu:** pozycje ekranu `{ type: 'presets', bind: 'settings.gfx' }` (zestaw naraz) i `{ type: 'keys', bind:
+'settings.keys' }` (klik i wciśnięcie klawisza; Esc — bez zmiany; ten sam klawisz dla dwóch czynności — barwa
+niebezpieczeństwa), opcja wyboru jako `{ value, label }`, akcja `reset:gfx` / `reset:mouse` / `reset:keys`. Gotowe
+ekrany: w definicji `"screens": { "graphics": "standard", "controls": "standard" }` (`SETTINGS_SCREENS`) — przykłady
+mają je w Opcjach albo w pauzie.
+
+**UI z magazynem:** `createGameUI(parent, def, { settings })` — dane magazynu w stanie gry pod `settings` (zawsze
+z magazynu), zmiana w menu → magazyn → akcja `settings`; `ui.fps(n)` — licznik klatek. **Grafika na scenie:**
+`js/render/game-graphics.js` — `applyGraphics({ renderer, look, scene, sun }, gfx)` (rozdzielczość i wygładzanie potoku
+kamery, cienie, mapa cieni słońca, światła dynamiczne), `lookParams(L, gfx)` (poświata, jasność, nasycenie w potoku
+kamery), `lights(scene, gfx)`. Laboratorium pokazuje zmiany od razu na scenie za UI; ▶ Graj stosuje je w grze (także
+klawisze i czułość myszy), po Stop edytor wraca do swojego wyglądu.
+
 ## UI gry w scenie (edytor, ▶ Graj)
 
 Scena wskazuje UI polem **`env.ui`** — nazwą UI zapisanego tutaj (zasób `ui`): w edytorze lista **UI gry** w oknie

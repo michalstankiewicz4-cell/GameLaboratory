@@ -5,6 +5,8 @@ import * as THREE from '../../../vendor/three/three.module.js';
 import { createStage } from '../shared/stage.js';
 import { LookPipeline, LOOK_DEFAULTS } from '../../render/sea/look.js';
 import { createGameUI, normalizeUI, emptyUI } from '../../gameui/gameui.js';
+import { createSettings } from '../../gameui/settings.js';
+import { applyGraphics, lookParams } from '../../render/game-graphics.js';
 import { SKINS, TOKENS, FONTS, resolveSkin } from '../../gameui/skins.js';
 import { HUD_TYPES, ANCHORS } from '../../gameui/hud.js';
 import { SAMPLES, sampleState } from './samples.js';
@@ -35,10 +37,16 @@ const startDef = () => {
   if (L.src.startsWith('asset:')) { const a = getAsset('ui', L.src.slice(6)); if (a) try { return normalizeUI(a); } catch { /* zły zasób */ } }
   return clone((SAMPLES[L.src.slice(7)] || SAMPLES.command).def);
 };
-const ui = createGameUI($('view'), startDef(), { state });
+// ustawienia gry (grafika, mysz, klawisze): wspólne z ▶ Graj edytora sceny — menu Opcje UI pisze tutaj, a scena za UI
+// pokazuje grafikę od razu (js/render/game-graphics.js)
+const settings = createSettings();
+const gfxApply = () => { applyGraphics({ renderer, look, scene, sun: stage.sun }, settings.data.gfx); look.set(lookParams({ ...LOOK_DEFAULTS }, settings.data.gfx), 'A'); };
+const ui = createGameUI($('view'), startDef(), { state, settings });
+gfxApply();
 ui.on((a, arg) => {
   if (a === 'event' || a === 'quit') { ui.log(a === 'quit' ? 'Quit pressed (the game decides what it means)' : `Event: ${arg}`, 'info'); status(`action: ${a}${arg ? ' ' + arg : ''}`); }
   if (a === 'choice') $('dRes').textContent = arg >= 0 ? `Chosen: ${arg + 1}` : 'Line read.';
+  if (a === 'settings') { gfxApply(); status('settings saved'); }
   if (a === 'screen' || a === 'resume') fillScreens();
   if (a === 'buy') { state = ui.state; syncSliders(); ui.log(`Bought: ${arg.id} (level ${arg.level}, ${arg.cost})`, 'info'); status(`bought ${arg.id} in ${arg.tree}`); }
   if (window.LabLog && a !== 'screen') window.LabLog.add('info', `Game UI: ${a}${arg != null ? ' ' + (typeof arg === 'object' ? JSON.stringify(arg) : arg) : ''}`);
@@ -198,7 +206,7 @@ if (window.LabConsole) apiTab(); else addEventListener('load', apiTab);
 /* ---------------- pętla ---------------- */
 function resize() { renderer.setSize(VS().w, VS().h, false); camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix(); look.resize(VS().w, VS().h); }
 addEventListener('resize', resize);
-let last = performance.now(), yaw = 0.6, simT = 0;
+let last = performance.now(), yaw = 0.6, simT = 0, fpsN = 0, fpsT = 0;
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   yaw += dt * 0.03;
@@ -211,11 +219,12 @@ function frame(now) {
     if ((simT % 1) < dt) { ui.set(state); $('sEnergy').value = state.ship.energy; $('sEnergyV').textContent = state.ship.energy.toFixed(0); }
   }
   ui.tick(dt);
+  fpsN++; if ((fpsT += dt) >= 1) { ui.fps(fpsN / fpsT); fpsN = 0; fpsT = 0; }
   look.sun(camera, stage.sunDir);
   window.LabPerf.begin(renderer); look.render(scene, camera); window.LabPerf.end(renderer);
   requestAnimationFrame(frame);
 }
 fillDefSel(); syncSliders(); ui.set(state); fillScreens(); fillSkinSel(); showTokens();
 resize();
-window.__gameui = { ui, stage, state: () => state };
+window.__gameui = { ui, stage, settings, state: () => state };
 requestAnimationFrame(frame);

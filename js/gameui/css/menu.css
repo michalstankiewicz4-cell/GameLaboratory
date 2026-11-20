@@ -23,3 +23,11 @@
 .gui .choices{display:flex;gap:.4em;flex-wrap:wrap}
 .gui .choices button.on{border-color:var(--g-accent);color:var(--g-accent)}
 .gui input[type=range]{width:100%;accent-color:var(--g-accent)}
+/* ustawienia gry: klawisze czynności (klik — czeka na klawisz; ten sam klawisz dla dwóch czynności — barwa ostrzeżenia) */
+.gui .gKeys{display:flex;flex-direction:column;gap:.25em;margin:.3em 0;text-align:left}
+.gui .gKeyRow{display:grid;grid-template-columns:1fr 8em;gap:.5em;align-items:center}
+.gui .gKeyRow > span{color:var(--g-dim)}
+.gui .gKeys button.gKey{padding:.3em .6em;font-size:.9em;text-align:center}
+.gui .gKeys button.gKey.wait{border-color:var(--g-accent);color:var(--g-accent)}
+.gui .gKeys button.gKey.dup{color:var(--g-err)}
+.gui .gMenu[data-layout=center] .stack .gKeys button.gKey:hover:not(:disabled){padding-left:.6em}

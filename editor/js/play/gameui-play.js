@@ -9,7 +9,7 @@
 import { createGameUI, normalizeUI } from '../../../js/gameui/gameui.js';
 import { getAsset } from '../../../js/scene/assets.js';
 
-export function createPlayUI(store, world, events) {
+export function createPlayUI(store, world, events, settings = null) {
   let ui = null, offs = [], tAcc = 0, time = 0;
   const S = {};
   function start(meName) {
@@ -19,7 +19,7 @@ export function createPlayUI(store, world, events) {
     if (!a) { if (window.LabLog) window.LabLog.add('warn', `Game UI "${name}" is not saved in this browser (the game UI lab)`); return null; }
     let def; try { def = normalizeUI(a); } catch (e) { if (window.LabLog) window.LabLog.add('error', 'Game UI: ' + e.message); return null; }
     time = 0; Object.assign(S, { player: { name: meName }, scene: { name: store.scene.name, surface: store.scene.env.surface, objects: store.scene.objects.length }, time: 0, radar: [], settings: {} });
-    ui = createGameUI(document.getElementById('view'), def, { state: S });
+    ui = createGameUI(document.getElementById('view'), def, { state: S, settings });   // Opcje: grafika i sterowanie gracza
     ui.on((act, arg) => {
       if (act === 'quit') { if (api.onQuit) api.onQuit(); }
       else if (act === 'event' || act === 'choice') events && events.emit('ui', act === 'event' ? { name: arg } : { choice: arg });

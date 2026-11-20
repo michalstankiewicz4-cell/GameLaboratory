@@ -3,6 +3,25 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.80.0 · UI gry 1.3.0 · edytor sceny 0.37.0 — 2026-11-20 (ustawienia gry: grafika i sterowanie)
+
+### Dodane
+- **Ustawienia gry** (`js/gameui/settings.js`, z Battle `js/core/settings.js` z historią): magazyn ustawień gracza
+  (zapis w przeglądarce, sanitize) — grafika (rozdzielczość, wygładzanie, cienie i ich jakość, oświetlenie dynamiczne,
+  poświata, jasność, nasycenie, licznik klatek; zestawy wysoka / lekka), mysz (czułość obracania i przybliżania),
+  klawisze czynności (kody klawiszy, niezależne od układu klawiatury), proste ustawienia danej gry (np. głośność).
+- UI gry: pozycje menu **zestaw** (`presets`) i **klawisze** (`keys` — klik i wciśnięcie klawisza), opcja wyboru
+  `{ value, label }`, akcja `reset:<część>`; gotowe ekrany **Grafika** i **Sterowanie** (`"graphics": "standard"`,
+  `"controls": "standard"`); `createGameUI(…, { settings })`, akcja `settings`, `ui.fps()`. Przykłady mają je w Opcjach
+  albo w pauzie.
+- Grafika gry na scenie: `js/render/game-graphics.js` (`applyGraphics`, `lookParams`, `lights`).
+- **Laboratorium UI gry 1.3.0**: zmiany grafiki w menu widać od razu na scenie za UI.
+- **Edytor sceny 0.37.0**: w ▶ Graj działają ustawienia gracza — grafika, czułość myszy i klawisze (sterowanie z kodów
+  klawiszy z ustawień); po Stop edytor wraca do swojego wyglądu.
+
+### Zmienione
+- `TODO.md`: punkt 8 (Hive Hunger) odhaczony; PatientZero na potem.
+
 ## Program 0.79.0 · pojazdy (ląd) 1.22.0 · budowle 1.5.2 · edytor sceny 0.36.0 — 2026-11-20 (złomowisko: toczenie, odrzut, skala, ugięcie)
 
 ### Dodane

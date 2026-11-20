@@ -3,6 +3,13 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.37.0 — 2026-11-20
+
+### Dodane
+- ▶ Graj z ustawieniami gracza (`js/gameui/settings.js`, menu Grafika i Sterowanie UI gry): rozdzielczość, wygładzanie,
+  cienie i ich jakość, światła dynamiczne, poświata, jasność, nasycenie, licznik klatek; czułość myszy; klawisze
+  czynności (zmienione w menu Sterowanie — sterowanie bierze kody klawiszy z ustawień). Po Stop — wygląd edytora.
+
 ## 0.36.0 — 2026-11-20
 
 ### Dodane

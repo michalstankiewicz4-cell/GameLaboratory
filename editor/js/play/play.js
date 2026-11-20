@@ -6,12 +6,27 @@ import { createItems } from '../../../js/behaviors/land/items.js';
 import { LIQUID_TIME } from '../../../js/render/liquid.js';
 import { createInput } from './input.js';
 import { createPlayUI } from './gameui-play.js';
+import { createSettings } from '../../../js/gameui/settings.js';
+import { applyGraphics, lights } from '../../../js/render/game-graphics.js';
 
 const { t, lang } = window.EditorI18n;
 
 export function createPlay(store, world, controls, actions, events) {
-  const input = createInput();
-  const playUI = createPlayUI(store, world, events);   // UI gry ze sceny (env.ui) jako nakładka w czasie gry
+  // ustawienia gry gracza (js/gameui/settings.js; te same co w laboratorium UI gry): grafika i mysz w czasie gry,
+  // klawisze czynności dla sterowania; menu Opcje UI gry zmienia je w biegu
+  const settings = createSettings();
+  const input = createInput(() => settings.data.keys);
+  const playUI = createPlayUI(store, world, events, settings);   // UI gry ze sceny (env.ui) jako nakładka w czasie gry
+  const orbit0 = { rot: controls.orbit.rotateSpeed, zoom: controls.orbit.zoomSpeed };
+  const gfxTarget = () => ({ renderer: world.renderer, look: world.look, scene: world.scene, sun: world.stage.sun });
+  function gameGraphics(on) {
+    const d = settings.data;
+    world.gameGfx = on ? d.gfx : null;
+    applyGraphics(gfxTarget(), on ? d.gfx : null); world.syncEnv();
+    controls.orbit.rotateSpeed = orbit0.rot * (on ? d.mouse.rotSens : 1); controls.orbit.zoomSpeed = orbit0.zoom * (on ? d.mouse.zoomSens : 1);
+  }
+  settings.onChange(() => { if (runs.length) gameGraphics(true); });
+  let lightT = 0, fpsN = 0, fpsT = 0;
   playUI.onQuit = () => stop();
   // akcje modelu (statki kosmiczne: ogień, skan, druk, wyłączenie, zniszczenie) — zdarzenie „action” na szynie; słucha
   // go zachowanie obiektu (run.act), dziennik i później dźwięk, interfejs, sieć
@@ -55,6 +70,7 @@ export function createPlay(store, world, controls, actions, events) {
     // gracz steruje wybranym (gdy ma zachowanie), inaczej pierwszym
     me = runs.find((r) => r.obj.id === store.selectedId) || runs[0];
     input.reset(BEHAVIORS[me.id], me.run.hud().throttle);
+    gameGraphics(true);
     last = me.b.root.position.clone(); hudT = 4;   // przez pierwsze sekundy linia stanu pokazuje klawisze
     controls.setPlaying(true); document.body.classList.add('playing');
     const acts = me.run.actions ? me.run.actions().map((a, i) => `${i + 1}: ${a.label.toLowerCase()}`).join(' · ') : '';
@@ -70,6 +86,7 @@ export function createPlay(store, world, controls, actions, events) {
     if (items) for (const it of [...items.list]) if (it.spawned) items.remove(it);
     items = null; machines.length = 0;
     runs = []; me = null; input.release(); playUI.stop();
+    gameGraphics(false);   // wygląd edytora
     controls.setPlaying(false); document.body.classList.remove('playing');
     world.syncPlaces(); controls.attach();
     actions.status(t('play.off'));
@@ -85,6 +102,8 @@ export function createPlay(store, world, controls, actions, events) {
     controls.orbit.target.add(d); world.camera.position.add(d);
     if ((hudT -= dt) <= 0) { hudT = 0.2; actions.status(hudText(me.run.hud())); }
     playUI.frame(dt, me, runs);
+    if ((lightT += dt) > 0.5) { lightT = 0; lights(world.scene, settings.data.gfx); }   // światła dodane w grze (ogień, lampy)
+    fpsN++; if ((fpsT += dt) >= 1) { if (playUI.ui) playUI.ui.fps(fpsN / fpsT); fpsN = 0; fpsT = 0; }
   }
   function hudText(h) {
     if (h.machine) return [me.obj.name, ...h.machine.map(([k, v]) => `${k} ${v}`)].join(' · ');
@@ -105,7 +124,7 @@ export function createPlay(store, world, controls, actions, events) {
     toggle: () => (runs.length ? stop() : start()),
     get playing() { return runs.length > 0; },
     get controlled() { return me ? me.obj.id : null; },
-    get ui() { return playUI.ui; }, takesEscape: () => playUI.takesEscape(),
+    get ui() { return playUI.ui; }, takesEscape: () => playUI.takesEscape(), settings,
     onChange: (f) => subs.add(f),
   };
 }

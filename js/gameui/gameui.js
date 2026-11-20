@@ -6,20 +6,25 @@
 // definicja (format 'gamelab-ui'):
 // { format: 'gamelab-ui', version: 1, name, skin: 'space' | 'battle' | 'engine' | { base, tokens },
 //   start: '<id ekranu>' | '' (od razu gra), pause: '<id ekranu>' (Esc w grze),
-//   screens: { id: ekran (screens.js) }, hud: [element (hud.js)],
+//   screens: { id: ekran (screens.js) albo 'standard' — gotowy ekran ustawień: graphics, controls }, hud: [element (hud.js)],
 //   windows: [{ id, title, key?, at?: 'c' | 'l' | 'r', body: [{ type: 'text', text } | { type: 'value', label, bind, unit? }
 //             | { type: 'stats', bind } (obiekt → wiersze) | { type: 'list', bind } (lista napisów albo { name, n })
 //             | { type: 'tree', tree, points } (drzewko ulepszeń: zasób „tree” albo przykład o tej nazwie, js/gameui/tree/;
 //               points — ścieżka punktów w stanie gry: kupno je odejmuje; widok z pola drzewka `view`)] }] }
 //
-// createGameUI(parent, def, { state, keys }) → ui:
+// createGameUI(parent, def, { state, keys, settings }) → ui:
+//   settings — magazyn ustawień gry (createSettings, js/gameui/settings.js): jego dane są w stanie gry pod `settings`
+//   (grafika `settings.gfx.*`, mysz `settings.mouse.*`, klawisze `settings.keys`), menu Opcje pisze do niego, a gra
+//   słucha akcji 'settings' (albo store.onChange) i stosuje grafikę i klawisze
 //   ui.set(stan | (stan) => stan)   stan gry (HUD, okna, ustawienia menu)
 //   ui.show(ekran), ui.back(), ui.hide()                        menu
 //   ui.open(okno), ui.close(okno), ui.toggle(okno)             okna gry
 //   ui.say({ who, text, choices?, side? }) → Promise<indeks wyboru | -1>   okno dialogowe (postać, narrator: who '')
 //   ui.log(tekst, rodzaj?, idDziennika?), ui.banner(tekst, podpis?, czas?)
 //   ui.on((akcja, arg) => …)        akcje: 'event' (arg — nazwa), 'quit', 'screen', 'resume', 'window', 'choice',
-//                                   'buy' (arg — { tree, id, level, cost, effects }: kupiony węzeł drzewka)
+//                                   'buy' (arg — { tree, id, level, cost, effects }: kupiony węzeł drzewka),
+//                                   'settings' (arg — ustawienia gry po zmianie w menu), 'reset' (bez magazynu)
+//   ui.fps(liczba)                  licznik klatek w rogu (gdy settings.gfx.showFps)
 //   ui.buy(drzewko, węzeł) → { bought, level, cost, effects } — jak kliknięcie w oknie drzewka
 //   ui.tree(nazwa) → TreeState drzewka (poziomy, effects(), toJSON(); zapis gry — load({ levels, spent }))
 //   ui.load(def), ui.skin(skórka), ui.tick(dt), ui.destroy(), ui.def, ui.state
@@ -33,6 +38,7 @@ import { getAsset } from '../scene/assets.js';
 import { createHud } from './hud.js';
 import { createScreens } from './screens.js';
 import { applySkin } from './skins.js';
+import { SETTINGS_SCREENS } from './settings.js';
 
 export const FORMAT = 'gamelab-ui', VERSION = 1;
 
@@ -44,23 +50,41 @@ export function normalizeUI(d) {
   if (!d || typeof d !== 'object' || d.format !== FORMAT) throw new Error('Not a GameLaboratory UI (format: ' + FORMAT + ').');
   const u = emptyUI(String(d.name || 'Game UI'));
   u.skin = d.skin || 'space'; u.start = String(d.start || ''); u.pause = String(d.pause || '');
-  u.screens = d.screens && typeof d.screens === 'object' ? d.screens : {};
+  u.screens = d.screens && typeof d.screens === 'object' ? { ...d.screens } : {};
+  // gotowe ekrany ustawień gry: { graphics: 'standard', controls: 'standard' } (js/gameui/settings.js)
+  for (const [id, v] of Object.entries(u.screens)) if (v === 'standard') { if (SETTINGS_SCREENS[id]) u.screens[id] = JSON.parse(JSON.stringify(SETTINGS_SCREENS[id])); else delete u.screens[id]; }
   u.hud = Array.isArray(d.hud) ? d.hud.filter((x) => x && typeof x.type === 'string') : [];
   u.windows = Array.isArray(d.windows) ? d.windows.filter((x) => x && x.id) : [];
   return u;
 }
 
-export function createGameUI(parent, def0, { state = {}, keys = true } = {}) {
+export function createGameUI(parent, def0, { state = {}, keys = true, settings = null } = {}) {
   const root = h('div', { class: 'gui' });
   parent.append(root);
   let def = normalizeUI(def0), S = state;
   const listeners = new Set(), emit = (a, arg) => listeners.forEach((f) => f(a, arg));
+  // ustawienia gry: kopia danych magazynu w stanie gry; zmiana w menu → magazyn (sanitize, zapis) → z powrotem do stanu
+  const copy = (o) => JSON.parse(JSON.stringify(o));
+  if (settings) S = { ...S, settings: copy(settings.data) };
+  let syncing = false;
+  const offSettings = settings ? settings.onChange((d) => { if (syncing) return; S = { ...S, settings: copy(d) }; if (screens.open) screens.refresh(); refresh(); }) : null;
+  function pushSettings() {
+    if (!settings || JSON.stringify(S.settings) === JSON.stringify(settings.data)) return;
+    syncing = true; settings.set(S.settings); syncing = false;
+    S = { ...S, settings: copy(settings.data) }; emit('settings', settings.data);
+  }
 
   const hud = createHud(root);
   const screens = createScreens(root, {
-    onAction: (a, arg) => { if (a === 'window') ui.open(arg); else emit(a, arg); hud.visible = !screens.open; },
-    getState: () => S, setState: (s) => { S = s; refresh(); },
+    onAction: (a, arg) => {
+      if (a === 'window') ui.open(arg);
+      else if (a === 'reset' && settings) { syncing = true; settings.reset(arg); syncing = false; S = { ...S, settings: copy(settings.data) }; screens.refresh(); emit('settings', settings.data); }
+      else emit(a, arg);
+      hud.visible = !screens.open;
+    },
+    getState: () => S, setState: (s) => { S = s; pushSettings(); refresh(); },
   });
+  const fpsEl = h('div', { class: 'gFps', hidden: true }); root.append(fpsEl);
 
   /* ---- okna gry (wygląd okien ze Space: ramka, kwadracik przy nagłówku, linia, przewijana treść) ---- */
   const winLayer = h('div', { class: 'gWins' }); root.append(winLayer);
@@ -185,7 +209,8 @@ export function createGameUI(parent, def0, { state = {}, keys = true } = {}) {
       hud.visible = !screens.open;
     },
     skin(s) { def.skin = s; applySkin(root, s); },
-    set(s) { S = typeof s === 'function' ? s(S) : { ...S, ...s }; refresh(); },
+    // z magazynem ustawień `settings` w stanie gry pochodzi zawsze z niego (zmienia je menu albo store.update)
+    set(s) { S = typeof s === 'function' ? s(S) : { ...S, ...s }; if (settings) S.settings = copy(settings.data); refresh(); },
     show: (id) => { const ok = screens.show(id); hud.visible = !screens.open; return ok; },
     back: () => screens.back(), hide: () => screens.hide(),
     open(id) { const w = wins.get(id); if (!w) return false; w.el.hidden = false; drawWin(id); emit('window', id); return true; },
@@ -195,8 +220,10 @@ export function createGameUI(parent, def0, { state = {}, keys = true } = {}) {
     say, log: (m, k, id) => hud.log(m, k, id), banner: (t, s, time) => hud.banner(t, s, time),
     on(f) { listeners.add(f); return () => listeners.delete(f); },
     tick(dt) { hud.tick(dt); },
+    fps(n) { const on = !!pick(S, 'settings.gfx.showFps'); fpsEl.hidden = !on; if (on) fpsEl.textContent = Math.round(n) + ' fps'; },
+    get settings() { return settings; },
     get menuOpen() { return screens.open; }, get screen() { return screens.current; },
-    destroy() { if (keys) removeEventListener('keydown', onKey); ro.disconnect(); for (const w of wins.values()) w.keep.forEach((k) => k && k.dispose && k.dispose()); root.remove(); listeners.clear(); },
+    destroy() { if (keys) removeEventListener('keydown', onKey); if (offSettings) offSettings(); ro.disconnect(); for (const w of wins.values()) w.keep.forEach((k) => k && k.dispose && k.dispose()); root.remove(); listeners.clear(); },
   };
   ui.load(def);
   return ui;

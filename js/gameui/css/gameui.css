@@ -29,3 +29,6 @@
 .gui .gChoices button{text-align:left}
 .gui .gMore{position:absolute;right:.8em;bottom:.4em;color:var(--g-accent);font-size:.8em;animation:gBlink 1s steps(2) infinite}
 @keyframes gBlink{50%{opacity:.3}}
+
+/* licznik klatek gry (ustawienie settings.gfx.showFps) */
+.gui .gFps{position:absolute;right:.6em;top:.4em;z-index:7;font-family:var(--g-font);font-size:.8em;color:var(--g-dim);font-variant-numeric:tabular-nums}
