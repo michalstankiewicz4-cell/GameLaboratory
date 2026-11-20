@@ -7,6 +7,7 @@ import { LIQUID_TIME } from '../../../js/render/liquid.js';
 import { createInput } from './input.js';
 import { createPlayUI } from './gameui-play.js';
 import { createSettings } from '../../../js/core/settings.js';
+import { mixer } from '../../../js/audio/mixer.js';
 import { applyGraphics, refresh } from '../../../js/render/game-graphics.js';
 
 const { t, lang } = window.EditorI18n;
@@ -15,6 +16,7 @@ export function createPlay(store, world, controls, actions, events) {
   // ustawienia gry gracza (js/core/settings.js; te same co w laboratorium UI gry): grafika i mysz w czasie gry,
   // klawisze czynności dla sterowania; menu Opcje UI gry zmienia je w biegu
   const settings = createSettings();
+  mixer().bindSettings(settings);   // głośności gracza (Opcje → Dźwięk) na szynach miksera
   const input = createInput(() => settings.data.keys);
   const playUI = createPlayUI(store, world, events, settings);   // UI gry ze sceny (env.ui) jako nakładka w czasie gry
   const orbit0 = { rot: controls.orbit.rotateSpeed, zoom: controls.orbit.zoomSpeed };
@@ -104,6 +106,7 @@ export function createPlay(store, world, controls, actions, events) {
     if ((hudT -= dt) <= 0) { hudT = 0.2; actions.status(hudText(me.run.hud())); }
     playUI.frame(dt, me, runs);
     if ((lightT += dt) > 0.5) { lightT = 0; refresh(world.scene, settings.data.gfx, world.renderer.capabilities.getMaxAnisotropy()); }   // to, co pojawiło się w grze (ogień, lampy, wersje dalekie modeli)
+    if (mixer().started) { const c2 = world.camera, f = c2.getWorldDirection(c2.position.clone()), u = c2.up; mixer().listen(c2.position.toArray(), f.toArray(), u.toArray()); }   // słuchacz — kamera
     fpsN++; if ((fpsT += dt) >= 1) { if (playUI.ui) playUI.ui.fps(fpsN / fpsT); fpsN = 0; fpsT = 0; }
   }
   function hudText(h) {

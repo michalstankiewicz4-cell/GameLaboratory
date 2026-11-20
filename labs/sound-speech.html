@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Sound lab · speech | GameLaboratory</title>
+<meta name="description" content="GameLaboratory speech lab: voices for game characters without audio files — the browser's speech synthesis (language, voice, rate, pitch), a synthetic voice from formants that speaks any text as character babble (pitch, size, speed, intonation, breath), whispers, and voice effects: radio, robot, echo, distance; through the engine's mixer, saved as named voices.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/sound-speech.html">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../ui/style/sea.css">
+<link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="../ui/pages/audio.css">
+</head>
+<!-- Laboratorium mowy (js/labs/sound-speech/): VoiceKit (js/audio/voice/voicekit.js) przez mikser silnika
+     (js/audio/mixer.js). Grupa „Dźwięk”: muzyka (labs/sound.html) · efekty (labs/sound-effects.html) · mowa. -->
+<body class="lab viewFits">
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/shell/menubar.js"></script>
+<div id="view"></div>
+<div class="bar">
+  <div class="envSwitch groupSwitch" data-group="sound"></div>
+  <select id="preset" aria-label="Voice" title="A ready voice or one saved under a name"></select>
+  <button type="button" id="say" title="Say the text (Ctrl+Enter)">▶ Say</button>
+  <button type="button" id="hush" title="Stop speaking">■ Stop</button>
+  <span class="sp"></span>
+  <span class="dimtxt" id="status"></span>
+</div>
+<div class="foot"><span id="fps" data-auto></span><span class="sp"></span><span>GameLaboratory</span></div>
+<script src="../ui/shell/bars.js"></script>
+<aside class="panel" data-std="info">
+  <h2 class="stdName">Speech</h2>
+  <p class="stdText">Voices for game characters, made live — no recordings. The browser's speech synthesis reads the text aloud in a real language; the synthetic voice speaks it as a character's babble, from formants (the resonances of the throat), like the voices of many games; a whisper murmurs without words. The synthetic voices go through effects — radio, robot, echo, distance — and the engine's mixer (the speech bus).</p>
+  <p class="note">For AI: VoiceApi in the console (API tab).</p>
+</aside>
+<aside class="panel" data-window="text" data-title="Text" data-title-pl="Tekst">
+  <textarea id="text" rows="5" spellcheck="false"></textarea>
+  <div class="btns" id="lines"></div>
+  <p class="note">Ctrl+Enter says the text. Commas and full stops make pauses; a question goes up at the end.</p>
+</aside>
+<aside class="panel" data-window="voice" data-title="Voice" data-title-pl="Głos">
+  <div class="row"><span>Kind</span><select id="mode"><option value="speech">Browser speech (real words)</option><option value="formant">Synthetic voice (babble)</option><option value="whisper">Whisper</option></select><output></output></div>
+  <div id="speechBox">
+    <div class="row"><span>Language</span><select id="lang"></select><output></output></div>
+    <div class="row"><span>Voice</span><select id="voiceSel"></select><output></output></div>
+    <div class="row"><span>Rate</span><input type="range" id="rate" min="0.3" max="2" step="0.05"><output id="rateV"></output></div>
+    <div class="row"><span>Pitch</span><input type="range" id="pitch" min="0" max="2" step="0.05"><output id="pitchV"></output></div>
+    <p class="note">The browser's voices depend on the system. This voice plays outside the audio graph: no effects and it is not in a recording — its loudness follows the speech bus.</p>
+  </div>
+  <div id="formantBox">
+    <div class="row"><span>Voice pitch</span><input type="range" id="hz" min="50" max="400" step="1"><output id="hzV"></output></div>
+    <div class="row"><span>Throat size</span><input type="range" id="size" min="0.6" max="1.6" step="0.01"><output id="sizeV"></output></div>
+    <div class="row"><span>Speed</span><input type="range" id="speed" min="0.4" max="2" step="0.05"><output id="speedV"></output></div>
+    <div class="row"><span>Intonation</span><input type="range" id="melody" min="0" max="1" step="0.05"><output id="melodyV"></output></div>
+    <div class="row"><span>Breath</span><input type="range" id="breath" min="0" max="1" step="0.05"><output id="breathV"></output></div>
+  </div>
+  <h3>Save</h3>
+  <div class="row"><span>Name</span><input type="text" id="name" maxlength="40"><output></output></div>
+  <div class="btns"><button type="button" id="save">Save under this name</button><button type="button" id="del">Delete saved</button></div>
+  <p class="note">A saved voice is a named asset "voice".</p>
+</aside>
+<aside class="panel" data-window="fx" data-side="right" data-title="Voice effects" data-title-pl="Efekty głosu">
+  <div class="row"><span>Radio</span><input type="range" id="fxRadio" min="0" max="1" step="0.05"><output id="fxRadioV"></output></div>
+  <div class="row"><span>Robot</span><input type="range" id="fxRobot" min="0" max="1" step="0.05"><output id="fxRobotV"></output></div>
+  <div class="row"><span>Echo</span><input type="range" id="fxEcho" min="0" max="1" step="0.05"><output id="fxEchoV"></output></div>
+  <div class="row"><span>Distance</span><input type="range" id="fxFar" min="0" max="1" step="0.05"><output id="fxFarV"></output></div>
+  <p class="note">Radio: a narrow band, a little distortion and hiss. Robot: ring modulation. For the synthetic voice and the whisper.</p>
+  <h3>Record</h3>
+  <div class="btns"><button type="button" id="rec">● Record the next line</button></div>
+  <p class="note" id="recState">A .webm file of what the synthetic voice says.</p>
+</aside>
+<aside class="panel" data-window="mixer" data-side="right" data-title="Mixer" data-title-pl="Mikser">
+  <div id="mixerBox"></div>
+</aside>
+<aside class="panel" data-window="json" data-side="right" data-title="Description (JSON)" data-title-pl="Opis (JSON)">
+  <textarea id="jsonText" class="mono" rows="7" spellcheck="false"></textarea>
+  <div class="btns"><button type="button" id="jsonApply">Apply</button><button type="button" id="jsonCopy">Copy</button></div>
+  <p class="note" id="jsonMsg">The voice as data.</p>
+</aside>
+<script src="../ui/shell/loader.js"></script>
+<script src="../ui/shell/envswitch.js"></script>
+<script src="../ui/shell/labwin.js"></script>
+<script src="../ui/shell/windows.js"></script>
+<script type="module" src="../js/labs/sound-speech/sound-speech.js"></script>
+</body>
+</html>

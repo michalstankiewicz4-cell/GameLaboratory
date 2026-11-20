@@ -11,7 +11,7 @@
    phrases (Polish; their English in phraseEn — a new phrase needs both),
    saved (localStorage key prefixes), art (the tile: bg + svg, or img),
    group + tab / tabPl (labs that belong together — one background, one glow in the menu, a switch on the bar:
-   "vehicles": space · water · land, "space": bodies · systems · scale, "terrain": land · caves),
+   "vehicles": space · water · land, "space": bodies · systems · scale, "terrain": land · caves, "sound": music · effects · speech),
    cat (the category: a coloured dot in the menu and on the tile; "cats" — their names, in order; colours:
    ui/style/tokens.css --cat-<id>). The labs are listed in category order (the menu and the start page follow it).
    The JSON between the markers is read by tools/sitemap.py — keep it JSON.
@@ -623,18 +623,61 @@ window.GameLabCatalog =
     {
       "file": "labs/sound.html",
       "cat": "ui",
-      "name": "Sound lab",
-      "namePl": "Laboratorium dźwięku",
+      "group": "sound",
+      "tab": "Music",
+      "tabPl": "Muzyka",
+      "name": "Sound lab · music",
+      "namePl": "Laboratorium dźwięku · muzyka",
       "doc": "docs/labs/sound.md",
-      "desc": "The game's music, made live from layers and a seed: drones, pads, chimes, whispers, a robot's voice.",
-      "descPl": "Muzyka gry tworzona na żywo z warstw i ziarna: burdony, plamy, dzwonki, szepty, głos robota.",
+      "desc": "The game's music, made live from layers and a seed: moods and ambient music, songs, drones, pads, chimes, whispers, a robot's voice — through the engine's mixer.",
+      "descPl": "Muzyka gry tworzona na żywo z warstw i ziarna: nastroje i muzyka ambientowa, piosenki, burdony, plamy, dzwonki, szepty, głos robota — przez mikser silnika.",
       "kind": "lab",
       "kit": "MusicKit",
-      "phrases": ["dźwięk", "muzyka"],
+      "phrases": ["dźwięk", "muzyka", "ambient"],
       "saved": ["soundLab."],
       "art": {
         "bg": ["#1f1840", "#0b0818"],
         "svg": "<g fill=\"none\" stroke-linecap=\"round\"><path d=\"M18 44 V56\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.525\"/><path d=\"M22.6 26.61905486672678 V73.38094513327322\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.7422618141659152\"/><path d=\"M27.2 16.33244614410112 V83.66755385589889\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.870844423198736\"/><path d=\"M31.799999999999997 16.613191587785153 V83.38680841221485\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.8673351051526856\"/><path d=\"M36.4 25.652195991217393 V74.3478040087826\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.7543475501097826\"/><path d=\"M41 37.54328236833426 V62.45671763166574\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.6057089703958218\"/><path d=\"M45.599999999999994 42.359795783242234 V57.640204216757766\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.5455025527094721\"/><path d=\"M50.199999999999996 41.774032526376715 V58.225967473623285\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.5528245934202911\"/><path d=\"M54.8 40.4737913384299 V59.5262086615701\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.5690776082696263\"/><path d=\"M59.4 33.6302228410456 V66.3697771589544\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.65462221448693\"/><path d=\"M64 31.889564309920857 V68.11043569007914\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.6763804461259892\"/><path d=\"M68.6 38.7069812597759 V61.2930187402241\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.5911627342528012\"/><path d=\"M73.19999999999999 35.38888167229133 V64.61111832770867\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.6326389790963584\"/><path d=\"M77.8 20.247264086663645 V79.75273591333635\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.8219091989167044\"/><path d=\"M82.39999999999999 11.082670043112977 V88.91732995688702\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.9364666244610877\"/><path d=\"M87 12.632565464129058 V87.36743453587094\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.9170929316983868\"/><path d=\"M91.6 24.585259859291735 V75.41474014070826\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.7676842517588534\"/><path d=\"M96.19999999999999 41.68946906627234 V58.31053093372766\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.5538816366715957\"/><path d=\"M100.8 31.50764153167958 V68.49235846832042\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.6811544808540052\"/><path d=\"M105.39999999999999 24.783365641958092 V75.21663435804192\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.7652079294755239\"/><path d=\"M110 27.33129532012908 V72.66870467987093\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.7333588084983865\"/><path d=\"M114.6 35.39147797834034 V64.60852202165967\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.6326065252707458\"/><path d=\"M119.19999999999999 42.58956450801383 V57.41043549198617\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.5426304436498272\"/><path d=\"M123.8 43.666744131541456 V56.333255868458544\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.5291656983557318\"/><path d=\"M128.39999999999998 37.52236702106481 V62.47763297893519\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.6059704122366899\"/><path d=\"M133 27.877806521130463 V72.12219347886953\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.7265274184858692\"/><path d=\"M137.6 21.1895620944689 V78.8104379055311\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.8101304738191388\"/><path d=\"M142.2 22.964536940537663 V77.03546305946233\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.7879432882432793\"/><path d=\"M146.79999999999998 34.52035507370054 V65.47964492629946\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.6434955615787432\"/><path d=\"M151.39999999999998 36.002456274638206 V63.997543725361794\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.6249692965670224\"/><path d=\"M156 19.802719458157615 V80.19728054184239\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.8274660067730298\"/><path d=\"M160.6 11.733887612941004 V88.266112387059\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.9283264048382375\"/><path d=\"M165.2 14.768444808650273 V85.23155519134973\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.8903944398918716\"/><path d=\"M169.79999999999998 26.530139473793124 V73.46986052620687\" stroke=\"#36d6b5\" stroke-width=\"2.2\" opacity=\"0.7433732565775859\"/><path d=\"M174.39999999999998 40.68256113662587 V59.31743886337413\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.5664679857921766\"/><path d=\"M179 37.59936975210632 V62.40063024789368\" stroke=\"#9fb4ff\" stroke-width=\"2.2\" opacity=\"0.605007878098671\"/></g><path d=\"M14 50 Q40 20 66 50 T118 50 T170 50 T190 50\" fill=\"none\" stroke=\"#f2b84b\" stroke-width=\"1.8\" opacity=\".8\"/>"
+      }
+    },
+    {
+      "file": "labs/sound-effects.html",
+      "cat": "ui",
+      "group": "sound",
+      "tab": "Effects",
+      "tabPl": "Efekty",
+      "name": "Sound lab · effects and ambience",
+      "namePl": "Laboratorium dźwięku · efekty i otoczenie",
+      "doc": "docs/labs/sound-effects.md",
+      "desc": "Sound effects and the sound of places, made live from code: explosions, shots, thunder, water, impacts, birds, wind, rain, the sea, fire, an engine; ambiences from layers (forest, city park, seaside, storm, night), sound in space.",
+      "descPl": "Efekty dźwiękowe i dźwięk miejsc tworzone na żywo z kodu: wybuchy, strzały, grzmot, woda, uderzenia, ptaki, wiatr, deszcz, morze, ogień, silnik; tła miejsc z warstw (las, park, brzeg morza, burza, noc), dźwięk w przestrzeni.",
+      "kind": "lab",
+      "kit": "SfxKit",
+      "phrases": ["dźwięk", "efekty dźwiękowe", "otoczenie", "ptaki", "wybuchy"],
+      "saved": ["gameLab.soundFx."],
+      "art": {
+        "bg": ["#1a2030", "#0b0e16"],
+        "svg": "<path d=\"M0 70 Q20 70 30 40 Q40 10 50 60 Q60 95 70 50 Q78 20 88 55 Q96 80 104 62 Q114 45 124 66 Q140 80 200 70\" fill=\"none\" stroke=\"#f2b84b\" stroke-width=\"2\" opacity=\".85\"/><circle cx=\"150\" cy=\"32\" r=\"14\" fill=\"#ff7a5c\" opacity=\".55\"/><circle cx=\"150\" cy=\"32\" r=\"24\" fill=\"none\" stroke=\"#ff7a5c\" stroke-width=\"1.5\" opacity=\".4\"/><path d=\"M40 30 q6 -6 12 0 q6 -6 12 0\" fill=\"none\" stroke=\"#36d6b5\" stroke-width=\"1.6\"/><path d=\"M0 88 Q30 82 60 88 T120 88 T200 88\" fill=\"none\" stroke=\"#5fb8f0\" stroke-width=\"1.6\" opacity=\".7\"/>"
+      }
+    },
+    {
+      "file": "labs/sound-speech.html",
+      "cat": "ui",
+      "group": "sound",
+      "tab": "Speech",
+      "tabPl": "Mowa",
+      "name": "Sound lab · speech",
+      "namePl": "Laboratorium dźwięku · mowa",
+      "doc": "docs/labs/sound-speech.md",
+      "desc": "Voices for game characters without recordings: the browser's speech synthesis, a synthetic voice from formants that speaks any text as a character's babble, whispers; radio, robot, echo and distance effects.",
+      "descPl": "Głosy postaci gry bez nagrań: synteza mowy przeglądarki, głos syntetyczny z formantów mówiący dowolny tekst jak bełkot postaci, szept; efekty radia, robota, echa i odległości.",
+      "kind": "lab",
+      "kit": "VoiceKit",
+      "phrases": ["dźwięk", "mowa", "głos", "postacie"],
+      "saved": ["gameLab.speech."],
+      "art": {
+        "bg": ["#22182e", "#0e0a14"],
+        "svg": "<path d=\"M60 30 h80 a12 12 0 0 1 12 12 v22 a12 12 0 0 1 -12 12 h-46 l-18 14 v-14 h-16 a12 12 0 0 1 -12 -12 v-22 a12 12 0 0 1 12 -12z\" fill=\"none\" stroke=\"#c68ae8\" stroke-width=\"2\"/><g stroke=\"#f2b84b\" stroke-width=\"3\" stroke-linecap=\"round\"><path d=\"M78 46 v14\"/><path d=\"M90 40 v26\"/><path d=\"M102 44 v18\"/><path d=\"M114 38 v30\"/><path d=\"M126 47 v12\"/></g>"
       }
     },
     {
@@ -781,6 +824,13 @@ window.GameLabCatalog =
     "animacja": "animation",
     "baza": "base",
     "budowle": "structures",
+    "ambient": "ambient",
+    "postacie": "characters",
+    "głos": "voice",
+    "mowa": "speech",
+    "ptaki": "birds",
+    "otoczenie": "ambience",
+    "efekty dźwiękowe": "sound effects",
     "paralaksa": "parallax",
     "fasady": "facades",
     "miasto": "city",

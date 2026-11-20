@@ -3,6 +3,29 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.84.0 · laboratorium dźwięku: muzyka 1.3.0, efekty 1.0.0, mowa 1.0.0 · UI gry 1.5.0 · edytor sceny 0.40.0 — 2026-11-20 (grupa dźwięku i mikser)
+
+### Dodane
+- **Mikser silnika** (`js/audio/mixer.js`): jeden kontekst Web Audio, szyny muzyki, otoczenia, efektów i mowy →
+  kompresor → głośność ogólna i wyciszenie; dźwięk przestrzenny (słuchacz = kamera, źródła w miejscu, HRTF); wspólny
+  szum; strumień do nagrań. Opis: `docs/audio/README.md`.
+- **Ustawienia dźwięku gracza** (`settings.audio`: ogólna, muzyka, otoczenie, efekty, mowa, wyciszenie) i gotowy ekran
+  Opcji **Dźwięk** w UI gry (`screens: { audio: 'standard' }`, obok Grafiki i Sterowania).
+- **Grupa dźwięku** (przełącznik na pasku, barwa `--sound`): muzyka · efekty · mowa.
+- **Laboratorium efektów i otoczenia** (`labs/sound-effects.html`, kit **SfxKit** `js/audio/sfx/`): wybuchy, strzały,
+  grzmot, plusk, uderzenia (z aTrain), trafienia, ptaki, dźwięki interfejsu (z Battle); dźwięki ciągłe — wiatr,
+  deszcz, morze, strumień, ogień, świerszcze, miasto, silnik, pisk koła, buczenie prądu; tła miejsc z warstw (las,
+  park, brzeg morza, burza, noc, ognisko); dźwięk w przestrzeni; zasoby `sound` i `ambience`; `window.SfxApi`.
+- **Laboratorium mowy** (`labs/sound-speech.html`, kit **VoiceKit** `js/audio/voice/`): mowa przeglądarki (w wybranym
+  języku), głos syntetyczny z formantów (sylaby z tekstu, intonacja), szept; efekty głosu (radio, robot, echo,
+  odległość), nagrywanie, gotowe głosy, zasób `voice`; `window.VoiceApi`.
+- Okno **Mikser** w laboratoriach dźwięku (`js/labs/shared/mixer-window.js`) — te same głośności co w grze, mierniki szyn.
+
+### Zmienione
+- Laboratorium muzyki: gra przez szynę muzyki miksera, okno Mikser; głos robota i szepty MusicKit przeniesione do
+  VoiceKit (brzmią tak samo).
+- Edytor sceny: ▶ Graj ustawia głośności z Opcji → Dźwięk i słuchacza w kamerze.
+
 ## Program 0.83.0 · laboratorium miasta 1.1.0 · edytor sceny 0.39.1 · doktor modeli 1.3.2 — 2026-11-20 (budynki Warszawy)
 
 ### Dodane

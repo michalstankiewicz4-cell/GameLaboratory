@@ -50,7 +50,7 @@ Ten schemat narysowany ramkami: menu **Pomoc → Schemat silnika** na każdej st
 | **Physics** | stały krok, prawa środowiska: próżnia, woda, ląd | osobno od skryptów |
 | **Rules** | reguły gry: stan rozgrywki (lobby, misja, wygrana, przegrana), cele, punkty, role graczy (np. patogen i lekarz), warunki końca rundy | dotyczą całej gry, nie jednego obiektu; słuchają zdarzeń i zmieniają scenę |
 | **Scripts** | zachowania podpinane do obiektów (strzelanie, sterowanie, AI przeciwników) | korzystają z fizyki i zdarzeń |
-| **Audio** | Web Audio: muzyka, efekty, dźwięk przestrzenny ze źródeł w scenie | słuchacz = kamera |
+| **Audio** | Web Audio: muzyka, efekty, dźwięk przestrzenny ze źródeł w scenie | słuchacz = kamera; jest (0.84.0): mikser `js/audio/mixer.js` (szyny muzyki, otoczenia, efektów i mowy, głośności gracza z Opcji → Dźwięk, dźwięk przestrzenny), MusicKit, SfxKit, VoiceKit ([`../audio/README.md`](../audio/README.md)); źródła dźwięku w scenie — w planie |
 | **UI** | menu, HUD, pasek postępu, okna | czyta stan sceny i zdarzenia |
 | **Input** | klawiatura, mysz, pad, dotyk, Pointer Lock → akcje („skok”, „strzał”) | akcje, nie klawisze, żeby dało się zmieniać sterowanie |
 | **Assets** | ładowanie, pamięć podręczna, postęp; prefabrykaty (gotowe obiekty z kitów) | |

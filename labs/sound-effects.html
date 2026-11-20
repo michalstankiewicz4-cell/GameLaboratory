@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Sound lab · effects and ambience | GameLaboratory</title>
+<meta name="description" content="GameLaboratory sound effects and ambience lab: explosions, gunshots, thunder, splashes, impacts on metal and wood, birds, wind, rain, sea waves, a stream, fire, crickets, city traffic, an engine by RPM, a wheel squealing on the rail — generated live with Web Audio, no audio files; ambiences of places from layers (forest, city park, seaside, storm, night, campfire), sound in space around the listener, through the engine's mixer.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/sound-effects.html">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../ui/style/sea.css">
+<link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="../ui/pages/audio.css">
+</head>
+<!-- Laboratorium efektów i otoczenia (js/labs/sound-effects/): SfxKit (js/audio/sfx/sfxkit.js) przez mikser silnika
+     (js/audio/mixer.js). Grupa „Dźwięk”: muzyka (labs/sound.html) · efekty · mowa (labs/sound-speech.html). -->
+<body class="lab viewFits">
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/shell/menubar.js"></script>
+<div id="view"></div>
+<div class="bar">
+  <div class="envSwitch groupSwitch" data-group="sound"></div>
+  <button type="button" id="play" title="Play the chosen sound (Space)">▶ Play</button>
+  <button type="button" id="stopAll" title="Stop everything that sounds">■ Stop all</button>
+  <span class="sp"></span>
+  <span class="dimtxt" id="status"></span>
+</div>
+<div class="foot"><span id="fps" data-auto></span><span class="sp"></span><span>GameLaboratory</span></div>
+<script src="../ui/shell/bars.js"></script>
+<aside class="panel" data-std="info">
+  <h2 class="stdName">Effects and ambience</h2>
+  <p class="stdText">The game's sound effects and the sound of places, made live from code — no audio files: explosions, shots, thunder, water, impacts, birds, wind, rain, the sea, fire, an engine. An ambience is layers: steady sounds and sounds now and then (birds in a forest, thunder in a storm). Everything plays through the engine's mixer — effects on the effects bus, ambiences on the ambience bus — and can stand in space around the listener.</p>
+  <p class="note">For AI: SfxApi in the console (API tab).</p>
+</aside>
+<aside class="panel" data-window="sound" data-title="Sound" data-title-pl="Dźwięk">
+  <div id="list"></div>
+  <h3 id="pTitle">Parameters</h3>
+  <div id="params"></div>
+  <div class="row"><span>Volume</span><input type="range" id="gain" min="0" max="2" step="0.05"><output id="gainV"></output></div>
+  <div class="btns"><button type="button" id="play2">▶ Play</button><button type="button" id="loopBtn">Start</button></div>
+  <label class="chk" title="Play the one-shot sound again and again (to tune it)"><input type="checkbox" id="repeat"> Repeat every 2 s</label>
+  <h3>Save</h3>
+  <div class="row"><span>Saved</span><select id="savedSel"></select><output></output></div>
+  <div class="row"><span>Name</span><input type="text" id="name" maxlength="40"><output></output></div>
+  <div class="btns"><button type="button" id="save">Save under this name</button><button type="button" id="del">Delete saved</button></div>
+  <p class="note">A saved sound is a named asset "sound" — games and the scene take it by its name.</p>
+</aside>
+<aside class="panel" data-window="ambience" data-title="Ambience" data-title-pl="Tło miejsca">
+  <div class="row"><span>Place</span><select id="ambSel"></select><output></output></div>
+  <div class="btns"><button type="button" id="ambPlay">▶ Start</button><button type="button" id="ambStop">■ Stop</button></div>
+  <div id="ambLayers"></div>
+  <div class="btns"><button type="button" id="ambAdd" title="Add the sound chosen in the Sound window as a layer">+ Add the chosen sound</button></div>
+  <div class="row"><span>Name</span><input type="text" id="ambName" maxlength="40"><output></output></div>
+  <div class="btns"><button type="button" id="ambSave">Save under this name</button><button type="button" id="ambDel">Delete saved</button></div>
+  <p class="note">Layers: steady sounds (wind, rain, the sea) and sounds now and then (birds, thunder) — every few seconds, here and there in the stereo field. Saved as the asset "ambience".</p>
+</aside>
+<aside class="panel" data-window="space" data-side="right" data-title="In space" data-title-pl="W przestrzeni">
+  <label class="chk"><input type="checkbox" id="spatial"> Place the sound around the listener</label>
+  <div class="padBox" id="pad"><b title="The listener (facing up)"></b><i id="dot"></i></div>
+  <div class="row"><span>Distance</span><output id="distV"></output><output></output></div>
+  <p class="note">Top view, the listener in the middle facing up; drag the source. Headphones: the sound comes from that side, quieter and duller far away (the engine's 3D sound, like objects in the scene).</p>
+</aside>
+<aside class="panel" data-window="mixer" data-side="right" data-title="Mixer" data-title-pl="Mikser">
+  <div id="mixerBox"></div>
+</aside>
+<aside class="panel" data-window="json" data-side="right" data-title="Description (JSON)" data-title-pl="Opis (JSON)">
+  <textarea id="jsonText" class="mono" rows="7" spellcheck="false"></textarea>
+  <div class="btns"><button type="button" id="jsonApply">Apply</button><button type="button" id="jsonCopy">Copy</button></div>
+  <p class="note" id="jsonMsg">The sound or the ambience as data.</p>
+</aside>
+<script src="../ui/shell/loader.js"></script>
+<script src="../ui/shell/envswitch.js"></script>
+<script src="../ui/shell/labwin.js"></script>
+<script src="../ui/shell/windows.js"></script>
+<script type="module" src="../js/labs/sound-effects/sound-effects.js"></script>
+</body>
+</html>

@@ -14,10 +14,10 @@ export const SAMPLES = {
         options: { title: 'Options', items: [
           { type: 'slider', label: 'Music', bind: 'settings.music', min: 0, max: 1, step: 0.05 },
           { type: 'slider', label: 'Sound', bind: 'settings.sound', min: 0, max: 1, step: 0.05 },
-          { label: 'Graphics', do: 'screen:graphics' }, { label: 'Controls', do: 'screen:controls' },
+          { label: 'Graphics', do: 'screen:graphics' }, { label: 'Controls', do: 'screen:controls' }, { label: 'Sound', do: 'screen:audio' },
           { type: 'toggle', label: 'Show the minimap', bind: 'settings.minimap' },
           { label: 'Back', do: 'back', sub: true }] },
-        graphics: 'standard', controls: 'standard',
+        graphics: 'standard', controls: 'standard', audio: 'standard',
         about: { title: 'About', text: 'A sample made in the GameLaboratory UI lab.', items: [{ label: 'Back', do: 'back' }] },
       },
       hud: [
@@ -44,9 +44,9 @@ export const SAMPLES = {
         main: { title: 'STEEL SALVO', text: 'Pick your ship and sail out.', items: [{ label: 'Sail out', do: 'resume' }, { label: 'Options', do: 'screen:options' }, { label: 'Quit', do: 'quit', sub: true }] },
         pause: { title: 'Paused', items: [{ label: 'Resume', do: 'resume' }, { label: 'Options', do: 'screen:options' }, { label: 'Leave the battle', do: 'screen:main' }] },
         options: { title: 'Options', items: [
-          { label: 'Graphics', do: 'screen:graphics' }, { label: 'Controls', do: 'screen:controls' },
+          { label: 'Graphics', do: 'screen:graphics' }, { label: 'Controls', do: 'screen:controls' }, { label: 'Sound', do: 'screen:audio' },
           { type: 'slider', label: 'Sound', bind: 'settings.sound', min: 0, max: 1, step: 0.05 }, { label: 'Back', do: 'back', sub: true }] },
-        graphics: 'standard', controls: 'standard',
+        graphics: 'standard', controls: 'standard', audio: 'standard',
       },
       hud: [
         { id: 'wave', type: 'text', at: 't', bind: 'waveText' },
@@ -67,9 +67,9 @@ export const SAMPLES = {
     def: {
       format: 'gamelab-ui', version: 1, name: 'Scene play', skin: 'space', start: '', pause: 'pause',
       screens: {
-        pause: { title: 'Paused', text: 'The scene keeps running behind the menu.', items: [{ label: 'Resume', do: 'resume' }, { label: 'Graphics', do: 'screen:graphics' }, { label: 'Controls', do: 'screen:controls' },
+        pause: { title: 'Paused', text: 'The scene keeps running behind the menu.', items: [{ label: 'Resume', do: 'resume' }, { label: 'Graphics', do: 'screen:graphics' }, { label: 'Controls', do: 'screen:controls' }, { label: 'Sound', do: 'screen:audio' },
           { label: 'Help', do: 'window:help' }, { label: 'Back to the editor', do: 'quit', sub: true }] },
-        graphics: 'standard', controls: 'standard',
+        graphics: 'standard', controls: 'standard', audio: 'standard',
       },
       hud: [
         { id: 'name', type: 'text', at: 'tl', label: 'You fly', bind: 'player.name' },
@@ -89,8 +89,8 @@ export const SAMPLES = {
     label: 'Simple game (engine skin)',
     def: {
       format: 'gamelab-ui', version: 1, name: 'Simple game', skin: 'engine', start: '', pause: 'pause',
-      screens: { pause: { title: 'Paused', items: [{ label: 'Resume', do: 'resume' }, { label: 'Inventory', do: 'window:bag' }, { label: 'Graphics', do: 'screen:graphics' }, { label: 'Controls', do: 'screen:controls' }] },
-        graphics: 'standard', controls: 'standard' },
+      screens: { pause: { title: 'Paused', items: [{ label: 'Resume', do: 'resume' }, { label: 'Inventory', do: 'window:bag' }, { label: 'Graphics', do: 'screen:graphics' }, { label: 'Controls', do: 'screen:controls' }, { label: 'Sound', do: 'screen:audio' }] },
+        graphics: 'standard', controls: 'standard', audio: 'standard' },
       hud: [
         { id: 'hp', type: 'bar', at: 'tl', label: 'Health', bind: 'ship.hull', max: 'ship.hullMax', low: 0.25 },
         { id: 'score', type: 'value', at: 'tr', label: 'Score', bind: 'credits' },

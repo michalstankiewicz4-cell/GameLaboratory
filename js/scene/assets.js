@@ -34,6 +34,11 @@
 //   building — budynek z laboratorium miasta: opis CityKit (rodzaj, ziarno, obrys, front, kondygnacje, mur, przęsła,
 //         okna, parter, gzymsy, balkony, dach, świecące okna; js/models/city/types.js); w scenie pole „asset” obiektu
 //         z prefabrykatem miasta (js/models/city/citykit.js); landmark — budynek Warszawy z OpenStreetMap (bryła z mapy)
+//   sound — dźwięk z laboratorium efektów: { sound (rodzaj SfxKit: wybuch, strzał, ptak, wiatr…), params, gain }
+//         (js/audio/sfx/sfxkit.js)
+//   ambience — tło miejsca z laboratorium efektów: { layers: [{ sound, params, level, every, spread }] }
+//   voice — głos z laboratorium mowy: opis VoiceKit (mode: speech | formant | whisper, lang, voice, rate, pitch, hz,
+//         size, speed, melody, breath, fx; js/audio/voice/voicekit.js)
 //   image — obraz z laboratorium sztuki: opis ArtKit (temat, technika, ziarno…; js/render/art/artkit.js), malowany od nowa
 //         tam, gdzie potrzebny (ten sam opis i ziarno — ten sam obraz); temat „image” (wgrany obraz) się nie zapisuje
 export const KEY = 'gameLab.assets.v1';
@@ -53,6 +58,9 @@ export const ASSET_KINDS = {
   tree: { label: 'Tech tree', labelPl: 'Drzewko', lab: 'labs/trees.html', keys: ['format', 'version', 'name', 'view', 'background', 'points', 'branches', 'nodes', 'notes'] },
   image: { label: 'Image', labelPl: 'Obraz', lab: 'labs/art.html', keys: ['size', 'aspect', 'seed', 'subject', 'palette', 'technique', 'stroke', 'detail', 'surface', 'relief', 'light', 'varnish', 'cracks', 'age', 'view', 'convert', 'format', 'text'] },
   building: { label: 'Building', labelPl: 'Budynek', lab: 'labs/city.html', keys: ['label', 'type', 'seed', 'footprint', 'front', 'floors', 'floorH', 'groundH', 'wall', 'bay', 'module', 'window', 'ground', 'bands', 'balcony', 'roof', 'lit', 'landmark'] },
+  sound: { label: 'Sound effect', labelPl: 'Efekt dźwiękowy', lab: 'labs/sound-effects.html', keys: ['label', 'sound', 'params', 'gain'] },
+  ambience: { label: 'Ambience', labelPl: 'Tło dźwiękowe', lab: 'labs/sound-effects.html', keys: ['label', 'layers'] },
+  voice: { label: 'Voice', labelPl: 'Głos', lab: 'labs/sound-speech.html', keys: ['label', 'mode', 'lang', 'voice', 'rate', 'pitch', 'hz', 'size', 'speed', 'melody', 'breath', 'fx'] },
   blocks: { label: 'Block body', labelPl: 'Bryła z bloków', lab: 'labs/blocks.html', keys: ['shape', 'radius', 'voxel', 'seed', 'text', 'layers', 'mats', 'matRefs'] },
 };
 

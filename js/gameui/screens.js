@@ -8,7 +8,7 @@
 //   GFX_PRESETS z js/core/settings.js) albo { type: 'keys', bind } (klawisze czynności: klik i wciśnięcie klawisza,
 //   Esc — bez zmiany; czynności — KEY_ACTIONS z js/core/settings.js)
 // do: 'screen:<id>' (następny ekran), 'back', 'resume' (zamyka menu — gra), 'window:<id>' (okno gry), 'event:<nazwa>'
-//     (zdarzenie dla gry), 'quit' (zdarzenie quit), 'reset:<część>' (ustawienia domyślne: gfx, mouse, keys)
+//     (zdarzenie dla gry), 'quit' (zdarzenie quit), 'reset:<część>' (ustawienia domyślne: gfx, mouse, keys, audio)
 import { h, btn, pick } from './dom.js';
 import { GFX_PRESETS, KEY_ACTIONS, keyName } from '../core/settings.js';
 

@@ -1,10 +1,14 @@
-// The sound lab's own script (labs/sound.html): MusicKit's player, its
-// panels and a picture of the sound.
+// The sound lab's own script (labs/sound.html — the sound group's music): MusicKit's player through the engine's mixer
+// (js/audio/mixer.js, the music bus), its panels, the Mixer window and a picture of the sound.
+import { mixer } from '../../audio/mixer.js';
+import { mixerWindow } from '../shared/mixer-window.js';
 (() => {
 "use strict";
 const $ = (id) => document.getElementById(id);
 const MK = window.MusicKit;
-const player = MK.create({ params: MK.PRESETS.station.params });
+const mx = mixer();
+const player = MK.create({ params: MK.PRESETS.station.params, ctx: mx.ctx, out: mx.bus('music'), mixer: mx });
+mixerWindow(document.getElementById('mixerBox'));
 const P = player.params;
 const paint = LabKit.paintSlider;
 

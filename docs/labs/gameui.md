@@ -107,7 +107,7 @@ każda zmiana przez `sanitize()` (liczby w zakresie, znane słowa).
 **Menu:** pozycje ekranu `{ type: 'presets', bind: 'settings.gfx' }` (zestaw naraz) i `{ type: 'keys', bind:
 'settings.keys' }` (klik i wciśnięcie klawisza; Esc — bez zmiany; ten sam klawisz dla dwóch czynności — barwa
 niebezpieczeństwa), opcja wyboru jako `{ value, label }`, akcja `reset:gfx` / `reset:mouse` / `reset:keys`. Gotowe
-ekrany: w definicji `"screens": { "graphics": "standard", "controls": "standard" }` (`SETTINGS_SCREENS`) — przykłady
+ekrany: w definicji `"screens": { "graphics": "standard", "controls": "standard", "audio": "standard" }` (`SETTINGS_SCREENS`; „audio” — Dźwięk: głośność ogólna, muzyki, otoczenia, efektów, mowy, wyciszenie — szyny miksera `js/audio/mixer.js`) — przykłady
 mają je w Opcjach albo w pauzie.
 
 **UI z magazynem:** `createGameUI(parent, def, { settings })` — dane magazynu w stanie gry pod `settings` (zawsze

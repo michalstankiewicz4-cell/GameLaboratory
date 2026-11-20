@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.40.0 — 2026-11-20
+
+### Dodane
+- ▶ Graj: mikser silnika (`js/audio/mixer.js`) bierze głośności z ustawień gracza (Opcje → Dźwięk UI gry), słuchacz
+  dźwięku przestrzennego podąża za kamerą.
+
 ## 0.39.1 — 2026-11-20
 
 ### Zmienione

@@ -10,10 +10,11 @@
 //                 lod (odległość szczegółów modeli 0,5…2), texture ('high' | 'low' — tekstury), fx (gęstość efektów
 //                 0,25…1), water (detal wody), view (zasięg widzenia 0,5…1), smallShadows (cienie drobnych części)
 // settings.mouse: rotSens, zoomSens (czułość obracania i przybliżania kamery 0,2…3)
+// settings.audio: master, music, ambience, sfx, voice (głośności 0…1 — szyny miksera js/audio/mixer.js), mute (wyciszenie)
 // settings.keys:  czynność → kod klawisza (KeyboardEvent.code, niezależny od układu klawiatury); czynności: KEY_ACTIONS
-// inne pola najwyższego poziomu (liczby, napisy, tak / nie — np. music, sound, minimap) — ustawienia danej gry, zostają
+// inne pola najwyższego poziomu (liczby, napisy, tak / nie — np. minimap) — ustawienia danej gry, zostają
 //
-// SETTINGS_SCREENS — gotowe ekrany menu „graphics” i „controls” (definicja UI: screens: { graphics: 'standard' })
+// SETTINGS_SCREENS — gotowe ekrany menu „graphics”, „controls” i „audio” (definicja UI: screens: { graphics: 'standard' })
 // createSettings(klucz?) → store { data, update(fn), set(dane), reset(część?), onChange(fn) → odpięcie }
 // GFX_PRESETS: high, light (Battle; light — dla słabszych komputerów); keyName(kod) — nazwa klawisza do menu
 export const KEY_ACTIONS = [
@@ -38,6 +39,7 @@ export const DEFAULTS = {
   gfx: { scale: 1, aa: true, shadows: true, shadowQuality: 'high', lights: true, bloom: true, bright: 1, sat: 1, showFps: false,
     lod: 1, texture: 'high', fx: 1, water: true, view: 1, smallShadows: true },
   mouse: { rotSens: 1, zoomSens: 1 },
+  audio: { master: 0.8, music: 0.7, ambience: 0.8, sfx: 0.9, voice: 1, mute: false },
   keys: Object.fromEntries(KEY_ACTIONS.map((a) => [a.id, a.key])),
 };
 // Graphics presets for the Options buttons (light = for weaker computers).
@@ -52,7 +54,7 @@ const code = (v, d) => (typeof v === 'string' && /^[A-Za-z0-9]{1,24}$/.test(v) ?
 const clone = (o) => JSON.parse(JSON.stringify(o));
 
 export function sanitize(s) {
-  const d = DEFAULTS, g = (s && s.gfx) || {}, m = (s && s.mouse) || {}, k = (s && s.keys) || {};
+  const d = DEFAULTS, g = (s && s.gfx) || {}, m = (s && s.mouse) || {}, k = (s && s.keys) || {}, a = (s && s.audio) || {};
   return {
     gfx: {
       scale: num(g.scale, d.gfx.scale, 0.5, 1),
@@ -72,6 +74,7 @@ export function sanitize(s) {
       smallShadows: bool(g.smallShadows, d.gfx.smallShadows),
     },
     mouse: { rotSens: num(m.rotSens, 1, 0.2, 3), zoomSens: num(m.zoomSens, 1, 0.2, 3) },
+    audio: { ...Object.fromEntries(['master', 'music', 'ambience', 'sfx', 'voice'].map((x) => [x, num(a[x], d.audio[x], 0, 1)])), mute: bool(a.mute, false) },
     keys: Object.fromEntries(KEY_ACTIONS.map((a) => [a.id, code(k[a.id], a.key)])),
     ...extra(s),
   };
@@ -111,6 +114,14 @@ export const SETTINGS_SCREENS = {
     { type: 'slider', label: 'Mouse: zoom', bind: 'settings.mouse.zoomSens', min: 0.2, max: 3, step: 0.1 },
     { type: 'keys', bind: 'settings.keys' },
     { label: 'Default keys', do: 'reset:keys', sub: true }, { label: 'Back', do: 'back', sub: true }] },
+  audio: { title: 'Sound', items: [
+    { type: 'slider', label: 'Master volume', bind: 'settings.audio.master', min: 0, max: 1, step: 0.05 },
+    { type: 'slider', label: 'Music', bind: 'settings.audio.music', min: 0, max: 1, step: 0.05 },
+    { type: 'slider', label: 'Ambience', bind: 'settings.audio.ambience', min: 0, max: 1, step: 0.05 },
+    { type: 'slider', label: 'Effects', bind: 'settings.audio.sfx', min: 0, max: 1, step: 0.05 },
+    { type: 'slider', label: 'Speech', bind: 'settings.audio.voice', min: 0, max: 1, step: 0.05 },
+    { type: 'toggle', label: 'Mute', bind: 'settings.audio.mute' },
+    { label: 'Default sound', do: 'reset:audio', sub: true }, { label: 'Back', do: 'back', sub: true }] },
 };
 
 const read = (key) => { try { const t = localStorage.getItem(key); return t ? JSON.parse(t) : null; } catch { return null; } };
@@ -122,7 +133,7 @@ export function createSettings(key = 'gamelab.settings.v1') {
   const save = () => { write(key, st.data); subs.forEach((f) => f(st.data)); };
   st.update = (fn) => { const draft = clone(st.data); fn(draft); st.data = sanitize(draft); save(); };
   st.set = (data) => { st.data = sanitize(data); save(); };
-  // reset(): wszystko; reset('gfx' | 'mouse' | 'keys'): jedna część
+  // reset(): wszystko; reset('gfx' | 'mouse' | 'keys' | 'audio'): jedna część
   st.reset = (part) => st.update((d) => { if (part && DEFAULTS[part]) d[part] = clone(DEFAULTS[part]); else Object.assign(d, clone(DEFAULTS)); });
   st.onChange = (fn) => { subs.add(fn); return () => subs.delete(fn); };
   return st;

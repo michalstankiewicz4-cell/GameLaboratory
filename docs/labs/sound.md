@@ -1,5 +1,8 @@
 # Sound lab (labs/sound.html) and MusicKit
 
+The music part of the sound group (the bar's switch): music · effects and ambience
+([`sound-effects.md`](sound-effects.md)) · speech ([`sound-speech.md`](sound-speech.md)).
+
 The game's music, generated live in the browser (Web Audio) — no audio
 files. Started 2026-10-05, the user's idea: "a music generator like the
 ship generator". Lab first (labs 1.3.0); the game later.
@@ -10,6 +13,8 @@ ship generator". Lab first (labs 1.3.0); the game later.
 |---|---|
 | `js/audio/musickit/musickit.js` | **MusicKit** (`window.MusicKit`), a classic script, no dependencies: `create({ params })` → a player (`start`, `stop`, `setParams` live, `say`, `analyser`, `stream`), `PRESETS`, `LAYERS`, `SCALES`, `NOTES`. Not in the game yet. |
 | `labs/sound.html` + `js/labs/sound/sound.js` | The lab: PLAY, MOODS, SEED, KEY, CHARACTER (tempo, density, brightness, space, volume), LAYERS (a level each), THE ROBOT'S VOICE (its lines, how often), RECORD (.webm), COPY SETTINGS; a picture of the sound in the middle. |
+| `js/audio/voice/voicekit.js` | **VoiceKit** (speech lab, [`sound-speech.md`](sound-speech.md)): MusicKit's robot voice (`VoiceKit.speak`) and whisper layer (`VoiceKit.murmur`) moved there (program 0.84.0). |
+| `js/audio/mixer.js` | The engine mixer ([`../audio/README.md`](../audio/README.md)): the lab plays MusicKit on its music bus — `create({ params, ctx, out, mixer })`; without `ctx`/`out` MusicKit makes its own context as before. The MIXER window sets the player's volumes (the game UI's Options → Sound). |
 
 ## How the music is made
 
@@ -141,8 +146,6 @@ sound plus:
 
 - Listen and tune (the user): the moods, the levels, the voice.
 - Into the game: the music following the situation (orbit, landing, near the
-  black hole, the surface), crossfades. Setup → Sound already exists
-  (v2.38.0): music / effects / voice, a switch and a level each — the
-  player's master gain is `settings.js#soundLevel("music")` (and "fx",
-  "voice"; 0 when switched off).
+  black hole, the surface), crossfades. The player's volumes are the engine
+  mixer's (`settings.audio`, Options → Sound in the game UI).
 - The robot's lines as files through a vocoder; maybe recorded whispers.

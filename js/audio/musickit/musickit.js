@@ -18,8 +18,9 @@
                rain (noise and drops)
      whispers  wordless murmuring: noise (and a little voice) through the
                formants of vowels, syllable by syllable, panned around
+               (VoiceKit, js/audio/voice/voicekit.js — loaded before)
      voice     a robot's announcements (the browser's speech synthesis —
-               outside the audio graph: not in a recording, no effects)
+               outside the audio graph: not in a recording, no effects; VoiceKit)
      lead      a melody: short phrases on the scale, landing on the chord,
                gliding between notes, a late vibrato, rests between
      beat      drums: a kick, a snare in a big room, hi-hats
@@ -50,7 +51,10 @@
    crash on the chorus. One song ends, the next begins.
 
    API
-     MusicKit.create({ params }) → player
+     MusicKit.create({ params, ctx, out, mixer }) → player
+                                  ctx, out — play through the engine's mixer (js/audio/mixer.js:
+                                  mixer().ctx, mixer().bus('music')); mixer — its volumes for the voice
+                                  (without them: its own context, straight to the speakers)
        player.start()             starts (call from a click: browsers need a gesture)
        player.stop()              fades out
        player.setParams(patch)    live: volume, tempo, density, brightness,
@@ -200,7 +204,6 @@ const RHYTHMS = {
 };
 
 // the vowels' formants (F1, F2, F3 in Hz), a lightish voice
-const VOWELS = [[850, 1220, 2810], [610, 2330, 2990], [350, 2700, 3300], [590, 920, 2710], [400, 1000, 2600], [700, 1500, 2600]];
 // how much of a layer goes to the reverb (the rest: 1) — a kick in a cathedral is mush
 const REVERB_SEND = { beat: 0.2, arp: 0.7 };
 // the ostinato's figures (indices into the chord), one per piece (the seed)
@@ -462,7 +465,7 @@ function create(opts = {}) {
     return buf;
   }
   function build() {
-    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    ctx = opts.ctx || new (window.AudioContext || window.webkitAudioContext)();   // the engine's mixer (js/audio/mixer.js) or its own
     N.master = ctx.createGain(); N.master.gain.value = 0;
     N.comp = ctx.createDynamicsCompressor(); N.comp.threshold.value = -18; N.comp.ratio.value = 3;
     N.analyser = ctx.createAnalyser(); N.analyser.fftSize = 2048;
@@ -471,7 +474,7 @@ function create(opts = {}) {
     N.shaper = ctx.createWaveShaper(); N.shaper.oversample = "2x";
     N.shelf = ctx.createBiquadFilter(); N.shelf.type = "highshelf"; N.shelf.frequency.value = 6500; N.shelf.gain.value = 0;
     N.hp = ctx.createBiquadFilter(); N.hp.type = "highpass"; N.hp.frequency.value = 28; N.hp.Q.value = 0.7;
-    N.master.connect(N.shaper); N.shaper.connect(N.shelf); N.shelf.connect(N.hp); N.hp.connect(N.comp); N.comp.connect(N.analyser); N.analyser.connect(ctx.destination); N.comp.connect(N.stream);
+    N.master.connect(N.shaper); N.shaper.connect(N.shelf); N.shelf.connect(N.hp); N.hp.connect(N.comp); N.comp.connect(N.analyser); N.analyser.connect(opts.out || ctx.destination); N.comp.connect(N.stream);
     // the reverb send and the echo send
     N.reverb = ctx.createConvolver(); N.reverb.buffer = impulse(2 + params.space * 6);
     N.revIn = ctx.createGain(); N.revIn.gain.value = 0.6 + params.space * 0.6;
@@ -980,47 +983,17 @@ function create(opts = {}) {
     g.gain.setValueAtTime(0.05 * rand(), t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.035);
     o.connect(g); g.connect(pan); pan.connect(N.bus.texture); o.stop(t + 0.05);
   }
-  // a murmured phrase: syllables of filtered noise (and a faint voiced hum)
+  // a murmured phrase: syllables of filtered noise (and a faint voiced hum) — VoiceKit (js/audio/voice/voicekit.js)
   function whisper(t) {
+    if (!window.VoiceKit) return;
     const pan = panner(rand() * 1.4 - 0.7); pan.connect(N.bus.whispers);
-    const n = 3 + Math.floor(rand() * 6), pitch = 190 + rand() * 50;
-    let at = t;
-    for (let k = 0; k < n; k++) {
-      const v = VOWELS[Math.floor(rand() * VOWELS.length)], len = 0.12 + rand() * 0.2;
-      const src = ctx.createBufferSource(); src.buffer = N.noise; src.playbackRate.value = 1;
-      const hum = ctx.createOscillator(); hum.type = "sawtooth"; hum.frequency.value = pitch * (1 + (rand() - 0.5) * 0.08);
-      const humG = gain(0.18);
-      const env = ctx.createGain();
-      env.gain.setValueAtTime(0, at); env.gain.linearRampToValueAtTime(0.5, at + 0.04); env.gain.setValueAtTime(0.5, at + len);
-      env.gain.exponentialRampToValueAtTime(0.0001, at + len + 0.12);
-      v.forEach((f, i) => {
-        const bp = filter("bandpass", f * (1 + (rand() - 0.5) * 0.06), 9);
-        const fg = gain([1, 0.55, 0.3][i]);
-        src.connect(bp); hum.connect(humG); humG.connect(bp); bp.connect(fg); fg.connect(env);
-      });
-      env.connect(pan);
-      src.start(at, rand() * 3); hum.start(at); src.stop(at + len + 0.15); hum.stop(at + len + 0.15);
-      // a soft "s" now and then
-      if (rand() < 0.25) {
-        const s = ctx.createBufferSource(); s.buffer = N.noise; const hp = filter("highpass", 5000);
-        const sg = ctx.createGain(); sg.gain.setValueAtTime(0.12, at + len); sg.gain.exponentialRampToValueAtTime(0.0001, at + len + 0.09);
-        s.connect(hp); hp.connect(sg); sg.connect(pan); s.start(at + len, rand() * 3); s.stop(at + len + 0.1);
-      }
-      at += len + 0.06 + rand() * 0.12;
-    }
+    window.VoiceKit.murmur(ctx, pan, t, { rand, noise: N.noise });
   }
-  // the robot voice: the browser's speech synthesis, low and slow
-  let voicePick = null;
+  // the robot voice: the browser's speech synthesis, low and slow — VoiceKit; its loudness: this layer × the volume
+  // (× the speech bus of the mixer, when the player plays through it)
   function speak(text) {
-    if (!window.speechSynthesis || !(params.levels.voice > 0.01)) return;
-    if (!voicePick) {
-      const vs = speechSynthesis.getVoices().filter((v) => /^en/i.test(v.lang));
-      voicePick = vs.find((v) => /male|david|daniel|george|guy|fred/i.test(v.name) && !/female/i.test(v.name)) || vs[0] || null;
-    }
-    const u = new SpeechSynthesisUtterance(text);
-    if (voicePick) u.voice = voicePick;
-    u.rate = 0.82; u.pitch = 0.15; u.volume = Math.min(1, params.levels.voice * params.volume * 1.3);
-    speechSynthesis.speak(u);
+    if (!window.VoiceKit || !(params.levels.voice > 0.01)) return;
+    window.VoiceKit.speak(text, { lang: "en-GB", male: true, rate: 0.82, pitch: 0.15, volume: Math.min(1, params.levels.voice * params.volume * 1.3), mix: opts.mixer || null });
   }
 
   // ---------- the clock: events a little ahead ----------
@@ -1153,7 +1126,7 @@ function create(opts = {}) {
     say(text) { speak(text); },
     // the song now playing (or chosen) as a MIDI file, with these params
     midi() { return songMidi(params); },
-    dispose() { player.stop(); setTimeout(() => { if (ctx) ctx.close(); ctx = null; }, 3200); },
+    dispose() { player.stop(); setTimeout(() => { if (ctx && !opts.ctx) ctx.close(); else if (N.analyser) N.analyser.disconnect(); ctx = null; }, 3200); },
   };
   return player;
 }

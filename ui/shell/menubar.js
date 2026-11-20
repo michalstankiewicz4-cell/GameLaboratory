@@ -143,9 +143,9 @@ function engineMap() {
   const lrow = el("div", "emLabRow");
   lrow.append(
     node("emLab", t("Models ▶ prefabs", "Modele ▶ prefabrykaty"), t("vehicles (space, water, land), celestial bodies, base, structures, city buildings, junkyard (machines, items), plants, caves, creatures, humans, weapons; far versions (LOD)", "pojazdy (kosmos, woda, ląd), ciała niebieskie, baza, budowle, budynki miasta, złomowisko (maszyny, przedmioty), rośliny, jaskinie, stwory, ludzie, broń; wersje dalekie (LOD)")),
-    node("emLab", t("Settings ▶ named assets", "Ustawienia ▶ zasoby z nazwą"), t("sea (water), land, weather and light (look), camera look (filters), space sky (bodies), game UI, cave, plant, blocks, building (city), effect, tech tree, picture (art)", "morze (woda), ląd, pogoda i światło (wygląd), wygląd kamery (filtry), niebo kosmosu (ciała niebieskie), UI gry, jaskinia, roślina, bryła z bloków, budynek (miasto), efekt, drzewko, obraz (sztuka)")),
+    node("emLab", t("Settings ▶ named assets", "Ustawienia ▶ zasoby z nazwą"), t("sea (water), land, weather and light (look), camera look (filters), space sky (bodies), game UI, cave, plant, blocks, building (city), effect, sound effect, ambience, voice, tech tree, picture (art)", "morze (woda), ląd, pogoda i światło (wygląd), wygląd kamery (filtry), niebo kosmosu (ciała niebieskie), UI gry, jaskinia, roślina, bryła z bloków, budynek (miasto), efekt, efekt dźwiękowy, tło dźwiękowe, głos, drzewko, obraz (sztuka)")),
     node("emLab", t("Materials (MatKit)", "Materiały (MatKit)"), t("saved as assets; the junkyard's and the blocks' textures and the city's walls use them, other models not yet", "zapisywane jako zasoby; korzystają z nich tekstury złomowiska i bloków oraz mury budynków miasta, inne modele jeszcze nie"), "part"),
-    node("emLab", t("Not connected yet", "Jeszcze niepołączone"), t("systems, skins, surface, gear, sound, creature editor, transformer, SDF and pixel art, scale", "układy, skórki, powierzchnia, przedmioty bohatera, dźwięk, edytor stworów, transformator, SDF i pixel art, skala"), "plan"));
+    node("emLab", t("Not connected yet", "Jeszcze niepołączone"), t("systems, skins, surface, gear, creature editor, transformer, SDF and pixel art, scale", "układy, skórki, powierzchnia, przedmioty bohatera, edytor stworów, transformator, SDF i pixel art, skala"), "plan"));
   labs.appendChild(lrow);
   m.appendChild(labs);
   m.appendChild(el("div", "emDown", t("▼ prefabs and assets go into the scene", "▼ prefabrykaty i zasoby trafiają do sceny")));
@@ -161,8 +161,8 @@ function engineMap() {
     .forEach(([a, b, st], i, all) => { if (i) pipe.appendChild(arrow("▶")); pipe.appendChild(node(i === all.length - 1 ? "emScreen" : "", a, b, st)); });
   eng.appendChild(pipe);
   const over = el("div", "emOver");
-  over.append(node("emUi", t("Game UI", "UI gry"), t("menu, HUD, windows, dialogue, tech trees, Options: graphics and controls — over the screen, from the game state and events", "menu, HUD, okna, dialogi, drzewka, Opcje: grafika i sterowanie — nad ekranem, ze stanu gry i zdarzeń")),
-    node("", "Audio", t("music and sounds of events", "muzyka i odgłosy zdarzeń"), "plan"));
+  over.append(node("emUi", t("Game UI", "UI gry"), t("menu, HUD, windows, dialogue, tech trees, Options: graphics, controls and sound — over the screen, from the game state and events", "menu, HUD, okna, dialogi, drzewka, Opcje: grafika, sterowanie i dźwięk — nad ekranem, ze stanu gry i zdarzeń")),
+    node("", "Audio", t("mixer: music, ambience, effects, speech buses with the player's volumes, 3D sound; music, effects and voices made live (labs) — sound sources in the scene: planned", "mikser: szyny muzyki, otoczenia, efektów i mowy z głośnościami gracza, dźwięk przestrzenny; muzyka, efekty i głosy tworzone na żywo (laboratoria) — źródła dźwięku w scenie: w planie"), "part"));
   eng.appendChild(over);
   eng.appendChild(el("div", "emFlow", t("▼ behaviours and physics change the scene · render draws it ▲", "▼ zachowania i fizyka zmieniają scenę · render ją rysuje ▲")));
   const scene = node("emScene", t("SCENE (data, JSON)", "SCENA (dane, JSON)"));
