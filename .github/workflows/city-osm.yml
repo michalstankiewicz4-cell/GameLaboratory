@@ -1,0 +1,32 @@
+# Budynki Warszawy z OpenStreetMap do laboratorium miasta: tools/city-osm.mjs pobiera je z Overpass i zapisuje
+# js/models/city/landmarks/osm-data.js, a akcja dopisuje wynik do main. Uruchamiane ręcznie albo po zmianie narzędzia.
+name: City OSM data
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['tools/city-osm.mjs']
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fetch from Overpass
+        run: node tools/city-osm.mjs
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898699+github-actions[bot]@users.noreply.github.com"
+          git add js/models/city/landmarks/osm-data.js
+          git diff --cached --quiet && exit 0
+          git commit -m "City lab: Warsaw buildings from OpenStreetMap (tools/city-osm.mjs)"
+          git pull --rebase origin main
+          git push origin HEAD:main
