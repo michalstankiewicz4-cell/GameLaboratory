@@ -2,9 +2,10 @@
 // building:part z wysokością, min_height, kształtem dachu, kolorem) w metrach od środka budynku. Wynik:
 // js/models/city/landmarks/osm-data.js (moduł ES, bez pobierania w trakcie działania). Dane © współtwórcy OpenStreetMap
 // (ODbL). Uruchamiane w GitHub Actions (.github/workflows/city-osm.yml — stąd jest dostęp do Overpass) albo lokalnie:
-//   node tools/city-osm.mjs
+//   node tools/city-osm.mjs            (dopisuje brakujące; FORCE=1 — pobiera wszystkie od nowa)
 // Budynek: nazwa (wyrażenie), punkt i promień szukania; części — building:part, których środek leży w obrysie budynku.
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
 
 export const LANDMARKS = [
   { id: 'pkin', name: 'Pałac Kultury i Nauki', re: 'Pałac Kultury', lat: 52.23175, lon: 21.00586, r: 220 },
@@ -15,7 +16,7 @@ export const LANDMARKS = [
   { id: 'spire', name: 'Warsaw Spire', re: 'Warsaw Spire|Spire', lat: 52.23270, lon: 20.98380, r: 220 },
   { id: 'rondo1', name: 'Rondo 1', re: 'Rondo 1', lat: 52.23380, lon: 21.00050, r: 180 },
   { id: 'cosmopolitan', name: 'Cosmopolitan', re: 'Cosmopolitan', lat: 52.23490, lon: 21.00180, r: 180 },
-  { id: 'wtt', name: 'Warsaw Trade Tower', re: 'Warsaw Trade Tower', lat: 52.23900, lon: 20.98800, r: 200 },
+  { id: 'wtt', name: 'Warsaw Trade Tower', re: 'Warsaw Trade Tower|WTT', lat: 52.23870, lon: 20.98420, r: 350 },
 ];
 const KEEP = ['name', 'building', 'building:part', 'height', 'min_height', 'building:levels', 'building:min_level', 'roof:shape', 'roof:height', 'roof:levels', 'roof:colour', 'building:colour', 'building:material', 'roof:material'];
 const UA = 'GameLaboratory-city/1.0 (+https://github.com/michalstankiewicz4-cell/GameLaboratory)';
@@ -95,10 +96,21 @@ async function landmark(L) {
   };
 }
 
+// to, co już pobrane, zostaje (Overpass bywa przeciążony — kolejne uruchomienie dopisuje brakujące)
+const FILE = 'js/models/city/landmarks/osm-data.js';
+const old = existsSync(FILE) && !process.env.FORCE ? (await import(pathToFileURL(FILE).href)).default : {};
 const out = {}, errors = [];
-for (const L of LANDMARKS) { try { out[L.id] = await landmark(L); } catch (e) { errors.push(e.message); console.error(e.message); } await new Promise((r) => setTimeout(r, 1500)); }
+for (const L of LANDMARKS) {
+  if (old[L.id]) { out[L.id] = old[L.id]; continue; }
+  let last = null;
+  for (let k = 0; k < 3 && !out[L.id]; k++) {
+    try { out[L.id] = await landmark(L); } catch (e) { last = e; console.error(e.message); if (/no building named/.test(e.message)) break; await new Promise((r) => setTimeout(r, 20000)); }
+  }
+  if (!out[L.id] && last) errors.push(L.id + ': ' + last.message);
+  await new Promise((r) => setTimeout(r, 3000));
+}
 mkdirSync('js/models/city/landmarks', { recursive: true });
-writeFileSync('js/models/city/landmarks/osm-data.js', `// Budynki Warszawy z OpenStreetMap (tools/city-osm.mjs) — dane © współtwórcy OpenStreetMap, licencja ODbL
+writeFileSync(FILE, `// Budynki Warszawy z OpenStreetMap (tools/city-osm.mjs) — dane © współtwórcy OpenStreetMap, licencja ODbL
 // (https://www.openstreetmap.org/copyright). Metry od środka budynku, x na wschód, z na południe; pobrane ${new Date().toISOString().slice(0, 10)}.
 // Plik generowany — nie edytować ręcznie.
 export const OSM_SOURCE = '© OpenStreetMap contributors (ODbL)';
