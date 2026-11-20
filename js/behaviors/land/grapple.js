@@ -20,8 +20,10 @@
 //   - przedmioty: wspólny świat brył sztywnych (land/items.js) — zderzają się ze sobą, z pojazdem (zderzacze z gry:
 //     podwozie, nadwozie, wysięgnik, ramię, koła, głowica chwytaka, jako bryły ruchome z prędkością) i z gruntem,
 //     przewracają się i obracają od uderzeń; trzymany przedmiot porusza chwytak.
-// Uproszczenia względem gry: pojazd nie odczuwa zderzeń z przedmiotami (18 t wobec najwyżej 190 kg), obrót chwytaka
-// wokół pionu idzie za ramieniem (opór przegubu).
+//   - odrzut: impulsy zderzeń brył pojazdu z przedmiotami wracają do pojazdu (prędkość, obrót, zawieszenie) i do
+//     chwytaka (wahadło);
+//   - ugięcie widać: wysięgnik i ramię wyginają się w łuk (js/models/junkyard/vehicle/bow.js, jak w grze).
+// Uproszczenie względem gry: obrót chwytaka wokół pionu idzie za ramieniem (opór przegubu).
 //
 // createGrapple(model, { x, z, yaw, ground, scene, items }) → g
 //   items — wspólny świat przedmiotów (createItems); bez niego przeładowarka ma własny i sama go liczy. Ze wspólnym
@@ -35,6 +37,7 @@ import * as THREE from '../../../vendor/three/three.module.js';
 import { createDrive, driveDef } from './drive.js';
 import { LAYOUT } from '../../models/junkyard/vehicle/grapple-truck.js';
 import { createItems, obbFrom, newObb } from './items.js';
+import { bowMaterial } from '../../models/junkyard/vehicle/bow.js';
 
 export const ENVIRONMENTS = ['land'];
 const G = 9.81, JAW_I = 25 * 0.6 * 0.6, MU = 0.7, ANG_DAMP = 3;
@@ -62,6 +65,10 @@ export function createGrapple(model, { x = 0, z = 0, yaw = 0, ground = null, sce
   const up = model.getObjectByName('nadwozie'), bm = model.getObjectByName('wysięgnik'), st = model.getObjectByName('ramię');
   const gr = model.getObjectByName('chwytak'), wheels = [0, 1, 2, 3].map((i) => model.getObjectByName('koło ' + i));
   const jawG = [0, 1, 2, 3].map((k) => model.getObjectByName('szczęka ' + k));
+  // widoczne ugięcie: wysięgnik i ramię wyginają się w łuk (shader, końce na swoim miejscu — jak w grze)
+  const meshOf = (g, n) => g.children.find((c) => c.isMesh && c.name === n);
+  const bowMeshes = [meshOf(bm, 'wysięgnik'), meshOf(st, 'ramię')];
+  const bowB = bowMeshes[0] ? bowMaterial(bowMeshes[0], LAYOUT.boomLen) : null, bowS = bowMeshes[1] ? bowMaterial(bowMeshes[1], LAYOUT.stickLen) : null;
   const arm = { slew: 0, boom: 0.55, stick: 1.35, sagB: 0, vB: 0, sagS: 0, vS: 0 };
   const jaws = jawG.map(() => ({ th: LAYOUT.jawOpen, w: 0, N: 0 }));
   let closed = false, spin = 0, wheelSpin = 0;
@@ -82,6 +89,8 @@ export function createGrapple(model, { x = 0, z = 0, yaw = 0, ground = null, sce
     qYaw.setFromAxisAngle(Y, drive.state.yaw); qTilt.setFromEuler(eTilt.set(-susp.th, 0, susp.ph));
     model.quaternion.copy(qYaw).multiply(qTilt);
     up.rotation.y = arm.slew; bm.rotation.x = -(arm.boom - arm.sagB); st.rotation.x = arm.stick + arm.sagS;
+    if (bowB) bowB.value = arm.sagB * LAYOUT.boomLen * 0.35;
+    if (bowS) bowS.value = arm.sagS * LAYOUT.stickLen * 0.35;
     model.updateMatrixWorld(true);
     return tmp.set(0, 0, LAYOUT.stickLen).applyMatrix4(st.matrixWorld);   // koniec ramienia = przegub chwytaka
   }
@@ -243,10 +252,27 @@ export function createGrapple(model, { x = 0, z = 0, yaw = 0, ground = null, sce
   }
   const unKin = W.addKinematic(BOXES.map((b) => b.box));
 
+  // odrzut: impulsy, które bryły pojazdu dały przedmiotom w poprzednim kroku (land/items.js — o.J, o.T), wracają do
+  // pojazdu (prędkość wzdłuż i w bok, obrót, zawieszenie) i do chwytaka (wahadło, masa chwytaka 700 kg)
+  const cgP = new THREE.Vector3(), rT = new THREE.Vector3(), tauT = new THREE.Vector3();
+  function recoil(h) {
+    const s = drive.state, D = drive.def, cy = Math.cos(s.yaw), sy = Math.sin(s.yaw);
+    cgP.set(s.x, (ground && ground.height ? ground.height(s.x, s.z) : 0) + susp.y + H_CG, s.z);
+    for (const b of BOXES) {
+      const J = b.box.J; if (J.lengthSq() < 1e-12) continue;
+      if (b.head) { bobPrev.addScaledVector(J, -h / (GRAB_MASS + payload())); continue; }
+      tauT.copy(b.box.T).add(rT.copy(b.box.c).sub(cgP).cross(J));
+      s.u += (J.x * sy + J.z * cy) / D.mass; s.v += (J.x * cy - J.z * sy) / D.mass; s.r += tauT.y / D.Iz;
+      const [lx, lz] = local(b.box.c);
+      susp.vy += J.y / BODY; susp.vth += (lz * J.y) / I_PITCH; susp.vph += (lx * J.y) / I_ROLL;
+    }
+  }
+
   // krok 1/240 s (w rytmie świata przedmiotów)
   let ctl = {};
   function substep(h) {
     const c = ctl;
+    recoil(h);
     drive.step(h, { throttle: c.throttle || 0, steer: c.steer || 0, brake: c.brake || 0 }, ground);
     arm.slew += clamp(c.slew || 0, -1, 1) * 0.5 * h;
     arm.boom = clamp(arm.boom + clamp(c.boom || 0, -1, 1) * 0.35 * h, -0.25, 1.25);
@@ -275,11 +301,12 @@ export function createGrapple(model, { x = 0, z = 0, yaw = 0, ground = null, sce
     drive, arm, held, susp, get closed() { return closed; }, jaws, items: W,
     get payload() { return payload(); },
     setJaws, toggleJaws() { setJaws(!closed); },
-    addItem({ mesh, mass, half, name, kind, at, rubber }) { return W.add({ mesh, mass, half, name, kind, at: [at[0], null, at[2]], rubber }); },
+    addItem({ mesh, mass, half, shape, name, kind, at, rubber }) { return W.add({ mesh, mass, half, shape, name, kind, at: [at[0], null, at[2]], rubber }); },
     step(dt, c = {}) { ctl = c; if (own) W.step(dt); },
     dispose() {
       unHook(); unKin(); for (const it of held) it.held = false; held.clear();
       if (grParent && gr.parent !== grParent) grParent.add(gr);
+      for (const m of bowMeshes) if (m && m.userData.bowRestore) { m.userData.bowRestore(); delete m.userData.bowRestore; }
       for (const s0 of pose0) { s0.o.position.copy(s0.p); s0.o.quaternion.copy(s0.q); }
     },
     sync() {

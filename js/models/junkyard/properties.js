@@ -2,7 +2,7 @@
 // fizyczne — metal (temperatura topnienia, gęstość: piec indukcyjny), palenie (czas w piecu na papier), zgniatanie do
 // innego modelu (puszka → puszka zgnieciona), sztabka, guma (tarcie opon). Ceny skupu zostają w grze (ekonomia gry).
 // Bryła przedmiotu w świecie przedmiotów (js/behaviors/land/items.js) — prostopadłościan z półwymiarów zderzacza gry
-// (halfExtents, jak zgniatarki w grze).
+// (halfExtents, jak zgniatarki w grze), kształt — walec dla opon, beczek, puszek i garnków (shapeOf).
 //
 // itemKit() → kit (moduły przedmiotów załadowane): kit.spawn(W, kind, { at, q, variant, scale, mass, parent }) — model
 // i bryła, kit.replace(W, it, kind, osWGórę) — zamiana rodzaju w tym samym miejscu, kit.glow(W) — żarzenie (it.heat).
@@ -39,6 +39,14 @@ export function halfExtents(info, s = [1, 1, 1]) {
   return [h[0] * s[0], h[1] * s[1], h[2] * s[2]];
 }
 
+/** Kształt bryły przedmiotu w świecie przedmiotów: walec (oś y) z zderzacza gry ring / cyl / cup, inaczej prostopadłościan. */
+export function shapeOf(info) {
+  const c = info.collider;
+  if (c.type === 'ring') return { type: 'cyl', hollow: c.rIn / c.rOut };
+  if (c.type === 'cyl' || c.type === 'cup') return { type: 'cyl' };
+  return { type: 'box' };
+}
+
 let texP = null;
 const textures = () => { if (typeof document === 'undefined') return; (texP || (texP = import('./textures.js'))).then((t) => t.applyTextures()); };
 
@@ -57,7 +65,7 @@ export async function itemKit() {
       if (q) holder.quaternion.copy(q);
       if (parent) parent.add(holder);
       textures();
-      const it = W.add({ mesh: holder, mass: mass ?? info.mass, half: halfExtents(info), kind, name: kind, variant: v, at, q, rubber: !!propsOf(kind).rubber });
+      const it = W.add({ mesh: holder, mass: mass ?? info.mass, half: halfExtents(info), shape: shapeOf(info), kind, name: kind, variant: v, at, q, rubber: !!propsOf(kind).rubber });
       it.spawned = true;
       if (scale.some((x) => x !== 1)) W.setScale(it, scale);
       return it;

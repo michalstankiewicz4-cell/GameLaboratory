@@ -119,7 +119,7 @@ planet brings the planet's (Luna: weak gravity, no air). The ship starts 40 m up
 controller that holds 1.5 m/s down and sets it on its four landing pads; by hand: Space — lift thrusters, W / S — the
 main engine, A / D — yaw. Touching down faster than 5 m/s breaks it.
 
-## The grapple loader from the junkyard (1.18.0 – 1.21.0)
+## The grapple loader from the junkyard (1.18.0 – 1.22.0)
 
 *Junkyard · grapple loader* in the list: JunkKit's wheeled scrap loader (`js/models/junkyard/vehicle/grapple-truck.js`,
 from the junkyard game) as a family of its own (`js/labs/vehicles-land/junk.js`) with the behaviour *grapple loader*
@@ -130,4 +130,6 @@ items lie in front of it (tyres, drums, newspapers, a box, a pot, a tractor tyre
 leans on its four springs (pitch, roll and the load on each wheel are shown) and the items collide with each other, with
 the loader and with the ground. Since 1.21.0 the items are rigid bodies of the shared item world
 (`js/behaviors/land/items.js`): they topple, tumble and roll over from impacts; their boxes come from the game's
-colliders (`js/models/junkyard/properties.js`).
+colliders (`js/models/junkyard/properties.js`). Since 1.22.0 tyres, drums and pots are cylinders and roll; the loader
+feels what it hits (the items' recoil slows and turns it, rocks it on its springs and swings the grapple), and the
+boom and the stick bend in an arc under the load, as in the game.

@@ -26,7 +26,9 @@ export class InductionFurnace {
     root.updateMatrixWorld(true);
     // tygiel: bryły ruchome w układzie grupy `tygiel` (dno — walec jako prostopadłościan, ścianka — wycinki)
     this.boxes = colliderBoxes(crucibleColliders).map((b) => ({ ...b, box: newObb() }));
-    this.cap = Math.PI * layout.inner.r ** 2 * (layout.inner.top - layout.inner.bottom);
+    // obiekt w skali (edytor sceny): tygiel rośnie z modelem (objętość × S³)
+    this.S = new THREE.Vector3().setFromMatrixScale(root.matrixWorld).x;
+    this.cap = Math.PI * layout.inner.r ** 2 * (layout.inner.top - layout.inner.bottom) * this.S ** 3;
     this.pourAcc = 0; this.q = new THREE.Quaternion(); this.v = new THREE.Vector3();
     this.place(true);
     this.unKin = W.addKinematic(this.boxes.map((b) => b.box));

@@ -3,6 +3,16 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.36.0 — 2026-11-20
+
+### Dodane
+- W grze: opony, beczki, puszki i garnki toczą się (walce); przeładowarka czuje, w co uderza (odrzut), a wysięgnik
+  i ramię wyginają się w łuk pod ładunkiem.
+
+### Poprawione
+- Maszyny, platforma, ogrodzenie i skup w skali obiektu zderzają się w swojej wielkości (wcześniej zderzacze miały
+  wielkość modelu w skali 1).
+
 ## 0.35.1 — 2026-11-19
 
 ### Poprawione

@@ -23,7 +23,9 @@ export class Casting {
       fill.visible = false; mesh.add(fill);
       return { mesh, fill, mat, slot: i, vol: 0, mass: 0, alMass: 0, temp: 20, offset: 0 };
     });
-    this.shift = 0; this.anim = 0; this.cap = this.D.volume;
+    // obiekt w skali (edytor sceny): formy, metal i sztabki rosną z modelem (S — skala, objętość × S³)
+    root.updateMatrixWorld(true); this.S = new THREE.Vector3().setFromMatrixScale(root.matrixWorld).x;
+    this.shift = 0; this.anim = 0; this.cap = this.D.volume * this.S ** 3;
     for (const m of this.molds) flow.sinks.push({ x: () => m.mesh.position.x, z: this.Z, y: layout.moldTop, hx: this.D.top[0] / 2 - 0.01, hz: this.D.top[1] / 2 - 0.005, add: (dV, al, dens) => this.add(m, dV, al, dens) });
     this.made = 0;
     this.unHook = W.hook((h) => this.step(h));
@@ -74,9 +76,9 @@ export class Casting {
     if (f < 0.02) { m.vol = m.mass = m.alMass = 0; return; }
     m.mesh.updateMatrixWorld(true);
     const w = new THREE.Vector3().setFromMatrixPosition(m.mesh.matrixWorld), sy = Math.max(0.08, f);
-    const q = new THREE.Quaternion().setFromRotationMatrix(this.root.matrixWorld);
+    const q = new THREE.Quaternion(); this.root.matrixWorld.decompose(new THREE.Vector3(), q, new THREE.Vector3()); const S = this.S;
     const variant = al >= 0.9 ? 0 : al <= 0.1 ? 1 : 2;
-    this.kit.spawn(this.W, this.kind, { variant, at: [w.x, w.y - this.D.h + this.D.h * sy / 2 + 0.004, w.z], q, scale: [1, sy, 1], mass: m.mass, parent: this.root.parent });
+    this.kit.spawn(this.W, this.kind, { variant, at: [w.x, w.y - (this.D.h - this.D.h * sy / 2 - 0.004) * S, w.z], q, scale: [S, sy * S, S], mass: m.mass, parent: this.root.parent });
     m.vol = m.mass = m.alMass = 0; m.temp = 20; m.fill.visible = false; this.made++;
   }
 }

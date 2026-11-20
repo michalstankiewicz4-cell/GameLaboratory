@@ -3,6 +3,22 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.79.0 · pojazdy (ląd) 1.22.0 · budowle 1.5.2 · edytor sceny 0.36.0 — 2026-11-20 (złomowisko: toczenie, odrzut, skala, ugięcie)
+
+### Dodane
+- Przedmioty na lądzie (`js/behaviors/land/items.js`): **walce** — opony, beczki, puszki i garnki są graniastosłupami
+  (16 ścian bocznych dla dużych, 8 dla małych) i **toczą się po obwodzie**; opona ma bezwładność pierścienia; zderzenia
+  brył wypukłych (SAT na normalnych ścian i iloczynach krawędzi). Kształt z zderzacza gry: `shapeOf`
+  (`js/models/junkyard/properties.js`).
+- Przeładowarka (`land/grapple.js`): **odrzut** — to, w co uderzy pojazd, oddaje impuls (prędkość wzdłuż i w bok, obrót,
+  zawieszenie), uderzenie w głowicę chwytaka popycha wahadło; **ugięcie w łuk** — wysięgnik i ramię wyginają się pod
+  ciężarem jak w grze (`js/models/junkyard/vehicle/bow.js`, z gry Złomowisko).
+
+### Poprawione
+- Zderzacze w skali: `obbFrom` bierze skalę z macierzy — maszyny, bryły otoczenia i przedmioty w skali obiektu
+  (edytor sceny) zderzają się w swojej wielkości; maszyny w skali: tłok, tygiel, objętość tygla i form (× S³), sztabki
+  i ruch strumienia metalu rosną z modelem.
+
 ## Program 0.78.1 · budowle 1.5.1 · edytor sceny 0.35.1 — 2026-11-19 (zgniatarka do puszek: niższa ścianka kosza)
 
 ### Poprawione

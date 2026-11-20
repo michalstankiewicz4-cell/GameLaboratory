@@ -13,6 +13,7 @@ export class MetalFlow {
   constructor(scene, castingRoot, layout) {
     this.L = layout; this.root = castingRoot; castingRoot.updateMatrixWorld(true);
     this.M = castingRoot.matrixWorld.clone(); this.Mi = this.M.clone().invert();
+    this.S = new THREE.Vector3().setFromMatrixScale(this.M).x;   // obiekt w skali: ruch liczony w układzie linii (g / S)
     this.dV = 0.00004;                                    // m³ na cząstkę (40 ml)
     this.p = new Float32Array(MAX * 3); this.v = new Float32Array(MAX * 3); this.al = new Float32Array(MAX); this.dens = new Float32Array(MAX); this.n = 0;
     this.mesh = new THREE.InstancedMesh(new THREE.SphereGeometry(0.022, 8, 6), lavaMaterial({ heat: 1, scale: 9 }), MAX);
@@ -27,7 +28,7 @@ export class MetalFlow {
   }
   emit(worldPos, worldVel, mix) {
     if (this.n >= MAX) return;
-    const k = this.n++, lp = worldPos.clone().applyMatrix4(this.Mi), lv = worldVel.clone().transformDirection(this.Mi).multiplyScalar(worldVel.length());
+    const k = this.n++, lp = worldPos.clone().applyMatrix4(this.Mi), lv = worldVel.clone().transformDirection(this.Mi).multiplyScalar(worldVel.length() / this.S);
     this.p.set([lp.x + (Math.random() - 0.5) * 0.01, lp.y, lp.z], k * 3); this.v.set([lv.x, lv.y, lv.z], k * 3); this.al[k] = mix.al; this.dens[k] = mix.density;
   }
   kill(k) { const j = --this.n; if (k !== j) { this.p.copyWithin(k * 3, j * 3, j * 3 + 3); this.v.copyWithin(k * 3, j * 3, j * 3 + 3); this.al[k] = this.al[j]; this.dens[k] = this.dens[j]; } }
@@ -40,7 +41,7 @@ export class MetalFlow {
     }
     for (let k = this.n - 1; k >= 0; k--) {
       const i = k * 3;
-      Vv[i + 1] -= 9.81 * dt;
+      Vv[i + 1] -= (9.81 / this.S) * dt;
       P[i] += Vv[i] * dt; P[i + 1] += Vv[i + 1] * dt; P[i + 2] += Vv[i + 2] * dt;
       // rynna
       d.set(P[i] - this.tc.x, P[i + 1] - this.tc.y, P[i + 2] - this.tc.z);

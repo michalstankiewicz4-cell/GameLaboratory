@@ -6,7 +6,8 @@ w Node — doktor modeli). Każdy moduł eksportuje `build(lod)` i `info`; spis 
 `GROUPS`). Materiały — `materials.js` (dane), tekstury proceduralne — `textures.js` (`applyTextures`, MatKit z
 `js/render/materials/matkit.js`), zderzacz → części wypukłe — `shapes.js`. Właściwości przedmiotów (metal, topnienie,
 gęstość, palenie, zgniatanie do innego modelu, guma) i ich bryły (`halfExtents`, `itemKit`) — `properties.js` (z katalogu
-gry, bez cen skupu); wygląd ognia i dymu pieca — `fire.js`, stopionego metalu — `lava.js`. Fizyka i maszyny w działaniu
+gry, bez cen skupu); wygląd ognia i dymu pieca — `fire.js`, stopionego metalu — `lava.js`, wygięcie wysięgnika i ramienia przeładowarki
+w łuk — `vehicle/bow.js` (z gry). Kształt bryły przedmiotu (`shapeOf`): walec dla opon, beczek, puszek i garnków. Fizyka i maszyny w działaniu
 są zachowaniami ([../behaviors/README.md](../behaviors/README.md)): przeładowarka `land/grapple.js`, przedmioty
 `land/items.js`, maszyny `land/machines/`. Zasady gry (skup, ceny) zostały w grze.
 

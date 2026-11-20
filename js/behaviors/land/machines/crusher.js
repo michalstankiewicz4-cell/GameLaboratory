@@ -28,7 +28,8 @@ export class Crusher {
     this.c = new THREE.Vector3().crossVectors(this.a, this.b);
     this.root.updateMatrixWorld(true);
     this.M = this.root.matrixWorld.clone(); this.Mi = this.M.clone().invert();
-    this.qRoot = new THREE.Quaternion().setFromRotationMatrix(this.M);
+    // obiekt w skali (edytor sceny): S — skala modelu (jednakowa), obrót bez skali
+    const sc = new THREE.Vector3(); this.qRoot = new THREE.Quaternion(); this.M.decompose(new THREE.Vector3(), this.qRoot, sc); this.S = sc.x;
     this.u0 = cfg.axis === 'x' ? L.ram.start : -L.ram.start;          // położenie tłoka (środek płyty) na osi a
     this.uEnd = cfg.axis === 'x' ? L.ram.end : -L.ram.end;
     this.u = this.u0; this.half = L.ram.thickness / 2; this.force = L.ram.force; this.speed = L.ram.speed;
@@ -80,7 +81,7 @@ export class Crusher {
       if (Math.abs(d.x) > ch.half[0] + 0.1 || Math.abs(d.y) > ch.half[1] + 0.6 || Math.abs(d.z) > ch.half[2] + 0.1) continue;
       const q = it.q.clone().premultiply(qi);
       const ax = [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1)].map((v) => v.applyQuaternion(q));
-      const h = it.half.slice();
+      const h = it.half.map((x) => x / this.S);   // w układzie modelu
       const ext = (v) => ax.reduce((s, A, k) => s + Math.abs(A.dot(v)) * h[k], 0);
       out.push({ it, p, ax, h, ea: ext(this.a), eb: ext(this.b), ec: ext(this.c), ua: p.dot(this.a), ub: p.dot(this.b), uc: p.dot(this.c) });
     }

@@ -101,8 +101,8 @@ Wpis: `{ id, label, family, surface, lab, build() → { root, kit, dispose } }`.
   statek nad lądem — lądowanie).
 - Złomowisko: przedmioty, maszyny i przeładowarka dzielą jeden świat przedmiotów (`world.items`, tworzony przy pierwszej
   potrzebie w grze edytora i liczony raz na klatkę po zachowaniach); przedmioty powstałe w grze (sztabki, puszki
-  zgniecione) znikają po „Stop”, spalone i stopione wracają. Uproszczenie: zderzacze maszyn nie skalują się ze skalą
-  obiektu.
+  zgniecione) znikają po „Stop”, spalone i stopione wracają. Maszyny, bryły otoczenia i przedmioty w skali obiektu
+  rosną z nią (zderzacze, tłok, tygiel, formy).
 - Nowe zachowanie: plik w `js/behaviors/<środowisko>/` (fizyka, bez sceny) i adapter tutaj.
 
 ## API sceny (`api.js`)

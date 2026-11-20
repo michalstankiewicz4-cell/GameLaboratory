@@ -158,8 +158,13 @@ w repo Trash); tu przepisana na fizykę GameLaboratory, z liczbami z gry:
   głowica nie pcha tego, co ściska) i z gruntem, przewracają się i obracają od uderzeń; trzymany przedmiot porusza
   chwytak (półwymiary przedmiotu w układzie chwytaka — może leżeć przewrócony).
 
-Uproszczenia względem gry: pojazd nie odczuwa zderzeń z przedmiotami (18 t wobec najwyżej 190 kg), obrót chwytaka
-wokół pionu idzie za ramieniem, wysięgnik nie wygina się w łuk (w grze shader) — ugięcie zmienia tylko kąty.
+- **odrzut** — impulsy, które bryły pojazdu dały przedmiotom (świat przedmiotów zbiera je w `o.J`, `o.T`), wracają do
+  pojazdu: prędkość wzdłuż i w bok (masa 18 t), obrót (bezwładność `Iz` jazdy), zawieszenie (pion, pochylenie,
+  przechył); uderzenie w głowicę chwytaka popycha wahadło (chwytak 700 kg z ładunkiem);
+- **ugięcie widać** — wysięgnik i ramię wyginają się w łuk jak w grze (shader części,
+  `js/models/junkyard/vehicle/bow.js`; końce zostają na miejscu), a ugięcie obniża też kąty.
+
+Uproszczenie względem gry: obrót chwytaka wokół pionu idzie za ramieniem.
 
 `createGrapple(model, { x, z, yaw, ground, scene, items })` → `{ drive, arm, susp, jaws, items (świat), held, payload,
 closed, step(dt, c), sync(), setJaws(), toggleJaws(), addItem({ mesh, mass, half, name, kind, at, rubber }), dispose() }`;
@@ -170,20 +175,28 @@ ją od świata i przywraca model (edytor sceny po „Stop”).
 ## Przedmioty na lądzie (`land/items.js`)
 
 Luźne przedmioty jako bryły sztywne — wspólne dla przeładowarki i maszyn złomowiska (w grze Złomowisko liczył to
-Rapier): prostopadłościan z półwymiarów przedmiotu (zderzacz gry → `halfExtents`, `js/models/junkyard/properties.js`),
-masa i tensor bezwładności prostopadłościanu, położenie, obrót, prędkość i prędkość kątowa.
+Rapier): bryła z zderzacza gry (`halfExtents`, `shapeOf` w `js/models/junkyard/properties.js`) — **walec** dla opon
+(pierścień: bezwładność pierścienia), beczek, puszek i garnków (graniastosłup o 16 ścianach bocznych dla dużych,
+8 dla małych — toczy się po obwodzie), **prostopadłościan** dla reszty; masa i tensor bezwładności bryły, położenie,
+obrót, prędkość i prędkość kątowa.
 
-- **kontakty**: grunt (wierzchołki pod gruntem), prostopadłościany ze sobą i z bryłami nieruchomymi (budowle, maszyny —
-  `colliders()` modeli) i ruchomymi (pojazd, tłok, brama, tygiel): test SAT (15 osi), punkty kontaktu — wierzchołki
-  jednej bryły w drugiej;
+- **kontakty**: grunt (wierzchołki pod gruntem), bryły wypukłe ze sobą i z prostopadłościanami nieruchomymi (budowle,
+  maszyny — `colliders()` modeli) i ruchomymi (pojazd, tłok, brama, tygiel): test SAT (normalne ścian i iloczyny
+  krawędzi), punkty kontaktu — wierzchołki jednej bryły w drugiej; prostopadłościany w skali obiektu (edytor sceny)
+  rosną z nią (`obbFrom` bierze skalę z macierzy);
 - **rozwiązywanie**: impulsy sekwencyjne (8 przejść) z odbiciem 0,1, tarciem Coulomba (guma μ 0,9, reszta 0,55 — jak
   w grze, para: średnia geometryczna) i korektą położenia (Baumgarte 0,2, luz 2 mm); tłumienie jak w grze (0,05 / 0,15);
   krok 1/240 s; bryła w spoczynku przez 0,5 s zasypia (stos stoi), budzi ją to, co się rusza;
-- **zgniatanie**: `setScale` — półwymiary maleją wzdłuż osi przedmiotu (masa bez zmian, jak w grze).
+- **zgniatanie**: `setScale` — półwymiary maleją wzdłuż osi przedmiotu (masa bez zmian, jak w grze; zgnieciony walec
+  jest eliptyczny);
+- **odrzut**: bryły ruchome zbierają impulsy, które dały przedmiotom (`o.J`, moment `o.T` względem `o.c`, z poprzedniego
+  kroku) — właściciel oddaje je sobie (przeładowarka).
 
-Uproszczenie: każdy przedmiot jest prostopadłościanem (opona leży jak walec w pudełku — nie toczy się po bieżniku).
+Uproszczenia: walec to graniastosłup (toczy się z lekkim stukaniem ścian), opona jest walcem pełnym na zewnątrz (dziura
+tylko w bezwładności).
 
-`createItems({ ground })` → `W`: `add({ mesh, mass, half, kind, at, q, rubber, anchor, meshScale, onRemove })`,
+`createItems({ ground })` → `W`: `add({ mesh, mass, half, shape, kind, at, q, rubber, anchor, meshScale, onRemove })`
+(`shape`: `{ type: 'box' }` albo `{ type: 'cyl', hollow }`, oś walca — y przedmiotu),
 `remove(it)`, `setScale(it, [sx, sy, sz])`, `statics(l)` / `addStatics(l)`, `kinematic(l)` / `addKinematic(l)` (bryły
 ruchome z prędkością `v`; zwracają odpięcie), `hook(f)` — `f(h)` na początku każdego kroku (pojazdy i maszyny liczą się
 w tym samym rytmie), `step(dt)`, `sync()`, `list`. OBB: `{ c, ax: [3 osie], e: [3 półwymiary], v, skip }`
@@ -212,7 +225,8 @@ czas palenia, zgniatanie do innego modelu): `js/models/junkyard/properties.js` (
 
 `createMachine(id, root, { W, kit, scene, mod })` (`machines.js`) → `{ actions(), act(id, on), tilt(cmd), hud(pl), frame(dt),
 dispose() }`; `connect(piec, linia)` — piec wylewa do linii (w grze linia 0,62 m przed piecem: `CASTING_FROM_INDUCTION`).
-Maszyny liczą się w krokach świata przedmiotów (`W.hook`), wygląd (ogień, strumień) — w `frame`.
+Maszyny liczą się w krokach świata przedmiotów (`W.hook`), wygląd (ogień, strumień) — w `frame`. Maszyna w skali
+(edytor sceny) rośnie z nią: zderzacze, tłok, tygiel, objętość tygla i form (× S³), sztabki i ruch strumienia metalu.
 
 ## Ciecze i gaz w kosmosie (`space/liquids.js`, `space/gases.js`)
 

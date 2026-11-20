@@ -24,7 +24,7 @@ function start(lab) {
   const two = el("div", "twoBtns"); two.append(jawBtn, resetBtn); panel.append(two);
   readout("speed", "Speed"); readout("jaws", "Grapple"); readout("payload", "Load"); readout("sag", "Boom / stick bend");
   readout("tilt", "Pitch / roll"); readout("wheels", "Wheel loads (FR · FL · RR · RL)");
-  panel.append(el("p", "note", "Physics in GameLaboratory: driving by forces (land/drive.js) with the game's numbers, the grapple as a pendulum on a ball joint, the jaws on motors pressing on what they hold — it stays in the grapple while friction carries its weight. The chassis rides on four springs (the game's suspension numbers) and leans under the counterweight, the load and the driving; the items are rigid bodies (land/items.js): they collide with each other, with the loader and with the ground, stack, topple and tumble from impacts."));
+  panel.append(el("p", "note", "Physics in GameLaboratory: driving by forces (land/drive.js) with the game's numbers, the grapple as a pendulum on a ball joint, the jaws on motors pressing on what they hold — it stays in the grapple while friction carries its weight. The chassis rides on four springs (the game's suspension numbers) and leans under the counterweight, the load and the driving; the items are rigid bodies (land/items.js): they collide with each other, with the loader and with the ground, stack, topple and tumble from impacts, and tyres, drums and pots roll. What the loader hits pushes back on it (speed, turn, springs, the grapple's swing), and the boom and the stick bend in an arc under the load."));
   jawBtn.addEventListener("click", () => { if (grab) { grab.toggleJaws(); jawBtn.blur(); } });
   resetBtn.addEventListener("click", () => { resetBtn.blur(); placePile(); });
 

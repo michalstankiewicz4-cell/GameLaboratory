@@ -14,7 +14,7 @@ import { createCraft, craftDef } from '../behaviors/water/craft.js';
 import { createOrbit, orbitMu, circularVelocity } from '../behaviors/space/orbit.js';
 import { createLander, landerDef } from '../behaviors/land/lander.js';
 import { createGrapple } from '../behaviors/land/grapple.js';
-import { halfExtents, propsOf, itemKit } from '../models/junkyard/properties.js';
+import { halfExtents, shapeOf, propsOf, itemKit } from '../models/junkyard/properties.js';
 import { createMachine, connect, MACHINE_IDS } from '../behaviors/land/machines/machines.js';
 import { addModelStatics } from '../behaviors/land/machines/statics.js';
 
@@ -299,7 +299,7 @@ export const BEHAVIORS = {
       const s = obj.scale || 1, half = halfExtents(k.info, [s, s, s]), root = built.root;
       root.updateMatrixWorld(true);
       const q = root.quaternion.clone(), at = root.position.clone().add(new THREE.Vector3(0, half[1], 0).applyQuaternion(q));
-      const it = world.items.add({ mesh: root, mass: k.info.mass * s * s * s, half, kind: k.id, name: obj.name, at: at.toArray(), q, rubber: !!propsOf(k.id).rubber,
+      const it = world.items.add({ mesh: root, mass: k.info.mass * s * s * s, half, shape: shapeOf(k.info), kind: k.id, name: obj.name, at: at.toArray(), q, rubber: !!propsOf(k.id).rubber,
         anchor: [0, -1, 0], meshScale: s, onRemove: () => { root.visible = false; } });
       return {
         state: it,
