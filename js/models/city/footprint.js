@@ -22,7 +22,7 @@ const eq = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]) < 1e-3;
 
 /** Obrys poprawiony: bez powtórzonych punktów i krawędzi zerowych, przeciwnie do wskazówek, wyśrodkowany (środek
  *  prostokąta otaczającego w 0, 0). Za mało punktów — null. */
-export function cleanPolygon(pts0, { center = true } = {}) {
+export function cleanPolygon(pts0, { center = true, minArea = 1 } = {}) {
   let p = (pts0 || []).map((q) => [+q[0], +q[1]]).filter((q) => Number.isFinite(q[0]) && Number.isFinite(q[1]));
   p = p.filter((q, i) => !eq(q, p[(i + 1) % p.length]));
   // punkty na jednej prostej z sąsiadami — zbędne (krawędź byłaby podzielona)
@@ -30,7 +30,7 @@ export function cleanPolygon(pts0, { center = true } = {}) {
     const a = p[(i - 1 + p.length) % p.length], b = p[(i + 1) % p.length];
     return Math.abs((q[0] - a[0]) * (b[1] - a[1]) - (q[1] - a[1]) * (b[0] - a[0])) > 1e-4;
   });
-  if (p.length < 3 || Math.abs(signedArea(p)) < 1) return null;
+  if (p.length < 3 || Math.abs(signedArea(p)) < minArea) return null;
   if (signedArea(p) < 0) p.reverse();
   if (center) {
     let x0 = Infinity, x1 = -Infinity, z0 = Infinity, z1 = -Infinity;
@@ -50,13 +50,26 @@ export function footprintPoints(f = {}) {
     case 'L': p = [[0, 0], [w, 0], [w, arm], [arm, arm], [arm, d], [0, d]]; break;
     case 'U': p = [[0, 0], [w, 0], [w, d], [w - arm, d], [w - arm, arm], [arm, arm], [arm, d], [0, d]]; break;
     case 'corner': p = [[0, 0], [w, 0], [w, d - cut], [w - cut, d], [0, d]]; break;
-    case 'custom': p = f.points && f.points.length >= 3 ? f.points : [[0, 0], [w, 0], [w, d], [0, d]]; break;
+    case 'custom':
+      if (f.fixed && f.points && f.points.length >= 3) { const q = cleanPolygon(f.points, { center: false, minArea: 0.05 }); if (q) return q; }   // obrys w swoim miejscu
+      p = f.points && f.points.length >= 3 ? f.points : [[0, 0], [w, 0], [w, d], [0, d]]; break;
     default: p = [[0, 0], [w, 0], [w, d], [0, d]];
   }
   // osie: z w obrysie rośnie „w głąb” budynku od frontu; w świecie front (krawędź 0) patrzy na −z
   return cleanPolygon(p) || cleanPolygon([[0, 0], [w, 0], [w, d], [0, d]]);
 }
 
+/** Dziedzińce obrysu (fixed): pierścienie zgodnie z ruchem wskazówek zegara — normalne ich ścian patrzą w dziedziniec. */
+export function holesOf(f = {}) {
+  if (!f.fixed || !Array.isArray(f.holes)) return [];
+  return f.holes.map((h) => cleanPolygon(h, { center: false, minArea: 0.05 })).filter(Boolean).map((h) => h.slice().reverse());
+}
+/** Środek ciężkości wielokąta (dachy spiczaste). */
+export function centroidOf(p) {
+  let A = 0, x = 0, z = 0;
+  for (let i = 0; i < p.length; i++) { const a = p[i], b = p[(i + 1) % p.length], k = a[0] * b[1] - b[0] * a[1]; A += k; x += (a[0] + b[0]) * k; z += (a[1] + b[1]) * k; }
+  return Math.abs(A) < 1e-9 ? p[0] : [x / (3 * A), z / (3 * A)];
+}
 /** Krawędzie obrysu: a, b, długość, kierunek, normalna na zewnątrz. */
 export function edgesOf(p) {
   return p.map((a, i) => {
@@ -91,9 +104,10 @@ export function maxInset(p, limit = 1e3) {
   for (let k = 0; k < 40; k++) { const m = (lo + hi) / 2; if (insetPolygon(p, m)) lo = m; else hi = m; }
   return lo;
 }
-/** Trójkąty wielokąta (indeksy). */
-export function triangulate(p) {
-  return THREE.ShapeUtils.triangulateShape(p.map(([x, z]) => new THREE.Vector2(x, z)), []).flat();
+/** Trójkąty wielokąta (indeksy w [...p, ...dziedzińce]). */
+export function triangulate(p, holes = []) {
+  const v = (r) => r.map(([x, z]) => new THREE.Vector2(x, z));
+  return THREE.ShapeUtils.triangulateShape(v(p), holes.map(v)).flat();
 }
 /** Czy obrys to prostokąt (4 wierzchołki, kąty proste) — dach dwuspadowy. */
 export function isRect(p) {

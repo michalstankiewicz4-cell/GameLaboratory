@@ -17,10 +17,12 @@ import { near, far, top } from './mesh.js';
 import { bakeTile } from './bake.js';
 import { tileMaterial, partMaterials, clearPartMaterials, NIGHT, POM } from './facade-material.js';
 import { textureRes } from '../../render/quality.js';
+import { buildLandmark, LANDMARK_IDS, landmarkInfo, landmarkStyle, OSM_SOURCE } from './landmarks/landmarks.js';
 
 export { TYPES, TYPE_IDS, WINDOW_STYLES, GROUND_KINDS, ROOF_TYPES, BAY_KINDS, normalizeSpec } from './types.js';
 export { FOOTPRINTS, footprintPoints } from './footprint.js';
 export { NIGHT, POM } from './facade-material.js';
+export { LANDMARK_IDS, landmarkInfo, landmarkStyle, OSM_SOURCE };
 export const setNight = (k) => { NIGHT.value = Math.max(0, Math.min(1, +k || 0)); };
 export const setPom = (on) => { POM.value = on ? 1 : 0; };
 
@@ -29,10 +31,12 @@ const bakes = new Map();
 export const facadeKey = (S) => JSON.stringify([S.wall, S.bay, S.module, S.window, S.ground, S.bands, S.balcony, S.floorH, S.groundH]);
 /** Kafelki budynku (z pamięci albo wypalone teraz); ms — czas wypalania tych, których nie było. */
 export function bakedTiles(L, { ppm = 64 } = {}) {
-  const px = textureRes(ppm * 4) / 4, base = facadeKey(L.S) + '|' + px, keys = Object.keys(L.cells).filter((k) => !(k === 'upper' && L.S.floors < 2) && !(k === 'plain' && !L.edges.some((e) => e.plain)));
+  // kafelki pięter i gładkiej ściany nie zależą od parteru — wspólne dla części o różnej wysokości parteru
+  const S = L.S, upKey = JSON.stringify([S.wall, S.bay, S.module, S.window, S.bands.floors, S.balcony, S.floorH]) + '|' + textureRes(ppm * 4) / 4;
+  const px = textureRes(ppm * 4) / 4, base = facadeKey(L.S) + '|' + px, keys = Object.keys(L.cells).filter((k) => !(k === 'upper' && L.S.floors < 2) && !(k === 'plain' && !L.edges.some((e) => e.plain) && !(L.S.attic > 0)));
   const t0 = performance.now(), tiles = {}; let fresh = 0;
   for (const k of keys) {
-    const id = base + '|' + k;
+    const id = (k === 'upper' || k === 'plain' ? upKey : base) + '|' + k;
     let t = bakes.get(id); if (!t) { t = bakeTile(L, k, { ppm: px }); bakes.set(id, t); fresh++; }
     tiles[k] = t;
   }
@@ -50,7 +54,8 @@ function stats(group) {
   return { triangles: Math.round(tris), drawCalls: calls, materials: mats.size };
 }
 
-export function buildBuilding(spec0 = {}, { detail = 1, ppm = 64 } = {}) {
+// mats — wspólna pamięć materiałów kafelków (części jednego budynku z mapy: te same materiały, scalane siatki)
+export function buildBuilding(spec0 = {}, { detail = 1, ppm = 64, mats = null } = {}) {
   const t0 = performance.now(), S = normalizeSpec(spec0), L = layout(S), geo = createGeo(), parts = partMaterials(S);
   const farMode = detail < 0.75;
   let baked = null;
@@ -58,8 +63,15 @@ export function buildBuilding(spec0 = {}, { detail = 1, ppm = 64 } = {}) {
   top(geo, L);
   const tileMats = [];
   const group = new THREE.Group(); group.name = 'building: ' + S.type;
+  group.position.y = S.base;   // część zaczynająca się wyżej (budynek z mapy)
   for (const m of geo.meshes((k) => {
-    if (k.startsWith('tile:')) { const t = baked.tiles[k.slice(5)]; if (!t) return null; const mt = tileMaterial(t, { seed: S.seed, lit: S.lit, ground: k.startsWith('tile:g:') }); tileMats.push(mt); return mt; }
+    if (k.startsWith('tile:')) {
+      const t = baked.tiles[k.slice(5)]; if (!t) return null;
+      if (mats && mats.has(t)) return mats.get(t);
+      const mt = tileMaterial(t, { seed: S.seed, lit: S.lit, ground: k.startsWith('tile:g:') });
+      if (mats) mats.set(t, mt); else tileMats.push(mt);
+      return mt;
+    }
     return parts[k] || parts.trim;
   })) group.add(m);
   let windows = 0;
@@ -77,4 +89,9 @@ export function buildBuilding(spec0 = {}, { detail = 1, ppm = 64 } = {}) {
     setLit(k) { for (const m of tileMats) m.userData.city.uLit.value = k; },
     dispose() { group.traverse((o) => { if (o.isMesh) o.geometry.dispose(); }); tileMats.forEach((m) => m.dispose()); },
   };
+}
+
+/** Budynek z opisu: z mapy (spec.landmark — bryła z OpenStreetMap, styl z opisu) albo zwykły (buildBuilding). */
+export function build(spec, opts = {}) {
+  return spec && spec.landmark && LANDMARK_IDS.includes(spec.landmark) ? buildLandmark(spec.landmark, { ...opts, style: spec, build: buildBuilding }) : buildBuilding(spec, opts);
 }

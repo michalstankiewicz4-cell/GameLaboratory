@@ -12,7 +12,7 @@
 //   { t: 'box', u0, u1, v0, v1, z0, z1, m, band }  bryła przed licem (parapet okna, płyta i balustrada balkonu,
 //        cokół, gzyms); band — pas poziomy przez całą ścianę (z bliska jedna bryła na ścianę, w teksturze w komórce)
 // Materiały elementów (m): wall, trim (ramy, parapety), glass, door, slab (płyta balkonu), railing.
-import { footprintPoints, edgesOf } from './footprint.js';
+import { footprintPoints, edgesOf, holesOf } from './footprint.js';
 
 export const FRAME = 0.06;   // szerokość ramy okna [m]
 
@@ -101,8 +101,11 @@ export const PLAIN_W = 4;   // szerokość kafelka gładkiej ściany [m]
 
 /** Układ budynku: obrys, krawędzie z modułami i rodzajami parteru, elementy komórek każdego rodzaju. */
 export function layout(S) {
-  const poly = footprintPoints(S.footprint), edges = edgesOf(poly), mw0 = S.bay * S.module.length;
-  const front = Math.min(S.front, edges.length - 1), H = S.groundH + (S.floors - 1) * S.floorH;
+  const poly = footprintPoints(S.footprint), holes = holesOf(S.footprint), mw0 = S.bay * S.module.length;
+  // ściany: obrys i dziedzińce (każdy pierścień osobno — sąsiedztwo krawędzi w obrębie pierścienia)
+  const ringsE = [poly, ...holes].map((r) => edgesOf(r)), edges = [];
+  for (const re of ringsE) for (let k = 0; k < re.length; k++) { const e = re[k]; e.i = edges.length; e.prevE = re[(k - 1 + re.length) % re.length]; e.nextE = re[(k + 1) % re.length]; edges.push(e); }
+  const front = Math.min(S.front, edges.length - 1), H = S.groundH + (S.floors - 1) * S.floorH + S.attic;
   let along = 0;
   for (const e of edges) {
     let n = Math.round(e.len / mw0);
@@ -115,14 +118,16 @@ export function layout(S) {
       for (let j = 0; j < k; j++) e.ground[Math.min(n - 1, Math.round((j + 0.5) * n / k - 0.5))] = 'door';
     }
     // wierzchołki: wypukły (gzymsy wydłużone, żeby róg był pełny) czy wklęsły
-    const prev = edges[(e.i - 1 + edges.length) % edges.length];
+    const prev = e.prevE;
     e.convex0 = prev.dir[0] * e.dir[1] - prev.dir[1] * e.dir[0] > 0;
   }
-  edges.forEach((e, i) => { e.convex1 = edges[(i + 1) % edges.length].convex0; });
+  edges.forEach((e) => { e.convex1 = e.nextE.convex0; });
+  for (const e of edges) { delete e.prevE; delete e.nextE; }
   const cells = { upper: upperCell(S), plain: plainCell(S) };
   for (const e of edges) for (const k of e.ground) if (!cells['g:' + k]) cells['g:' + k] = groundCell(k, S);
+  if ((edges.some((e) => e.plain) || S.attic > 0) && !cells.plain) cells.plain = plainCell(S);
   if (edges.some((e) => e.plain) && !cells['g:wall']) cells['g:wall'] = groundCell('wall', S);   // parter gładkiej ściany
-  return { S, poly, edges, front, H, mw0, cells, perimeter: along };
+  return { S, poly, holes, edges, front, H, mw0, cells, perimeter: along };
 }
 
 /** Kafelki tekstur: rodzaj komórki → szerokość i wysokość [m] (moduł × kondygnacja). */

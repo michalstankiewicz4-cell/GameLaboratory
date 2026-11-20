@@ -20,7 +20,7 @@ import { SPECIES, SPECIES_IDS, growPlant, plantMaterials, windUniforms } from '.
 import { buildCave } from '../models/caves/cavekit.js';
 import { buildBody as buildBlocks, SHAPES as BLOCK_SHAPES } from '../models/blocks/blockkit.js';
 import { MODELS as JUNK } from '../models/junkyard/registry.js';
-import { TYPES as CITY_TYPES, TYPE_IDS as CITY_IDS, buildBuilding } from '../models/city/citykit.js';
+import { TYPES as CITY_TYPES, TYPE_IDS as CITY_IDS, build as buildCity } from '../models/city/citykit.js';
 
 // family: grupa na liście; surface: gdzie stoi ('sea' — na wodzie, 'land' — na gruncie, 'air' — w powietrzu)
 export const FAMILIES = {
@@ -168,7 +168,7 @@ JUNK.forEach((m, i) => add('junkyard/' + m.id, m.name, 'junkyard', 'land', JUNK_
 // „building”, pole „asset”); z bliska siatka, z daleka (detail 0,5) płaskie ściany z wypaloną fasadą i paralaksą;
 // obrys wyśrodkowany w punkcie obiektu, front na −z, podstawa w y = 0
 CITY_IDS.forEach((id) => add('city/' + id, CITY_TYPES[id].label, 'city', 'land', 'labs/city.html?type=' + id, (o) => {
-  const b = buildBuilding((o && o.asset) || { type: id }, { detail: det(o) });
+  const b = buildCity((o && o.asset) || { type: id }, { detail: det(o) });   // zasób z budynkiem z mapy (landmark) też
   return { root: b.group, kit: b, dispose: () => b.dispose() };
 }, { assetKind: 'building', ...LOD }));
 

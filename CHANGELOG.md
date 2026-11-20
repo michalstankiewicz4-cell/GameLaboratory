@@ -3,6 +3,26 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.83.0 · laboratorium miasta 1.1.0 · edytor sceny 0.39.1 · doktor modeli 1.3.2 — 2026-11-20 (budynki Warszawy)
+
+### Dodane
+- **Budynki Warszawy z OpenStreetMap w laboratorium miasta** (grupa „Warsaw (OpenStreetMap)”): Pałac Kultury i Nauki
+  z iglicą, dworzec Warszawa Centralna, Złota 44, InterContinental, Varso, Warsaw Spire, Rondo 1, Cosmopolitan —
+  bryła z mapy (obrys, części z wysokościami, początkiem nad gruntem, dachami i kolorami), wygląd CityKit (styl
+  każdego budynku: mur, okna, parter, gzymsy; zmieniany w oknach Fasada i Parter), z wersją bliską i wypaloną daleką
+  (Pałac Kultury: ok. 470 000 → 17 000 trójkątów). Dane © współtwórcy OpenStreetMap (ODbL).
+- `tools/city-osm.mjs` — pobiera budynki z Overpass do `js/models/city/landmarks/osm-data.js`; uruchamiane w GitHub
+  Actions (`city-osm.yml`), wynik dopisywany do repozytorium.
+- CityKit: obrys w swoim miejscu i z dziedzińcami, część zaczynająca się nad gruntem (`base`), pas bez okien nad
+  ostatnią kondygnacją (`attic`), dachy namiotowe / iglice / stożki (`pyramid`) i kopuły (`dome`), wysokość dachu
+  w metrach (`roof.height`), `build(opis)` — zwykły budynek albo z mapy (`landmark`); części budynku scalone po
+  materiale, materiały kafelków wspólne.
+- Edytor sceny: zasób `building` z budynkiem z mapy stawia go w scenie; doktor modeli bada budynki z mapy.
+
+### Zmienione
+- Laboratorium miasta: domyślna odległość przełączania na wersję daleką 2 × promień budynku (40–150 m) — dalej siatka
+  z bliska migotała drobnymi ramami.
+
 ## Program 0.82.0 · laboratorium miasta 1.0.0 · edytor sceny 0.39.0 · doktor modeli 1.3.1 — 2026-11-20 (kreator budynków)
 
 ### Dodane

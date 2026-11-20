@@ -14,6 +14,8 @@ Proceduralne budynki na dowolnym obrysie. Metry, y w górę, podstawa w y = 0, o
 | `bake.js` | wypalanie kafelków na procesorze (bez WebGL) |
 | `facade-material.js` | materiał kafelka z paralaksą, materiały wersji bliskiej, `NIGHT`, `POM` |
 | `geo.js` | zbieranie trójkątów po materiale, układ ściany → świat |
+| `landmarks/landmarks.js` | budynki Warszawy z mapy: części jako budynki CityKit (`partSpec`), scalone po materiale; style budynków |
+| `landmarks/osm-data.js` | dane z OpenStreetMap (generowane: `tools/city-osm.mjs`; © współtwórcy OSM, ODbL) |
 
 ## Opis budynku
 
@@ -49,9 +51,28 @@ najwyżej wystającego elementu w głąb (8–64 kroki, więcej przy dużej gł�
 między krokami; mapy czytane `textureGrad` z pochodnymi pierwotnego UV (bez schodków mipmap na krawędziach wnęk).
 Okno nocą: numer okna z mapy + komórka z UV (piętra) albo z atrybutu `aCell` (parter) → `cityHash` jak w JS.
 
+## Budynki z mapy (`landmarks/`)
+
+`build({ landmark: 'pkin', …styl })` (i prefabrykat z zasobem `building` z polem `landmark`) buduje budynek z danych
+OpenStreetMap: każda część (`building:part`; bez części — sam obrys budynku) to budynek CityKit z obrysem w swoim
+miejscu (`footprint.fixed`, dziedzińce — `footprint.holes`), początkiem `base` (`min_height`), kondygnacjami stylu
+i dachem z mapy (`roof:shape` → `flat`, `hip`, `gable`, `mansard`, `pyramid` — namiot, iglica, stożek, `dome` —
+kopuła, kopuła cebulasta; `roof:height` → `roof.height`). Wysokość ścian dzielona na kondygnacje stylu (część nad
+gruntem — bez parteru), reszta to `attic` — pas muru bez okien nad ostatnią kondygnacją; dzięki temu części mają
+wspólne kafelki fasady. Zadaszenia (`building:part=roof`) — płyta 1,2 m pod górą, jak w grze. Kolory muru i dachu
+z mapy (hex albo nazwa CSS), inne — ze stylu. `edgeBase` przesuwa numery ścian kolejnych części (inne świecące okna).
+Części scalone w jedną siatkę na materiał (materiały kafelków wspólne dla części: `buildBuilding(…, { mats })`).
+
+Dane: `node tools/city-osm.mjs` — Overpass (punkt, promień, nazwa budynku; najwyższy pasujący, części ze środkiem
+w obrysie) → `osm-data.js`. Stąd (kontener) Overpass jest niedostępny, więc narzędzie uruchamia GitHub Actions
+(`.github/workflows/city-osm.yml`, po zmianie narzędzia albo ręcznie) i dopisuje wynik do `main`; pobrane zostają,
+zmieniony wpis (nazwa, punkt, promień) — od nowa, niedostępny serwer — zostają stare dane.
+
 ## Ograniczenia (dziś)
 
 - Dach dwuspadowy tylko na prostokącie; kopertowy na L / U kończy się płaskim szczytem, gdzie dalej się nie da.
 - Balkony w wersji dalekiej nie rzucają cienia (płaska ściana) i z bliska pod ostrym kątem mają smugi paralaksy —
   wersja daleka jest na odległość.
 - Gzymsy na rogach wklęsłych zachodzą na siebie (wypukłe są domknięte).
+- Budynki z mapy: obrys z dziedzińcem ma zawsze dach płaski; części zachodzące na siebie w mapie dają w doktorze
+  ściany w jednej płaszczyźnie (dane, nie kit); kształty w mapie są uproszczone (np. zakrzywiona Złota 44 — wielokąt).

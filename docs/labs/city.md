@@ -17,8 +17,8 @@ Osobne laboratorium — **Laboratorium budynków** (`labs/buildings.html`, BaseK
   szorstkość / metaliczność i numer okna. Shader (parallax occlusion mapping) prowadzi promień oka w pole wysokości,
   więc okna wyglądają na wnęki, a parapety, gzymsy i balkony — na wystające. Kamienica: ok. 7 000 trójkątów blisko,
   ok. 170 daleko; blok 31 000 → 76; wieżowiec 78 000 → 188.
-- **Z odległości (jak w grze):** obie wersje, przełączane w odległości „Switch at” (domyślnie 4 × promień budynku,
-  co najmniej 40 m) z zapasem ±10 %. W edytorze sceny przełącza świat (prefabrykaty `city/*` z `lod: true`).
+- **Z odległości (jak w grze):** obie wersje, przełączane w odległości „Switch at” (domyślnie 2 × promień budynku,
+  od 40 do 150 m — dalej siatka z bliska tylko migocze drobnymi ramami) z zapasem ±10 %. W edytorze sceny przełącza świat (prefabrykaty `city/*` z `lod: true`).
 - Nocą świecą okna — **te same** blisko i daleko: o oknie decyduje liczba z ziarna (ziarno, ściana, moduł,
   kondygnacja, okno), liczona tak samo w JS i w shaderze. Część świecących — suwak „Lit windows”; trzy barwy światła.
 
@@ -46,8 +46,19 @@ wierzchołek (siatka co 0,5 m), Enter, klik w pierwszy punkt albo „Finish outl
 przerywa. Obrys jest wyśrodkowywany i ustawiany przeciwnie do ruchu wskazówek zegara; front — krawędź 0.
 Ten sam format przyjmie obrys z mapy (np. OSM w grze CityExplorer — następny krok).
 
+## Budynki Warszawy (OpenStreetMap)
+
+Na liście budynków grupa **Warsaw (OpenStreetMap)**: Pałac Kultury i Nauki (z iglicą), dworzec Warszawa Centralna
+(dach na słupach), Złota 44, InterContinental, Varso, Warsaw Spire, Rondo 1, Cosmopolitan, Warsaw Trade Tower — te,
+które narzędzie znalazło w mapie. Bryła jest z mapy: obrys budynku i jego części (Simple 3D Buildings) z wysokością,
+początkiem nad gruntem, kształtem i wysokością dachu, kolorami muru i dachu. Wygląd jest nasz — styl budynku CityKit
+(mur, okna, parter, gzymsy; okna Fasada, Parter i gzymsy, barwa dachu), z wersją bliską i wypaloną daleką. Pola
+obrysu, kondygnacji, frontu i rodzaju dachu znikają (są z mapy). Zapis pod nazwą zapamiętuje budynek i styl.
+Dane: © współtwórcy OpenStreetMap (ODbL), pobierane narzędziem `tools/city-osm.mjs` ([`../models/city.md`](../models/city.md)).
+
 ## API dla AI
 
 `window.CityApi`: `make(opis)` → opis po sprawdzeniu (i budynek), `spec`, `types`, `footprints`, `info` (wymiary,
 okna, trójkąty i wywołania obu wersji), `save(nazwa)` → zasób `building`, `night(0…1)`. Zakładka **API** w konsoli.
-Adres `labs/city.html?type=<rodzaj>` otwiera rodzaj (edytor sceny: „Otwórz w laboratorium”).
+Adres `labs/city.html?type=<rodzaj>` otwiera rodzaj (edytor sceny: „Otwórz w laboratorium”), `?landmark=<id>` —
+budynek Warszawy; `CityApi.make({ landmark: 'pkin', … })`, `CityApi.landmarks` — lista.

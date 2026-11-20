@@ -75,6 +75,7 @@ W kolejności kategorii z menu Narzędzia i strony startowej (`ui/data/catalog.j
 | Transformator (poziomy szczegółów, strefy trafień) | `labs/transform.html` | [labs/transform.md](labs/transform.md) |
 | Doktor modeli | `tools/doctor.html` | [tools/doctor.md](tools/doctor.md) (broń ręczna: [models/weapons/README.md](models/weapons/README.md)) |
 | Kontrola kitów | `tools/kitcheck.html` | sprawdza modele kitów Space z wzorcem `tools/kitcheck.golden.json` |
+| Budynki z OpenStreetMap (laboratorium miasta) | `tools/city-osm.mjs`, `.github/workflows/city-osm.yml` | [models/city.md](models/city.md), „Budynki z mapy” |
 | Sprawdzenia (przy każdym wypchnięciu) | `tools/paths.py`, `tools/sitemap.py` | [../CLAUDE.md](../CLAUDE.md), „Strona startowa” |
 
 ## Przewodniki

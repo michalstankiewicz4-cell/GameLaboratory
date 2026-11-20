@@ -9,7 +9,7 @@ import { createStage } from '../shared/stage.js';
 import { LookPipeline, LOOK_DEFAULTS } from '../../render/sea/look.js';
 import { WEATHER } from '../../envs/sky/skykit.js';
 import { PRESETS as MAT_PRESETS, normalize as matNormalize } from '../../render/materials/matkit.js';
-import { TYPES, TYPE_IDS, WINDOW_STYLES, GROUND_KINDS, ROOF_TYPES, FOOTPRINTS, normalizeSpec, buildBuilding, setNight, setPom, clearBakes, facadeKey } from '../../models/city/citykit.js';
+import { TYPES, TYPE_IDS, WINDOW_STYLES, GROUND_KINDS, ROOF_TYPES, FOOTPRINTS, normalizeSpec, build, setNight, setPom, clearBakes, facadeKey, LANDMARK_IDS, landmarkInfo, landmarkStyle, OSM_SOURCE } from '../../models/city/citykit.js';
 import { cleanPolygon } from '../../models/city/footprint.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 
@@ -21,8 +21,12 @@ let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null');
 const L = { src: 'type:tenement', spec: null, mode: 'auto', ppm: 64, pom: true, lodAt: 0, weather: 'fair', time: 15.5, ...(saved || {}) };
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(L)); } catch { /* prywatny tryb */ } };
 const status = (s) => { $('status').textContent = s || ''; };
+// budynek z mapy (OpenStreetMap): bryła z danych, wygląd — styl budynku (landmarks.js), zmieniany w oknach Fasada i Parter
+function landmarkSpec(id) { return normalizeSpec({ ...landmarkStyle(id), landmark: id }); }
 let spec = normalizeSpec(L.spec || { type: 'tenement' });
-{ const q = new URLSearchParams(location.search).get('type'); if (q && TYPES[q]) { spec = normalizeSpec({ type: q }); L.src = 'type:' + q; L.lodAt = 0; } }   // „Otwórz w laboratorium” z edytora sceny
+{ const P = new URLSearchParams(location.search), q = P.get('type'), m = P.get('landmark');   // „Otwórz w laboratorium” z edytora sceny
+  if (q && TYPES[q]) { spec = normalizeSpec({ type: q }); L.src = 'type:' + q; L.lodAt = 0; }
+  if (m && LANDMARK_IDS.includes(m)) { spec = landmarkSpec(m); L.src = 'osm:' + m; L.lodAt = 0; } }
 
 /* ---------------- scena ---------------- */
 const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
@@ -50,16 +54,16 @@ async function rebuild() {
     const work = async () => {
       dropBuilds();
       if (fk !== lastFacade) { clearBakes(); lastFacade = fk; }
-      if (L.mode !== 'far') near = buildBuilding(spec, { detail: 1 });
-      if (L.mode !== 'near') far = buildBuilding(spec, { detail: 0.5, ppm: L.ppm });
+      if (L.mode !== 'far') near = build(spec, { detail: 1 });
+      if (L.mode !== 'near') far = build(spec, { detail: 0.5, ppm: L.ppm });
     };
-    const heavy = spec.floors * spec.footprint.w > 1500;
+    const heavy = spec.landmark || spec.floors * spec.footprint.w > 1500;
     if (heavy && window.LabLoad) await window.LabLoad.run('Building…', work); else await work();
     for (const b of [near, far]) if (b) scene.add(b.group);
     const b = near || far, bb = new THREE.Box3().setFromObject(b.group);
     bb.getCenter(center); radius = bb.getSize(new THREE.Vector3()).length() / 2;
     stage.fitShadow(new THREE.Vector3(center.x, 0, center.z), Math.max(20, radius * 1.1));
-    if (!L.lodAt) L.lodAt = Math.round(Math.max(40, radius * 4) / 5) * 5;
+    if (!L.lodAt) L.lodAt = Math.round(Math.min(150, Math.max(40, radius * 2)) / 5) * 5;   // dalej siatka z bliska tylko migocze (drobne ramy)
     $('lodAt').value = L.lodAt; $('lodAtV').textContent = L.lodAt + ' m';
     showStats(); drawMaps(); pickShown(true);
     $('jsonText').value = JSON.stringify(spec, null, 1);
@@ -80,13 +84,13 @@ function pickShown(force) {
   shown = want;
   for (const b of [near, far]) if (b) b.group.visible = b === shown;
   if (shown) window.LabPerf.model(shown.group, shown.stats.buildMs);
-  status(`${TYPES[spec.type].label} · ${shown === far ? 'far: baked facade' : 'near: mesh'} · ${shown.stats.triangles.toLocaleString('en')} triangles · ${shown.stats.drawCalls} draw calls`);
+  status(`${spec.landmark ? landmarkInfo(spec.landmark).name : TYPES[spec.type].label} · ${shown === far ? 'far: baked facade' : 'near: mesh'} · ${shown.stats.triangles.toLocaleString('en')} triangles · ${shown.stats.drawCalls} draw calls`);
 }
 
 const fm = (x, d = 1) => (+x).toFixed(d);
 function showStats() {
   const b = near || far, I = b.info, rows = [
-    ['Kind', TYPES[spec.type].label],
+    ...(spec.landmark ? [['Building', `${I.name} (OpenStreetMap ${I.osm}, ${I.parts} parts)`], ['Style', TYPES[spec.type].label]] : [['Kind', TYPES[spec.type].label]]),
     ['Size', `${fm(I.size[0])} × ${fm(I.size[2])} m, ${fm(I.roofTop)} m high`],
     ['Storeys', `${I.floors} (walls ${fm(I.height)} m)`],
     ['Footprint', `${Math.round(I.area).toLocaleString('en')} m², ${I.walls} walls`],
@@ -94,6 +98,7 @@ function showStats() {
   ];
   if (near) rows.push(['Near (mesh)', `${near.stats.triangles.toLocaleString('en')} tri · ${near.stats.drawCalls} calls`]);
   if (far) rows.push(['Far (baked)', `${far.stats.triangles.toLocaleString('en')} tri · ${far.stats.drawCalls} calls`]);
+  if (spec.landmark) rows.push(['Data', OSM_SOURCE]);
   $('specs').replaceChildren(...rows.map(([k, v]) => el('tr', {}, el('td', { textContent: k }), el('td', { textContent: v }))));
   const br = far ? [
     ['Tiles', Object.keys(far.tiles).length],
@@ -157,6 +162,7 @@ function fill() {
   const g1 = el('optgroup', { label: 'Ready' }); TYPE_IDS.forEach((id) => g1.append(new Option(TYPES[id].label, 'type:' + id))); t.append(g1);
   const names = listAssets('building');
   if (names.length) { const g2 = el('optgroup', { label: 'Saved' }); names.forEach((n) => g2.append(new Option(n, 'asset:' + n))); t.append(g2); }
+  if (LANDMARK_IDS.length) { const g3 = el('optgroup', { label: 'Warsaw (OpenStreetMap)' }); LANDMARK_IDS.forEach((id) => g3.append(new Option(landmarkInfo(id).name, 'osm:' + id))); t.append(g3); }
   t.value = L.src; if (t.value !== L.src) t.value = '';
   const wm = $('wallMat'); wm.replaceChildren();
   const m1 = el('optgroup', { label: 'Ready' }); Object.entries(MAT_PRESETS).forEach(([id, p]) => m1.append(new Option(p.label, 'preset:' + id))); wm.append(m1);
@@ -177,6 +183,11 @@ function show() {
   $('shape').value = spec.footprint.shape;
   $('armRow').hidden = !['L', 'U'].includes(spec.footprint.shape); $('cutRow').hidden = spec.footprint.shape !== 'corner';
   for (const id of ['fw', 'fd']) $(id).closest('.row').hidden = spec.footprint.shape === 'custom';
+  // budynek z mapy: obrys, kondygnacje, front i dach z danych — te pola znikają
+  const lm = !!spec.landmark;
+  for (const id of ['floors', 'groundH', 'front', 'rType', 'rPitch', 'rOver']) $(id).closest('.row').hidden = lm;
+  if (lm) for (const id of ['fw', 'fd', 'farm', 'fcut']) $(id).closest('.row').hidden = true;
+  $('shape').disabled = $('draw').disabled = lm; $('lmNote').hidden = !lm;
   $('front').max = String(Math.max(3, (spec.footprint.shape === 'custom' && spec.footprint.points ? spec.footprint.points.length : 8) - 1));
   $('seed').value = spec.seed; $('lit').value = spec.lit; $('litV').textContent = Math.round(spec.lit * 100) + ' %';
   const ws = Object.entries(MAT_PRESETS).find(([, p]) => p.kind === spec.wall.kind && p.label === spec.wall.label);
@@ -202,7 +213,7 @@ $('shape').onchange = () => {
 };
 $('type').onchange = () => {
   const v = $('type').value; L.src = v;
-  spec = normalizeSpec(v.startsWith('asset:') ? getAsset('building', v.slice(6)) || { type: 'tenement' } : { type: v.slice(5) });
+  spec = normalizeSpec(v.startsWith('asset:') ? getAsset('building', v.slice(6)) || { type: 'tenement' } : v.startsWith('osm:') ? landmarkSpec(v.slice(4)) : { type: v.slice(5) });
   L.lodAt = 0; show(); rebuild().then(() => aimCam('corner'));
 };
 $('wallMat').onchange = () => {
@@ -316,9 +327,10 @@ addEventListener('keydown', (e) => {
 // CityApi: make(opis) — zbuduj (zwraca opis po sprawdzeniu); spec — obecny opis; types — rodzaje; footprints — obrysy;
 // info — liczby budynku; save(nazwa) — zasób „building”; night(0…1) — pora: noc, okna świecą
 window.CityApi = {
-  make: async (d) => { spec = normalizeSpec(d); L.src = 'type:' + spec.type; $('type').value = L.src; L.lodAt = 0; show(); await rebuild(); aimCam('corner'); return JSON.parse(JSON.stringify(spec)); },
+  make: async (d) => { spec = normalizeSpec(d && d.landmark && LANDMARK_IDS.includes(d.landmark) ? { ...landmarkStyle(d.landmark), ...d } : d); L.src = spec.landmark ? 'osm:' + spec.landmark : 'type:' + spec.type; $('type').value = L.src; L.lodAt = 0; show(); await rebuild(); aimCam('corner'); return JSON.parse(JSON.stringify(spec)); },
   get spec() { return JSON.parse(JSON.stringify(spec)); },
   types: Object.fromEntries(TYPE_IDS.map((k) => [k, TYPES[k].label])),
+  landmarks: Object.fromEntries(LANDMARK_IDS.map((k) => [k, landmarkInfo(k).name])),
   footprints: Object.fromEntries(Object.entries(FOOTPRINTS).map(([k, f]) => [k, f.label])),
   get info() { const b = near || far; return b ? { ...b.info, near: near && near.stats, far: far && far.stats } : null; },
   save: (n) => { saveAsset('building', String(n), { ...spec, label: String(n) }); fill(); return true; },

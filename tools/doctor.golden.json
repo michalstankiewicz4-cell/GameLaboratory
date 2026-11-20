@@ -68,6 +68,146 @@
    "triangles": 13910
   }
  },
+ "city/osm-centralna": {
+  "counts": {
+   "sliver": 2,
+   "zfight": 1
+  },
+  "fingerprint": {
+   "drawCalls": 14,
+   "materials": 14,
+   "size": [
+    153.87,
+    18.52,
+    125.03
+   ],
+   "triangles": 56210
+  }
+ },
+ "city/osm-cosmopolitan": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 9,
+   "materials": 9,
+   "size": [
+    47.34,
+    161.02,
+    55.12
+   ],
+   "triangles": 185722
+  }
+ },
+ "city/osm-intercontinental": {
+  "counts": {
+   "zfight": 1
+  },
+  "fingerprint": {
+   "drawCalls": 14,
+   "materials": 14,
+   "size": [
+    53.7,
+    165.02,
+    53.4
+   ],
+   "triangles": 276522
+  }
+ },
+ "city/osm-pkin": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 14,
+   "materials": 14,
+   "size": [
+    254.69,
+    237.02,
+    300.27
+   ],
+   "triangles": 467144
+  }
+ },
+ "city/osm-rondo1": {
+  "counts": {
+   "seethrough": 1,
+   "sliver": 1,
+   "zfight": 1
+  },
+  "fingerprint": {
+   "drawCalls": 18,
+   "materials": 18,
+   "size": [
+    103.3,
+    160.02,
+    109.5
+   ],
+   "triangles": 429290
+  }
+ },
+ "city/osm-spire": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 10,
+   "materials": 10,
+   "size": [
+    44.84,
+    220.02,
+    61
+   ],
+   "triangles": 199394
+  }
+ },
+ "city/osm-varso": {
+  "counts": {
+   "seethrough": 1,
+   "sliver": 1,
+   "zfight": 1
+  },
+  "fingerprint": {
+   "drawCalls": 18,
+   "materials": 18,
+   "size": [
+    84.3,
+    310.02,
+    54.42
+   ],
+   "triangles": 617606
+  }
+ },
+ "city/osm-wtt": {
+  "counts": {
+   "seethrough": 1,
+   "sliver": 1,
+   "zfight": 1
+  },
+  "fingerprint": {
+   "drawCalls": 17,
+   "materials": 17,
+   "size": [
+    63.59,
+    208.02,
+    58.2
+   ],
+   "triangles": 322860
+  }
+ },
+ "city/osm-zlota44": {
+  "counts": {
+   "seethrough": 1,
+   "sliver": 2,
+   "zfight": 1
+  },
+  "fingerprint": {
+   "drawCalls": 13,
+   "materials": 13,
+   "size": [
+    61.82,
+    193.02,
+    54.98
+   ],
+   "triangles": 308968
+  }
+ },
  "city/tenement": {
   "counts": {},
   "fingerprint": {

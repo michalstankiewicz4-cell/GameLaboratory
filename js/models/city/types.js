@@ -4,7 +4,11 @@
 //   type         rodzaj, z którego wzięto wartości (house, tenement, block, tower, office, market)
 //   seed         ziarno: które okna świecą nocą, drobne różnice
 //   footprint    { shape: rect | L | U | corner | custom, w, d, arm (szerokość ramienia L / U), cut (ścięcie narożnika),
-//                  points — własny obrys [[x, z], …] }
+//                  points — własny obrys [[x, z], …], holes — dziedzińce (pierścienie w obrysie), fixed — obrys w swoim
+//                  miejscu (bez wyśrodkowania; części budynku z mapy) }
+//   base         wysokość, od której budynek się zaczyna [m] (część na innej części; zwykle 0)
+//   attic        pas muru bez okien nad ostatnią kondygnacją [m] (reszta wysokości części budynku z mapy; zwykle 0)
+//   edgeBase     przesunięcie numerów ścian w liczbie z ziarna (części jednego budynku świecą różnymi oknami)
 //   front        krawędź frontu (wejścia, witryny) — indeks krawędzi obrysu
 //   floors       kondygnacje razem z parterem; floorH — wysokość piętra, groundH — parteru [m]
 //   wall         materiał ścian: opis MatKit (js/render/materials/matkit.js) — gotowy (preset) albo zapisany
@@ -15,8 +19,10 @@
 //   bands        { plinth (cokół, wysokość m; 0 — bez), cornice (gzyms nad parterem), floors (pasy między piętrami),
 //                  top (gzyms wieńczący) }
 //   balcony      { depth, railing (barwa balustrady) } — dla przęseł balcony
-//   roof         { type: flat | gable | hip | mansard, pitch (°), overhang (okap m), color, parapet (attyka m) }
+//   roof         { type: flat | gable | hip | mansard | pyramid | dome, pitch (°), height (wysokość dachu m; 0 — ze
+//                  spadku), overhang (okap m), color, parapet (attyka m) }
 //   lit          część okien świecących nocą (0…1)
+//   landmark     budynek z mapy (landmarks/landmarks.js, np. pkin): bryła z OpenStreetMap, z opisu — tylko wygląd
 import { PRESETS as MAT } from '../../render/materials/matkit.js';
 
 const mat = (id, over) => ({ ...MAT[id], ...over });
@@ -85,7 +91,7 @@ export const TYPES = {
 export const TYPE_IDS = Object.keys(TYPES);
 export const WINDOW_STYLES = { punched: 'Punched windows', ribbon: 'Ribbon windows', curtain: 'Curtain wall (glass)' };
 export const GROUND_KINDS = { shop: 'Shop windows', window: 'Windows', glass: 'Glass wall', wall: 'Plain wall' };
-export const ROOF_TYPES = { flat: 'Flat (with parapet)', gable: 'Gable (rectangles; else hip)', hip: 'Hip', mansard: 'Mansard' };
+export const ROOF_TYPES = { flat: 'Flat (with parapet)', gable: 'Gable (rectangles; else hip)', hip: 'Hip', mansard: 'Mansard', pyramid: 'Pyramid / spire', dome: 'Dome' };
 export const BAY_KINDS = { window: 'Window', balcony: 'Balcony', pier: 'Pier (plain wall)' };
 
 const num = (v, lo, hi, d) => { const x = +v; return Number.isFinite(x) ? Math.min(hi, Math.max(lo, x)) : d; };
@@ -103,7 +109,8 @@ export function normalizeSpec(s0 = {}) {
     footprint: { shape: pick(f.shape, { rect: 1, L: 1, U: 1, corner: 1, custom: 1 }, 'rect'), w: num(f.w, 4, 300, 12), d: num(f.d, 4, 300, 10), arm: num(f.arm, 3, 150, 0), cut: num(f.cut, 1, 60, 4) },
     front: Math.max(0, Math.round(num(s.front, 0, 999, 0))),
     floors: Math.round(num(s.floors, 1, 120, 3)),
-    floorH: num(s.floorH, 2.4, 6, 3), groundH: num(s.groundH, 2.4, 9, 3.5),
+    base: num(s.base, -50, 1000, 0), attic: num(s.attic, 0, 12, 0), edgeBase: Math.round(num(s.edgeBase, 0, 1e6, 0)),
+    floorH: num(s.floorH, 2.4, 6, 3), groundH: num(s.groundH, 0.3, 12, 3.5),
     wall: { ...(s.wall || T.wall) },
     bay: num(s.bay, 1, 12, 3),
     module: (Array.isArray(s.module) && s.module.length ? s.module : T.module).slice(0, 6).map((k) => pick(k, BAY_KINDS, 'window')),
@@ -111,10 +118,14 @@ export function normalizeSpec(s0 = {}) {
     ground: { front: pick(g.front, GROUND_KINDS, 'window'), sides: pick(g.sides, GROUND_KINDS, 'window'), entrances: Math.round(num(g.entrances, 0, 20, 1)), door: col(g.door, '#4a2f1f') },
     bands: { plinth: num(b.plinth, 0, 1.5, 0), cornice: !!b.cornice, floors: !!b.floors, top: !!b.top },
     balcony: { depth: num(bc.depth, 0.5, 2.5, 1.1), railing: col(bc.railing, '#3b3f42') },
-    roof: { type: pick(r.type, ROOF_TYPES, 'flat'), pitch: num(r.pitch, 5, 65, 30), overhang: num(r.overhang, 0, 1.5, 0.3), color: col(r.color, '#6b4a3c'), parapet: num(r.parapet, 0, 2, 0) },
+    roof: { type: pick(r.type, ROOF_TYPES, 'flat'), pitch: num(r.pitch, 5, 80, 30), height: num(r.height, 0, 300, 0), overhang: num(r.overhang, 0, 1.5, 0.3), color: col(r.color, '#6b4a3c'), parapet: num(r.parapet, 0, 2, 0) },
     lit: num(s.lit, 0, 1, 0.4),
   };
   if (s0.footprint && Array.isArray(s0.footprint.points)) out.footprint.points = s0.footprint.points.map((p) => [+p[0], +p[1]]);
+  if (s0.footprint && s0.footprint.fixed) out.footprint.fixed = true;
+  if (typeof s0.landmark === 'string' && s0.landmark) out.landmark = s0.landmark;   // budynek z mapy (landmarks/landmarks.js): bryła z OpenStreetMap, styl z opisu
+  if (s0.footprint && Array.isArray(s0.footprint.holes) && s0.footprint.holes.length) out.footprint.holes = s0.footprint.holes.map((h) => h.map((p) => [+p[0], +p[1]]));
+  if (out.groundH < 2.4) { out.ground.front = out.ground.sides = 'wall'; out.ground.entrances = 0; }   // niski parter (część z mapy): mur
   if (!out.footprint.arm) out.footprint.arm = Math.min(out.footprint.w, out.footprint.d) * 0.4;
   out.bay = Math.max(out.bay, out.window.style === 'punched' ? out.window.w + 0.4 : 1);
   out.window.h = Math.min(out.window.h, out.floorH - out.window.sill - 0.15);

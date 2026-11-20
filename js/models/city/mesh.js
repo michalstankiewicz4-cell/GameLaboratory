@@ -104,30 +104,33 @@ export function near(geo, L) {
         if (!bandList.length) for (const f of feats) if (f.band) bandList.push({ ...f, v0: y0 + f.v0, v1: y0 + f.v1 });
         wallAround(geo, F, cu0, cu1, r ? y0 : -0.02, y1, ops, tile);   // parter od −2 cm: do spodu budynku (roof.js)
         for (const o of ops) {
-          const li = windowLight(S.seed, e.i, c.i, r, o.wid, S.lit);
+          const li = windowLight(S.seed, e.i + S.edgeBase, c.i, r, o.wid, S.lit);
           opening(geo, F, o, li ? 'lit' + li : 'glass', tile); holes.push(o);
         }
         for (const b of mine) if (b.t === 'box') box(geo, F, b.m, b.u0, b.u1, b.v0, b.v1, b.z0, b.z1, tile);
       }
       bands(geo, F, e, bandList, holes, tile);
     }
+    // poddasze: pas muru bez okien nad ostatnią kondygnacją (reszta wysokości części budynku z mapy)
+    if (S.attic > 0) { const y0 = L.H - S.attic; wq(geo, 'wall', [F.P(0, y0, 0), F.P(e.len, y0, 0), F.P(e.len, L.H, 0), F.P(0, L.H, 0)], F.D(0, 0, 1), tile); }
   }
 }
 
 /** Wersja daleka: prostokąty z teksturami komórek; atrybut aCell — (ściana, moduł parteru albo −1 dla pięter). */
 export function far(geo, L) {
-  const S = L.S, gh = S.groundH, H = L.H, up = S.floors - 1;
+  const S = L.S, gh = S.groundH, H = L.H - S.attic, up = S.floors - 1, eb = S.edgeBase;
   for (const e of L.edges) {
     const F = facadeFrame(e), n = F.D(0, 0, 1);
     const q = (key, u0, u1, v0, v1, uv, cell) => geo.quad('tile:' + key, [F.P(u0, v0 || -0.02, 0), F.P(u1, v0 || -0.02, 0), F.P(u1, v1, 0), F.P(u0, v1, 0)], n, uv, cell);   // parter od −2 cm
     if (e.plain) {
       const k = e.len / L.mw0;
-      q('g:wall', 0, e.len, 0, gh, [[0, 0], [k, 0], [k, 1], [0, 1]], [e.i, 0]);
-      if (up) { const k2 = e.len / PLAIN_W; q('plain', 0, e.len, gh, H, [[0, 0], [k2, 0], [k2, up], [0, up]], [e.i, -1]); }
-      continue;
+      q('g:wall', 0, e.len, 0, gh, [[0, 0], [k, 0], [k, 1], [0, 1]], [e.i + eb, 0]);
+      if (up) { const k2 = e.len / PLAIN_W; q('plain', 0, e.len, gh, H, [[0, 0], [k2, 0], [k2, up], [0, up]], [e.i + eb, -1]); }
+    } else {
+      for (let i = 0; i < e.n; i++) q('g:' + e.ground[i], i * e.mw, (i + 1) * e.mw, 0, gh, [[0, 0], [1, 0], [1, 1], [0, 1]], [e.i + eb, i]);
+      if (up) q('upper', 0, e.len, gh, H, [[0, 0], [e.n, 0], [e.n, up], [0, up]], [e.i + eb, -1]);
     }
-    for (let i = 0; i < e.n; i++) q('g:' + e.ground[i], i * e.mw, (i + 1) * e.mw, 0, gh, [[0, 0], [1, 0], [1, 1], [0, 1]], [e.i, i]);
-    if (up) q('upper', 0, e.len, gh, H, [[0, 0], [e.n, 0], [e.n, up], [0, up]], [e.i, -1]);
+    if (S.attic > 0) { const k2 = e.len / PLAIN_W, kv = S.attic / S.floorH; q('plain', 0, e.len, H, L.H, [[0, 0], [k2, 0], [k2, kv], [0, kv]], [e.i + eb, -1]); }   // poddasze
   }
 }
 

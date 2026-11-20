@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.39.1 — 2026-11-20
+
+### Zmienione
+- Budynki miasta: zasób `building` z budynkiem Warszawy z OpenStreetMap (pole `landmark`, z laboratorium miasta) stawia
+  ten budynek.
+
 ## 0.39.0 — 2026-11-20
 
 ### Dodane
