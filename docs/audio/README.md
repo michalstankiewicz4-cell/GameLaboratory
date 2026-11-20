@@ -44,5 +44,10 @@ w laboratoriach dźwięku (`js/labs/shared/mixer-window.js`) zmienia te same ust
 ## Zasoby z nazwą (`js/scene/assets.js`)
 
 `sound` (efekt: `{ sound, params, gain }`), `ambience` (tło: `{ layers }`), `voice` (głos VoiceKit) — z laboratoriów
-efektów i mowy. Scena ich jeszcze nie używa: źródła dźwięku przy obiektach i efekty wywoływane przez zachowania
-(strzał, wybuch, silnik jadącego pojazdu) — następny krok (mikser ma do tego dźwięk przestrzenny).
+efektów i mowy. `sound` i `ambience` — w scenie jako dźwięk przy obiekcie (pole `sound`); `voice` scena jeszcze nie używa.
+
+## Dźwięk w scenie (`js/scene/sounds.js`)
+
+Źródła przy obiektach (pole `sound`), silniki pojazdów z zachowań, strzały, wybuchy i efekty — w miejscu, słuchacz to
+kamera ▶ Graj. Opis: [`../scene/README.md`](../scene/README.md#dźwięk-w-scenie-soundsjs). SfxKit: `start` i `ambience`
+w miejscu mają `move(at)` (źródło idzie za obiektem), `ref` — odległość pełnej głośności.

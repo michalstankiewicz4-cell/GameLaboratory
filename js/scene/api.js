@@ -21,8 +21,8 @@ const COMMANDS = {
   help: { args: '', does: 'this list' },
   describe: { args: '', does: 'the whole scene as data (format gamelab-scene) and a short summary' },
   prefabs: { args: '[family]', does: 'the models that can be added: id, name, family, where it stands, behaviours, and the kind of asset it takes (asset)' },
-  add: { args: 'prefab, [name], [pos [x,y,z] m], [rot [pitch,heading,roll] °], [scale], [behavior], [asset], [shot]', does: 'adds a model; returns its id (asset — a named asset of the kind the model takes, e.g. a block body from the blocks lab)' },
-  set: { args: 'id | name, then any of: newName (with id also name), prefab, pos, rot, scale, behavior, orbit { around: id | name ("" — the nearest heavier body), period: s } (the orbit behaviour), asset (a named asset of the kind the model takes; "" — the default model), shot (a ship that shoots: the look of its shots — an effect id or a saved effect from the effects lab; "" — the shot)', does: 'changes an object' },
+  add: { args: 'prefab, [name], [pos [x,y,z] m], [rot [pitch,heading,roll] °], [scale], [behavior], [asset], [shot], [sound]', does: 'adds a model; returns its id (asset — a named asset of the kind the model takes, e.g. a block body from the blocks lab)' },
+  set: { args: 'id | name, then any of: newName (with id also name), prefab, pos, rot, scale, behavior, orbit { around: id | name ("" — the nearest heavier body), period: s } (the orbit behaviour), asset (a named asset of the kind the model takes; "" — the default model), shot (a ship that shoots: the look of its shots — an effect id or a saved effect from the effects lab; "" — the shot), sound (a sound at the object during play: a ready sound — fire, engine, bird…, a ready place ambience — forest, park, seaside, storm, night, campfire, or a sound / ambience asset from the sound effects lab; "" — none)', does: 'changes an object' },
   move: { args: 'id | name, by [dx,dy,dz] m', does: 'moves an object by an offset' },
   remove: { args: 'id | name', does: 'removes an object' },
   env: { args: 'any of: surface (sea | land | space | underground — inside a cave), cave (underground: a cave asset name from the cave lab, "" — the default cave), caveGlow (underground: true — a faint glow to see the cave, false — true darkness), light (a ready light or a weather asset name), look, ui (a game UI asset name, "" — none), land (a land asset name, "" — the plain ground), sea (a sea asset name, "" — the default sea), sky (any surface: "" — the default for the surface, "day" — the day sky, "preset:<id>" — a ready space sky, or a sky asset name)', does: 'changes the environment' },
@@ -35,6 +35,7 @@ const COMMANDS = {
   events: { args: '[n]', does: 'the last n events (default 20)' },
   ui: { args: 'during play, one of: say { who, text, choices }, log (text) [kind], banner (text) [sub], show (screen), hide, open (window), close (window)', does: 'the game UI of the scene (env.ui): a line of dialogue (returns at once; the choice comes as a "ui" event), an event log entry, a banner, a menu screen, a window' },
   effect: { args: 'effect (shot | orb | debris | bolt | zap | bubble | hole | laser | piercer | storm | tow | cutter | field | warp | marker | portal | scan | smoke | sparks | explosion | scorch | ember, or an effect asset name from the effects lab), then: from, to (shot, orb, bubble, laser, piercer, storm, tow, cutter; warp: from, dir) | at, [dir] (debris, hole, field, marker, portal, scan, smoke, sparks, scorch, ember; explosion: at, radius) | path [p, p, …] (bolt, zap) — each point [x,y,z] m or an object id | name', does: 'shows an effect — an "effect" event (anything listening gets it)' },
+  sound: { args: 'sound (a ready sound — explosion, gunshot, thunder, splash, impact, hit, bird, ui… — or a sound asset from the sound effects lab), at [x,y,z] m | object id | name', does: 'plays a sound once at a place (a continuous sound: 4 s); behaviours, shots and effects sound by themselves during play' },
   check: { args: '[budget { tris, draws }]', does: 'the scene doctor: problems in the scene (wrong environment, under the ground or in the air, overlapping, missing assets, unfitting behaviours, cost over the budget), each with a proposed fix (commands) — nothing is changed' },
   play: { args: '', does: 'runs the behaviours (like ▶ Play)' },
   stop: { args: '', does: 'back to editing' },
@@ -83,6 +84,11 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
       else if (n !== '' && !kinds.includes(n) && !saved.includes(n)) fail(`shot: one of ${kinds.join(', ')}${saved.length ? ' or a saved effect: ' + saved.join(', ') : ''}; "" — the shot`);
       p.shot = n;
     }
+    if (c.sound != null) {   // dźwięk przy obiekcie w grze (js/scene/sounds.js): gotowy dźwięk lub tło, zapisany dźwięk lub tło; "" — bez
+      const n = String(c.sound).slice(0, 40), all = hooks.soundNames ? hooks.soundNames() : [];
+      if (n !== '' && hooks.soundNames && !all.includes(n)) fail(`sound: one of ${all.join(', ')}; "" — none`);
+      p.sound = n;
+    }
     if (c.orbit != null) {   // zachowanie „orbita”: { around: id albo nazwa obiektu ("" — sam wybiera), period: s }
       const o = c.orbit, x = {};
       if (o.around != null) x.around = o.around === '' ? '' : target(typeof o.around === 'string' && !store.scene.objects.some((q) => q.id === o.around) ? { name: o.around } : { id: o.around }).id;
@@ -91,7 +97,9 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
     }
     return p;
   }
-  const summary = (o) => ({ id: o.id, name: o.name, prefab: o.prefab, pos: o.pos, rot: o.rot, scale: o.scale, ...(o.behavior != null ? { behavior: o.behavior } : {}), ...(o.orbit ? { orbit: o.orbit } : {}), ...(o.asset ? { asset: o.asset } : {}), ...(o.shot ? { shot: o.shot } : {}) });
+  // punkt: [x, y, z] m albo obiekt (id albo nazwa) — jego położenie teraz (w grze: tam, gdzie go niesie zachowanie)
+  const place = (p, f) => (Array.isArray(p) ? vec3(p, f) : (() => { const o = target(store.scene.objects.some((q) => q.id === p) ? { id: p } : { name: p }); return hooks.objectPos ? hooks.objectPos(o) : o.pos; })());
+  const summary = (o) => ({ id: o.id, name: o.name, prefab: o.prefab, pos: o.pos, rot: o.rot, scale: o.scale, ...(o.behavior != null ? { behavior: o.behavior } : {}), ...(o.orbit ? { orbit: o.orbit } : {}), ...(o.asset ? { asset: o.asset } : {}), ...(o.shot ? { shot: o.shot } : {}), ...(o.sound ? { sound: o.sound } : {}) });
 
   const run1 = {
     help: () => ({ commands: COMMANDS, notes: 'Units: metres, degrees. Y is up; heading 0 looks along +Z. An object is named by "id" or "name". A list of commands runs in order.' }),
@@ -170,11 +178,18 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
       const n = String(c.effect || ''), kinds = hooks.effectKinds || [], saved = assets.list('effect');
       const e = saved.includes(n) ? { asset: n } : kinds.includes(n) ? { kind: n } : fail(`effect: one of ${kinds.join(', ')}${saved.length ? ' or a saved effect: ' + saved.join(', ') : ''}`);
       // punkt: [x, y, z] m albo obiekt (id albo nazwa) — jego położenie teraz (w grze: tam, gdzie go niesie zachowanie)
-      const pt = (p, f) => (Array.isArray(p) ? vec3(p, f) : (() => { const o = target(store.scene.objects.some((q) => q.id === p) ? { id: p } : { name: p }); return hooks.objectPos ? hooks.objectPos(o) : o.pos; })());
+      const pt = place;
       for (const f of ['from', 'to', 'at', 'dir']) if (c[f] != null) e[f] = f === 'dir' ? vec3(c[f], f) : pt(c[f], f);
       for (const f of ['radius', 'n', 'size', 'frames']) if (c[f] != null) e[f] = num(c[f], f);   // wybuch, iskry, znak, czas
       if (c.path != null) { if (!Array.isArray(c.path) || c.path.length < 2) fail('path: at least two points'); e.path = c.path.map((p, i) => pt(p, 'path[' + i + ']')); }
       hooks.effect(e); return { effect: n, ...e };
+    },
+    sound: (c) => {
+      if (!hooks.sound) fail('sound is not available here');
+      if (c.at == null) fail('at: [x, y, z] m or an object id | name');
+      const n = String(c.sound || ''), at = place(c.at, 'at');
+      try { hooks.sound(n, at); } catch (e) { fail(`${e.message} (ready: ${(hooks.soundNames ? hooks.soundNames() : []).join(', ')})`); }
+      return { sound: n, at };
     },
     check: (c) => { if (!hooks.check) fail('the scene doctor is not available here'); return hooks.check({ budget: c.budget }); },
     events: (c) => ({ events: hooks.events ? hooks.events(c.n > 0 ? Math.min(200, +c.n) : 20) : [] }),

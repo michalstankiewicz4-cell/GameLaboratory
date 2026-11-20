@@ -207,8 +207,9 @@ export function createWorld(container, store, onWarn) {
   function wireShots(o, kit) {
     if (!kit || !('onShot' in kit)) return;
     const r = built.get(o.id); if (r && kit.damageView) r.dmg = shipDamage(kit, dmgFx);   // uszkodzenia: laboratorium efektów
+    const dmg0 = kit.onDamage; if (dmg0) kit.onDamage = (e) => { dmg0(e); if (world.onDamage) world.onDamage(o, e); };   // world.onDamage — dźwięk wybuchu
     kit.onScan = (s) => { try { fxLib.play('scan', { at: s.at.toArray(), radius: s.radius, color: s.color }); } catch { /* bez fali */ } };   // fala skanu: laboratorium efektów
-    kit.onShot = (s) => { const cur = store.scene.objects.find((q) => q.id === o.id); try { fxLib.shot((cur && cur.shot) || 'shot', s); } catch (err) { if (window.LabLog) window.LabLog.add('warn', 'Shot effect: ' + err.message); } };
+    kit.onShot = (s) => { const cur = store.scene.objects.find((q) => q.id === o.id); try { fxLib.shot((cur && cur.shot) || 'shot', s); } catch (err) { if (window.LabLog) window.LabLog.add('warn', 'Shot effect: ' + err.message); } if (world.onShot) world.onShot(cur || o, s); };   // world.onShot — dźwięk strzału
   }
   function frame(now) {
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
@@ -241,6 +242,7 @@ export function createWorld(container, store, onWarn) {
   }
   const world = {
     renderer, scene, camera, root, built, stage, look, pending, syncObjects, syncPlaces, syncEnv, bounds, effect,
+    onShot: null, onDamage: null,   // (obiekt, strzał | uszkodzenie statku) → dźwięk (editor/js/play/play.js)
     gameGfx: null,   // ▶ Graj: settings.gfx gracza (js/core/settings.js) — potok kamery z nimi; null — wygląd edytora
     clearEffects: () => fxLib.dispose(), forgetEffect: (n) => fxLib.forget(n),
     objectRoot: (id) => (built.get(id) || {}).root || null,

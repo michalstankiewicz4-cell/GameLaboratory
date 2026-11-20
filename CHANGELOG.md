@@ -3,6 +3,17 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.85.0 · edytor sceny 0.41.0 — 2026-11-20 (dźwięk w scenie)
+
+### Dodane
+- **Dźwięk w scenie** (`js/scene/sounds.js`): w ▶ Graj obiekt z polem **Dźwięk** gra w swoim miejscu i idzie za nim —
+  gotowy dźwięk (ogień, silnik, ptak…), gotowe tło miejsca (las, park, brzeg morza, burza, noc, ognisko) albo zapisane
+  w laboratorium efektów dźwiękowych; silniki pojazdów z zachowań (samochód z biegami, okręt, mała jednostka, samolot,
+  przeładowarka; łaziki i nurek — napęd elektryczny; statki kosmiczne — huk silników z mocą); strzały i wybuchy statków,
+  rozbicie samolotu lub lądownika, efekty z polecenia `effect` — swój dźwięk. Głośność maleje z odległością od kamery.
+- API sceny: pole `sound` w `add` / `set`, polecenie `sound { sound, at }`; lekarz sceny zgłasza brakujący dźwięk.
+- SfxKit: źródło w miejscu przesuwane (`move`), odległość pełnej głośności (`ref`).
+
 ## Program 0.84.0 · laboratorium dźwięku: muzyka 1.3.0, efekty 1.0.0, mowa 1.0.0 · UI gry 1.5.0 · edytor sceny 0.40.0 — 2026-11-20 (grupa dźwięku i mikser)
 
 ### Dodane

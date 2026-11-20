@@ -4,6 +4,7 @@ import { PREFABS, FAMILIES, prefab } from '../../../js/scene/prefabs.js';
 import { LIGHTS, readProfiles } from '../world/world.js';
 import { listAssets, ASSET_KINDS } from '../../../js/scene/assets.js';
 import { FX_KINDS, FX_BADGES } from '../../../js/render/effects/effects.js';
+import { SOUNDS, AMBIENCES, CATS } from '../../../js/audio/sfx/sfxkit.js';
 import { skyPresets, SKY_PRESET, SKY_DAY } from '../../../js/scene/space.js';
 import { BEHAVIORS, behaviorsFor, behaviorOf, ORBIT_PERIOD } from '../../../js/scene/behaviors.js';
 
@@ -159,6 +160,19 @@ export function createPanels(store, actions) {
         ...(cur && !FX_KINDS[cur] && !saved.includes(cur) ? [el('option', { value: cur, textContent: t('env.seaMissing', { name: cur }) })] : []));
       $('oShot').value = cur === 'shot' ? '' : cur;
     }
+    // dźwięk przy obiekcie w ▶ Graj (js/scene/sounds.js): gotowe dźwięki po kategoriach, gotowe tła miejsc, zapisane
+    // w laboratorium efektów dźwiękowych; '' — bez
+    {
+      const sv = listAssets('sound'), sp = listAssets('ambience'), cur = o.sound || '', L = (d) => (lang === 'pl' ? d.labelPl : d.label);
+      const opt = (v, txt) => el('option', { value: v, textContent: txt });
+      $('oSound').replaceChildren(opt('', t('obj.soundNone')),
+        ...Object.keys(CATS).map((c) => el('optgroup', { label: CATS[c][lang === 'pl' ? 1 : 0] }, ...Object.entries(SOUNDS).filter(([, d]) => d.cat === c).map(([id, d]) => opt(id, L(d))))),
+        el('optgroup', { label: t('obj.soundPlaces') }, ...Object.entries(AMBIENCES).map(([id, d]) => opt(id, L(d)))),
+        ...(sv.length ? [el('optgroup', { label: t('obj.soundSaved') }, ...sv.map((n) => opt(n, n)))] : []),
+        ...(sp.length ? [el('optgroup', { label: t('obj.soundSavedPlaces') }, ...sp.map((n) => opt(n, n)))] : []),
+        ...(cur && !SOUNDS[cur] && !AMBIENCES[cur] && !sv.includes(cur) && !sp.includes(cur) ? [opt(cur, t('env.seaMissing', { name: cur }))] : []));
+      $('oSound').value = cur; $('oSound').disabled = document.body.classList.contains('playing');
+    }
     // zasób modelu (prefabrykat z assetKind, np. bryła z laboratorium bloków): zapisane pod nazwą albo model domyślny
     const pk = prefab(o.prefab), ak = pk && pk.assetKind; $('oAssetRow').hidden = !ak;
     if (ak) {
@@ -200,6 +214,7 @@ export function createPanels(store, actions) {
   });
   $('oBehavior').addEventListener('change', () => { const o = store.selected; if (o) store.update(o.id, { behavior: $('oBehavior').value }); });
   $('oShot').addEventListener('change', () => { const o = store.selected; if (o) store.update(o.id, { shot: $('oShot').value }); });
+  $('oSound').addEventListener('change', () => { const o = store.selected; if (o) store.update(o.id, { sound: $('oSound').value }); });
   $('oAsset').addEventListener('change', () => { const o = store.selected; if (o) actions.build(() => store.update(o.id, { asset: $('oAsset').value })); });
   $('orbitAround').addEventListener('change', () => { const o = store.selected; if (o) store.update(o.id, { orbit: { ...(o.orbit || {}), around: $('orbitAround').value } }); });
   $('orbitPeriod').addEventListener('input', () => { const o = store.selected, v = parseFloat($('orbitPeriod').value); if (o && v > 0) store.update(o.id, { orbit: { ...(o.orbit || {}), period: v } }); });

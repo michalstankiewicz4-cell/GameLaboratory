@@ -3,6 +3,13 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.41.0 — 2026-11-20
+
+### Dodane
+- Okno Właściwości obiektu: **Dźwięk** (gotowe dźwięki po kategoriach, tła miejsc, zapisane w laboratorium efektów
+  dźwiękowych) — gra w ▶ Graj w miejscu obiektu. W grze także silniki pojazdów, strzały, wybuchy i dźwięk efektów.
+- API: `sound` w `add` / `set`, polecenie `sound`.
+
 ## 0.40.0 — 2026-11-20
 
 ### Dodane

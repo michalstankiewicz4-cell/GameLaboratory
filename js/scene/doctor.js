@@ -10,7 +10,7 @@
 //   prefab(id) → { id, label, family, surface } | null      (js/scene/prefabs.js)
 //   behaviorsFor(prefabId) → [id], behaviorOf(obj, surface) → id | '', behaviorEnv(id) → 'water' | 'land' | 'space'
 //   bodyRank(prefabId) → ranga ciała niebieskiego (−1 — nie ciało)                    (js/scene/behaviors.js)
-//   assets: { list(kind) → nazwy }, lights: [nazwy], skyPresets: [id]                 (js/scene/assets.js, space.js)
+//   assets: { list(kind) → nazwy }, soundNames: [nazwy dźwięków obiektu — js/scene/sounds.js], lights: [nazwy], skyPresets: [id]                 (js/scene/assets.js, space.js)
 //   probe (nieobowiązkowe, świat): { groundAt(x, z), isWater(x, z, depth), waterLevel(x, z) }   (scena bazowa)
 //   boxOf(obj) → { min: [x, y, z], max: [x, y, z] } | null — obrys w świecie z danych obiektu (pos, rot, scale)
 //   costOf(obj) → { tris, draws } | null — koszt zbudowanego modelu
@@ -59,6 +59,9 @@ export function checkScene(scene, ctx) {
     // zasób modelu (pole „asset”, np. bryła z laboratorium bloków): nie ma go w tej przeglądarce — stoi model domyślny
     if (o.asset && p.assetKind && !A.list(p.assetKind).includes(o.asset))
       add('error', 'missing-asset', o, `No ${p.assetKind} asset "${o.asset}" (save one in ${p.lab}): the default model stands instead`, { cmd: 'set', id: o.id, asset: '' });
+    // dźwięk przy obiekcie (pole „sound”, js/scene/sounds.js): nie ma takiego gotowego ani zapisanego — w grze cisza
+    if (o.sound && ctx.soundNames && !ctx.soundNames.includes(o.sound))
+      add('error', 'missing-asset', o, `No sound or ambience "${o.sound}" (save one in the sound effects lab): it is silent in play`, { cmd: 'set', id: o.id, sound: '' });
 
     // zachowanie: wybrane, a nie pasuje do modelu; działa w innym środowisku niż scena
     if (o.behavior && !ctx.behaviorsFor(o.prefab).includes(o.behavior))

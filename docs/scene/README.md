@@ -12,6 +12,7 @@ edytora: [`../../editor/README.md`](../../editor/README.md).
 | `api.js` | API sceny (dla AI): polecenia JSON na danych sceny | nie |
 | `doctor.js` | lekarz sceny: problemy w układzie sceny i proponowane poprawki ([doctor.md](doctor.md)) | nie |
 | `assets.js` | zasoby z nazwą: ustawienia zapisane w laboratorium pod nazwą | nie |
+| `sounds.js` | dźwięk w scenie: źródła przy obiektach (pole `sound`), silniki pojazdów z zachowań, dźwięk strzałów, wybuchów i efektów ([../audio/README.md](../audio/README.md)) | nie (Web Audio) |
 | `space.js` | kosmos: kity ze Space ładowane przy pierwszej potrzebie, gotowe tła nieba | nie (ładuje kity) |
 
 Zasada: **dane są jedynym źródłem prawdy.** Okna edytora, uchwyt, API i pliki zmieniają tylko dane (w edytorze:
@@ -127,6 +128,20 @@ Polecenia (`help`, `describe`, `prefabs`, `assets`, `add`, `set`, `move`, `remov
 - `hooks`: `build(fn)` (zmiana, po której trzeba zbudować modele), `group(fn)`, `play()`, `stop()`, `playing()`,
   `act(obj, action, on)`, `actionsOf(obj)`, `events(n)` (szyna zdarzeń), `check(opts)` (lekarz sceny), `gameUI()` (UI gry w czasie gry).
 
+## Dźwięk w scenie (`sounds.js`)
+
+- Pole obiektu `sound`: gotowy dźwięk SfxKit (`fire`, `engine`, `bird`…), gotowe tło miejsca (`forest`, `park`,
+  `seaside`, `storm`, `night`, `campfire`) albo zasób `sound` / `ambience` z laboratorium efektów dźwiękowych; '' — bez.
+  W ▶ Graj gra w miejscu obiektu i idzie za nim (jednorazowe — co kilka sekund). Okno Właściwości: lista **Dźwięk**;
+  API: `set { sound }`; lekarz sceny: brakujący zapisany dźwięk.
+- Silniki z zachowań (`ENGINES`): jazda (biegi), okręt, mała jednostka, lot, przeładowarka — dźwięk silnika z obrotami
+  i obciążeniem z prędkości i dźwigni; łaziki i nurek — buczenie napędu elektrycznego; ciąg w próżni i lądowanie —
+  huk ognia z mocą; rozbicie — wybuch.
+- Efekty: strzały statków (ShipKit `onShot`, przez `world.onShot`), wybuch statku (`onDamage` „blast”), zdarzenie
+  `effect` (`EFFECT_SOUNDS`: strzał, przebijak, wybuch, odłamki, piorun); polecenie API `sound { sound, at }`.
+- Głośność z odległością: każdy rodzaj ma swoją odległość pełnej głośności (wybuch 40 m, strzał 25 m, silnik 10 m,
+  ognisko 6 m…); słuchacz — kamera.
+
 ## Zdarzenia (`js/core/events.js`)
 
 Szyna zdarzeń silnika: `createEvents({ log })` → `on(name, fn)` (zwraca wypisanie), `once`, `emit(name, data)`,
@@ -135,7 +150,7 @@ Szyna zdarzeń silnika: `createEvents({ log })` → `on(name, fn)` (zwraca wypis
 | Zdarzenie | Dane | Kto wysyła | Kto słucha |
 |---|---|---|---|
 | `action` | `{ object, name, action, on? }` | gra w edytorze (klawisze 1…9), API `act` | zachowanie obiektu (`run.act`: model ShipKit `act`), dziennik konsoli |
-| `effect` | `{ kind \| asset, from?, to?, at?, dir?, path? }` (punkty w metrach) | API `effect` | świat edytora rysuje efekt (EffectKit, [`../labs/effects.md`](../labs/effects.md)), dziennik konsoli |
+| `effect` | `{ kind \| asset, from?, to?, at?, dir?, path? }` (punkty w metrach) | API `effect` | świat edytora rysuje efekt (EffectKit, [`../labs/effects.md`](../labs/effects.md)), dźwięk efektu (`sounds.js`), dziennik konsoli |
 
 Zachowanie z akcjami podaje `actions()` → `[{ id, label, kind: 'trigger' | 'toggle', on }]` i `act(id, on)`; dziś
 „ciąg w próżni” (akcje ShipKit: ogień, skan, druk, wyłączenie, zniszczenie i własne statku).

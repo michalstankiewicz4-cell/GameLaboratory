@@ -9,7 +9,7 @@
 //   jednorazowe (loop: false) — play(); ciągłe (loop: true) — start() → { set(params), stop() }
 // Dźwięk jako dane (zasób „sound”): { sound: id, params, gain }; tło miejsca (zasób „ambience”): { layers: [{ sound,
 //   params, level, every: [od, do] s — dla jednorazowych (np. ptaki), spread — rozrzut miejsc 0…1 }] }
-// play(opis, { at, bus, gain, when }) · start(opis, { at, bus, gain }) → { set(params, poziom), volume(v), stop() }
+// play(opis, { at, ref, bus, gain, when }) · start(opis, { at, ref, bus, gain }) → { set(params, poziom), move(at), volume(v), stop() }
 // · ambience(opis | id) → { set(warstwa, poziom), stop() }
 // AMBIENCES — gotowe tła: las, park w mieście, brzeg morza, burza, noc, ognisko.
 import { mixer } from '../mixer.js';
@@ -275,19 +275,20 @@ const LOOP = {
 };
 
 /* ---------------- odtwarzanie ---------------- */
-// wyjście: szyna miksera, w miejscu (at: [x, y, z]) albo wprost; gain — głośność tego dźwięku
-function outFor(at, bus, gain) {
+// wyjście: szyna miksera, w miejscu (at: [x, y, z]; ref — odległość pełnej głośności, m) albo wprost; gain — głośność
+// tego dźwięku; g.pan — źródło w przestrzeni (do przesuwania), gdy jest
+function outFor(at, bus, gain, ref) {
   const mx = mixer(), ctx = mx.ctx, g = gainN(ctx, gain);
-  if (at) g.connect(mx.at(at, bus)); else g.connect(mx.bus(bus));
+  if (at) { g.pan = mx.at(at, bus, ref ? { ref } : undefined); g.connect(g.pan); } else g.connect(mx.bus(bus));
   return g;
 }
 /** Dźwięk jednorazowy: opis { sound, params, gain } albo id. → { end } (czas końca w sekundach kontekstu). */
-export function play(d0, { at = null, bus = 'sfx', gain = 1, when = 0 } = {}) {
+export function play(d0, { at = null, bus = 'sfx', gain = 1, when = 0, ref = 0 } = {}) {
   const d = normalizeSound(typeof d0 === 'string' ? { sound: d0 } : d0), def = SOUNDS[d.sound], mx = mixer(), ctx = mx.ctx;
   mx.unlock();
-  if (def.loop) { const h = start(d, { at, bus: bus === 'sfx' ? 'ambience' : bus, gain }); setTimeout(() => h.stop(), 4000); return { end: ctx.currentTime + 4, handle: h }; }
-  const out = outFor(at, bus, d.gain * gain), t = ctx.currentTime + 0.02 + when, len = ONE[d.sound](ctx, out, t, d.params);
-  setTimeout(() => { try { out.disconnect(); } catch { /* już */ } }, (len + when + 1) * 1000);
+  if (def.loop) { const h = start(d, { at, ref, bus: bus === 'sfx' ? 'ambience' : bus, gain }); setTimeout(() => h.stop(), 4000); return { end: ctx.currentTime + 4, handle: h }; }
+  const out = outFor(at, bus, d.gain * gain, ref), t = ctx.currentTime + 0.02 + when, len = ONE[d.sound](ctx, out, t, d.params);
+  setTimeout(() => { try { out.disconnect(); if (out.pan) out.pan.disconnect(); } catch { /* już */ } }, (len + when + 1) * 1000);
   return { end: t + len };
 }
 const live = new Set();
@@ -296,11 +297,11 @@ function ensureTicker() {
   if (ticker) return;
   ticker = setInterval(() => { const ctx = mixer().ctx, t = ctx.currentTime; for (const h of live) h.tick(t); if (!live.size) { clearInterval(ticker); ticker = 0; } }, 100);
 }
-/** Dźwięk ciągły (albo tło jednorazowych co jakiś czas): → { set(params), stop(fade), playing }. */
-export function start(d0, { at = null, bus = 'ambience', gain = 1, every = null, spread = 0 } = {}) {
+/** Dźwięk ciągły (albo tło jednorazowych co jakiś czas): → { set(params), move(at), stop(fade), playing }. */
+export function start(d0, { at = null, bus = 'ambience', gain = 1, every = null, spread = 0, ref = 0 } = {}) {
   const d = normalizeSound(typeof d0 === 'string' ? { sound: d0 } : d0), def = SOUNDS[d.sound], mx = mixer(), ctx = mx.ctx;
   mx.unlock();
-  const out = outFor(at, bus, 0), level = () => d.gain * gain;
+  const out = outFor(at, bus, 0, ref), level = () => d.gain * gain;
   out.gain.setTargetAtTime(level(), ctx.currentTime, 0.3);
   let inner = null, next = 0;
   if (def.loop) inner = LOOP[d.sound](ctx, out, d.params);
@@ -316,11 +317,12 @@ export function start(d0, { at = null, bus = 'ambience', gain = 1, every = null,
       }
     },
     set(params = {}, g = null) { Object.assign(d.params, params); if (g != null) gain = g; if (inner) inner.set(d.params); out.gain.setTargetAtTime(level(), ctx.currentTime, 0.2); },
+    move(p) { if (out.pan) mx.move(out.pan, p); },   // źródło w przestrzeni (at): nowe położenie
     volume(v) { d.gain = Math.max(0, Math.min(2, +v || 0)); out.gain.setTargetAtTime(level(), ctx.currentTime, 0.2); },
     stop(fade = 0.6) {
       if (!h.playing) return; h.playing = false; live.delete(h);
       const t = ctx.currentTime; out.gain.cancelScheduledValues(t); out.gain.setTargetAtTime(0, t, fade / 3);
-      setTimeout(() => { if (inner) for (const n of inner.nodes) { try { n.stop(); } catch { /* już */ } } try { out.disconnect(); } catch { /* już */ } }, fade * 1000 + 200);
+      setTimeout(() => { if (inner) for (const n of inner.nodes) { try { n.stop(); } catch { /* już */ } } try { out.disconnect(); if (out.pan) out.pan.disconnect(); } catch { /* już */ } }, fade * 1000 + 200);
     },
   };
   if (!inner) next = ctx.currentTime + Math.random() * ((every || [3, 9])[0]);
@@ -347,10 +349,10 @@ export function normalizeAmbience(a = {}) {
   });
   return { layers };
 }
-/** Tło miejsca: warstwy grają razem na szynie otoczenia. → { layers: [uchwyt], set(i, poziom), stop() } */
-export function ambience(a0, { at = null } = {}) {
+/** Tło miejsca: warstwy grają razem na szynie otoczenia. → { layers: [uchwyt], set(i, poziom), move(at), stop() } */
+export function ambience(a0, { at = null, ref = 0 } = {}) {
   const a = normalizeAmbience(typeof a0 === 'string' ? AMBIENCES[a0] : a0);
-  const hs = a.layers.map((l) => start({ sound: l.sound, params: l.params }, { at, bus: 'ambience', gain: l.level, every: l.every, spread: l.spread }));
-  return { def: a, layers: hs, set(i, level) { if (hs[i]) hs[i].set({}, level); a.layers[i].level = level; }, stop(fade = 1.2) { hs.forEach((h) => h.stop(fade)); } };
+  const hs = a.layers.map((l) => start({ sound: l.sound, params: l.params }, { at, ref, bus: 'ambience', gain: l.level, every: l.every, spread: l.spread }));
+  return { def: a, layers: hs, set(i, level) { if (hs[i]) hs[i].set({}, level); a.layers[i].level = level; }, move(p) { hs.forEach((h) => h.move(p)); }, stop(fade = 1.2) { hs.forEach((h) => h.stop(fade)); } };
 }
 export const stopAll = (fade = 0.5) => { for (const h of [...live]) h.stop(fade); };

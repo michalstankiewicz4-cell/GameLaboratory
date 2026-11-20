@@ -8,6 +8,7 @@ import { createInput } from './input.js';
 import { createPlayUI } from './gameui-play.js';
 import { createSettings } from '../../../js/core/settings.js';
 import { mixer } from '../../../js/audio/mixer.js';
+import { createSceneSounds } from '../../../js/scene/sounds.js';
 import { applyGraphics, refresh } from '../../../js/render/game-graphics.js';
 
 const { t, lang } = window.EditorI18n;
@@ -29,6 +30,13 @@ export function createPlay(store, world, controls, actions, events) {
     controls.orbit.rotateSpeed = orbit0.rot * (on ? d.mouse.rotSens : 1); controls.orbit.zoomSpeed = orbit0.zoom * (on ? d.mouse.zoomSens : 1);
   }
   settings.onChange(() => { if (runs.length) gameGraphics(true); });
+  // dźwięk w scenie (js/scene/sounds.js): źródła przy obiektach (pole „sound”), silniki zachowań, strzały i efekty;
+  // położenie obiektu — model w świecie (zachowania złomowiska ruszają model, nie grupę obiektu)
+  const tmpV = world.camera.position.clone();
+  const positionOf = (id) => { const b = world.built.get(id); if (!b) return null; const k = b.kit, m = k && k.model && k.model.isObject3D && k.model.parent ? k.model : b.root; return m.getWorldPosition(tmpV).toArray(); };
+  const sounds = createSceneSounds({ positionOf });
+  world.onShot = (o, s) => sounds.shot(s, o.shot || 'shot');   // strzał statku (ShipKit onShot) — także poza grą
+  world.onDamage = (o, e) => sounds.damage(e);   // wybuch statku (ShipKit onDamage { type: 'blast' })
   let lightT = 0, fpsN = 0, fpsT = 0;
   playUI.onQuit = () => stop();
   // akcje modelu (statki kosmiczne: ogień, skan, druk, wyłączenie, zniszczenie) — zdarzenie „action” na szynie; słucha
@@ -79,11 +87,13 @@ export function createPlay(store, world, controls, actions, events) {
     const acts = me.run.actions ? me.run.actions().map((a, i) => `${i + 1}: ${a.label.toLowerCase()}`).join(' · ') : '';
     actions.status(t('play.on', { name: me.obj.name, keys: (lang === 'pl' ? BEHAVIORS[me.id].keysPl : BEHAVIORS[me.id].keys) + (acts ? ' · ' + acts : '') }));
     playUI.start(me.obj.name);
+    sounds.start(store.scene.objects, runs);
     if (window.LabLog) window.LabLog.add('info', 'Play: ' + runs.length + ' object(s), controlling ' + me.obj.name);
     changed();
   }
   function stop() {
     if (!runs.length) return;
+    sounds.stop();
     runs.forEach((r) => { if (r.run.reset) r.run.reset(); r.b.driven = false; r.b.lodFree = false; });
     // przedmioty powstałe w grze (sztabki, puszki zgniecione) znikają ze świata
     if (items) for (const it of [...items.list]) if (it.spawned) items.remove(it);
@@ -99,13 +109,14 @@ export function createPlay(store, world, controls, actions, events) {
   function frame(dt, time) {
     if (!runs.length) return;
     const c = input.read(dt);
-    runs.forEach((r) => r.run.step(dt, r === me ? c : {}, time));
+    runs.forEach((r) => { r.input = r === me ? c : {}; r.run.step(dt, r.input, time); });
     if (items) { items.step(dt); items.sync(); JUNK_KIT.glow(items); if (machines.length) LIQUID_TIME.value += dt; }
     const p = me.b.root.position, d = p.clone().sub(last); last.copy(p);
     controls.orbit.target.add(d); world.camera.position.add(d);
     if ((hudT -= dt) <= 0) { hudT = 0.2; actions.status(hudText(me.run.hud())); }
     playUI.frame(dt, me, runs);
     if ((lightT += dt) > 0.5) { lightT = 0; refresh(world.scene, settings.data.gfx, world.renderer.capabilities.getMaxAnisotropy()); }   // to, co pojawiło się w grze (ogień, lampy, wersje dalekie modeli)
+    sounds.frame();
     if (mixer().started) { const c2 = world.camera, f = c2.getWorldDirection(c2.position.clone()), u = c2.up; mixer().listen(c2.position.toArray(), f.toArray(), u.toArray()); }   // słuchacz — kamera
     fpsN++; if ((fpsT += dt) >= 1) { if (playUI.ui) playUI.ui.fps(fpsN / fpsT); fpsN = 0; fpsT = 0; }
   }
@@ -123,7 +134,7 @@ export function createPlay(store, world, controls, actions, events) {
   }
   const subs = new Set(), changed = () => subs.forEach((f) => f(!!runs.length));
   return {
-    start, stop, frame, act,
+    start, stop, frame, act, sounds,
     actionsOf: (id) => { const r = runs.find((x) => x.obj.id === id); return r && r.run.actions ? r.run.actions() : []; },
     toggle: () => (runs.length ? stop() : start()),
     get playing() { return runs.length > 0; },

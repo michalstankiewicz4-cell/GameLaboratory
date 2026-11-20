@@ -13,6 +13,7 @@ import { createApiConsole } from './ui/api-console.js';
 import { createSceneApi } from '../../js/scene/api.js';
 import { behaviorsFor, behaviorOf, bodyRank, BEHAVIORS } from '../../js/scene/behaviors.js';
 import { checkScene } from '../../js/scene/doctor.js';
+import { allSoundNames } from '../../js/scene/sounds.js';
 import { createDoctorPanel } from './ui/doctor-panel.js';
 import { onAssetsChange, listAssets, ASSET_KINDS } from '../../js/scene/assets.js';
 import { emptyScene, makeObject } from '../../js/scene/scene-data.js';
@@ -78,7 +79,7 @@ const actions = {
 const events = createEvents({ log: (name, d) => window.LabLog && window.LabLog.add('info', `Event ${name}: ${d.name || d.object || ''}${d.action ? ' — ' + d.action + (d.on != null ? (d.on ? ' on' : ' off') : '') : ''}`) });
 const placer = createPlacer(world, store, actions, { t });
 actions.play = createPlay(store, world, controls, actions, events);
-events.on('effect', (e) => { try { world.effect(e); } catch (err) { if (window.LabLog) window.LabLog.add('warn', 'Effect: ' + err.message); } });   // efekty z laboratorium efektów
+events.on('effect', (e) => { try { world.effect(e); } catch (err) { if (window.LabLog) window.LabLog.add('warn', 'Effect: ' + err.message); } actions.play.sounds.effect(e); });   // efekty z laboratorium efektów i ich dźwięk
 const panels = createPanels(store, actions);
 // modele, które czekały na kity ze Space, są już zbudowane: uchwyt, hierarchia i okna od nowa
 world.afterAsync = () => { controls.attach(); panels.renderTree(); panels.renderProps(); if (window.sceneEditor) window.sceneEditor.doctor.check(); };
@@ -88,10 +89,10 @@ const api = createSceneApi({
   hooks: { build, group: (fn) => store.group(fn), play: () => actions.play.start(), stop: () => actions.play.stop(), playing: () => actions.play.playing,
     check: ({ budget } = {}) => checkScene(store.scene, {   // lekarz sceny: dane sceny + pomiary świata (obrysy, koszt, grunt)
       prefab, behaviorsFor, behaviorOf, behaviorEnv: (id) => (BEHAVIORS[id] || {}).env, bodyRank,
-      assets: { list: listAssets }, lights: Object.keys(LIGHTS), skyPresets: skyPresets().map((p) => p.id),
+      assets: { list: listAssets }, soundNames: allSoundNames(), lights: Object.keys(LIGHTS), skyPresets: skyPresets().map((p) => p.id),
       probe: world.stage, boxOf: world.boxOf, costOf: world.costOf, budget }),
     act: (o, action, on) => actions.play.act(o.id, action, on),
-    effectKinds: Object.keys(FX_KINDS), effect: (e) => events.emit('effect', e), objectPos: (o) => { const r = world.objectRoot(o.id); return r ? r.position.toArray() : o.pos; }, gameUI: () => actions.play.ui, actionsOf: (o) => actions.play.actionsOf(o.id), events: (n) => events.history(n) },
+    effectKinds: Object.keys(FX_KINDS), effect: (e) => events.emit('effect', e), objectPos: (o) => { const r = world.objectRoot(o.id); return r ? r.position.toArray() : o.pos; }, sound: (n, at) => actions.play.sounds.play(n, at), soundNames: () => allSoundNames(), gameUI: () => actions.play.ui, actionsOf: (o) => actions.play.actionsOf(o.id), events: (n) => events.history(n) },
 });
 createApiConsole(api);
 const doctor = createDoctorPanel(store, api, actions);
