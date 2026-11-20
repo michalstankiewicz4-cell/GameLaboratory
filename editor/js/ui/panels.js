@@ -31,6 +31,7 @@ const ICONS = {
   humans: 'M12 7a2.5 2.5 0 1 0 0-5a2.5 2.5 0 1 0 0 5M8 21l1-8h6l1 8M6 12l3-3h6l3 3',
   blocks: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
   junkyard: 'M12 20a8 8 0 1 0 0-16a8 8 0 1 0 0 16M12 15a3 3 0 1 0 0-6a3 3 0 1 0 0 6M12 4v2M12 18v2M4 12h2M18 12h2',
+  city: 'M3 21h18M5 21V8h6v13M11 21V3h8v18M7 11h2M7 15h2M14 7h2M14 11h2M14 15h2',
   creatures: 'M4 10c2-3 5-3 8-2h5l3-2v4l-3 1c-1 2-3 3-6 3H8zM7 13l-1 7M10 14l1 6M15 13l1 7M18 11l1 4',
 };
 function familyIcon(f) {

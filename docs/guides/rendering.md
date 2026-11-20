@@ -110,6 +110,11 @@ Jedno miejsce, z którego czytają modele, materiały, efekty, woda i scena — 
 | `view` (`gfx.view`, 0,5…1) | daleka płaszczyzna kamery × `view`, zasięg cieni × `view` | `applyGraphics` (kamera), świat edytora (`fitShadow`) |
 | `smallShadows` (`gfx.smallShadows`) | siatki o promieniu kuli opisanej do 0,25 m nie rzucają cienia | `refresh()` |
 
+Budynki miasta (CityKit, 0.82.0) mają wersję daleką innego rodzaju: zamiast mniej odcinków — płaskie ściany
+z wypaloną fasadą i mapowaniem paralaksy (parallax occlusion mapping, `js/models/city/facade-material.js`); kafelki
+wypalane w rozdzielczości z `textureRes` (jakość tekstur), a okna świecą nocą z `NIGHT` (świat edytora ustawia je
+z pory dnia). Opis: [`../models/city.md`](../models/city.md).
+
 Reszta ustawień grafiki (rozdzielczość obrazu, wygładzanie, cienie i mapa cieni, światła dynamiczne, poświata,
 jasność, nasycenie) — renderer i potok kamery (`applyGraphics`, `lookParams`). `refresh(scene, gfx)` poprawia to, co
 pojawiło się później (ogień, lampy, wersje dalekie modeli) — ▶ Graj woła je co 0,5 s.

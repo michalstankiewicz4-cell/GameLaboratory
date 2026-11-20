@@ -31,6 +31,9 @@
 //         efektu), values — liczby efektu EffectKit (js/render/effects/effects.js) }; w scenie: polecenie API „effect”
 //   tree — drzewko ulepszeń z laboratorium drzewek: definicja 'gamelab-tree' (gałęzie, węzły, punkty, widok, tło, notatki;
 //         js/gameui/tree/tree.js)
+//   building — budynek z laboratorium miasta: opis CityKit (rodzaj, ziarno, obrys, front, kondygnacje, mur, przęsła,
+//         okna, parter, gzymsy, balkony, dach, świecące okna; js/models/city/types.js); w scenie pole „asset” obiektu
+//         z prefabrykatem miasta (js/models/city/citykit.js)
 //   image — obraz z laboratorium sztuki: opis ArtKit (temat, technika, ziarno…; js/render/art/artkit.js), malowany od nowa
 //         tam, gdzie potrzebny (ten sam opis i ziarno — ten sam obraz); temat „image” (wgrany obraz) się nie zapisuje
 export const KEY = 'gameLab.assets.v1';
@@ -49,6 +52,7 @@ export const ASSET_KINDS = {
   effect: { label: 'Effect', labelPl: 'Efekt', lab: 'labs/effects.html', keys: ['kind', 'scale', 'values'] },
   tree: { label: 'Tech tree', labelPl: 'Drzewko', lab: 'labs/trees.html', keys: ['format', 'version', 'name', 'view', 'background', 'points', 'branches', 'nodes', 'notes'] },
   image: { label: 'Image', labelPl: 'Obraz', lab: 'labs/art.html', keys: ['size', 'aspect', 'seed', 'subject', 'palette', 'technique', 'stroke', 'detail', 'surface', 'relief', 'light', 'varnish', 'cracks', 'age', 'view', 'convert', 'format', 'text'] },
+  building: { label: 'Building', labelPl: 'Budynek', lab: 'labs/city.html', keys: ['label', 'type', 'seed', 'footprint', 'front', 'floors', 'floorH', 'groundH', 'wall', 'bay', 'module', 'window', 'ground', 'bands', 'balcony', 'roof', 'lit'] },
   blocks: { label: 'Block body', labelPl: 'Bryła z bloków', lab: 'labs/blocks.html', keys: ['shape', 'radius', 'voxel', 'seed', 'text', 'layers', 'mats', 'matRefs'] },
 };
 

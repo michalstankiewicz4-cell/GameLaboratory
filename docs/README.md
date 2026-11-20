@@ -47,6 +47,7 @@ W kolejności kategorii z menu Narzędzia i strony startowej (`ui/data/catalog.j
 | | Wygląd | `labs/look.html` | [labs/look.md](labs/look.md) |
 | | Filtry | `labs/filters.html` | [labs/filters.md](labs/filters.md) |
 | | Budowle | `labs/structures.html` | [labs/structures.md](labs/structures.md), [labs/structures/coastal.md](labs/structures/coastal.md), [labs/structures/super300.md](labs/structures/super300.md) |
+| | Miasto (CityKit: budynki, wypalone fasady z paralaksą) | `labs/city.html`, `js/models/city/` | [labs/city.md](labs/city.md), [models/city.md](models/city.md) |
 | | Rośliny | `labs/plants.html` | [labs/plants.md](labs/plants.md) |
 | | Przedmioty (złomowisko) | `labs/items.html`, `js/models/junkyard/` | [labs/items.md](labs/items.md), [models/junkyard.md](models/junkyard.md) |
 | Życie i postacie | Życie, edytor stworów | `labs/life.html`, `labs/creator.html` | [labs/life.md](labs/life.md) |

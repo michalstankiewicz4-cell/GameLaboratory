@@ -3,6 +3,24 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.82.0 · laboratorium miasta 1.0.0 · edytor sceny 0.39.0 · doktor modeli 1.3.1 — 2026-11-20 (kreator budynków)
+
+### Dodane
+- **Laboratorium miasta** (`labs/city.html`, kit **CityKit** `js/models/city/`): kreator budynków — dom, kamienica, blok,
+  wieżowiec, biurowiec, market — na dowolnym obrysie (prostokąt, L, U, narożnik ze ściętym rogiem albo narysowany
+  na gruncie). Okna (pojedyncze, pasmowe, ściana kurtynowa; słupki, ślemię, wnęka), wejścia, witryny, przeszklenia,
+  balkony, cokół, gzymsy i dachy (płaski z attyką, dwuspadowy, kopertowy, mansardowy) rozmieszczane proceduralnie
+  z opisu (JSON); mur z materiałów MatKit. Zapis pod nazwą — zasób **building**; `CityApi` dla AI.
+- **Wypalona fasada z paralaksą** — wersja daleka budynku: fasada wypalona na procesorze w tekstury (barwa, normalne,
+  wysokość, AO / szorstkość / metaliczność, numer okna) z tego samego układu co siatka, ściany jako płaskie prostokąty
+  z mapowaniem paralaksy (parallax occlusion mapping) — okna we wnękach, wystające parapety, gzymsy i balkony
+  (kamienica ok. 7 000 → 170 trójkątów, blok 31 000 → 76, wieżowiec 78 000 → 188). Przełączanie z odległości.
+- Okna świecą nocą — te same blisko i daleko (liczba z ziarna liczona tak samo w JS i w shaderze); w edytorze sceny
+  z pory dnia światła sceny.
+- Prefabrykaty `city/<rodzaj>` w edytorze sceny (rodzina „Budynki miasta”, wersja daleka, pole `asset` — budynek
+  z laboratorium); doktor modeli bada wszystkie rodzaje (wersja bliska).
+- Schemat silnika: budynki miasta w modelach, zasób „budynek”, wypalone fasady w renderze.
+
 ## Program 0.81.0 · UI gry 1.4.0 · edytor sceny 0.38.0 — 2026-11-20 (poziom jakości silnika)
 
 ### Dodane

@@ -101,11 +101,11 @@ Zasada: **dane są jedynym źródłem prawdy**. Okna, uchwyt i pliki zmieniają 
   z laboratorium filtrów (zasób `look`, `gameLab.assets.v1`) albo `""`.
 - `pos` w metrach (Y w górę), `rot` w stopniach (kolejność YXZ: kurs, pochylenie, przechył), `scale` — mnożnik.
 - `prefab`: id z `js/scene/prefabs.js` (`sea/…`, `road/…`, `tram/…`, `train/…`, `air/…`, `structures/…`, `weapons/…`,
-  `space/…`, `marine/…`, `rovers/…`, `plants/…`, `caves/…`, `base/…`, `bodies/…`, `humans/…`, `creatures/…`, `blocks/…`).
+  `space/…`, `marine/…`, `rovers/…`, `plants/…`, `caves/…`, `base/…`, `bodies/…`, `humans/…`, `creatures/…`, `blocks/…`, `junkyard/…`, `city/…`).
 - `behavior` (nieobowiązkowe): id z `js/scene/behaviors.js` (`ship`, `flight`); bez pola — domyślne dla modelu, `""` — stoi w miejscu.
 - `shot` (nieobowiązkowe, statki, które strzelają): efekt strzału z laboratorium efektów (id albo zapisany efekt);
   w oknie Obiekt „Efekt strzału”.
-- `asset` (nieobowiązkowe): zasób modelu z laboratorium (dziś bryła z bloków — rodzaj `blocks`); w oknie Obiekt lista
+- `asset` (nieobowiązkowe): zasób modelu z laboratorium (bryła z bloków — rodzaj `blocks`, budynek z laboratorium miasta — `building`, roślina, jaskinia); w oknie Obiekt lista
   zapisanych pod nazwą i „Model domyślny”.
 - Zmiana formatu podnosi `version` w `scene-data.js`, a `normalize` przenosi starsze sceny.
 

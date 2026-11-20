@@ -319,6 +319,23 @@ window.GameLabCatalog =
       }
     },
     {
+      "file": "labs/city.html",
+      "cat": "world",
+      "name": "City lab",
+      "namePl": "Laboratorium miasta",
+      "doc": "docs/labs/city.md",
+      "desc": "A building creator: houses, tenements, blocks of flats, skyscrapers, offices and supermarkets on any outline — windows, entrances, shop windows, balconies, cornices and roofs placed procedurally. Far away the facade is baked into textures and drawn with parallax: flat walls with recessed windows, the same windows lit at night.",
+      "descPl": "Kreator budynków: domy, kamienice, bloki, wieżowce, biurowce i markety na dowolnym obrysie — okna, wejścia, witryny, balkony, gzymsy i dachy rozmieszczane proceduralnie. Z daleka fasada wypalona w tekstury i rysowana z paralaksą: płaskie ściany z oknami we wnękach, nocą świecą te same okna.",
+      "kind": "lab",
+      "kit": "CityKit",
+      "phrases": ["ląd", "miasto", "budynki", "fasady", "paralaksa", "LOD"],
+      "saved": ["gameLab.city."],
+      "art": {
+        "bg": ["#1d2430", "#0c1016"],
+        "svg": "<path d=\"M0 86 H200\" stroke=\"#4a5262\" stroke-width=\"2\"/><rect x=\"22\" y=\"40\" width=\"38\" height=\"46\" fill=\"#c9b48c\"/><path d=\"M18 40 L41 24 L64 40 Z\" fill=\"#7a3a2a\"/><rect x=\"70\" y=\"14\" width=\"34\" height=\"72\" fill=\"#5d6a78\"/><rect x=\"112\" y=\"30\" width=\"64\" height=\"56\" fill=\"#b9b3a6\"/><g fill=\"#2b3f4f\"><rect x=\"28\" y=\"48\" width=\"8\" height=\"10\"/><rect x=\"46\" y=\"48\" width=\"8\" height=\"10\"/><rect x=\"28\" y=\"66\" width=\"8\" height=\"10\"/><rect x=\"118\" y=\"38\" width=\"10\" height=\"8\"/><rect x=\"136\" y=\"38\" width=\"10\" height=\"8\"/><rect x=\"154\" y=\"38\" width=\"10\" height=\"8\"/><rect x=\"118\" y=\"54\" width=\"10\" height=\"8\"/><rect x=\"154\" y=\"54\" width=\"10\" height=\"8\"/></g><g fill=\"#ffc477\"><rect x=\"46\" y=\"66\" width=\"8\" height=\"10\"/><rect x=\"136\" y=\"54\" width=\"10\" height=\"8\"/><rect x=\"76\" y=\"22\" width=\"22\" height=\"4\"/><rect x=\"76\" y=\"46\" width=\"22\" height=\"4\"/></g><g fill=\"#8fb2c9\" opacity=\".55\"><rect x=\"76\" y=\"30\" width=\"22\" height=\"4\"/><rect x=\"76\" y=\"38\" width=\"22\" height=\"4\"/><rect x=\"76\" y=\"54\" width=\"22\" height=\"4\"/><rect x=\"76\" y=\"62\" width=\"22\" height=\"4\"/></g>"
+      }
+    },
+    {
       "file": "labs/plants.html",
       "cat": "world",
       "name": "Plants lab",
@@ -764,6 +781,9 @@ window.GameLabCatalog =
     "animacja": "animation",
     "baza": "base",
     "budowle": "structures",
+    "paralaksa": "parallax",
+    "fasady": "facades",
+    "miasto": "city",
     "budynki": "buildings",
     "błędy": "errors",
     "chód": "gait",

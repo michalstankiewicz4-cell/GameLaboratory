@@ -17,6 +17,10 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
     z historią) z jego dwoma drzewkami (poziomy ulepszeń i rozgałęzienia w formacie); drzewko jako okno w UI gry (blok
     `tree`, okno Research w przykładzie Space command) i w API (`GameUIApi.tree`, `buy`); tło drzewka z obrazu
     z laboratorium sztuki (zasób `image`).
+- [ ] **Kreator budynków** (właściciel, 2026-11-20) — dla CityExplorer i innych gier:
+  - [x] **Etap 1** (0.82.0): laboratorium miasta (`labs/city.html`, CityKit `js/models/city/`, `docs/labs/city.md`) —
+    budynki na dowolnym obrysie, wypalona fasada z paralaksą z daleka, okna świecące nocą, prefabrykaty w edytorze.
+  - [ ] **Etap 2**: CityExplorer — budynki z obrysów OSM z CityKit (kopia do folderu `lab/` gry jej skryptem sync-lab).
 - [ ] Punkt 9 — materiał z PatientZero (z historią): środowisko „organizm”, laboratorium tkanek, laboratorium patogenów.
   Na potem (właściciel, 2026-11-20).
 

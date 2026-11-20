@@ -14,6 +14,7 @@ import { spaceReady, loadSpace, SKY_PRESET, SKY_DAY } from '../../../js/scene/sp
 import { createEffectLibrary, STEP as FX_STEP } from '../../../js/render/effects/effects.js';
 import { DamageFx, shipDamage } from '../../../js/render/effects/damage.js';
 import { buildCave } from '../../../js/models/caves/cavekit.js';
+import { setNight } from '../../../js/models/city/citykit.js';
 
 export { LIGHTS };
 const D2R = Math.PI / 180;
@@ -167,7 +168,8 @@ export function createWorld(container, store, onWarn) {
     // światło: gotowe (LIGHTS) albo zasób „weather” z laboratorium wyglądu; brak zasobu — popołudnie i ostrzeżenie
     let light = LIGHTS[env.light] ? env.light : env.light ? getAsset('weather', env.light) : null;
     if (!light) { if (env.light && onWarn) onWarn('light:' + env.light); light = 'afternoon'; }
-    stage.setLight(light);
+    const Lt = stage.setLight(light);
+    setNight(Math.min(1, Math.max(0, (1 - Lt.day) * 1.25)));   // okna budynków (CityKit) świecą po zmroku
     if (env.surface === 'underground') { stage.sun.intensity = 0; stage.hemi.intensity = env.caveGlow === false ? 0 : 0.35;   // poświata (env.caveGlow) albo ciemność
       stage.hemi.color.setRGB(0.75, 0.78, 0.85); stage.hemi.groundColor.setRGB(0.12, 0.1, 0.09); }
     // morze: zasób z laboratorium wody (po nazwie) albo domyślne; brak zasobu w tej przeglądarce — domyślne i ostrzeżenie

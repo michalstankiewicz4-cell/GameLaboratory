@@ -20,6 +20,7 @@ import { SPECIES, SPECIES_IDS, growPlant, plantMaterials, windUniforms } from '.
 import { buildCave } from '../models/caves/cavekit.js';
 import { buildBody as buildBlocks, SHAPES as BLOCK_SHAPES } from '../models/blocks/blockkit.js';
 import { MODELS as JUNK } from '../models/junkyard/registry.js';
+import { TYPES as CITY_TYPES, TYPE_IDS as CITY_IDS, buildBuilding } from '../models/city/citykit.js';
 
 // family: grupa na liście; surface: gdzie stoi ('sea' — na wodzie, 'land' — na gruncie, 'air' — w powietrzu)
 export const FAMILIES = {
@@ -40,6 +41,7 @@ export const FAMILIES = {
   creatures: { label: 'Creatures', labelPl: 'Stwory' },
   blocks: { label: 'Blocks', labelPl: 'Bloki' },
   junkyard: { label: 'Junkyard', labelPl: 'Złomowisko' },
+  city: { label: 'City buildings', labelPl: 'Budynki miasta' },
 };
 
 const P = [];
@@ -161,6 +163,14 @@ JUNK.forEach((m, i) => add('junkyard/' + m.id, m.name, 'junkyard', 'land', JUNK_
   root.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
   return { root, kit: { info: JUNK_MODS[i].info, mod: JUNK_MODS[i], model, id: m.id, group: m.group }, dispose: () => model.traverse((o) => { if (o.isMesh) o.geometry.dispose(); }) };
 }, LOD));
+
+// budynki miasta (CityKit, laboratorium miasta): rodzaj z gotowym opisem albo budynek zapisany w laboratorium (zasób
+// „building”, pole „asset”); z bliska siatka, z daleka (detail 0,5) płaskie ściany z wypaloną fasadą i paralaksą;
+// obrys wyśrodkowany w punkcie obiektu, front na −z, podstawa w y = 0
+CITY_IDS.forEach((id) => add('city/' + id, CITY_TYPES[id].label, 'city', 'land', 'labs/city.html?type=' + id, (o) => {
+  const b = buildBuilding((o && o.asset) || { type: id }, { detail: det(o) });
+  return { root: b.group, kit: b, dispose: () => b.dispose() };
+}, { assetKind: 'building', ...LOD }));
 
 export const PREFABS = P;
 export const prefab = (id) => P.find((p) => p.id === id) || null;

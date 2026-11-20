@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>City Lab — procedural buildings, baked facades with parallax | GameLaboratory</title>
+<meta name="description" content="GameLaboratory city lab: a building creator for games — houses, tenements, blocks of flats, skyscrapers, office buildings and supermarkets on any outline (rectangle, L, U, street corner or drawn by hand), with windows, entrances, shop windows, balconies, cornices and roofs placed procedurally. Far away the facade is baked into textures (colour, normals, depth) and drawn on flat walls with parallax occlusion mapping, so the windows still look recessed; at night the same windows light up.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/city.html">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../ui/style/sea.css">
+<link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="../ui/pages/city.css">
+</head>
+<!-- Laboratorium miasta (js/labs/city/): CityKit (js/models/city/) w scenie bazowej (js/labs/shared/stage.js). -->
+<body class="lab viewFits">
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/shell/menubar.js"></script>
+<div id="view"></div>
+<div class="bar">
+  <select id="type" aria-label="Building" title="A ready building or one saved under a name"></select>
+  <select id="shape" aria-label="Outline" title="The building's outline"></select>
+  <button type="button" id="draw" title="Click points on the ground, Enter or the first point to close, Esc to cancel">Draw outline</button>
+  <select id="mode" aria-label="Version" title="Near: the mesh; far: flat walls with baked textures and parallax; by distance: switches like a game">
+    <option value="auto">By distance</option><option value="near">Near (mesh)</option><option value="far">Far (baked)</option>
+  </select>
+  <span class="sp"></span>
+  <span class="dimtxt" id="status"></span>
+</div>
+<div class="foot"><span id="fps" data-auto></span><span class="sp"></span><span>GameLaboratory</span></div>
+<script src="../ui/shell/bars.js"></script>
+<aside class="panel" data-std="info">
+  <h2 class="stdName" id="bName">City</h2>
+  <p class="stdText">A building creator: houses, tenements, blocks, skyscrapers, offices and supermarkets on any outline, with windows, entrances, shop windows, balconies, cornices and roofs placed from a short description. Near — a real mesh; far — flat walls with the facade baked into textures and parallax, so the windows still look recessed for a fraction of the cost. Drag to orbit, right-drag to pan, wheel to zoom.</p>
+  <table class="specs" id="specs"></table>
+  <p class="note">For AI: CityApi in the console (API tab).</p>
+</aside>
+<aside class="panel" data-window="building" data-title="Building" data-title-pl="Budynek">
+  <div class="row"><span>Width</span><input type="range" id="fw" min="4" max="120" step="0.5"><output id="fwV"></output></div>
+  <div class="row"><span>Depth</span><input type="range" id="fd" min="4" max="120" step="0.5"><output id="fdV"></output></div>
+  <div class="row" id="armRow"><span>Wing width</span><input type="range" id="farm" min="3" max="60" step="0.5"><output id="farmV"></output></div>
+  <div class="row" id="cutRow"><span>Cut corner</span><input type="range" id="fcut" min="1" max="20" step="0.5"><output id="fcutV"></output></div>
+  <div class="row"><span>Storeys</span><input type="range" id="floors" min="1" max="60" step="1"><output id="floorsV"></output></div>
+  <div class="row"><span>Storey height</span><input type="range" id="floorH" min="2.4" max="6" step="0.05"><output id="floorHV"></output></div>
+  <div class="row"><span>Ground floor</span><input type="range" id="groundH" min="2.4" max="9" step="0.05"><output id="groundHV"></output></div>
+  <div class="row"><span>Front wall</span><input type="range" id="front" min="0" max="8" step="1"><output id="frontV"></output></div>
+  <div class="row"><span>Seed</span><input type="number" id="seed" min="1" max="99999" step="1"><output></output></div>
+  <p class="note">The front wall gets the entrances and the shop windows (it faces the camera's Front view).</p>
+  <h3>Save</h3>
+  <div class="row"><span>Name</span><input type="text" id="name" maxlength="40"><output></output></div>
+  <div class="btns"><button type="button" id="save">Save under this name</button><button type="button" id="del">Delete saved</button></div>
+  <p class="note">A saved building is a named asset — the scene editor places it (City family, Asset field).</p>
+</aside>
+<aside class="panel" data-window="facade" data-title="Facade" data-title-pl="Fasada">
+  <div class="row"><span>Wall</span><select id="wallMat"></select><output></output></div>
+  <div class="row"><span>Wall colour</span><input type="color" id="wallColor"><output id="wallColorV"></output></div>
+  <div class="row"><span>Bay width</span><input type="range" id="bay" min="1" max="8" step="0.1"><output id="bayV"></output></div>
+  <div class="row"><span>Storey pattern</span><select id="module"></select><output></output></div>
+  <h3>Windows</h3>
+  <div class="row"><span>Kind</span><select id="wStyle"></select><output></output></div>
+  <div class="row"><span>Width</span><input type="range" id="wW" min="0.4" max="4" step="0.05"><output id="wWV"></output></div>
+  <div class="row"><span>Height</span><input type="range" id="wH" min="0.4" max="5" step="0.05"><output id="wHV"></output></div>
+  <div class="row"><span>Sill height</span><input type="range" id="wSill" min="0" max="2.5" step="0.05"><output id="wSillV"></output></div>
+  <div class="row"><span>Mullions</span><input type="range" id="wMull" min="0" max="6" step="1"><output id="wMullV"></output></div>
+  <div class="row"><span>Recess</span><input type="range" id="wDepth" min="0.04" max="0.6" step="0.01"><output id="wDepthV"></output></div>
+  <label class="chk"><input type="checkbox" id="wTransom"> Transom (top light)</label>
+  <div class="row"><span>Frame</span><input type="color" id="wFrame"><output id="wFrameV"></output></div>
+  <div class="row"><span>Glass</span><input type="color" id="wGlass"><output id="wGlassV"></output></div>
+  <h3>Balconies</h3>
+  <div class="row"><span>Depth</span><input type="range" id="bDepth" min="0.5" max="2.5" step="0.05"><output id="bDepthV"></output></div>
+  <div class="row"><span>Railing</span><input type="color" id="bRail"><output id="bRailV"></output></div>
+</aside>
+<aside class="panel" data-window="ground" data-title="Ground floor and bands" data-title-pl="Parter i gzymsy">
+  <div class="row"><span>Front</span><select id="gFront"></select><output></output></div>
+  <div class="row"><span>Other walls</span><select id="gSides"></select><output></output></div>
+  <div class="row"><span>Entrances</span><input type="range" id="gEnt" min="0" max="12" step="1"><output id="gEntV"></output></div>
+  <div class="row"><span>Doors</span><input type="color" id="gDoor"><output id="gDoorV"></output></div>
+  <h3>Bands</h3>
+  <div class="row"><span>Plinth</span><input type="range" id="plinth" min="0" max="1.5" step="0.05"><output id="plinthV"></output></div>
+  <label class="chk"><input type="checkbox" id="cornice"> Cornice above the ground floor</label>
+  <label class="chk"><input type="checkbox" id="fBands"> Bands between storeys</label>
+  <label class="chk"><input type="checkbox" id="topCornice"> Crowning cornice</label>
+</aside>
+<aside class="panel" data-window="roof" data-title="Roof" data-title-pl="Dach">
+  <div class="row"><span>Kind</span><select id="rType"></select><output></output></div>
+  <div class="row"><span>Pitch</span><input type="range" id="rPitch" min="5" max="65" step="1"><output id="rPitchV"></output></div>
+  <div class="row"><span>Eaves</span><input type="range" id="rOver" min="0" max="1.5" step="0.05"><output id="rOverV"></output></div>
+  <div class="row"><span>Parapet</span><input type="range" id="rPar" min="0" max="2" step="0.05"><output id="rParV"></output></div>
+  <div class="row"><span>Colour</span><input type="color" id="rColor"><output id="rColorV"></output></div>
+  <p class="note">Gable needs a rectangle; on another outline it becomes a hip roof. A hip roof on an L or U ends in a flat top where it cannot rise further.</p>
+</aside>
+<aside class="panel" data-window="bake" data-side="right" data-title="Baked facade" data-title-pl="Wypalona fasada">
+  <div class="row"><span>Resolution</span><select id="ppm"><option value="32">32 px/m</option><option value="64" selected>64 px/m</option><option value="128">128 px/m</option></select><output></output></div>
+  <label class="chk"><input type="checkbox" id="pom" checked> Parallax (recesses by depth)</label>
+  <div class="row"><span>Switch at</span><input type="range" id="lodAt" min="20" max="600" step="5"><output id="lodAtV"></output></div>
+  <table class="specs" id="bakeStats"></table>
+  <div class="row"><span>Tile</span><select id="tileSel"></select><output></output></div>
+  <div id="maps"></div>
+  <p class="note">Click a map to save it as PNG. Colour (A: wall mask), normals, height for the parallax, AO · roughness · metalness (A: window number — which ones light up at night).</p>
+</aside>
+<aside class="panel" data-window="json" data-side="right" data-title="Description (JSON)" data-title-pl="Opis (JSON)">
+  <textarea id="jsonText" class="mono" rows="9" spellcheck="false"></textarea>
+  <div class="btns"><button type="button" id="jsonApply">Apply</button><button type="button" id="jsonCopy">Copy</button></div>
+  <p class="note" id="jsonMsg">The same description and seed give the same building.</p>
+</aside>
+<aside class="panel" data-std="camera">
+  <div class="btns" id="cams"></div>
+</aside>
+<aside class="panel" data-std="light">
+  <div class="row"><span>Weather</span><select id="weather"></select><output></output></div>
+  <div class="row"><span>Time of day</span><input type="range" id="time" min="0" max="24" step="0.25"><output id="timeV"></output></div>
+  <div class="row"><span>Lit windows</span><input type="range" id="lit" min="0" max="1" step="0.05"><output id="litV"></output></div>
+  <p class="note">After dusk the windows light up — the same ones near and far.</p>
+</aside>
+<aside class="panel" data-std="perf"></aside>
+<script src="../ui/shell/loader.js"></script>
+<script src="../ui/shell/perf.js"></script>
+<script src="../ui/shell/labwin.js"></script>
+<script src="../ui/shell/windows.js"></script>
+<script type="module" src="../js/labs/city/city.js"></script>
+</body>
+</html>

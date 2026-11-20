@@ -14,6 +14,86 @@
    "triangles": 19735
   }
  },
+ "city/block": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 10,
+   "materials": 10,
+   "size": [
+    62.4,
+    28.62,
+    14.4
+   ],
+   "triangles": 30988
+  }
+ },
+ "city/house": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 8,
+   "materials": 8,
+   "size": [
+    12,
+    9.44,
+    10
+   ],
+   "triangles": 1492
+  }
+ },
+ "city/market": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 8,
+   "materials": 8,
+   "size": [
+    50.68,
+    7.52,
+    36.68
+   ],
+   "triangles": 800
+  }
+ },
+ "city/office": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 9,
+   "materials": 9,
+   "size": [
+    42.68,
+    30.52,
+    20.68
+   ],
+   "triangles": 13910
+  }
+ },
+ "city/tenement": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 9,
+   "materials": 9,
+   "size": [
+    20.7,
+    21.64,
+    14.7
+   ],
+   "triangles": 7018
+  }
+ },
+ "city/tower": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 9,
+   "materials": 9,
+   "size": [
+    30,
+    114.52,
+    30
+   ],
+   "triangles": 78000
+  }
+ },
  "junkyard/barrel": {
   "counts": {},
   "fingerprint": {

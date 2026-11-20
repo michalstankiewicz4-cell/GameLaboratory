@@ -3,6 +3,13 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.39.0 — 2026-11-20
+
+### Dodane
+- Budynki miasta (CityKit z laboratorium miasta): rodzina „Budynki miasta”, `city/<rodzaj>`, z wersją daleką (wypalona
+  fasada z paralaksą) i polem `asset` (budynek zapisany w laboratorium). Okna budynków świecą po zmroku (z pory dnia
+  światła sceny).
+
 ## 0.38.0 — 2026-11-20
 
 ### Dodane

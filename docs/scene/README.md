@@ -70,6 +70,8 @@ Wpis: `{ id, label, family, surface, lab, build() → { root, kit, dispose } }`.
   — oświetlenie od słońca sceny, obrót, błyski pulsara (edytor podaje kierunek słońca i kamerę).
 - Ludzie i stwory: `humans/humanBust`, `humans/humanHead`, `creatures/strider` (LifeKit) — parametry domyślne,
   `tick` — chód „idle”; chodzenie jako zachowanie — później.
+- Budynki miasta: `city/<rodzaj>` (CityKit, `house`, `tenement`, `block`, `tower`, `office`, `market`) — opis rodzaju
+  albo zasób `building` (pole `asset`); wersja daleka — wypalona fasada z paralaksą; [`../labs/city.md`](../labs/city.md).
 - Bryły z bloków: `blocks/<kształt>` (BlockKit, `sphere`, `cube`, `pair`, `belt`, `balls`) — domyślne warstwy
   laboratorium bloków, powierzchnia kosmosu; [`../labs/blocks.md`](../labs/blocks.md).
 - Moduły bazy: `base/<moduł>` (BaseKit, `MODULES`: `pad`, `hab`, `solar`, `drill`, `refinery`, `depot`) — gotowe
@@ -157,6 +159,7 @@ scena trzyma tylko nazwę. Inna karta widzi zmianę od razu (`onAssetsChange`).
 | `plant` | rośliny ([`../labs/plants.md`](../labs/plants.md)) | `species`, `seed`, `size`, `detail`, `season`; w scenie pole `asset` obiektu `plants/<gatunek>` |
 | `cave` | jaskinie ([`../labs/caves.md`](../labs/caves.md)) | ustawienia CaveKit (`seed`, `length`, `branches`, `width`, `winding`, `chambers`, `rough`, `cell`, `drips`, `rubble`, `lakes`, `lava`, `rock`, `wet`, `relief`); w scenie pole `asset` obiektu `caves/cave` albo `env.cave` podziemia |
 | `effect` | efekty ([`../labs/effects.md`](../labs/effects.md)) | `kind`, `scale`, `values` (liczby EffectKit); w scenie polecenie API `effect` |
+| `building` | miasto ([`../labs/city.md`](../labs/city.md)) | opis CityKit: `type`, `seed`, `footprint`, `front`, `floors`, `floorH`, `groundH`, `wall`, `bay`, `module`, `window`, `ground`, `bands`, `balcony`, `roof`, `lit`; w scenie pole `asset` obiektu `city/<rodzaj>` |
 | `blocks` | bloki ([`../labs/blocks.md`](../labs/blocks.md)) | `shape`, `radius`, `voxel`, `seed`, `text`, `layers`, `mats` (opisy MatKit bloków stałych), `matRefs` (wybór w laboratorium); w scenie pole `asset` obiektu |
 
 - Funkcje: `listAssets(kind)`, `getAsset(kind, name)`, `saveAsset(kind, name, data)` (tylko pola rodzaju),
