@@ -133,11 +133,11 @@ sound plus:
 
 ## Limits (honest)
 
-- **The voice** is the browser's own speech synthesis. It sits outside the
-  audio graph: no effects (no vocoder), not in a recording, and it sounds
-  different on each system. The plan for the game: the lines generated
-  once into small files and played through a vocoder in the graph.
-- **The whispers** are murmuring without words — real words need recordings.
+- **The voice** is the browser's own speech synthesis (VoiceKit `speak`, the
+  speech lab — [`sound-speech.md`](sound-speech.md)). It sits outside the audio
+  graph: no effects, not in a recording, and it sounds different on each system.
+  The speech lab's formant voice and whisper are in the graph (effects, recording).
+- **The whispers** are murmuring without words (VoiceKit `murmur`) — real words need recordings.
 - The moods are generative, not songs (no arc beyond the ostinato's
   growing octave); the songs have a form, but one melody per section kind
   (every verse the same, every chorus the same) and no lyrics.

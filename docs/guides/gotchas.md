@@ -121,3 +121,16 @@ eclipse lighting):
   (ShipKit `withRounding`) works because the build is synchronous. Always
   restore in `finally`. Classes that extend them (`ConeGeometry`) bound
   the originals at definition and aren't affected.
+
+## Sound (2026-11: the mixer, the sound labs, scene and UI sounds)
+
+- **A sound check by polling the level meter misses short sounds on a heavy page.** `mixer().level(bus)` reads the
+  analyser's last 1024 samples (about 23 ms); a click, a gunshot or a door latch is over before the next poll when the
+  page renders 3D slowly (headless, SwiftShader). Check that the event fires (wrap `sounds.play`, count `onSound`
+  events) on the heavy page, and measure loudness on a light one (the sound effects lab).
+- **The browser's speech synthesis is outside Web Audio**: no meter, no effects, not in a recording — its level is
+  0 on every bus. The speech lab's formant voice and whisper are in the graph.
+- **A model event at the first frame**: `motion()` starts from the part's rest state (doors shut, gear down); a model
+  built with its part already moving reports the first change, not a phantom one.
+- **After ■ Stop the parts go back to rest** (behaviour `reset`), which would report doors slamming: the scene's sounds
+  play model events only while the game runs (`sounds.model` checks `live`).

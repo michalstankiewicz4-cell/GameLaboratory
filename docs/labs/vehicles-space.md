@@ -1,4 +1,4 @@
-# Vehicle lab · space (`ship.html`) and ShipKit
+# Vehicle lab · space (`labs/vehicles-space.html`) and ShipKit
 
 The space page of the vehicle lab, for procedurally built 3D spaceships. The
 ships themselves live in **`js/models/ships-space/shipkit.js`** (ShipKit, from the
@@ -7,7 +7,7 @@ doctor and the kit check all build from it. A change to a lab bumps that lab's
 version; a change to ShipKit bumps the program's (`ui/data/versions.js`, `CHANGELOG.md`).
 
 The page needs a local server (ES modules): `python3 -m http.server` in the
-repository, then `http://localhost:8000/labs/ship.html`.
+repository, then `http://localhost:8000/labs/vehicles-space.html`.
 
 > **The ship lab is the reference lab** (the user's words, 2026-10-03:
 > the first lab and the most polished; the others take their patterns from
@@ -271,7 +271,7 @@ need them as world-space objects (so a turning ship doesn't drag its shots along
 
 ## The lab page
 
-The space page of the **vehicle lab** (water: `warship.html`, land: `vehicles.html`; the environment switch in the
+The space page of the **vehicle lab** (water: `labs/vehicles-water.html`, land: `labs/vehicles-land.html`; the environment switch in the
 top bar goes between them). The top bar: the ship list and the environment switch. The windows are the standard ones
 (`ui/shell/labwin.js`, the same on every lab) plus the lab's own:
 
@@ -522,8 +522,8 @@ Before turning either on in the game, decide the values and measure
 A new file `js/models/ships-space/ships/<id>.js`, shaped like the others: one IIFE
 that takes the helpers it needs from `ShipKit._` and pushes its entry into
 `ShipKit.SHIP_DEFS`, built from the blocks above. Then load it after the
-others on **every page that loads ShipKit** — the labs (`ship.html`, `scale.html`,
-`surface.html`, `buildings.html`, `vehicles.html`), `tools/kitcheck.html`
+others on **every page that loads ShipKit** — the labs (`vehicles-space.html`, `scale.html`,
+`surface.html`, `buildings.html`, `vehicles-land.html`), `tools/kitcheck.html`
 and the model doctor's sources (`tools/doctor/sources/`). A helper the core doesn't export yet:
 add it to the `_` list at the end of `shipkit.js`. Finally run
 `tools/kitcheck.html`, and add the new ship's fingerprint to the golden

@@ -1,4 +1,4 @@
-// The ship lab's own script (ship.html): its scene and panels, wired to the kits'
+// The vehicle lab's space page (labs/vehicles-space.html): its scene and panels, wired to the kits'
 // public APIs. Moved out of the page (2026-10-03) so the page is markup and styles.
 /* =======================================================================
    THE LAB — the page's own script.

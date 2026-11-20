@@ -11,6 +11,7 @@ Układ folderów jest taki sam jak w kodzie:
 | `models/` | modele używane przez kilka laboratoriów | `js/models/` |
 | `scene/` | silnik sceny: scena jako dane, prefabrykaty, zachowania w scenie, API dla AI, zasoby z nazwą, lekarz sceny | `js/scene/` |
 | `behaviors/` | zachowania (napęd i ruch modeli w środowiskach) | `js/behaviors/` |
+| `audio/` | dźwięk silnika: mikser, kity dźwięku, dźwięk w scenie, dźwięki modeli i UI | `js/audio/` |
 | `tools/` | narzędzia | `tools/` |
 | `guides/` | jak korzystać z laboratoriów, renderowanie, znane pułapki | — |
 | `history/` | historia sprzed przeniesienia i wykonany remanent | — |
@@ -25,7 +26,8 @@ Układ folderów jest taki sam jak w kodzie:
 | Silnik sceny (`js/scene/`) | [scene/README.md](scene/README.md) |
 | Lekarz sceny (`js/scene/doctor.js`) | [scene/doctor.md](scene/doctor.md) |
 | Zachowania (`js/behaviors/`): okręt i mała jednostka na wodzie, jazda po lądzie, lądowanie, lot, koło na szynie, ciąg w próżni, orbita, ciecze i gaz w kosmosie, przeładowarka, przedmioty na lądzie (bryły sztywne), maszyny złomowiska | [behaviors/README.md](behaviors/README.md) |
-| Ustawienia gracza (`js/core/settings.js`: grafika, mysz, klawisze) i ich menu w UI gry | [labs/gameui.md](labs/gameui.md), „Ustawienia gry” |
+| Dźwięk silnika (`js/audio/`: mikser, MusicKit, SfxKit, VoiceKit; dźwięk w scenie `js/scene/sounds.js`, dźwięki modeli `onSound`, dźwięki UI gry) | [audio/README.md](audio/README.md) |
+| Ustawienia gracza (`js/core/settings.js`: grafika, mysz, klawisze, dźwięk) i ich menu w UI gry | [labs/gameui.md](labs/gameui.md), „Ustawienia gry” |
 | Poziom jakości silnika (`js/render/quality.js`: szczegóły modeli z odległości, tekstury, efekty, woda, zasięg, cienie) | [guides/rendering.md](guides/rendering.md), „Poziom jakości silnika” |
 
 ## Laboratoria
@@ -35,7 +37,7 @@ W kolejności kategorii z menu Narzędzia i strony startowej (`ui/data/catalog.j
 | Kategoria | Laboratorium | Strona | Dokument |
 |---|---|---|---|
 | Pojazdy | Pojazdy — kosmos (statki, dron, stacja) *(grupa pojazdów)* | `labs/vehicles-space.html` | [labs/vehicles-space.md](labs/vehicles-space.md) |
-| | Pojazdy — woda (ORP Błyskawica, ORP Orzeł, roboty morskie) | `labs/vehicles-water.html` | [models/ships-sea/blyskawica.md](models/ships-sea/blyskawica.md), [models/ships-sea/orzel.md](models/ships-sea/orzel.md), [models/marine.md](models/marine.md) |
+| | Pojazdy — woda (ORP Błyskawica, ORP Orzeł, roboty morskie) | `labs/vehicles-water.html` | [labs/vehicles-water.md](labs/vehicles-water.md), [models/ships-sea/blyskawica.md](models/ships-sea/blyskawica.md), [models/ships-sea/orzel.md](models/ships-sea/orzel.md), [models/marine.md](models/marine.md) |
 | | Pojazdy — ląd (łaziki, amfibia, pociąg, pojazdy drogowe, tramwaj, samolot) | `labs/vehicles-land.html` | [labs/vehicles-land.md](labs/vehicles-land.md), [models/train/fizyka.md](models/train/fizyka.md), [models/train/grafika.md](models/train/grafika.md), [models/road/README.md](models/road/README.md), [models/train/swing.md](models/train/swing.md), [models/air/spitfire.md](models/air/spitfire.md) |
 | Kosmos | Ciała niebieskie *(grupa kosmosu)* | `labs/bodies.html` | [labs/bodies.md](labs/bodies.md) |
 | | Układy *(grupa kosmosu)* | `labs/systems.html` | [labs/systems.md](labs/systems.md) |
@@ -77,6 +79,8 @@ W kolejności kategorii z menu Narzędzia i strony startowej (`ui/data/catalog.j
 | Kontrola kitów | `tools/kitcheck.html` | sprawdza modele kitów Space z wzorcem `tools/kitcheck.golden.json` |
 | Budynki z OpenStreetMap (laboratorium miasta) | `tools/city-osm.mjs`, `.github/workflows/city-osm.yml` | [models/city.md](models/city.md), „Budynki z mapy” |
 | Sprawdzenia (przy każdym wypchnięciu) | `tools/paths.py`, `tools/sitemap.py` | [../CLAUDE.md](../CLAUDE.md), „Strona startowa” |
+| Sprawdzenia bez okna (Playwright) | `tools/doctor.py` (doktor modeli z wzorcem), `tools/lab-check.py` (laboratoria modeli, zrzuty do `tools/out/`), `tools/pixel-check.py` (Pixel Studio) | opis w nagłówku każdego skryptu |
+| Dane laboratoriów obrazów i języka | `tools/img/build-*.py` (→ `data/img/`, `data/img-color/`), `tools/lang/build-wasm.js` + `matmul.wat` (→ `js/labs/lang/wasm.js`) | opis w nagłówku każdego skryptu |
 
 ## Przewodniki
 

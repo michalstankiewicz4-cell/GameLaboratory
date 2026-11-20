@@ -50,7 +50,7 @@ Ten schemat narysowany ramkami: menu **Pomoc → Schemat silnika** na każdej st
 | **Physics** | stały krok, prawa środowiska: próżnia, woda, ląd | osobno od skryptów |
 | **Rules** | reguły gry: stan rozgrywki (lobby, misja, wygrana, przegrana), cele, punkty, role graczy (np. patogen i lekarz), warunki końca rundy | dotyczą całej gry, nie jednego obiektu; słuchają zdarzeń i zmieniają scenę |
 | **Scripts** | zachowania podpinane do obiektów (strzelanie, sterowanie, AI przeciwników) | korzystają z fizyki i zdarzeń |
-| **Audio** | Web Audio: muzyka, efekty, dźwięk przestrzenny ze źródeł w scenie | słuchacz = kamera; jest (0.84.0): mikser `js/audio/mixer.js` (szyny muzyki, otoczenia, efektów i mowy, głośności gracza z Opcji → Dźwięk, dźwięk przestrzenny), MusicKit, SfxKit, VoiceKit ([`../audio/README.md`](../audio/README.md)); źródła dźwięku w scenie — w planie |
+| **Audio** | Web Audio: muzyka, efekty, dźwięk przestrzenny ze źródeł w scenie | słuchacz = kamera; jest (0.84.0): mikser `js/audio/mixer.js` (szyny muzyki, otoczenia, efektów i mowy, głośności gracza z Opcji → Dźwięk, dźwięk przestrzenny), MusicKit, SfxKit, VoiceKit ([`../audio/README.md`](../audio/README.md)); 0.85.0–0.87.0: źródła dźwięku w scenie (`js/scene/sounds.js`: dźwięk przy obiekcie z zasięgiem, silniki z zachowań, strzały, wybuchy, efekty), dźwięki modeli (`onSound`), dźwięki UI gry i głosy postaci (szyna interfejsu); muzyka w scenie — w planie |
 | **UI** | menu, HUD, pasek postępu, okna | czyta stan sceny i zdarzenia |
 | **Input** | klawiatura, mysz, pad, dotyk, Pointer Lock → akcje („skok”, „strzał”) | akcje, nie klawisze, żeby dało się zmieniać sterowanie |
 | **Assets** | ładowanie, pamięć podręczna, postęp; prefabrykaty (gotowe obiekty z kitów) | |
@@ -70,7 +70,7 @@ Ten schemat narysowany ramkami: menu **Pomoc → Schemat silnika** na każdej st
 | Graphics + FX | `js/render/` (wygląd kamery, filtry, widzenie; poziom jakości `quality.js`, ustawienia grafiki gracza `game-graphics.js`) |
 | Input | `editor/js/play/input.js` — czynności z klawiszami z ustawień gracza (`js/core/settings.js`, `settings.keys`) |
 | Physics | prawa środowisk w zachowaniach (`js/behaviors/`), bryły sztywne na lądzie `js/behaviors/land/items.js` |
-| Audio | `js/audio/` (MusicKit) |
+| Audio | `js/audio/` (mikser, MusicKit, SfxKit, VoiceKit, słuchanie modeli), dźwięk w scenie `js/scene/sounds.js`, dźwięki UI `js/gameui/sounds.js` |
 | UI i Debug | `ui/shell/` (okna, `LabPerf`, konsola, `LabLog`, karta ładowania) |
 | Jobs/Workers | wątki nauki w laboratoriach języka i obrazów |
 | Scene (dane) | `js/scene/scene-data.js` (format `gamelab-scene`), prefabrykaty `js/scene/prefabs.js` — [opis](../scene/README.md) |

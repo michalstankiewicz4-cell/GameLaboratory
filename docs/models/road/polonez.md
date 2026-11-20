@@ -35,6 +35,11 @@ Pierwsza seria Poloneza (1978–1986): pięciodrzwiowy liftback z napędem na ty
 - **Podwozie**: sztywna oś tylna z mostem i resorami, wahacze przednie, wał napędowy, zbiornik, miska olejowa.
 - **Koła**: opona z profilu (barki, bok z napisem 175/70 R13, bieżnik jako mapa wypukłości), felga stalowa, chromowany kołpak, bęben hamulca.
 
+## Dźwięk
+
+Drzwi kierowcy zgłaszają `door-open` (zamek) i `door-shut` (trzaśnięcie) — `onSound`; silnik w `info.sounds.engine`:
+4 cylindry, 850–5600 obr/min ([`../../audio/README.md`](../../audio/README.md)).
+
 ## Doktor modeli
 
 Wynik przy wydaniu (`tools/doctor.golden.json`): 0 błędów obróconych ścian i migotania; zostają 2 drobne „seethrough”

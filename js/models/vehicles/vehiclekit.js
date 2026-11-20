@@ -2,7 +2,7 @@
    VEHICLEKIT — ground vehicles (window.VehicleKit)
    =======================================================================
    A classic script like ShipKit, BodyKit and BaseKit: the vehicles lab
-   (vehicles.html) uses it, the surface lab and the game can later. Built
+   (labs/vehicles-land.html) uses it, the surface lab and the game can later. Built
    from ShipKit's generators (plating, solar cells, struts) — needs THREE
    and window.ShipKit. Not in the game yet (docs/labs/vehicles-land.md).
 

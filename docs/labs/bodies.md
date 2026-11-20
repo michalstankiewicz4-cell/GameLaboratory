@@ -1,7 +1,7 @@
 # Body lab (`bodies.html`) and BodyKit
 
 A standalone preview page for procedurally generated celestial bodies,
-the companion of [`ship.html`](vehicles-space.md) and built on the same scheme.
+the companion of [the vehicle lab's space page](vehicles-space.md) and built on the same scheme.
 The bodies themselves live in **`js/models/bodies/bodykit.js` (BodyKit, from the
 game Space)**; the body, system, scale and surface labs and the kit check build
 from it. A change to the lab bumps its version; a change to BodyKit bumps the

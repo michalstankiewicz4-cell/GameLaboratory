@@ -1,4 +1,4 @@
-// The vehicle lab's land page (vehicles.html): its scene and panels, wired to the kits'
+// The vehicle lab's land page (labs/vehicles-land.html): its scene and panels, wired to the kits'
 // public APIs. Moved out of the page (2026-10-03) so the page is markup and styles.
 // The list: VehicleKit's rovers, MarineKit's amphibian (moved here from the sea lab: on land it drives on its
 // wheels; where there is water it floats) and RoadKit's real-world road vehicles (js/models/road, the FSO Polonez…).

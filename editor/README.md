@@ -15,7 +15,7 @@ dostosowywać (zasoby z nazwą, wspólne zachowania).
 
 - Okna: **Opis**, **Scena** (dodaj model, hierarchia), **Właściwości** (środowisko albo wybrany obiekt), **Lekarz sceny**
   (przycisk **Badaj** na pasku; kafelek „Lekarz sceny” na stronie startowej otwiera edytor z tym oknem, `editor/index.html?doctor`: problemy w scenie i poprawki, `docs/scene/doctor.md`), **Kamera**,
-  **Wydajność**; OPCJE → Okna. **Okna | Panele** na pasku: w Panelach okna są panelami przy krawędziach, konsola na dole
+  **Wydajność**; OPCJE → Okna. **Okna | Panele** na pasku (domyślnie Panele): w Panelach okna są panelami przy krawędziach, konsola na dole
   pośrodku, a widok 3D zajmuje wolny środek (`body.viewFits`).
 - Pasek narzędzi: cofnij · domek · ponów (przeglądarka), **▶ Graj / ■ Stop**, **Cofnij / Ponów** (zmiany sceny), uchwyt **Przesuń / Obróć / Skaluj**, **Nowa**, **Zapisz plik**, **Otwórz plik**.
 - Klawisze: Ctrl+Z — cofnij, Ctrl+Y / Ctrl+Shift+Z — ponów; W / E / R — przesuń, obróć, skaluj; Delete — usuń; Ctrl+D — powiel; F — pokaż wybrany; Esc — środowisko;
@@ -27,6 +27,12 @@ dostosowywać (zasoby z nazwą, wspólne zachowania).
   To klawisze domyślne: gracz zmienia je w menu Sterowanie UI gry (ustawienia gry, `js/core/settings.js` — te same
   w laboratorium UI gry); w grze działają też jego ustawienia grafiki (rozdzielczość, wygładzanie, cienie, światła
   dynamiczne, poświata, jasność, nasycenie, poziom jakości silnika) i czułość myszy — po Stop edytor wraca do swojego wyglądu.
+- **Dźwięk** (okno Właściwości obiektu): gotowy dźwięk, tło miejsca albo zapisane w laboratorium efektów dźwiękowych —
+  w ▶ Graj gra w miejscu obiektu i idzie za nim. **Zasięg dźwięku** (suwak; 0 — domyślny dla dźwięku): przy
+  zaznaczonym obiekcie dwie kule — wewnętrzna to pełna głośność, zewnętrzna granica słyszalności (10%). W grze same
+  z siebie grają: silniki pojazdów (z danych modelu), drzwi, właz, podwozie i klapy modeli, strzały i wybuchy statków,
+  efekty z polecenia `effect`, UI gry ze swoją skórką; słuchacz to kamera, głośności — Opcje → Dźwięk UI gry. Część
+  robocza modelu (drzwi, właz, owiewka, rampa) to akcja **work** (klawisz 1). Opis: [`../docs/audio/README.md`](../docs/audio/README.md).
 - **Szczegóły z odległości (LOD):** model z wersją daleką (prefabrykat z `lod: true`) przełącza się na nią daleko od
   kamery — próg z wielkości modelu × ustawienie gracza „odległość szczegółów” (w edytorze poza grą × 1); model, którego
   części rusza zachowanie w grze, zostaje bliski ([../docs/guides/rendering.md](../docs/guides/rendering.md)).
@@ -93,18 +99,18 @@ Zasada: **dane są jedynym źródłem prawdy**. Okna, uchwyt i pliki zmieniają 
 
 - `env.land` (ląd): `""` — płaski grunt albo nazwa terenu z laboratorium lądu; `env.light`: gotowe (`afternoon`,
   `noon`, `dusk`, `overcast`) albo nazwa pogody z laboratorium wyglądu; `env.look`: nazwa wyglądu kamery (laboratorium filtrów).
-- `env.surface`: także `space`; `env.sky` (każda powierzchnia): `""` — domyślne (morze i ląd — dzienne, kosmos — Deep field),
+- `env.surface`: `sea` | `land` | `space` | `underground` (jaskinia: `env.cave`, `env.caveGlow`); `env.ui`: UI gry z laboratorium UI gry; `env.sky` (każda powierzchnia): `""` — domyślne (morze i ląd — dzienne, kosmos — Deep field),
   `"day"` — dzienne, `"preset:<id>"` — gotowe tło kosmosu (`deep`, `quiet`, `crimson`, `emerald`, `core`, `black`),
   albo nazwa nieba zapisanego w laboratorium ciał niebieskich.
 - `env.sea`: nazwa zasobu „morze” z laboratorium wody (`js/scene/assets.js`) albo `""` — morze domyślne.
-- `env.surface`: `sea` | `land`; `env.light`: `afternoon` | `noon` | `dusk` | `overcast`; `env.look`: nazwa profilu
-  z laboratorium filtrów (zasób `look`, `gameLab.assets.v1`) albo `""`.
 - `pos` w metrach (Y w górę), `rot` w stopniach (kolejność YXZ: kurs, pochylenie, przechył), `scale` — mnożnik.
 - `prefab`: id z `js/scene/prefabs.js` (`sea/…`, `road/…`, `tram/…`, `train/…`, `air/…`, `structures/…`, `weapons/…`,
   `space/…`, `marine/…`, `rovers/…`, `plants/…`, `caves/…`, `base/…`, `bodies/…`, `humans/…`, `creatures/…`, `blocks/…`, `junkyard/…`, `city/…`).
-- `behavior` (nieobowiązkowe): id z `js/scene/behaviors.js` (`ship`, `flight`); bez pola — domyślne dla modelu, `""` — stoi w miejscu.
+- `behavior` (nieobowiązkowe): id z `js/scene/behaviors.js` (`ship`, `flight`, `drive`, `craft`, `thrust`, `lander`, `construct`, `orbit`, `grapple`, `item`, `machine`, `solid`); bez pola — domyślne dla modelu, `""` — stoi w miejscu.
 - `shot` (nieobowiązkowe, statki, które strzelają): efekt strzału z laboratorium efektów (id albo zapisany efekt);
   w oknie Obiekt „Efekt strzału”.
+- `sound` (nieobowiązkowe): dźwięk przy obiekcie w grze — gotowy dźwięk SfxKit (`fire`, `engine`, `bird`…), tło miejsca
+  (`forest`, `campfire`…) albo zasób `sound` / `ambience`; `soundRange` — zasięg w metrach (odległość pełnej głośności).
 - `asset` (nieobowiązkowe): zasób modelu z laboratorium (bryła z bloków — rodzaj `blocks`, budynek z laboratorium miasta — `building`, roślina, jaskinia); w oknie Obiekt lista
   zapisanych pod nazwą i „Model domyślny”.
 - Zmiana formatu podnosi `version` w `scene-data.js`, a `normalize` przenosi starsze sceny.
@@ -120,8 +126,8 @@ albo lista (po kolei); wynik `{ "ok": true, … }` albo `{ "ok": false, "error":
 | `help` | — | lista poleceń |
 | `describe` | — | cała scena (dane) i krótki opis |
 | `prefabs` | `[family]` | modele do dodania: id, nazwa, rodzina, gdzie stoi, zachowania |
-| `add` | `prefab`, `[name]`, `[pos]`, `[rot]`, `[scale]`, `[behavior]`, `[asset]`, `[shot]` | dodaje model, zwraca `id` (`asset` — zasób modelu, np. bryła z laboratorium bloków) |
-| `set` | `id` albo `name`, potem `newName` (z `id` także `name`), `prefab`, `pos`, `rot`, `scale`, `behavior`, `orbit` (`{ around, period }` — zachowanie „orbita”), `asset` (`""` — model domyślny), `shot` (efekt strzału statku, `""` — strzał) | zmienia obiekt |
+| `add` | `prefab`, `[name]`, `[pos]`, `[rot]`, `[scale]`, `[behavior]`, `[asset]`, `[shot]`, `[sound]` | dodaje model, zwraca `id` (`asset` — zasób modelu, np. bryła z laboratorium bloków) |
+| `set` | `id` albo `name`, potem `newName` (z `id` także `name`), `prefab`, `pos`, `rot`, `scale`, `behavior`, `orbit` (`{ around, period }` — zachowanie „orbita”), `asset` (`""` — model domyślny), `shot` (efekt strzału statku, `""` — strzał), `sound` (dźwięk przy obiekcie, `""` — bez), `soundRange` (m, 0 — domyślny) | zmienia obiekt |
 | `move` | `id` albo `name`, `by: [dx, dy, dz]` | przesuwa o wektor |
 | `remove` | `id` albo `name` | usuwa |
 | `env` | `surface` (`sea` / `land` / `space` / `underground`), `light`, `look`, `land`, `sea`, `sky`, `ui`, `cave` | środowisko (`ui` — UI gry z laboratorium UI gry, nakładka w ▶ Graj; `underground` — w jaskini, `cave` — jaskinia z laboratorium jaskiń jako teren planszy) |
@@ -130,11 +136,12 @@ albo lista (po kolei); wynik `{ "ok": true, … }` albo `{ "ok": false, "error":
 | `new` | `[name]` | pusta scena |
 | `load` | `scene` | cała scena z danych |
 | `play`, `stop` | — | jak ▶ Graj / ■ Stop |
-| `act` | `id` albo `name`, `action`, `[on]` (przełącznik) | w czasie gry: akcja obiektu (statek kosmiczny: `fire`, `scan`, `print`, `offline`, `destroy`, własne) — zdarzenie „action” |
+| `act` | `id` albo `name`, `action`, `[on]` (przełącznik) | w czasie gry: akcja obiektu (statek kosmiczny: `fire`, `scan`, `print`, `offline`, `destroy`, własne; pojazdy: `work` — drzwi, właz, owiewka, rampa) — zdarzenie „action” |
 | `actions` | `id` albo `name` | w czasie gry: akcje obiektu |
 | `events` | `[n]` | ostatnie zdarzenia szyny (domyślnie 20) |
 | `effect` | `effect` (id albo nazwa zapisanego efektu), `from` / `to` / `at` / `dir` / `path` — punkty `[x, y, z]` albo obiekty | efekt z laboratorium efektów — zdarzenie `effect`, świat je rysuje ([`../docs/labs/effects.md`](../docs/labs/effects.md)) |
-| `ui` | w czasie gry: `say { who, text, choices }`, `log`, `banner`, `show`, `hide`, `open`, `close` | UI gry sceny (`env.ui`): dialog, wpis, baner, ekran, okno ([`../docs/labs/gameui.md`](../docs/labs/gameui.md)) |
+| `sound` | `sound` (gotowy albo zapisany), `at` — punkt `[x, y, z]` albo obiekt | dźwięk raz w miejscu |
+| `ui` | w czasie gry: `say { who, text, choices, voice }`, `log`, `banner`, `show`, `hide`, `open`, `close` | UI gry sceny (`env.ui`): dialog, wpis, baner, ekran, okno ([`../docs/labs/gameui.md`](../docs/labs/gameui.md)) |
 | `check` | `[budget { tris, draws }]` | lekarz sceny: problemy (złe środowisko, pod gruntem / w powietrzu, zachodzenie, brakujące zasoby, zachowania, koszt) z proponowanymi poprawkami — niczego nie zmienia ([`../docs/scene/doctor.md`](../docs/scene/doctor.md)) |
 
 ```json
@@ -164,7 +171,6 @@ Jednostki: metry, stopnie; Y w górę, kurs 0 — wzdłuż +Z. W czasie gry pole
 
 ## Na później (propozycje)
 
-- Pozostałe modele ze Space (łaziki, budynki baz, roboty morskie) i ciała niebieskie w scenie kosmosu.
 - Brzegi, lód i prądy z laboratorium wody w morzu z zasobu; deszcz i błyskawice z zapisanej pogody; morze z płyciznami przy terenie (dziś woda sceny bazowej nie zna terenu).
 - Woda wycięta w kadłubie każdego okrętu (dziś WaterKit umie jeden kadłub w środku sceny).
-- Zachowania dla pozostałych modeli (koło na szynie dla tramwaju i pociągu — potrzebuje toru w scenie, pojazdy drogowe).
+- Zachowania dla pozostałych modeli (koło na szynie dla tramwaju i pociągu — potrzebuje toru w scenie).

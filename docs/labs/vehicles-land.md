@@ -1,9 +1,9 @@
-# Vehicle lab (vehicles.html) and VehicleKit
+# Vehicle lab · land (`labs/vehicles-land.html`) and VehicleKit
 
 Ground vehicles for the planets' surfaces. Started 2026-10-03. The user's
 call: a page of its own, separate from the ship page ("too much in one file",
 and these get driving animations). Since 2026-11-02 it is the land page of one
-**vehicle lab** (space: `ship.html`, water: `warship.html`, land: this page),
+**vehicle lab** (space: `vehicles-space.html`, water: `vehicles-water.html`, land: this page),
 with MarineKit's amphibian on its list ([marine.md](../models/marine.md)).
 
 ## Files
@@ -11,7 +11,7 @@ with MarineKit's amphibian on its list ([marine.md](../models/marine.md)).
 | File | What it is |
 |---|---|
 | `js/models/vehicles/vehiclekit.js` | **VehicleKit** (`window.VehicleKit`), a classic script like ShipKit, BodyKit and BaseKit. It holds the vehicles, their animation, a simple driving model and the dust. It is built from ShipKit's generators (plating, solar cells, struts) and needs THREE and ShipKit. Not in the game, nor in the surface lab, yet. |
-| `vehicles.html` | The lab. Rough ground with sliders, AUTO driving (wandering, turning back toward the middle) or WASD, NIGHT, DUST and WORK. |
+| `labs/vehicles-land.html` | The lab. Rough ground with sliders, AUTO driving (wandering, turning back toward the middle) or WASD, NIGHT, DUST and WORK. |
 
 ## Road vehicles (RoadKit)
 
@@ -118,6 +118,12 @@ The ShipKit spacecraft with motion numbers (Codewing, Scribe, Swarmer) are on th
 planet brings the planet's (Luna: weak gravity, no air). The ship starts 40 m up with the lift thrusters off. AUTO is a
 controller that holds 1.5 m/s down and sets it on its four landing pads; by hand: Space — lift thrusters, W / S — the
 main engine, A / D — yaw. Touching down faster than 5 m/s breaks it.
+
+## Model sounds (1.23.0)
+
+The lab listens to the models (`hearModel`, `js/audio/model-sounds.js`): the work part's button (the Polonez's door, the
+bus's pneumatic doors, the tank's hatch, the Spitfire's canopy), the Spitfire's gear and flaps play their sounds at the
+part, through the engine mixer, the camera as the listener ([`../audio/README.md`](../audio/README.md)).
 
 ## The grapple loader from the junkyard (1.18.0 – 1.22.0)
 

@@ -147,8 +147,8 @@ laboratoria języka i obrazów (osobne silniki), doktor modeli, kitcheck.
       (promienie, holowanie, cięcie, pola, skok) są już w laboratorium efektów (0.69.0);
    3. *(zrobione w 0.67.0: `labs/effects.html`, opis `docs/labs/effects.md`)* **laboratorium efektów** (`js/three/effects`): strzały, wybuchy, cząsteczki — odpowiedź na zdarzenia (np. akcja
       `fire`);
-   4. **drzewka technologiczne** (`tools/tree-editor.html`) — później: dane gry jako zasób z nazwą i narzędzie do ich
-      edycji.
+   4. *(zrobione w 0.73.0–0.74.0: `labs/trees.html`, opis `docs/labs/trees.md`)* **drzewka technologiczne**
+      (`tools/tree-editor.html`): dane gry jako zasób z nazwą i narzędzie do ich edycji.
 9. **Materiał z PatientZero** (repozytorium `michalstankiewicz4-cell/PatientZero`; przeniesienie **z historią**), po
    Hive Hunger:
    1. **środowisko „organizm”** — czwarte obok kosmosu, wody i lądu, ze swoimi prawami: przepływ płynów (krew, chłonka,

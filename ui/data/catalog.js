@@ -92,7 +92,7 @@ window.GameLabCatalog =
       "tabPl": "Woda",
       "name": "Vehicle lab · water",
       "namePl": "Laboratorium pojazdów · woda",
-      "doc": "docs/models/ships-sea/blyskawica.md",
+      "doc": "docs/labs/vehicles-water.md",
       "page": "labs/vehicles-space.html",
       "desc": "Real warships at true scale, ORP Błyskawica and the submarine ORP Orzeł, and robot vessels: a skimmer on foils, a barge, a diver.",
       "descPl": "Prawdziwe okręty w prawdziwej skali, ORP Błyskawica i okręt podwodny ORP Orzeł, oraz roboty morskie: ślizgacz na płatach, barka, nurek.",

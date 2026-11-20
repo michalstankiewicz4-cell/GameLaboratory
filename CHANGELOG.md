@@ -3,6 +3,18 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.87.1 — 2026-11-20 (domyślnie panele, porządek w dokumentacji)
+
+### Zmienione
+- Okna laboratoriów, narzędzi i edytora sceny: **domyślnie Panele** (okna przypięte przy krawędziach, widok w wolnym
+  środku); okno pływa dopiero po odpięciu pinezką albo przełącznikiem Okna | Panele (wybór zostaje zapamiętany).
+- Dokumentacja: nowy opis strony wody laboratorium pojazdów (`docs/labs/vehicles-water.md`, w katalogu zamiast opisu
+  Błyskawicy); dźwięk w opisach silnika, edytora, sceny, modeli (Polonez, Urbino 18, Abrams, Spitfire), laboratorium
+  pojazdów lądowych i przewodnika; nowe pułapki (dźwięk); stare nazwy stron (`ship.html`, `warship.html`,
+  `vehicles.html`) zamienione na obecne; z `TODO.md` usunięte zrobione punkty (są tu, w zmianach); z opisu MarineKit
+  usunięta historia morza usuniętego z kitu; w edytorze — powtórzony, nieaktualny opis środowiska i zrobione
+  propozycje; mapa dokumentacji: dźwięk (`docs/audio/`) i narzędzia sprawdzające.
+
 ## Program 0.87.0 · UI gry 1.6.0 · efekty dźwiękowe 1.2.0 · muzyka 1.3.1 · mowa 1.0.1 · edytor sceny 0.43.0 — 2026-11-20 (dźwięki UI, pełny reset)
 
 ### Dodane

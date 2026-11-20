@@ -15,7 +15,7 @@
    so pages with a strict CSP work.
    Window or panel: the pin on a title bar docks that window in the panel on its side (a column between the bars,
    one window under another, scrolled), and back; the toolbar switch Windows | Panels does it for all of them.
-   Docked or not is kept with the window's place. Panels (all docked): real panels flush with the edges, the console
+   Docked or not is kept with the window's place; by default every window is docked (Panels) until it is undocked. Panels (all docked): real panels flush with the edges, the console
    (ui/shell/console.js) docked at the bottom between them, body.lmPanels; the free middle is published as --viewL,
    --viewR, --viewB on <html> and through window.LabView (a page with body.viewFits puts its #view there and sizes its
    renderer from it — the scene editor; other pages keep the view full size, under the panels). Such a page also gets
@@ -92,7 +92,7 @@ function make(body) {
   w.open = s.open !== false; el.hidden = !w.open;
   w.home = { parent: el.parentNode, next: el.nextSibling };      // where it goes back when it floats again
   wins.push(w);
-  if (s.docked) setDocked(w, true, true);
+  if (s.docked !== false) setDocked(w, true, true);   // domyślnie panele: okno pływa, tylko gdy je odpięto (docked: false)
   pinTitle(w);
   return w;
 }

@@ -30,6 +30,11 @@ Autobus przegubowy IV generacji w barwach MZA Warszawa (żółta góra, czerwony
 `speed`, `steer` (−1..1, dodatni w lewo), `contact(x, z)` (w układzie członu przedniego), `lights`, `brake`, `work` (drzwi).
 `articulation()` — bieżący kąt przegubu (dla kolizji w grze).
 
+## Dźwięk
+
+Przednie drzwi zgłaszają `door-open` i `door-close` (syk pneumatyki) — `onSound`; napęd elektryczny
+(`info.sounds.engine.electric`) ([`../../audio/README.md`](../../audio/README.md)).
+
 ## Doktor modeli
 
 Bez błędów obróconych ścian; zostają drobne „seethrough” w panelach dolnych przy łukach i igły (info).

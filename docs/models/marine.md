@@ -1,55 +1,17 @@
-# MarineKit: the robot vessels (and a sea of its own)
+# MarineKit: the robot vessels
 
-The sea, and the vehicles that sail it and go under it. Started 2026-10-03 as a lab of its own (the sea lab,
-`marine.html`), separate from the ground vehicles, because you'll be able to go under water.
-
-The owner's call (2026-11-02): one **vehicle lab** with the environment switch — space (`ship.html`), water
-(`warship.html`), land (`vehicles.html`). The sea lab is gone: the skimmer, the barge and the diver are on the water
-page's list next to the warships (on its plain water or the base stage's sea: drive, dive, night, wake, work), the amphibian on the land page
-(it drives on the ground; where there is water it floats). MarineKit's own sea (`makeSea`, the view under water,
-marine snow) is used by no lab now; it stays in the kit — the water lab's sea from Battle is the one in use.
+The robot vessels that sail the sea and go under it: the skimmer, the barge, the diver and the amphibian. Started
+2026-10-03 as a lab of its own (the sea lab); since 2026-11-02 they are in the **vehicle lab** (the environment switch):
+the skimmer, the barge and the diver on the water page next to the warships, the amphibian on the land page. The water
+is the water lab's sea from Battle; MarineKit's own sea was removed on 2026-11-06 (its history: git, CHANGELOG).
 
 ## Files
 
 | File | What it is |
 |---|---|
-| `js/models/marine/marinekit.js` | **MarineKit** (`window.MarineKit`), a classic script like the other kits. It holds the sea (waves, the seabed and an island, the water's and the bed's shaders), the vessels, the wake and marine snow. It needs THREE, ShipKit and VehicleKit (the amphibian's wheels: `VehicleKit.parts`). Not in the game, nor in the surface lab, yet. |
+| `js/models/marine/marinekit.js` | **MarineKit** (`window.MarineKit`), a classic script like the other kits: the vessels (and their data: `foils`, `azimuth`, `wheels`, `sounds.engine`) and the wake. It needs THREE, ShipKit and VehicleKit (the amphibian's wheels: `VehicleKit.parts`). In the scene editor: the family "Sea robots". |
 | `labs/vehicles-water.html`, `js/labs/vehicles-water/vehicles-water.js` | The vehicle lab's water page: the skimmer, the barge and the diver — AUTO (wandering, turning back toward the middle) or WASD + Q/E to dive, NIGHT, WAKE, WORK. |
 | `labs/vehicles-land.html`, `js/labs/vehicles-land/vehicles-land.js` | The land page: the amphibian, with the rovers' DRIVE and GROUND. |
-
-## The sea
-
-- **One wave function** lives in two places: JS (`waveHeight`, what floats
-  rides it) and GLSL (the same sum, unrolled, which is what you see).
-  - There are five directional swells, 8–60 m long.
-  - Their speeds come from deep water: ω = √(g·k).
-  - The "Waves" slider scales their height.
-- **The seabed** is the same in JS and GLSL too (`floorAt`): a depth, gentle
-  hills and an island (a Gaussian bump 6 m above the sea).
-  - The water uses it to know where it's shallow: lighter turquoise, and
-    foam rolling on the shore.
-  - The amphibian uses it to know where it can drive.
-- **The water's shader**, from above:
-  - the water's colour, lighter in the shallows;
-  - the sky reflected (fresnel) and the sun's glint;
-  - per-pixel ripples;
-  - foam on steep crests and on the shore.
-
-  The ocean mesh is 700 m and follows the camera in 2 m steps, so the
-  grid doesn't swim.
-- **From below** (the back face):
-  - the bright window of the sky straight up (Snell's window, about 48°);
-  - outside it, a dark mirror;
-  - fog in the water's colour.
-- **Under water**:
-  - FogExp2 at 0.035 in a teal that darkens with the camera's depth;
-  - the sun dims with depth;
-  - marine snow drifts around the camera.
-- **The bed**:
-  - colour: wet sand under water, a light beach, grass and rock on the
-    island;
-  - light fades with depth;
-  - caustics dance on the bed under water.
 
 ## The vessels
 
@@ -97,14 +59,12 @@ The vessels move and float with the behaviour `js/behaviors/water/craft.js` (doc
 rudder, buoyancy, the skimmer's foils, the diver's vertical thrusters, the amphibian's wheels. `update(t, dt, { pose })`
 takes its pose (`y`, `pitch`, `roll`, `lift`, `depth`, `onLand`, `vd`) and only shows it; without `pose` the vessel stands
 level at its waterline. The kit's own sea (`makeSea`, `WAVES`, `waveHeight`, `makeSnow`) and its floating springs were
-removed (2026-11-06) — the sections below about the sea are history. The data for the behaviour sit in the definitions: `foils` (the
+removed (2026-11-06). The data for the behaviour sit in the definitions: `foils` (the
 skimmer), `azimuth` (the barge), `wheels` (the amphibian). Used by both vehicle labs and the scene editor (family
 "Sea robots", loaded with the Space kits).
 
 ## Next
 
 - Detail and look, later (the user's call).
-- Put the sea into the surface lab, where the planet's seas get this
-  water and a floor.
 - The barge carries vehicles (the ramp).
 - Vehicles and vessels as part of a base's logistics.

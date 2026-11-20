@@ -17,6 +17,11 @@ Układ: +Z przód, +X lewe skrzydło, Y w górę; 1 j. = 1 m. Na ziemi stoi na k
 `update(t, dt, { throttle, aileron, elevator, rudder, flaps, gear, work, lights, speed })` — tylko wygląd (obroty śmigła,
 wychylenia sterów, klapy, podwozie, owiewka, światła).
 
+## Dźwięk
+Podwozie zgłasza `gear-close` / `gear-open` (hydraulika) i `gear-shut` / `gear-opened` (blokada), klapy `flaps-open` /
+`flaps-close`, owiewka `work-open` / `work-shut` — `onSound`; silnik w `info.sounds.engine`: V12, 900–3000 obr/min
+([`../../audio/README.md`](../../audio/README.md)).
+
 ## Liczby lotu (`info.flight`)
 Powierzchnia 22,48 m², rozpiętość 11,23 m, cięciwa średnia 2,08 m, masa 2700 kg, moc 770 kW, śmigło (ciąg statyczny,
 sprawność), współczynniki nośnej, oporu, przeciągnięcia, momentów i podwozia (koła ze sprężyną, tłumieniem, hamulcami).

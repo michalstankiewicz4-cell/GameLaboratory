@@ -38,6 +38,8 @@ Zasada: **dane są jedynym źródłem prawdy.** Okna edytora, uchwyt, API i plik
 - `orbit` (nieobowiązkowe, zachowanie „orbita”): `{ around: id obiektu, period: s }`.
 - `shot` (nieobowiązkowe, statek, który strzela — `prefab.shoots`): efekt strzału — id efektu albo nazwa zasobu
   „effect” z laboratorium efektów; bez pola — strzał.
+- `sound` (nieobowiązkowe): dźwięk przy obiekcie w grze — gotowy dźwięk SfxKit, tło miejsca albo zasób `sound` /
+  `ambience`; `soundRange` — zasięg w metrach (odległość pełnej głośności; bez pola — domyślny dźwięku).
 - `asset` (nieobowiązkowe): nazwa zasobu rodzaju, który bierze prefabrykat (`assetKind`, np. `blocks` — bryła z laboratorium
   bloków); bez pola — model domyślny prefabrykatu.
 - Zmiana formatu podnosi `VERSION`, a `normalize` przenosi starsze sceny. Nowe nieobowiązkowe pole (jak `behavior`,
@@ -84,7 +86,9 @@ Wpis: `{ id, label, family, surface, lab, build() → { root, kit, dispose } }`.
 (`lodFree` — zachowanie rusza całym modelem, nie jego częściami: model może przejść na wersję daleką). Klawisze gracza
 z ustawień (`js/core/settings.js`, `settings.keys`, menu Sterowanie UI gry); w grze działa też jego grafika i poziom
 jakości silnika, po Stop — wygląd edytora.
-`create` zwraca `{ state, step(dt, input, t), hud(), reset() }` albo `null` (model bez potrzebnych danych).
+`create` zwraca `{ state, step(dt, input, t), hud(), reset(), actions?(), act?(id, on) }` albo `null` (model bez potrzebnych danych).
+Jazda, lot i mała jednostka mają akcję **work** — część roboczą modelu (`info.work`: drzwi, właz, owiewka, rampa; `opts.work`
+w `update`). Silnik w grze gra dźwięk z danych modelu (`info.sounds.engine`) — „Dźwięk w scenie” niżej.
 
 | id | Dla | Zachowanie | Sterowanie (`input`) |
 |---|---|---|---|
@@ -172,14 +176,16 @@ scena trzyma tylko nazwę. Inna karta widzi zmianę od razu (`onAssetsChange`).
 | `weather` | wygląd ([`../labs/look.md`](../labs/look.md)) | `weather`, `coverage`, `density`, `scale`, `haze`, `wind`, `rain`, `vis`, `lightning`, `time`, `sunEl`, `sunAz`, `moon` |
 | `look` | filtry ([`../labs/filters.md`](../labs/filters.md)) | profil potoku kamery (`LOOK_DEFAULTS` w `js/render/sea/look.js`); dawny klucz `gameLab.lookProfiles.v1` przenosi się sam |
 | `sky` | ciała niebieskie ([`../labs/bodies.md`](../labs/bodies.md)), Niebo | wszystkie liczby nieba BodyKit (mgławice, pas, pył, gwiazdy, barwy, ziarno) |
-| `ui`, `uiskin` | UI gry ([`../labs/gameui.md`](../labs/gameui.md)) | definicja `gamelab-ui`; skórka: `base`, `tokens` |
+| `ui`, `uiskin` | UI gry ([`../labs/gameui.md`](../labs/gameui.md)) | definicja `gamelab-ui`; skórka: `base`, `tokens`, `sounds` |
+| `sound`, `ambience` | efekty dźwiękowe ([`../labs/sound-effects.md`](../labs/sound-effects.md)) | dźwięk: `sound`, `params`, `gain`; tło: `layers`; w scenie pole `sound` obiektu |
+| `voice` | mowa ([`../labs/sound-speech.md`](../labs/sound-speech.md)) | opis VoiceKit (`mode`, `lang`, `voice`, `rate`, `pitch`, `hz`, `size`, `speed`, `melody`, `breath`, `fx`); głos postaci w UI gry |
 | `tree` | drzewka ([`../labs/trees.md`](../labs/trees.md)) | definicja `gamelab-tree`: gałęzie, węzły, punkty, widok, tło, notatki |
 | `image` | sztuka ([`../labs/art.md`](../labs/art.md)) | opis obrazu ArtKit (temat, technika, ziarno, powierzchnia, konwersje…), malowany od nowa tam, gdzie potrzebny |
 | `material` | materiały ([`../labs/materials.md`](../labs/materials.md)) | opis MatKit |
 | `plant` | rośliny ([`../labs/plants.md`](../labs/plants.md)) | `species`, `seed`, `size`, `detail`, `season`; w scenie pole `asset` obiektu `plants/<gatunek>` |
 | `cave` | jaskinie ([`../labs/caves.md`](../labs/caves.md)) | ustawienia CaveKit (`seed`, `length`, `branches`, `width`, `winding`, `chambers`, `rough`, `cell`, `drips`, `rubble`, `lakes`, `lava`, `rock`, `wet`, `relief`); w scenie pole `asset` obiektu `caves/cave` albo `env.cave` podziemia |
 | `effect` | efekty ([`../labs/effects.md`](../labs/effects.md)) | `kind`, `scale`, `values` (liczby EffectKit); w scenie polecenie API `effect` |
-| `building` | miasto ([`../labs/city.md`](../labs/city.md)) | opis CityKit: `type`, `seed`, `footprint`, `front`, `floors`, `floorH`, `groundH`, `wall`, `bay`, `module`, `window`, `ground`, `bands`, `balcony`, `roof`, `lit`; w scenie pole `asset` obiektu `city/<rodzaj>` |
+| `building` | miasto ([`../labs/city.md`](../labs/city.md)) | opis CityKit: `type`, `seed`, `footprint`, `front`, `floors`, `floorH`, `groundH`, `wall`, `bay`, `module`, `window`, `ground`, `bands`, `balcony`, `roof`, `lit`, `landmark` (budynek Warszawy z OpenStreetMap); w scenie pole `asset` obiektu `city/<rodzaj>` |
 | `blocks` | bloki ([`../labs/blocks.md`](../labs/blocks.md)) | `shape`, `radius`, `voxel`, `seed`, `text`, `layers`, `mats` (opisy MatKit bloków stałych), `matRefs` (wybór w laboratorium); w scenie pole `asset` obiektu |
 
 - Funkcje: `listAssets(kind)`, `getAsset(kind, name)`, `saveAsset(kind, name, data)` (tylko pola rodzaju),

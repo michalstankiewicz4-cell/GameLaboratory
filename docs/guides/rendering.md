@@ -14,7 +14,7 @@ how the labs draw today (Three.js r186, the graphics of the labs from Battle): C
   ACES filmic tone mapping (exposure 1.1) and
   `scene.environment = ShipKit.makeEnvironment(renderer)` — a PMREM of
   the labs' own generated space sky (`ShipKit.makeSpaceSky()`), so metal
-  reflects and ShipKit models look as they do in `ship.html`. Planets and
+  reflects and ShipKit models look as they do in `labs/vehicles-space.html`. Planets and
   the station pick up the reflections too. The skybox and the scene
   lights weren't retuned for it yet (the user's plan: later).
 - **Color management (`scene/colorManagement.js`)**: with sRGB output a

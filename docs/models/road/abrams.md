@@ -35,6 +35,11 @@ Czołg podstawowy (General Dynamics Land Systems), w barwach do wyboru: zieleń 
 `speed` (m/s), `turn` (rad/s, dodatni w lewo), `contact(x, z)`, `turret` (rad), `gun` (rad), `lights`, `brake`, `work` (właz dowódcy).
 Kadłub kołysze się na płaszczyźnie przez koła jezdne, przysiada przy ruszaniu i hamowaniu.
 
+## Dźwięk
+
+Właz zgłasza `work-open` (zamek) i `work-shut` (ciężkie dobicie) — `onSound`; silnik w `info.sounds.engine`: 8 cylindrów,
+700–3000 obr/min (w oryginale turbina gazowa — dźwięku turbiny jeszcze nie ma) ([`../../audio/README.md`](../../audio/README.md)).
+
 ## Doktor modeli
 
 Bez błędów i ostrzeżeń (zostaje 7 części z igłami — info). Ok. 71 tys. trójkątów.

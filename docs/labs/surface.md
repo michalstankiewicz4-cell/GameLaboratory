@@ -301,7 +301,7 @@ Saved in localStorage under `gameLab.bases` (until 0.13.0 `roj-bases`), one base
 
 ## Not done yet
 
-- Vehicles lab (`vehicles.html` and its own kit, reusing ShipKit's blocks):
+- Vehicles lab (`vehicles-land.html` and its own kit, reusing ShipKit's blocks):
   rovers with a driving animation. The user's call: separate from the ship
   lab.
 - Underwater: the seas have a floor, and a sea vehicles lab is planned

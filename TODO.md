@@ -3,23 +3,7 @@
 Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHANGELOG.md`.
 
 ## Następne w planie (`docs/guides/lab-breakdown.md`, „Kolejność”)
-- [x] Punkt 7 — lekarz sceny: zrobiony w 0.60.0 (`js/scene/doctor.js`, `docs/scene/doctor.md`); następne reguły — w opisie.
-- [x] Punkt 8 — materiał z Hive Hunger (z historią): ~~laboratorium bloków~~ (0.64.0), ~~statki roju~~ (nie przenosimy — w grze to tylko kolorowe kreski; decyzja właściciela 2026-11-14), ~~laboratorium efektów~~ (0.67.0), ~~drzewka
-  technologiczne~~ (0.73.0–0.74.0) — zrobione.
-- [x] **Laboratorium drzewek technologicznych** (właściciel, 2026-11-14; koniec punktu 8) — uniwersalne, dla dowolnej gry:
-  - [x] **Etap 1** (0.73.0, `labs/trees.html`, `docs/labs/trees.md`): jeden format drzewka jako zasób z nazwą (`tree`: gałęzie z kolorami, węzły, rodzice — „którykolwiek”
-    albo „wszystkie”, koszt, efekt jako dane, opis EN/PL, ikona, pole `background`); edytor z Hive Hunger
-    (`tools/tree-editor.html`, z historią) w wyglądzie laboratoriów; widok promienisty w pixel arcie z Hive Hunger
-    (`js/ui/TreeView.js`, dane `js/core/SkillTree.js`); tryb próby (punkty, kupowanie, co się odblokowuje; koszt
-    całości, najdłuższa ścieżka); sprawdzanie drzewka (węzły nieosiągalne, pętle, brak opisu, efekt bez znaczenia);
-    przykład: drzewko Hive Hunger.
-  - [x] **Etap 2** (0.74.0): widok „płytka drukowana” z badań Space (`js/ui/windows/techTree.js`, `techTreeData.js`,
-    z historią) z jego dwoma drzewkami (poziomy ulepszeń i rozgałęzienia w formacie); drzewko jako okno w UI gry (blok
-    `tree`, okno Research w przykładzie Space command) i w API (`GameUIApi.tree`, `buy`); tło drzewka z obrazu
-    z laboratorium sztuki (zasób `image`).
-- [ ] **Kreator budynków** (właściciel, 2026-11-20) — dla CityExplorer i innych gier:
-  - [x] **Etap 1** (0.82.0): laboratorium miasta (`labs/city.html`, CityKit `js/models/city/`, `docs/labs/city.md`) —
-    budynki na dowolnym obrysie, wypalona fasada z paralaksą z daleka, okna świecące nocą, prefabrykaty w edytorze.
+- [ ] **Kreator budynków** (właściciel, 2026-11-20) — dla CityExplorer i innych gier (etap 1 — laboratorium miasta, budynki Warszawy z OSM: 0.82.0–0.83.0):
   - [ ] **Etap 2**: CityExplorer — budynki z obrysów OSM z CityKit (kopia do folderu `lab/` gry jej skryptem sync-lab).
 - [ ] Punkt 9 — materiał z PatientZero (z historią): środowisko „organizm”, laboratorium tkanek, laboratorium patogenów.
   Na potem (właściciel, 2026-11-20).
@@ -34,7 +18,6 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 - [ ] **Laboratorium lądu — przełącznik „Okrągła”**: generator lądu na kuli (zastąpi drugie źródło lądu — z planety);
   wraca z nim skok (skreślony z punktu 6).
 - [ ] **Widok mapy zawiniętej jako torus** (kształt, nie tylko topologia).
-- [x] Laboratorium UI gry: zrobione w 0.61.0 (`labs/gameui.html`, `js/gameui/`, `docs/labs/gameui.md`). UI w scenie (`env.ui`, nakładka w ▶ Graj): 0.62.0.
 - [ ] **Laboratorium scenariusza** (właściciel, 2026-11-13): treści i dialogi podpinane pod postacie i narratora —
   sceny scenariusza, kwestie, wybory, warunki (stan gry, zdarzenia), teksty po angielsku i po polsku; dane jako zasób
   z nazwą, w scenie przypięte do obiektów (postać, narrator), w API dla AI.
@@ -48,14 +31,9 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 - [ ] **System statystyk i stanu gry** (właściciel, 2026-11-14, do przemyślenia): statystyki obiektów (np. HP postaci
   i przeciwników) i matematyka gry (wzory, modyfikatory — np. z drzewek i przedmiotów), połączone z zapisem stanu gry
   (statystyki, położenie obiektów i ich zmiany w czasie). Na schemacie silnika: moduły Rules i Save/Load.
-- [x] **Ustawienia gry: grafika i sterowanie** (właściciel, 2026-11-14): zrobione w 0.80.0 — magazyn ustawień
-  (`js/core/settings.js`), ekrany Grafika i Sterowanie w UI gry, grafika na scenie (`js/render/game-graphics.js`),
-  klawisze i mysz w ▶ Graj edytora.
 - [ ] **Laboratorium animacji** (do rozważenia): chód ludzi i stworów jako zachowanie, animacje modeli.
 - [ ] **Grawitacja statków w kosmosie** (propozycja do decyzji): statki w scenie przyciągane przez ciała niebieskie,
   jak orbity.
-- [ ] **Zasoby z nazwą dla jaskiń i roślin**: ustawienia z laboratoriów zapisane pod nazwą i użyte w scenie (jak ląd
-  i morze).
 
 ## Pełne połączenie laboratoriów — przekształcenie w silnik (właściciel, 2026-11-13)
 Cel: każde laboratorium jest edytorem jednej części silnika, a jego wynik trafia do sceny (i do gier) jako prefabrykat
@@ -73,10 +51,6 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
   w 2D i 3D).
 - [ ] **Sztuka → scena:** obraz z laboratorium sztuki jako zasób (zrobione w 0.74.0: zasób `image`) i obiekt sceny (płaszczyzna z fakturą farby, rama 3D
   ze złoceniem — tryb 3D sztuki).
-- [x] **Bloki:** bryła z laboratorium bloków jako zasób z nazwą (0.66.0; pole `asset` obiektu).
-- [x] **Jaskinie:** zasób „cave” (0.71.0) — w scenie jako obiekt (pole `asset`) albo teren całej planszy (powierzchnia
-  „podziemie”, `env.cave`); grupa laboratoriów „Teren” (ląd · jaskinie).
-- [x] **Rośliny:** pojedyncza roślina jako zasób `plant` (0.72.0; gatunek, ziarno, wielkość, szczegółowość, pora roku).
 - [ ] **Roślinność krajobrazu:** las, zagajniki i trawa z laboratorium roślin (biom, gęstość) jako zasób — pokrycie
   terenu lądu w scenie.
 - [ ] **Rozległe jaskinie** (właściciel, 2026-11-14): jaskinia dzielona na kawałki liczone wokół gracza (dziś CaveKit liczy
@@ -95,7 +69,9 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
 - [ ] **Powierzchnia (surface):** to, czego ląd z planety jeszcze nie przejął (grunt SurfaceKit, zejście, jazda) —
   rozliczyć i zamknąć albo połączyć z laboratorium lądu.
 - [ ] **Przedmioty bohatera (gear):** latarki i lampy jako prefabrykaty (światło w scenie, jaskinie).
-- [ ] **Dźwięk (sound):** MusicKit jako zasób sceny (muzyka, odgłosy zdarzeń z szyny `js/core/events.js`).
+- [ ] **Dźwięk (sound):** muzyka MusicKit jako zasób sceny. *(Zrobione w 0.84.0–0.87.0: mikser, efekty i tła jako
+  zasoby `sound` / `ambience`, dźwięk przy obiekcie z zasięgiem, silniki, strzały, wybuchy i efekty w ▶ Graj, dźwięki
+  modeli, dźwięki UI i głosy postaci.)*
 - [ ] **Edytor stworów (creator), transformator (transform):** wynik jako prefabrykat sceny.
 - [ ] **Postacie SDF i pixel art** (generator zombie, Kostnica SDF, SDF Walkers, Pixel Studio): postacie i sprite'y jako
   zasoby (np. dla gier 2D i HUD); laboratoria języka i obrazów — rozstrzygnąć, czy należą do silnika.
@@ -107,7 +83,6 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
 - [ ] Przenieść materiały modeli na MatKit stopniowo, rodzina po rodzinie (doktor modeli, porównanie obrazów):
   budowle (`js/models/structures/materials.js`), okręty (`js/render/sea/materials.js`, `js/models/ships-sea/materials.js`),
   pojazdy, statki kosmiczne; potem teren i powierzchnie 2D laboratorium sztuki.
-- [x] Bloki laboratorium bloków (Hive Hunger) z materiałów (0.64.0).
 - [ ] Złocenie ramy; faktura farby jako mapa nierówności.
 
 ## Efekty

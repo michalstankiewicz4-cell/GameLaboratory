@@ -5,6 +5,8 @@
 These labs were the workshop behind the game *Steel Salvo* (repository Battle): each one tries out one part (a ship, the
 sea, the look, the land) with every option switchable, so a choice can be made. This guide says what
 each lab is for, how to drive it and what to try. Technical details are in the per-lab documents (`docs/*.md`).
+It covers the labs that came from Battle; every other lab (and the scene editor) has its own document — the map:
+[`../README.md`](../README.md).
 
 ## Opening the labs
 
@@ -23,10 +25,13 @@ each lab is for, how to drive it and what to try. Technical details are in the p
 | Zoom | mouse wheel |
 | Camera presets | the buttons in the **Camera** window |
 | Windows | OPTIONS → Windows opens and closes them; every lab has **Description** (left), its own windows, **Camera**, **Light and weather** and **Performance** (right) |
+| Windows or panels | by default the windows are **panels** at the edges (the view in the free middle); the pin on a title bar undocks one, **Windows \| Panels** on the toolbar switches all |
+| Forget everything | OPTIONS → **Reset saved settings** clears all GameLaboratory keeps in this browser (settings, windows, assets, scenes) |
 | Hide the windows (clean view, screenshots) | **H** |
 | The log | **Console** on the right of the top bar: errors, warnings, loading steps, newest first |
 | Keep a result | **Copy settings (JSON)** — paste it into the chat; it is what moves into the game |
 | Settings survive a reload | yes (stored in the browser); "Reset" buttons where they exist |
+| Sound | the sound group (music · effects · speech); the volumes in **Mixer** windows are the game's (Options → Sound) |
 
 ## Vehicle lab, water — `labs/vehicles-water.html`
 

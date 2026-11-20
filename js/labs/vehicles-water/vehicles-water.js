@@ -3,7 +3,7 @@
 // dimension labels, part toggles, turret training/elevation and statistics. Uses only ShipKit's public API.
 // The robot vessels (MarineKit: skimmer, barge, diver; moved here from the sea lab) are on the same list: they drive
 // (auto or W/A/S/D, the diver dives with Q/E), with lamps, a wake and their work; the camera rides along.
-// The amphibian is on the land page (vehicles.html).
+// The amphibian is on the land page (vehicles-land.html).
 import * as THREE from '../../../vendor/three/three.module.js';
 import { PostPipeline } from '../../render/sea/post.js';
 import { SHIP_IDS, buildShip, shipInfo, shipView } from '../../models/ships-sea/index.js';
