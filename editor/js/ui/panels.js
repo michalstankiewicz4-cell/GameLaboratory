@@ -6,6 +6,7 @@ import { listAssets, ASSET_KINDS } from '../../../js/scene/assets.js';
 import { FX_KINDS, FX_BADGES } from '../../../js/render/effects/effects.js';
 import { SOUNDS, AMBIENCES, CATS } from '../../../js/audio/sfx/sfxkit.js';
 import { rangeOf } from '../../../js/scene/sounds.js';
+import '../../../js/scene/music.js';   // window.MusicKit — nastroje i piosenki do list muzyki
 import { audible } from '../../../js/audio/mixer.js';
 import { skyPresets, SKY_PRESET, SKY_DAY } from '../../../js/scene/space.js';
 import { BEHAVIORS, behaviorsFor, behaviorOf, ORBIT_PERIOD } from '../../../js/scene/behaviors.js';
@@ -109,6 +110,17 @@ export function createPanels(store, actions) {
       $('uiAsset').replaceChildren(el('option', { value: '', textContent: t('env.uiNone') }), ...uis.map((n) => el('option', { value: n, textContent: n })),
         ...(curUi && !uis.includes(curUi) ? [el('option', { value: curUi, textContent: t('env.seaMissing', { name: curUi }) })] : []));
       $('uiAsset').value = curUi;
+      // muzyka (js/scene/music.js): nastroje i piosenki MusicKit, zapisane w laboratorium muzyki; zwykła i akcji
+      for (const [id, key] of [['musicAsset', 'music'], ['musicAction', 'musicAction']]) {
+        const K = window.MusicKit, cur = S.env[key] || '', saved = listAssets('music'), opt = (v, txt) => el('option', { value: v, textContent: txt });
+        const known = new Set(['', ...Object.keys(K.PRESETS).map((k) => 'mood:' + k), ...Object.keys(K.SONGS).map((k) => 'song:' + k), ...saved]);
+        $(id).replaceChildren(opt('', t('env.musicNone')),
+          el('optgroup', { label: t('env.musicMoods') }, ...Object.entries(K.PRESETS).map(([k, p]) => opt('mood:' + k, p.name))),
+          el('optgroup', { label: t('env.musicSongs') }, ...Object.entries(K.SONGS).map(([k, p]) => opt('song:' + k, p.name))),
+          ...(saved.length ? [el('optgroup', { label: t('env.musicSaved') }, ...saved.map((n) => opt(n, n)))] : []),
+          ...(known.has(cur) ? [] : [opt(cur, t('env.seaMissing', { name: cur }))]));
+        $(id).value = cur;
+      }
       // morze: zasoby z laboratorium wody; nazwa ze sceny, której nie ma w tej przeglądarce, zostaje na liście (oznaczona)
       const seas = listAssets('sea'), cur = S.env.sea || '';
       $('seaAsset').replaceChildren(el('option', { value: '', textContent: t('env.seaDefault') }), ...seas.map((n) => el('option', { value: n, textContent: n })),
@@ -233,6 +245,8 @@ export function createPanels(store, actions) {
   $('light').addEventListener('change', () => store.setEnv({ light: $('light').value }));
   $('look').addEventListener('change', () => store.setEnv({ look: $('look').value }));
   $('uiAsset').addEventListener('change', () => store.setEnv({ ui: $('uiAsset').value }));
+  $('musicAsset').addEventListener('change', () => store.setEnv({ music: $('musicAsset').value }));
+  $('musicAction').addEventListener('change', () => store.setEnv({ musicAction: $('musicAction').value }));
   $('toGround').addEventListener('click', () => { const o = store.selected; if (o) store.update(o.id, { pos: [o.pos[0], +actions.groundAt(o.pos[0], o.pos[2]).toFixed(2), o.pos[2]] }); });   // teren z laboratorium lądu albo 0
   $('dupBtn').addEventListener('click', actions.duplicate);
   $('delBtn').addEventListener('click', actions.remove);

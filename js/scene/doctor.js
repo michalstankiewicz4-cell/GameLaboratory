@@ -10,7 +10,7 @@
 //   prefab(id) → { id, label, family, surface } | null      (js/scene/prefabs.js)
 //   behaviorsFor(prefabId) → [id], behaviorOf(obj, surface) → id | '', behaviorEnv(id) → 'water' | 'land' | 'space'
 //   bodyRank(prefabId) → ranga ciała niebieskiego (−1 — nie ciało)                    (js/scene/behaviors.js)
-//   assets: { list(kind) → nazwy }, soundNames: [nazwy dźwięków obiektu — js/scene/sounds.js], lights: [nazwy], skyPresets: [id]                 (js/scene/assets.js, space.js)
+//   assets: { list(kind) → nazwy }, soundNames: [nazwy dźwięków obiektu — js/scene/sounds.js], musicNames: [nazwy muzyki — js/scene/music.js], lights: [nazwy], skyPresets: [id]                 (js/scene/assets.js, space.js)
 //   probe (nieobowiązkowe, świat): { groundAt(x, z), isWater(x, z, depth), waterLevel(x, z) }   (scena bazowa)
 //   boxOf(obj) → { min: [x, y, z], max: [x, y, z] } | null — obrys w świecie z danych obiektu (pos, rot, scale)
 //   costOf(obj) → { tris, draws } | null — koszt zbudowanego modelu
@@ -43,6 +43,9 @@ export function checkScene(scene, ctx) {
   asset('sea', 'sea', 'water lab');
   asset('look', 'look', 'filters lab');
   asset('ui', 'ui', 'game UI lab');
+  // muzyka (env.music, env.musicAction): nastrój, piosenka albo zasób „music” — js/scene/music.js
+  for (const f of ['music', 'musicAction']) if (S.env[f] && ctx.musicNames && !ctx.musicNames.includes(S.env[f]))
+    add('error', 'missing-asset', null, `Environment ${f}: no music "${S.env[f]}" (save one in the music lab; "" — none): silent in play`, { cmd: 'env', [f]: '' });
   if (surf === 'underground') asset('cave', 'cave', 'cave lab');
   asset('sky', 'sky', 'celestial bodies lab', (n) => n === 'day' || (n.startsWith('preset:') && (!(ctx.skyPresets || []).length || ctx.skyPresets.includes(n.slice(7)))));
   if (S.env.light && !(ctx.lights || []).includes(S.env.light) && !A.list('weather').includes(S.env.light))

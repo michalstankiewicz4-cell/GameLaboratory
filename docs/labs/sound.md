@@ -13,6 +13,7 @@ ship generator". Lab first (labs 1.3.0); the game later.
 |---|---|
 | `js/audio/musickit/musickit.js` | **MusicKit** (`window.MusicKit`), a classic script, no dependencies: `create({ params })` → a player (`start`, `stop`, `setParams` live, `say`, `analyser`, `stream`), `PRESETS`, `LAYERS`, `SCALES`, `NOTES`. Not in the game yet. |
 | `labs/sound.html` + `js/labs/sound/sound.js` | The lab: PLAY, MOODS, SEED, KEY, CHARACTER (tempo, density, brightness, space, volume), LAYERS (a level each), THE ROBOT'S VOICE (its lines, how often), RECORD (.webm), COPY SETTINGS; a picture of the sound in the middle. |
+| SAVE FOR THE SCENE | The settings as the named asset **music** (`js/scene/assets.js`); the scene editor plays it in ▶ Play (environment: Music, Action music — `js/scene/music.js`, [`../audio/README.md`](../audio/README.md)). |
 | `js/audio/voice/voicekit.js` | **VoiceKit** (speech lab, [`sound-speech.md`](sound-speech.md)): MusicKit's robot voice (`VoiceKit.speak`) and whisper layer (`VoiceKit.murmur`) moved there (program 0.84.0). |
 | `js/audio/mixer.js` | The engine mixer ([`../audio/README.md`](../audio/README.md)): the lab plays MusicKit on its music bus — `create({ params, ctx, out, mixer })`; without `ctx`/`out` MusicKit makes its own context as before. The MIXER window sets the player's volumes (the game UI's Options → Sound). |
 
@@ -145,7 +146,7 @@ sound plus:
 ## Next
 
 - Listen and tune (the user): the moods, the levels, the voice.
-- Into the game: the music following the situation (orbit, landing, near the
-  black hole, the surface), crossfades. The player's volumes are the engine
+- Into the game: done for the scene (0.88.0) — the music and the action music after loud events (`js/scene/music.js`);
+  more situations (orbit, landing, near the black hole) and real crossfades later. The player's volumes are the engine
   mixer's (`settings.audio`, Options → Sound in the game UI).
 - The robot's lines as files through a vocoder; maybe recorded whispers.

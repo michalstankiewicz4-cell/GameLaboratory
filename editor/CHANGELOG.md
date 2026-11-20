@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.44.0 — 2026-11-20
+
+### Dodane
+- Środowisko: **Muzyka** i **Muzyka akcji** (nastroje, piosenki, zapisane w laboratorium muzyki) — w ▶ Graj muzyka akcji
+  po wybuchach i strzałach przez 20 s; API `env { music, musicAction }`, `music { play | action }`.
+
 ## 0.43.0 — 2026-11-20
 
 ### Dodane

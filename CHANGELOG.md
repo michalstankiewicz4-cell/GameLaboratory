@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.88.0 · muzyka 1.4.0 · edytor sceny 0.44.0 — 2026-11-20 (muzyka w scenie)
+
+### Dodane
+- **Muzyka w scenie** (`js/scene/music.js`): środowisko **Muzyka** gra w ▶ Graj (nastrój, piosenka albo zapisana),
+  **Muzyka akcji** zastępuje ją po wybuchu, strzale, piorunie albo rozbiciu i ustępuje po 20 s spokoju. API:
+  `env { music, musicAction }`, w grze `music { play | action }`; lekarz sceny zgłasza brakującą muzykę.
+- Laboratorium muzyki: **SAVE FOR THE SCENE** — ustawienia jako zasób `music` (zapis i wczytanie z listy).
+
 ## Program 0.87.1 — 2026-11-20 (domyślnie panele, porządek w dokumentacji)
 
 ### Zmienione

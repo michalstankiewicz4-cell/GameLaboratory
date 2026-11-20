@@ -25,7 +25,8 @@ textarea.lab{ height:96px; width:100%; padding:6px; resize:vertical; line-height
 .twoBtns .tBtn{ height:28px; font-size:12.5px; }
 #btnWarm{ width:100%; height:28px; font-size:12.5px; margin-top:8px; }
 #btnMidi{ width:100%; height:28px; font-size:12.5px; margin-top:6px; }
-#recState{ font-size:12.5px; color:var(--dim); margin-top:6px; min-height:16px; }
+#recState, #musMsg{ font-size:12.5px; color:var(--dim); margin-top:6px; min-height:16px; }
+#musName{ width:100%; }
 #tapHint{ position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); z-index:1; pointer-events:none; text-align:center;
   font-family:var(--font); letter-spacing:3px; color:var(--dim); font-size:15px; opacity:.85; transition:opacity .6s; }
 #tapHint b{ display:block; font-size:34px; color:var(--accent); letter-spacing:4px; margin-bottom:6px; }

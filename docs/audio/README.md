@@ -71,6 +71,15 @@ Część robocza modelu (`info.work`: drzwi, właz, owiewka, rampa) jest w ▶ G
 zachowań jazdy, lotu i małej jednostki. Laboratorium pojazdów lądowych słucha modeli (przycisk części roboczej,
 podwozie, klapy).
 
+## Muzyka w scenie (`js/scene/music.js`)
+
+Środowisko sceny: **Muzyka** (`env.music`) gra w ▶ Graj na szynie muzyki; **Muzyka akcji** (`env.musicAction`,
+nieobowiązkowa) zastępuje ją po głośnym zdarzeniu — wybuchu, strzale, piorunie, rozbiciu (`sounds.js` `onLoud`) —
+i ustępuje po 20 s spokoju (`ACTION_HOLD`). Nazwa: `mood:<id>` (nastrój MusicKit), `song:<id>` (piosenka) albo
+zasób **music** — ustawienia zapisane w laboratorium muzyki (okno Instruments and voice → SAVE FOR THE SCENE).
+API: `env { music, musicAction }`, w grze `music { play }` i `music { action: true }`; lekarz sceny zgłasza brakującą
+muzykę.
+
 ## Zasoby z nazwą (`js/scene/assets.js`)
 
 `sound` (efekt: `{ sound, params, gain }`), `ambience` (tło: `{ layers }`), `voice` (głos VoiceKit) — z laboratoriów

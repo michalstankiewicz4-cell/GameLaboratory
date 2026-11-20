@@ -2,6 +2,7 @@
 // (js/audio/mixer.js, the music bus), its panels, the Mixer window and a picture of the sound.
 import { mixer } from '../../audio/mixer.js';
 import { mixerWindow } from '../shared/mixer-window.js';
+import { listAssets, getAsset, saveAsset, onAssetsChange } from '../../scene/assets.js';
 (() => {
 "use strict";
 const $ = (id) => document.getElementById(id);
@@ -193,6 +194,20 @@ function draw(t) {
   else $("nowPlaying").innerHTML = player.playing ? `Playing · chord <b>${player.chordName}</b> · ${MK.SCALES[P.scale].name.split(" ")[0].toLowerCase()} in ${MK.NOTES[P.root]}${Array.isArray(P.progression) && P.progression.length ? " · fixed progression" : ""}` : "Stopped";
   requestAnimationFrame(draw);
 }
+
+// SAVE FOR THE SCENE: the settings as the named asset "music" (js/scene/assets.js) — the scene editor's Music
+function fillSaved(cur) {
+  const s = $("musSaved"); s.replaceChildren(new Option("— saved —", ""), ...listAssets("music").map((n) => new Option(n, n))); s.value = cur || "";
+}
+$("btnSaveMus").addEventListener("click", () => {
+  const n = $("musName").value.trim(); if (!n) { $("musMsg").textContent = "Give it a name first."; return; }
+  saveAsset("music", n, { label: n, params: JSON.parse(JSON.stringify(P)) }); fillSaved(n); $("musMsg").textContent = `Saved: ${n} (asset "music").`;
+});
+$("musSaved").addEventListener("change", () => {
+  const a = getAsset("music", $("musSaved").value); if (!a) return;
+  player.setParams(JSON.parse(JSON.stringify(a.params))); $("musName").value = $("musSaved").value; showAll(); markPreset(null);
+});
+onAssetsChange(() => fillSaved($("musSaved").value)); fillSaved();
 
 LabKit.autoHideWindows();   // every window of the page fades when idle
 showAll(); markPreset("station");

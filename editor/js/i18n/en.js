@@ -32,6 +32,8 @@
   'tree.env': 'Environment', 'tree.empty': 'No models yet: pick a category above and click + next to a model.',
   'env.title': 'Environment', 'env.surface': 'Surface', 'env.sea': 'Sea', 'env.land': 'Land',
   'env.light': 'Light', 'env.look': 'Camera look', 'env.plain': 'Plain (no profile)',
+  'env.music': 'Music', 'env.musicAction': 'Action music', 'env.musicNone': 'None', 'env.musicMoods': 'Moods', 'env.musicSongs': 'Songs', 'env.musicSaved': 'Saved in the music lab',
+  'env.musicNote': 'Music in ▶ Play: a mood, a song or your own saved in the music lab. The action music plays after explosions and shots and gives way again after 20 s of quiet.',
   'env.ui': 'Game UI', 'env.uiNone': 'None', 'env.uiNote': 'The game\'s menu, HUD, windows and dialogue over the view in ▶ Play — saved in the game UI lab.',
   'env.lookNote': 'Camera looks are the profiles saved in the filters lab.',
   'obj.title': 'Object', 'obj.orbitAround': 'Orbits', 'obj.orbitAuto': 'Nearest heavier body', 'obj.orbitPeriod': 'Period', 'obj.name': 'Name', 'obj.model': 'Model',

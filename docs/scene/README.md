@@ -143,6 +143,8 @@ Polecenia (`help`, `describe`, `prefabs`, `assets`, `add`, `set`, `move`, `remov
   dwiema kulami (wewnętrzna — pełna głośność, zewnętrzna — 10%, `editor/js/world/sound-range.js`), suwak **Zasięg
   dźwięku** w oknie Właściwości; API `set { soundRange }` (0 — domyślny).
 - Dźwięki modeli (drzwi, właz, podwozie — `onSound`) w ▶ Graj: `sounds.model(e)` ([../audio/README.md](../audio/README.md)).
+- **Muzyka** (`js/scene/music.js`): `env.music` w ▶ Graj, `env.musicAction` po głośnych zdarzeniach (wybuch, strzał,
+  rozbicie) przez 20 s; polecenie API `music`.
 - Silniki z zachowań (`ENGINES`): jazda (biegi), okręt, mała jednostka, lot, przeładowarka — dźwięk silnika z obrotami
   i obciążeniem z prędkości i dźwigni; łaziki i nurek — buczenie napędu elektrycznego; ciąg w próżni i lądowanie —
   huk ognia z mocą; rozbicie — wybuch.
@@ -178,6 +180,7 @@ scena trzyma tylko nazwę. Inna karta widzi zmianę od razu (`onAssetsChange`).
 | `sky` | ciała niebieskie ([`../labs/bodies.md`](../labs/bodies.md)), Niebo | wszystkie liczby nieba BodyKit (mgławice, pas, pył, gwiazdy, barwy, ziarno) |
 | `ui`, `uiskin` | UI gry ([`../labs/gameui.md`](../labs/gameui.md)) | definicja `gamelab-ui`; skórka: `base`, `tokens`, `sounds` |
 | `sound`, `ambience` | efekty dźwiękowe ([`../labs/sound-effects.md`](../labs/sound-effects.md)) | dźwięk: `sound`, `params`, `gain`; tło: `layers`; w scenie pole `sound` obiektu |
+| `music` | muzyka ([`../labs/sound.md`](../labs/sound.md)) | `label`, `params` (ustawienia MusicKit: nastrój albo piosenka); w scenie `env.music`, `env.musicAction` |
 | `voice` | mowa ([`../labs/sound-speech.md`](../labs/sound-speech.md)) | opis VoiceKit (`mode`, `lang`, `voice`, `rate`, `pitch`, `hz`, `size`, `speed`, `melody`, `breath`, `fx`); głos postaci w UI gry |
 | `tree` | drzewka ([`../labs/trees.md`](../labs/trees.md)) | definicja `gamelab-tree`: gałęzie, węzły, punkty, widok, tło, notatki |
 | `image` | sztuka ([`../labs/art.md`](../labs/art.md)) | opis obrazu ArtKit (temat, technika, ziarno, powierzchnia, konwersje…), malowany od nowa tam, gdzie potrzebny |

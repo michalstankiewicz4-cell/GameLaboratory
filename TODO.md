@@ -69,9 +69,6 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
 - [ ] **Powierzchnia (surface):** to, czego ląd z planety jeszcze nie przejął (grunt SurfaceKit, zejście, jazda) —
   rozliczyć i zamknąć albo połączyć z laboratorium lądu.
 - [ ] **Przedmioty bohatera (gear):** latarki i lampy jako prefabrykaty (światło w scenie, jaskinie).
-- [ ] **Dźwięk (sound):** muzyka MusicKit jako zasób sceny. *(Zrobione w 0.84.0–0.87.0: mikser, efekty i tła jako
-  zasoby `sound` / `ambience`, dźwięk przy obiekcie z zasięgiem, silniki, strzały, wybuchy i efekty w ▶ Graj, dźwięki
-  modeli, dźwięki UI i głosy postaci.)*
 - [ ] **Edytor stworów (creator), transformator (transform):** wynik jako prefabrykat sceny.
 - [ ] **Postacie SDF i pixel art** (generator zombie, Kostnica SDF, SDF Walkers, Pixel Studio): postacie i sprite'y jako
   zasoby (np. dla gier 2D i HUD); laboratoria języka i obrazów — rozstrzygnąć, czy należą do silnika.

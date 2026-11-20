@@ -25,7 +25,7 @@ const COMMANDS = {
   set: { args: 'id | name, then any of: newName (with id also name), prefab, pos, rot, scale, behavior, orbit { around: id | name ("" — the nearest heavier body), period: s } (the orbit behaviour), asset (a named asset of the kind the model takes; "" — the default model), shot (a ship that shoots: the look of its shots — an effect id or a saved effect from the effects lab; "" — the shot), sound (a sound at the object during play: a ready sound — fire, engine, bird…, a ready place ambience — forest, park, seaside, storm, night, campfire, or a sound / ambience asset from the sound effects lab; "" — none), soundRange (m: full volume up to it, then it fades — about 8.5× further it is at 10%; 0 — the default of the sound)', does: 'changes an object' },
   move: { args: 'id | name, by [dx,dy,dz] m', does: 'moves an object by an offset' },
   remove: { args: 'id | name', does: 'removes an object' },
-  env: { args: 'any of: surface (sea | land | space | underground — inside a cave), cave (underground: a cave asset name from the cave lab, "" — the default cave), caveGlow (underground: true — a faint glow to see the cave, false — true darkness), light (a ready light or a weather asset name), look, ui (a game UI asset name, "" — none), land (a land asset name, "" — the plain ground), sea (a sea asset name, "" — the default sea), sky (any surface: "" — the default for the surface, "day" — the day sky, "preset:<id>" — a ready space sky, or a sky asset name)', does: 'changes the environment' },
+  env: { args: 'any of: music, musicAction ("mood:<id>", "song:<id>" or a music asset from the music lab; the action music plays after explosions and shots, 20 s; "" — none), surface (sea | land | space | underground — inside a cave), cave (underground: a cave asset name from the cave lab, "" — the default cave), caveGlow (underground: true — a faint glow to see the cave, false — true darkness), light (a ready light or a weather asset name), look, ui (a game UI asset name, "" — none), land (a land asset name, "" — the plain ground), sea (a sea asset name, "" — the default sea), sky (any surface: "" — the default for the surface, "day" — the day sky, "preset:<id>" — a ready space sky, or a sky asset name)', does: 'changes the environment' },
   assets: { args: '[kind]', does: 'named assets saved in the labs, by kind (sea — the water lab, sky — the celestial bodies lab, look — the filters lab, weather — the look lab, land — the land lab, ui and uiskin — the game UI lab, material — the materials lab, blocks — the blocks lab) and the ready skies' },
   select: { args: 'id | name, or nothing', does: 'selects an object in the editor (nothing: the environment)' },
   new: { args: '[name]', does: 'an empty scene' },
@@ -36,6 +36,7 @@ const COMMANDS = {
   ui: { args: 'during play, one of: say { who, text, choices, voice (a ready voice — narrator, robot, villager, child, giant, radio, android, ghost — or a voice asset from the speech lab; without it — the voice the game UI gives the character in voices, else no voice) }, log (text) [kind], banner (text) [sub], show (screen), hide, open (window), close (window)', does: 'the game UI of the scene (env.ui): a line of dialogue (returns at once; the choice comes as a "ui" event), an event log entry, a banner, a menu screen, a window' },
   effect: { args: 'effect (shot | orb | debris | bolt | zap | bubble | hole | laser | piercer | storm | tow | cutter | field | warp | marker | portal | scan | smoke | sparks | explosion | scorch | ember, or an effect asset name from the effects lab), then: from, to (shot, orb, bubble, laser, piercer, storm, tow, cutter; warp: from, dir) | at, [dir] (debris, hole, field, marker, portal, scan, smoke, sparks, scorch, ember; explosion: at, radius) | path [p, p, …] (bolt, zap) — each point [x,y,z] m or an object id | name', does: 'shows an effect — an "effect" event (anything listening gets it)' },
   sound: { args: 'sound (a ready sound — explosion, gunshot, thunder, splash, impact, hit, bird, ui… — or a sound asset from the sound effects lab), at [x,y,z] m | object id | name', does: 'plays a sound once at a place (a continuous sound: 4 s); behaviours, shots and effects sound by themselves during play' },
+  music: { args: 'during play: play (a music name like env.music; "" — silence) | action (true — the action music now)', does: 'changes the music while playing' },
   check: { args: '[budget { tris, draws }]', does: 'the scene doctor: problems in the scene (wrong environment, under the ground or in the air, overlapping, missing assets, unfitting behaviours, cost over the budget), each with a proposed fix (commands) — nothing is changed' },
   play: { args: '', does: 'runs the behaviours (like ▶ Play)' },
   stop: { args: '', does: 'back to editing' },
@@ -143,7 +144,11 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
         e.sky = n === '' || n === 'day' || all.includes(n) || ready.includes(n) || (n.startsWith('preset:') && !ready.length) ? n
           : fail(`no sky "${n}" ("day", ready: ${ready.join(', ') || 'preset:deep, preset:quiet, preset:crimson, preset:emerald, preset:core, preset:black'}; saved: ${all.join(', ') || 'none yet — save one in the celestial bodies lab'})`);
       }
-      if (!Object.keys(e).length) fail('nothing to change (surface, light, look, land, sea, sky, ui)');
+      for (const f of ['music', 'musicAction']) if (c[f] != null) {   // muzyka (js/scene/music.js): nastrój, piosenka albo zasób „music”
+        const n = String(c[f]), all = hooks.musicNames ? hooks.musicNames() : null;
+        e[f] = n === '' || !all || all.includes(n) ? n : fail(`${f}: one of ${all.join(', ')}; "" — none`);
+      }
+      if (!Object.keys(e).length) fail('nothing to change (surface, light, look, land, sea, sky, ui, music, musicAction)');
       store.setEnv(e); return { env: clone(store.scene.env) };
     },
     assets: (c) => {
@@ -193,6 +198,13 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
       const n = String(c.sound || ''), at = place(c.at, 'at');
       try { hooks.sound(n, at); } catch (e) { fail(`${e.message} (ready: ${(hooks.soundNames ? hooks.soundNames() : []).join(', ')})`); }
       return { sound: n, at };
+    },
+    music: (c) => {
+      if (!hooks.music || !(hooks.playing && hooks.playing())) fail('during play only: {"cmd":"play"} first');
+      if (c.action) { hooks.music.action(); return { music: 'action' }; }
+      if (c.play == null) fail('play (a music name, "" — silence) or action: true');
+      try { hooks.music.play(String(c.play)); } catch (e) { fail(`${e.message} (${(hooks.musicNames ? hooks.musicNames() : []).join(', ')})`); }
+      return { music: String(c.play) };
     },
     check: (c) => { if (!hooks.check) fail('the scene doctor is not available here'); return hooks.check({ budget: c.budget }); },
     events: (c) => ({ events: hooks.events ? hooks.events(c.n > 0 ? Math.min(200, +c.n) : 20) : [] }),

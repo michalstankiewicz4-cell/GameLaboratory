@@ -14,6 +14,7 @@ import { createSceneApi } from '../../js/scene/api.js';
 import { behaviorsFor, behaviorOf, bodyRank, BEHAVIORS } from '../../js/scene/behaviors.js';
 import { checkScene } from '../../js/scene/doctor.js';
 import { allSoundNames } from '../../js/scene/sounds.js';
+import { musicNames } from '../../js/scene/music.js';
 import { createSoundRange } from './world/sound-range.js';
 import { createDoctorPanel } from './ui/doctor-panel.js';
 import { onAssetsChange, listAssets, ASSET_KINDS } from '../../js/scene/assets.js';
@@ -90,10 +91,10 @@ const api = createSceneApi({
   hooks: { build, group: (fn) => store.group(fn), play: () => actions.play.start(), stop: () => actions.play.stop(), playing: () => actions.play.playing,
     check: ({ budget } = {}) => checkScene(store.scene, {   // lekarz sceny: dane sceny + pomiary świata (obrysy, koszt, grunt)
       prefab, behaviorsFor, behaviorOf, behaviorEnv: (id) => (BEHAVIORS[id] || {}).env, bodyRank,
-      assets: { list: listAssets }, soundNames: allSoundNames(), lights: Object.keys(LIGHTS), skyPresets: skyPresets().map((p) => p.id),
+      assets: { list: listAssets }, soundNames: allSoundNames(), musicNames: musicNames(), lights: Object.keys(LIGHTS), skyPresets: skyPresets().map((p) => p.id),
       probe: world.stage, boxOf: world.boxOf, costOf: world.costOf, budget }),
     act: (o, action, on) => actions.play.act(o.id, action, on),
-    effectKinds: Object.keys(FX_KINDS), effect: (e) => events.emit('effect', e), objectPos: (o) => { const r = world.objectRoot(o.id); return r ? r.position.toArray() : o.pos; }, sound: (n, at) => actions.play.sounds.play(n, at), soundNames: () => allSoundNames(), gameUI: () => actions.play.ui, actionsOf: (o) => actions.play.actionsOf(o.id), events: (n) => events.history(n) },
+    effectKinds: Object.keys(FX_KINDS), effect: (e) => events.emit('effect', e), objectPos: (o) => { const r = world.objectRoot(o.id); return r ? r.position.toArray() : o.pos; }, sound: (n, at) => actions.play.sounds.play(n, at), soundNames: () => allSoundNames(), music: { play: (n) => actions.play.music.play(n), action: () => actions.play.music.action() }, musicNames: () => musicNames(), gameUI: () => actions.play.ui, actionsOf: (o) => actions.play.actionsOf(o.id), events: (n) => events.history(n) },
 });
 createApiConsole(api);
 const doctor = createDoctorPanel(store, api, actions);

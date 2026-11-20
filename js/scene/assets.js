@@ -37,6 +37,8 @@
 //   sound — dźwięk z laboratorium efektów: { sound (rodzaj SfxKit: wybuch, strzał, ptak, wiatr…), params, gain }
 //         (js/audio/sfx/sfxkit.js)
 //   ambience — tło miejsca z laboratorium efektów: { layers: [{ sound, params, level, every, spread }] }
+//   music — muzyka z laboratorium muzyki: { label, params — ustawienia MusicKit (nastrój albo piosenka: song) }; w scenie
+//         env.music (muzyka w ▶ Graj) i env.musicAction (muzyka akcji po wybuchach i strzałach; js/scene/music.js)
 //   voice — głos z laboratorium mowy: opis VoiceKit (mode: speech | formant | whisper, lang, voice, rate, pitch, hz,
 //         size, speed, melody, breath, fx; js/audio/voice/voicekit.js)
 //   image — obraz z laboratorium sztuki: opis ArtKit (temat, technika, ziarno…; js/render/art/artkit.js), malowany od nowa
@@ -60,6 +62,7 @@ export const ASSET_KINDS = {
   building: { label: 'Building', labelPl: 'Budynek', lab: 'labs/city.html', keys: ['label', 'type', 'seed', 'footprint', 'front', 'floors', 'floorH', 'groundH', 'wall', 'bay', 'module', 'window', 'ground', 'bands', 'balcony', 'roof', 'lit', 'landmark'] },
   sound: { label: 'Sound effect', labelPl: 'Efekt dźwiękowy', lab: 'labs/sound-effects.html', keys: ['label', 'sound', 'params', 'gain'] },
   ambience: { label: 'Ambience', labelPl: 'Tło dźwiękowe', lab: 'labs/sound-effects.html', keys: ['label', 'layers'] },
+  music: { label: 'Music', labelPl: 'Muzyka', lab: 'labs/sound.html', keys: ['label', 'params'] },
   voice: { label: 'Voice', labelPl: 'Głos', lab: 'labs/sound-speech.html', keys: ['label', 'mode', 'lang', 'voice', 'rate', 'pitch', 'hz', 'size', 'speed', 'melody', 'breath', 'fx'] },
   blocks: { label: 'Block body', labelPl: 'Bryła z bloków', lab: 'labs/blocks.html', keys: ['shape', 'radius', 'voxel', 'seed', 'text', 'layers', 'mats', 'matRefs'] },
 };

@@ -9,6 +9,7 @@ import { createPlayUI } from './gameui-play.js';
 import { createSettings } from '../../../js/core/settings.js';
 import { mixer } from '../../../js/audio/mixer.js';
 import { createSceneSounds } from '../../../js/scene/sounds.js';
+import { createSceneMusic } from '../../../js/scene/music.js';
 import { applyGraphics, refresh } from '../../../js/render/game-graphics.js';
 
 const { t, lang } = window.EditorI18n;
@@ -34,7 +35,8 @@ export function createPlay(store, world, controls, actions, events) {
   // położenie obiektu — model w świecie (zachowania złomowiska ruszają model, nie grupę obiektu)
   const tmpV = world.camera.position.clone();
   const positionOf = (id) => { const b = world.built.get(id); if (!b) return null; const k = b.kit, m = k && k.model && k.model.isObject3D && k.model.parent ? k.model : b.root; return m.getWorldPosition(tmpV).toArray(); };
-  const sounds = createSceneSounds({ positionOf });
+  const music = createSceneMusic();   // muzyka sceny (env.music) i muzyka akcji po głośnych zdarzeniach (env.musicAction)
+  const sounds = createSceneSounds({ positionOf, onLoud: () => { if (runs.length) music.action(); } });
   world.onShot = (o, s) => sounds.shot(s, o.shot || 'shot');   // strzał statku (ShipKit onShot) — także poza grą
   world.onDamage = (o, e) => sounds.damage(e);   // wybuch statku (ShipKit onDamage { type: 'blast' })
   world.onSound = (o, e) => sounds.model(e);   // dźwięk modelu (onSound: drzwi, właz, podwozie, klapy)
@@ -89,12 +91,13 @@ export function createPlay(store, world, controls, actions, events) {
     actions.status(t('play.on', { name: me.obj.name, keys: (lang === 'pl' ? BEHAVIORS[me.id].keysPl : BEHAVIORS[me.id].keys) + (acts ? ' · ' + acts : '') }));
     playUI.start(me.obj.name);
     sounds.start(store.scene.objects, runs);
+    music.start(store.scene.env);
     if (window.LabLog) window.LabLog.add('info', 'Play: ' + runs.length + ' object(s), controlling ' + me.obj.name);
     changed();
   }
   function stop() {
     if (!runs.length) return;
-    sounds.stop();
+    sounds.stop(); music.stop();
     runs.forEach((r) => { if (r.run.reset) r.run.reset(); r.b.driven = false; r.b.lodFree = false; });
     // przedmioty powstałe w grze (sztabki, puszki zgniecione) znikają ze świata
     if (items) for (const it of [...items.list]) if (it.spawned) items.remove(it);
@@ -117,7 +120,7 @@ export function createPlay(store, world, controls, actions, events) {
     if ((hudT -= dt) <= 0) { hudT = 0.2; actions.status(hudText(me.run.hud())); }
     playUI.frame(dt, me, runs);
     if ((lightT += dt) > 0.5) { lightT = 0; refresh(world.scene, settings.data.gfx, world.renderer.capabilities.getMaxAnisotropy()); }   // to, co pojawiło się w grze (ogień, lampy, wersje dalekie modeli)
-    sounds.frame();
+    sounds.frame(); music.frame();
     if (mixer().started) { const c2 = world.camera, f = c2.getWorldDirection(c2.position.clone()), u = c2.up; mixer().listen(c2.position.toArray(), f.toArray(), u.toArray()); }   // słuchacz — kamera
     fpsN++; if ((fpsT += dt) >= 1) { if (playUI.ui) playUI.ui.fps(fpsN / fpsT); fpsN = 0; fpsT = 0; }
   }
@@ -135,7 +138,7 @@ export function createPlay(store, world, controls, actions, events) {
   }
   const subs = new Set(), changed = () => subs.forEach((f) => f(!!runs.length));
   return {
-    start, stop, frame, act, sounds,
+    start, stop, frame, act, sounds, music,
     actionsOf: (id) => { const r = runs.find((x) => x.obj.id === id); return r && r.run.actions ? r.run.actions() : []; },
     toggle: () => (runs.length ? stop() : start()),
     get playing() { return runs.length > 0; },

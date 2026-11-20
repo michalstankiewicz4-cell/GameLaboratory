@@ -39,7 +39,7 @@ Jednostki: metry, stopnie, sekundy; Y w górę; kurs 0 — wzdłuż +Z. Teksty i
 | Materia | `materials.html`, `art.html`, `pixel.html`, `zombies.html` | materiały PBR ze starzeniem, obrazy i ekspertyza, pixel art, generator zombie | `material`, `image` | `MaterialApi`, `ArtApi` |
 | Woksele, efekty | `blocks.html`, `effects.html` | bryły z bloków (ciecze, gaz), efekty (strzały, wybuchy, pola, skok…) | `blocks`, `effect` | `BlocksApi`, `EffectsApi` |
 | UI | `gameui.html`, `trees.html`, `skins.html` | UI gry (menu, HUD, okna, dialog, dźwięki skórki, głosy), drzewka ulepszeń, skórki statków | `ui`, `uiskin`, `tree` | `GameUIApi`, `TreeApi` |
-| Dźwięk | `sound.html` · `sound-effects.html` · `sound-speech.html` | muzyka, efekty i tła miejsc, mowa (głosy postaci) | `sound`, `ambience`, `voice` | `SfxApi`, `VoiceApi` |
+| Dźwięk | `sound.html` · `sound-effects.html` · `sound-speech.html` | muzyka, efekty i tła miejsc, mowa (głosy postaci) | `music`, `sound`, `ambience`, `voice` | `SfxApi`, `VoiceApi` |
 | AI | `lang.html`, `img.html` | małe sieci języka i obrazów, uczone w przeglądarce | — | — |
 
 Laboratoria bez API mają okna z suwakami i **Copy settings (JSON)** albo zapis pod nazwą. Narzędzia: **edytor sceny**
@@ -55,11 +55,11 @@ Najważniejsze polecenia (pełna tabela: [`../../editor/README.md`](../../editor
 | Polecenie | Co robi |
 |---|---|
 | `help`, `describe`, `prefabs [family]`, `assets [kind]` | co można: polecenia, scena jako dane, modele do dodania, zasoby z nazwą |
-| `env { surface, light, look, sea, land, sky, ui, cave }` | środowisko: `sea` / `land` / `space` / `underground`; zasoby środowiska |
+| `env { surface, light, look, sea, land, sky, ui, cave, music, musicAction }` | środowisko: `sea` / `land` / `space` / `underground`; zasoby środowiska |
 | `add { prefab, name, pos, rot, scale, behavior, asset, shot, sound }` | dodaje model (`prefab` z `prefabs`) |
 | `set { id \| name, … , sound, soundRange, orbit }`, `move`, `remove` | zmienia obiekt |
 | `play`, `stop`, `act { name, action }`, `actions` | gra: zachowania, akcje obiektu (`fire`, `scan`, `destroy`, `work` — drzwi, właz…) |
-| `effect { effect, from, to \| at, path }`, `sound { sound, at }` | efekt z laboratorium efektów, dźwięk w miejscu |
+| `effect { effect, from, to \| at, path }`, `sound { sound, at }`, `music { play \| action }` | efekt z laboratorium efektów, dźwięk w miejscu, muzyka w grze |
 | `ui { say: { who, text, choices, voice } \| log \| banner \| show \| open … }` | UI gry sceny (w grze) |
 | `check` | lekarz sceny: problemy i proponowane poprawki (niczego nie zmienia) |
 | `events [n]` | ostatnie zdarzenia szyny (akcje, efekty, wybory w dialogu) |
@@ -95,7 +95,7 @@ Nazwy pól i dozwolone wartości — w liście z API (np. `CityApi.types`, `SfxA
 
 ```json
 [{ "cmd": "new", "name": "Zatoka" },
- { "cmd": "env", "surface": "sea", "light": "dusk" },
+ { "cmd": "env", "surface": "sea", "light": "dusk", "music": "mood:orbit", "musicAction": "song:escape" },
  { "cmd": "add", "prefab": "sea/blyskawica", "name": "Błyskawica", "pos": [0, 0, 0] },
  { "cmd": "add", "prefab": "structures/super300", "name": "Platforma", "pos": [250, 0, 150], "sound": "engine", "soundRange": 20 },
  { "cmd": "check" },
@@ -103,7 +103,7 @@ Nazwy pól i dozwolone wartości — w liście z API (np. `CityApi.types`, `SfxA
  { "cmd": "effect", "effect": "explosion", "at": [40, 2, -30], "radius": 12 }]
 ```
 
-Wybuch ma swój dźwięk; okręt — dźwięk maszyn z dźwignią (W / S). Przy zaznaczonym obiekcie z dźwiękiem edytor
+Wybuch ma swój dźwięk i włącza muzykę akcji na 20 s; okręt — dźwięk maszyn z dźwignią (W / S). Przy zaznaczonym obiekcie z dźwiękiem edytor
 pokazuje kule zasięgu.
 
 **Samochód, drzwi i silnik** (ląd):
@@ -132,8 +132,7 @@ wybór gracza przychodzi jako zdarzenie (`events`).
   wszystko.
 - **Dźwięk zaczyna grać po pierwszym kliknięciu albo klawiszu** (zasada przeglądarek); mowa przeglądarki nie jest
   w grafie Web Audio (bez efektów, poziom 0 na miernikach).
-- **Jeszcze nie ma:** muzyki jako zasobu sceny, chodu ludzi i stworów, dźwięku turbin, dźwięków maszyn złomowiska,
-  drugiego etapu budynków dla CityExplorer — lista: [`../../TODO.md`](../../TODO.md), plan:
+- **Jeszcze nie ma:** chodu ludzi i stworów, drugiego etapu budynków dla CityExplorer — lista: [`../../TODO.md`](../../TODO.md), plan:
   [`lab-breakdown.md`](lab-breakdown.md), [`engine-architecture.md`](engine-architecture.md).
 - **Fizyka jest prawdziwa** (siły, nie skrypty): samolot z kółkiem ogonowym rozbije się, jeśli na rozbiegu nie trzymać
   steru wysokości; okręt osiądzie na mieliźnie. To wynik sił, nie błąd.

@@ -32,7 +32,8 @@ dostosowywać (zasoby z nazwą, wspólne zachowania).
   zaznaczonym obiekcie dwie kule — wewnętrzna to pełna głośność, zewnętrzna granica słyszalności (10%). W grze same
   z siebie grają: silniki pojazdów (z danych modelu), drzwi, właz, podwozie i klapy modeli, strzały i wybuchy statków,
   efekty z polecenia `effect`, UI gry ze swoją skórką; słuchacz to kamera, głośności — Opcje → Dźwięk UI gry. Część
-  robocza modelu (drzwi, właz, owiewka, rampa) to akcja **work** (klawisz 1). Opis: [`../docs/audio/README.md`](../docs/audio/README.md).
+  robocza modelu (drzwi, właz, owiewka, rampa) to akcja **work** (klawisz 1). Środowisko: **Muzyka** i **Muzyka akcji**
+  (nastrój, piosenka albo zapisana w laboratorium muzyki; akcja gra po wybuchach i strzałach przez 20 s). Opis: [`../docs/audio/README.md`](../docs/audio/README.md).
 - **Szczegóły z odległości (LOD):** model z wersją daleką (prefabrykat z `lod: true`) przełącza się na nią daleko od
   kamery — próg z wielkości modelu × ustawienie gracza „odległość szczegółów” (w edytorze poza grą × 1); model, którego
   części rusza zachowanie w grze, zostaje bliski ([../docs/guides/rendering.md](../docs/guides/rendering.md)).
@@ -130,7 +131,7 @@ albo lista (po kolei); wynik `{ "ok": true, … }` albo `{ "ok": false, "error":
 | `set` | `id` albo `name`, potem `newName` (z `id` także `name`), `prefab`, `pos`, `rot`, `scale`, `behavior`, `orbit` (`{ around, period }` — zachowanie „orbita”), `asset` (`""` — model domyślny), `shot` (efekt strzału statku, `""` — strzał), `sound` (dźwięk przy obiekcie, `""` — bez), `soundRange` (m, 0 — domyślny) | zmienia obiekt |
 | `move` | `id` albo `name`, `by: [dx, dy, dz]` | przesuwa o wektor |
 | `remove` | `id` albo `name` | usuwa |
-| `env` | `surface` (`sea` / `land` / `space` / `underground`), `light`, `look`, `land`, `sea`, `sky`, `ui`, `cave` | środowisko (`ui` — UI gry z laboratorium UI gry, nakładka w ▶ Graj; `underground` — w jaskini, `cave` — jaskinia z laboratorium jaskiń jako teren planszy) |
+| `env` | `surface` (`sea` / `land` / `space` / `underground`), `light`, `look`, `land`, `sea`, `sky`, `ui`, `cave`, `music`, `musicAction` | środowisko (`ui` — UI gry z laboratorium UI gry, nakładka w ▶ Graj; `underground` — w jaskini, `cave` — jaskinia z laboratorium jaskiń jako teren planszy) |
 | `assets` | `[kind]` | zasoby z nazwą (`sea` — woda, `land` — ląd, `weather` — wygląd, `look` — filtry, `sky` — ciała niebieskie) i gotowe tła kosmosu |
 | `select` | `id` / `name` albo nic | wybór w edytorze |
 | `new` | `[name]` | pusta scena |
@@ -141,6 +142,7 @@ albo lista (po kolei); wynik `{ "ok": true, … }` albo `{ "ok": false, "error":
 | `events` | `[n]` | ostatnie zdarzenia szyny (domyślnie 20) |
 | `effect` | `effect` (id albo nazwa zapisanego efektu), `from` / `to` / `at` / `dir` / `path` — punkty `[x, y, z]` albo obiekty | efekt z laboratorium efektów — zdarzenie `effect`, świat je rysuje ([`../docs/labs/effects.md`](../docs/labs/effects.md)) |
 | `sound` | `sound` (gotowy albo zapisany), `at` — punkt `[x, y, z]` albo obiekt | dźwięk raz w miejscu |
+| `music` | w czasie gry: `play` (nazwa muzyki, `""` — cisza) albo `action: true` | zmienia muzykę |
 | `ui` | w czasie gry: `say { who, text, choices, voice }`, `log`, `banner`, `show`, `hide`, `open`, `close` | UI gry sceny (`env.ui`): dialog, wpis, baner, ekran, okno ([`../docs/labs/gameui.md`](../docs/labs/gameui.md)) |
 | `check` | `[budget { tris, draws }]` | lekarz sceny: problemy (złe środowisko, pod gruntem / w powietrzu, zachodzenie, brakujące zasoby, zachowania, koszt) z proponowanymi poprawkami — niczego nie zmienia ([`../docs/scene/doctor.md`](../docs/scene/doctor.md)) |
 

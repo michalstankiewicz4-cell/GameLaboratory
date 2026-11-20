@@ -97,7 +97,9 @@ export const EFFECT_SOUNDS = {
 };
 const pt = (p) => (p && p.toArray ? p.toArray() : Array.isArray(p) && p.length === 3 && p.every(Number.isFinite) ? p : null);
 
-export function createSceneSounds({ positionOf, get = getAsset }) {
+// onLoud(rodzaj) — głośne zdarzenie (wybuch, strzał, piorun, rozbicie): np. muzyka akcji (js/scene/music.js)
+const LOUD = new Set(['explosion', 'gunshot', 'thunder']);
+export function createSceneSounds({ positionOf, get = getAsset, onLoud = null }) {
   let sources = [], engines = [], live = false;   // live: w grze (dźwięki modeli tylko wtedy — po „Stop” części wracają na miejsce po cichu)
   const near = (id) => positionOf(id) || [0, 0, 0];
   function effectSound(kind, e) {
@@ -105,6 +107,7 @@ export function createSceneSounds({ positionOf, get = getAsset }) {
     const at = pt(m.from ? e.from : m.path ? (e.path || [])[0] : e.at) || pt(e.to) || pt(e.from); if (!at) return;
     const params = { ...m.params }; if (m.size) params.size = m.size(e);
     try { playSound({ sound: m.sound, params }, { at, ref: refOf(m.sound) }); } catch (err) { if (window.LabLog) window.LabLog.add('warn', 'Sound: ' + err.message); }
+    if (onLoud && LOUD.has(m.sound)) onLoud(m.sound);
   }
   return {
     // początek gry: źródła przy obiektach z polem „sound” i silniki zachowań
@@ -129,7 +132,7 @@ export function createSceneSounds({ positionOf, get = getAsset }) {
         const h = e.r.run.hud(), v = e.f(h, e.eng, e.r.input || {}), p = positionOf(e.r.obj.id);
         if (p) e.h.move(p);
         e.h.set(v.params, v.level ?? 1);
-        if (h.crashed && !e.crashed && p) playSound({ sound: 'explosion', params: { size: 0.7, distance: 0.1, debris: 0.7 } }, { at: p, ref: refOf('explosion') });
+        if (h.crashed && !e.crashed && p) { playSound({ sound: 'explosion', params: { size: 0.7, distance: 0.1, debris: 0.7 } }, { at: p, ref: refOf('explosion') }); if (onLoud) onLoud('crash'); }
         e.crashed = !!h.crashed;
       }
     },

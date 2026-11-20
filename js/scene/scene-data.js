@@ -8,6 +8,8 @@
 //          sea: '' | nazwa zasobu „morze” (js/scene/assets.js; '' — morze domyślne),
 //          sky: '' | 'day' | 'preset:<id>' | nazwa zasobu „niebo” (każda powierzchnia; '' — domyślne: morze i ląd —
 //          dzienne, kosmos — Deep field; js/scene/space.js),
+//          music, musicAction: '' | 'mood:<id>' | 'song:<id>' | nazwa zasobu „music” (muzyka w ▶ Graj i muzyka akcji po
+//          głośnych zdarzeniach; js/scene/music.js),
 //          ui: '' | nazwa zasobu „ui” (UI gry z laboratorium UI gry — nakładka w ▶ Graj; '' — bez UI),
 //          cave: '' | nazwa zasobu „cave” (podziemie: jaskinia z laboratorium jaskiń jako teren planszy; '' — domyślna),
 //          caveGlow: true | false (podziemie: słaba poświata, żeby było widać jaskinię; false — prawdziwa ciemność:
@@ -24,7 +26,7 @@
 export const FORMAT = 'gamelab-scene', VERSION = 1;
 
 export function emptyScene(name = 'New scene') {
-  return { format: FORMAT, version: VERSION, name, env: { surface: 'sea', light: 'afternoon', look: '', sea: '', sky: '', land: '', ui: '', cave: '', caveGlow: true }, objects: [] };
+  return { format: FORMAT, version: VERSION, name, env: { surface: 'sea', light: 'afternoon', look: '', sea: '', sky: '', land: '', ui: '', cave: '', caveGlow: true, music: '', musicAction: '' }, objects: [] };
 }
 
 let seq = 0;
