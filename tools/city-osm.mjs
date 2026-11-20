@@ -12,11 +12,11 @@ export const LANDMARKS = [
   { id: 'centralna', name: 'Warszawa Centralna (dworzec)', re: 'Warszawa Centralna|Dworzec Centralny', lat: 52.22880, lon: 21.00330, r: 260 },
   { id: 'zlota44', name: 'Złota 44', re: 'Złota 44', lat: 52.22975, lon: 21.00290, r: 160 },
   { id: 'intercontinental', name: 'InterContinental', re: 'InterContinental', lat: 52.23140, lon: 21.00290, r: 160 },
-  { id: 'varso', name: 'Varso Tower', re: 'Varso', lat: 52.22890, lon: 20.99780, r: 220 },
+  { id: 'varso', name: 'Varso Tower', re: 'Varso Tower|Varso Place|Varso 3|Varso III', lat: 52.22890, lon: 20.99780, r: 260 },
   { id: 'spire', name: 'Warsaw Spire', re: 'Warsaw Spire|Spire', lat: 52.23270, lon: 20.98380, r: 220 },
   { id: 'rondo1', name: 'Rondo 1', re: 'Rondo 1', lat: 52.23380, lon: 21.00050, r: 180 },
   { id: 'cosmopolitan', name: 'Cosmopolitan', re: 'Cosmopolitan', lat: 52.23490, lon: 21.00180, r: 180 },
-  { id: 'wtt', name: 'Warsaw Trade Tower', re: 'Warsaw Trade Tower|WTT', lat: 52.23870, lon: 20.98420, r: 350 },
+  { id: 'wtt', name: 'Warsaw Trade Tower', re: 'Warsaw Trade Tower|WTT', lat: 52.23830, lon: 20.98250, r: 600 },
 ];
 const KEEP = ['name', 'building', 'building:part', 'height', 'min_height', 'building:levels', 'building:min_level', 'roof:shape', 'roof:height', 'roof:levels', 'roof:colour', 'building:colour', 'building:material', 'roof:material'];
 const UA = 'GameLaboratory-city/1.0 (+https://github.com/michalstankiewicz4-cell/GameLaboratory)';
@@ -71,9 +71,12 @@ async function landmark(L) {
   const els = await overpass(q), re = new RegExp(L.re, 'i');
   const named = els.filter((e) => e.tags && e.tags.building && re.test(e.tags.name || ''));
   if (!named.length) throw new Error(`${L.id}: no building named /${L.re}/ (found: ${[...new Set(els.filter((e) => e.tags && e.tags.name).map((e) => e.tags.name))].slice(0, 30).join(' | ')})`);
-  // największy pasujący budynek
-  let main = null, mainShape = null, best = 0;
-  for (const e of named) for (const s of shapeOf(e, L.lat, L.lon)) { const a = Math.abs(area(s.outer)); if (a > best) { best = a; main = e; mainShape = s; } }
+  // najwyższy pasujący budynek (przy tej samej wysokości — największy)
+  let main = null, mainShape = null, best = 0, bestK = -1;
+  for (const e of named) for (const s of shapeOf(e, L.lat, L.lon)) {
+    const a = Math.abs(area(s.outer)), k = (parseFloat(e.tags.height) || 0) * 1e7 + a;
+    if (k > bestK) { bestK = k; best = a; main = e; mainShape = s; }
+  }
   // części: building:part ze środkiem w obrysie (i nie większe od budynku)
   const parts = [];
   for (const e of els) {
@@ -101,11 +104,13 @@ const FILE = 'js/models/city/landmarks/osm-data.js';
 const old = existsSync(FILE) && !process.env.FORCE ? (await import(pathToFileURL(FILE).href)).default : {};
 const out = {}, errors = [];
 for (const L of LANDMARKS) {
-  if (old[L.id]) { out[L.id] = old[L.id]; continue; }
+  const query = { re: L.re, lat: L.lat, lon: L.lon, r: L.r };
+  if (old[L.id] && JSON.stringify(old[L.id].query) === JSON.stringify(query)) { out[L.id] = old[L.id]; continue; }   // zmieniony wpis — od nowa
   let last = null;
   for (let k = 0; k < 3 && !out[L.id]; k++) {
-    try { out[L.id] = await landmark(L); } catch (e) { last = e; console.error(e.message); if (/no building named/.test(e.message)) break; await new Promise((r) => setTimeout(r, 20000)); }
+    try { out[L.id] = { ...(await landmark(L)), query }; } catch (e) { last = e; console.error(e.message); if (/no building named/.test(e.message)) break; await new Promise((r) => setTimeout(r, 20000)); }
   }
+  if (!out[L.id] && old[L.id] && !/no building named/.test(String(last && last.message))) out[L.id] = old[L.id];   // nie odpowiedział — zostaje to, co było
   if (!out[L.id] && last) errors.push(L.id + ': ' + last.message);
   await new Promise((r) => setTimeout(r, 3000));
 }
