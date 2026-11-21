@@ -352,6 +352,23 @@ window.GameLabCatalog =
       }
     },
     {
+      "file": "labs/rocks.html",
+      "cat": "world",
+      "name": "Rocks lab",
+      "namePl": "Laboratorium skał",
+      "doc": "docs/labs/rocks.md",
+      "desc": "Rocks from code at real scale: granite boulders, limestone blocks, layered sandstone, angular basalt — boulders, slabs, spires and pebbles with moss and lichen, and a boulder field with scree.",
+      "descPl": "Skały z kodu w prawdziwej skali: głazy granitowe, bloki wapienia, piaskowiec w warstwach, kanciasty bazalt — głazy, płyty, iglice i otoczaki z mchem i porostami oraz rumowisko z piargiem.",
+      "kind": "lab",
+      "kit": "RockKit",
+      "phrases": ["ląd", "skały", "kamienie", "głazy", "geologia"],
+      "saved": ["gameLab.rocks."],
+      "art": {
+        "bg": ["#2f3236", "#14161a"],
+        "svg": "<path d=\"M0 92 H200\" stroke=\"#4f5a50\" stroke-width=\"2\"/><path d=\"M30 92 L42 58 L70 46 L96 60 L104 92 Z\" fill=\"#8b8781\"/><path d=\"M42 58 L70 46 L74 64 L52 72 Z\" fill=\"#a7a39c\"/><path d=\"M98 92 L112 66 L140 56 L168 70 L176 92 Z\" fill=\"#4d4c4b\"/><path d=\"M112 66 L140 56 L146 72 L122 78 Z\" fill=\"#6a6966\"/><path d=\"M60 50 Q70 44 82 50\" stroke=\"#6f8f3a\" stroke-width=\"4\" fill=\"none\"/><g fill=\"#9a958c\"><ellipse cx=\"84\" cy=\"90\" rx=\"6\" ry=\"3\"/><ellipse cx=\"184\" cy=\"90\" rx=\"5\" ry=\"2.5\"/><ellipse cx=\"20\" cy=\"90\" rx=\"4\" ry=\"2\"/><ellipse cx=\"150\" cy=\"91\" rx=\"4\" ry=\"2\"/></g>"
+      }
+    },
+    {
       "file": "labs/items.html",
       "cat": "world",
       "name": "Items lab",
@@ -905,6 +922,9 @@ window.GameLabCatalog =
     "życie": "life",
     "jaskinie": "caves",
     "skały": "rocks",
+    "kamienie": "stones",
+    "głazy": "boulders",
+    "geologia": "geology",
     "materiały": "materials",
     "światło": "light",
     "latarka": "flashlight",

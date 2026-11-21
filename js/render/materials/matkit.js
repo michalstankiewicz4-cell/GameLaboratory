@@ -50,6 +50,8 @@ export const PRESETS = {
   deck: { label: 'Ship deck (teak)', kind: 'wood', color: '#a58561', color2: '#2a2018', tile: 2, roughness: 0.8, metalness: 0, planks: 8, grain: 0.5, wear: 0.3, dirt: 0.3 },
   granite: { label: 'Rock (granite)', kind: 'rock', color: '#8b8781', color2: '#4b4844', tile: 3, roughness: 0.85, metalness: 0, cracks: 0.4, grains: 0.8, dirt: 0.2 },
   sandstone: { label: 'Rock (sandstone)', kind: 'rock', color: '#c4a57c', color2: '#8a6a48', tile: 4, roughness: 0.9, metalness: 0, cracks: 0.25, grains: 0.4, dirt: 0.15 },
+  limestone: { label: 'Rock (limestone)', kind: 'rock', color: '#c9c3b2', color2: '#8f897b', tile: 3, roughness: 0.88, metalness: 0, cracks: 0.55, grains: 0.25, dirt: 0.2 },
+  basalt: { label: 'Rock (basalt)', kind: 'rock', color: '#4d4c4b', color2: '#242325', tile: 2, roughness: 0.8, metalness: 0, cracks: 0.35, grains: 0.65, dirt: 0.1 },
   concrete: { label: 'Concrete', kind: 'concrete', color: '#a9a69c', color2: '#7c7a73', tile: 3, roughness: 0.9, metalness: 0, pores: 0.5, wear: 0.1, dirt: 0.35 },
   brick: { label: 'Brick wall', kind: 'brick', color: '#9a4b35', color2: '#bdb6a6', tile: 2, roughness: 0.85, metalness: 0, bricks: 8, wear: 0.15, dirt: 0.25 },
   paper: { label: 'Paper', kind: 'paper', color: '#ece6d6', color2: '#cbbfa3', tile: 0.5, roughness: 0.9, metalness: 0, fibres: 0.6, wear: 0, dirt: 0.1 },

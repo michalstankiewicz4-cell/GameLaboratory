@@ -59,6 +59,7 @@ export const ASSET_KINDS = {
   material: { label: 'Material', labelPl: 'Materiał', lab: 'labs/materials.html', keys: ['label', 'kind', 'color', 'color2', 'tile', 'seed', 'roughness', 'metalness', 'bump', 'wear', 'dirt', 'rust', 'brushed', 'panels', 'rivets', 'planks', 'grain', 'cracks', 'grains', 'pores', 'bricks', 'fibres', 'threads', 'trowel'] },
   uiskin: { label: 'Game UI skin', labelPl: 'Skórka UI gry', lab: 'labs/gameui.html', keys: ['base', 'tokens', 'sounds'] },
   plant: { label: 'Plant', labelPl: 'Roślina', lab: 'labs/plants.html', keys: ['species', 'seed', 'size', 'detail', 'season'] },
+  rock: { label: 'Rock', labelPl: 'Skała', lab: 'labs/rocks.html', keys: ['kind', 'shape', 'seed', 'size', 'detail', 'moss', 'lichen'] },
   system: { label: 'Star system', labelPl: 'Układ planetarny', lab: 'labs/systems.html', keys: ['name', 'seed', 'sky', 'centers', 'centerGap', 'orbits'] },
   vegetation: { label: 'Vegetation', labelPl: 'Roślinność', lab: 'labs/plants.html', keys: ['density', 'grass', 'grassR', 'lod', 'impostors', 'season', 'seed', 'radius'] },
   cave: { label: 'Cave', labelPl: 'Jaskinia', lab: 'labs/caves.html', keys: ['seed', 'length', 'branches', 'width', 'winding', 'chambers', 'rough', 'cell', 'drips', 'rubble', 'lakes', 'lava', 'rock', 'wet', 'relief'] },

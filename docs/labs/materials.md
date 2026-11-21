@@ -22,7 +22,7 @@ przesuwania (okno Światło) — nierówności widać w świetle bocznym.
 - `seed` — ziarno: ten sam opis i ziarno dają ten sam materiał.
 
 Gotowe (`PRESETS`): blacha, stal szczotkowana, zardzewiała stal, malowany kadłub, aluminium, miedź, złoto, deski,
-pokład okrętu (tek), granit, piaskowiec, beton, cegła, papier, płótno, tynk, lód. Zapisane pod nazwą — zasób
+pokład okrętu (tek), granit, piaskowiec, wapień, bazalt (1.1.0 — dla laboratorium skał), beton, cegła, papier, płótno, tynk, lód. Zapisane pod nazwą — zasób
 **material** (`js/scene/assets.js`).
 
 ## Mapy

@@ -3,6 +3,18 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.102.0 · skały 1.0.0 · materiały 1.1.0 · edytor sceny 0.54.0 — 2026-11-21 (laboratorium skał)
+
+### Dodane
+- **Laboratorium skał** (`labs/rocks.html`, RockKit `js/models/rocks/rockkit.js`): skały z kodu w prawdziwej skali —
+  granit (zaokrąglone głazy), wapień (bloki o ostrych krawędziach, wżery), piaskowiec (warstwy), bazalt (kanciasty,
+  płaskie przełamy); kształty: głaz, blok, płyta, iglica, otoczak; mech na ścianach patrzących w górę i porosty
+  plamami; powierzchnia z MatKit nakładana trójpłaszczyznowo (bez szwów). Wymiary, objętość, masa z gęstości skały.
+  Tryb *Rumowisko*: głazy o rozkładzie wielkości jak w prawdziwym osuwisku i piarg wokół nich (instancje).
+- Zasób „rock” (skała zapisana pod nazwą) i rodzina **Skały** w edytorze sceny (`rocks/granite`, `rocks/limestone`,
+  `rocks/sandstone`, `rocks/basalt`, z wersją daleką); `RocksApi` dla AI.
+- MatKit: materiały „Rock (limestone)” i „Rock (basalt)”.
+
 ## Program 0.101.0 · ląd 1.10.0 · rośliny 1.7.0 · edytor sceny 0.53.0 — 2026-11-21 (nawierzchnia i ściółka)
 
 ### Dodane

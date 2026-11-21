@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Rocks Lab — procedural rocks, boulders and scree | GameLaboratory</title>
+<meta name="description" content="GameLaboratory rocks lab: rocks built from code at real scale — granite boulders, limestone blocks, layered sandstone, angular basalt; boulders, slabs, spires and pebbles with moss and lichen, and a boulder field with scree.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/rocks.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Rocks Lab — procedural rocks and boulders">
+<meta property="og:description" content="Granite, limestone, sandstone and basalt from code: boulders, blocks, slabs, spires and pebbles with moss and lichen.">
+<meta property="og:url" content="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/rocks.html">
+<meta property="og:image" content="https://michalstankiewicz4-cell.github.io/GameLaboratory/assets/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="../assets/favicon-32.png">
+<link rel="stylesheet" href="../ui/style/sea.css">
+<link rel="stylesheet" href="../ui/ui.css">
+</head>
+<!-- Laboratorium skał (js/labs/rocks/): kamienie i skały RockKit (js/models/rocks/rockkit.js). -->
+<body class="lab viewFits">
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/shell/menubar.js"></script>
+<script src="../ui/shell/loader.js"></script>
+<div id="view"></div>
+<div class="bar">
+  <div class="btns" id="modes"></div>
+  <select id="kind" aria-label="Rock" title="The kind of rock"></select>
+  <select id="shape" aria-label="Shape" title="The rock's shape"></select>
+  <span class="sp"></span>
+  <span class="dimtxt" id="status"></span>
+</div>
+<aside class="panel" data-std="info">
+  <h2 class="stdName" id="rkName"></h2>
+  <p class="stdText" id="rkNote"></p>
+  <div class="stats" id="rkStats"></div>
+</aside>
+<aside class="panel" data-window="rock" data-title="Rock" data-title-pl="Skała">
+  <h3>Rock</h3>
+  <div class="row"><span>Seed</span><input type="number" id="seed" min="1" max="99999" step="1"><output></output></div>
+  <div class="btns"><button type="button" id="another">Another one</button></div>
+  <div class="row"><span>Size</span><input type="range" id="size" min="0.1" max="8" step="0.05"><output id="sizeV"></output></div>
+  <div class="row"><span>Detail</span><input type="range" id="detail" min="0.5" max="1.5" step="0.25"><output id="detailV"></output></div>
+  <div class="row"><span>Moss</span><input type="range" id="moss" min="0" max="1" step="0.05"><output id="mossV"></output></div>
+  <div class="row"><span>Lichen</span><input type="range" id="lichen" min="0" max="1" step="0.05"><output id="lichenV"></output></div>
+  <label class="chk"><input type="checkbox" id="wire"> Wireframe</label>
+  <h3>Save</h3>
+  <div class="row"><span>Saved</span><select id="savedSel" title="Rocks saved under a name: pick one to load it"></select><output></output></div>
+  <div class="row"><span>Name</span><input type="text" id="saveName" maxlength="40"><output></output></div>
+  <div class="btns"><button type="button" id="saveRock">Save under this name</button><button type="button" id="delRock">Delete saved</button></div>
+  <p class="note">A saved rock (kind, shape, seed, size, detail, moss, lichen) is a named asset: in the scene editor pick it for a Rocks model.</p>
+</aside>
+<aside class="panel" data-window="field" data-title="Field" data-title-pl="Rumowisko">
+  <h3>Boulder field</h3>
+  <div class="row"><span>Boulders</span><input type="range" id="fDensity" min="0.1" max="2" step="0.05"><output id="fDensityV"></output></div>
+  <div class="row"><span>Largest</span><input type="range" id="fMax" min="0.5" max="8" step="0.25"><output id="fMaxV"></output></div>
+  <div class="row"><span>Scree</span><input type="range" id="fScree" min="0" max="2" step="0.05"><output id="fScreeV"></output></div>
+  <div class="row"><span>Field seed</span><input type="number" id="fSeed" min="1" max="99999" step="1"><output></output></div>
+  <p class="note">The rock kind, moss and lichen from the Rock window. Many small stones, few large ones (sizes fall off like a real rockfall); scree in drifts around the boulders.</p>
+</aside>
+<aside class="panel" data-std="camera">
+  <div class="btns" id="cams"></div>
+  <p class="note">Drag to orbit, wheel to zoom.</p>
+</aside>
+<aside class="panel" data-std="light">
+  <div class="row"><span>Weather</span><select id="weather"></select><output></output></div>
+  <div class="row"><span>Sun height</span><input type="range" id="sunEl" min="-6" max="70" step="1"><output id="sunElV"></output></div>
+  <div class="row"><span>Sun bearing</span><input type="range" id="sunAz" min="0" max="360" step="2"><output id="sunAzV"></output></div>
+</aside>
+<aside class="panel" data-std="perf">
+  <div class="stats" id="stats"></div>
+</aside>
+<div class="foot">
+  <span id="fps"></span>
+  <span class="sp"></span>
+  <span>GameLaboratory</span>
+</div>
+<script src="../ui/shell/perf.js"></script>
+<script src="../ui/shell/labwin.js"></script>
+<script src="../ui/shell/windows.js"></script>
+<script type="module" src="../js/labs/rocks/rocks.js"></script>
+</body>
+</html>

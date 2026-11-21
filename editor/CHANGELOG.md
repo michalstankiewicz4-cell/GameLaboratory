@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.54.0 — 2026-11-21
+
+### Dodane
+- Rodzina modeli **Skały** (RockKit, laboratorium skał): granit, wapień, piaskowiec, bazalt; skała zapisana w
+  laboratorium skał (zasób „rock”) w polu `asset`.
+
 ## 0.53.0 — 2026-11-21
 
 ### Zmienione

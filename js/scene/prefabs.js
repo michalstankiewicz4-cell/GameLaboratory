@@ -17,6 +17,7 @@ import { STRUCTURE_IDS, structureInfo, buildStructure } from '../models/structur
 import { BODIES, DEFAULT_TRAIN, buildVehicle as buildRail } from '../models/train/trainkit.js';
 import * as THREE from '../../vendor/three/three.module.js';
 import { SPECIES, SPECIES_IDS, growPlant, plantMaterials, windUniforms } from '../models/plants/plantkit.js';
+import { ROCK_KINDS, ROCK_DEFAULTS, rockGeometry, rockMaterial } from '../models/rocks/rockkit.js';
 import { buildCave } from '../models/caves/cavekit.js';
 import { ITEMS as GEAR, makeItem } from '../models/gear/gearkit.js';
 import { buildBody as buildBlocks, SHAPES as BLOCK_SHAPES } from '../models/blocks/blockkit.js';
@@ -35,6 +36,7 @@ export const FAMILIES = {
   marine: { label: 'Sea robots', labelPl: 'Roboty morskie' },
   rovers: { label: 'Rovers', labelPl: 'Łaziki' },
   plants: { label: 'Plants', labelPl: 'Rośliny' },
+  rocks: { label: 'Rocks', labelPl: 'Skały' },
   caves: { label: 'Caves', labelPl: 'Jaskinie' },
   base: { label: 'Base modules', labelPl: 'Moduły bazy' },
   bodies: { label: 'Celestial bodies', labelPl: 'Ciała niebieskie' },
@@ -78,6 +80,17 @@ function buildPlant(id0, a, d = 1) {
     dispose: () => { for (const x of [pl.bark, pl.leaf]) if (x) x.dispose(); for (const m of Object.values(mats)) { if (m.map) m.map.dispose(); m.dispose(); } } };
 }
 SPECIES_IDS.forEach((id) => add('plants/' + id, SPECIES[id].name, 'plants', 'land', 'labs/plants.html', (opts) => buildPlant(id, opts && opts.asset, det(opts)), { assetKind: 'plant', ...LOD }));
+
+// skały (RockKit): głaz danego rodzaju (jak w laboratorium skał na starcie) albo skała zapisana w laboratorium skał
+// (zasób „rock”: rodzaj, kształt, ziarno, wielkość, szczegółowość, mech, porosty); podstawa w punkcie obiektu
+function buildRock(kind0, a, d = 1) {
+  const s = { ...ROCK_DEFAULTS, kind: kind0, ...(a || {}) }; if (!ROCK_KINDS[s.kind]) s.kind = kind0;
+  const geo = rockGeometry({ ...s, detail: (+s.detail || 1) * d }), mesh = new THREE.Mesh(geo, rockMaterial(s.kind));
+  mesh.castShadow = mesh.receiveShadow = true;
+  const root = new THREE.Group(); root.add(mesh);
+  return { root, kit: { spec: s, size: geo.userData.size }, dispose: () => geo.dispose() };   // materiał wspólny dla rodzaju (RockKit)
+}
+Object.keys(ROCK_KINDS).forEach((id) => add('rocks/' + id, ROCK_KINDS[id].name, 'rocks', 'land', 'labs/rocks.html', (opts) => buildRock(id, opts && opts.asset, det(opts)), { assetKind: 'rock', ...LOD }));
 // jaskinia (CaveKit) z ustawień domyślnych laboratorium jaskiń (CAVE_DEFAULTS): korytarze, komory, nacieki, jeziorka;
 // budowa trwa (pole odległości, ok. sekundy)
 // jaskinia jako obiekt: domyślna albo zapisana w laboratorium jaskiń (zasób „cave”, pole „asset”); jaskinia jako teren
