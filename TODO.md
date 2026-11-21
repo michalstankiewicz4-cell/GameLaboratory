@@ -86,6 +86,12 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
 - [ ] **Laboratorium tłumaczenia:** tłumaczenie gry (teksty UI, dialogi, opisy) na języki; podstawowe: polski,
   angielski, ukraiński. Dwa rodzaje przekształcenia gry: LTR (od lewej do prawej) i RTL (od prawej do lewej —
   odwrócony układ UI, kierunek tekstu).
+- [ ] **Przełącznik kierunku LTR / RTL dla graczy z zagranicy — w grach i laboratoriach** (właściciel, 2026-11-21: na
+  końcu, gdy projekt przestanie się mocno zmieniać). Jedna wersja dla obu kierunków, bez osobnej wersji RTL: atrybut
+  `dir="rtl"` na stronie (i na nakładce UI gry), przeglądarka odwraca układ, który jest pisany właściwościami logicznymi
+  CSS (zasada w `CLAUDE.md`, „Wygląd (UI)”). Do zrobienia wtedy: wybór kierunku w Opcjach laboratoriów i w Opcjach UI gry
+  (automatycznie z języka albo ręcznie), przejście starych arkuszy (`left`/`right` → odpowiedniki logiczne), miejsca, gdzie
+  kierunek ma znaczenie (paski postępu, strzałki, suwaki, kolejność przycisków), sprawdzenie zrzutów w obu kierunkach.
 - [ ] Przetłumaczyć okna laboratoriów na polski (teraz po polsku są pasek menu, strona startowa, tytuły okien standardowych, konsola i okno Wydajność).
 
 ## Modele — błędy znalezione przez doktora (po stronie gry, chyba że doktor nauczy się je naprawiać)
