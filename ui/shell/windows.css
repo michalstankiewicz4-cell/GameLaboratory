@@ -23,7 +23,7 @@
 .labDock.right{right:0;width:300px;border-left:1px solid var(--line)}
 body.lmNoBar .labDock{top:var(--menuH)}
 body.lmNoFoot .labDock{bottom:0}
-.labDock:not(:has(> .labWin:not([hidden]))){display:none}
+.labDock:not(:has(> .labWin:not([hidden]))),.labDock.noWins{display:none}
 .labWin.docked{position:static;flex:none;width:auto;max-width:none;max-height:none;background:none;border:0;border-bottom:1px solid var(--line);
   border-radius:0;box-shadow:none;backdrop-filter:none;transform:none}
 .labWin.docked .labWinHead{cursor:default;border-bottom:0;height:32px}

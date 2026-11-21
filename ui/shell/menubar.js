@@ -108,7 +108,7 @@ const dlg = el("div"); dlg.id = "lmDialog"; dlg.lang = LANG;
 const box = el("div", "lmBox"); dlg.appendChild(box);
 dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.classList.remove("open"); });
 function dialog(title, rows, note) {
-  box.textContent = ""; box.classList.remove("lmWide");
+  box.textContent = ""; box.classList.remove("lmWide", "lmKeys");
   box.appendChild(el("h3", null, title));
   if (rows && rows.length) {
     const t = el("table");
@@ -121,10 +121,30 @@ function dialog(title, rows, note) {
   dlg.classList.add("open");
 }
 
+// HELP → Keyboard shortcuts: this page's keys from ui/data/keys.js (a module, loaded when the window opens; the player's
+// keys in the scene editor as the player set them)
+function keysDialog() {
+  import(ROOT + "ui/data/keys.js").then((m) => {
+    const secs = m.keysFor(PAGE, LANG);
+    box.textContent = ""; box.classList.remove("lmWide"); box.classList.add("lmKeys");
+    box.appendChild(el("h3", null, t("Keyboard shortcuts", "Klawiszologia")));
+    if (!secs.length) box.appendChild(el("p", null, t("This page has no keyboard shortcuts.", "Ta strona nie ma skrótów klawiszowych.")));
+    secs.forEach((s) => {
+      box.appendChild(el("h4", null, s.title));
+      const tb = el("table");
+      s.rows.forEach(([k, v]) => { const tr = el("tr"); tr.append(el("td", null, k), el("td", null, v)); tb.appendChild(tr); });
+      box.appendChild(tb);
+    });
+    const ok = el("button", null, t("Close", "Zamknij")); ok.addEventListener("click", () => dlg.classList.remove("open"));
+    box.appendChild(ok);
+    dlg.classList.add("open");
+  }).catch((e) => console.error("keyboard shortcuts: " + e.message));   // the log (ui/shell/log.js) picks it up
+}
+
 // the engine's diagram (docs/guides/engine-architecture.md, "Zasada: scena w środku") drawn with boxes; every block shows
 // whether it works today (solid) or is planned (dashed) — the state of the full connection of the labs: TODO.md
 function engineMap() {
-  box.textContent = ""; box.classList.add("lmWide");
+  box.textContent = ""; box.classList.remove("lmKeys"); box.classList.add("lmWide");
   box.appendChild(el("h3", null, t("How the engine is built", "Schemat silnika")));
   const m = el("div", "emMap");
   // st: "on" — works, "part" — partly, "plan" — planned
@@ -267,6 +287,7 @@ function help() {
     link(t("What's new", "Co nowego"), REPO + "CHANGELOG.md", { blank: true }),
     link(t("Repository (GitHub)", "Repozytorium (GitHub)"), "https://github.com/michalstankiewicz4-cell/GameLaboratory", { blank: true }),
     el("div", "lmSep"),
+    action(t("Keyboard shortcuts", "Klawiszologia"), keysDialog),
     action(t("Engine diagram", "Schemat silnika"), engineMap),
     action(t("About the labs", "O laboratoriach"), () => dialog("GameLaboratory", [[t("What", "Co to"), t("an engine for AI in the browser: laboratories of models and worlds — space, land and water", "silnik dla AI w przeglądarce: laboratoria modeli i światów — kosmos, ląd i woda")],
       [t("Program", "Program"), "v" + APP_VERSION], ...(me && V.labs[me.file] ? [[isTool ? t("This tool", "To narzędzie") : t("This lab", "To laboratorium"), "v" + V.labs[me.file]]] : []), [t("Code", "Kod"), "MIT, github.com/michalstankiewicz4-cell/GameLaboratory"]],

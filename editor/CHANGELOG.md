@@ -3,6 +3,11 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.51.2 — 2026-11-21
+
+### Zmienione
+- Po schowaniu okien (H) scena rozszerza się na miejsce paneli; Pomoc → Klawiszologia (wspólne, `ui/data/keys.js`).
+
 ## 0.51.1 — 2026-11-21
 
 ### Dodane

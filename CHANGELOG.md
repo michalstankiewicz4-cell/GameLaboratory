@@ -3,6 +3,17 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.99.0 · edytor sceny 0.51.2 — 2026-11-21 (klawiszologia, widok po schowaniu okien)
+
+### Dodane
+- **Pomoc → Klawiszologia** na każdej stronie: skróty klawiszowe tej strony w sekcjach (np. edytor sceny: edycja,
+  stawianie modułów, konsola API, ▶ Graj — z klawiszami gracza tak, jak je ustawił). Jedno miejsce: `ui/data/keys.js`
+  (moduł wczytywany przy otwarciu okna); nowy skrót w kodzie strony to wpis tam.
+
+### Zmienione
+- Gdy wszystkie okna panelu są schowane (H), panel znika, a scena zajmuje jego miejsce (`ui/shell/windows.js`,
+  `.labDock.noWins`) — w laboratoriach i w edytorze sceny.
+
 ## Program 0.98.1 · edytor sceny 0.51.1 — 2026-11-21 (drzewa z wiatrem, H w edytorze)
 
 ### Zmienione
