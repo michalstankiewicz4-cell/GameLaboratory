@@ -90,6 +90,27 @@ stays the default.
 camera, and screenshots `tools/out/lab-look.png`. Performance on a real GPU has not been measured yet ("Measure the
 cost of each effect" in the lab does it on the user's machine).
 
+## Variable weather (1.5.0)
+
+**Variable weather** under the weather list (Light and weather) makes the weather change by itself
+(`js/envs/sky/weather-cycle.js`, written anew after aTrain's "changing conditions"):
+
+- **Transition table** — each weather has its own chances of turning into the others (from a storm most often into
+  rain; fog only from calm weathers); 0 — never.
+- **Fronts as in nature** — when it gets worse, clouds and wind come first and rain and lightning later; when it
+  clears, the rain stops first and the clouds go last; fog thickens once the wind has dropped. Visibility changes on
+  a log scale.
+- **Seed** — the same seed gives the same weathers in the same order. How long a weather lasts and how long a change
+  takes (ranges, s); a storm lasts half as long, fog a little shorter.
+- The **Variable weather** window: the weather now and the change in progress, a bar and a list of the coming
+  weathers, preview at ×1 / ×10 / ×60, **Change now** to a chosen weather, the settings and the table.
+- Moving a weather slider or picking a weather from the list switches it off. Saved with the weather for the scene
+  editor (`cycle` in the "weather" asset); the scene editor does not play it.
+- The same switch is in the Light and weather window of the city, land, plants, items and structures labs
+  (`js/labs/shared/weather-cycle-ui.js`).
+- For AI: `LookApi.weatherCycle` — `on(b)`, `set(settings)`, `force(id, s)`, `speed(k)`, `now`, `params`,
+  `upcoming(n)`, `weathers`.
+
 ## Weather for the scene editor (1.4.0)
 
 The Light and weather window's **Weather for the scene editor** saves the weather and the time of day (clouds, wind,

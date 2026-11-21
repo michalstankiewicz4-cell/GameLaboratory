@@ -9,6 +9,7 @@ import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
 import { MODELS, junkEntry } from '../../models/junkyard/registry.js';
 import { applyTextures, setAnisotropy } from '../../models/junkyard/textures.js';
 import { shapeParts } from '../../models/junkyard/shapes.js';
+import { attachWeatherCycle } from '../shared/weather-cycle-ui.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -43,8 +44,9 @@ scene.add(hemi, sun, sun.target);
 const ground = new THREE.Mesh(new THREE.CircleGeometry(40, 64).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x5b554b, roughness: 0.97 }));
 ground.receiveShadow = true; scene.add(ground);
 let envRT = null, envDirty = true;
+let wxNow = null;   // liczby zmiennej pogody (js/labs/shared/weather-cycle-ui.js); null — pogoda z listy
 function updateSky() {
-  const w = WEATHER[S.weather] || WEATHER.fair;
+  const w = wxNow || WEATHER[S.weather] || WEATHER.fair;
   const L = applySky(skyU, { ...w, sunEl: S.sunEl, sunAz: S.sunAz, moon: 0.8 });
   sun.color.copy(L.sunColor); sun.intensity = L.sunIntensity; hemi.intensity = L.ambient; hemi.color.copy(L.sky); hemi.groundColor.copy(L.ground);
   sun.userData.dir = L.sunDir.clone();
@@ -137,7 +139,8 @@ $('item').onchange = () => { S.variant = 0; load($('item').value); };
 $('variant').onchange = () => { S.variant = +$('variant').value; rebuild(false); };
 for (const k of ['lod1', 'wire', 'coll', 'pair']) { $(k).checked = S[k]; $(k).onchange = () => { S[k] = $(k).checked; rebuild(k === 'pair'); }; }
 $('weather').replaceChildren(...Object.entries(WEATHER).map(([k, w]) => el('option', { value: k, textContent: w.label || k })));
-$('weather').value = S.weather; $('weather').onchange = () => { S.weather = $('weather').value; updateSky(); save(); };
+$('weather').value = S.weather; $('weather').onchange = () => { wxNow = null; S.weather = $('weather').value; updateSky(); save(); };
+attachWeatherCycle({ select: $('weather'), apply: (p) => { wxNow = p; updateSky(); }, every: 0.5 });
 for (const [k, u] of [['sunEl', '°'], ['sunAz', '°']]) {
   $(k).value = S[k]; $(k + 'V').textContent = S[k] + u;
   $(k).oninput = () => { S[k] = +$(k).value; $(k + 'V').textContent = S[k] + u; updateSky(); save(); };

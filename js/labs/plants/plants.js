@@ -11,6 +11,7 @@ import { SPECIES, SPECIES_IDS, growPlant, plantMaterials, windUniforms } from '.
 import { Forest, bakeImpostors, impostorMaterial, grassField, plantLight } from '../../models/plants/forestkit.js';
 import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
+import { attachWeatherCycle } from '../shared/weather-cycle-ui.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -156,8 +157,9 @@ function scatter(T) {
 
 /* ---------------- light and weather ---------------- */
 let envRT = null, envDirty = true, envT = 0, fogBase = 0.0003;
+let wxNow = null;   // liczby zmiennej pogody (js/labs/shared/weather-cycle-ui.js); null — pogoda z listy
 function updateSky() {
-  const w = WEATHER[S.weather] || WEATHER.fair;
+  const w = wxNow || WEATHER[S.weather] || WEATHER.fair;
   const L = applySky(skyU, { ...w, sunEl: S.sunEl, sunAz: S.sunAz, moon: 0.8 });
   sun.color.copy(L.sunColor); sun.intensity = L.sunIntensity; hemi.intensity = L.ambient; hemi.color.copy(L.sky); hemi.groundColor.copy(L.ground);
   sun.userData.dir = L.sunDir.clone();
@@ -256,7 +258,8 @@ $('biome').value = S.biome; $('biome').onchange = () => { S.biome = $('biome').v
 $('mapSeed').value = S.mapSeed; $('mapSeed').onchange = () => { S.mapSeed = Math.max(0, +$('mapSeed').value | 0); buildLand(); save(); };
 $('newMap').onclick = () => { S.mapSeed = Math.floor(Math.random() * 1e5); $('mapSeed').value = S.mapSeed; buildLand(); save(); };
 $('impostors').checked = S.impostors; $('impostors').onchange = () => { S.impostors = $('impostors').checked; if (forest) { forest.impostors = S.impostors; forest.update(camera); } save(); };
-$('weather').value = S.weather; $('weather').onchange = () => { S.weather = $('weather').value; updateSky(); save(); };
+$('weather').value = S.weather; $('weather').onchange = () => { wxNow = null; S.weather = $('weather').value; updateSky(); save(); };
+attachWeatherCycle({ select: $('weather'), apply: (p) => { wxNow = p; updateSky(); }, every: 0.5 });
 /* ---------------- save under a name: the "plant" asset (js/scene/assets.js) for the scene editor ---------------- */
 const PLANT_KEYS = ['species', 'seed', 'size', 'detail', 'season'];
 function fillSaved() {

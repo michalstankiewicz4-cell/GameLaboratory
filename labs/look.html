@@ -16,6 +16,7 @@
 <link rel="icon" type="image/png" href="../assets/favicon-32.png">
 <link rel="stylesheet" href="../ui/style/sea.css">
 <link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="../ui/pages/look.css">
 </head>
 <body class="lab viewFits">
 <script src="../ui/data/versions.js"></script>
@@ -55,6 +56,27 @@
   <p class="note" id="bake"></p>
   <div class="btns"><button type="button" id="copy">Copy settings (JSON)</button></div>
   <p class="note" id="copied"></p>
+</aside>
+<aside class="panel" data-window="weathercycle" data-title="Variable weather" data-title-pl="Zmienna pogoda">
+  <h3>Now</h3>
+  <p class="note">Switch it on in Light and weather (Variable weather, under the weather list).</p>
+  <div class="wcNow" id="wcNow"></div>
+  <div class="wcBar" id="wcBar"></div>
+  <ol class="wcNext" id="wcNext"></ol>
+  <p class="note">Preview speed (the scene and the game run at ×1):</p>
+  <div class="btns" id="wcSpeed"></div>
+  <div class="row"><span>Change to</span><select id="wcGo"></select><output></output></div>
+  <div class="btns"><button type="button" id="wcGoNow">Change now</button></div>
+  <h3>Settings</h3>
+  <label class="chk"><input type="checkbox" id="wcFronts"> Fronts as in nature: clouds and wind first, rain later; rain stops first, clouds go last</label>
+  <div class="row"><span>Seed</span><input type="number" id="wcSeed" min="1" max="999999" step="1"><output></output></div>
+  <div class="row"><span>A weather lasts</span><div class="wcPair"><input type="number" id="wcHold0" min="5" max="3600" step="5"><input type="number" id="wcHold1" min="5" max="3600" step="5"></div><output>s</output></div>
+  <div class="row"><span>A change takes</span><div class="wcPair"><input type="number" id="wcChange0" min="2" max="1200" step="1"><input type="number" id="wcChange1" min="2" max="1200" step="1"></div><output>s</output></div>
+  <h3>Transitions</h3>
+  <p class="note">How likely each weather (row) turns into another (column); 0 — never. The same seed gives the same weathers in the same order.</p>
+  <div class="wcTable" id="wcTable"></div>
+  <div class="btns"><button type="button" id="wcReset">Default settings</button></div>
+  <p class="note">Saved with the weather for the scene editor (Weather for the scene editor).</p>
 </aside>
 <aside class="panel" data-std="camera">
   <div class="btns" id="cams"></div>

@@ -33,6 +33,8 @@
   --cat-ui:#8b9cff;
   --cat-ai:#e86a9a;
   --cat-tools:#9aa6b4;
+  /* pogody (zmienna pogoda, laboratorium wyglądu): od pogodnej do burzy */
+  --wx-clear:#7fc8f2; --wx-fair:#a8d6ee; --wx-broken:#a3aebb; --wx-overcast:#76818f; --wx-rain:#5d88bd; --wx-fog:#c3c9d1; --wx-storm:#8d6fd0;
   --ok:#5fd0a0;
   --err:#e04b50;
   --font:"Space Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;

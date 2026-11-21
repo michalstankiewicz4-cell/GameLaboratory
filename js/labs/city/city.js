@@ -12,6 +12,7 @@ import { PRESETS as MAT_PRESETS, normalize as matNormalize } from '../../render/
 import { TYPES, TYPE_IDS, WINDOW_STYLES, GROUND_KINDS, ROOF_TYPES, FOOTPRINTS, normalizeSpec, build, setNight, setPom, clearBakes, facadeKey, LANDMARK_IDS, landmarkInfo, landmarkStyle, OSM_SOURCE } from '../../models/city/citykit.js';
 import { cleanPolygon } from '../../models/city/footprint.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
+import { attachWeatherCycle } from '../shared/weather-cycle-ui.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
@@ -237,13 +238,14 @@ $('jsonCopy').onclick = async () => { try { await navigator.clipboard.writeText(
 onAssetsChange(() => { const v = $('type').value; fill(); $('type').value = v; show(); });
 
 /* ---------------- światło: pogoda i pora dnia (noc — okna świecą) ---------------- */
+let wxNow = null;   // liczby zmiennej pogody (js/labs/shared/weather-cycle-ui.js); null — pogoda z listy
 function light() {
-  const Lt = stage.setLight({ weather: L.weather, time: L.time });
+  const Lt = stage.setLight({ ...(wxNow || {}), weather: L.weather, time: L.time });
   setNight(Math.min(1, Math.max(0, (1 - Lt.day) * 1.25)));
   const h = Math.floor(L.time), m = Math.round((L.time - h) * 60);
   $('timeV').textContent = `${String(h % 24).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 }
-$('weather').onchange = () => { L.weather = $('weather').value; save(); light(); };
+$('weather').onchange = () => { wxNow = null; L.weather = $('weather').value; save(); light(); };
 $('time').oninput = () => { L.time = +$('time').value; save(); light(); };
 
 /* ---------------- kamera: orbita, przesuwanie, ujęcia ---------------- */
@@ -367,6 +369,7 @@ function frame(now) {
 fill(); show();
 $('mode').value = L.mode; $('ppm').value = String(L.ppm); $('pom').checked = L.pom; setPom(L.pom);
 $('weather').value = L.weather; $('time').value = L.time;
+attachWeatherCycle({ select: $('weather'), apply: (p) => { wxNow = p; light(); }, every: 0.5 });
 light(); resize();
 rebuild().then(() => aimCam('corner'));
 window.__city = { stage, scene, camera, orbit, get spec() { return spec; }, get near() { return near; }, get far() { return far; }, get shown() { return shown; } };

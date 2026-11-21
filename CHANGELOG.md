@@ -3,6 +3,20 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.91.0 · wygląd 1.5.0 · miasto 1.2.0 · ląd 1.8.0 · rośliny 1.5.0 · przedmioty 1.1.0 · budowle 1.6.0 — 2026-11-21 (zmienna pogoda)
+
+### Dodane
+- **Zmienna pogoda** (`js/envs/sky/weather-cycle.js`, od nowa na wzór „zmiennych warunków” aTrain): pogoda sama
+  przechodzi między siedmioma pogodami — **tabela przejść** (z każdej pogody własne szanse przejścia do innych),
+  **fronty jak w naturze** (przy pogarszaniu najpierw chmury i wiatr, deszcz i pioruny później; przy rozpogadzaniu
+  deszcz ustaje pierwszy, chmury odchodzą na końcu; mgła gęstnieje, gdy osłabnie wiatr), **ziarno** (ta sama
+  kolejność pogód), czas trwania pogody i przejścia.
+- Przełącznik **Variable weather** pod listą pogód w oknie Światło i pogoda: laboratoria wyglądu, miasta, lądu,
+  roślin, przedmiotów i budowli (`js/labs/shared/weather-cycle-ui.js`).
+- Laboratorium wyglądu: okno **Variable weather** — pogoda teraz, pasek i lista nadchodzących pogód, podgląd ×1 / ×10 /
+  ×60, zmiana pogody teraz, ustawienia i tabela przejść; zapis z pogodą dla sceny (`cycle` w zasobie „weather”);
+  dla AI `LookApi.weatherCycle`. Edytor sceny zmiennej pogody nie gra.
+
 ## Program 0.90.0 · efekty 1.4.0 · pojazdy — ląd 1.25.0 — 2026-11-21 (dym i iskry z aTrain)
 
 ### Dodane

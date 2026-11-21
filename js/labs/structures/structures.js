@@ -16,6 +16,7 @@ import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
 import { MODELS as JUNK, junkEntry } from '../../models/junkyard/registry.js';
 import { applyTextures as junkTextures, setAnisotropy as junkAniso } from '../../models/junkyard/textures.js';
 import { createJunkWork } from './junk-work.js';
+import { attachWeatherCycle } from '../shared/weather-cycle-ui.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -67,8 +68,9 @@ function seaFor(wind) {
 /* ---------------- light ---------------- */
 const TIMES = { Day: 32, 'Low sun': 8, Dusk: -3, Night: -16 };
 let envRT = null, envDirty = true, envT = 0, fogBase = 0.0003, dayNow = 1;
+let wxNow = null;   // liczby zmiennej pogody (js/labs/shared/weather-cycle-ui.js); null — pogoda z listy
 function updateSky() {
-  const w = WEATHER[S.weather] || WEATHER.fair;
+  const w = wxNow || WEATHER[S.weather] || WEATHER.fair;
   const L = applySky(skyU, { ...w, sunEl: TIMES[S.time] ?? 32, sunAz: 225, moon: 0.7 });
   sun.color.copy(L.sunColor); sun.intensity = L.sunIntensity; sun.userData.dir = L.sunDir.clone();
   hemi.intensity = L.ambient; hemi.color.copy(L.sky); hemi.groundColor.copy(L.ground);
@@ -210,7 +212,8 @@ for (const t of ['Piers and jetties (soon)', 'Harbours (soon)', 'Lighthouses (so
 { const og = el('optgroup', { label: 'Junkyard (on land)' }); JUNK_STRUCT.forEach((m) => og.append(el('option', { value: 'junk:' + m.id, textContent: m.name }))); $('structure').append(og); }
 $('structure').value = S.id; $('structure').onchange = () => { S.id = $('structure').value; rebuild(); save(); };
 for (const [k, w] of Object.entries(WEATHER)) $('weather').append(el('option', { value: k, textContent: w.label }));
-$('weather').value = S.weather; $('weather').onchange = () => { S.weather = $('weather').value; updateSky(); save(); };
+$('weather').value = S.weather; $('weather').onchange = () => { wxNow = null; S.weather = $('weather').value; updateSky(); save(); };
+attachWeatherCycle({ select: $('weather'), apply: (p) => { wxNow = p; updateSky(); }, every: 0.5 });
 for (const t of Object.keys(TIMES)) $('times').append(el('button', { type: 'button', textContent: t, onclick: () => { S.time = t; markTimes(); updateSky(); save(); } }));
 const markTimes = () => [...$('times').children].forEach((b) => b.classList.toggle('on', b.textContent === S.time));
 const bind = (id, fmt, fn) => { const r = $(id), o = $(id + 'V'); r.value = S[id]; o.textContent = fmt(+r.value); r.addEventListener('input', () => { S[id] = +r.value; o.textContent = fmt(S[id]); if (fn) fn(); save(); }); };

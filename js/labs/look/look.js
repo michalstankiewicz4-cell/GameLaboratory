@@ -10,6 +10,8 @@ import { navLights, gunFlashes, signalLamp } from '../../models/ships-sea/lights
 import { heightAt, LOOKS } from '../../envs/water/waterkit.js';
 import { createStage } from '../shared/stage.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
+import { attachWeatherCycle } from '../shared/weather-cycle-ui.js';
+import { weatherWindow } from './weather-window.js';
 import { LookPipeline, AutoResolution, LOOK_PRESETS, LOOK_DEFAULTS } from '../../render/sea/look.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
@@ -128,6 +130,31 @@ $('lightning').value = S.sky.lightning; $('lightningV').textContent = fmtSky.lig
 $('lightning').addEventListener('input', () => { S.sky.lightning = +$('lightning').value; $('lightningV').textContent = fmtSky.lightning(S.sky.lightning); bolts.S.rate = S.sky.lightning; save(); });
 $('strike').onclick = () => bolts.strikeNow(camera);
 $('thunder').addEventListener('change', () => { if ($('thunder').checked) bolts.unlock(); });
+// zmienna pogoda (js/envs/sky/weather-cycle.js): przełącznik pod listą pogód, okno „Variable weather”; ustawienia
+// w S.sky.cycle (zapisywane z pogodą dla sceny). Liczby pogody idą do suwaków i nieba
+const SKY_SLIDERS = ['coverage', 'density', 'wind', 'haze', 'rain', 'vis', 'lightning'];
+const showSky = () => SKY_SLIDERS.forEach((k) => { $(k).value = S.sky[k]; const o = $(k + 'V'); if (o) o.textContent = fmtSky[k](S.sky[k]); });
+const { on: cycleOn0, ...cycleOpts0 } = S.sky.cycle || {};
+const wc = attachWeatherCycle({ select: $('weather'), every: 0.25, opts: cycleOpts0,
+  apply: (p) => { const { weather, ...num } = p; Object.assign(S.sky, num, { weather }); bolts.S.rate = S.sky.lightning; showSky(); updateSky(); } });
+wc.cycle.set(cycleOpts0);
+wc.setOn(!!cycleOn0);
+const keepOn = () => { S.sky.cycle = { ...(S.sky.cycle || {}), on: wc.on }; save(); };
+$('weather').addEventListener('change', keepOn); wc.onChange(() => { if (!(S.sky.cycle && S.sky.cycle.on)) keepOn(); });
+const wcWin = weatherWindow({ wc, get: () => S.sky.cycle, set: (c) => { S.sky.cycle = { ...c, on: wc.on }; save(); } });
+// ruszenie suwaka pogody wyłącza zmienną pogodę (zostaje to, co ustawione ręcznie)
+SKY_SLIDERS.forEach((k) => $(k).addEventListener('input', () => { if (wc.on) { wc.setOn(false, true); keepOn(); } }));
+// dla AI: LookApi.weatherCycle — włącz / wyłącz, ustawienia, pogoda teraz, nadchodzące
+window.LookApi = {
+  weatherCycle: {
+    on: (b = true) => { wc.setOn(b); keepOn(); return wc.on; },
+    set: (o) => { const { on, ...opts } = o || {}; S.sky.cycle = { ...wc.cycle.opts, ...opts, on: wc.on }; wc.cycle.set(S.sky.cycle); if (on != null) wc.setOn(on); keepOn(); wcWin.fill(); return wc.cycle.opts; },
+    force: (id, seconds) => { if (!wc.on) wc.setOn(true); const n = wc.cycle.force(id, seconds); wc.push(); keepOn(); return n; },
+    speed: (k) => { if (k != null) wc.speed = Math.max(0, +k || 1); return wc.speed; },
+    get now() { return wc.cycle.now; }, get params() { return wc.cycle.params; }, upcoming: (n = 6) => wc.cycle.upcoming(n),
+    weathers: Object.keys(WEATHER),
+  },
+};
 // pogoda i światło jako zasób dla edytora sceny (js/scene/assets.js, rodzaj „weather”)
 const WX_KEYS = ['weather', 'coverage', 'density', 'scale', 'haze', 'wind', 'rain', 'vis', 'lightning', 'time', 'sunEl', 'sunAz', 'moon'];
 function fillWx(sel) {
@@ -138,7 +165,7 @@ function fillWx(sel) {
 }
 $('wxSave').onclick = () => {
   const n = $('wxName').value.trim(); if (!n) { $('wxNote').textContent = 'Give the weather a name first.'; return; }
-  const ok = saveAsset('weather', n, S.sky);
+  const ok = saveAsset('weather', n, { ...S.sky, cycle: { ...wc.cycle.opts, on: wc.on } });
   $('wxNote').textContent = ok ? `Saved "${n}". The scene editor offers it in Environment → Light.` : 'The browser did not let me save.';
   fillWx(n);
 };
@@ -146,6 +173,7 @@ $('wxLoad').onclick = () => {
   const n = $('wxList').value, a = n && getAsset('weather', n); if (!a) return;
   Object.assign(S.sky, a); $('weather').value = WEATHER[S.sky.weather] ? S.sky.weather : 'custom';
   for (const k of WX_KEYS) if ($(k) && k !== 'weather') { $(k).value = S.sky[k]; const o = $(k + 'V'); if (o) o.textContent = k === 'time' ? fmtTime(S.sky[k]) : fmtSky[k] ? fmtSky[k](S.sky[k]) : S.sky[k]; }
+  if (a.cycle) { const { on, ...o } = a.cycle; wc.cycle.set(o); wc.setOn(!!on); wcWin.fill(); }
   bolts.S.rate = S.sky.lightning; $('wxName').value = n; updateSky(); save();
   $('wxNote').textContent = `Loaded "${n}".`;
 };

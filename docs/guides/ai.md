@@ -85,6 +85,7 @@ Każde jest też w zakładce **API** konsoli swojego laboratorium (JSON). Wywoł
 | `SfxApi` | `sound-effects.html` | `play(opis \| id, { at })`, `start(opis)` → uchwyt, `ambience(opis \| id)`, `sounds`, `ambiences`, `stop()`, `save(nazwa, opis)` → `sound` | `SfxApi.play({ sound: 'explosion', params: { size: 0.8 } })` |
 | `VoiceApi` | `sound-speech.html` | `say(tekst, głos?)`, `voice`, `presets`, `voices(język)`, `save(nazwa)` → `voice` | `VoiceApi.say('Witaj', { mode: 'formant', hz: 120 })` |
 | `PlantApi`, `CaveApi` | `plants.html`, `caves.html` | `save(nazwa)` → `plant` / `cave`, `load(nazwa)`, `saved()`, `get()` | `PlantApi.save('dąb jesienny')` |
+| `LookApi` | `look.html` | `weatherCycle`: `on(b)`, `set({ seed, hold, change, fronts, table })`, `force(pogoda, s)`, `speed(k)`, `now`, `params`, `upcoming(n)` — zmienna pogoda | `LookApi.weatherCycle.force('storm', 30)` |
 | `ItemsApi` | `items.html` | `list()`, `show(id, { variant, wire, coll })`, `info()` | `await ItemsApi.show('barrel')` |
 
 Nazwy pól i dozwolone wartości — w liście z API (np. `CityApi.types`, `SfxApi.sounds`) albo w dokumencie laboratorium.

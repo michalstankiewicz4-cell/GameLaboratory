@@ -15,6 +15,7 @@ import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
 import { createStage } from '../shared/stage.js';
 import { worldFor, PLANETS } from '../../envs/land/planet.js';
 import { loadSpace, spaceReady } from '../../scene/space.js';
+import { attachWeatherCycle } from '../shared/weather-cycle-ui.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -193,9 +194,10 @@ mini.addEventListener('click', (e) => {
 });
 
 /* ---------------- light and weather ---------------- */
+let wxNow = null;   // liczby zmiennej pogody (js/labs/shared/weather-cycle-ui.js); null — pogoda z listy
 function updateSky() {
-  const w = WEATHER[S.sky.weather] || WEATHER.fair;
-  const L = stage.setLight({ weather: S.sky.weather, sunEl: S.sky.sunEl, sunAz: S.sky.sunAz, moon: 0.8 });   // sky, sun, fog, sea light, sky environment
+  const w = wxNow || WEATHER[S.sky.weather] || WEATHER.fair;
+  const L = stage.setLight({ ...(wxNow || {}), weather: S.sky.weather, sunEl: S.sky.sunEl, sunAz: S.sky.sunAz, moon: 0.8 });   // sky, sun, fog, sea light, sky environment
   scene.environmentIntensity = (0.85 - w.coverage * w.density * 0.45) * (0.1 + 0.9 * L.day);   // and darker at night
   look.sunVisible = stage.sunSeen;
   look.set({ exposure: LOOK_PRESETS.clean.exposure * (1 + 2.6 * (1 - L.day)) });
@@ -238,7 +240,8 @@ $('gen').onclick = () => { generateShown(); save(); };
 for (const k of ['shape', 'size', 'res', 'barrier']) { $(k).value = String(S.map[k]); $(k).onchange = () => { S.map[k] = k === 'size' || k === 'res' ? +$(k).value : $(k).value; regen(); }; }
 $('wrap').value = S.map.wrap ? '1' : '0'; $('wrap').onchange = () => { S.map.wrap = $('wrap').value === '1'; regen(); };
 $('sail').checked = S.sail; $('sail').onchange = () => { S.sail = $('sail').checked; ship.obj.visible = ship.on && S.sail; if (!S.sail && camMode !== 'Overview') setCam('Free flight'); else if (S.sail) setCam('Chase'); save(); };
-$('weather').value = S.sky.weather; $('weather').onchange = () => { S.sky.weather = $('weather').value; updateSky(); save(); };
+$('weather').value = S.sky.weather; $('weather').onchange = () => { wxNow = null; S.sky.weather = $('weather').value; updateSky(); save(); };
+attachWeatherCycle({ select: $('weather'), apply: (p) => { wxNow = p; updateSky(); }, every: 0.5 });
 for (const k of ['sunEl', 'sunAz']) { $(k).value = S.sky[k]; $(k + 'V').textContent = S.sky[k] + '°'; $(k).addEventListener('input', () => { S.sky[k] = +$(k).value; $(k + 'V').textContent = S.sky[k] + '°'; updateSky(); save(); }); }
 // ląd jako zasób dla edytora sceny (js/scene/assets.js, rodzaj „land”): ustawienia mapy i wód
 function fillLand(sel) {
