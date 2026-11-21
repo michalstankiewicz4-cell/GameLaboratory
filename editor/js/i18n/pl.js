@@ -12,7 +12,7 @@
   'doc.note': 'Kliknij problem, aby zaznaczyć jego obiekt; Popraw wykonuje proponowane polecenie API (Cofnij to odwraca). Nic nie zmienia się samo.',
   'info.name': 'Edytor sceny',
   'info.text': 'Warsztat: scena złożona z modeli laboratoriów. Dodaj model, przesuń, obróć i przeskaluj go uchwytem albo liczbami, zamień na inny jednym kliknięciem; środowisko to morze albo ląd ze światłem z laboratoriów wodnych albo kosmos z niebem z laboratorium ciał niebieskich. Scena to zwykłe dane (JSON): zostaje w tej przeglądarce i można ją zapisać do pliku.',
-  'info.keys': 'P albo ▶ Graj uruchamia zachowania (okręty na wodzie, samolot w powietrzu, statki kosmiczne w próżni) i steruje wybranym modelem; Esc zatrzymuje. Kliknij model, żeby go wybrać. W / E / R: przesuwanie, obrót, skala. Ctrl+Z cofa, Ctrl+Y ponawia, Delete usuwa, Ctrl+D powiela, F pokazuje wybrany, Esc wybiera środowisko.',
+  'info.keys': 'P albo ▶ Graj uruchamia zachowania (okręty na wodzie, samolot w powietrzu, statki kosmiczne w próżni) i steruje wybranym modelem; Esc zatrzymuje. Kliknij model, żeby go wybrać. W / E / R: przesuwanie, obrót, skala. Ctrl+Z cofa, Ctrl+Y ponawia, Delete usuwa, Ctrl+D powiela, F pokazuje wybrany, Esc wybiera środowisko, H chowa okna.',
   'bar.move': 'Przesuń', 'bar.rotate': 'Obróć', 'bar.scale': 'Skaluj',
   'bar.move.tip': 'Przesuń (W)', 'bar.rotate.tip': 'Obróć (E)', 'bar.scale.tip': 'Skaluj (R)',
   'bar.new': 'Nowa', 'bar.new.tip': 'Pusta scena',

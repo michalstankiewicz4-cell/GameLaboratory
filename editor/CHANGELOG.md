@@ -3,6 +3,14 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.51.1 — 2026-11-21
+
+### Dodane
+- Klawisz **H** chowa i pokazuje okna (jak w laboratoriach); wrócił do opisu.
+
+### Zmienione
+- Drzewa, liście i trawa z wiatrem pogody sceny: kierunek (wiatr cyklonu albo dryf chmur) i siła do 24 m/s.
+
 ## 0.51.0 — 2026-11-21
 
 ### Dodane

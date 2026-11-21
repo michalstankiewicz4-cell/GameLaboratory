@@ -46,6 +46,7 @@ export function createToolbar(store, controls, actions) {
     else if ((k === 'delete' || k === 'backspace') && store.selectedId) { e.preventDefault(); actions.remove(); }
     else if (k === 'd' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); actions.duplicate(); }
     else if (k === 'escape') store.select(null);
+    else if (k === 'h' && !mod) document.querySelectorAll('[data-window]').forEach((w) => w.classList.toggle('hidden-panel'));   // H chowa i pokazuje okna (jak w laboratoriach)
   });
   return { setMode };
 }

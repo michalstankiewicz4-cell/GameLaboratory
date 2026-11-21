@@ -238,7 +238,8 @@ mgła, morze WaterKit, płaski grunt albo teren LandKit z wodami RegionKit, mapa
 - Roślinność na terenie `setVegetation(zasób „vegetation” | null)` (`js/models/plants/vegetation.js`): gatunki z biomów
   terenu (północny, równiny, pustynia), miejsca z gruntu (woda, wysokość, nachylenie) — reguły laboratorium roślin;
   lasy w kafelkach 256 m w promieniu `radius` wokół kamery (to samo ziarno i kafelek — te same rośliny), pełne modele
-  blisko, impostory dalej, trawa wokół kamery; światło, mgła i wiatr ze sceny. W edytorze — `env.vegetation` (tylko na
+  blisko, impostory dalej, trawa wokół kamery; światło, mgła i wiatr ze sceny (drzewa bujają się, a liście i trawa drgają z siłą wiatru
+  pogody — pełna przy 24 m/s — i w jego kierunku: wiatr cyklonu albo kierunek dryfu chmur). W edytorze — `env.vegetation` (tylko na
   terenie z zasobu lądu); `stage.vegetation` → liczby (rośliny, blisko, daleko, kafelki, trawa).
 - Morze przy terenie zna teren (płycizny, przybój, barwy i prądy wód, lód, olej); fale powtarzają się co rozmiar mapy.
 - Ląd z planety (`T.atmo`): niebo dzienne w odcieniu jej atmosfery (`tintAtmosphere` w `setLight`); bez atmosfery

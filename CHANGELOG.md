@@ -3,6 +3,17 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.98.1 · edytor sceny 0.51.1 — 2026-11-21 (drzewa z wiatrem, H w edytorze)
+
+### Zmienione
+- **Roślinność w scenie z wiatrem pogody** (`js/labs/shared/stage.js`, `js/models/plants/vegetation.js`): drzewa
+  bujają się, a liście i trawa drgają w kierunku wiatru — wiatru cyklonu albo dryfu chmur (wcześniej zawsze 225°);
+  siła rośnie do 24 m/s (wcześniej stawała przy 16 m/s), więc w burzy i cyklonie gną się mocniej.
+- Edytor sceny: klawisz **H** chowa i pokazuje okna, jak w laboratoriach.
+
+### Poprawione
+- Chmury przy cyklonie płynęły pod wiatr (przesunięcie wzoru chmur ma przeciwny znak) — teraz idą z wiatrem.
+
 ## Program 0.98.0 · wygląd 1.8.0 · edytor sceny 0.51.0 — 2026-11-21 (kamera i grunt w API sceny, cyklon dla AI)
 
 ### Dodane

@@ -7,7 +7,8 @@
 //   season (0 lato … 1 jesień), seed — rozmieszczenie, radius — promień lasu wokół kamery [m] (kafelki 256 m)
 // scatterArea(T, x0, z0, x1, z1, { density }, seed) → [{ id, x, y, z, yaw, s, v }] — rośliny w prostokącie mapy
 // createVegetation(renderer, scene) → { set(land, def) — land: { T, uniforms, btex } (teren sceny) albo null,
-//   update(camera, dt), light(sun, hemi, fog, env), fog(gęstość), wind(m/s, kierunek°), visible, counts, dispose() }
+//   update(camera, dt), light(sun, hemi, fog, env), fog(gęstość), wind(m/s, kierunek° — dokąd wieje: 0° +z, 90° +x;
+//   siła PlantKit 0…1,5 — pełna przy 24 m/s), visible, counts, dispose() }
 import * as THREE from '../../../vendor/three/three.module.js';
 import { sampleHeight, fbm } from '../../envs/land/landkit.js';
 import { biomeAt } from '../../envs/land/regionkit.js';
@@ -107,7 +108,7 @@ export function createVegetation(renderer, scene) {
     return true;
   }
   return {
-    group, wind: (mps = 6, dirDeg = 225) => { wind.uWind.value = Math.min(1, Math.max(0, mps / 16)); const a = dirDeg * Math.PI / 180; wind.uWindDir.value.set(Math.sin(a), Math.cos(a)); },
+    group, wind: (mps = 6, dirDeg = 225) => { wind.uWind.value = Math.min(1.5, Math.max(0, mps / 16)); const a = dirDeg * Math.PI / 180; wind.uWindDir.value.set(Math.sin(a), Math.cos(a)); },
     get counts() { return counts(); },
     get def() { return def; },
     // teren sceny i ustawienia; null — bez roślin

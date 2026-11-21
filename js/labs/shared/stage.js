@@ -75,6 +75,9 @@ export function createStage(renderer, scene, opts = {}) {
   let tornado = null;   // trąba powietrzna / tornado z pogody (pole tornado: { strength, kind }; js/envs/sky/tornado.js)
   let cyc = null, cycA = null, cycG = 0, cycSky = null, windDir = null;   // cyklon z pogody (pole cyclone; js/envs/sky/cyclone.js): pasma i ściana oka na niebie, wiatr
   const CW = [0, 0, 0];
+  // drzewa i trawa (PlantKit) z wiatrem pogody: siła z w.wind, kierunek — wiatr cyklonu (windDir) albo dryf chmur (chmury
+  // idą w stronę −clouds, bo przesunięcie wzoru rośnie o clouds — patrz tick)
+  const vegWind = () => { const d = windDir || [-clouds[0], -clouds[1]]; veg.wind(windNow, Math.atan2(d[0], d[1]) * 180 / Math.PI); };
   setSea();
   // atmosfera planety (ląd z planety, T.atmo): niebo dzienne przebarwione na odcień jej atmosfery (Ziemia 205°), tym
   // bledsze i ciemniejsze, im rzadsza atmosfera; bez atmosfery — niebo kosmosu (tryb nieba ustawia strona)
@@ -98,7 +101,7 @@ export function createStage(renderer, scene, opts = {}) {
     if (!vegDef || !land) { if (veg) { veg.dispose(); veg = null; } return; }
     if (!veg) veg = createVegetation(renderer, scene);
     veg.set({ T: land.T, uniforms: land.tm.uniforms, btex: land.btex }, vegDef);
-    veg.light(sun, hemi, scene.fog, scene.environmentIntensity); veg.wind(windNow);
+    veg.light(sun, hemi, scene.fog, scene.environmentIntensity); vegWind();
   }
   const stage = {
     skyU, WU, sun, hemi, water, ground, setSea, setWaterDetail, get waterDetail() { return waterDetail; },
@@ -227,7 +230,7 @@ export function createStage(renderer, scene, opts = {}) {
       cycA = cyc ? cycloneAt(cyc) : null; cycG = 0;   // stan cyklonu na chwilę podania pogody; porywy liczą się dalej w tick
       if (cyc && !cycSky) cycSky = createCycloneSky(scene);
       windDir = w.windDir || (cycA ? cycA.dir : null);
-      if (veg) { veg.light(sun, hemi, scene.fog, scene.environmentIntensity); veg.wind(windNow); }
+      if (veg) { veg.light(sun, hemi, scene.fog, scene.environmentIntensity); vegWind(); }
       if (space) {   // niebo kosmosu: słońce białe i pełne (bez atmosfery i chmur), kierunek z pory dnia; prawie bez rozproszonego
         sunSeen = 1; sun.color.setRGB(1, 0.97, 0.92); sun.intensity = 3.2;
         hemi.intensity = 0.04; hemi.color.setRGB(0.6, 0.65, 0.8); hemi.groundColor.setRGB(0.05, 0.05, 0.07);
@@ -254,7 +257,8 @@ export function createStage(renderer, scene, opts = {}) {
       t += dt; shift += shiftSpeed * dt; lastDt = dt; cycG += dt;
       WU.uTime.value = t; WU.uShift.value = shift;
       const k = stage.wind == null ? 1 : stage.wind * 0.3;
-      if (windDir) { const m = Math.hypot(clouds[0], clouds[1]) * 1.4; skyU.uCloudOff.value.x += dt * windDir[0] * m * k; skyU.uCloudOff.value.y += dt * windDir[1] * m * k; }   // chmury z wiatrem (cyklon)
+      // przesunięcie wzoru chmur rośnie, więc chmury na niebie idą w przeciwną stronę (p = d.xz + uCloudOff): z wiatrem — odjąć
+      if (windDir) { const m = Math.hypot(clouds[0], clouds[1]) * 1.4; skyU.uCloudOff.value.x -= dt * windDir[0] * m * k; skyU.uCloudOff.value.y -= dt * windDir[1] * m * k; }   // chmury z wiatrem (cyklon)
       else { skyU.uCloudOff.value.x += dt * clouds[0] * k; skyU.uCloudOff.value.y += dt * clouds[1] * k; }
       envT += dt;
       return t;
