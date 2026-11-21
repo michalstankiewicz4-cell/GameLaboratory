@@ -141,6 +141,12 @@ export function createPanels(store, actions) {
         ...(curLand && !lands.includes(curLand) ? [el('option', { value: curLand, textContent: t('env.seaMissing', { name: curLand }) })] : []));
       $('landAsset').value = curLand;
       $('landRow').hidden = $('landNote').hidden = S.env.surface !== 'land';
+      // roślinność: tylko na terenie lądu (zasób z laboratorium roślin)
+      const vegs = listAssets('vegetation'), curVeg = S.env.vegetation || '';
+      $('vegAsset').replaceChildren(el('option', { value: '', textContent: t('env.vegNone') }), ...vegs.map((n) => el('option', { value: n, textContent: n })),
+        ...(curVeg && !vegs.includes(curVeg) ? [el('option', { value: curVeg, textContent: t('env.seaMissing', { name: curVeg }) })] : []));
+      $('vegAsset').value = curVeg; $('vegAsset').disabled = !S.env.land;
+      $('vegRow').hidden = $('vegNote').hidden = S.env.surface !== 'land';
       // niebo (dla każdej powierzchni): domyślne dla powierzchni, dzienne, gotowe tła kosmosu (SystemKit, lista po
       // załadowaniu kitów) i niebo zapisane w laboratorium ciał niebieskich
       const skies = listAssets('sky'), presets = skyPresets(), curSky = S.env.sky || '';
@@ -238,6 +244,7 @@ export function createPanels(store, actions) {
   $('orbitPeriod').addEventListener('input', () => { const o = store.selected, v = parseFloat($('orbitPeriod').value); if (o && v > 0) store.update(o.id, { orbit: { ...(o.orbit || {}), period: v } }); });
   $('surface').addEventListener('change', () => store.setEnv({ surface: $('surface').value }));
   $('landAsset').addEventListener('change', () => actions.build(() => store.setEnv({ land: $('landAsset').value })));
+  $('vegAsset').addEventListener('change', () => actions.build(() => store.setEnv({ vegetation: $('vegAsset').value })));
   $('caveGlow').addEventListener('change', () => store.setEnv({ caveGlow: $('caveGlow').checked }));
   $('caveAsset').addEventListener('change', () => actions.build(() => store.setEnv({ cave: $('caveAsset').value })));
   $('skyAsset').addEventListener('change', () => store.setEnv({ sky: $('skyAsset').value }));

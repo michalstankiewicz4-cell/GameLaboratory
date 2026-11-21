@@ -34,7 +34,7 @@ Jednostki: metry, stopnie, sekundy; Y w górę; kurs 0 — wzdłuż +Z. Teksty i
 | Pojazdy | `vehicles-space.html` · `vehicles-water.html` · `vehicles-land.html` | statki kosmiczne, okręty i roboty morskie, pojazdy drogowe, tramwaj, pociąg, samolot, łaziki, przeładowarka — z jazdą siłami | — | — |
 | Kosmos | `bodies.html`, `systems.html`, `scale.html`, `surface.html`, `buildings.html` | ciała niebieskie, układy, skala, powierzchnia planety, moduły bazy | `sky` (niebo kosmosu) | — |
 | Świat | `water.html`, `land.html`, `caves.html`, `look.html`, `filters.html` | morze, ląd (teren, wody, biomy), jaskinie, pogoda i światło, wygląd kamery | `sea`, `land`, `cave`, `weather`, `look` | `CaveApi` |
-| Świat | `structures.html`, `city.html`, `plants.html`, `items.html` | budowle wodne, budynki miasta (także Warszawa z OpenStreetMap), rośliny, przedmioty złomowiska | `building`, `plant` | `CityApi`, `PlantApi`, `ItemsApi` |
+| Świat | `structures.html`, `city.html`, `plants.html`, `items.html` | budowle wodne, budynki miasta (także Warszawa z OpenStreetMap), rośliny i roślinność krajobrazu, przedmioty złomowiska | `building`, `plant`, `vegetation` | `CityApi`, `PlantApi`, `ItemsApi` |
 | Życie | `life.html`, `creator.html`, `human.html`, `gear.html`, `morgue.html`, `walkers.html` | zwierzęta, edytor stworów, człowiek, przedmioty bohatera (światło), głowy SDF, postacie SDF z siecią ocen | — | — |
 | Materia | `materials.html`, `art.html`, `pixel.html`, `zombies.html` | materiały PBR ze starzeniem, obrazy i ekspertyza, pixel art, generator zombie | `material`, `image` | `MaterialApi`, `ArtApi` |
 | Woksele, efekty | `blocks.html`, `effects.html` | bryły z bloków (ciecze, gaz), efekty (strzały, wybuchy, pola, skok…) | `blocks`, `effect` | `BlocksApi`, `EffectsApi` |
@@ -55,7 +55,7 @@ Najważniejsze polecenia (pełna tabela: [`../../editor/README.md`](../../editor
 | Polecenie | Co robi |
 |---|---|
 | `help`, `describe`, `prefabs [family]`, `assets [kind]` | co można: polecenia, scena jako dane, modele do dodania, zasoby z nazwą |
-| `env { surface, light, look, sea, land, sky, ui, cave, music, musicAction }` | środowisko: `sea` / `land` / `space` / `underground`; zasoby środowiska |
+| `env { surface, light, look, sea, land, vegetation, sky, ui, cave, music, musicAction }` | środowisko: `sea` / `land` / `space` / `underground`; zasoby środowiska |
 | `add { prefab, name, pos, rot, scale, behavior, asset, shot, sound }` | dodaje model (`prefab` z `prefabs`) |
 | `set { id \| name, … , sound, soundRange, orbit }`, `move`, `remove` | zmienia obiekt |
 | `play`, `stop`, `act { name, action }`, `actions` | gra: zachowania, akcje obiektu (`fire`, `scan`, `destroy`, `work` — drzwi, właz…) |
@@ -84,7 +84,7 @@ Każde jest też w zakładce **API** konsoli swojego laboratorium (JSON). Wywoł
 | `TreeApi` | `trees.html` | `get()`, `load(def \| nazwa)`, `check()`, `stats()`, `points(n)`, `buy(id)`, `effects()`, `save(nazwa)` → `tree` | `TreeApi.check()` |
 | `SfxApi` | `sound-effects.html` | `play(opis \| id, { at })`, `start(opis)` → uchwyt, `ambience(opis \| id)`, `sounds`, `ambiences`, `stop()`, `save(nazwa, opis)` → `sound` | `SfxApi.play({ sound: 'explosion', params: { size: 0.8 } })` |
 | `VoiceApi` | `sound-speech.html` | `say(tekst, głos?)`, `voice`, `presets`, `voices(język)`, `save(nazwa)` → `voice` | `VoiceApi.say('Witaj', { mode: 'formant', hz: 120 })` |
-| `PlantApi`, `CaveApi` | `plants.html`, `caves.html` | `save(nazwa)` → `plant` / `cave`, `load(nazwa)`, `saved()`, `get()` | `PlantApi.save('dąb jesienny')` |
+| `PlantApi`, `CaveApi` | `plants.html`, `caves.html` | `save(nazwa)` → `plant` / `cave`, `load(nazwa)`, `saved()`, `get()`; `PlantApi.saveVegetation(nazwa)` → `vegetation` (lasy i trawa na terenie sceny) | `PlantApi.save('dąb jesienny')` |
 | `LookApi` | `look.html` | `weatherCycle`: `on(b)`, `set({ seed, hold, change, fronts, table })`, `force(pogoda, s)`, `speed(k)`, `now`, `params`, `upcoming(n)` — zmienna pogoda | `LookApi.weatherCycle.force('storm', 30)` |
 | `ItemsApi` | `items.html` | `list()`, `show(id, { variant, wire, coll })`, `info()` | `await ItemsApi.show('barrel')` |
 

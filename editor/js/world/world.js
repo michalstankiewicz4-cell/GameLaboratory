@@ -172,6 +172,10 @@ export function createWorld(container, store, onWarn) {
       lastLand = landKey; stage.setLand(landDef);
     }
     stage.setSurface(env.surface === 'land' || env.surface === 'space' || env.surface === 'underground' ? env.surface : 'sea');
+    // roślinność: zasób „vegetation” z laboratorium roślin na terenie lądu (bez terenu — nic); brak zasobu — ostrzeżenie
+    const vegDef = env.surface === 'land' && env.vegetation ? getAsset('vegetation', env.vegetation) : null;
+    if (env.surface === 'land' && env.vegetation && !vegDef && onWarn) onWarn('vegetation:' + env.vegetation);
+    stage.setVegetation(vegDef && landDef ? vegDef : null);
     syncCave(env);
     syncSpace(env);   // przed światłem: tryb nieba decyduje o słońcu, mgle i odbiciach
     // światło: gotowe (LIGHTS) albo zasób „weather” z laboratorium wyglądu; brak zasobu — popołudnie i ostrzeżenie

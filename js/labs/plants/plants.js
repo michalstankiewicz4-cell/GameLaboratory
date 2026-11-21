@@ -5,10 +5,11 @@
 import * as THREE from '../../../vendor/three/three.module.js';
 import { WEATHER, skyUniforms, GLSL_SKY, skyDome, applySky, skyEnvironment } from '../../envs/sky/skykit.js';
 import { waveSet, waterUniforms, setWaves, polarGrid, waterMaterial, LOOKS } from '../../envs/water/waterkit.js';
-import { heightTexture, terrainMeshes, sampleHeight, GLSL_LAND, fbm } from '../../envs/land/landkit.js';
-import { generateWorld, biomeTexture, biomeAt, BIOMES } from '../../envs/land/regionkit.js';
+import { heightTexture, terrainMeshes, sampleHeight, GLSL_LAND } from '../../envs/land/landkit.js';
+import { generateWorld, biomeTexture, BIOMES } from '../../envs/land/regionkit.js';
 import { SPECIES, SPECIES_IDS, growPlant, plantMaterials, windUniforms } from '../../models/plants/plantkit.js';
 import { Forest, bakeImpostors, impostorMaterial, grassField, plantLight } from '../../models/plants/forestkit.js';
+import { scatterArea } from '../../models/plants/vegetation.js';
 import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 import { attachWeatherCycle } from '../shared/weather-cycle-ui.js';
@@ -115,45 +116,8 @@ function waves() {
   wv = waveSet({ Hs: 0.06 + 0.25 * S.wind, Lp: 4 + 8 * S.wind, chop: 0.4, spread: 50, n: 8 }, S.windDir, 3);
   setWaves(WU, wv);
 }
-// Where each plant stands: a jittered grid; the biome picks the species mix, the ground decides (water, height, slope)
-function scatter(T) {
-  const out = [], seed = S.mapSeed * 31 + 5, size = T.size, rel = (h) => h / Math.max(1, T.relief);
-  let s = seed >>> 0; const r = () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; };
-  // distance to water (for oases and lake shores): a coarse grid
-  const G = 96, cellG = size / G, wd = new Float32Array(G * G).fill(1e9), q = [];
-  for (let j = 0; j < G; j++) for (let i = 0; i < G; i++) if (sampleHeight(T, (i + 0.5) * cellG, (j + 0.5) * cellG) < 0) { wd[j * G + i] = 0; q.push(j * G + i); }
-  for (let qi = 0; qi < q.length; qi++) { const p = q[qi], pi = p % G, pj = (p / G) | 0; for (const [a, b] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const x = pi + a, z = pj + b; if (x < 0 || z < 0 || x >= G || z >= G) continue; const k = z * G + x; if (wd[k] > wd[p] + cellG) { wd[k] = wd[p] + cellG; q.push(k); } } }
-  const water = (x, z) => wd[Math.min(G - 1, Math.max(0, Math.floor(z / cellG))) * G + Math.min(G - 1, Math.max(0, Math.floor(x / cellG)))];
-  const step = 7 / Math.sqrt(Math.max(0.05, S.density));
-  const pick = (tab) => { let t = r() * tab.reduce((a, b) => a + b[1], 0); for (const [id, w] of tab) { t -= w; if (t <= 0) return id; } return tab[0][0]; };
-  for (let z = 80; z < size - 80; z += step) for (let x = 80; x < size - 80; x += step) {
-    const px = x + (r() - 0.5) * step * 0.9, pz = z + (r() - 0.5) * step * 0.9, h = sampleHeight(T, px, pz);
-    if (h < 0.6) continue;
-    const e = 3, sl = Math.hypot(sampleHeight(T, px + e, pz) - h, sampleHeight(T, px, pz + e) - h) / e;
-    if (sl > 0.7) continue;
-    const b = biomeAt(T, px, pz), u = px / size, v = pz / size, dw = water(px, pz);
-    const forestN = fbm(u, v, 6, 4, 0.5, seed) + 0.3 * fbm(u, v, 18, 3, 0.5, seed + 1);
-    let id = null;
-    const roll = r();
-    if (roll < b.temperate) {                                            // northern: spruce and pine forests, birch at the edges, juniper on the heath
-      if (rel(h) > 0.55 || sl > 0.55) continue;
-      if (forestN > 0.0) id = pick([['spruce', 0.55 - rel(h) * 0.4], ['pine', 0.3 + rel(h) * 0.4 + (sl > 0.3 ? 0.3 : 0)], ['birch', forestN < 0.12 ? 0.35 : 0.1]]);
-      else if (r() < 0.12) id = pick([['birch', 0.5], ['juniper', 0.8], ['pine', 0.2]]);
-    } else if (roll < b.temperate + b.plains) {                         // plains: copses of oak and birch, lone oaks in the fields, birches by the water
-      if (forestN > 0.18) id = pick([['oak', 0.5], ['birch', 0.3], ['pine', 0.2]]);
-      else if (dw < 60 && r() < 0.3) id = 'birch';
-      else if (r() < 0.02) id = 'oak';
-      else if (r() < 0.02) id = 'juniper';
-    } else {                                                            // desert: palm oases by the water, acacias here and there, saltbush scrub
-      if (dw < 110 && h < 8) { if (r() < 0.3) id = 'palm'; }
-      else if (r() < 0.03 && sl < 0.3) id = 'acacia';
-      else if (r() < 0.12 && sl < 0.4) id = 'saltbush';
-    }
-    if (!id) continue;
-    out.push({ id, x: px, y: h - 0.05, z: pz, yaw: r() * 6.283, s: 0.75 + r() * 0.45, v: Math.floor(r() * 3) });
-  }
-  return out;
-}
+// Where each plant stands: the landscape's rules (js/models/plants/vegetation.js — the same as on a scene's terrain)
+function scatter(T) { return scatterArea(T, 80, 80, T.size - 80, T.size - 80, { density: S.density }, S.mapSeed * 31 + 5); }
 
 /* ---------------- light and weather ---------------- */
 let envRT = null, envDirty = true, envT = 0, fogBase = 0.0003;
@@ -283,8 +247,33 @@ $('savePlant').onclick = () => { try { const n = savePlant($('saveName').value);
 $('delPlant').onclick = () => { const n = $('savedSel').value; if (!n) return; removeAsset('plant', n); if (S.savedAs === n) S.savedAs = ''; save(); fillSaved(); };
 $('savedSel').onchange = () => { const n = $('savedSel').value; if (n) loadPlant(n); };
 onAssetsChange(fillSaved); fillSaved();
-// for AI: PlantApi.save(name) — the "plant" asset; load(name), saved(), get()
-window.PlantApi = { save: (n) => ({ saved: savePlant(n) }), load: (n) => loadPlant(n), saved: () => listAssets('plant'), get: () => Object.fromEntries(PLANT_KEYS.map((k) => [k, S[k]])) };
+/* ---------------- save the landscape's plants: the "vegetation" asset — forests and grass on a scene's land terrain ---------------- */
+const vegOf = () => ({ density: S.density, grass: S.grass, grassR: S.grassR, lod: S.lod, impostors: S.impostors, season: S.season, seed: S.mapSeed });
+function fillVeg() {
+  const names = listAssets('vegetation'), s2 = $('vegSel');
+  s2.replaceChildren(el('option', { value: '', textContent: names.length ? '—' : 'none yet' }), ...names.map((n) => el('option', { value: n, textContent: n })));
+  s2.value = names.includes(S.vegAs || '') ? S.vegAs : '';
+}
+function saveVeg(n) {
+  n = String(n || '').trim(); if (!n) throw new Error('give the vegetation a name');
+  saveAsset('vegetation', n, vegOf()); S.vegAs = n; save(); fillVeg(); return n;
+}
+function loadVeg(n) {
+  const a = getAsset('vegetation', n); if (!a) throw new Error(`no saved vegetation "${n}"`);
+  for (const k of ['density', 'grass', 'grassR', 'lod', 'impostors', 'season']) if (a[k] != null) S[k] = a[k];
+  if (a.seed != null) S.mapSeed = a.seed;
+  S.vegAs = n; $('vegName').value = n; $('mapSeed').value = S.mapSeed; $('impostors').checked = S.impostors;
+  for (const k of ['density', 'grass', 'grassR', 'lod', 'season']) { $(k).value = S[k]; $(k + 'V').textContent = RANGES[k][0](+S[k]); }
+  wind.uSeason.value = S.season; save(); fillVeg(); if (S.mode !== 'landscape') setMode('landscape'); else buildLand(); return a;
+}
+$('vegName').value = S.vegAs || '';
+$('saveVeg').onclick = () => { try { const n = saveVeg($('vegName').value); window.LabLog && window.LabLog.add('info', `Saved: ${n} (asset "vegetation")`); } catch { $('vegName').focus(); } };
+$('delVeg').onclick = () => { const n = $('vegSel').value; if (!n) return; removeAsset('vegetation', n); if (S.vegAs === n) S.vegAs = ''; save(); fillVeg(); };
+$('vegSel').onchange = () => { const n = $('vegSel').value; if (n) loadVeg(n); };
+onAssetsChange(fillVeg); fillVeg();
+// for AI: PlantApi.save(name) — the "plant" asset; load(name), saved(), get(); saveVegetation(name), loadVegetation(name) — the "vegetation" asset (forests and grass for the scene editor)
+window.PlantApi = { save: (n) => ({ saved: savePlant(n) }), load: (n) => loadPlant(n), saved: () => listAssets('plant'), get: () => Object.fromEntries(PLANT_KEYS.map((k) => [k, S[k]])),
+  saveVegetation: (n) => ({ saved: saveVeg(n) }), loadVegetation: (n) => loadVeg(n), vegetation: () => listAssets('vegetation'), getVegetation: vegOf };
 function setMode(m) {
   S.mode = m; save();
   [...$('modes').children].forEach((b) => b.classList.toggle('on', b.dataset.m === m));

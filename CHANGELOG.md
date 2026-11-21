@@ -3,6 +3,18 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.94.0 · rośliny 1.6.0 · edytor sceny 0.47.0 — 2026-11-21 (roślinność krajobrazu w scenie)
+
+### Dodane
+- **Roślinność krajobrazu** (`js/models/plants/vegetation.js`): lasy, zagajniki, oazy, zarośla i trawa na terenie lądu
+  według biomów (północny, równiny, pustynia) i gruntu (woda, wysokość, nachylenie) — reguły z laboratorium roślin,
+  w kafelkach 256 m wokół kamery (pełne modele blisko, impostory dalej, trawa wokół kamery), światło, mgła i wiatr
+  ze sceny. Scena bazowa: `stage.setVegetation(zasób)`.
+- Laboratorium roślin (Krajobraz): zapis **roślinności dla edytora sceny** — zasób „vegetation” (gęstość, trawa, zasięg
+  pełnych modeli, impostory, pora roku, ziarno); `PlantApi.saveVegetation`. Las w laboratorium bez zmian (te same reguły
+  i ziarno).
+- Edytor sceny: Środowisko → **Roślinność** (na terenie z laboratorium lądu); API `env { vegetation }`.
+
 ## Program 0.93.1 · UI gry 1.7.1 — 2026-11-21 (poprawki skórki terminal i podglądu kontrolek)
 
 ### Poprawione

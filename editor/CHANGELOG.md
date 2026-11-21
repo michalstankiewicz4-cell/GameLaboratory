@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.47.0 — 2026-11-21
+
+### Dodane
+- Środowisko → **Roślinność**: lasy, zagajniki i trawa z laboratorium roślin (zasób „vegetation”) na terenie lądu sceny,
+  według biomów terenu; API `env { vegetation }`, lekarz sceny zgłasza brak zasobu i roślinność bez terenu.
+
 ## 0.46.0 — 2026-11-21
 
 ### Dodane

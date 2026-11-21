@@ -222,6 +222,11 @@ mgła, morze WaterKit, płaski grunt albo teren LandKit z wodami RegionKit, mapa
   z wysokością kamery).
 - Powierzchnia `setSurface`, niebo `setSkyMode`, światło `setLight(id | pogoda)`, morze `setSea(zasób)`, ląd
   `setLand({ map, water })` albo `setWorld(T)` (świat już wygenerowany), kadłub wycięty z wody `setShip`.
+- Roślinność na terenie `setVegetation(zasób „vegetation” | null)` (`js/models/plants/vegetation.js`): gatunki z biomów
+  terenu (północny, równiny, pustynia), miejsca z gruntu (woda, wysokość, nachylenie) — reguły laboratorium roślin;
+  lasy w kafelkach 256 m w promieniu `radius` wokół kamery (to samo ziarno i kafelek — te same rośliny), pełne modele
+  blisko, impostory dalej, trawa wokół kamery; światło, mgła i wiatr ze sceny. W edytorze — `env.vegetation` (tylko na
+  terenie z zasobu lądu); `stage.vegetation` → liczby (rośliny, blisko, daleko, kafelki, trawa).
 - Morze przy terenie zna teren (płycizny, przybój, barwy i prądy wód, lód, olej); fale powtarzają się co rozmiar mapy.
 - Ląd z planety (`T.atmo`): niebo dzienne w odcieniu jej atmosfery (`tintAtmosphere` w `setLight`); bez atmosfery
   `stage.airless` — strona daje niebo kosmosu; planeta bez mórz (`T.noSea`) — bez wody wokół wycinka.

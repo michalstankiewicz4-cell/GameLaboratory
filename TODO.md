@@ -44,15 +44,13 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
     jaskinie, życie (stwory), ludzie i broń, bryły z bloków (domyślne);
   - przez zasoby modelu (pole `asset` obiektu) — bryła z bloków (0.66.0);
   - przez zasoby z nazwą — morze (woda), ląd (ląd), pogoda i światło (wygląd), wygląd kamery (filtry), niebo kosmosu
-    (ciała niebieskie), UI gry (UI gry), materiał (materiały).
+    (ciała niebieskie), UI gry (UI gry), materiał (materiały), roślinność (rośliny, 0.94.0).
 - [ ] **Materiały → modele i scena:** modele biorą materiały z MatKit (rodzina po rodzinie, doktor modeli, porównanie
   obrazów); w scenie i w API pole materiału obiektu (podmiana np. kadłuba na zardzewiałą stal).
 - [ ] **Materiały ↔ sztuka:** powierzchnie 2D laboratorium sztuki z generatora MatKit (ten sam papier, drewno, metal
   w 2D i 3D).
 - [ ] **Sztuka → scena:** obraz z laboratorium sztuki jako zasób (zrobione w 0.74.0: zasób `image`) i obiekt sceny (płaszczyzna z fakturą farby, rama 3D
   ze złoceniem — tryb 3D sztuki).
-- [ ] **Roślinność krajobrazu:** las, zagajniki i trawa z laboratorium roślin (biom, gęstość) jako zasób — pokrycie
-  terenu lądu w scenie.
 - [ ] **Rozległe jaskinie** (właściciel, 2026-11-14): jaskinia dzielona na kawałki liczone wokół gracza (dziś CaveKit liczy
   całą jaskinię naraz, do ok. 2,4 mln próbek — przy dużej jaskini oczka siatki rosną i ściany tracą szczegóły);
   wejście do jaskini wycięte w terenie lądu — połączenie lądu i podziemia.

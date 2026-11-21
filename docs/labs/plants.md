@@ -52,6 +52,8 @@ range. Triangles per plant at detail 1: roughly 0.2k (saltbush) … 10k (spruce)
 
 ## Where plants grow (the lab's scatter)
 
+The rules live in `js/models/plants/vegetation.js` (`scatterArea`) — the same on a scene's land terrain.
+
 A jittered grid (~7 m between candidates at 100 %) over a 2.4 km RegionKit world with lakes; at each point the biome
 (RegionKit weights) picks the mix and the ground decides:
 
@@ -67,8 +69,16 @@ A jittered grid (~7 m between candidates at 100 %) over a 2.4 km RegionKit world
 Window *Plants* → *Specimen* → *Save*: the species, seed, size, detail and season as the named asset `plant`
 (`js/scene/assets.js`); the list loads one back. In the scene editor a Plants model picks it in the Object window
 (field `asset`; the saved species is built, whatever the model's own species), or through the API (`add` / `set` with
-`asset`). For AI: `PlantApi.save(name)`, `load(name)`, `saved()`, `get()`. The landscape's forest (density, biome)
-is not an asset yet (`TODO.md`).
+`asset`). For AI: `PlantApi.save(name)`, `load(name)`, `saved()`, `get()`.
+
+## Vegetation for the scene (1.6.0)
+
+*Landscape* → *Vegetation for the scene editor*: the plants' density, grass, grass radius, full-model distance,
+impostors, season and seed as the named asset `vegetation`. In the scene editor, Environment → Vegetation (on a land
+terrain from the land lab) grows forests, copses and grass on the scene's terrain by its biomes, with the same rules as
+here (`js/models/plants/vegetation.js`): tiles of 256 m within 1.2 km of the camera, full models near, impostors
+beyond, grass around the camera; light, fog and wind from the scene. For AI: `PlantApi.saveVegetation(name)`,
+`loadVegetation(name)`, `vegetation()`, `getVegetation()`; in the scene `{ "cmd": "env", "vegetation": name }`.
 
 ## Sources
 

@@ -60,6 +60,12 @@
     <div class="row"><span>Full models to</span><input type="range" id="lod" min="30" max="400" step="10"><output id="lodV"></output></div>
     <label class="chk"><input type="checkbox" id="impostors" checked> Impostors beyond that (off: full models only, capped)</label>
     <div class="stats" id="landStats"></div>
+    <h3>Vegetation for the scene editor</h3>
+    <div class="row"><span>Name</span><input type="text" id="vegName" maxlength="40" placeholder="e.g. Northern woods"><output></output></div>
+    <div class="btns"><button type="button" id="saveVeg">Save the vegetation</button></div>
+    <div class="row"><span>Saved</span><select id="vegSel"></select><output></output></div>
+    <div class="btns"><button type="button" id="delVeg">Delete</button></div>
+    <p class="note">The plants, grass, full-model distance, impostors, season and seed go to the scene editor (Environment → Vegetation): forests, copses and grass grow on the scene's land terrain by its biomes.</p>
     <p class="note">Plants stand by biome, height, slope and water: spruce and pine forests with birch at their edges and juniper on the heath; copses and lone oaks on the plains; palm oases by the water, acacias and saltbush in the desert. Rocks come in their own lab.</p>
   </div>
 </aside>

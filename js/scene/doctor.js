@@ -40,6 +40,7 @@ export function checkScene(scene, ctx) {
     if (!A.list(kind).includes(n)) add('error', 'missing-asset', null, `Environment ${field}: no ${kind} asset "${n}" (save one in the ${lab}; "" — the default)`, { cmd: 'env', [field]: '' });
   };
   asset('land', 'land', 'land lab');
+  asset('vegetation', 'vegetation', 'plants lab (Landscape)');
   asset('sea', 'sea', 'water lab');
   asset('look', 'look', 'filters lab');
   asset('ui', 'ui', 'game UI lab');
@@ -51,6 +52,7 @@ export function checkScene(scene, ctx) {
   if (S.env.light && !(ctx.lights || []).includes(S.env.light) && !A.list('weather').includes(S.env.light))
     add('error', 'missing-asset', null, `Environment light: no ready light or weather asset "${S.env.light}" (save one in the look lab)`, { cmd: 'env', light: (ctx.lights || ['afternoon'])[0] });
   if (S.env.land && surf !== 'land') add('info', 'unused-asset', null, `The land "${S.env.land}" is set, but the surface is ${surf}: it is not shown`);
+  if (S.env.vegetation && (surf !== 'land' || !S.env.land)) add('info', 'unused-asset', null, `The vegetation "${S.env.vegetation}" is set, but there is no land terrain (surface land with a land asset): it is not shown`);
 
   /* ---- obiekty ---- */
   const names = new Map(), want = [];   // want: powierzchnia, której potrzebuje obiekt w złym środowisku
