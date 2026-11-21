@@ -68,93 +68,21 @@
    "triangles": 13910
   }
  },
- "city/osm-jerozolimskie-54": {
-  "counts": {
-   "sliver": 2,
-   "zfight": 1
-  },
-  "fingerprint": {
-   "drawCalls": 14,
-   "materials": 14,
-   "size": [
-    153.87,
-    18.52,
-    125.03
-   ],
-   "triangles": 56210
-  }
- },
- "city/osm-twarda-2-4": {
-  "counts": {},
-  "fingerprint": {
-   "drawCalls": 9,
-   "materials": 9,
-   "size": [
-    47.34,
-    161.02,
-    55.12
-   ],
-   "triangles": 185722
-  }
- },
- "city/osm-emilii-plater-49": {
-  "counts": {
-   "zfight": 1
-  },
-  "fingerprint": {
-   "drawCalls": 14,
-   "materials": 14,
-   "size": [
-    53.7,
-    165.02,
-    53.4
-   ],
-   "triangles": 276522
-  }
- },
- "city/osm-defilad-1": {
-  "counts": {
-   "sliver": 1
-  },
-  "fingerprint": {
-   "drawCalls": 14,
-   "materials": 14,
-   "size": [
-    254.69,
-    237.02,
-    300.27
-   ],
-   "triangles": 467144
-  }
- },
- "city/osm-rondo-onz-1": {
+ "city/osm-chlodna-51": {
   "counts": {
    "seethrough": 1,
    "sliver": 1,
    "zfight": 1
   },
   "fingerprint": {
-   "drawCalls": 18,
-   "materials": 18,
+   "drawCalls": 17,
+   "materials": 17,
    "size": [
-    103.3,
-    160.02,
-    109.5
+    63.59,
+    208.02,
+    58.2
    ],
-   "triangles": 429290
-  }
- },
- "city/osm-europejski-1": {
-  "counts": {},
-  "fingerprint": {
-   "drawCalls": 10,
-   "materials": 10,
-   "size": [
-    44.84,
-    220.02,
-    61
-   ],
-   "triangles": 199394
+   "triangles": 322860
   }
  },
  "city/osm-chmielna-69": {
@@ -174,21 +102,93 @@
    "triangles": 617606
   }
  },
- "city/osm-chlodna-51": {
+ "city/osm-defilad-1": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 14,
+   "materials": 14,
+   "size": [
+    254.69,
+    237.02,
+    300.27
+   ],
+   "triangles": 467144
+  }
+ },
+ "city/osm-emilii-plater-49": {
+  "counts": {
+   "zfight": 1
+  },
+  "fingerprint": {
+   "drawCalls": 14,
+   "materials": 14,
+   "size": [
+    53.7,
+    165.02,
+    53.4
+   ],
+   "triangles": 276522
+  }
+ },
+ "city/osm-europejski-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 10,
+   "materials": 10,
+   "size": [
+    44.84,
+    220.02,
+    61
+   ],
+   "triangles": 199394
+  }
+ },
+ "city/osm-jerozolimskie-54": {
+  "counts": {
+   "sliver": 2,
+   "zfight": 1
+  },
+  "fingerprint": {
+   "drawCalls": 14,
+   "materials": 14,
+   "size": [
+    153.87,
+    18.52,
+    125.03
+   ],
+   "triangles": 56210
+  }
+ },
+ "city/osm-rondo-onz-1": {
   "counts": {
    "seethrough": 1,
    "sliver": 1,
    "zfight": 1
   },
   "fingerprint": {
-   "drawCalls": 17,
-   "materials": 17,
+   "drawCalls": 18,
+   "materials": 18,
    "size": [
-    63.59,
-    208.02,
-    58.2
+    103.3,
+    160.02,
+    109.5
    ],
-   "triangles": 322860
+   "triangles": 429290
+  }
+ },
+ "city/osm-twarda-2-4": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 9,
+   "materials": 9,
+   "size": [
+    47.34,
+    161.02,
+    55.12
+   ],
+   "triangles": 185722
   }
  },
  "city/osm-zlota-44": {
@@ -506,6 +506,124 @@
     1.79
    ],
    "triangles": 32272
+  }
+ },
+ "plants/acacia": {
+  "counts": {
+   "seethrough": 1
+  },
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 2,
+   "size": [
+    20.81,
+    10.54,
+    20.71
+   ],
+   "triangles": 500
+  }
+ },
+ "plants/birch": {
+  "counts": {
+   "seethrough": 1
+  },
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 2,
+   "size": [
+    11.05,
+    16.75,
+    12.16
+   ],
+   "triangles": 1394
+  }
+ },
+ "plants/juniper": {
+  "counts": {
+   "seethrough": 1
+  },
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 2,
+   "size": [
+    3.31,
+    3.24,
+    3.16
+   ],
+   "triangles": 204
+  }
+ },
+ "plants/oak": {
+  "counts": {
+   "seethrough": 1
+  },
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 2,
+   "size": [
+    17.84,
+    21.28,
+    18.7
+   ],
+   "triangles": 1420
+  }
+ },
+ "plants/palm": {
+  "counts": {
+   "seethrough": 1
+  },
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 2,
+   "size": [
+    9.09,
+    21.14,
+    8.75
+   ],
+   "triangles": 1536
+  }
+ },
+ "plants/pine": {
+  "counts": {
+   "seethrough": 1
+  },
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 2,
+   "size": [
+    9.2,
+    25.54,
+    9.02
+   ],
+   "triangles": 1840
+  }
+ },
+ "plants/saltbush": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    1.95,
+    1.36,
+    2.02
+   ],
+   "triangles": 204
+  }
+ },
+ "plants/spruce": {
+  "counts": {
+   "seethrough": 1
+  },
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 2,
+   "size": [
+    12.57,
+    31.5,
+    12.59
+   ],
+   "triangles": 10144
   }
  },
  "road/abrams": {
