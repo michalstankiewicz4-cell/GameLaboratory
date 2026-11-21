@@ -7,6 +7,7 @@ import { buildNetwork } from "../../models/structures/railway/network.js";
 import { trainMaterials } from "../../models/train/materials.js";
 import { attachRail, railAnchor, ANCHOR_OFFSET } from "../../behaviors/rail/rail.js";
 import { createRailSounds } from "../../audio/rail-sounds.js";
+import { createRailFx } from "../../render/effects/rail-fx.js";
 const THREE = window.THREE;
 
 const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
@@ -88,13 +89,17 @@ function start(lab) {
 
   const role = "Rail: a shunting diesel and two covered wagons — a knuckle coupler, then a chain on a hook — on an oval with two turnouts and a loop. Real wheel–rail physics (from aTrain): nothing holds the train on the track but the contact of the wheels with the rails.";
   const sounds = createRailSounds(); let active = false;   // dźwięk szyn: tylko gdy pociąg jest pokazany
+  let fx = null;                                            // dym z wydechu i iskry spod kół (aTrain, js/render/effects/rail-fx.js)
   lab.addMode({
     name: "Train", tabName: "Train", role, panel,
     target: [-1, 1.6, -50], camera: [-14, 7, -30],
     build() {
       const g = new THREE.Group(); g.name = "pociąg na torze";
       train = buildTrain(DEFAULT_TRAIN); rail = attachRail(train); sim = rail.sim;
-      sim.listen = (s, n) => { if (active) sounds.listen(s, n); };   // dźwięk szyn z zdarzeń fizyki (aTrain)
+      if (fx) fx.dispose();
+      fx = createRailFx(g, train);
+      // z fizyki (aTrain): najpierw dym i iskry (zerują moc tarcia ślizgowego), potem dźwięk szyn (zeruje moc obrzeży)
+      sim.listen = (s, n) => { fx.listen(s, n); if (active) sounds.listen(s, n); else for (const b of s.bodies) b.flangeP = 0; };
       this.rail = rail;   // do testów i narzędzi (sim, sync)
       const flat = new THREE.Mesh(new THREE.PlaneGeometry(1200, 600), trainMaterials().ground);
       flat.rotation.x = -Math.PI / 2; flat.position.set(sim.TRACK.hl + 120, -0.45, 0); flat.receiveShadow = true; g.add(flat);
@@ -112,11 +117,12 @@ function start(lab) {
         ["Couplers", "knuckle · chain on hook"], ["Curve radius", sim ? sim.TRACK.R + " m" : "–"],
         ["Physics step", "1/2400 s"], ["Triangles", v ? Math.round(tris(train)).toLocaleString("en-US") : "–"]];
     },
-    leave() { active = false; sounds.stop(); },
+    leave() { active = false; sounds.stop(); if (fx) fx.clear(); },
     update(dt) {
       active = true;
       if (follow) { offLocal.copy(cam.position).sub(controls.target); rotY(offLocal, -follow.last.yaw); }
       rail.update(dt);
+      fx.light = lab.state && lab.state.night ? 0.15 : 1; fx.step(Math.min(dt, 1 / 20));
       for (let i = 0; i < 2; i++) { const t = swLabel(i); if (ui["sw" + i].textContent !== t) ui["sw" + i].textContent = t; }
       net.userData.update(sim.track.switches);
       couplerLabels();

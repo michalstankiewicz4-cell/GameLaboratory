@@ -119,6 +119,13 @@ planet brings the planet's (Luna: weak gravity, no air). The ship starts 40 m up
 controller that holds 1.5 m/s down and sets it on its four landing pads; by hand: Space — lift thrusters, W / S — the
 main engine, A / D — yaw. Touching down faster than 5 m/s breaks it.
 
+## Smoke and sparks (1.25.0)
+
+The train's exhaust smoke and the sparks from under its wheels come from the physics, as in aTrain
+(`js/render/effects/rail-fx.js`, drawn by `js/render/effects/land.js` — the effects lab's Smoke (land) and Sparks (land)):
+the more tractive force against the engine's power, the thicker the smoke; sparks from the wheels' slip friction power
+and a quarter of the flange friction power (spinning on start, a locked wheel, tight curves). At night the smoke is darker.
+
 ## Rail sounds (1.24.0)
 
 The train and the tram sound from the physics: aTrain's acoustic events (rail joints, sleepers, the knuckle, the chain,

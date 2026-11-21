@@ -3,6 +3,20 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.90.0 · efekty 1.4.0 · pojazdy — ląd 1.25.0 — 2026-11-21 (dym i iskry z aTrain)
+
+### Dodane
+- **Dym i iskry na lądzie** (EffectKit: `js/render/effects/land.js`, z aTrain): **Dym (ląd)** — kłęby z wyporem i oporem
+  powietrza, rosną, biorą prędkość źródła, ciemnieją nocą, gęstsze przy większym obciążeniu; **Iskry (ląd)** — spadają
+  z przyspieszeniem ziemskim i odbijają się od gruntu. W laboratorium efektów obok dymu i iskier z kosmosu (te są
+  bez grawitacji), z suwakami i zapisem pod nazwą.
+- **Pociąg dymi i iskrzy z fizyki** (`js/render/effects/rail-fx.js`): dym z wydechu lokomotywy z siły napędu wobec mocy,
+  iskry spod kół z mocy tarcia ślizgowego i obrzeża (buksowanie, zablokowane koła, łuki) — jak w aTrain.
+
+### Zmienione
+- Temat pociągu zamknięty (właściciel): teren i pogoda z aTrain nie są przenoszone — silnik ma laboratorium lądu
+  i pogodę z laboratorium wyglądu.
+
 ## Kontrola kitów 1.0.7 — 2026-11-21 (nowy wzorzec)
 
 ### Zmienione

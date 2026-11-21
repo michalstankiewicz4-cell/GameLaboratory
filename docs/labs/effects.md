@@ -1,6 +1,7 @@
 # Laboratorium efektów (`labs/effects.html`)
 
-Efekty z Hive Hunger (przeniesione z historią, 0.67.0) w kosmosie, bez grawitacji. Kit: **EffectKit**
+Efekty z Hive Hunger (przeniesione z historią, 0.67.0) w kosmosie, bez grawitacji — poza dymem i iskrami na lądzie
+(z aTrain, 0.90.0). Kit: **EffectKit**
 (`js/render/effects/effects.js`) — wspólne wejście do siedmiu efektów z gry (`js/render/effects/`: `shots.js`,
 `orbs.js`, `debris.js`, `lightning.js`, `zaps.js`, `bubbles.js`, `black-holes.js`, tekstury `textures.js`; obliczenia
 bez zmian, liczby na klatkę 60 Hz). Strona `js/labs/effects/effects.js`, arkusz `ui/pages/effects.css`; kategoria
@@ -27,6 +28,8 @@ w menu i na stronie startowej: **Efekty**.
 | Fala skanu | `scan` | `at`, `radius` | rosnąca powłoka z jasnym brzegiem i liniami (z ShipKit) |
 | Dym | `smoke` | `at`, `dir` | miękkie szare kłęby, unoszą się i rozchodzą (`frames` — jak długo dymi) |
 | Iskry | `sparks` | `at`, `dir`, `n` | seria krótkich jasnych iskier z oporem |
+| Dym (ląd) | `smokeLand` | `at`, `vel`, `load` | kłęby z wyporem i oporem powietrza: unoszą się, zwalniają, rosną, biorą prędkość źródła (`vel`), ciemnieją nocą; im większe obciążenie `load` (0…1), tym gęściej i wyżej (`rate` + `rateLoad` × `load` kłębów na sekundę przez `frames` klatek) |
+| Iskry (ląd) | `sparksLand` | `at`, `vel`, `ground`, `n` | seria `n` iskier: spadają z przyspieszeniem ziemskim (`gravity`), odbijają się od gruntu na wysokości `ground` (`bounce`) |
 | Wybuch | `explosion` | `at`, `radius` | błysk i kule ognia (1.4 s) |
 | Spalenizna | `scorch` | `at`, `dir` (normalna) | ciemny poszarpany ślad na powierzchni |
 | Ognik | `ember` | `at`, `dir` | migoczący pomarańczowy ognik na powierzchni |
@@ -37,6 +40,11 @@ je gospodarz `swarm-fx.js`: każdy grany efekt to jeden „statek”, `frames` �
 i tunel (`portal.js`) — ze sceny gry; fala skanu (`scan.js`) — z ShipKit. Zostają przy modelu (decyzje właściciela,
 2026-11-14): wiertło wiertnicy, łamanie i odpadanie części przy uszkodzeniu i zniszczeniu, laser „print” Scribe (pisze
 napis w chmurze gazu — animacja statku) i rozbłysk oka Scribe przy strzale.
+
+Dym i iskry na lądzie (`land.js`, `LandFx`) są z aTrain: cząstki w metrach sceny (bez skali `root`), z ruchem i liczbami
+jak w aTrain. Pociąg wyrzuca je z fizyki „koło na szynie” (`rail-fx.js`, `createRailFx`): dym z wydechu lokomotywy
+z obciążenia silnika (siła napędu wobec mocy), iskry spod kół z mocy tarcia ślizgowego i obrzeża — w laboratorium
+pojazdów (ląd, pociąg).
 
 Soczewki (czarna dziura, kula cieczy) potrzebują obrazu sceny: `fx.render(renderer, scene, camera, draw)` rysuje
 scenę do celu (`draw(target)` — w laboratoriach przez potok kamery `LookPipeline`) i zagina go.

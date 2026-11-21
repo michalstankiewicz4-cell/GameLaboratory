@@ -93,11 +93,6 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
   odwrócony układ UI, kierunek tekstu).
 - [ ] Przetłumaczyć okna laboratoriów na polski (teraz po polsku są pasek menu, strona startowa, tytuły okien standardowych, konsola i okno Wydajność).
 
-## Pociąg (zachowanie „koło na szynie”)
-- [ ] Dym i iskry z aTrain.
-- [ ] Teren z aTrain: góra, skarpa, morze, las (fizyka zna go przez `sim.groundH`).
-- [ ] Pogoda z aTrain.
-
 ## Modele — błędy znalezione przez doktora (po stronie gry, chyba że doktor nauczy się je naprawiać)
 - [ ] Dziury: talerz anteny (haven), kadłub (swarmer), kadłuby (skimmer, barka, amfibia), półkula (scout).
 - [ ] Migotanie zlicowanych ścian z teksturą: hauler, crawler.

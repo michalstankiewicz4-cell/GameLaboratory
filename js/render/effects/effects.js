@@ -1,13 +1,15 @@
 // EffectKit — efekty z Hive Hunger w jednym miejscu: strzał, kula plazmy, odłamki, błyskawica, piorun łańcuchowy,
 // kula cieczy, czarna dziura. Każdy efekt to dane (FX_DEFAULTS: liczby z gry, na klatkę 60 Hz) — laboratorium
-// efektów zmienia je suwakami i zapisuje pod nazwą (zasób „effect”, js/scene/assets.js). Kosmos: bez grawitacji.
+// efektów zmienia je suwakami i zapisuje pod nazwą (zasób „effect”, js/scene/assets.js). Kosmos: bez grawitacji — poza
+// dymem i iskrami na lądzie (smokeLand, sparksLand — land.js, z aTrain: wypór, opór powietrza, grawitacja, grunt; w metrach).
 //
 // createEffects(scene, { scale, settings }) → fx
 //   scale — metry na jednostkę gry (w Hive Hunger blok = 0.5): wszystko rysuje się w grupie fx.root o tej skali,
 //           położenia podaje się w metrach sceny
 //   settings — { shot, orb, debris, bolt, zap, bubble, hole } nadpisanie liczb (np. z zasobu „effect”)
 // fx.play(kind, opts) — jeden efekt: { from, to } (shot, orb, bubble), { at, dir?, color?, n? } (debris),
-//   { path: [[x,y,z], …] } (bolt, zap), { at } (hole); punkty jako [x, y, z] albo Vector3; zwraca true
+//   { path: [[x,y,z], …] } (bolt, zap), { at } (hole), { at, vel?, load? } (smokeLand), { at, vel?, ground?, n? }
+//   (sparksLand); punkty jako [x, y, z] albo Vector3; zwraca true
 // fx.step(camera) — jedna klatka gry (1/60 s; wołać stałym krokiem), fx.render(renderer, scene, camera, draw) —
 //   obraz z soczewkami czarnych dziur i kul cieczy (draw(target) — rysowanie sceny, np. LookPipeline)
 // fx.set(kind, values), fx.counts(), fx.clear(), fx.dispose()
@@ -21,6 +23,7 @@ import { Bubbles } from './bubbles.js';
 import { BlackHoles } from './black-holes.js';
 import { createSwarmEffects, SWARM_DEFAULTS, SWARM_KINDS } from './swarm-fx.js';
 import { DamageFx, DAMAGE_DEFAULTS } from './damage.js';
+import { LandFx, LAND_DEFAULTS } from './land.js';
 import { QUALITY, fxCount } from '../quality.js';
 
 export const STEP = 1 / 60;
@@ -38,6 +41,7 @@ export const FX_DEFAULTS = {
   bubble: { speed: 0.07, size: 1.5, wobble: 0.08 },
   hole: { grow: 60, hold: 120, shrink: 60, size: 2.2, range: 7.5, core: 0.9, pullDebris: 0.004, pullPieces: 0.0015, maxPieceSpeed: 0.05, ringColor: 0xc9a0ff },
   ...DAMAGE_DEFAULTS,  // dym, iskry, wybuch, spalenizna, ognik (damage.js, z ShipKit)
+  ...LAND_DEFAULTS,    // dym i iskry na lądzie: wypór, opór powietrza, grawitacja, odbicie od gruntu (land.js, z aTrain)
   ...SWARM_DEFAULTS,   // laser, przebijacz, burza, holowanie, cięcie, pole, skok, znacznik, tunel, skan (swarm-fx.js)
 };
 export const FX_KINDS = {
@@ -51,6 +55,8 @@ export const FX_KINDS = {
   ...SWARM_KINDS,
   smoke: { label: 'Smoke', labelPl: 'Dym', needs: 'at, dir', badges: ['spot', 'area'] },
   sparks: { label: 'Sparks', labelPl: 'Iskry', needs: 'at, dir', badges: ['spot', 'area'] },
+  smokeLand: { label: 'Smoke (land)', labelPl: 'Dym (ląd)', needs: 'at, vel?, load?', badges: ['spot', 'area'] },
+  sparksLand: { label: 'Sparks (land)', labelPl: 'Iskry (ląd)', needs: 'at, vel?, ground?, n?', badges: ['spot', 'area'] },
   explosion: { label: 'Explosion', labelPl: 'Wybuch', needs: 'at, radius', badges: ['spot', 'area'] },
   scorch: { label: 'Scorch mark', labelPl: 'Spalenizna', needs: 'at, dir', badges: ['spot', 'point'] },
   ember: { label: 'Ember', labelPl: 'Ognik', needs: 'at, dir', badges: ['spot', 'point'] },
@@ -80,10 +86,11 @@ export function createEffects(scene, { scale = 1, settings = {} } = {}) {
       shot: new Shots(root, S.shot, VOXEL), orb: new Orbs(root, S.orb, VOXEL), debris: new Debris3D(root, S.debris),
       bolt: new Lightning3D(root, S.bolt), zap: new Zaps(root, S.zap), bubble: new Bubbles(S.bubble), hole: new BlackHoles(S.hole),
       swarm: createSwarmEffects(root, S), damage: new DamageFx(root, S), smokes: [], marks: [],
+      land: new LandFx(scene, S), landSmokes: [],   // w metrach sceny (bez skali root): grawitacja i grunt są w metrach
     };
   }
   function drop() {
-    fx.swarm.clear(); fx.damage.dispose(); fx.shot.clear(); fx.orb.clear(); fx.bolt.clear(); fx.zap.clear(); fx.bubble.clear(); fx.hole.clear();
+    fx.swarm.clear(); fx.damage.dispose(); fx.land.dispose(); fx.shot.clear(); fx.orb.clear(); fx.bolt.clear(); fx.zap.clear(); fx.bubble.clear(); fx.hole.clear();
     root.traverse((m) => { if (m.geometry) m.geometry.dispose(); if (m.material) [].concat(m.material).forEach((x) => x.dispose()); });
     root.clear();
   }
@@ -104,6 +111,10 @@ export function createEffects(scene, { scale = 1, settings = {} } = {}) {
         case 'hole': fx.hole.add(v(o.at)); return true;
         case 'smoke': fx.smokes.push({ at: v(o.at), dir: o.dir ? v(o.dir).normalize() : new THREE.Vector3(0, 1, 0), age: 0, frames: o.frames || S.smoke.frames }); return true;
         case 'sparks': fx.damage.sparks(v(o.at), o.dir ? v(o.dir).normalize() : new THREE.Vector3(0, 1, 0), Math.round(o.n || S.sparks.n)); return true;
+        case 'smokeLand': { const p = (q, d) => (q ? (q.isVector3 ? q.toArray() : q) : d);
+          fx.landSmokes.push({ at: p(o.at, [0, 0, 0]), vel: p(o.vel, [0, 0, 0]), load: o.load ?? 0.5, age: 0, frames: o.frames || S.smokeLand.frames, acc: 0 }); return true; }
+        case 'sparksLand': { const p = (q, d) => (q ? (q.isVector3 ? q.toArray() : q) : d), at = p(o.at, [0, 0, 0]), vel = p(o.vel, [0, 0, 0]);
+          for (let j = 0, n = Math.round(o.n || S.sparksLand.n); j < n; j++) fx.land.sparks(at, vel, o.ground ?? -Infinity); return true; }
         case 'explosion': fx.damage.blast(v(o.at), o.radius != null ? o.radius / scale : S.explosion.radius); return true;
         case 'scorch': case 'ember': {   // znak na powierzchni: kotwica w `at`, +z wzdłuż `dir` (normalna powierzchni)
           const a = new THREE.Object3D(); a.position.copy(v(o.at)); a.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), o.dir ? v(o.dir).normalize() : new THREE.Vector3(0, 0, 1)); root.add(a);
@@ -122,6 +133,13 @@ export function createEffects(scene, { scale = 1, settings = {} } = {}) {
       fx.damage.smoke(fx.smokes.map((e) => ({ at: e.at, dir: e.dir, alpha: 1 })));
       fx.marks = fx.marks.filter((m) => { if (++m.age <= m.frames) return true; fx.damage.unmark(m.a); root.remove(m.a); return false; });
       fx.damage.step();
+      // dym i iskry na lądzie (land.js): źródła dymu wyrzucają kłęby z szybkością zależną od obciążenia
+      fx.landSmokes = fx.landSmokes.filter((e) => {
+        e.acc += STEP * (S.smokeLand.rate + S.smokeLand.rateLoad * e.load);
+        while (e.acc >= 1) { e.acc -= 1; fx.land.smoke(e.at, e.vel, e.load); }
+        return ++e.age <= e.frames;
+      });
+      fx.land.step(STEP);
       camera = lc;
       fx.shot.update(); fx.orb.update(); fx.bubble.update((b) => fx.debris.emit(b.pos.clone(), [0.55, 0.8, 1], 10));   // rozbryzg u celu (splashColor, splash z gry)
       fx.hole.update(fx.debris); fx.debris.update(); fx.bolt.update(camera); fx.zap.update(camera);
@@ -134,7 +152,7 @@ export function createEffects(scene, { scale = 1, settings = {} } = {}) {
       try { H.render(renderer, sc, camera, lenses, null, draw); } finally { H.holes.forEach((h, i) => h.pos.copy(keep[i])); H.cfg.size = size; }
     },
     set(kind, values) { Object.assign(S[kind], values); make(); },
-    counts: () => ({ shot: fx.shot.list.length, orb: fx.orb.list.length, debris: fx.debris.count, bolt: fx.bolt.bolts.length, zap: fx.zap.list.length, bubble: fx.bubble.list.length, hole: fx.hole.holes.length, ...fx.swarm.counts(), smoke: fx.smokes.length, sparks: fx.damage.counts.sparks, explosion: fx.damage.counts.blasts, scorch: fx.marks.length, ember: fx.marks.length }),
+    counts: () => ({ shot: fx.shot.list.length, orb: fx.orb.list.length, debris: fx.debris.count, bolt: fx.bolt.bolts.length, zap: fx.zap.list.length, bubble: fx.bubble.list.length, hole: fx.hole.holes.length, ...fx.swarm.counts(), ...fx.land.counts, smoke: fx.smokes.length, sparks: fx.damage.counts.sparks, explosion: fx.damage.counts.blasts, scorch: fx.marks.length, ember: fx.marks.length }),
     clear() { make(); },
     dispose() { drop(); scene.remove(root); },
   };
