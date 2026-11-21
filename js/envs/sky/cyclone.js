@@ -11,9 +11,10 @@
 // Układ: x — wschód, −z — północ; bearing — kierunek od środka cyklonu do sceny (0° północ, 90° wschód), trackDir —
 // kierunek wędrówki cyklonu (dokąd idzie); odległości w km, prędkości w m/s, czas t w s.
 // CYCLONE_DEFAULTS; CATEGORIES — [{ id, label, vmax }]
-// cycloneAt(C, t?) → { r (km), x (r / Rm), zone, vmax, wind, dir [x, z] (dokąd wieje), rain, band, eye, rel [x, z] km }
+// cycloneAt(C, t?) → { r (km), x (r / Rm), zone, vmax, wind, dir [x, z] (dokąd wieje), rain, band, eye, rel [x, z] km,
+//   seaWind (m/s — wiatr, który wzbudził morze: w oku wysokie fale ze ściany), seaSpread (° — rozrzut kierunków fal) }
 // cycloneWeather(C, t?) → liczby pogody (jak WEATHER: coverage, density, haze, wind, scale, rain, vis, lightning)
-//   z polami windDir, cyclone (stan) i tornado (trąba w paśmie, gdy spouts)
+//   z polami windDir, seaWind, seaSpread, cyclone (stan) i tornado (trąba w paśmie, gdy spouts)
 // cycloneWind(C, t, out, A?) → wiatr przy ziemi w scenie [x, y, z] m/s z porywami (jednakowy w obrębie sceny);
 //   A — gotowe cycloneAt(C) (bez liczenia na nowo przy każdym ciele)
 // createCyclone(opts) → { step(dt) → liczby pogody, params, time, at, set(opts), opts }
@@ -49,19 +50,24 @@ export function cycloneAt(C0, t) {
   const C = opt(C0), tt = t ?? C.t, rel = relOf(C, tt), r = Math.hypot(rel[0], rel[1]), Rm = Math.max(3, C.eye), x = r / Rm;
   const vmax = vmaxOf(C.category), q = Math.pow(1 / Math.max(x, 0.05), B);
   const eyeK = 1 - 0.85 * (1 - smooth(0.45, 0.85, x));                  // w oku wiatr słabnie bardziej niż w profilu (cisza)
-  const wind = vmax * Math.sqrt(q * Math.exp(1 - q)) * eyeK * (x > 20 ? Math.max(0, 1 - (x - 20) / 10) : 1);
+  const eye = 1 - smooth(0.55, 0.9, x);                                  // oko: cisza i przejaśnienie
+  // w oku nie ma zupełnej ciszy: słaby, zmienny wiatr (ok. 4–7 m/s, silniejszy w silniejszym cyklonie)
+  const wind = Math.max(vmax * Math.sqrt(q * Math.exp(1 - q)) * eyeK, (2.5 + 0.06 * vmax) * eye) * (x > 20 ? Math.max(0, 1 - (x - 20) / 10) : 1);
   // kierunek: styczny (półkula północna — przeciwnie do zegara patrząc z góry: przy x wschód, −z północ, obrót dodatni
   // z +x do −z), z napływem do środka
   const s = C.hemisphere === 'south' ? -1 : 1, nx = rel[0] / (r || 1), nz = rel[1] / (r || 1);
   const tx = nz * s, tz = -nx * s;   // styczna (z góry: x→−z to obrót przeciwny do zegara)
   const dir = [tx * Math.cos(INFLOW) - nx * Math.sin(INFLOW), tz * Math.cos(INFLOW) - nz * Math.sin(INFLOW)];
   const band = bandAt(C, rel[0], rel[1], tt);
-  const eye = 1 - smooth(0.55, 0.9, x);                                  // oko: cisza i przejaśnienie
   const wall = Math.exp(-Math.pow((x - 1.1) / 0.32, 2));                 // ściana oka (tuż za promieniem wiatru max)
   const outer = 1 - smooth(10, 20, x);                                    // zasięg chmur cyklonu
   const rain = clamp(Math.max(wall * 1.0, band * 0.85 * (1 - smooth(9, 13, x)), 0.12 * outer * (1 - eye) * smooth(1.5, 3, x) * (1 - smooth(6, 14, x))) * (1 - eye), 0, 1);
   const zone = eye > 0.5 ? 'eye' : wall > 0.35 ? 'eyewall' : band > 0.35 && x < 13 ? 'rain band' : x < 13 ? 'between bands' : x < 20 ? 'outer clouds' : 'outside';
-  return { r, x, zone, vmax, wind, dir, rain, band, eye, wall, outer, rel, Rm };
+  // morze: fale robi wiatr ściany oka i pasm, więc w oku i tuż za ścianą morze zostaje wysokie (wiatr, który je wzbudził),
+  // a w oku jest skłębione — fale przychodzą ze wszystkich stron (szerszy rozrzut kierunków)
+  const seaWind = Math.max(wind, vmax * 0.85 * (1 - smooth(1.5, 6, x)));
+  const seaSpread = 35 + 55 * eye;
+  return { r, x, zone, vmax, wind, dir, rain, band, eye, wall, outer, rel, Rm, seaWind, seaSpread };
 }
 // liczby pogody sceny w danej chwili
 export function cycloneWeather(C0, t) {
@@ -74,7 +80,7 @@ export function cycloneWeather(C0, t) {
   const lightning = clamp(A.wall * 0.55 + A.band * 0.35 * (1 - A.eye), 0, 1);
   const out = { coverage, density, haze, wind: A.wind, scale: base.scale ?? 1, rain: wet, vis, lightning,
     weather: A.zone === 'eye' ? 'fair' : wet > 0.6 ? 'storm' : wet > 0.15 ? 'rain' : far > 0.5 ? 'broken' : 'overcast',
-    windDir: A.dir, cyclone: { ...C, t: t ?? C.t } };
+    windDir: A.dir, seaWind: A.seaWind, seaSpread: A.seaSpread, cyclone: { ...C, t: t ?? C.t } };
   // trąba wodna / tornado w paśmie (prawdziwe cyklony je rodzą w pasmach); które pasmo — z odcinka czasu (powtarzalne)
   if (C.spouts && A.band > 0.6 && A.x > 1.6 && A.x < 8) {
     const slot = Math.floor((t ?? C.t) / 600), h = Math.sin(slot * 12.9898 + C.category * 78.233) * 43758.5453;

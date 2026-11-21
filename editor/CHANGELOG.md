@@ -3,6 +3,15 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.51.0 — 2026-11-21
+
+### Dodane
+- API: polecenie `camera { pos, target, fov }` (kamera widoku; bez pól — odczyt) i `add` z `ground: true` (model na
+  terenie pod `pos`).
+
+### Poprawione
+- Z opisu usunięty skrót „H chowa okna” (edytor go nie miał).
+
 ## 0.50.1 — 2026-11-21
 
 ### Poprawione

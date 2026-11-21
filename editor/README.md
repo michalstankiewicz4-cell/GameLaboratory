@@ -127,13 +127,14 @@ albo lista (po kolei); wynik `{ "ok": true, … }` albo `{ "ok": false, "error":
 | `help` | — | lista poleceń |
 | `describe` | — | cała scena (dane) i krótki opis |
 | `prefabs` | `[family]` | modele do dodania: id, nazwa, rodzina, gdzie stoi, zachowania |
-| `add` | `prefab`, `[name]`, `[pos]`, `[rot]`, `[scale]`, `[behavior]`, `[asset]`, `[shot]`, `[sound]` | dodaje model, zwraca `id` (`asset` — zasób modelu, np. bryła z laboratorium bloków) |
+| `add` | `prefab`, `[name]`, `[pos]`, `[ground]` (`true` — na terenie: `y` to wysokość gruntu pod `pos`, a `y` z `pos` — wysokość nad nim; na morzu linia wody), `[rot]`, `[scale]`, `[behavior]`, `[asset]`, `[shot]`, `[sound]` | dodaje model, zwraca `id` (`asset` — zasób modelu, np. bryła z laboratorium bloków) |
 | `set` | `id` albo `name`, potem `newName` (z `id` także `name`), `prefab`, `pos`, `rot`, `scale`, `behavior`, `orbit` (`{ around, period }` — zachowanie „orbita”), `asset` (`""` — model domyślny), `shot` (efekt strzału statku, `""` — strzał), `sound` (dźwięk przy obiekcie, `""` — bez), `soundRange` (m, 0 — domyślny) | zmienia obiekt |
 | `move` | `id` albo `name`, `by: [dx, dy, dz]` | przesuwa o wektor |
 | `remove` | `id` albo `name` | usuwa |
 | `env` | `surface` (`sea` / `land` / `space` / `underground`), `light`, `look`, `land`, `sea`, `sky`, `ui`, `cave`, `music`, `musicAction` | środowisko (`ui` — UI gry z laboratorium UI gry, nakładka w ▶ Graj; `underground` — w jaskini, `cave` — jaskinia z laboratorium jaskiń jako teren planszy) |
 | `assets` | `[kind]` | zasoby z nazwą (`sea` — woda, `land` — ląd, `weather` — wygląd, `look` — filtry, `sky` — ciała niebieskie) i gotowe tła kosmosu |
 | `select` | `id` / `name` albo nic | wybór w edytorze |
+| `camera` | `[pos]`, `[target]` (`[x, y, z]` albo obiekt `id` / `name`), `[fov]` (10…120°); bez nich — tylko odczyt | kamera widoku: położenie, na co patrzy, kąt widzenia; zwraca `pos`, `target`, `fov` takie, jakie są (kamera edytora nie schodzi poniżej wysokości celu — niższa zostaje podniesiona) |
 | `new` | `[name]` | pusta scena |
 | `load` | `scene` | cała scena z danych |
 | `play`, `stop` | — | jak ▶ Graj / ■ Stop |

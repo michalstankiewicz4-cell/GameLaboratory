@@ -13,6 +13,7 @@ import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '..
 import { attachWeatherCycle } from '../shared/weather-cycle-ui.js';
 import { weatherWindow } from './weather-window.js';
 import { cycloneWindow } from './cyclone-window.js';
+import { CATEGORIES } from '../../envs/sky/cyclone.js';
 import { LookPipeline, AutoResolution, LOOK_PRESETS, LOOK_DEFAULTS } from '../../render/sea/look.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
@@ -62,11 +63,12 @@ $('bake').textContent = `Baked occlusion and edges for ${bake.vertices.toLocaleS
 
 /* ---------------- sea ---------------- */
 stage.setShip(SHIPS.blyskawica.lines, model.beam);   // the hull cut out of the water
-// the sea from the wind (fully developed sea), as a "sea" setting of the stage
+// the sea from the wind (fully developed sea), as a "sea" setting of the stage; a cyclone gives the wind that raised the
+// sea (seaWind: high seas in the eye) and the spread of wave directions (seaSpread: a confused sea in the eye)
 function seaFromWind() {
-  const U = Math.max(1.5, S.sky.wind), Hs = Math.min(6.5, 0.0246 * U * U), Lp = Math.min(200, Math.max(10, 0.83 * U * U));
+  const U = Math.max(1.5, S.sky.seaWind ?? S.sky.wind), Hs = Math.min(6.5, 0.0246 * U * U), Lp = Math.min(200, Math.max(10, 0.83 * U * U));
   const look = S.sky.coverage > 0.93 ? LOOKS.storm : S.sky.coverage > 0.75 ? LOOKS.baltic : LOOKS.atlantic;
-  stage.setSea({ Hs: S.sky.windSea ? Hs : 1.2, Lp: S.sky.windSea ? Lp : 34, chop: Math.min(0.9, 0.35 + U * 0.025), spread: 35, n: 12, dir: 30,
+  stage.setSea({ Hs: S.sky.windSea ? Hs : 1.2, Lp: S.sky.windSea ? Lp : 34, chop: Math.min(0.9, 0.35 + U * 0.025), spread: S.sky.seaSpread ?? 35, n: 12, dir: 30,
     deep: look.deep, scatter: look.scatter, shine: look.shine, ripples: look.ripples, crest: Math.min(1, look.crest + U * 0.015) });
 }
 
@@ -152,7 +154,7 @@ SKY_SLIDERS.forEach((k) => $(k).addEventListener('input', () => { if (wc.on) { w
 const cyWin = cycloneWindow({
   get: () => S.sky.cyclone, set: (c) => { S.sky.cyclone = c; save(); },
   apply: (p) => {
-    if (!p) { S.sky.windDir = null; updateSky(); return; }
+    if (!p) { S.sky.windDir = S.sky.seaWind = S.sky.seaSpread = null; updateSky(); return; }
     const { weather, windDir, cyclone, tornado, ...num } = p;
     Object.assign(S.sky, num, { weather, windDir, cyclone: { ...cyclone, on: true } }); $('weather').value = weather;   // lista: najbliższa pogoda
     if (cyclone.spouts) S.sky.tornado = tornado;
@@ -172,6 +174,15 @@ window.LookApi = {
     get now() { return wc.cycle.now; }, get params() { return wc.cycle.params; }, upcoming: (n = 6) => wc.cycle.upcoming(n),
     weathers: Object.keys(WEATHER),
   },
+};
+// dla AI: LookApi.cyclone — włącz / wyłącz, ustawienia (siła, oko, gdzie jest scena, wędrówka, półkula, trąby), stan teraz
+window.LookApi.cyclone = {
+  on: (b = true) => { cyWin.setOn(b); return cyWin.on; },
+  set: (o) => cyWin.set(o),
+  speed: (k) => { if (k != null) cyWin.speed = k; return cyWin.speed; },
+  get at() { const { r, x, zone, vmax, wind, dir, rain, band } = cyWin.cyclone.at; return { zone, r, x, vmax, wind, dir, rain, band }; },
+  get params() { return cyWin.cyclone.params; }, get opts() { return { ...cyWin.cyclone.opts, on: cyWin.on }; },
+  categories: CATEGORIES,
 };
 // pogoda i światło jako zasób dla edytora sceny (js/scene/assets.js, rodzaj „weather”)
 const WX_KEYS = ['weather', 'coverage', 'density', 'scale', 'haze', 'wind', 'rain', 'vis', 'lightning', 'time', 'sunEl', 'sunAz', 'moon'];
@@ -357,7 +368,7 @@ function frame(now) {
   frames++;
   if (now - fpsT > 500) {
     frames = 0; fpsT = now;
-    $('lookNow').replaceChildren(el('span', { textContent: 'Render scale' }), el('b', { textContent: Math.round(look.scale * 100) + '%' }), el('span', { textContent: 'Visibility' }), el('b', { textContent: visKm < 1 ? Math.round(visKm * 1000) + ' m' : visKm.toFixed(1) + ' km' }), el('span', { textContent: 'Wave height' }), el('b', { textContent: (S.sky.windSea ? Math.min(6.5, 0.0246 * S.sky.wind ** 2) : 1.2).toFixed(1) + ' m' }));
+    $('lookNow').replaceChildren(el('span', { textContent: 'Render scale' }), el('b', { textContent: Math.round(look.scale * 100) + '%' }), el('span', { textContent: 'Visibility' }), el('b', { textContent: visKm < 1 ? Math.round(visKm * 1000) + ' m' : visKm.toFixed(1) + ' km' }), el('span', { textContent: 'Wave height' }), el('b', { textContent: (S.sky.windSea ? Math.min(6.5, 0.0246 * Math.max(1.5, S.sky.seaWind ?? S.sky.wind) ** 2) : 1.2).toFixed(1) + ' m' }));
   }
   requestAnimationFrame(frame);
 }

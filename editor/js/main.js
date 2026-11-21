@@ -94,6 +94,18 @@ const api = createSceneApi({
       assets: { list: listAssets }, soundNames: allSoundNames(), musicNames: musicNames(), lights: Object.keys(LIGHTS), skyPresets: skyPresets().map((p) => p.id),
       probe: world.stage, boxOf: world.boxOf, costOf: world.costOf, budget }),
     act: (o, action, on) => actions.play.act(o.id, action, on),
+    // grunt pod punktem: teren lądu (zasób „land” albo płaski grunt), na morzu linia wody; kosmos i jaskinia — brak
+    groundAt: (x, z) => { const s = store.scene.env.surface; if (s !== 'land' && s !== 'sea') return null; world.syncEnv(); return s === 'sea' ? 0 : world.stage.groundAt(x, z); },
+    // kamera widoku: położenie, punkt, na który patrzy (środek obrotu), kąt widzenia
+    camera: ({ pos, target, fov } = {}) => {
+      const cam = world.camera, orbit = controls.orbit;
+      if (pos) cam.position.set(...pos);
+      if (target) orbit.target.set(...target);
+      if (fov) { cam.fov = fov; cam.updateProjectionMatrix(); }
+      if (pos || target) orbit.update();
+      const r = (v) => v.toArray().map((n) => +n.toFixed(2));
+      return { pos: r(cam.position), target: r(orbit.target), fov: cam.fov };
+    },
     effectKinds: Object.keys(FX_KINDS), effect: (e) => events.emit('effect', e), objectPos: (o) => { const r = world.objectRoot(o.id); return r ? r.position.toArray() : o.pos; }, sound: (n, at) => actions.play.sounds.play(n, at), soundNames: () => allSoundNames(), music: { play: (n) => actions.play.music.play(n), action: () => actions.play.music.action() }, musicNames: () => musicNames(), gameUI: () => actions.play.ui, actionsOf: (o) => actions.play.actionsOf(o.id), events: (n) => events.history(n) },
 });
 createApiConsole(api);

@@ -56,7 +56,8 @@ Najważniejsze polecenia (pełna tabela: [`../../editor/README.md`](../../editor
 |---|---|
 | `help`, `describe`, `prefabs [family]`, `assets [kind]` | co można: polecenia, scena jako dane, modele do dodania, zasoby z nazwą |
 | `env { surface, light, look, sea, land, vegetation, sky, ui, cave, music, musicAction }` | środowisko: `sea` / `land` / `space` / `underground`; zasoby środowiska |
-| `add { prefab, name, pos, rot, scale, behavior, asset, shot, sound }` | dodaje model (`prefab` z `prefabs`) |
+| `add { prefab, name, pos, ground, rot, scale, behavior, asset, shot, sound }` | dodaje model (`prefab` z `prefabs`; `ground: true` — stawia go na terenie pod `pos`) |
+| `camera { pos, target, fov }` | kamera widoku (`target` — punkt albo obiekt); bez pól — odczyt |
 | `set { id \| name, … , sound, soundRange, orbit }`, `move`, `remove` | zmienia obiekt |
 | `play`, `stop`, `act { name, action }`, `actions` | gra: zachowania, akcje obiektu (`fire`, `scan`, `destroy`, `work` — drzwi, właz…) |
 | `effect { effect, from, to \| at, path }`, `sound { sound, at }`, `music { play \| action }` | efekt z laboratorium efektów, dźwięk w miejscu, muzyka w grze |
@@ -85,7 +86,7 @@ Każde jest też w zakładce **API** konsoli swojego laboratorium (JSON). Wywoł
 | `SfxApi` | `sound-effects.html` | `play(opis \| id, { at })`, `start(opis)` → uchwyt, `ambience(opis \| id)`, `sounds`, `ambiences`, `stop()`, `save(nazwa, opis)` → `sound` | `SfxApi.play({ sound: 'explosion', params: { size: 0.8 } })` |
 | `VoiceApi` | `sound-speech.html` | `say(tekst, głos?)`, `voice`, `presets`, `voices(język)`, `save(nazwa)` → `voice` | `VoiceApi.say('Witaj', { mode: 'formant', hz: 120 })` |
 | `PlantApi`, `CaveApi` | `plants.html`, `caves.html` | `save(nazwa)` → `plant` / `cave`, `load(nazwa)`, `saved()`, `get()`; `PlantApi.saveVegetation(nazwa)` → `vegetation` (lasy i trawa na terenie sceny) | `PlantApi.save('dąb jesienny')` |
-| `LookApi` | `look.html` | `weatherCycle`: `on(b)`, `set({ seed, hold, change, fronts, table })`, `force(pogoda, s)`, `speed(k)`, `now`, `params`, `upcoming(n)` — zmienna pogoda | `LookApi.weatherCycle.force('storm', 30)` |
+| `LookApi` | `look.html` | `weatherCycle`: `on(b)`, `set({ seed, hold, change, fronts, table })`, `force(pogoda, s)`, `speed(k)`, `now`, `params`, `upcoming(n)` — zmienna pogoda; `cyclone`: `on(b)`, `set({ category, eye, dist, bearing, moving, trackDir, trackSpeed, hemisphere, spouts, t })`, `speed(k)`, `at` (strefa, wiatr), `params`, `opts`, `categories` — cyklon | `LookApi.cyclone.set({ on: true, dist: 4, moving: false })` |
 | `SystemsApi` | `systems.html` | `get()`, `set(układ)`, `random(ziarno)`, `presets`, `save(nazwa)` → `system` (obiekt „Star system” w scenie kosmosu), `load(nazwa)`, `saved()` | `SystemsApi.random(42); SystemsApi.save('podwójne słońca')` |
 | `ItemsApi` | `items.html` | `list()`, `show(id, { variant, wire, coll })`, `info()` | `await ItemsApi.show('barrel')` |
 

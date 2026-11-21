@@ -73,12 +73,14 @@ what cannot be drawn with the weather numbers alone (`js/envs/sky/cyclone-sky.js
 
 - **Zones** (by the distance in eye radii, x = r / Rm): outer clouds (high cloud, rising wind, up to ~20 Rm), spiral
   **rain bands** (three logarithmic spirals, pitch 15°, from ~1.6 to ~12 Rm; a squall with a downpour, then a break
-  between bands), the **eyewall** (the strongest wind, a storm, visibility near zero) and the **eye** (calm, clear,
-  the eyewall all around on the horizon like the stands of a stadium).
+  between bands), the **eyewall** (the strongest wind, a storm, visibility near zero) and the **eye** (a light,
+  variable wind of ~4–7 m/s, clear, the eyewall all around on the horizon like the stands of a stadium).
 - **Wind**: the Holland (1980) profile V(r) = Vmax·√((Rm/r)^1.5·e^(1−(Rm/r)^1.5)), weaker still in the eye; Vmax from
   **Strength** (tropical storm 28 m/s, categories 1–5: 38 … 75 m/s); it turns counter-clockwise in the north
   (clockwise in the south, **Hemisphere**) with ~20° inflow, with gusts stronger in bands and the eyewall. The wind
   is real air for the physics, as with the tornado (`stage.windAt`), and the clouds drift with it.
+- **The sea** (with *Sea from the wind*): the waves come from the wind that raised them (`seaWind`), so in the eye and
+  just outside the eyewall the sea stays high; in the eye it is confused — waves from every side (`seaSpread` up to 90°).
 - **Where the scene is**: **Distance** from the centre and **Direction** (where the scene lies from the centre),
   **Eye radius** (the radius of maximum wind, 10–60 km). **Moving**: the centre goes in **Track** at **Track speed**,
   so the scene passes through the zones (by default the cyclone comes over the scene: bands → eyewall → eye →
@@ -88,8 +90,11 @@ what cannot be drawn with the weather numbers alone (`js/envs/sky/cyclone-sky.js
   ago to 12 h ahead; the line above it: the zone, the distance, the wind (from where), rain, a spout, when the eye
   comes. Preview ×1 / ×60 / ×600.
 - The sky: a cloud layer at 1.8 km with the bands in real kilometres from the centre (they pass overhead as the
-  cyclone moves and turns, once in ~4 h) and, from the eye, the eyewall — bright, sunlit cloud flaring outwards up to
-  ~12 km like the stands of a stadium, drawn closer at the same angular size.
+  cyclone moves and turns, once in ~4 h) and, from the eye, the eyewall — bright, sunlit, billowing cloud (puffs shaded
+  from above, towers of different heights along the top) flaring outwards up to ~12 km like the stands of a stadium,
+  drawn closer at the same angular size.
+- For AI: `LookApi.cyclone` — `on(b)`, `set({ category, eye, dist, bearing, moving, trackDir, trackSpeed, hemisphere,
+  spouts, t })`, `speed(k)`, `at` (zone, wind), `params`, `opts`, `categories`.
 
 The cyclone and the variable weather exclude each other: switching one on switches the other off; choosing a weather
 from the list or moving a weather slider switches the cyclone off. Saved with the weather (`cyclone` in the "weather"

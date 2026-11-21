@@ -3,6 +3,23 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.98.0 · wygląd 1.8.0 · edytor sceny 0.51.0 — 2026-11-21 (kamera i grunt w API sceny, cyklon dla AI)
+
+### Dodane
+- **API sceny** (`js/scene/api.js`): polecenie `camera { pos, target, fov }` — kamera widoku (cel: punkt albo obiekt;
+  bez pól — odczyt); `add` z `ground: true` — model stoi na terenie pod `pos` (wysokość gruntu, jak poprawka lekarza
+  sceny; `y` z `pos` — nad gruntem; na morzu linia wody).
+- **`LookApi.cyclone`** w laboratorium wyglądu: włącz / wyłącz, ustawienia, przyspieszenie, stan teraz (strefa, wiatr).
+
+### Zmienione
+- **Cyklon**: w oku słaby, zmienny wiatr (ok. 4–7 m/s) zamiast zupełnej ciszy; morze z wiatru, który je wzbudził
+  (`seaWind`) — w oku i tuż za ścianą fale zostają wysokie, w oku skłębione, ze wszystkich stron (`seaSpread`).
+- **Ściana oka** kłębiasta: komórki chmur cieniowane od góry, jaśniejsze czubki i ciemniejsze zagłębienia, nierówna
+  krawędź z wież na różnej wysokości.
+
+### Poprawione
+- Edytor sceny: z opisu usunięty skrót „H chowa okna” (nie było go).
+
 ## Program 0.97.1 · wygląd 1.7.1 · edytor sceny 0.50.1 — 2026-11-21 (ściana oka cyklonu)
 
 ### Poprawione

@@ -13,7 +13,9 @@
 //   assets       — zasoby z nazwą: { kinds: ['sea', …], list(kind) → nazwy, skyPresets — id gotowych teł kosmosu }
 //                  (js/scene/assets.js, js/scene/space.js)
 //   hooks        — { build(fn) — zmiana, po której trzeba zbudować modele; group(fn) — lista poleceń jako jeden krok
-//                  historii (cofnij / ponów); play(), stop(), playing(); check(opts) — lekarz sceny, js/scene/doctor.js }
+//                  historii (cofnij / ponów); play(), stop(), playing(); check(opts) — lekarz sceny, js/scene/doctor.js;
+//                  groundAt(x, z) → wysokość gruntu (m; na morzu linia wody 0; null — tu nie ma gruntu: kosmos, jaskinia);
+//                  camera({ pos, target, fov }) → { pos, target, fov } — kamera widoku }
 //                  (nieobowiązkowe)
 import { normalize, clone } from './scene-data.js';
 
@@ -21,13 +23,14 @@ const COMMANDS = {
   help: { args: '', does: 'this list' },
   describe: { args: '', does: 'the whole scene as data (format gamelab-scene) and a short summary' },
   prefabs: { args: '[family]', does: 'the models that can be added: id, name, family, where it stands, behaviours, and the kind of asset it takes (asset)' },
-  add: { args: 'prefab, [name], [pos [x,y,z] m], [rot [pitch,heading,roll] °], [scale], [behavior], [asset], [shot], [sound]', does: 'adds a model; returns its id (asset — a named asset of the kind the model takes, e.g. a block body from the blocks lab)' },
+  add: { args: 'prefab, [name], [pos [x,y,z] m], [ground] (true — stands on the terrain: y is the ground height under pos, pos y is then the height above it; on the sea — the waterline), [rot [pitch,heading,roll] °], [scale], [behavior], [asset], [shot], [sound]', does: 'adds a model; returns its id (asset — a named asset of the kind the model takes, e.g. a block body from the blocks lab)' },
   set: { args: 'id | name, then any of: newName (with id also name), prefab, pos, rot, scale, behavior, orbit { around: id | name ("" — the nearest heavier body), period: s } (the orbit behaviour), asset (a named asset of the kind the model takes; "" — the default model), shot (a ship that shoots: the look of its shots — an effect id or a saved effect from the effects lab; "" — the shot), sound (a sound at the object during play: a ready sound — fire, engine, bird…, a ready place ambience — forest, park, seaside, storm, night, campfire, or a sound / ambience asset from the sound effects lab; "" — none), soundRange (m: full volume up to it, then it fades — about 8.5× further it is at 10%; 0 — the default of the sound)', does: 'changes an object' },
   move: { args: 'id | name, by [dx,dy,dz] m', does: 'moves an object by an offset' },
   remove: { args: 'id | name', does: 'removes an object' },
   env: { args: 'any of: music, musicAction ("mood:<id>", "song:<id>" or a music asset from the music lab; the action music plays after explosions and shots, 20 s; "" — none), vegetation (on a land terrain: a vegetation asset from the plants lab — forests, copses and grass by biome; "" — none), surface (sea | land | space | underground — inside a cave), cave (underground: a cave asset name from the cave lab, "" — the default cave), caveGlow (underground: true — a faint glow to see the cave, false — true darkness), light (a ready light or a weather asset name), look, ui (a game UI asset name, "" — none), land (a land asset name, "" — the plain ground), sea (a sea asset name, "" — the default sea), sky (any surface: "" — the default for the surface, "day" — the day sky, "preset:<id>" — a ready space sky, or a sky asset name)', does: 'changes the environment' },
   assets: { args: '[kind]', does: 'named assets saved in the labs, by kind (sea — the water lab, sky — the celestial bodies lab, look — the filters lab, weather — the look lab, land — the land lab, vegetation — the plants lab, system — the systems lab, ui and uiskin — the game UI lab, material — the materials lab, blocks — the blocks lab) and the ready skies' },
   select: { args: 'id | name, or nothing', does: 'selects an object in the editor (nothing: the environment)' },
+  camera: { args: 'any of: pos [x,y,z] m, target [x,y,z] m | object id | name (where it looks), fov (°, 10…120); nothing — only read', does: 'sets the view camera (in the editor and in play until the player moves it); returns pos, target, fov as they are — the editor keeps the camera at or above the height of its target, so a camera below its target is raised' },
   new: { args: '[name]', does: 'an empty scene' },
   load: { args: 'scene (format gamelab-scene)', does: 'replaces the whole scene' },
   act: { args: 'id | name, action (from "actions"), [on] (a toggle: true / false; without — switches)', does: 'during play: the object does an action (a spaceship: fire, scan, print, offline, destroy) — an "action" event' },
@@ -114,7 +117,12 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
     prefabs: (c) => ({ prefabs: prefabs.filter((p) => !c.family || p.family === c.family).map((p) => ({ id: p.id, name: p.label, family: p.family, stands: p.surface, behaviors: behaviorsFor(p.id), ...(p.assetKind ? { asset: p.assetKind } : {}), ...(p.shoots ? { shoots: true } : {}) })) }),
     add: (c) => {
       const p = prefabOf(c.prefab), x = patch({ ...c, newName: null }, p.id);
-      const pos = x.pos || [0, p.surface === 'air' ? 30 : 0, 0];   // statek kosmiczny: na wysokości 0, jak inne
+      let pos = x.pos || [0, p.surface === 'air' ? 30 : 0, 0];   // statek kosmiczny: na wysokości 0, jak inne
+      if (c.ground) {   // na gruncie: punkt zaczepienia modelu na wysokości gruntu pod nim (jak poprawka lekarza sceny); y z pos — nad gruntem
+        const g = hooks.groundAt ? hooks.groundAt(pos[0], pos[2]) : null;
+        if (g == null) fail(`ground: the scene has no ground here (surface ${store.scene.env.surface}); give pos with y`);
+        pos = [pos[0], +(g + (x.pos ? pos[1] : p.surface === 'air' ? 30 : 0)).toFixed(3), pos[2]];
+      }
       let o; build(() => { o = store.add(p.id, c.name != null ? String(c.name).slice(0, 60) : p.label, pos); delete x.pos; if (Object.keys(x).length) store.update(o.id, x); });
       return { id: o.id, object: summary(o) };
     },
@@ -158,6 +166,14 @@ export function createSceneApi({ store, prefabs, behaviorsFor = () => [], lights
       return { assets: Object.fromEntries(kinds.map((k) => [k, assets.list(k)])), readySkies: (assets.skyPresets || []).map((id) => 'preset:' + id) };
     },
     select: (c) => { const o = c.id == null && c.name == null ? null : target(c); store.select(o ? o.id : null); return { selected: o ? o.id : null }; },
+    camera: (c) => {
+      if (!hooks.camera) fail('the camera is not available here');
+      const want = {};
+      if (c.pos != null) want.pos = vec3(c.pos, 'pos');
+      if (c.target != null) want.target = place(c.target, 'target');
+      if (c.fov != null) { want.fov = num(c.fov, 'fov'); if (!(want.fov >= 10 && want.fov <= 120)) fail('fov: 10…120 (degrees)'); }
+      return { camera: hooks.camera(want) };
+    },
     new: (c) => { store.reset(String(c.name || 'New scene')); return { scene: store.scene.name }; },
     load: (c) => { const s = normalize(c.scene); build(() => store.load(s)); return { objects: s.objects.length }; },
     play: () => { if (!hooks.play) fail('play is not available here'); hooks.play(); return { playing: !!(hooks.playing && hooks.playing()) }; },

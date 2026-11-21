@@ -13,7 +13,7 @@
   'doc.note': 'Click a problem to select its object; Fix runs the proposed API command (Undo takes it back). Nothing is changed by itself.',
   'info.name': 'Scene editor',
   'info.text': 'The workshop: a scene built from the labs\' models. Add a model, move, turn and scale it with the gizmo or the numbers, swap it for another one in one click; the environment is the sea or land with the light of the water labs, or space with a sky from the celestial bodies lab. The scene is plain data (JSON): it is kept in this browser and can be saved to a file.',
-  'info.keys': 'P or ▶ Play runs the behaviours (ships on the water, the aircraft in the air, spacecraft in vacuum) and drives the selected model; Esc stops. Click a model to select it. W / E / R: move, rotate, scale. Ctrl+Z undoes, Ctrl+Y redoes, Delete removes, Ctrl+D duplicates, F frames the selection, Esc selects the environment, H hides the windows.',
+  'info.keys': 'P or ▶ Play runs the behaviours (ships on the water, the aircraft in the air, spacecraft in vacuum) and drives the selected model; Esc stops. Click a model to select it. W / E / R: move, rotate, scale. Ctrl+Z undoes, Ctrl+Y redoes, Delete removes, Ctrl+D duplicates, F frames the selection, Esc selects the environment.',
   'bar.move': 'Move', 'bar.rotate': 'Rotate', 'bar.scale': 'Scale',
   'bar.move.tip': 'Move (W)', 'bar.rotate.tip': 'Rotate (E)', 'bar.scale.tip': 'Scale (R)',
   'bar.new': 'New', 'bar.new.tip': 'An empty scene',

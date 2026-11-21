@@ -42,13 +42,19 @@ varying vec2 vUv; varying vec3 vW;
 ${NOISE}
 void main() {
   float h = vUv.y;
-  vec2 q = vec2(vUv.x * 60.0 + uTime * 0.01, h * 6.0);
-  float n = cyF(q), n2 = cyF(q * 2.7 + 3.1);
-  float edge = 1.0 - smoothstep(0.72 + 0.18 * n, 1.0, h);            // kłębiasta krawędź u góry
+  // kłęby: komórki (jak kalafior) — „wypukła” odmiana szumu, cieniowana od góry z pochodnych (jasne czubki, ciemne zagłębienia)
+  vec2 q = vec2(vUv.x * 70.0 + uTime * 0.01, h * 6.5);
+  float n = cyF(q), b = 1.0 - abs(2.0 * cyF(q * 1.9 + 7.3) - 1.0);
+  float nx = cyF(q + vec2(0.06, 0.0)) - n, ny = cyF(q + vec2(0.0, 0.06)) - n;
+  float puff = 0.55 + 0.45 * b;                                       // środek kłębu jaśniejszy
+  float shade = clamp(0.78 + 4.0 * ny - 1.5 * nx, 0.5, 1.15);          // światło z góry i z boku
+  // wieże u góry: krawędź ściany nierówna (kopuły chmur na różnej wysokości)
+  float top = 0.62 + 0.26 * cyF(vec2(vUv.x * 28.0, 3.7)) + 0.1 * n;
+  float edge = 1.0 - smoothstep(top - 0.1 * b - 0.04, top, h);
   float a = uAlpha * edge * smoothstep(0.0, 0.08, h + 0.02);
   vec3 dir = normalize(vW - cameraPosition);
   float lit = 0.75 + 0.25 * (dot(-dir, normalize(uSun)) * 0.5 + 0.5);   // ściana w słońcu (w oku jasno), od słońca trochę jaśniejsza
-  vec3 c = mix(uCol, uTop, smoothstep(0.1, 0.7, h)) * (0.82 + 0.25 * n2) * lit * uLight;
+  vec3 c = mix(uCol, uTop, smoothstep(0.1, 0.7, h) * 0.6 + 0.4 * b) * puff * shade * lit * uLight;
   c = mix(uFogCol, c, smoothstep(0.0, 0.25, h));                      // dół w mgiełce
   gl_FragColor = vec4(c, a);
   #include <colorspace_fragment>

@@ -3,7 +3,7 @@
 // wędrówka (kierunek, prędkość), półkula, trąby w pasmach. Włączony cyklon wyłącza zmienną pogodę; ruszenie suwaka pogody
 // albo wybór pogody z listy — wyłącza cyklon. Ustawienia — S.sky.cyclone (zapis z pogodą dla sceny).
 // cycloneWindow({ get, set, apply, stopOthers }) — get() → S.sky.cyclone; set(c) — zapis; apply(liczby) — do nieba;
-//   stopOthers() — wyłącz zmienną pogodę → { on, setOn(b), cyclone, fill() }
+//   stopOthers() — wyłącz zmienną pogodę → { on, setOn(b), set(ustawienia), speed, cyclone, fill() }
 import { CATEGORIES, CYCLONE_DEFAULTS, createCyclone, bandAt, relOf } from '../../envs/sky/cyclone.js';
 
 const $ = (id) => document.getElementById(id);
@@ -18,9 +18,10 @@ export function cycloneWindow({ get, set, apply, stopOthers }) {
   const save = () => set({ ...cy.opts, on });
   const store = (o) => { cy.set(o); save(); acc = 1e9; fill(); };
   CATEGORIES.forEach((c) => $('cyCat').append(new Option(`${c.label} · ${c.vmax} m/s`, c.id)));
+  const setSpeed = (k) => { speed = k; [...$('cySpeed').children].forEach((x) => x.classList.toggle('on', +x.dataset.k === k)); };
   for (const k of [1, 60, 600]) {
     const b = document.createElement('button'); b.type = 'button'; b.textContent = '×' + k; b.dataset.k = k;
-    b.onclick = () => { speed = k; [...$('cySpeed').children].forEach((x) => x.classList.toggle('on', +x.dataset.k === k)); };
+    b.onclick = () => setSpeed(k);
     $('cySpeed').append(b);
   }
   $('cySpeed').firstChild.classList.add('on');
@@ -77,6 +78,9 @@ export function cycloneWindow({ get, set, apply, stopOthers }) {
   const api = {
     cyclone: cy, fill,
     get on() { return on; },
+    // ustawienia (pola CYCLONE_DEFAULTS; t — czas cyklonu w s) — jak suwaki okna; przyspieszenie podglądu (dowolne k ≥ 0)
+    set(o = {}) { const { on: b, ...opts } = o; if (Object.keys(opts).length) store(opts); if (b != null) api.setOn(b); return cy.opts; },
+    get speed() { return speed; }, set speed(k) { setSpeed(Math.max(0, +k || 0)); },
     setOn(b) {
       b = !!b; if (b === on) return; on = b; $('cyOn').checked = on;
       if (on) { stopOthers(); acc = 1e9; } else apply(null);
