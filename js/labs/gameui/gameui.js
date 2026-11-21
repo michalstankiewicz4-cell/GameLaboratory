@@ -5,6 +5,7 @@ import * as THREE from '../../../vendor/three/three.module.js';
 import { createStage } from '../shared/stage.js';
 import { LookPipeline, LOOK_DEFAULTS } from '../../render/sea/look.js';
 import { createGameUI, normalizeUI, emptyUI } from '../../gameui/gameui.js';
+import { controlsPreview } from './controls-preview.js';
 import { createSettings } from '../../core/settings.js';
 import { applyGraphics, lookParams } from '../../render/game-graphics.js';
 import { SKINS, TOKENS, FONTS, resolveSkin, UI_EVENTS, UI_KINDS } from '../../gameui/skins.js';
@@ -166,6 +167,11 @@ $('skinSel').onchange = () => {
   else ui.skin(v);
   showTokens(); $('jsonText').value = JSON.stringify(ui.def, null, 1);
 };
+// podgląd podstawowych kontrolek w bieżącej skórce (js/gameui/css/controls.css)
+const ctl = controlsPreview(ui.el);
+ctl.onShow = (b) => { $('ctlPreview').checked = b; L.controls = b; save(); };
+$('ctlPreview').onchange = () => ctl.show($('ctlPreview').checked);
+if (L.controls) ctl.show(true);
 $('skinSave').onclick = () => {
   const n = $('skinName').value.trim(); if (!n) { status('Give the skin a name first.'); return; }
   const s = curSkin(), r = resolveSkin(s); saveAsset('uiskin', n, { base: s.base, tokens: r.tokens, sounds: r.sounds }); ui.skin({ base: s.base, tokens: r.tokens, sounds: r.sounds, name: n });

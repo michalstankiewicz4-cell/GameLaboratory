@@ -1,0 +1,18 @@
+/* UI gry · skórka „syntax” (z dawnego laboratorium skórek, SYNTAX): wymyślona paleta edytora kodu (słowo kluczowe
+   różowe, funkcja błękitna, napis zielony, liczba pomarańczowa, typ fioletowy, komentarz łupkowy), zaokrąglone
+   panele z rozmyciem, nagłówki czcionką kodu, paski w gradiencie, logo w przelewającym się gradiencie, przycisk unosi się
+   z poświatą. Tokeny — js/gameui/skins.js. Zakres: .gui[data-skin=syntax]. */
+.gui[data-skin=syntax]{--kw:#ff6ac1;--fn:#5ee7ff;--str:#7ef29a;--num:#ffb45c;--type:#b58cff;--com:#6c7399}
+.gui[data-skin=syntax] .gItem,.gui[data-skin=syntax] .gWin,.gui[data-skin=syntax] .gDialog,
+.gui[data-skin=syntax] .gMenu[data-layout=center] .screen{backdrop-filter:blur(10px);box-shadow:0 10px 30px var(--g-glow)}
+.gui[data-skin=syntax] .logo{background:linear-gradient(90deg,var(--kw),var(--num) 35%,var(--str) 65%,var(--fn));background-size:200% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;animation:gSynShift 8s ease-in-out infinite alternate}
+.gui[data-skin=syntax] .gHd::before{content:"// ";color:var(--com)}
+.gui[data-skin=syntax] button{transition:transform .12s,box-shadow .12s,border-color .12s}
+.gui[data-skin=syntax] button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 14px rgb(94 231 255 / .25);border-color:var(--fn)}
+.gui[data-skin=syntax] button.on{border-color:var(--str);color:var(--str);box-shadow:0 0 12px rgb(126 242 154 / .25)}
+.gui[data-skin=syntax] .gBar{background:#262a44;border:0;border-radius:4px;overflow:hidden}
+.gui[data-skin=syntax] .gBar i{border-radius:4px;background:linear-gradient(90deg,var(--fn),var(--str))}
+.gui[data-skin=syntax] .gBar i.low{background:linear-gradient(90deg,var(--num),var(--kw))}
+.gui[data-skin=syntax] .gSq{display:none}
+@keyframes gSynShift{to{background-position:100% 0}}

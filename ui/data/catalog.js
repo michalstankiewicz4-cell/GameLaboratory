@@ -575,8 +575,8 @@ window.GameLabCatalog =
       "name": "Game UI Lab",
       "namePl": "Laboratorium UI gry",
       "doc": "docs/labs/gameui.md",
-      "desc": "A game's interface as data over a live scene: menu screens, HUD (bars, counters, telegraph, rudder, crosshair, event log, minimap, banners), in-game windows and a dialogue box for characters and the narrator, in skins kept apart from the labs' look — Space, Battle, the engine's or your own. JSON for AI.",
-      "descPl": "Interfejs gry jako dane nad żywą sceną: ekrany menu, HUD (paski, liczniki, telegraf, ster, celownik, dziennik zdarzeń, minimapa, banery), okna w grze i okno dialogowe postaci i narratora, w skórkach oddzielonych od wyglądu laboratoriów — Space, Battle, silnika albo własnych. JSON dla AI.",
+      "desc": "A game's interface as data over a live scene: menu screens, HUD (bars, counters, telegraph, rudder, crosshair, event log, minimap, banners), in-game windows and a dialogue box for characters and the narrator, in skins kept apart from the labs' look — Space, Battle, the engine's, a green terminal, a code editor or your own — with a preview of the basic controls. JSON for AI.",
+      "descPl": "Interfejs gry jako dane nad żywą sceną: ekrany menu, HUD (paski, liczniki, telegraf, ster, celownik, dziennik zdarzeń, minimapa, banery), okna w grze i okno dialogowe postaci i narratora, w skórkach oddzielonych od wyglądu laboratoriów — Space, Battle, silnika, zielonego terminala, edytora kodu albo własnych — z podglądem podstawowych kontrolek. JSON dla AI.",
       "kind": "lab",
       "kit": "GameUI",
       "phrases": ["UI", "menu", "HUD", "dialogi", "gra"],
@@ -601,23 +601,6 @@ window.GameLabCatalog =
       "art": {
         "bg": ["#140c26", "#07040e"],
         "svg": "<path d=\"M60 84 A40 40 0 0 1 140 84\" fill=\"none\" stroke=\"#2a1d45\" stroke-width=\"1.5\"/><path d=\"M36 84 A64 64 0 0 1 164 84\" fill=\"none\" stroke=\"#2a1d45\" stroke-width=\"1.5\"/><g stroke-width=\"1.5\"><path d=\"M100 84 L70 56 L56 30\" stroke=\"#78ff8c\"/><path d=\"M100 84 L100 50 L100 22\" stroke=\"#ff5a96\"/><path d=\"M100 84 L132 58 L146 32\" stroke=\"#be8cff\"/><path d=\"M100 50 L132 58\" stroke=\"#c9b0ff\" stroke-dasharray=\"3 3\"/></g><path d=\"M100 74 L110 84 L100 94 L90 84 Z\" fill=\"#ffd65c\"/><path d=\"M70 50 L76 56 L70 62 L64 56 Z\" fill=\"#78ff8c\"/><path d=\"M100 44 L106 50 L100 56 L94 50 Z\" fill=\"#ff5a96\"/><path d=\"M132 51 L138 55 L138 62 L132 66 L126 62 L126 55 Z\" fill=\"#140c26\" stroke=\"#be8cff\" stroke-width=\"1.5\"/><circle cx=\"56\" cy=\"30\" r=\"3.5\" fill=\"#140c26\" stroke=\"#78ff8c\"/><circle cx=\"100\" cy=\"22\" r=\"3.5\" fill=\"#ff5a96\"/><circle cx=\"146\" cy=\"32\" r=\"3.5\" fill=\"#140c26\" stroke=\"#46385e\"/>"
-      }
-    },
-    {
-      "file": "labs/skins.html",
-      "cat": "ui",
-      "name": "Skin lab",
-      "namePl": "Laboratorium skórek",
-      "doc": "docs/labs/skins.md",
-      "desc": "Other looks for the game's interface, tried on a mock-up.",
-      "descPl": "Inne wyglądy interfejsu gry, przymierzane na makiecie.",
-      "kind": "lab",
-      "kit": "UI",
-      "phrases": ["interfejs", "wygląd"],
-      "saved": ["gameLab.skins"],
-      "art": {
-        "bg": ["#3a1830", "#160a14"],
-        "svg": "<rect x=\"34\" y=\"22\" width=\"92\" height=\"58\" rx=\"8\" fill=\"#1d1328\" stroke=\"#ff8bd1\" stroke-width=\"2\"/><rect x=\"34\" y=\"22\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#ff8bd1\" opacity=\".5\"/><rect x=\"74\" y=\"38\" width=\"92\" height=\"52\" rx=\"8\" fill=\"#16182a\" stroke=\"#8b9cff\" stroke-width=\"2\"/><rect x=\"74\" y=\"38\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#8b9cff\" opacity=\".5\"/><g><circle cx=\"92\" cy=\"68\" r=\"7\" fill=\"#36d6b5\"/><circle cx=\"112\" cy=\"68\" r=\"7\" fill=\"#f2b84b\"/><circle cx=\"132\" cy=\"68\" r=\"7\" fill=\"#ff6b8b\"/><circle cx=\"152\" cy=\"68\" r=\"7\" fill=\"#8b9cff\"/></g>"
       }
     },
     {

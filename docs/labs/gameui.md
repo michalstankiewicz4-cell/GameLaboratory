@@ -18,11 +18,13 @@ telegraf, ster, celownik, baner, minimapa). Przerobione na elementy z danych.
 | `hud.js` | HUD z danych: 9 kotwic, elementy `bar`, `value`, `text`, `steps`, `dial`, `log`, `banner`, `crosshair`, `minimap` | Battle (hud.js gry) |
 | `log.js` | dziennik zdarzeń: wpisy z godziną, rodzaj (info, gain, alert), znikanie | Space (eventLog.js gry) |
 | `dom.js` | `h()`, `btn()`, `pick(stan, ścieżka)` — bez innerHTML | Battle (dom.js gry) |
-| `skins.js` | skórki: tokeny `--g-*`, gotowe `space`, `battle`, `engine`, `applySkin` | nowy |
+| `skins.js` | skórki: tokeny `--g-*`, gotowe `space`, `battle`, `engine`, `terminal`, `syntax`, `applySkin` | nowy; `terminal`, `syntax` — z laboratorium skórek (Space) |
 | `css/gameui.css` | wejście: nakładka, przyciski, okno dialogowe, `@import` części i skórek | nowy |
 | `css/menu.css`, `hud.css`, `log.css`, `window.css` | części na tokenach skórki | Battle `css/menu.css`, `css/hud.css`; Space `eventLog.css`, `window.css` |
 | `css/skin-space.css` | materiał z ziarnem, przyciski obrysowane, czcionki (`grain.png`) | Space `css/ui/kit.css` |
 | `css/skin-battle.css` | płaskie przyciski, mosiężny akcent | wygląd Battle |
+| `css/skin-terminal.css`, `css/skin-syntax.css` | zielony ekran CRT z poświatą; kolorowy motyw kodu | laboratorium skórek (Space), [../history/skins.md](../history/skins.md) |
+| `css/controls.css` | podstawowe kontrolki w skórce: przyciski, suwak, przełącznik `.gToggle`, lista, pole tekstowe, pole wyboru, opcje, zakładki `.gTabs` | nowy |
 
 Strona z UI gry linkuje `js/gameui/css/gameui.css` (CSP: style tylko z `'self'`; skrypty ustawiają style przez CSSOM).
 
@@ -64,7 +66,13 @@ Strona z UI gry linkuje `js/gameui/css/gameui.css` (CSP: style tylko z `'self'`;
 Tokeny (`js/gameui/skins.js`): czcionka tekstu i nagłówków, tekst, przygaszony tekst, nagłówki, akcent, dobrze,
 ostrzeżenie, niebezpieczeństwo, panel, ramka, poświata ramki, tło menu, przycisk (i po najechaniu), zaokrąglenie.
 Gotowe: **space** (niebieski materiał z ziarnem, poświata, Antonio i Roboto Condensed), **battle** (stal i mosiądz,
-czcionka o stałej szerokości), **engine** (wygląd laboratoriów). Własna skórka = podstawa + zmienione tokeny, zapisana
+czcionka o stałej szerokości), **engine** (wygląd laboratoriów), **terminal** (zielony ekran CRT, jedna barwa z poświatą,
+napis w ramce, przycisk w negatywie, paski z segmentów, migający kursor w logo) i **syntax** (paleta edytora kodu,
+zaokrąglone panele z rozmyciem, paski w gradiencie, logo w przelewającym się gradiencie) — dwa ostatnie z dawnego
+laboratorium skórek (1.7.0, [../history/skins.md](../history/skins.md)). **Basic controls** w oknie Skórka pokazuje
+podstawowe kontrolki w bieżącej skórce: przyciski (zwykły, wciśnięty, wyłączony; najechanie — kursorem), suwak,
+przełącznik, listę wyboru, pole tekstowe, pola wyboru, przyciski opcji i zakładki (`js/labs/gameui/controls-preview.js`,
+style `js/gameui/css/controls.css` — także dla gier). Własna skórka = podstawa + zmienione tokeny, zapisana
 pod nazwą jako zasób **uiskin**; całe UI — zasób **ui** (`js/scene/assets.js`).
 
 ## Dźwięki UI (1.6.0)

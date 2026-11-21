@@ -1,0 +1,30 @@
+/* UI gry · podstawowe kontrolki w skórce: przyciski (zwykły, wciśnięty .on, wyłączony), suwak, przełącznik (.gToggle),
+   lista wyboru, pole tekstowe, pole wyboru, przycisk opcji (radio), zakładki (.gTabs). Barwy — tokeny skórki (--g-*);
+   skórki dokładają swoje w skin-*.css. Podgląd: laboratorium UI gry (okno Skórka → Basic controls). */
+.gui select,.gui input[type=text]{font:inherit;color:var(--g-text);background:var(--g-btn);border:1px solid var(--g-line);
+  border-radius:calc(var(--g-radius) * .5);padding:.3em .5em;box-sizing:border-box;min-width:0}
+.gui select:focus,.gui input[type=text]:focus{outline:1px solid var(--g-accent);outline-offset:0}
+.gui input[type=text]::placeholder{color:var(--g-dim)}
+.gui input[type=checkbox],.gui input[type=radio]{accent-color:var(--g-accent);width:1.05em;height:1.05em;margin:0}
+.gui input.gToggle{appearance:none;-webkit-appearance:none;position:relative;width:2.3em;height:1.25em;margin:0;cursor:pointer;
+  background:var(--g-btn);border:1px solid var(--g-line);border-radius:1em;transition:background .15s}
+.gui input.gToggle::after{content:"";position:absolute;left:.15em;top:50%;width:.85em;height:.85em;transform:translateY(-50%);
+  border-radius:50%;background:var(--g-dim);transition:left .15s,background .15s}
+.gui input.gToggle:checked{background:color-mix(in srgb,var(--g-accent) 30%,var(--g-btn));border-color:var(--g-accent)}
+.gui input.gToggle:checked::after{left:1.2em;background:var(--g-accent)}
+.gui .gTabs{display:flex;gap:.2em;border-bottom:1px solid var(--g-line)}
+.gui .gTabs button{border:0;border-radius:calc(var(--g-radius) * .5) calc(var(--g-radius) * .5) 0 0;background:transparent;color:var(--g-dim)}
+.gui .gTabs button.on{background:var(--g-btn);color:var(--g-head);box-shadow:inset 0 -2px 0 var(--g-accent)}
+.gui[data-skin=terminal] .gToggle{border-radius:0}.gui[data-skin=terminal] .gToggle::after{border-radius:0}
+.gui[data-skin=terminal] .gTabs button.on{background:var(--g-btnHover);color:#010502;box-shadow:none}
+/* podgląd kontrolek (laboratorium UI gry) */
+.gui .gPreview{position:absolute;right:4%;top:50%;transform:translateY(-50%);z-index:7;width:min(26em,calc(100% - 32px));
+  box-sizing:border-box;padding:.8em 1em 1em;background:var(--g-panel);border:1.5px solid var(--g-line);border-radius:var(--g-radius);
+  box-shadow:0 0 10px var(--g-glow);pointer-events:auto}
+.gui .gPreview .gWinHead{margin-bottom:.4em}
+.gui .gPreview .pRow{display:grid;grid-template-columns:8em 1fr;gap:.6em;align-items:center;margin:.45em 0}
+.gui .gPreview .pRow > span{color:var(--g-dim);font-size:.9em}
+.gui .gPreview .pBtns{display:flex;flex-wrap:wrap;gap:.4em}
+.gui .gPreview .pPick{display:flex;flex-wrap:wrap;gap:.8em;align-items:center}
+.gui .gPreview .pPick label{display:flex;gap:.35em;align-items:center}
+.gui .gPreview .pTab{padding:.6em .2em 0;color:var(--g-text);min-height:2.2em}

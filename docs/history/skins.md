@@ -1,3 +1,7 @@
+> **Historia.** Laboratorium skórek usunięte w programie 0.93.0 (2026-11-21): jego dwa wyglądy, TERMINAL i SYNTAX, są
+> skórkami **terminal** i **syntax** laboratorium UI gry (`js/gameui/skins.js`, `js/gameui/css/skin-terminal.css`,
+> `skin-syntax.css`; [../labs/gameui.md](../labs/gameui.md)). Poniżej opis z czasów prototypu.
+
 # Skin lab (skins.html)
 
 A standalone prototype of the in-game HUD in new looks ("skins"), to

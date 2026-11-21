@@ -65,7 +65,6 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
     jaskini, światło przeciekające tam, gdzie go nie powinno być (słońce w jaskini); później — wygląd z kilku ujęć
     (porównanie zrzutów).
 - [ ] **Układy (systems):** układ planetarny z laboratorium jako zasób, wstawiany do sceny kosmosu z orbitami.
-- [ ] **Skórki (skins):** malowanie statków jako zasób, wybierany dla obiektu w scenie.
 - [ ] **Powierzchnia (surface):** to, czego ląd z planety jeszcze nie przejął (grunt SurfaceKit, zejście, jazda) —
   rozliczyć i zamknąć albo połączyć z laboratorium lądu.
 - [ ] **Przedmioty bohatera (gear):** latarki i lampy jako prefabrykaty (światło w scenie, jaskinie).
@@ -112,7 +111,6 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
 ## Z remanentu (listopad 2026, do decyzji)
 - [ ] D6: wspólne pomocnicze `$()` / `el()` (np. nowy plik w `js/labkit/`).
 - [ ] F3: dane głowy człowieka jako plik `.bin` (wczytywany asynchronicznie).
-- [ ] Laboratorium skórek bez CSP (atrybuty `style=` w makiecie i w `js/labs/skins/skins.js`).
 
 ## Pomysły na laboratoria przeniesione z TODO.md w Battle
 - [ ] Pixel Studio: edytor i import palet, warstwy, zaznaczanie i przesuwanie, czas klatki, podgląd kafelka 3×3, normalne koron drzew, więcej obiektów 3D.

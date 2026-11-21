@@ -7,6 +7,9 @@
 @import url("tree.css");
 @import url("skin-space.css");
 @import url("skin-battle.css");
+@import url("skin-terminal.css");
+@import url("skin-syntax.css");
+@import url("controls.css");
 
 .gui{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:3;
   font-family:var(--g-font);font-size:calc(15px * var(--g-scale,1));line-height:1.4;color:var(--g-text)}

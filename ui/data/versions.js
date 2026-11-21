@@ -5,13 +5,12 @@
 (function () {
   "use strict";
   const V = {
-  app: "0.92.0",
+  app: "0.93.0",
   labs: {
     "labs/vehicles-space.html": "1.11.0",
     "labs/bodies.html": "1.5.2",
     "labs/systems.html": "1.4.2",
     "labs/scale.html": "1.1.9",
-    "labs/skins.html": "1.1.2",
     "labs/surface.html": "1.4.0",
     "labs/buildings.html": "1.4.0",
     "labs/vehicles-land.html": "1.25.0",
@@ -29,7 +28,7 @@
     "labs/look.html": "1.5.0",
     "labs/pixel.html": "1.2.0",
     "labs/art.html": "1.3.0",
-    "labs/gameui.html": "1.6.0",
+    "labs/gameui.html": "1.7.0",
     "labs/trees.html": "1.1.0",
     "labs/items.html": "1.1.0",
     "labs/materials.html": "1.0.0",
@@ -38,7 +37,7 @@
     "labs/zombies.html": "1.2.1",
     "tools/doctor.html": "1.3.2",
     "labs/transform.html": "1.3.0",
-    "tools/kitcheck.html": "1.0.7",
+    "tools/kitcheck.html": "1.0.8",
     "labs/filters.html": "0.6.0",
     "editor/index.html": "0.46.0",
     "editor/index.html?doctor": "0.33.1",

@@ -1,0 +1,18 @@
+/* UI gry · skórka „terminal” (z dawnego laboratorium skórek, TERMINAL): zielony ekran CRT, jedna barwa z poświatą,
+   ramki z napisem w ramce, przycisk po najechaniu w negatywie, paski z segmentów jak wyświetlacz, migający kursor
+   w logo. Tokeny — js/gameui/skins.js. Zakres: .gui[data-skin=terminal]. */
+.gui[data-skin=terminal]{font-size:calc(14px * var(--g-scale,1))}
+.gui[data-skin=terminal] .logo,.gui[data-skin=terminal] .gHd,.gui[data-skin=terminal] .gVal,.gui[data-skin=terminal] .gWho,
+.gui[data-skin=terminal] .screen h2{text-shadow:0 0 5px rgb(57 255 122 / .75),0 0 14px rgb(57 255 122 / .25)}
+.gui[data-skin=terminal] .logo::after{content:"\2588";margin-left:.15em;animation:gTermBlink 1s steps(1) infinite}
+.gui[data-skin=terminal] .gHd::before{content:"\2524 ";color:var(--g-dim)}
+.gui[data-skin=terminal] .gHd::after{content:" \251C";color:var(--g-dim)}
+.gui[data-skin=terminal] button:hover:not(:disabled),.gui[data-skin=terminal] button.on{background:var(--g-btnHover);color:#010502;text-shadow:none}
+.gui[data-skin=terminal] .stack button::before{content:"  ";white-space:pre}
+.gui[data-skin=terminal] .stack button:hover:not(:disabled)::before{content:"> "}
+.gui[data-skin=terminal] .gBar{background:repeating-linear-gradient(90deg,rgb(31 155 72 / .35) 0 7px,transparent 7px 9px);border:0}
+.gui[data-skin=terminal] .gBar i{background:repeating-linear-gradient(90deg,var(--g-ok) 0 7px,transparent 7px 9px);filter:drop-shadow(0 0 4px rgb(57 255 122 / .8))}
+.gui[data-skin=terminal] .gBar i.low{animation:gTermPulse 1.4s ease-in-out infinite}
+.gui[data-skin=terminal] .gSq{display:none}
+@keyframes gTermBlink{50%{opacity:0}}
+@keyframes gTermPulse{50%{opacity:.45}}

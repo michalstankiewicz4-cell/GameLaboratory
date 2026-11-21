@@ -3,6 +3,18 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.93.0 · UI gry 1.7.0 · kontrola kitów 1.0.8 — 2026-11-21 (skórki w laboratorium UI, podgląd kontrolek)
+
+### Dodane
+- **Skórki terminal i syntax** w UI gry (`js/gameui/skins.js`, `css/skin-terminal.css`, `css/skin-syntax.css`): dwa wyglądy
+  z laboratorium skórek — zielony ekran CRT z poświatą i kolorowy motyw edytora kodu — z tokenami, arkuszem i dźwiękami.
+- **Podstawowe kontrolki w skórce** (`js/gameui/css/controls.css`): przyciski, suwak, przełącznik, lista wyboru, pole
+  tekstowe, pola wyboru, przyciski opcji, zakładki; w laboratorium UI gry podgląd **Basic controls** (okno Skórka).
+
+### Usunięte
+- **Laboratorium skórek** (`labs/skins.html`): połączone z laboratorium UI gry (decyzja właściciela); opis —
+  `docs/history/skins.md`. Kontrola kitów go już nie otwiera.
+
 ## Program 0.92.0 · edytor sceny 0.46.0 — 2026-11-21 (zmienna pogoda w grze)
 
 ### Dodane

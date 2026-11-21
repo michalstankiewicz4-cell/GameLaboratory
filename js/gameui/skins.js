@@ -1,6 +1,8 @@
 // UI gry · skórki: wygląd UI gry oddzielony od wyglądu laboratoriów (ui/style/tokens.css). Skórka to zestaw tokenów
 // (zmienne CSS --g-*) i podstawa z własnym arkuszem (materiał, ramki, przyciski): 'space' — zestaw UI ze Space
-// (js/gameui/css/skin-space.css), 'battle' — menu i HUD z Battle (skin-battle.css), 'engine' — wygląd silnika.
+// (js/gameui/css/skin-space.css), 'battle' — menu i HUD z Battle (skin-battle.css), 'engine' — wygląd silnika,
+// 'terminal' i 'syntax' — dwa wyglądy z dawnego laboratorium skórek (ze Space, docs/history/skins.md): zielony ekran CRT
+// z poświatą (skin-terminal.css) i kolorowy motyw kodu (skin-syntax.css).
 // Skórki zapisane pod nazwą to zasób „uiskin” (js/scene/assets.js): { base, tokens: { nazwa: wartość }, sounds? }.
 // Dźwięki skórki (sounds): zdarzenie UI → dźwięk interfejsu SfxKit (sound 'ui': kind, pitch, level) albo null (cisza);
 // grają na szynie interfejsu miksera (js/gameui/sounds.js) — kosmiczna piszczy, Battle klika metalem, silnik tyka.
@@ -28,6 +30,8 @@ export const SKIN_SOUNDS = {
   space: { click: U(4), hover: U(4, 1.6, 0.35), open: U(7, 1.2), close: U(8, 1.2), back: U(4, 0.75), type: U(4, 1.9, 0.25), choice: U(10, 1.1), buy: U(2, 1.2), deny: U(11), banner: U(1, 1.2, 0.8), log: U(4, 1.3, 0.5) },
   battle: { click: U(6), hover: U(5, 0.8, 0.4), open: U(6, 0.7), close: U(6, 0.9, 0.7), back: U(6, 0.85), type: U(9, 1, 0.8), choice: U(6, 0.75), buy: U(2), deny: U(11, 0.8), banner: U(1), log: U(9, 1.1, 0.6) },
   engine: { click: U(5), hover: U(5, 1.5, 0.3), open: U(7), close: U(8), back: U(5, 0.8), type: U(5, 1.8, 0.25), choice: U(10), buy: U(10, 1.2), deny: U(11, 1.1), banner: U(4, 0.9), log: U(5, 1.2, 0.6) },
+  terminal: { click: U(9, 1.1), hover: U(5, 2, 0.25), open: U(4, 0.6), close: U(4, 0.5), back: U(9, 0.9), type: U(9, 1.3, 0.35), choice: U(9, 0.8), buy: U(10, 0.8), deny: U(11, 0.7), banner: U(4, 0.55, 0.8), log: U(9, 1.2, 0.5) },
+  syntax: { click: U(4, 1.4), hover: U(4, 2, 0.3), open: U(7, 1.4), close: U(8, 1.4), back: U(4, 1.1), type: U(5, 2.2, 0.2), choice: U(10, 1.3), buy: U(10, 1.5), deny: U(11, 1.2), banner: U(1, 1.5, 0.7), log: U(4, 1.7, 0.5) },
 };
 export const FONTS = ['"Roboto Condensed", "Arial Narrow", sans-serif', '"Antonio", "Arial Narrow", sans-serif', '"Oswald", "Arial Narrow", sans-serif',
   '"Space Grotesk", system-ui, sans-serif', 'ui-monospace, Consolas, monospace', '"IBM Plex Mono", ui-monospace, monospace', 'Georgia, serif'];
@@ -42,6 +46,12 @@ export const SKINS = {
   engine: { label: 'Engine (the labs\' dark glass and gold)', tokens: {
     font: FONTS[3], fontHead: FONTS[3], text: '#e8eaee', dim: '#9aa3ad', head: '#e7c27a', accent: '#e7c27a', ok: '#6fcf8e', warn: '#e7c27a', err: '#e0675f',
     panel: 'rgb(14 18 24 / .86)', line: 'rgb(255 255 255 / .14)', glow: 'transparent', backdrop: 'rgb(6 8 12 / .55)', btn: 'rgb(255 255 255 / .06)', btnHover: 'rgb(231 194 122 / .18)', radius: '8px' } },
+  terminal: { label: 'Terminal (a green CRT display, one colour)', tokens: {
+    font: FONTS[5], fontHead: FONTS[5], text: '#39ff7a', dim: '#1f9b48', head: '#9dffbe', accent: '#39ff7a', ok: '#39ff7a', warn: '#d8ff6a', err: '#eaffef',
+    panel: 'rgb(2 18 7 / .84)', line: '#1f9b48', glow: 'rgb(57 255 122 / .16)', backdrop: 'rgb(1 5 2 / .72)', btn: 'rgb(1 8 3 / .85)', btnHover: '#39ff7a', radius: '0px' } },
+  syntax: { label: 'Syntax (a colourful code editor)', tokens: {
+    font: FONTS[3], fontHead: FONTS[5], text: '#e6e8f2', dim: '#6c7399', head: '#5ee7ff', accent: '#ff6ac1', ok: '#7ef29a', warn: '#ffb45c', err: '#ff5c7a',
+    panel: 'rgb(22 24 38 / .88)', line: '#2a2e48', glow: 'rgb(0 0 0 / .35)', backdrop: 'rgb(13 14 23 / .62)', btn: '#1d2033', btnHover: '#262a44', radius: '10px' } },
 };
 
 // skórka: id gotowej albo { base, tokens, sounds } (zapisana) → { base, tokens, sounds } (pełne; dźwięk null — cisza)

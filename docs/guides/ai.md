@@ -38,7 +38,7 @@ Jednostki: metry, stopnie, sekundy; Y w górę; kurs 0 — wzdłuż +Z. Teksty i
 | Życie | `life.html`, `creator.html`, `human.html`, `gear.html`, `morgue.html`, `walkers.html` | zwierzęta, edytor stworów, człowiek, przedmioty bohatera (światło), głowy SDF, postacie SDF z siecią ocen | — | — |
 | Materia | `materials.html`, `art.html`, `pixel.html`, `zombies.html` | materiały PBR ze starzeniem, obrazy i ekspertyza, pixel art, generator zombie | `material`, `image` | `MaterialApi`, `ArtApi` |
 | Woksele, efekty | `blocks.html`, `effects.html` | bryły z bloków (ciecze, gaz), efekty (strzały, wybuchy, pola, skok…) | `blocks`, `effect` | `BlocksApi`, `EffectsApi` |
-| UI | `gameui.html`, `trees.html`, `skins.html` | UI gry (menu, HUD, okna, dialog, dźwięki skórki, głosy), drzewka ulepszeń, skórki statków | `ui`, `uiskin`, `tree` | `GameUIApi`, `TreeApi` |
+| UI | `gameui.html`, `trees.html` | UI gry (menu, HUD, okna, dialog, skórki i ich dźwięki, głosy, podgląd kontrolek), drzewka ulepszeń | `ui`, `uiskin`, `tree` | `GameUIApi`, `TreeApi` |
 | Dźwięk | `sound.html` · `sound-effects.html` · `sound-speech.html` | muzyka, efekty i tła miejsc, mowa (głosy postaci) | `music`, `sound`, `ambience`, `voice` | `SfxApi`, `VoiceApi` |
 | AI | `lang.html`, `img.html` | małe sieci języka i obrazów, uczone w przeglądarce | — | — |
 
