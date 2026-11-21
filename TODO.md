@@ -3,10 +3,10 @@
 Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHANGELOG.md`.
 
 ## Następne w planie (`docs/guides/lab-breakdown.md`, „Kolejność — następne”)
-- [ ] **Kreator budynków** (właściciel, 2026-11-20) — dla CityExplorer i innych gier (etap 1 — laboratorium miasta, budynki Warszawy z OSM: 0.82.0–0.83.0):
-  - [ ] **Etap 2**: CityExplorer — budynki z obrysów OSM z CityKit (kopia do folderu `lab/` gry jej skryptem sync-lab).
 - [ ] Punkt 9 — materiał z PatientZero (z historią): środowisko „organizm”, laboratorium tkanek, laboratorium patogenów.
-  Na potem (właściciel, 2026-11-20).
+  Na koniec (właściciel, 2026-11-21).
+- Kreator budynków — etap 2 (CityExplorer: budynki z obrysów OSM z CityKit) odłożony: gry CityExplorer już nie
+  rozwijamy (właściciel, 2026-11-21). Etap 1 — laboratorium miasta (0.82.0–0.83.0, adresy 0.89.1).
 
 ## Pomysły (właściciel, czekają na decyzję)
 - [ ] **Wiki w menu Pomoc**: artykuły o laboratoriach, modelach, środowiskach i zjawiskach, z małymi ilustracjami
@@ -113,9 +113,6 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
 
 ## Do przeniesienia
 - [ ] SDF Walkers, laboratorium języka i obrazów (z NeuroLabPA): przenieść na okna z opcjami (w tym okna standardowe) — dziś to przewijane strony (`pageFlow`) we własnym stylu.
-
-## Testy
-- [ ] Pełny kitcheck po wersji 0.5.0 (przerwany; doktor przeszedł).
 
 ## Z remanentu (listopad 2026, do decyzji)
 - [ ] D6: wspólne pomocnicze `$()` / `el()` (np. nowy plik w `js/labkit/`).
