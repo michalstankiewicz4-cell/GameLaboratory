@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.93.1 · UI gry 1.7.1 — 2026-11-21 (poprawki skórki terminal i podglądu kontrolek)
+
+### Poprawione
+- Skórka terminal: przycisk zamykania okna obrysowany w zieleni zamiast jasnej plamki.
+- Podgląd kontrolek: podpisy wierszy barwą tekstu skórki (były blade).
+
 ## Program 0.93.0 · UI gry 1.7.0 · kontrola kitów 1.0.8 — 2026-11-21 (skórki w laboratorium UI, podgląd kontrolek)
 
 ### Dodane

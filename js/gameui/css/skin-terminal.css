@@ -14,5 +14,6 @@
 .gui[data-skin=terminal] .gBar i{background:repeating-linear-gradient(90deg,var(--g-ok) 0 7px,transparent 7px 9px);filter:drop-shadow(0 0 4px rgb(57 255 122 / .8))}
 .gui[data-skin=terminal] .gBar i.low{animation:gTermPulse 1.4s ease-in-out infinite}
 .gui[data-skin=terminal] .gSq{display:none}
+.gui[data-skin=terminal] .gClose{background:none;border:1px solid var(--g-line);color:var(--g-text);border-radius:0}
 @keyframes gTermBlink{50%{opacity:0}}
 @keyframes gTermPulse{50%{opacity:.45}}

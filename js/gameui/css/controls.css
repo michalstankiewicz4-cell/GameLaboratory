@@ -23,7 +23,7 @@
   box-shadow:0 0 10px var(--g-glow);pointer-events:auto}
 .gui .gPreview .gWinHead{margin-bottom:.4em}
 .gui .gPreview .pRow{display:grid;grid-template-columns:8em 1fr;gap:.6em;align-items:center;margin:.45em 0}
-.gui .gPreview .pRow > span{color:var(--g-dim);font-size:.9em}
+.gui .gPreview .pRow > span{color:var(--g-text);font-size:.9em}
 .gui .gPreview .pBtns{display:flex;flex-wrap:wrap;gap:.4em}
 .gui .gPreview .pPick{display:flex;flex-wrap:wrap;gap:.8em;align-items:center}
 .gui .gPreview .pPick label{display:flex;gap:.35em;align-items:center}
