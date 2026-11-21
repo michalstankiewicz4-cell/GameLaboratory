@@ -202,5 +202,5 @@ the left; animation, direction, camera, light, style (realistic or pixel art) an
 
 ## When something looks wrong
 
-Take a screenshot, note the lab, the camera preset and — if possible — *Copy settings (JSON)*,
+Take a screenshot (H hides the windows), note the lab, the camera preset and — if possible — *Copy settings (JSON)*,
 and send them; that is enough to reproduce it.
