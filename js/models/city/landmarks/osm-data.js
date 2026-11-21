@@ -1,5 +1,5 @@
 // Budynki Warszawy z OpenStreetMap (tools/city-osm.mjs) — dane © współtwórcy OpenStreetMap, licencja ODbL
-// (https://www.openstreetmap.org/copyright). Metry od środka budynku, x na wschód, z na południe; pobrane 2026-11-20.
+// (https://www.openstreetmap.org/copyright). Metry od środka budynku, x na wschód, z na południe; pobrane 2026-11-21.
 // Plik generowany — nie edytować ręcznie.
 export const OSM_SOURCE = '© OpenStreetMap contributors (ODbL)';
 export const OSM_ERRORS = [];
