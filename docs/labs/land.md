@@ -85,6 +85,18 @@ The shape of the ground reads even under a high sun that casts no shadows (LandK
 - The ground's detail noise wraps its lattice every 289 cells before hashing: far from the map's origin the hash had
   lost precision and drew stripes close to the camera.
 
+## Ground (1.10.0)
+
+The terrain's surface besides the biomes' colours (LandKit):
+
+- **Scree and gravel** at the foot of rock faces (moderately steep ground below the cliffs, in patches), with a pebbly
+  fine relief.
+- **Mud** in patches on flat northern shores — dark, wet, smoother; not every shore is a beach.
+- **Sand** close up (within ~35 m): wind ripples ~12 cm apart across a west-south-west wind and grains, on beaches,
+  the plains' shore and desert sand.
+- **Forest litter** under the forests of the scene's vegetation — needles, leaves, moss (the plants lab: forest cover,
+  `terrain.setForest(tex, season)`); without vegetation, none.
+
 ## Map edge
 
 | Topology | What happens at the edge |

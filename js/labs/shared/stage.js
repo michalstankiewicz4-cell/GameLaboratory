@@ -98,9 +98,10 @@ export function createStage(renderer, scene, opts = {}) {
   }
   // roślinność: na terenie lądu (nie na płaskim gruncie ani morzu); bez ustawień — usunięta
   function applyVeg() {
-    if (!vegDef || !land) { if (veg) { veg.dispose(); veg = null; } return; }
+    if (!vegDef || !land) { if (veg) { veg.dispose(); veg = null; } if (land) land.tm.setForest(null); return; }
     if (!veg) veg = createVegetation(renderer, scene);
     veg.set({ T: land.T, uniforms: land.tm.uniforms, btex: land.btex }, vegDef);
+    land.tm.setForest(veg.forestTex, veg.def ? veg.def.season : 0);   // ściółka pod lasami
     veg.light(sun, hemi, scene.fog, scene.environmentIntensity); vegWind();
   }
   const stage = {

@@ -5,7 +5,11 @@
 // VEG_DEFAULTS — ustawienia (zasób „vegetation” z laboratorium roślin): density — gęstość drzew (0.05…2), grass —
 //   gęstość trawy (0…1), grassR — promień trawy wokół kamery [m], lod — odległość pełnych modeli [m], impostors,
 //   season (0 lato … 1 jesień), seed — rozmieszczenie, radius — promień lasu wokół kamery [m] (kafelki 256 m)
-// scatterArea(T, x0, z0, x1, z1, { density }, seed) → [{ id, x, y, z, yaw, s, v }] — rośliny w prostokącie mapy
+// scatterArea(T, x0, z0, x1, z1, { density, forestSeed }, seed) → [{ id, x, y, z, yaw, s, v }] — rośliny w prostokącie
+//   mapy; forestSeed — ziarno pola lasów na całą mapę (bez niego: seed; kafelki z różnym seed miały różne lasy i lasy
+//   urywały się na brzegach kafelków 256 m)
+// forestCover(T, { forestSeed }) → { data: Uint8Array RGBA M×M (r — pokrycie lasem, g — udział iglastych), M } — te same
+//   reguły co scatterArea; forestTexture(T, def) — tekstura dla terenu (ściółka pod drzewami, LandKit setForest)
 // createVegetation(renderer, scene) → { set(land, def) — land: { T, uniforms, btex } (teren sceny) albo null,
 //   update(camera, dt), light(sun, hemi, fog, env), fog(gęstość), wind(m/s, kierunek° — dokąd wieje: 0° +z, 90° +x;
 //   siła PlantKit 0…1,5 — pełna przy 24 m/s), visible, counts, dispose() }
@@ -36,7 +40,8 @@ function waterGrid(T) {
 }
 
 // Gdzie stoi każda roślina: siatka z rozrzutem; biom wybiera gatunki, grunt decyduje (woda, wysokość, nachylenie)
-export function scatterArea(T, x0, z0, x1, z1, { density = 1 } = {}, seed = 1) {
+export function scatterArea(T, x0, z0, x1, z1, { density = 1, forestSeed } = {}, seed = 1) {
+  const fs = forestSeed ?? seed;
   const out = [], size = T.size, rel = (h) => h / Math.max(1, T.relief);
   let s = seed >>> 0; const r = () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; };
   const water = waterGrid(T);
@@ -51,7 +56,7 @@ export function scatterArea(T, x0, z0, x1, z1, { density = 1 } = {}, seed = 1) {
     const e = 3, sl = Math.hypot(sampleHeight(T, wrap(mx + e), mz) - h, sampleHeight(T, mx, wrap(mz + e)) - h) / e;
     if (sl > 0.7) continue;
     const b = biomeAt(T, mx, mz), u = mx / size, v = mz / size, dw = water(mx, mz);
-    const forestN = fbm(u, v, 6, 4, 0.5, seed) + 0.3 * fbm(u, v, 18, 3, 0.5, seed + 1);
+    const forestN = forestNoise(u, v, fs);
     let id = null;
     const roll = r();
     if (roll < b.temperate) {                                            // północ: lasy świerkowe i sosnowe, brzozy na skrajach, jałowiec na wrzosowisku
@@ -73,17 +78,46 @@ export function scatterArea(T, x0, z0, x1, z1, { density = 1 } = {}, seed = 1) {
   }
   return out;
 }
+// pole lasów (−1…1): las na północy, gdzie > 0, zagajniki na równinach, gdzie > 0,18
+const forestNoise = (u, v, seed) => fbm(u, v, 6, 4, 0.5, seed) + 0.3 * fbm(u, v, 18, 3, 0.5, seed + 1);
+const smooth = (a, b, x) => { const t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+// pokrycie lasem i udział iglastych na siatce M × M (reguły jak w scatterArea, bez losowania pojedynczych drzew)
+export function forestCover(T, { forestSeed = 7 } = {}, M = 256) {
+  const data = new Uint8Array(M * M * 4), size = T.size, cell = size / M, e = 3;
+  for (let j = 0; j < M; j++) for (let i = 0; i < M; i++) {
+    const x = (i + 0.5) * cell, z = (j + 0.5) * cell, h = sampleHeight(T, x, z), k = (j * M + i) * 4;
+    if (h < 0.6) continue;
+    const wx = T.wrap ? (x + e) % size : Math.min(size - 0.01, x + e), wz = T.wrap ? (z + e) % size : Math.min(size - 0.01, z + e);
+    const sl = Math.hypot(sampleHeight(T, wx, z) - h, sampleHeight(T, x, wz) - h) / e, rel = h / Math.max(1, T.relief);
+    const b = biomeAt(T, x, z), n = forestNoise(x / size, z / size, forestSeed);
+    const north = rel > 0.55 || sl > 0.55 ? 0 : smooth(0.0, 0.08, n) * b.temperate;    // spruce, pine; birch at the edges
+    const plains = smooth(0.18, 0.26, n) * b.plains;                                      // oak and birch, a few pines
+    const cover = Math.min(1, north + plains);
+    if (cover <= 0) continue;
+    const conifer = (north * (n < 0.12 ? 0.6 : 0.9) + plains * 0.2) / Math.max(1e-4, north + plains);
+    data[k] = Math.round(cover * 255); data[k + 1] = Math.round(conifer * 255); data[k + 3] = 255;
+  }
+  return { data, M };
+}
+export function forestTexture(T, def = {}) {
+  const { data, M } = forestCover(T, { forestSeed: def.seed ?? VEG_DEFAULTS.seed });
+  const tex = new THREE.DataTexture(data, M, M, THREE.RGBAFormat, THREE.UnsignedByteType);
+  tex.wrapS = tex.wrapT = T.wrap ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+  tex.magFilter = tex.minFilter = THREE.LinearFilter; tex.generateMipmaps = false; tex.needsUpdate = true;
+  return tex;
+}
 // ziarno kafelka: to samo ziarno i kafelek — te same rośliny
 const tileSeed = (seed, i, j) => ((Math.imul(seed | 0, 73856093) ^ Math.imul(i | 0, 19349663) ^ Math.imul(j | 0, 83492791)) >>> 0) || 1;
 
 export function createVegetation(renderer, scene) {
   const wind = windUniforms(), light = plantLight();
   const group = new THREE.Group(); group.name = 'vegetation'; scene.add(group);
-  let land = null, def = null, forest = null, grass = null, tiles = new Map(), keyNow = '', sortT = 0, time = 0;
+  let land = null, def = null, forest = null, grass = null, tiles = new Map(), keyNow = '', sortT = 0, time = 0, forestTex = null;
   const counts = () => ({ plants: forest ? forest.list.length : 0, near: forest ? forest.counts.near : 0, far: forest ? forest.counts.far : 0, tiles: tiles.size, grass: grass ? grass.userData.tufts : 0 });
   function clear() {
     if (forest) { forest.dispose(); forest = null; }
     if (grass) { group.remove(grass); grass.geometry.dispose(); grass.material.dispose(); grass = null; }
+    if (forestTex) { forestTex.dispose(); forestTex = null; }
     tiles.clear(); keyNow = '';
   }
   // kafelki w promieniu wokół kamery; zmiana zestawu — nowa lista lasu
@@ -101,7 +135,7 @@ export function createVegetation(renderer, scene) {
     for (const k of want) {
       if (tiles.has(k)) { next.set(k, tiles.get(k)); continue; }
       const [i, j] = k.split(',').map(Number);
-      next.set(k, scatterArea(land.T, i * TILE, j * TILE, (i + 1) * TILE, (j + 1) * TILE, def, tileSeed(def.seed, i, j)));
+      next.set(k, scatterArea(land.T, i * TILE, j * TILE, (i + 1) * TILE, (j + 1) * TILE, { ...def, forestSeed: def.seed }, tileSeed(def.seed, i, j)));
     }
     tiles = next;
     forest.set([].concat(...tiles.values()));
@@ -111,6 +145,8 @@ export function createVegetation(renderer, scene) {
     group, wind: (mps = 6, dirDeg = 225) => { wind.uWind.value = Math.min(1.5, Math.max(0, mps / 16)); const a = dirDeg * Math.PI / 180; wind.uWindDir.value.set(Math.sin(a), Math.cos(a)); },
     get counts() { return counts(); },
     get def() { return def; },
+    // pokrycie lasem dla terenu (ściółka: LandKit terrain.setForest) — null bez roślin
+    get forestTex() { return forestTex; },
     // teren sceny i ustawienia; null — bez roślin
     set(l, d) {
       const nd = d ? { ...VEG_DEFAULTS, ...d } : null;
@@ -120,8 +156,9 @@ export function createVegetation(renderer, scene) {
       if (!land || !def) return;
       wind.uSeason.value = def.season;
       forest = new Forest(renderer, group, { wind, light });
+      forestTex = forestTexture(land.T, def);
       forest.nearDist = def.lod; forest.impostors = def.impostors;
-      if (def.grass > 0.01) { grass = grassField(land.uniforms, land.btex, wind, light, { R: def.grassR, spacing: 0.6 / Math.sqrt(Math.max(0.05, def.grass)), relief: land.T.relief }); group.add(grass); }
+      if (def.grass > 0.01) { grass = grassField(land.uniforms, land.btex, wind, light, { R: def.grassR, spacing: 0.6 / Math.sqrt(Math.max(0.05, def.grass)), relief: land.T.relief, forest: forestTex }); group.add(grass); }
     },
     update(camera, dt = 0) {
       time += dt; wind.uTime.value = time;

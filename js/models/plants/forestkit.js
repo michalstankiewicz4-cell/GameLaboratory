@@ -198,19 +198,22 @@ function tuftGeometry(n = 6, seg = 4) {
   g.setAttribute('aT', new THREE.Float32BufferAttribute(at, 1)); g.setIndex(idx);
   return g;
 }
-// landU: LandKit land uniforms (tLand, uLand, uLandOff…); biome: RegionKit biome texture; R: radius (m); spacing (m)
-export function grassField(landU, biome, wind, light, { R = 45, spacing = 0.6, relief = 300 } = {}) {
+// landU: LandKit land uniforms (tLand, uLand, uLandOff…); biome: RegionKit biome texture; R: radius (m); spacing (m);
+// forest: forest cover texture (vegetation.js forestTexture) — under the trees, on the litter, the grass thins out
+export function grassField(landU, biome, wind, light, { R = 45, spacing = 0.6, relief = 300, forest = null } = {}) {
   const g = tuftGeometry(), n = Math.floor((2 * R / spacing) ** 2), off = new Float32Array(n * 4);
   let s = 12345; const rnd = () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; };
   const side = Math.round(2 * R / spacing);
   for (let k = 0; k < n; k++) { const i = k % side, j = (k / side) | 0; off[k * 4] = -R + (i + rnd()) * spacing; off[k * 4 + 1] = -R + (j + rnd()) * spacing; off[k * 4 + 2] = rnd() * 6.283; off[k * 4 + 3] = rnd(); }
   g.setAttribute('aOff', new THREE.InstancedBufferAttribute(off, 4)); g.instanceCount = n;
-  const u = { ...landU, ...wind, ...light, uMatGain: { value: 0.7 }, tBiome: { value: biome }, uGrass: { value: new THREE.Vector4(R, 1, relief, 1) } };
+  const u = { ...landU, ...wind, ...light, uMatGain: { value: 0.7 }, tBiome: { value: biome }, uGrass: { value: new THREE.Vector4(R, 1, relief, 1) },
+    tForest: { value: forest || biome }, uForestOn: { value: forest ? 1 : 0 } };
   const m = new THREE.ShaderMaterial({
     uniforms: u, side: THREE.DoubleSide,
     vertexShader: GLSL_LAND + /* glsl */`
       attribute vec4 aOff; attribute float aT;
       uniform sampler2D tBiome; uniform vec4 uGrass;          // radius, density 0..1, relief, -
+      uniform sampler2D tForest; uniform float uForestOn;     // forest cover: little grass on the litter under the trees
       uniform float uWind, uTime; uniform vec2 uWindDir;
       varying vec3 vCol; varying vec3 vN; varying float vT, vDist;
       float gh(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
@@ -222,6 +225,7 @@ export function grassField(landU, biome, wind, light, { R = 45, spacing = 0.6, r
         vec4 bw = texture2D(tBiome, (base + uLandOff) / uLand.x);
         float bs = bw.r + bw.g + bw.b + 1e-4; bw /= bs;
         float dens = (bw.r * 0.8 + bw.g * 1.0 + bw.b * 0.1) * uGrass.y;
+        if (uForestOn > 0.5) dens *= 1.0 - 0.85 * smoothstep(0.15, 0.6, texture2D(tForest, (base + uLandOff) / uLand.x).r);
         float rel = h / max(1.0, uGrass.z);
         float keep = step(aOff.w, dens) * smoothstep(0.35, 0.9, h) * (1.0 - smoothstep(0.55, 0.8, slope)) * (1.0 - smoothstep(0.5, 0.65, rel * bw.r + rel * 0.3 * (bw.g + bw.b)));
         float d = length(base - cameraPosition.xz);

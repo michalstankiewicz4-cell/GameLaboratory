@@ -3,6 +3,19 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.101.0 · ląd 1.10.0 · rośliny 1.7.0 · edytor sceny 0.53.0 — 2026-11-21 (nawierzchnia i ściółka)
+
+### Dodane
+- **Nawierzchnia terenu** (LandKit): rumosz i żwir u stóp ścian skalnych, błoto płatami na płaskich brzegach północy,
+  piasek z bliska ze zmarszczkami od wiatru i ziarnem (plaże, brzeg równin, pustynia).
+- **Ściółka pod lasem**: igły pod iglastymi, liście pod liściastymi (jesienią barwniejsze), mech płatami, postrzępione
+  brzegi; trawa na ściółce rzednie. Pokrycie lasem z tych samych reguł co rośliny (`forestCover`, `forestTexture` —
+  `js/models/plants/vegetation.js`); w laboratorium roślin i na terenie sceny z roślinnością.
+
+### Poprawione
+- Lasy na terenie sceny urywały się na brzegach kafelków 256 m (każdy kafelek miał własne ziarno pola lasów) — pole
+  lasów ma teraz jedno ziarno na całą mapę.
+
 ## Program 0.100.0 · ląd 1.9.0 · edytor sceny 0.52.0 — 2026-11-21 (cienie nierówności terenu)
 
 ### Dodane

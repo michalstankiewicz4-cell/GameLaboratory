@@ -64,6 +64,14 @@ A jittered grid (~7 m between candidates at 100 %) over a 2.4 km RegionKit world
 - **Desert**: date palm oases within ~110 m of water and below 8 m; acacias scattered sparsely on gentle ground;
   saltbush scrub.
 
+**Forest litter (1.7.0)**: the same rules give the forest cover over the whole map (`forestCover` / `forestTexture`:
+cover and the conifer share, 256 × 256): the terrain lays litter under the forests — needles under conifers, leaves
+under broadleaf trees (more colour as the season turns to autumn), moss in patches, ragged edges — and the grass thins
+out on it (LandKit `terrain.setForest`, ForestKit `grassField({ forest })`). Here and on a scene's terrain alike.
+
+The forest field has one seed for the whole map (`forestSeed`): on a scene's terrain each 256 m tile used its own seed
+for it, so forests broke off at the tiles' edges.
+
 ## Saved under a name — a plant for the scene
 
 Window *Plants* → *Specimen* → *Save*: the species, seed, size, detail and season as the named asset `plant`

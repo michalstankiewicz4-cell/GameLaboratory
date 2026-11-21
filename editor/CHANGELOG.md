@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.53.0 — 2026-11-21
+
+### Zmienione
+- Teren: rumosz, błoto na brzegach, piasek z bliska; ściółka pod lasami roślinności sceny (trawa na niej rzednie);
+  lasy nie urywają się już na brzegach kafelków.
+
 ## 0.52.0 — 2026-11-21
 
 ### Zmienione

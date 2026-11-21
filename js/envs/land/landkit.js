@@ -13,6 +13,9 @@
 //                         hollows and the foot of slopes see less sky and get less of its light — the relief reads even
 //                         under a high sun that casts no shadows. The terrain also takes its normal per pixel from the
 //                         heightmap and a fine relief of the ground close up (grass tufts, stones, rock cracks, ripples).
+//                         The ground: scree and gravel at the foot of rock faces, mud in patches on flat shores, sand with
+//                         wind ripples close up, forest litter (needles, leaves, moss) under the vegetation's forests
+//                         (setForest — the forest cover from js/models/plants/vegetation.js).
 import * as THREE from '../../../vendor/three/three.module.js';
 
 /* ---------------- noise (periodic: every octave repeats across the map) ---------------- */
@@ -276,6 +279,7 @@ const TERRAIN_FRAG_HEAD = /* glsl */`
 ${GLSL_LAND}
 uniform vec3 uHole; uniform float uRelief, uTime;
 uniform sampler2D tSky; uniform float uSkyOcc;     // sky visibility (skyTexture) and how strongly it darkens the sky's light
+uniform sampler2D tForest; uniform float uForestOn, uSeason;   // forest cover (r) and its conifer share (g) — litter under the trees
 uniform sampler2D tBiome; uniform float uBiomeOn; uniform vec4 uGround;   // map size; biome weights (temperate, plains, desert, -) over the map (RegionKit)
 varying vec3 vLandP; varying vec3 vLandN; varying vec2 vLandQ;
 float lnHash(vec2 p) { p = fract(p * vec2(233.34, 851.73)); p += dot(p, p + 23.45); return fract(p.x * p.y); }
@@ -291,6 +295,7 @@ const TERRAIN_FRAG_COLOR = /* glsl */`
   float hh = vLandP.y, up = normalize(vLandN).y;
   vec2 q = vLandQ;                                       // map coordinates: the ground's texture moves with the ground
   float rk = 0.5;                                        // how rocky the ground is here (the fine relief below)
+  float sd = 0.0, soft = 0.0;                            // how sandy (ripples close up), how soft (litter, mud: a gentler relief)
   // detail noise fades out with distance before it gets finer than a pixel (no shimmering, no moiré)
   float fd = length(cameraPosition - vLandP);
   float n0 = lnFbm(q * 0.006), n1 = lnFbm(q * 0.035);
@@ -320,6 +325,14 @@ const TERRAIN_FRAG_COLOR = /* glsl */`
     c = mix(c, sand, beach);
     float wet = smoothstep(1.4, 0.3, hh) * beach;
     c = mix(c, wetSand, wet); rough = mix(0.95, 0.35, wet);
+    sd = beach * (1.0 - wet * 0.5);
+    // scree and gravel at the foot of rock faces: moderately steep ground below the cliffs, patchy
+    float scree = smoothstep(0.6, 0.72, up) * smoothstep(0.92, 0.82, up) * smoothstep(0.3, 0.55, n2 + (n1 - 0.5) * 0.4) * (1.0 - snowy) * (1.0 - beach);
+    vec3 gravel = mix(vec3(0.33, 0.32, 0.3), vec3(0.47, 0.45, 0.42), n3) * (0.8 + 0.3 * lnNoise(q * 4.7));
+    c = mix(c, gravel, scree * 0.75); rk = max(rk, scree * 0.85);
+    // mud on flat shores of the north (not every shore is a beach): dark, wet, in patches along the water
+    float mud = smoothstep(2.2, 0.4, hh) * smoothstep(0.86, 0.95, up) * smoothstep(0.42, 0.62, lnNoise(q * 0.018 + 2.7));
+    c = mix(c, vec3(0.2, 0.17, 0.13) * (0.85 + 0.3 * n3), mud * 0.85); rough = mix(rough, 0.45, mud); sd *= 1.0 - mud; soft = max(soft, mud);
     c *= 0.82 + 0.18 * smoothstep(0.5, 0.95, up);                                     // steeper ground reads darker (soil, shadowed gullies)
     vec4 bw = uBiomeOn > 0.5 ? texture2D(tBiome, q / uLand.x) : vec4(1.0, 0.0, 0.0, 0.0);
     if (bw.g + bw.b > 0.004) {
@@ -349,6 +362,22 @@ const TERRAIN_FRAG_COLOR = /* glsl */`
       cd = mix(cd, wetSand * vec3(1.05, 0.98, 0.9), wet);
       float bs = bw.r + bw.g + bw.b + 1e-4;
       c = (c * bw.r + cp * bw.g + cd * bw.b) / bs;
+      sd = (sd * bw.r + beachP * bw.g + smoothstep(0.62, 0.85, up) * (1.0 - smoothstep(0.25, 0.4, rel) * smoothstep(0.9, 0.97, up) * 0.75) * bw.b) / bs;
+    }
+    // forest litter under the trees (the vegetation's forest cover, js/models/plants/vegetation.js): needles under
+    // conifers, leaves under broadleaf trees (more colour in autumn), moss in patches; ragged edges
+    if (uForestOn > 0.5) {
+      vec4 fo = texture2D(tForest, q / uLand.x);
+      float lit = smoothstep(0.12, 0.55, fo.r + (n1 - 0.5) * 0.3 + (n3 - 0.5) * 0.08) * veg * (1.0 - snowy) * (1.0 - beach);
+      vec3 needles = mix(vec3(0.17, 0.1, 0.055), vec3(0.27, 0.16, 0.085), n2) * (0.85 + 0.25 * n3);
+      vec3 leaves = mix(vec3(0.21, 0.15, 0.075), vec3(0.3, 0.2, 0.095), n2) * (0.85 + 0.25 * n3);
+      leaves = mix(leaves, vec3(0.45, 0.26, 0.07), uSeason * 0.6 * smoothstep(0.4, 0.8, n3));
+      vec3 litter = mix(leaves, needles, fo.g);
+      // close up: single needles, leaves and twigs as a fine speckle (fades out by ~40 m)
+      float sp = mix(0.5, lnNoise(q * 13.0) * 0.6 + lnNoise(q * 37.0 + 3.3) * 0.4, smoothstep(40.0, 5.0, fd));
+      litter *= 0.7 + 0.6 * sp;
+      litter = mix(litter, mix(vec3(0.12, 0.19, 0.06), vec3(0.2, 0.26, 0.09), n1) * (0.8 + 0.4 * sp), smoothstep(0.55, 0.8, n2) * 0.5);
+      c = mix(c, litter, lit * 0.9); soft = max(soft, lit); rk *= 1.0 - lit * 0.6;
     }
   }
   // grunt innej planety (T.ground): barwa jej skały (regolit, rdza, bazalt) w miejsce ziemskiej, ta sama jasność i wzór
@@ -360,10 +389,19 @@ const TERRAIN_FRAG_COLOR = /* glsl */`
   vec3 lnN = normalize(vec3(landH(vLandP.xz - vec2(le, 0.0)) - landH(vLandP.xz + vec2(le, 0.0)), 2.0 * le, landH(vLandP.xz - vec2(0.0, le)) - landH(vLandP.xz + vec2(0.0, le))));
   float mk = smoothstep(260.0, 30.0, fd);
   if (mk > 0.0) {
-    float amp = mix(0.35, 1.2, rk) * mk;
+    float amp = mix(0.35, 1.2, rk) * mk * (1.0 - 0.5 * soft) * (1.0 - 0.6 * sd);
     #define LN_MICRO(p) ((lnFbm((p) * 0.18) * 0.9 + lnFbm((p) * 0.7 + 5.3) * 0.3 + lnNoise((p) * 2.6) * mix(0.05, 0.12, rk)) * amp)
     float m0 = LN_MICRO(q), mx = LN_MICRO(q + vec2(0.2, 0.0)), mz = LN_MICRO(q + vec2(0.0, 0.2));
     lnN = normalize(lnN + vec3(m0 - mx, 0.0, m0 - mz) / 0.2);
+    // sand: wind ripples ~12 cm apart across a west-south-west wind and grains — the slope of the ripples directly
+    // (too fine for the differences above), only within ~35 m
+    float rs = sd * smoothstep(35.0, 6.0, fd);
+    if (rs > 0.0) {
+      // sinuous, breaking crests: the phase wanders at two scales, the ripples fade in and out in patches
+      vec2 rd = vec2(0.83, 0.55); float ph = dot(q, rd) * 52.0 + lnNoise(q * 0.9) * 6.0 + lnNoise(q * 3.1 + 1.7) * 2.5;
+      float ra = 0.2 * smoothstep(0.25, 0.7, lnNoise(q * 0.35 + 4.4)) * (0.6 + 0.4 * lnNoise(q * 1.7));
+      lnN = normalize(lnN + vec3(rd.x, 0.0, rd.y) * (ra * cos(ph) * rs) + vec3(lnNoise(q * 31.0) - 0.5, 0.0, lnNoise(q * 31.0 + 7.0) - 0.5) * 0.25 * rs);
+    }
   }
   float lnSky = mix(1.0, pow(texture2D(tSky, q / uLand.x).r, 2.0), uSkyOcc);
 `;
@@ -413,7 +451,7 @@ export function terrainMeshes(T, tex, opt = {}) {
   const lu = opt.uniforms || landUniforms(T, tex);      // pass the sea's land uniforms to share them
   if (opt.uniforms) setLand(lu, T, tex);
   const groundV = (T2) => (T2.ground ? new THREE.Vector4(...T2.ground) : new THREE.Vector4(0, 0, 0, 0));   // T.ground [r, g, b, ile] — grunt innej planety
-  const common = { tSky: { value: skyTexture(T) }, uSkyOcc: { value: opt.skyOcc ?? 1 }, uRelief: { value: T.relief }, uTime: { value: 0 }, tBiome: { value: opt.biome || NO_BIOME() }, uBiomeOn: { value: opt.biome ? 1 : 0 }, uGround: { value: groundV(T) } };
+  const common = { tSky: { value: skyTexture(T) }, uSkyOcc: { value: opt.skyOcc ?? 1 }, tForest: { value: NO_BIOME() }, uForestOn: { value: 0 }, uSeason: { value: 0 }, uRelief: { value: T.relief }, uTime: { value: 0 }, tBiome: { value: opt.biome || NO_BIOME() }, uBiomeOn: { value: opt.biome ? 1 : 0 }, uGround: { value: groundV(T) } };
   const mk = (cells, cell, drop, hole) => {
     const g = new THREE.PlaneGeometry(cells * cell, cells * cell, cells, cells); g.rotateX(-Math.PI / 2);
     const extra = { ...common, uDrop: { value: drop }, uHole: { value: hole } };
@@ -451,6 +489,9 @@ export function terrainMeshes(T, tex, opt = {}) {
       far.userData.extra.uHole.value.set(fine.position.x, fine.position.z, far.userData.extra.uHole.value.z);
     },
     get triangles() { return (n * n + nf * nf) * 2; },
+    // forest cover texture (vegetation.js forestTexture: r — cover, g — conifer share) for the litter under the trees, or
+    // null — no litter; season 0 summer … 1 autumn (the leaf litter's colour)
+    setForest(tex, season = 0) { common.tForest.value = tex || NO_BIOME(); common.uForestOn.value = tex ? 1 : 0; common.uSeason.value = season; },
     // how strongly the sky visibility darkens the sky's light on the ground (0 — off, 1 — full)
     set skyOcc(k) { common.uSkyOcc.value = Math.max(0, Math.min(1, +k || 0)); }, get skyOcc() { return common.uSkyOcc.value; },
   };

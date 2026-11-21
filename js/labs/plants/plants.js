@@ -9,7 +9,7 @@ import { heightTexture, terrainMeshes, sampleHeight, GLSL_LAND } from '../../env
 import { generateWorld, biomeTexture, BIOMES } from '../../envs/land/regionkit.js';
 import { SPECIES, SPECIES_IDS, growPlant, plantMaterials, windUniforms } from '../../models/plants/plantkit.js';
 import { Forest, bakeImpostors, impostorMaterial, grassField, plantLight } from '../../models/plants/forestkit.js';
-import { scatterArea } from '../../models/plants/vegetation.js';
+import { scatterArea, forestTexture } from '../../models/plants/vegetation.js';
 import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 import { attachWeatherCycle } from '../shared/weather-cycle-ui.js';
@@ -80,7 +80,7 @@ function buildSpecimen() {
 
 /* ---------------- landscape: terrain, water, forest, grass ---------------- */
 const land = new THREE.Group(); scene.add(land);
-let T = null, tex = null, btex = null, terrain = null, water = null, WU = null, forest = null, grass = null, placed = [];
+let T = null, tex = null, btex = null, ftex = null, terrain = null, water = null, WU = null, forest = null, grass = null, placed = [];
 function world() {
   return generateWorld({ seed: S.mapSeed, res: 384, size: 2400, land: 0.86, shape: 'islands', relief: 220, depth: 25, rough: 0.5, erosion: 0.4, wrap: false, barrier: 'wall' },
     { layout: 'single', body: 'lake', biome: S.biome, biomeBlend: 900, blend: 300 });
@@ -101,10 +101,11 @@ function buildLandNow() {
   } else { terrain.set(T, tex); terrain.setBiome(btex); }
   waves();
   placed = scatter(T);
+  if (ftex) ftex.dispose(); ftex = forestTexture(T, { seed: S.mapSeed * 31 + 5 }); terrain.setForest(ftex, S.season);   // ściółka pod lasami (to samo pole lasów co scatter)
   forest.nearDist = S.lod; forest.impostors = S.impostors;
   forest.set(placed); forest.update(camera);
   if (grass) { land.remove(grass); grass.geometry.dispose(); grass.material.dispose(); }
-  grass = grassField(terrain.uniforms, btex, wind, light, { R: S.grassR, spacing: 0.6 / Math.sqrt(Math.max(0.05, S.grass)), relief: T.relief }); land.add(grass);
+  grass = grassField(terrain.uniforms, btex, wind, light, { R: S.grassR, spacing: 0.6 / Math.sqrt(Math.max(0.05, S.grass)), relief: T.relief, forest: ftex }); land.add(grass);
   grass.visible = S.grass > 0.01;
   const by = {}; for (const p of placed) by[p.id] = (by[p.id] || 0) + 1;
   $('landStats').replaceChildren(...[['Built in', `${Math.round(performance.now() - t0)} ms`], ['Plants', placed.length.toLocaleString('en')], ...Object.entries(by).map(([k, n]) => [SPECIES[k].name, n.toLocaleString('en')]), ['Grass tufts', grass.userData.tufts.toLocaleString('en')]]
@@ -203,7 +204,7 @@ for (const [k, w] of Object.entries(WEATHER)) $('weather').append(el('option', {
 let tm = 0; const later = (fn) => { clearTimeout(tm); tm = setTimeout(() => { fn(); save(); }, 250); };
 const RANGES = {
   size: [(v) => `${Math.round(v * 100)} %`, () => later(buildSpecimen)], detail: [(v) => v.toFixed(2), () => later(buildSpecimen)],
-  season: [(v) => (v < 0.15 ? 'summer' : v < 0.6 ? 'early autumn' : 'autumn'), (v) => { wind.uSeason.value = v; save(); }],
+  season: [(v) => (v < 0.15 ? 'summer' : v < 0.6 ? 'early autumn' : 'autumn'), (v) => { wind.uSeason.value = v; if (terrain && ftex) terrain.setForest(ftex, v); save(); }],
   density: [(v) => `${Math.round(v * 100)} %`, () => later(buildLand)], grass: [(v) => `${Math.round(v * 100)} %`, () => later(buildLand)], grassR: [(v) => `${v} m`, () => later(buildLand)],
   lod: [(v) => `${v} m`, (v) => { if (forest) { forest.nearDist = v; forest.update(camera); } save(); }],
   wind: [(v) => (v < 0.05 ? 'calm' : v < 0.4 ? 'light breeze' : v < 0.9 ? 'fresh breeze' : 'strong wind'), () => { setWind(); save(); }],
