@@ -18,6 +18,7 @@ import { BODIES, DEFAULT_TRAIN, buildVehicle as buildRail } from '../models/trai
 import * as THREE from '../../vendor/three/three.module.js';
 import { SPECIES, SPECIES_IDS, growPlant, plantMaterials, windUniforms } from '../models/plants/plantkit.js';
 import { buildCave } from '../models/caves/cavekit.js';
+import { ITEMS as GEAR, makeItem } from '../models/gear/gearkit.js';
 import { buildBody as buildBlocks, SHAPES as BLOCK_SHAPES } from '../models/blocks/blockkit.js';
 import { MODELS as JUNK } from '../models/junkyard/registry.js';
 import { TYPES as CITY_TYPES, TYPE_IDS as CITY_IDS, build as buildCity } from '../models/city/citykit.js';
@@ -42,6 +43,7 @@ export const FAMILIES = {
   blocks: { label: 'Blocks', labelPl: 'Bloki' },
   junkyard: { label: 'Junkyard', labelPl: 'Złomowisko' },
   city: { label: 'City buildings', labelPl: 'Budynki miasta' },
+  gear: { label: 'Hero items (light)', labelPl: 'Przedmioty bohatera (światło)' },
 };
 
 const P = [];
@@ -133,6 +135,28 @@ function buildBody(groupId, bodyId, d = 1) {
   return { root: b.group, kit: b, dispose: () => BK.disposeBody(b), tick: (t, dt, at = {}) => b.update(t, dt, at.sunPos ? { sunPosition: at.sunPos, center: at.center } : { sunDir: at.sunDir, center: at.center }) };
 }
 BODY_LIST.forEach(([g, id, name]) => add('bodies/' + id, name, 'bodies', 'space', 'labs/bodies.html', (o) => buildBody(g, id, det(o)), { needs: 'space', ...LOD }));
+// układ planetarny (SystemKit ze Space): cały układ z laboratorium układów — środki, planety, księżyce, pasy i pierścienie
+// na orbitach, które krążą same (zegar układu); zasób „system” (pole asset; bez zasobu — układ gotowy z laboratorium).
+// Jednostki SystemKit (gwiazda ~4, Ziemia ~1) × SYSTEM_SCALE m: gwiazda jak słońce sceny (ok. 50 m); wielkość — skalą
+// obiektu. Światło sceny w kosmosie pada od jego gwiazdy (editor/js/world/world.js, kit.lightPosition).
+export const SYSTEM_SCALE = 12.5;
+function buildSystem(asset, d = 1) {
+  const SK = window.SystemKit; if (!SK) throw new Error('SystemKit is not loaded (js/scene/space.js loadSpace())');
+  const sys = asset && Array.isArray(asset.centers) ? JSON.parse(JSON.stringify(asset)) : SK.PRESETS[1].make();
+  const h = SK.build(sys, { detail: 0.4 * d }), root = new THREE.Group(); root.name = sys.name || 'star system';
+  h.root.scale.setScalar(SYSTEM_SCALE); root.add(h.root);
+  const cam = { position: new THREE.Vector3() };
+  return { root, kit: h, dispose: () => h.dispose(), tick: (t, dt, at = {}) => { if (at.center) cam.position.copy(at.center); h.update(t, dt, { camera: at.center ? cam : null, time: t }); } };
+}
+add('systems/system', 'Star system', 'bodies', 'space', 'labs/systems.html', (o) => buildSystem(o && o.asset, det(o)), { needs: 'space', assetKind: 'system' });
+// przedmioty bohatera dające światło (GearKit): latarka, lampa naftowa, światło chemiczne, zapalniczka, ekran telefonu —
+// postawione w scenie (bez ręki: model w miejscu obiektu, latarka świeci wzdłuż −Z), ze swoim światłem i migotaniem
+// (tick); w jaskini — jedyne światło obok lawy
+function buildGear(id) {
+  const it = makeItem(id); it.group.position.set(0, 0, 0); it.group.rotation.set(0, 0, 0);
+  return { root: it.group, kit: it, dispose: () => it.dispose(), tick: (t, dt) => it.update(dt) };
+}
+Object.keys(GEAR).forEach((id) => add('gear/' + id, GEAR[id].name, 'gear', 'land', 'labs/gear.html', () => buildGear(id)));
 // ludzie i stwory (LifeKit ze Space, ładowany jak ShipKit): parametry domyślne kreatury (jak na starcie laboratorium);
 // na postoju — chód „idle” (oddech, rozglądanie); chodzenie jako zachowanie — później
 function buildLife(id, d = 1) {

@@ -229,10 +229,12 @@ export function createWorld(container, store, onWarn) {
     // kosmos: słońce w scenie (ciało „Sol”) jest źródłem światła — ciała niebieskie oświetla jego położenie, statki
     // światło sceny z jego kierunku (od środka kadru); czarna dziura w scenie — soczewkowanie, słońce — flara i promienie
     // (efekty kosmosu potoku kamery, js/render/space-fx.js)
-    let sunB = null, holeB = null;
-    if (stage.space) built.forEach((r) => { if (!sunB && r.prefab === 'bodies/sol') sunB = r; if (!holeB && r.prefab === 'bodies/abyss') holeB = r; });
-    if (sunB) stage.aimSun(sunB.root.position.clone().sub(camera.position).normalize());   // światło od słońca w scenie
-    const at = { sunDir: stage.sunDir, sunPos: sunB ? sunB.root.position : null, center: camera.position };   // dla ciał niebieskich: światło, kamera
+    let sunB = null, holeB = null, sysB = null;
+    if (stage.space) built.forEach((r) => { if (!sunB && r.prefab === 'bodies/sol') sunB = r; if (!holeB && r.prefab === 'bodies/abyss') holeB = r; if (!sysB && r.prefab === 'systems/system' && r.kit && r.kit.lightPosition) sysB = r; });
+    // bez słońca w scenie: światło od gwiazdy układu planetarnego (prefabrykat „Star system”)
+    const sunPos = sunB ? sunB.root.position : sysB ? sysB.kit.lightPosition : null;
+    if (sunPos) stage.aimSun(sunPos.clone().sub(camera.position).normalize());   // światło od słońca w scenie
+    const at = { sunDir: stage.sunDir, sunPos, center: camera.position };   // dla ciał niebieskich: światło, kamera
     updateLod();
     // części na postoju (statki kosmiczne, ciała niebieskie); wersja daleka ma swój tick (np. światło ciała niebieskiego)
     built.forEach((r) => { if (r.driven) return; const tk = r.showFar && r.farB ? r.farB.tick : r.tick; if (tk) tk(t, dt, at); });

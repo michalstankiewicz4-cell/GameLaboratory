@@ -3,6 +3,15 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.95.0 · układy 1.5.0 · edytor sceny 0.48.0 — 2026-11-21 (układ planetarny i przedmioty bohatera w scenie)
+
+### Dodane
+- **Układ planetarny w scenie kosmosu**: prefabrykat `systems/system` (SystemKit) — cały układ z laboratorium układów
+  (zasób „system”) z orbitami, które krążą same; światło sceny od jego gwiazdy. Laboratorium układów: zapis dla edytora
+  sceny, `SystemsApi`.
+- **Przedmioty bohatera jako modele sceny**: `gear/<id>` (GearKit) — latarka, lampa naftowa, światło chemiczne,
+  zapalniczka, ekran telefonu, ze swoim światłem i migotaniem (np. w jaskini).
+
 ## Program 0.94.1 · rośliny 1.6.1 · doktor modeli 1.4.0 — 2026-11-21 (kora na zewnątrz)
 
 ### Dodane

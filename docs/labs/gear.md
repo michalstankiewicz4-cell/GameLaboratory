@@ -14,6 +14,9 @@ binoculars. The test place is a dark cave from CaveKit ([`caves.md`](caves.md)).
 
 ## Items
 
+In the scene editor each item is a model too (`gear/<id>`, family *Hero items (light)*, program 0.95.0): it stands where
+the object is, with its light and flicker — a light in a cave, a lamp on a table; the flashlight shines along −Z.
+
 The set was chosen for the lab (to change as the game needs): flashlight, lantern, glow stick, lighter, phone screen.
 Each has a small model held in the hand (in the camera's space) and its light:
 

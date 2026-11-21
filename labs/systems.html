@@ -84,6 +84,12 @@
     <div class="secHd">BACKGROUND</div>
     <select class="lab wide" id="sky"></select>
     <button class="tBtn wideBtn" id="btnCopy" title="This system as data (JSON), for SystemKit">COPY SYSTEM</button>
+    <div class="secHd">FOR THE SCENE EDITOR</div>
+    <input class="lab wide" id="sysSaveName" type="text" maxlength="40" placeholder="Name, e.g. Twin suns">
+    <button class="tBtn wideBtn" id="sysSave">SAVE THE SYSTEM</button>
+    <select class="lab wide" id="sysSaved" aria-label="Saved systems"></select>
+    <button class="tBtn wideBtn" id="sysDel">DELETE</button>
+    <p class="note" id="sysSaveNote">A saved system is a named asset: a Star system object in a space scene (Celestial bodies) builds it, orbits turning.</p>
   </div>
 </div>
 <div id="opt" class="hudPanel" data-std="camera">

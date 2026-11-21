@@ -86,6 +86,7 @@ Każde jest też w zakładce **API** konsoli swojego laboratorium (JSON). Wywoł
 | `VoiceApi` | `sound-speech.html` | `say(tekst, głos?)`, `voice`, `presets`, `voices(język)`, `save(nazwa)` → `voice` | `VoiceApi.say('Witaj', { mode: 'formant', hz: 120 })` |
 | `PlantApi`, `CaveApi` | `plants.html`, `caves.html` | `save(nazwa)` → `plant` / `cave`, `load(nazwa)`, `saved()`, `get()`; `PlantApi.saveVegetation(nazwa)` → `vegetation` (lasy i trawa na terenie sceny) | `PlantApi.save('dąb jesienny')` |
 | `LookApi` | `look.html` | `weatherCycle`: `on(b)`, `set({ seed, hold, change, fronts, table })`, `force(pogoda, s)`, `speed(k)`, `now`, `params`, `upcoming(n)` — zmienna pogoda | `LookApi.weatherCycle.force('storm', 30)` |
+| `SystemsApi` | `systems.html` | `get()`, `set(układ)`, `random(ziarno)`, `presets`, `save(nazwa)` → `system` (obiekt „Star system” w scenie kosmosu), `load(nazwa)`, `saved()` | `SystemsApi.random(42); SystemsApi.save('podwójne słońca')` |
 | `ItemsApi` | `items.html` | `list()`, `show(id, { variant, wire, coll })`, `info()` | `await ItemsApi.show('barrel')` |
 
 Nazwy pól i dozwolone wartości — w liście z API (np. `CityApi.types`, `SfxApi.sounds`) albo w dokumencie laboratorium.

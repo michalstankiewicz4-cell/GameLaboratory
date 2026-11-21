@@ -3,6 +3,14 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.48.0 — 2026-11-21
+
+### Dodane
+- **Star system** (Ciała niebieskie): cały układ planetarny z laboratorium układów (zasób „system”) z krążącymi orbitami;
+  światło w kosmosie od jego gwiazdy.
+- **Przedmioty bohatera (światło)**: latarka, lampa naftowa, światło chemiczne, zapalniczka, ekran telefonu — ze swoim
+  światłem i migotaniem.
+
 ## 0.47.0 — 2026-11-21
 
 ### Dodane

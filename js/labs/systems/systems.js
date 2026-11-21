@@ -1,6 +1,7 @@
 // The systems lab's own script (systems.html): its scene and panels, wired to the kits'
 // public APIs. Moved out of the page (2026-10-03) so the page is markup and styles.
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
+import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 (() => {
 "use strict";
@@ -549,6 +550,28 @@ window.addEventListener("resize", () => { camera.aspect = VS().w / VS().h; camer
 [$("speed"), $("qSlider"), $("dSlider")].forEach(paint);
 applyQuality(state.quality);
 preset.value = "1";
+// ---------- for the scene editor: the "system" asset (js/scene/assets.js) — a Star system object in a space scene ----------
+function fillSaved() {
+  const names = listAssets("system"), sel = $("sysSaved");
+  sel.replaceChildren(...[Object.assign(document.createElement("option"), { value: "", textContent: names.length ? "—" : "none yet" }),
+    ...names.map((n) => Object.assign(document.createElement("option"), { value: n, textContent: n }))]);
+}
+function saveSystem(n) {
+  n = String(n || "").trim(); if (!n) throw new Error("give the system a name");
+  saveAsset("system", n, JSON.parse(JSON.stringify(state.system))); fillSaved(); $("sysSaved").value = n; return n;
+}
+function loadSystem(n) {
+  const a = getAsset("system", n); if (!a || !Array.isArray(a.centers)) throw new Error(`no saved system "${n}"`);
+  preset.value = ""; $("sysSaveName").value = n; load(JSON.parse(JSON.stringify(a))); return a;
+}
+$("sysSave").addEventListener("click", () => { try { const n = saveSystem($("sysSaveName").value); $("sysSaveNote").textContent = `Saved "${n}": in the scene editor, a Star system object (Celestial bodies) picks it.`; } catch (e) { $("sysSaveNote").textContent = "Give the system a name first."; } });
+$("sysSaved").addEventListener("change", () => { const n = $("sysSaved").value; if (n) loadSystem(n); });
+$("sysDel").addEventListener("click", () => { const n = $("sysSaved").value; if (!n) return; removeAsset("system", n); fillSaved(); $("sysSaveNote").textContent = `Deleted "${n}".`; });
+onAssetsChange(fillSaved); fillSaved();
+// for AI: SystemsApi — the system as data, save / load the "system" asset
+window.SystemsApi = { get: () => JSON.parse(JSON.stringify(state.system)), set: (sys) => { load(JSON.parse(JSON.stringify(sys))); return true; },
+  random: (seed = 1) => { load(SK.random(seed)); return JSON.parse(JSON.stringify(state.system)); }, presets: SK.PRESETS.map((p) => p.name),
+  save: (n) => ({ saved: saveSystem(n) }), load: (n) => loadSystem(n), saved: () => listAssets("system") };
 load(SK.PRESETS[1].make());
 frame();
 window.LabLoad.done();   // the loading card (ui/shell/loader.js)

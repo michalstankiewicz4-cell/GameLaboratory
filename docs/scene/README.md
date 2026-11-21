@@ -65,6 +65,12 @@ Wpis: `{ id, label, family, surface, lab, build() → { root, kit, dispose } }`.
   wiatru; jaskinia: `caves/cave` (CaveKit, `CAVE_DEFAULTS` albo zapisana jaskinia — pole `asset`, zasób `cave`; budowa ok.
   sekundy; ściany patrzą do środka — z zewnątrz widać wnętrze). Jaskinia jako teren całej planszy — powierzchnia
   `underground` i `env.cave` (świat edytora, `editor/js/world/world.js`).
+- Układ planetarny: `systems/system` (SystemKit) — cały układ z laboratorium układów (pole `asset`, zasób `system`; bez
+  zasobu — gotowy układ z laboratorium): środki, planety, księżyce, pasy i pierścienie na orbitach, które krążą same
+  (`tick`, zegar układu); jednostki SystemKit × `SYSTEM_SCALE` (12,5 m — gwiazda jak słońce sceny). W kosmosie bez
+  słońca w scenie światło pada od jego gwiazdy (`kit.lightPosition`, `editor/js/world/world.js`).
+- Przedmioty bohatera: `gear/<id>` (GearKit: latarka, lampa naftowa, światło chemiczne, zapalniczka, ekran telefonu) —
+  model w miejscu obiektu (bez ręki; latarka świeci wzdłuż −Z obiektu) ze swoim światłem i migotaniem (`tick`).
 - Statki ShipKit: strzał, skan i uszkodzenia rysuje laboratorium efektów — `model.onShot` (pole `shot` obiektu: efekt
   strzału), `model.onScan`, `model.onDamage` i `model.damageView()` ([`../labs/effects.md`](../labs/effects.md)).
 - Nowy model: wpis tutaj (jedna linia na kit); kity ze Space (ShipKit, VehicleKit, MarineKit, BaseKit) ładuje `space.js`.

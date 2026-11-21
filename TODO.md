@@ -44,7 +44,7 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
     jaskinie, życie (stwory), ludzie i broń, bryły z bloków (domyślne);
   - przez zasoby modelu (pole `asset` obiektu) — bryła z bloków (0.66.0);
   - przez zasoby z nazwą — morze (woda), ląd (ląd), pogoda i światło (wygląd), wygląd kamery (filtry), niebo kosmosu
-    (ciała niebieskie), UI gry (UI gry), materiał (materiały), roślinność (rośliny, 0.94.0).
+    (ciała niebieskie), UI gry (UI gry), materiał (materiały), roślinność (rośliny, 0.94.0); układ planetarny (układy) i przedmioty bohatera jako modele (0.95.0).
 - [ ] **Materiały → modele i scena:** modele biorą materiały z MatKit (rodzina po rodzinie, doktor modeli, porównanie
   obrazów); w scenie i w API pole materiału obiektu (podmiana np. kadłuba na zardzewiałą stal).
 - [ ] **Materiały ↔ sztuka:** powierzchnie 2D laboratorium sztuki z generatora MatKit (ten sam papier, drewno, metal
@@ -62,10 +62,8 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
     (jezioro w jaskini a morze obok), rzeka kończąca się w niczym, obiekt wiszący nad otworem albo wbity w ścianę
     jaskini, światło przeciekające tam, gdzie go nie powinno być (słońce w jaskini); później — wygląd z kilku ujęć
     (porównanie zrzutów).
-- [ ] **Układy (systems):** układ planetarny z laboratorium jako zasób, wstawiany do sceny kosmosu z orbitami.
 - [ ] **Powierzchnia (surface):** to, czego ląd z planety jeszcze nie przejął (grunt SurfaceKit, zejście, jazda) —
   rozliczyć i zamknąć albo połączyć z laboratorium lądu.
-- [ ] **Przedmioty bohatera (gear):** latarki i lampy jako prefabrykaty (światło w scenie, jaskinie).
 - [ ] **Edytor stworów (creator), transformator (transform):** wynik jako prefabrykat sceny.
 - [ ] **Postacie SDF i pixel art** (generator zombie, Kostnica SDF, SDF Walkers, Pixel Studio): postacie i sprite'y jako
   zasoby (np. dla gier 2D i HUD); laboratoria języka i obrazów — rozstrzygnąć, czy należą do silnika.

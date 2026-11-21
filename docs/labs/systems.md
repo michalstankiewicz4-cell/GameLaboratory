@@ -126,6 +126,13 @@ bodies at once. `dispose()` frees everything.
 - Measured: the Solar System preset (18 bodies) and the others hold 60 fps
   on the test machine at the defaults.
 
+## For the scene editor (1.5.0)
+
+**FOR THE SCENE EDITOR** in the System window saves the system (data as above) as the named asset `system`; the list
+loads one back. In the scene editor a **Star system** object (Celestial bodies, `systems/system`) builds it with its
+orbits turning; the scene's light in space comes from its star. For AI: `SystemsApi` — `get()`, `set(system)`,
+`random(seed)`, `presets`, `save(name)`, `load(name)`, `saved()`.
+
 ## Next
 
 The rest of the hand editor (sizes, moons one by one), moons of moons, comets on long orbits, and taking
