@@ -3,6 +3,19 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.96.0 · wygląd 1.6.0 · edytor sceny 0.49.0 — 2026-11-21 (trąba powietrzna i tornado)
+
+### Dodane
+- **Trąba powietrzna i tornado w pogodzie** (`js/envs/sky/tornado.js`): wir od chmury do ziemi — nad wodą trąba wodna
+  (jasny, cienki, wygięty lejek, wodny pył u podstawy), nad lądem tornado (ciemny, szerszy lejek, kurz i szczątki),
+  nad nim wirująca chmura; siła 18…100 m/s ustawia wszystko naraz; wędruje po mapie, pojawia się i gaśnie. Pole
+  `tornado` pogody (`{ on, strength, kind }`), scena bazowa je stawia; zapis z pogodą dla sceny.
+- **Wiatr wiru dla fizyki** (wir Rankine'a z napływem przy ziemi i prądem wznoszącym): `stage.windAt` — w ▶ Graj
+  okręty (napór i przechył), małe jednostki, pojazdy (opony trzymają do przyczepności), samoloty i przedmioty
+  (opór powietrza).
+- Laboratorium wyglądu: **Waterspout and tornado** (włącz, siła, rodzaj); zmienna pogoda — tornado w burzy (szansa
+  i siła w oknie Variable weather).
+
 ## Program 0.95.0 · układy 1.5.0 · edytor sceny 0.48.0 — 2026-11-21 (układ planetarny i przedmioty bohatera w scenie)
 
 ### Dodane

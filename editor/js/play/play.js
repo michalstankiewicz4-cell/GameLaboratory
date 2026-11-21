@@ -72,8 +72,9 @@ export function createPlay(store, world, controls, actions, events) {
       objects: store.scene.objects, objectPos: (id) => { const b = world.built.get(id); return b ? b.root.position.toArray() : null; },
       get gravity() { return world.stage.gravity; }, get airDensity() { return world.stage.airDensity; },   // lądowanie: prawa planety
       get sunDir() { return world.stage.sunDir; }, get cameraPos() { return world.camera.position; },
+      windAt: (x, y, z, out) => world.stage.windAt(x, y, z, out),   // wiatr trąby powietrznej / tornada (pogoda sceny)
       // złomowisko: wspólny świat przedmiotów (land/items.js) — przedmioty, maszyny, przeładowarka; liczony w frame()
-      get items() { return items || (items = createItems({ ground: { height: (x, z) => { const h = world.stage.terrainAt(x, z); return h == null ? 0 : h; } } })); },
+      get items() { return items || (items = createItems({ ground: { height: (x, z) => { const h = world.stage.terrainAt(x, z); return h == null ? 0 : h; } }, wind: (x, y, z, out) => world.stage.windAt(x, y, z, out) })); },
       scene: world.root, machines };
     runs = store.scene.objects.map((o) => {
       const id = behaviorOf(o, store.scene.env.surface), b = world.built.get(o.id); if (!id || !b) return null;

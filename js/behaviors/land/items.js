@@ -31,6 +31,7 @@ import * as THREE from '../../../vendor/three/three.module.js';
 
 export const ENVIRONMENTS = ['land'];
 const G = 9.81, STEP = 1 / 240, ITER = 8, SLOP = 0.002, BETA = 0.2, REST = 0.1;
+const WV = [0, 0, 0];   // wiatr w punkcie (bez alokacji)
 const V = () => new THREE.Vector3();
 
 export const newObb = () => ({ c: V(), ax: [V(), V(), V()], e: [0, 0, 0], v: V(), J: V(), T: V() });
@@ -129,7 +130,7 @@ function localShape(it) {
   return { verts, faces, edges };
 }
 
-export function createItems({ ground = null } = {}) {
+export function createItems({ ground = null, wind = null } = {}) {
   const gh = (x, z) => (ground && ground.height ? ground.height(x, z) : 0);
   const list = [], statics = [], moving = [], hooks = [];
   let acc = 0;
@@ -216,6 +217,17 @@ export function createItems({ ground = null } = {}) {
   function substep(h) {
     for (const f of hooks) f(h);
     for (const o of moving) if (o.J) { o.J.set(0, 0, 0); o.T.set(0, 0, 0); }
+    // wiatr (trąba powietrzna, tornado — wind(x, y, z, out) m/s): opór powietrza 0,5·ρ·Cd·A·|v|·v na średnie pole ścian
+    // bryły; śpiący budzi się, gdy wiatr przesunąłby go mimo tarcia (siła ponad połowę ciężaru)
+    if (wind) for (const it of list) {
+      if (it.held || it.fixed) continue;
+      wind(it.p.x, it.p.y, it.p.z, WV);
+      if (WV[0] === 0 && WV[1] === 0 && WV[2] === 0) continue;
+      const rx = WV[0] - it.v.x, ry = WV[1] - it.v.y, rz = WV[2] - it.v.z, m = Math.hypot(rx, ry, rz);
+      const [hx, hy, hz] = it.half, A = (4 * (hx * hy + hy * hz + hx * hz)) / 3, k = 0.5 * 1.225 * 1.05 * A * m / it.mass;
+      if (it.sleep2) { if (k * m < 0.5 * G) continue; it.sleep2 = false; it.sleep = 0; }
+      it.v.x += k * rx * h; it.v.y += k * ry * h; it.v.z += k * rz * h;
+    }
     // grawitacja; śpiące stoją
     for (const it of list) { if (it.sleep2) { it.v.set(0, 0, 0); it.w.set(0, 0, 0); } else if (dyn(it)) it.v.y -= G * h; }
     contacts.length = 0;

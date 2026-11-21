@@ -136,11 +136,13 @@ const SKY_SLIDERS = ['coverage', 'density', 'wind', 'haze', 'rain', 'vis', 'ligh
 const showSky = () => SKY_SLIDERS.forEach((k) => { $(k).value = S.sky[k]; const o = $(k + 'V'); if (o) o.textContent = fmtSky[k](S.sky[k]); });
 const { on: cycleOn0, ...cycleOpts0 } = S.sky.cycle || {};
 const wc = attachWeatherCycle({ select: $('weather'), every: 0.25, opts: cycleOpts0,
-  apply: (p) => { const { weather, ...num } = p; Object.assign(S.sky, num, { weather }); bolts.S.rate = S.sky.lightning; showSky(); updateSky(); } });
+  apply: (p) => { const { weather, ...num } = p; Object.assign(S.sky, num, { weather }); bolts.S.rate = S.sky.lightning; showSky(); if (typeof showTw === 'function') showTw(); updateSky(); } });
 wc.cycle.set(cycleOpts0);
 wc.setOn(!!cycleOn0);
 const keepOn = () => { S.sky.cycle = { ...(S.sky.cycle || {}), on: wc.on }; save(); };
-$('weather').addEventListener('change', keepOn); wc.onChange(() => { if (!(S.sky.cycle && S.sky.cycle.on)) keepOn(); });
+// tornado zmiennej pogody (bez pola on) gaśnie z nią; tornado ustawione ręcznie zostaje
+$('weather').addEventListener('change', () => { if (S.sky.tornado && S.sky.tornado.on == null) { S.sky.tornado = null; showTw(); updateSky(); } keepOn(); });
+wc.onChange(() => { if (!(S.sky.cycle && S.sky.cycle.on)) keepOn(); });
 const wcWin = weatherWindow({ wc, get: () => S.sky.cycle, set: (c) => { S.sky.cycle = { ...c, on: wc.on }; save(); } });
 // ruszenie suwaka pogody wyłącza zmienną pogodę (zostaje to, co ustawione ręcznie)
 SKY_SLIDERS.forEach((k) => $(k).addEventListener('input', () => { if (wc.on) { wc.setOn(false, true); keepOn(); } }));
@@ -174,7 +176,7 @@ $('wxLoad').onclick = () => {
   Object.assign(S.sky, a); $('weather').value = WEATHER[S.sky.weather] ? S.sky.weather : 'custom';
   for (const k of WX_KEYS) if ($(k) && k !== 'weather') { $(k).value = S.sky[k]; const o = $(k + 'V'); if (o) o.textContent = k === 'time' ? fmtTime(S.sky[k]) : fmtSky[k] ? fmtSky[k](S.sky[k]) : S.sky[k]; }
   if (a.cycle) { const { on, ...o } = a.cycle; wc.cycle.set(o); wc.setOn(!!on); wcWin.fill(); }
-  bolts.S.rate = S.sky.lightning; $('wxName').value = n; updateSky(); save();
+  bolts.S.rate = S.sky.lightning; $('wxName').value = n; showTw(); updateSky(); save();
   $('wxNote').textContent = `Loaded "${n}".`;
 };
 $('wxDel').onclick = () => { const n = $('wxList').value; if (!n) return; removeAsset('weather', n); fillWx(); $('wxNote').textContent = `Deleted "${n}".`; };
@@ -199,6 +201,15 @@ $('side').onchange = () => { S.salvoSide = +$('side').value; trainTo(S.salvoSide
 addEventListener('keydown', (e) => { if (e.code === 'KeyF' && !e.target.closest('input,select')) salvo(); });
 for (const k of ['squalls', 'rainLens', 'thunder']) { $(k).checked = !!S.sky[k]; $(k).onchange = () => { S.sky[k] = $(k).checked; applyLook(); save(); }; }
 $('windSea').checked = S.sky.windSea; $('windSea').onchange = () => { S.sky.windSea = $('windSea').checked; seaFromWind(); save(); };
+// trąba powietrzna / tornado (js/envs/sky/tornado.js): pole tornado pogody — { on, strength, kind }; scena bazowa je stawia
+const twFmt = (v) => { const V = 18 + 82 * v; return `${Math.round(V)} m/s${v < 0.3 ? ' · weak' : v < 0.65 ? ' · strong' : ' · violent'}`; };
+function showTw() {
+  const t = S.sky.tornado || { on: false, strength: 0.5, kind: 'auto' };
+  $('twOn').checked = !!t.on || (t.on == null && t.strength > 0); $('twStrength').value = t.strength ?? 0.5; $('twStrengthV').textContent = twFmt(+$('twStrength').value); $('twKind').value = t.kind || 'auto';
+}
+function setTw() { S.sky.tornado = { on: $('twOn').checked, strength: +$('twStrength').value, kind: $('twKind').value }; $('twStrengthV').textContent = twFmt(S.sky.tornado.strength); updateSky(); save(); }
+['twOn', 'twKind'].forEach((k) => { $(k).onchange = setTw; }); $('twStrength').addEventListener('input', setTw);
+showTw();
 for (const k of Object.keys(AU)) if ($(k)) bindRange(k, S.age, k, (v) => v.toFixed(2), () => { AU[k].value = S.age[k]; });
 
 const LOOK_SLIDERS = [['exposure', 'Exposure', 0.3, 2.5, 0.05], ['autoTarget', 'Auto exposure target', 0.08, 0.5, 0.01], ['contrast', 'Contrast', 0.7, 1.5, 0.01], ['saturation', 'Saturation', 0, 1.6, 0.01], ['vibrance', 'Vibrance', -1, 1, 0.01],

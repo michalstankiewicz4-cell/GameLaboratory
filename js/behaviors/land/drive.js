@@ -50,6 +50,7 @@ export function driveDef(info = {}, extra = {}) {
   };
 }
 
+const WD = [0, 0, 0];   // wiatr w punkcie (bez alokacji)
 export function createDrive(def, { x = 0, z = 0, yaw = 0 } = {}) {
   const D = def.mass && def.Iz ? def : driveDef(def);
   const s = { x, z, yaw, u: 0, v: 0, r: 0, speed: 0, steer: 0, slip: 0, depth: 0 };
@@ -111,10 +112,21 @@ export function createDrive(def, { x = 0, z = 0, yaw = 0 } = {}) {
       s.steer = 0; s.slip = 0;
     }
     // ruch: m(u̇ − v·r) = ΣF wzdłuż, m(v̇ + u·r) = ΣF w bok, Iz·ṙ = M (układ pojazdu)
-    const Fu = Fx - roll - air - wDrag - grav;
+    let Fu = Fx - roll - air - wDrag - grav;
     const wSide = 0.5 * RHO_W * 1.0 * D.L * sunk * s.v * Math.abs(s.v);
+    // wiatr (trąba powietrzna, tornado — gr.wind(x, y, z, out)): opór powietrza na przód i bok pojazdu; boczny trzymają
+    // opony (siła boczna z poślizgu, do przyczepności) — na śliskim albo przy silnym wirze pojazd zjeżdża w bok
+    let FlW = 0;
+    if (gr && gr.wind) {
+      const sy = Math.sin(s.yaw), cy = Math.cos(s.yaw), Wv = gr.wind(s.x, (gr.height ? gr.height(s.x, s.z) : 0) + D.H * 0.5, s.z, WD);
+      if (Wv[0] || Wv[2]) {   // bez wiatru — nic (opór własnego ruchu liczy „air”)
+        const wu = Wv[0] * sy + Wv[2] * cy, wv = Wv[0] * cy - Wv[2] * sy, au = wu - s.u, av = wv - s.v;
+        Fu += 0.5 * RHO * D.cda * au * Math.abs(au) + air;   // opór względem powietrza zamiast względem ziemi
+        FlW = 0.5 * RHO * 1.1 * D.L * D.H * av * Math.abs(av);
+      }
+    }
     s.u += (Fu / D.mass + s.v * s.r) * h;
-    s.v += ((Fl - wSide) / D.mass - s.u * s.r) * h;
+    s.v += ((Fl + FlW - wSide) / D.mass - s.u * s.r) * h;
     s.r += (M / D.Iz) * h - (vAbs < 0.05 && !thr ? s.r * Math.min(1, 20 * h) : 0);   // na postoju tarcie gasi obrót
     if (Math.abs(s.u) < 0.02 && !thr) s.u = 0;                                        // tarcie spoczynkowe
     s.yaw += s.r * h;

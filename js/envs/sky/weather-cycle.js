@@ -7,9 +7,9 @@
 // przez 35–60 s) — tu napisane od nowa.
 //
 // CYCLE_DEFAULTS — { on, seed, start, hold: [min, max] s, change: [min, max] s, fronts,
-//   table: { pogoda: { pogoda: waga } }, holdScale: { pogoda: mnożnik czasu trwania } }
+//   table: { pogoda: { pogoda: waga } }, holdScale: { pogoda: mnożnik czasu trwania }, tornado: { chance, strength: [od, do], kind } }
 // createWeatherCycle(opts) → {
-//   step(dt) → liczby pogody (i weather — bliższa z dwóch pogód), params, time,
+//   step(dt) → liczby pogody (i weather — bliższa z dwóch pogód; tornado — { strength, kind } w burzy, gdy wypadło), params, time,
 //   now → { from, to, u } (u 0…1 — postęp przejścia; 0 — trwa pogoda from),
 //   upcoming(n) → [{ weather, at, until }] (s od teraz: początek i koniec przejścia do tej pogody),
 //   force(id, change?) — przejście do pogody teraz (przez change s), dalej po tabeli,
@@ -30,6 +30,8 @@ export const CYCLE_DEFAULTS = {
     storm: { rain: 14, overcast: 6 },
   },
   holdScale: { storm: 0.5, fog: 0.8 },   // burza krótka, mgła krótsza
+  // trąba powietrzna / tornado w burzy: szansa na burzę, siła (od…do), rodzaj ('auto' — nad wodą trąba wodna, nad lądem tornado)
+  tornado: { chance: 0.35, strength: [0.3, 0.9], kind: 'auto' },
 };
 const clone = (o) => JSON.parse(JSON.stringify(o));
 
@@ -63,7 +65,7 @@ function blend(from, to, u, fronts) {
 
 export function createWeatherCycle(opts = {}) {
   let O = { ...clone(CYCLE_DEFAULTS), ...clone(opts) };
-  let rand, segs, time = 0, params;
+  let rand, trand, segs, time = 0, params;   // trand: osobny los trąb (ta sama kolejność pogód co bez nich)
   function pickNext(id) {
     const row = O.table[id] || {}, ids = Object.keys(row).filter((k) => WEATHER[k] && row[k] > 0);
     if (!ids.length) return id;
@@ -74,7 +76,9 @@ export function createWeatherCycle(opts = {}) {
   // odcinek: pogoda trwa (start … holdEnd), potem przejście do następnej (… end); from — jej liczby
   function push(weather, start) {
     const holdEnd = start + between(rand, O.hold) * (O.holdScale[weather] ?? 1);
-    segs.push({ weather, from: only(WEATHER[weather]), start, holdEnd, end: holdEnd + between(rand, O.change), next: pickNext(weather) });
+    const tc = O.tornado || {}, tr = trand(), ts = trand();
+    const tornado = weather === 'storm' && tr < (tc.chance ?? 0) ? between(() => ts, tc.strength || [0.3, 0.9]) : 0;
+    segs.push({ weather, from: only(WEATHER[weather]), start, holdEnd, end: holdEnd + between(rand, O.change), next: pickNext(weather), tornado });
   }
   function ensure(n) { while (segs.length < n) { const s = segs[segs.length - 1]; push(s.next, s.end); } }
   function current() {
@@ -83,11 +87,12 @@ export function createWeatherCycle(opts = {}) {
     if (i > 0) { segs.splice(0, i); i = 0; }   // minione odcinki nie są potrzebne
     return segs[0];
   }
-  function reset() { rand = rng(O.seed); segs = []; time = 0; push(WEATHER[O.start] ? O.start : 'fair', 0); }
+  function reset() { rand = rng(O.seed); trand = rng((O.seed * 7919 + 13) >>> 0); segs = []; time = 0; push(WEATHER[O.start] ? O.start : 'fair', 0); }
   function evaluate() {
     const s = current(), u = time <= s.holdEnd ? 0 : (time - s.holdEnd) / (s.end - s.holdEnd);
     params = u <= 0 ? { ...s.from } : blend(s.from, only(WEATHER[s.next]), u, O.fronts);
     params.weather = u < 0.5 ? s.weather : s.next;
+    params.tornado = s.tornado > 0 && u <= 0 ? { strength: s.tornado, kind: (O.tornado && O.tornado.kind) || 'auto' } : null;   // w burzy; z jej końcem gaśnie
     return { s, u };
   }
   reset(); evaluate();

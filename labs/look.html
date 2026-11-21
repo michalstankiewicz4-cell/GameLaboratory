@@ -72,6 +72,8 @@
   <div class="row"><span>Seed</span><input type="number" id="wcSeed" min="1" max="999999" step="1"><output></output></div>
   <div class="row"><span>A weather lasts</span><div class="wcPair"><input type="number" id="wcHold0" min="5" max="3600" step="5"><input type="number" id="wcHold1" min="5" max="3600" step="5"></div><output>s</output></div>
   <div class="row"><span>A change takes</span><div class="wcPair"><input type="number" id="wcChange0" min="2" max="1200" step="1"><input type="number" id="wcChange1" min="2" max="1200" step="1"></div><output>s</output></div>
+  <div class="row"><span>Tornado in a storm</span><input type="range" id="wcTwChance" min="0" max="1" step="0.05"><output id="wcTwChanceV"></output></div>
+  <div class="row"><span>Its strength</span><div class="wcPair"><input type="number" id="wcTw0" min="0.05" max="1" step="0.05"><input type="number" id="wcTw1" min="0.05" max="1" step="0.05"></div><output></output></div>
   <h3>Transitions</h3>
   <p class="note">How likely each weather (row) turns into another (column); 0 — never. The same seed gives the same weathers in the same order.</p>
   <div class="wcTable" id="wcTable"></div>
@@ -106,6 +108,11 @@
   <label class="chk"><input type="checkbox" id="squalls" checked> Squalls (the rain comes and goes)</label>
   <label class="chk"><input type="checkbox" id="rainLens" checked> Rain on the lens</label>
   <label class="chk"><input type="checkbox" id="windSea" checked> Wind sets the sea (wave height and length)</label>
+  <h3>Waterspout and tornado</h3>
+  <label class="chk"><input type="checkbox" id="twOn"> A whirl from the cloud to the ground: a waterspout over water, a tornado over land</label>
+  <div class="row"><span>Strength</span><input type="range" id="twStrength" min="0.05" max="1" step="0.05"><output id="twStrengthV"></output></div>
+  <div class="row"><span>Kind</span><select id="twKind"><option value="auto">By the ground (water / land)</option><option value="water">Waterspout</option><option value="land">Tornado</option></select><output></output></div>
+  <p class="note" id="twNote">It wanders over the map; its wind pulls and lifts light objects and pushes ships and vehicles in the scene editor's ▶ Play.</p>
   <h3>Time of day</h3>
   <div class="btns" id="times"></div>
   <div class="row"><span>Time</span><input type="range" id="time" min="0" max="24" step="0.05"><output id="timeV"></output></div>

@@ -48,6 +48,23 @@ density 1.73 / visibility). The thicker of fog, haze and rain wins; the same den
 `FogExp2`), the sea and the sky (path through a 260 m fog layer, so the zenith stays lighter and the sun shows as a
 pale disc). Fog and rain take the sun's light down and its glitter faster still (the glitter needs a sharp sun).
 
+## Waterspout and tornado (1.6.0)
+
+**Waterspout and tornado** (Light and weather; `js/envs/sky/tornado.js`): a whirl from the cloud to the ground — over
+water a waterspout (a pale, thin, bending funnel, white spray at its foot), over land a tornado (a dark, wider funnel
+with dust and debris); **Kind** can force either. **Strength** sets everything at once: the top wind speed 18 m/s
+(a weak waterspout) … 100 m/s (a violent tornado), the core radius 10 … 120 m, the funnel's width and height and the
+amount of spray or dust. Above the funnel a turning wall cloud. It wanders over the map (6–15 m/s) and fades in and out
+over a few seconds.
+
+Its wind is real air for the physics (a Rankine vortex: solid-body spin inside the core, falling off as 1/r outside;
+inflow at the ground, an updraft in the core weakening with height): `stage.windAt(x, y, z)`. In the scene editor's
+▶ Play it pushes and heels ships, pushes small craft and vehicles (tyres hold up to their grip), drags aircraft and
+picks up light items (air drag on each). Saved with the weather (`tornado` in the "weather" asset).
+
+With the variable weather a storm can bring one: **Tornado in a storm** (the chance per storm) and **Its strength**
+(from … to) in the Variable weather window; it fades when the storm ends.
+
 ## Time of day
 
 A **Time** slider (local solar time at 55° N in late October — the North Atlantic convoy season) and buttons Dawn,

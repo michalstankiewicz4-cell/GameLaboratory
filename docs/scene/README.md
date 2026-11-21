@@ -228,6 +228,9 @@ mgła, morze WaterKit, płaski grunt albo teren LandKit z wodami RegionKit, mapa
   z wysokością kamery).
 - Powierzchnia `setSurface`, niebo `setSkyMode`, światło `setLight(id | pogoda)`, morze `setSea(zasób)`, ląd
   `setLand({ map, water })` albo `setWorld(T)` (świat już wygenerowany), kadłub wycięty z wody `setShip`.
+- Trąba powietrzna / tornado z pogody (pole `tornado` światła: `{ on, strength, kind }`; zmienna pogoda — w burzy):
+  `stage.tornado` → `{ x, z, kind, vmax, rc }`, wiatr w punkcie `stage.windAt(x, y, z, out)` (m/s) — zachowania w ▶ Graj
+  (`world.windAt`, [`../behaviors/README.md`](../behaviors/README.md)).
 - Roślinność na terenie `setVegetation(zasób „vegetation” | null)` (`js/models/plants/vegetation.js`): gatunki z biomów
   terenu (północny, równiny, pustynia), miejsca z gruntu (woda, wysokość, nachylenie) — reguły laboratorium roślin;
   lasy w kafelkach 256 m w promieniu `radius` wokół kamery (to samo ziarno i kafelek — te same rośliny), pełne modele

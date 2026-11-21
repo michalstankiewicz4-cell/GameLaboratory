@@ -7,6 +7,7 @@ import { worldFor } from '../../envs/land/planet.js';
 import { generateWorld, biomeTexture, regionTextures, regionUniforms, setRegions, GLSL_REGIONS } from '../../envs/land/regionkit.js';
 import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, hullTexture, LOOKS, SEAS } from '../../envs/water/waterkit.js';
 import { createVegetation } from '../../models/plants/vegetation.js';
+import { createTornado, tornadoWind } from '../../envs/sky/tornado.js';
 
 // oświetlenie do sprawdzania filtrów: pogoda z SkyKit + pora dnia (55° N, koniec października, jak w laboratorium wyglądu)
 export const LIGHTS = {
@@ -69,6 +70,7 @@ export function createStage(renderer, scene, opts = {}) {
   let space = false, spaceEnv = null, lightId = 'afternoon', surfaceKind = 'sea';
   let land = null;   // teren (setLand / setWorld): { T, tm, tex, btex, rtex, buoys } — mapa, siatki LandKit, tekstury; morze zna teren
   let veg = null, vegDef = null, lastDt = 0, windNow = 6;   // roślinność na terenie (setVegetation, js/models/plants/vegetation.js)
+  let tornado = null;   // trąba powietrzna / tornado z pogody (pole tornado: { strength, kind }; js/envs/sky/tornado.js)
   setSea();
   // atmosfera planety (ląd z planety, T.atmo): niebo dzienne przebarwione na odcień jej atmosfery (Ziemia 205°), tym
   // bledsze i ciemniejsze, im rzadsza atmosfera; bez atmosfery — niebo kosmosu (tryb nieba ustawia strona)
@@ -158,6 +160,9 @@ export function createStage(renderer, scene, opts = {}) {
     // roślinność krajobrazu na terenie lądu: zasób „vegetation” z laboratorium roślin ({ density, grass, … }) albo null;
     // gatunki z biomów terenu, miejsca z gruntu; lasy w kafelkach wokół kamery (pełne modele blisko, impostory dalej), trawa
     setVegetation(def) { vegDef = def || null; applyVeg(); },
+    // wiatr trąby powietrznej / tornada w punkcie (m/s, świat) — fizyka środowiska (zachowania w ▶ Graj); bez wiru — zero
+    windAt(x, y, z, out = [0, 0, 0]) { return tornadoWind(tornado && tornado.state, x, y, z, out); },
+    get tornado() { return tornado && tornado.state ? { x: tornado.state.x, z: tornado.state.z, kind: tornado.kind, vmax: tornado.state.vmax * tornado.state.fade, rc: tornado.state.rc } : null; },
     get vegetation() { return veg ? veg.counts : null; },
     get land() { return land ? land.T : null; },
     get terrain() { return land ? land.tm : null; },
@@ -204,6 +209,10 @@ export function createStage(renderer, scene, opts = {}) {
       envDirty = true;
       if (atmo && !space && surfaceKind === 'land') tintAtmosphere(atmo);   // niebo planety: barwa i gęstość jej atmosfery
       windNow = w.wind ?? 6;
+      // trąba powietrzna / tornado: z pogody (siła > 0, nie w kosmosie); bez — gaśnie
+      const tw = !space && w.tornado && w.tornado.on !== false && w.tornado.strength > 0 ? w.tornado : null;
+      if (tw && !tornado) tornado = createTornado(scene);
+      if (tornado) tornado.set(tw);
       if (veg) { veg.light(sun, hemi, scene.fog, scene.environmentIntensity); veg.wind(windNow); }
       if (space) {   // niebo kosmosu: słońce białe i pełne (bez atmosfery i chmur), kierunek z pory dnia; prawie bez rozproszonego
         sunSeen = 1; sun.color.setRGB(1, 0.97, 0.92); sun.intensity = 3.2;
@@ -243,6 +252,10 @@ export function createStage(renderer, scene, opts = {}) {
       if (veg) { veg.visible = surfaceKind === 'land'; if (surfaceKind === 'land') veg.update(camera, lastDt); }
       if (opts.fogHeight && !space) { const f = fogBase / (1 + Math.max(0, camera.position.y - 40) / 300); scene.fog.density = f; WU.uFogDen.value = f; }
       if (veg) veg.fog(scene.fog.density);
+      if (tornado) {
+        tornado.update(lastDt, camera, { isWater: (x, z) => stage.isWater(x, z, 0.5), groundAt: (x, z) => (land && surfaceKind === 'land' ? sampleHeight(land.T, x, z) : 0), light: WU.uLight.value, fog: scene.fog });
+        if (!tornado.state) { tornado.dispose(); tornado = null; }
+      }
       if (envDirty && !space && envT > envEvery) { if (envRT) envRT.dispose(); envRT = skyEnvironment(renderer, skyU); scene.environment = envRT.texture; envDirty = false; envT = 0; }
     },
     update(dt, camera) { stage.tick(dt); stage.follow(camera); return t; },

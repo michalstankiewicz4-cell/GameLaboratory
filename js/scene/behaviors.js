@@ -62,6 +62,7 @@ export const SPACE_NUMBERS = {
   'space/swarmer': { mass: 6.0e3, thrust: 1.5e5, reverse: 4.0e4, torque: 4.0e4, inertia: 8.0e4 },
 };
 
+const WF = [0, 0, 0], ZERO3 = [0, 0, 0];   // wiatr w punkcie (lot), bez alokacji
 export const BEHAVIORS = {
   ship: {
     label: 'Ship on water', labelPl: 'Okręt na wodzie', env: 'water', throttle: [-0.4, 1],
@@ -75,7 +76,7 @@ export const BEHAVIORS = {
       return {
         state: s,
         step(dt, c, t) {
-          sim.step(dt, { throttle: c.throttle || 0, rudder: c.rudder || 0 }, world.waves, t, (x, z) => (world.isWater ? world.isWater(x, z) : world.surface === 'sea'));   // teren z laboratorium lądu: mielizny i brzeg
+          sim.step(dt, { throttle: c.throttle || 0, rudder: c.rudder || 0 }, world.waves, t, (x, z) => (world.isWater ? world.isWater(x, z) : world.surface === 'sea'), world.windAt || null);   // teren z laboratorium lądu: mielizny i brzeg; wiatr trąby wodnej
           root.position.set(s.x, s.heave + obj.pos[1], s.z);
           root.rotation.set(-s.pitch, s.th, s.roll, 'YXZ');
         },
@@ -106,7 +107,7 @@ export const BEHAVIORS = {
             flaps: c.flaps ? 1 : 0, gear: c.gear === false ? 0 : 1, brake: c.brake || 0 };
           const n = Math.max(1, Math.ceil(dt / (1 / 240))), h = dt / n;   // stały mały krok fizyki
           const gh = world.groundAt || (() => 0);   // teren z laboratorium lądu albo poziom 0
-          for (let i = 0; i < n; i++) sim.step(h, ctrl, gh);
+          for (let i = 0; i < n; i++) sim.step(h, ctrl, gh, world.windAt ? world.windAt(s.p[0], s.p[1], s.p[2], WF) : ZERO3);   // wiatr: tornado, trąba
           root.position.fromArray(s.p); quatOf(s.q, root.quaternion);
           tAcc += dt; if (k.update) k.update(tAcc, dt, { ...ctrl, gear: ctrl.gear === 1, speed: s.V, work: work.on ? 1 : 0 });   // śmigło, stery, podwozie, owiewka
         },
@@ -126,7 +127,7 @@ export const BEHAVIORS = {
       const k = built.kit || {}, sim = createDrive(driveDef(k.def || {}), { x: obj.pos[0], z: obj.pos[2], yaw: obj.rot[1] * D2R });
       const s = sim.state, root = built.root;
       // grunt i woda ze sceny bazowej: teren z laboratorium lądu, płaski grunt; na morzu dno głęboko — auto tonie i staje
-      const ground = { height: (x, z) => { const h = world.terrainAt ? world.terrainAt(x, z) : 0; return h == null ? 0 : h; }, water: (x, z) => (world.waterLevel ? world.waterLevel(x, z) : null) };
+      const ground = { height: (x, z) => { const h = world.terrainAt ? world.terrainAt(x, z) : 0; return h == null ? 0 : h; }, water: (x, z) => (world.waterLevel ? world.waterLevel(x, z) : null), wind: world.windAt || null };
       let tAcc = 0, pedal = 0; const work = workPart(k);
       return {
         state: s,
@@ -158,7 +159,7 @@ export const BEHAVIORS = {
       const s = sim.state, root = built.root;
       // woda (z falami) i grunt / dno ze sceny bazowej; bez wody — sam grunt (amfibia jedzie, reszta leży)
       const env = { surface: (x, z) => { const w = world.waterAt ? world.waterAt(x, z) : 0; return w == null ? -1e9 : w; },
-        floor: (x, z) => { const g = world.terrainAt ? world.terrainAt(x, z) : -30; return g == null ? -1e9 : g; } };
+        floor: (x, z) => { const g = world.terrainAt ? world.terrainAt(x, z) : -30; return g == null ? -1e9 : g; }, wind: world.windAt || null };
       let tAcc = 0, dive = 0, lever = 0; const work = workPart(k);
       return {
         state: s,

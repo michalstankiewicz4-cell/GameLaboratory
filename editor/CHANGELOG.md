@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.49.0 — 2026-11-21
+
+### Dodane
+- ▶ Graj: **wiatr trąby powietrznej i tornada** z pogody sceny — pcha i przechyla okręty, spycha małe jednostki
+  i pojazdy, znosi samoloty, podrywa lekkie przedmioty.
+
 ## 0.48.0 — 2026-11-21
 
 ### Dodane

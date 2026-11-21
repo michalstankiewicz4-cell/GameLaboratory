@@ -32,6 +32,12 @@ export function weatherWindow({ wc, get, set }) {
   num('wcSeed', (v) => store({ seed: Math.max(1, Math.round(v)) }));
   const pair = (a, b, key) => { const f = () => { const x = +$(a).value, y = +$(b).value; if (Number.isFinite(x) && Number.isFinite(y)) store({ [key]: [Math.min(x, y), Math.max(x, y)] }); }; $(a).onchange = f; $(b).onchange = f; };
   pair('wcHold0', 'wcHold1', 'hold'); pair('wcChange0', 'wcChange1', 'change');
+  // trąba powietrzna / tornado w burzy: szansa i siła (od…do)
+  const twC = () => ({ ...CYCLE_DEFAULTS.tornado, ...(C().tornado || {}) });
+  $('wcTwChance').addEventListener('input', () => { $('wcTwChanceV').textContent = Math.round(+$('wcTwChance').value * 100) + ' %'; });
+  $('wcTwChance').onchange = () => store({ tornado: { ...twC(), chance: +$('wcTwChance').value } });
+  const twPair = () => { const a = +$('wcTw0').value, b = +$('wcTw1').value; if (Number.isFinite(a) && Number.isFinite(b)) store({ tornado: { ...twC(), strength: [Math.max(0.05, Math.min(a, b)), Math.min(1, Math.max(a, b))] } }); };
+  $('wcTw0').onchange = twPair; $('wcTw1').onchange = twPair;
   $('wcReset').onclick = () => { const { on } = C(); set({ ...clone(CYCLE_DEFAULTS), on }); wc.cycle.set(clone(CYCLE_DEFAULTS)); fill(); show(); };
   // tabela przejść: wiersz — z której pogody, kolumna — do której
   function table() {
@@ -53,6 +59,8 @@ export function weatherWindow({ wc, get, set }) {
     const c = C();
     $('wcFronts').checked = !!c.fronts; $('wcSeed').value = c.seed;
     $('wcHold0').value = c.hold[0]; $('wcHold1').value = c.hold[1]; $('wcChange0').value = c.change[0]; $('wcChange1').value = c.change[1];
+    const tw = { ...CYCLE_DEFAULTS.tornado, ...(c.tornado || {}) };
+    $('wcTwChance').value = tw.chance; $('wcTwChanceV').textContent = Math.round(tw.chance * 100) + ' %'; $('wcTw0').value = tw.strength[0]; $('wcTw1').value = tw.strength[1];
     table();
   }
   // bieżąca pogoda, pasek (następne ok. 20 min) i lista nadchodzących
@@ -60,7 +68,7 @@ export function weatherWindow({ wc, get, set }) {
     const n = wc.cycle.now, p = wc.cycle.params;
     $('wcNow').textContent = !wc.on ? 'Off — the weather from the list.'
       : n.u > 0 ? `${label(n.from)} → ${label(n.to)} · ${Math.round(n.u * 100)}% · rain ${Math.round(p.rain * 100)}% · wind ${p.wind.toFixed(1)} m/s`
-        : `${label(n.from)} · wind ${p.wind.toFixed(1)} m/s · visibility ${p.vis < 1 ? Math.round(p.vis * 1000) + ' m' : p.vis.toFixed(1) + ' km'}`;
+        : `${label(n.from)} · wind ${p.wind.toFixed(1)} m/s · visibility ${p.vis < 1 ? Math.round(p.vis * 1000) + ' m' : p.vis.toFixed(1) + ' km'}${p.tornado ? ` · tornado ${Math.round(18 + 82 * p.tornado.strength)} m/s` : ''}`;
     const next = wc.cycle.upcoming(8), span = 1200, bar = $('wcBar'); bar.replaceChildren();
     let t = 0, cur = n.from;
     const seg = (id, len, change) => { if (len <= 0 || t >= span) return; const e = document.createElement('span'); e.className = 'wx-' + id + (change ? ' change' : ''); e.style.flex = String(Math.min(len, span - t)); e.title = label(id); bar.append(e); t += len; };

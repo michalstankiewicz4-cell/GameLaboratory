@@ -47,6 +47,7 @@ export function craftDef(info = {}, extra = {}) {
   };
 }
 
+const WC = [0, 0, 0];   // wiatr w punkcie (bez alokacji)
 export function createCraft(def, { x = 0, z = 0, yaw = 0, y = 0 } = {}) {
   const D = def.Kd ? def : craftDef(def);
   const s = { x, z, yaw, u: 0, v: 0, r: 0, y, vy: 0, pitch: 0, vp: 0, roll: 0, vr: 0, depth: 0, lift: 0, onLand: 0, speed: 0 };
@@ -120,7 +121,13 @@ export function createCraft(def, { x = 0, z = 0, yaw = 0, y = 0 } = {}) {
     // opór: prędkość maksymalna jednostki z płatami jest na płatach; kadłub w wodzie (przed wyjściem) stawia więcej
     const wet = inWater ? 1 : 0, dragK = D.Kd * (D.foils ? 1 + 1.5 * (1 - s.lift) : 1);
     Fx -= dragK * s.u * Math.abs(s.u) * wet + (D.wheels && N > 0 ? 0.03 * N * Math.tanh(s.u / 0.3) : 0) + (N > 0 && !D.wheels ? 0.5 * N * Math.tanh(s.u / 0.3) : 0);
-    const Fl = -(D.Klat * s.v * Math.abs(s.v) + D.mass * 2 * s.v) * (inWater || N > 0 ? 1 : 0) + slopeL;
+    let Fl = -(D.Klat * s.v * Math.abs(s.v) + D.mass * 2 * s.v) * (inWater || N > 0 ? 1 : 0) + slopeL;
+    // wiatr (trąba wodna — env.wind(x, y, z, out)): opór powietrza na część nad wodą (wysokość bez zanurzenia)
+    if (env && env.wind) {
+      const sy = Math.sin(s.yaw), cy = Math.cos(s.yaw), Hd = Math.max(0.2, D.H - imm), Wv = env.wind(s.x, s.y + Hd, s.z, WC);
+      const ax = Wv[0] - (s.u * sy + s.v * cy), az = Wv[2] - (s.u * cy - s.v * sy), am = Math.hypot(ax, az);
+      if ((Wv[0] || Wv[2]) && am > 0.01) { const au = ax * sy + az * cy, av = ax * cy - az * sy, q = 0.5 * 1.225 * 1.1 * am; Fx += q * D.W * Hd * au; Fl += q * D.L * Hd * av; }
+    }
     // ster: moment ∝ v² (do promienia R na pełnym wychyleniu), pędniki azymutalne — także w miejscu; koła — jak auto
     const st = clamp(c.steer || 0, -1, 1);
     let M = st * Ca * (s.u * Math.abs(s.u)) / D.R / Math.max(Math.abs(s.u), 0.5) * (inWater ? 1 : 0);
