@@ -210,7 +210,7 @@ function tube(G, pts, rads, segs, wind, texW = 0.6, texH = 1.6) {
   }
   for (let i = 0; i < n - 1; i++) for (let s = 0; s < segs; s++) {
     const a = base + i * (segs + 1) + s, b = a + 1, c = a + segs + 1, d = c + 1;
-    G.i.push(a, c, b, b, c, d);
+    G.i.push(a, b, c, b, d, c);   // na zewnątrz (normalna ściany zgodna z normalną wierzchołka — doktor: facing)
   }
 }
 // A foliage card: base at c, extends along ax by h, across side by w; nrm is the shading normal (outward from the crown)

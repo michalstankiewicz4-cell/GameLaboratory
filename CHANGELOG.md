@@ -3,6 +3,16 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.94.1 · rośliny 1.6.1 · doktor modeli 1.4.0 — 2026-11-21 (kora na zewnątrz)
+
+### Dodane
+- Doktor modeli: **rośliny** (PlantKit, `tools/doctor/sources/plants.js`) — każdy gatunek jako kora i liście.
+
+### Poprawione
+- PlantKit: trójkąty pni i gałęzi (`tube`) były nawinięte do środka — kamera widziała wewnętrzną ścianę kory, jakby
+  pień był wywrócony na lewą stronę (zgłoszenie właściciela; doktor: `facing`). Teraz na zewnątrz — wszystkie gatunki,
+  w laboratorium roślin, w roślinności sceny i w impostorach. Zostaje `seethrough`: otwarte końce pni i gałęzi (`TODO.md`).
+
 ## Program 0.94.0 · rośliny 1.6.0 · edytor sceny 0.47.0 — 2026-11-21 (roślinność krajobrazu w scenie)
 
 ### Dodane

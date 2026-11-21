@@ -1,6 +1,6 @@
 # Doktor modeli (`tools/doctor.html`, `tools/doctor/`)
 
-Jeden doktor dla wszystkich modeli laboratorium: kosmos (Space), morze (Battle), ląd i tabor (TrainKit).
+Jeden doktor dla wszystkich modeli laboratorium: kosmos (Space), morze (Battle), ląd i tabor (TrainKit), rośliny (PlantKit).
 Szuka powtarzających się błędów modeli budowanych kodem. Scalony z dwóch wersji: doktora ze Space i jego rozszerzonej
 wersji z Battle (historia obu — w git). Logika to wersja z Battle — ma wszystkie testy wersji ze Space i więcej.
 
@@ -24,6 +24,7 @@ wersji z Battle (historia obu — w git). Logika to wersja z Battle — ma wszys
 | `tools/doctor/sources/road.js` | pojazdy drogowe z RoadKit (FSO Polonez, M1A2 Abrams, Solaris Urbino 18) |
 | `tools/doctor/sources/tram.js` | tramwaje z TramKit (PESA Swing 120Na) |
 | `tools/doctor/sources/city.js` | budynki miasta z CityKit (wszystkie rodzaje i budynki Warszawy z mapy, wersja bliska; jedna płaszczyzna do 1 cm) |
+| `tools/doctor/sources/plants.js` | rośliny z PlantKit: każdy gatunek (ziarno 1) jako kora i liście |
 | `tools/doctor/sources/test-bench.js` | stanowisko testowe: model z jednym błędem na każdy test |
 | `tools/doctor/sources/common.js` | wspólne: koszt rysowania (trójkąty, wywołania, materiały) |
 | `tools/doctor.py` | doktor bez okna (Playwright): porównuje z `tools/doctor.golden.json` |

@@ -95,6 +95,7 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
 - [ ] Migotanie zlicowanych ścian z teksturą: hauler, crawler.
 - [ ] Wiszące części: scribe (korona), constructor, scout, skimmer, amfibia.
 - [ ] Orzeł: działko 40 mm zasłonięte w części łuku.
+- [ ] Rośliny (PlantKit): otwarte końce pni i gałęzi — doktor widzi tył kory przez otwór (`seethrough`; pień w ziemi, końce gałęzi w liściach).
 
 ## Grafika (do oceny)
 - [ ] Mgławica w tle laboratorium ciał niebieskich ciemniejsza po przejściu na grafikę Battle.
