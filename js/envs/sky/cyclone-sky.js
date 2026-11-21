@@ -1,7 +1,7 @@
 // Niebo cyklonu (js/envs/sky/cyclone.js): to, czego nie da się zrobić liczbami pogody SkyKit —
 //  • pasma nad głową: warstwa chmur na 1,8 km wokół kamery, z gęstością spiralnych pasm cyklonu w prawdziwych
 //    kilometrach (od środka cyklonu) — ciemne pasma przesuwają się nad sceną, gdy cyklon idzie i się obraca;
-//  • ściana oka w oku: pierścień chmur jak trybuny stadionu dookoła na horyzoncie (oko ma 10–60 km: pierścień
+//  • ściana oka w oku: pierścień jasnych, oświetlonych słońcem chmur rozchylony ku górze jak trybuny stadionu dookoła na horyzoncie (oko ma 10–60 km: pierścień
 //    narysowany bliżej, w tej samej skali kątowej — środek i promień przeskalowane do ok. 4,5 km od kamery), jasny u góry
 //    od słońca, nad nim przejaśnienie.
 // createCycloneSky(scene) → { update(camera, view, { light, fog, sunDir, t }), dispose(), group }
@@ -47,8 +47,8 @@ void main() {
   float edge = 1.0 - smoothstep(0.72 + 0.18 * n, 1.0, h);            // kłębiasta krawędź u góry
   float a = uAlpha * edge * smoothstep(0.0, 0.08, h + 0.02);
   vec3 dir = normalize(vW - cameraPosition);
-  float lit = 0.55 + 0.45 * max(0.0, dot(-dir, normalize(uSun)) * 0.5 + 0.5);   // ściana od słońca jaśniejsza
-  vec3 c = mix(uCol, uTop, smoothstep(0.25, 0.95, h)) * (0.7 + 0.45 * n2) * lit * uLight;
+  float lit = 0.75 + 0.25 * (dot(-dir, normalize(uSun)) * 0.5 + 0.5);   // ściana w słońcu (w oku jasno), od słońca trochę jaśniejsza
+  vec3 c = mix(uCol, uTop, smoothstep(0.1, 0.7, h)) * (0.82 + 0.25 * n2) * lit * uLight;
   c = mix(uFogCol, c, smoothstep(0.0, 0.25, h));                      // dół w mgiełce
   gl_FragColor = vec4(c, a);
   #include <colorspace_fragment>
@@ -61,9 +61,9 @@ export function createCycloneSky(scene) {
   const layer = new THREE.Mesh(new THREE.PlaneGeometry(18000, 18000, 1, 1).rotateX(Math.PI / 2),
     new THREE.ShaderMaterial({ uniforms: LU, vertexShader: LAYER_VS, fragmentShader: LAYER_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide }));
   layer.frustumCulled = false; layer.renderOrder = -1; group.add(layer);
-  const WU = { uTime: { value: 0 }, uAlpha: { value: 0 }, uLight: { value: 1 }, uCol: { value: new THREE.Color(0.42, 0.44, 0.47) }, uTop: { value: new THREE.Color(0.95, 0.95, 0.93) },
+  const WU = { uTime: { value: 0 }, uAlpha: { value: 0 }, uLight: { value: 1 }, uCol: { value: new THREE.Color(0.6, 0.63, 0.68) }, uTop: { value: new THREE.Color(1.0, 1.0, 0.98) },
     uFogCol: { value: new THREE.Color(0.6, 0.62, 0.65) }, uSun: { value: new THREE.Vector3(0, 1, 0) } };
-  const wall = new THREE.Mesh(new THREE.CylinderGeometry(1, 1.25, 1, 128, 1, true).translate(0, 0.5, 0),
+  const wall = new THREE.Mesh(new THREE.CylinderGeometry(1.9, 1, 1, 128, 1, true).translate(0, 0.5, 0),
     new THREE.ShaderMaterial({ uniforms: WU, vertexShader: WALL_VS, fragmentShader: WALL_FS, transparent: true, depthWrite: false, side: THREE.BackSide }));
   wall.frustumCulled = false; wall.renderOrder = -1; group.add(wall);
   const D = 4500;   // pierścień oka rysowany w tej odległości (ta sama skala kątowa; w zasięgu kamery 9 km)
@@ -87,7 +87,7 @@ export function createCycloneSky(scene) {
       if (wall.visible) {
         const Rm = view.Rm * 1000, k = D / Math.max(Rm, 1), cx = -view.rel[0] * 1000, cz = -view.rel[1] * 1000;
         wall.position.set(camera.position.x + (cx - camera.position.x) * k, -200, camera.position.z + (cz - camera.position.z) * k);
-        wall.scale.set(Rm * 0.85 * k, 15000 * k, Rm * 0.85 * k);      // ściana do ok. 15 km
+        wall.scale.set(Rm * 0.85 * k, 12000 * k, Rm * 0.85 * k);      // ściana do ok. 12 km, rozchylona ku górze (trybuny: u góry ok. 1,9 × szersza)
       }
     },
     dispose() { scene.remove(group); layer.geometry.dispose(); layer.material.dispose(); wall.geometry.dispose(); wall.material.dispose(); },

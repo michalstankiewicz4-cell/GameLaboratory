@@ -88,7 +88,8 @@ what cannot be drawn with the weather numbers alone (`js/envs/sky/cyclone-sky.js
   ago to 12 h ahead; the line above it: the zone, the distance, the wind (from where), rain, a spout, when the eye
   comes. Preview ×1 / ×60 / ×600.
 - The sky: a cloud layer at 1.8 km with the bands in real kilometres from the centre (they pass overhead as the
-  cyclone moves and turns, once in ~4 h) and, from the eye, the eyewall — drawn closer at the same angular size.
+  cyclone moves and turns, once in ~4 h) and, from the eye, the eyewall — bright, sunlit cloud flaring outwards up to
+  ~12 km like the stands of a stadium, drawn closer at the same angular size.
 
 The cyclone and the variable weather exclude each other: switching one on switches the other off; choosing a weather
 from the list or moving a weather slider switches the cyclone off. Saved with the weather (`cyclone` in the "weather"

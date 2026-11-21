@@ -3,6 +3,11 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.50.1 — 2026-11-21
+
+### Poprawione
+- Cyklon: ściana oka rozchylona ku górze i jasna (biała ściana chmur dookoła oka).
+
 ## 0.50.0 — 2026-11-21
 
 ### Dodane

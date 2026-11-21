@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.97.1 · wygląd 1.7.1 · edytor sceny 0.50.1 — 2026-11-21 (ściana oka cyklonu)
+
+### Poprawione
+- **Ściana oka cyklonu** (`js/envs/sky/cyclone-sky.js`): rozchyla się ku górze jak trybuny stadionu (wcześniej
+  zwężała się), sięga ok. 12 km i jest jasna, oświetlona słońcem — z oka widać białą ścianę chmur dookoła i niebo
+  nad głową.
+
 ## Program 0.97.0 · wygląd 1.7.0 · edytor sceny 0.50.0 — 2026-11-21 (cyklon)
 
 ### Dodane
