@@ -1,10 +1,10 @@
 {
  "ship/codewing": {
-  "tris": 75616,
-  "verts": 47035,
-  "meshes": 90,
-  "materials": 66,
-  "textures": 12,
+  "tris": 70848,
+  "verts": 44193,
+  "meshes": 68,
+  "materials": 31,
+  "textures": 11,
   "size": [
    12.064,
    5.864,
@@ -12,85 +12,85 @@
   ]
  },
  "ship/codewing/merged": {
-  "tris": 75616,
-  "verts": 115556,
-  "meshes": 44,
-  "materials": 66,
-  "textures": 12,
+  "tris": 70848,
+  "verts": 112714,
+  "meshes": 22,
+  "materials": 31,
+  "textures": 11,
   "size": [
    12.064,
    5.864,
-   10.958
+   9.854
   ]
  },
  "ship/scribe": {
-  "tris": 28816,
-  "verts": 19418,
-  "meshes": 77,
-  "materials": 64,
-  "textures": 12,
+  "tris": 24080,
+  "verts": 16612,
+  "meshes": 57,
+  "materials": 31,
+  "textures": 11,
   "size": [
-   4.229,
-   3.77,
+   3.985,
+   3.575,
    4.468
   ]
  },
  "ship/scribe/merged": {
-  "tris": 28816,
-  "verts": 39752,
-  "meshes": 61,
-  "materials": 64,
-  "textures": 12,
+  "tris": 24080,
+  "verts": 36946,
+  "meshes": 41,
+  "materials": 31,
+  "textures": 11,
   "size": [
-   4.224,
-   4.521,
-   5.397
+   3.985,
+   3.575,
+   4.468
   ]
  },
  "ship/swarmer": {
-  "tris": 13338,
-  "verts": 8472,
-  "meshes": 50,
-  "materials": 51,
-  "textures": 7,
+  "tris": 8634,
+  "verts": 5702,
+  "meshes": 32,
+  "materials": 20,
+  "textures": 6,
   "size": [
    6.062,
-   2.621,
-   5.262
+   0.92,
+   3.663
   ]
  },
  "ship/swarmer/merged": {
-  "tris": 13338,
-  "verts": 23632,
-  "meshes": 32,
-  "materials": 51,
-  "textures": 7,
+  "tris": 8634,
+  "verts": 20862,
+  "meshes": 14,
+  "materials": 20,
+  "textures": 6,
   "size": [
    6.062,
-   2.553,
+   0.92,
    3.663
   ]
  },
  "ship/haven": {
-  "tris": 31526,
-  "verts": 27320,
-  "meshes": 86,
-  "materials": 44,
-  "textures": 10,
+  "tris": 26950,
+  "verts": 24694,
+  "meshes": 76,
+  "materials": 23,
+  "textures": 8,
   "size": [
-   15.027,
+   14.554,
    7.554,
-   9.125
+   8.69
   ]
  },
  "ship/haven/merged": {
-  "tris": 31526,
-  "verts": 50800,
-  "meshes": 39,
-  "materials": 44,
-  "textures": 10,
+  "tris": 26950,
+  "verts": 48174,
+  "meshes": 29,
+  "materials": 23,
+  "textures": 8,
   "size": [
-   15.057,
+   14.554,
    7.554,
    8.69
   ]

@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Kontrola kitów 1.0.7 — 2026-11-21 (nowy wzorzec)
+
+### Zmienione
+- Wzorzec `tools/kitcheck.golden.json` uaktualniony: 4 statki (CODEWING, SCRIBE, SWARMER, HAVEN — zwykłe i scalone)
+  mają mniej części od 0.68–0.70 (strzały, dym, iskry i fala skanu przeszły do laboratorium efektów), wzorzec był
+  sprzed tej zmiany. Kontrola znów przechodzi (54 modele zgodne).
+
 ## Program 0.89.1 · miasto 1.1.1 — 2026-11-21 (porządki w kodzie, budynki pod adresami)
 
 ### Zmienione

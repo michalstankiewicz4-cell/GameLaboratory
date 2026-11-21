@@ -38,7 +38,7 @@
     "labs/zombies.html": "1.2.1",
     "tools/doctor.html": "1.3.2",
     "labs/transform.html": "1.3.0",
-    "tools/kitcheck.html": "1.0.6",
+    "tools/kitcheck.html": "1.0.7",
     "labs/filters.html": "0.6.0",
     "editor/index.html": "0.45.0",
     "editor/index.html?doctor": "0.33.1",
