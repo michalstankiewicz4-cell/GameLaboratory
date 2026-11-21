@@ -9,6 +9,10 @@
 //                         coarse one to the horizon) displaced in the vertex shader, shaded by height and slope (sand,
 //                         wet sand, grass, scrub, rock, snow; sea floor from sand to mud). One draw call each.
 //  sampleHeight(t, x, z)  the same height in JS (bilinear, wrap or clamp) for ships, grounding and cameras.
+//  skyTexture(t)          how much of the sky each texel sees (0…1, horizon in 8 directions out to ~70 texels): valleys,
+//                         hollows and the foot of slopes see less sky and get less of its light — the relief reads even
+//                         under a high sun that casts no shadows. The terrain also takes its normal per pixel from the
+//                         heightmap and a fine relief of the ground close up (grass tufts, stones, rock cracks, ripples).
 import * as THREE from '../../../vendor/three/three.module.js';
 
 /* ---------------- noise (periodic: every octave repeats across the map) ---------------- */
@@ -184,6 +188,39 @@ function outsideHeight(T, edge, out) {
   return edge + ((T.barrier === 'mountains' ? Math.max(T.relief, 250) * 1.2 : -T.depth) - edge) * k;
 }
 
+/* ---------------- sky visibility (ambient occlusion of the relief) ---------------- */
+// For each texel: in 8 directions the highest horizon out to ~70 texels (steps growing ×1.6), sky seen = mean of
+// 1 − sin(horizon angle). A flat plain sees all of it (1); a valley floor between ridges ~0.6–0.8. Kept on T (T.sky).
+export function skyVisibility(T) {
+  if (T.sky && T.sky.length === T.res * T.res) return T.sky;
+  const N = T.res, c = T.cell, H = T.h, out = new Float32Array(N * N);
+  const DIRS = [[1, 0], [0.7071, 0.7071], [0, 1], [-0.7071, 0.7071], [-1, 0], [-0.7071, -0.7071], [0, -1], [0.7071, -0.7071]];
+  const OFF = [];   // [di, dj, 1 / distance (m)] for every direction and step
+  for (const [dx, dz] of DIRS) { const row = []; for (let d = 1; d < 72; d *= 1.6) row.push([Math.round(dx * d), Math.round(dz * d), 1 / (d * c)]); OFF.push(row); }
+  const pow2 = (N & (N - 1)) === 0, M = N - 1;
+  const wrapI = T.wrap ? (pow2 ? (i) => i & M : (i) => ((i % N) + N) % N) : (i) => (i < 0 ? 0 : i > M ? M : i);
+  for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+    const h0 = Math.max(H[j * N + i], 0);   // under the sea: from the water's surface (the sea floor is not lit by the sky this way)
+    let sum = 0;
+    for (let k = 0; k < 8; k++) {
+      const row = OFF[k]; let t = 0;
+      for (let s = 0; s < row.length; s++) { const o = row[s], g = (H[wrapI(j + o[1]) * N + wrapI(i + o[0])] - h0) * o[2]; if (g > t) t = g; }
+      sum += 1 - t / Math.sqrt(1 + t * t);
+    }
+    out[j * N + i] = sum / 8;
+  }
+  T.sky = out;
+  return out;
+}
+export function skyTexture(T) {
+  const N = T.res, v = skyVisibility(T), data = new Uint8Array(N * N);
+  for (let k = 0; k < data.length; k++) data[k] = Math.round(Math.min(1, Math.max(0, v[k])) * 255);
+  const tex = new THREE.DataTexture(data, N, N, THREE.RedFormat, THREE.UnsignedByteType);
+  tex.wrapS = tex.wrapT = T.wrap ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+  tex.magFilter = tex.minFilter = THREE.LinearFilter; tex.generateMipmaps = false; tex.needsUpdate = true;
+  return tex;
+}
+
 /* ---------------- GPU ---------------- */
 export function heightTexture(T) {
   const N = T.res, data = new Uint16Array(N * N);
@@ -236,18 +273,24 @@ const TERRAIN_VERT_NORMAL = /* glsl */`
   vLandN = objectNormal; vLandP = vec3(lxz.x, lh, lxz.y); vLandQ = lxz + uLandOff;
 `;
 const TERRAIN_FRAG_HEAD = /* glsl */`
+${GLSL_LAND}
 uniform vec3 uHole; uniform float uRelief, uTime;
-uniform vec4 uLand; uniform sampler2D tBiome; uniform float uBiomeOn; uniform vec4 uGround;   // map size; biome weights (temperate, plains, desert, -) over the map (RegionKit)
+uniform sampler2D tSky; uniform float uSkyOcc;     // sky visibility (skyTexture) and how strongly it darkens the sky's light
+uniform sampler2D tBiome; uniform float uBiomeOn; uniform vec4 uGround;   // map size; biome weights (temperate, plains, desert, -) over the map (RegionKit)
 varying vec3 vLandP; varying vec3 vLandN; varying vec2 vLandQ;
 float lnHash(vec2 p) { p = fract(p * vec2(233.34, 851.73)); p += dot(p, p + 23.45); return fract(p.x * p.y); }
-float lnNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
-  return mix(mix(lnHash(i), lnHash(i + vec2(1, 0)), f.x), mix(lnHash(i + vec2(0, 1)), lnHash(i + vec2(1, 1)), f.x), f.y); }
+// the lattice wraps every 289 cells before hashing: far from the origin (thousands of metres × the frequency) the hash
+// lost precision and drew stripes; wrapping integer corners keeps the noise continuous
+float lnNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); i = mod(i, 289.0);
+  vec2 j = mod(i + 1.0, 289.0);
+  return mix(mix(lnHash(i), lnHash(vec2(j.x, i.y)), f.x), mix(lnHash(vec2(i.x, j.y)), lnHash(j), f.x), f.y); }
 float lnFbm(vec2 p) { return lnNoise(p) * 0.5 + lnNoise(p * 2.1 + 3.1) * 0.3 + lnNoise(p * 4.3 + 7.7) * 0.2; }
 `;
 const TERRAIN_FRAG_COLOR = /* glsl */`
   if (uHole.z > 0.0 && abs(vLandP.x - uHole.x) < uHole.z && abs(vLandP.z - uHole.y) < uHole.z) discard;
   float hh = vLandP.y, up = normalize(vLandN).y;
   vec2 q = vLandQ;                                       // map coordinates: the ground's texture moves with the ground
+  float rk = 0.5;                                        // how rocky the ground is here (the fine relief below)
   // detail noise fades out with distance before it gets finer than a pixel (no shimmering, no moiré)
   float fd = length(cameraPosition - vLandP);
   float n0 = lnFbm(q * 0.006), n1 = lnFbm(q * 0.035);
@@ -270,6 +313,7 @@ const TERRAIN_FRAG_COLOR = /* glsl */`
     float beach = smoothstep(4.5 + n2 * 2.5, 1.5, hh) * smoothstep(0.82, 0.93, up);
     float veg = smoothstep(0.7, 0.86, up + (n1 - 0.5) * 0.12) * (1.0 - smoothstep(0.45, 0.75, rel + n1 * 0.12));
     float snowy = smoothstep(0.62, 0.8, rel + n1 * 0.15) * smoothstep(0.55, 0.75, up) * smoothstep(280.0, 420.0, hh);   // only on real heights
+    rk = (1.0 - veg) * (1.0 - snowy);
     c = rock;
     c = mix(c, mix(scrub, grass, smoothstep(0.5, 0.2, rel)), veg);
     c = mix(c, snow, snowy);
@@ -310,6 +354,18 @@ const TERRAIN_FRAG_COLOR = /* glsl */`
   // grunt innej planety (T.ground): barwa jej skały (regolit, rdza, bazalt) w miejsce ziemskiej, ta sama jasność i wzór
   if (uGround.w > 0.0) c = mix(c, uGround.rgb * dot(c, vec3(0.3, 0.59, 0.11)) / 0.42, uGround.w);
   diffuseColor.rgb = c;
+  // the normal per pixel from the heightmap (the vertex grid is 4 texels wide far away) and, close up, a fine relief of
+  // the ground — tufts and stones, stronger and sharper on rock — so the shape of the ground reads under any light
+  float le = uLand.x / uLand.y;
+  vec3 lnN = normalize(vec3(landH(vLandP.xz - vec2(le, 0.0)) - landH(vLandP.xz + vec2(le, 0.0)), 2.0 * le, landH(vLandP.xz - vec2(0.0, le)) - landH(vLandP.xz + vec2(0.0, le))));
+  float mk = smoothstep(260.0, 30.0, fd);
+  if (mk > 0.0) {
+    float amp = mix(0.35, 1.2, rk) * mk;
+    #define LN_MICRO(p) ((lnFbm((p) * 0.18) * 0.9 + lnFbm((p) * 0.7 + 5.3) * 0.3 + lnNoise((p) * 2.6) * mix(0.05, 0.12, rk)) * amp)
+    float m0 = LN_MICRO(q), mx = LN_MICRO(q + vec2(0.2, 0.0)), mz = LN_MICRO(q + vec2(0.0, 0.2));
+    lnN = normalize(lnN + vec3(m0 - mx, 0.0, m0 - mz) / 0.2);
+  }
+  float lnSky = mix(1.0, pow(texture2D(tSky, q / uLand.x).r, 2.0), uSkyOcc);
 `;
 
 function terrainMaterial(lu, extra) {
@@ -322,7 +378,16 @@ function terrainMaterial(lu, extra) {
       .replace('#include <begin_vertex>', 'vec3 transformed = vec3(position.x, lh - uDrop, position.z);');
     sh.fragmentShader = TERRAIN_FRAG_HEAD + sh.fragmentShader
       .replace('#include <color_fragment>', '#include <color_fragment>\n' + TERRAIN_FRAG_COLOR)
-      .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = rough;');
+      .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = rough;')
+      .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\nnormal = normalize((viewMatrix * vec4(lnN, 0.0)).xyz);')
+      // the sky's light (and its reflection) by how much sky the ground sees; the sun a little too (cavities and the
+      // floors of gullies are lit by less of it — they also hide in their own small shadows), so the relief reads at noon
+      .replace('#include <aomap_fragment>', `#include <aomap_fragment>
+reflectedLight.indirectDiffuse *= lnSky;
+reflectedLight.directDiffuse *= mix(1.0, lnSky, 0.45);
+#if defined( USE_ENVMAP ) && defined( STANDARD )
+  reflectedLight.indirectSpecular *= computeSpecularOcclusion(saturate(dot(geometryNormal, geometryViewDir)), lnSky, material.roughness);
+#endif`);
   };
   m.customProgramCacheKey = () => 'landkit-terrain';
   return m;
@@ -348,7 +413,7 @@ export function terrainMeshes(T, tex, opt = {}) {
   const lu = opt.uniforms || landUniforms(T, tex);      // pass the sea's land uniforms to share them
   if (opt.uniforms) setLand(lu, T, tex);
   const groundV = (T2) => (T2.ground ? new THREE.Vector4(...T2.ground) : new THREE.Vector4(0, 0, 0, 0));   // T.ground [r, g, b, ile] — grunt innej planety
-  const common = { uRelief: { value: T.relief }, uTime: { value: 0 }, tBiome: { value: opt.biome || NO_BIOME() }, uBiomeOn: { value: opt.biome ? 1 : 0 }, uGround: { value: groundV(T) } };
+  const common = { tSky: { value: skyTexture(T) }, uSkyOcc: { value: opt.skyOcc ?? 1 }, uRelief: { value: T.relief }, uTime: { value: 0 }, tBiome: { value: opt.biome || NO_BIOME() }, uBiomeOn: { value: opt.biome ? 1 : 0 }, uGround: { value: groundV(T) } };
   const mk = (cells, cell, drop, hole) => {
     const g = new THREE.PlaneGeometry(cells * cell, cells * cell, cells, cells); g.rotateX(-Math.PI / 2);
     const extra = { ...common, uDrop: { value: drop }, uHole: { value: hole } };
@@ -368,6 +433,7 @@ export function terrainMeshes(T, tex, opt = {}) {
     far = mk(nf, c * 4, 0.6, new THREE.Vector3(0, 0, (n / 2 - 6) * c));
     group.add(fine, far);
     common.uRelief.value = T2.relief; common.uGround.value = groundV(T2);
+    if (T2 !== T) { common.tSky.value.dispose(); common.tSky.value = skyTexture(T2); T = T2; }
   }
   build(T);
   return {
@@ -385,6 +451,8 @@ export function terrainMeshes(T, tex, opt = {}) {
       far.userData.extra.uHole.value.set(fine.position.x, fine.position.z, far.userData.extra.uHole.value.z);
     },
     get triangles() { return (n * n + nf * nf) * 2; },
+    // how strongly the sky visibility darkens the sky's light on the ground (0 — off, 1 — full)
+    set skyOcc(k) { common.uSkyOcc.value = Math.max(0, Math.min(1, +k || 0)); }, get skyOcc() { return common.uSkyOcc.value; },
   };
 }
 

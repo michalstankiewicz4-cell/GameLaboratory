@@ -3,6 +3,20 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.100.0 · ląd 1.9.0 · edytor sceny 0.52.0 — 2026-11-21 (cienie nierówności terenu)
+
+### Dodane
+- **Rzeźba terenu widoczna przy każdym świetle** (LandKit, `js/envs/land/landkit.js`):
+  - **widoczność nieba** liczona z mapy wysokości (horyzont w 8 kierunkach do ok. 1,1 km): żleby, zagłębienia i podnóża
+    zboczy widzą mniej nieba, więc dostają mniej jego światła i trochę mniej słońca — rzeźbę widać także w południe,
+    gdy słońce nie rzuca cieni (`terrain.skyOcc` 0…1);
+  - **normalna na piksel** z mapy wysokości (daleko siatka ma 4 teksele, cieniowanie zostaje szczegółowe);
+  - **drobny relief gruntu z bliska** (do ok. 260 m): kępy i kamyki na trawie, mocniejszy i ostrzejszy na skale.
+
+### Poprawione
+- Drobny wzór gruntu z dala od środka mapy rysował paski przy kamerze (utrata precyzji w szumie) — siatka szumu
+  zawija się teraz co 289 oczek.
+
 ## Program 0.99.0 · edytor sceny 0.51.2 — 2026-11-21 (klawiszologia, widok po schowaniu okien)
 
 ### Dodane

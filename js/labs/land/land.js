@@ -404,5 +404,5 @@ $('planet').value = S.map.planet || '';
 $('planet').onchange = () => { S.map.planet = $('planet').value || undefined; generateShown(); save(); };
 if (S.map.planet && !spaceReady()) { const p = S.map.planet; S.map.planet = undefined; generate(); S.map.planet = p; generateShown(); } else generate();
 updateSky(); setCam(ship.on && S.sail ? (S.cam === 'Free flight' ? 'Chase' : S.cam || 'Chase') : 'Overview'); resize();
-window.__land = { S, get T() { return T; }, regionAt: (x, z) => regionAt(T, x, z), ship, camera, orbit, free, generate, setCam, sampleHeight: (x, z) => sampleHeight(T, x, z), clearAt, wrapC, sailStep };
+window.__land = { S, stage, get T() { return T; }, regionAt: (x, z) => regionAt(T, x, z), ship, camera, orbit, free, generate, setCam, sampleHeight: (x, z) => sampleHeight(T, x, z), clearAt, wrapC, sailStep };
 requestAnimationFrame(frame);

@@ -71,6 +71,20 @@ Ground only: **plants and rocks as objects** (trees, bushes, grass blades, bould
 terrain's colours stand in for them until then. Rivers carved in *Mixed* follow the reshaped land (a meander swings
 the course from side to side down the distance-to-the-sea field).
 
+## Relief shading (1.9.0)
+
+The shape of the ground reads even under a high sun that casts no shadows (LandKit, `js/envs/land/landkit.js`):
+
+- **Sky visibility** (`skyVisibility(T)` / `skyTexture(T)`, baked with the map, ~0.2 s at 512²): for every texel the
+  highest horizon in 8 directions out to ~70 texels (~1.1 km at 8 km / 512), sky seen = the mean of 1 − sin(horizon
+  angle). A plain sees all of it, gullies, hollows and the foot of slopes less. It darkens the sky's light on the
+  ground (squared), its reflection, and a little of the sun's (cavities and gully floors hide in their own small
+  shadows): `terrain.skyOcc` 0…1 (1 by default).
+- **The normal per pixel** from the heightmap: far away the grid is 4 texels wide, the shading keeps the map's detail.
+- **Fine relief close up** (fades out by ~260 m): tufts and stones on grass, stronger and sharper on rock.
+- The ground's detail noise wraps its lattice every 289 cells before hashing: far from the map's origin the hash had
+  lost precision and drew stripes close to the camera.
+
 ## Map edge
 
 | Topology | What happens at the edge |

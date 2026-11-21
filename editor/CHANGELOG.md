@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.52.0 — 2026-11-21
+
+### Zmienione
+- Teren lądu: rzeźba widoczna przy każdym świetle (widoczność nieba z mapy wysokości, normalna na piksel, drobny relief
+  z bliska) — LandKit.
+
 ## 0.51.2 — 2026-11-21
 
 ### Zmienione
