@@ -145,6 +145,10 @@ Polecenia (`help`, `describe`, `prefabs`, `assets`, `add`, `set`, `move`, `remov
 - Dźwięki modeli (drzwi, właz, podwozie — `onSound`) w ▶ Graj: `sounds.model(e)` ([../audio/README.md](../audio/README.md)).
 - **Muzyka** (`js/scene/music.js`): `env.music` w ▶ Graj, `env.musicAction` po głośnych zdarzeniach (wybuch, strzał,
   rozbicie) przez 20 s; polecenie API `music`.
+- **Zmienna pogoda** (`js/scene/weather.js`): gdy światło sceny (`env.light`) to zasób „weather” z włączoną zmienną
+  pogodą (pole `cycle` z laboratorium wyglądu), w ▶ Graj pogoda sama się zmienia (`js/envs/sky/weather-cycle.js`:
+  tabela przejść, fronty, ziarno), zaczynając od pogody zasobu; pora dnia i słońce zostają z zasobu. Edytor podaje
+  liczby niebu i światłu co 0.5 s (`world.setWeather`); po Stop — pogoda z zasobu.
 - Silniki z zachowań (`ENGINES`): jazda (biegi), okręt, mała jednostka, lot, przeładowarka — dźwięk silnika z obrotami
   i obciążeniem z prędkości i dźwigni; łaziki i nurek — buczenie napędu elektrycznego; ciąg w próżni i lądowanie —
   huk ognia z mocą; rozbicie — wybuch.

@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.46.0 — 2026-11-21
+
+### Dodane
+- ▶ Graj: **zmienna pogoda** — scena ze światłem z zasobu pogody z włączoną zmienną pogodą (laboratorium wyglądu) sama
+  zmienia pogodę w grze (`js/scene/weather.js`); po Stop wraca pogoda z zasobu.
+
 ## 0.45.0 — 2026-11-20
 
 ### Dodane

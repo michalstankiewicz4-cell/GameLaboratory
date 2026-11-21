@@ -154,6 +154,14 @@ export function createWorld(container, store, onWarn) {
     }
     if (skyBody) skyBody.group.visible = true;
   }
+  // światło i pogoda; weatherNow — liczby zmiennej pogody w grze (▶ Graj, js/scene/weather.js) na zasobie „weather”
+  let weatherNow = null;
+  function applyLight(light) {
+    if (weatherNow && light && typeof light === 'object') light = { ...light, ...weatherNow };
+    const Lt = stage.setLight(light);
+    setNight(Math.min(1, Math.max(0, (1 - Lt.day) * 1.25)));   // okna budynków (CityKit) świecą po zmroku
+    return Lt;
+  }
   function syncEnv() {
     const env = store.scene.env;
     // ląd: teren z laboratorium lądu (zasób „land”) albo płaski grunt; generowanie tylko po zmianie zasobu
@@ -169,8 +177,7 @@ export function createWorld(container, store, onWarn) {
     // światło: gotowe (LIGHTS) albo zasób „weather” z laboratorium wyglądu; brak zasobu — popołudnie i ostrzeżenie
     let light = LIGHTS[env.light] ? env.light : env.light ? getAsset('weather', env.light) : null;
     if (!light) { if (env.light && onWarn) onWarn('light:' + env.light); light = 'afternoon'; }
-    const Lt = stage.setLight(light);
-    setNight(Math.min(1, Math.max(0, (1 - Lt.day) * 1.25)));   // okna budynków (CityKit) świecą po zmroku
+    applyLight(light);
     if (env.surface === 'underground') { stage.sun.intensity = 0; stage.hemi.intensity = env.caveGlow === false ? 0 : 0.35;   // poświata (env.caveGlow) albo ciemność
       stage.hemi.color.setRGB(0.75, 0.78, 0.85); stage.hemi.groundColor.setRGB(0.12, 0.1, 0.09); }
     // morze: zasób z laboratorium wody (po nazwie) albo domyślne; brak zasobu w tej przeglądarce — domyślne i ostrzeżenie
@@ -243,6 +250,14 @@ export function createWorld(container, store, onWarn) {
   }
   const world = {
     renderer, scene, camera, root, built, stage, look, pending, syncObjects, syncPlaces, syncEnv, bounds, effect,
+    get weatherNow() { return weatherNow; },
+    // zmienna pogoda w grze: same światło i niebo z liczbami pogody (bez przebudowy reszty otoczenia); null — z zasobu
+    setWeather(p) {
+      weatherNow = p || null;
+      const env = store.scene.env, a = env.light && !LIGHTS[env.light] ? getAsset('weather', env.light) : null;
+      if (!a || env.surface === 'underground') return;
+      applyLight(a); look.sunVisible = stage.sunSeen;
+    },
     onShot: null, onDamage: null, onSound: null,   // (obiekt, strzał | uszkodzenie statku | dźwięk modelu) → dźwięk (editor/js/play/play.js)
     gameGfx: null,   // ▶ Graj: settings.gfx gracza (js/core/settings.js) — potok kamery z nimi; null — wygląd edytora
     clearEffects: () => fxLib.dispose(), forgetEffect: (n) => fxLib.forget(n),

@@ -105,7 +105,7 @@ cost of each effect" in the lab does it on the user's machine).
 - The **Variable weather** window: the weather now and the change in progress, a bar and a list of the coming
   weathers, preview at ×1 / ×10 / ×60, **Change now** to a chosen weather, the settings and the table.
 - Moving a weather slider or picking a weather from the list switches it off. Saved with the weather for the scene
-  editor (`cycle` in the "weather" asset); the scene editor does not play it.
+  editor (`cycle` in the "weather" asset); the scene editor plays it in ▶ Play (editor 0.46.0, `js/scene/weather.js`).
 - The same switch is in the Light and weather window of the city, land, plants, items and structures labs
   (`js/labs/shared/weather-cycle-ui.js`).
 - For AI: `LookApi.weatherCycle` — `on(b)`, `set(settings)`, `force(id, s)`, `speed(k)`, `now`, `params`,

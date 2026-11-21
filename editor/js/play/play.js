@@ -10,6 +10,7 @@ import { createSettings } from '../../../js/core/settings.js';
 import { mixer } from '../../../js/audio/mixer.js';
 import { createSceneSounds } from '../../../js/scene/sounds.js';
 import { createSceneMusic } from '../../../js/scene/music.js';
+import { createSceneWeather } from '../../../js/scene/weather.js';
 import { applyGraphics, refresh } from '../../../js/render/game-graphics.js';
 
 const { t, lang } = window.EditorI18n;
@@ -36,6 +37,7 @@ export function createPlay(store, world, controls, actions, events) {
   const tmpV = world.camera.position.clone();
   const positionOf = (id) => { const b = world.built.get(id); if (!b) return null; const k = b.kit, m = k && k.model && k.model.isObject3D && k.model.parent ? k.model : b.root; return m.getWorldPosition(tmpV).toArray(); };
   const music = createSceneMusic();   // muzyka sceny (env.music) i muzyka akcji po głośnych zdarzeniach (env.musicAction)
+  const weather = createSceneWeather((p) => world.setWeather(p));   // zmienna pogoda z zasobu „weather” (cycle.on)
   const sounds = createSceneSounds({ positionOf, onLoud: () => { if (runs.length) music.action(); } });
   world.onShot = (o, s) => sounds.shot(s, o.shot || 'shot');   // strzał statku (ShipKit onShot) — także poza grą
   world.onDamage = (o, e) => sounds.damage(e);   // wybuch statku (ShipKit onDamage { type: 'blast' })
@@ -92,12 +94,13 @@ export function createPlay(store, world, controls, actions, events) {
     playUI.start(me.obj.name);
     sounds.start(store.scene.objects, runs);
     music.start(store.scene.env);
+    weather.start(store.scene.env);
     if (window.LabLog) window.LabLog.add('info', 'Play: ' + runs.length + ' object(s), controlling ' + me.obj.name);
     changed();
   }
   function stop() {
     if (!runs.length) return;
-    sounds.stop(); music.stop();
+    sounds.stop(); music.stop(); weather.stop();
     runs.forEach((r) => { if (r.run.reset) r.run.reset(); r.b.driven = false; r.b.lodFree = false; });
     // przedmioty powstałe w grze (sztabki, puszki zgniecione) znikają ze świata
     if (items) for (const it of [...items.list]) if (it.spawned) items.remove(it);
@@ -112,6 +115,7 @@ export function createPlay(store, world, controls, actions, events) {
   // klatka: zachowania, kamera za graczem, linia stanu
   function frame(dt, time) {
     if (!runs.length) return;
+    weather.frame(dt);   // pogoda niezależna od reszty klatki
     const c = input.read(dt);
     runs.forEach((r) => { r.input = r === me ? c : {}; r.run.step(dt, r.input, time); });
     if (items) { items.step(dt); items.sync(); JUNK_KIT.glow(items); if (machines.length) LIQUID_TIME.value += dt; }
@@ -138,7 +142,7 @@ export function createPlay(store, world, controls, actions, events) {
   }
   const subs = new Set(), changed = () => subs.forEach((f) => f(!!runs.length));
   return {
-    start, stop, frame, act, sounds, music,
+    start, stop, frame, act, sounds, music, weather,
     actionsOf: (id) => { const r = runs.find((x) => x.obj.id === id); return r && r.run.actions ? r.run.actions() : []; },
     toggle: () => (runs.length ? stop() : start()),
     get playing() { return runs.length > 0; },

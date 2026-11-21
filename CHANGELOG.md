@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.92.0 · edytor sceny 0.46.0 — 2026-11-21 (zmienna pogoda w grze)
+
+### Dodane
+- **Zmienna pogoda w ▶ Graj** (`js/scene/weather.js`, silnik wspólny dla edytora i gier): światło sceny z zasobu pogody
+  z włączoną zmienną pogodą zmienia się w grze samo, od pogody zasobu (pora dnia i słońce z zasobu); po Stop — pogoda
+  z zasobu.
+
 ## Program 0.91.0 · wygląd 1.5.0 · miasto 1.2.0 · ląd 1.8.0 · rośliny 1.5.0 · przedmioty 1.1.0 · budowle 1.6.0 — 2026-11-21 (zmienna pogoda)
 
 ### Dodane
