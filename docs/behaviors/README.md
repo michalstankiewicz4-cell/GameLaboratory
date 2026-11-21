@@ -22,13 +22,14 @@ Zasada (CLAUDE.md): fizyka jest prawdziwa — start, ruch, skręt i zatrzymanie 
 | przedmioty na lądzie (bryły sztywne) | `land/items.js` (przedmioty złomowiska w nim: `land/junk-items.js` — `itemKit`) | ląd | przeładowarka, maszyny złomowiska, edytor sceny (`item`) |
 | maszyny złomowiska | `land/machines/` (`machines.js`: zgniatarka `crusher.js`, piec na papier `furnace.js`, piec indukcyjny `induction.js`, linia odlewnicza `casting.js` + strumień metalu `metal-flow.js`, zderzacze `statics.js`) | ląd | laboratorium budowli (maszyny złomowiska w działaniu), edytor sceny (`machine`, `solid`) |
 
-## Wiatr w scenie (trąba powietrzna, tornado)
+## Wiatr w scenie (trąba powietrzna, tornado, cyklon)
 
 Wiatr środowiska — `world.windAt(x, y, z, out)` w ▶ Graj (scena bazowa: `stage.windAt`, wir z pogody,
 `js/envs/sky/tornado.js`): okręt (`ship.js`: napór na burtę i nadbudówki, przechył od wiatru z boku), mała jednostka
 (`craft.js`: na część nad wodą), pojazd (`drive.js`: opór względem powietrza, bok trzymają opony do przyczepności),
 samolot (`flight.js`: wiatr jako ruch powietrza) i przedmioty (`items.js`: opór 0,5·ρ·Cd·A·|v|·v, śpiący budzi się, gdy
-wiatr przesunąłby go mimo tarcia). Bez wiru — zero (bez zmian w zachowaniu).
+wiatr przesunąłby go mimo tarcia). Cyklon (`js/envs/sky/cyclone.js`) dokłada wiatr jednakowy w całej scenie (profil
+Hollanda z porywami, przy ziemi trochę słabszy). Bez wiru i cyklonu — zero (bez zmian w zachowaniu).
 
 ## Okręt na wodzie (`water/ship.js`)
 

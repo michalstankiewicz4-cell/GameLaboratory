@@ -65,6 +65,35 @@ picks up light items (air drag on each). Saved with the weather (`tornado` in th
 With the variable weather a storm can bring one: **Tornado in a storm** (the chance per storm) and **Its strength**
 (from … to) in the Variable weather window; it fades when the storm ends.
 
+## Cyclone (1.7.0)
+
+A tropical cyclone is hundreds of kilometres across — too big for a model — so it is a **weather field**: the scene's
+weather comes from where the scene is relative to the cyclone's centre (`js/envs/sky/cyclone.js`), and the sky shows
+what cannot be drawn with the weather numbers alone (`js/envs/sky/cyclone-sky.js`). Window **Cyclone**:
+
+- **Zones** (by the distance in eye radii, x = r / Rm): outer clouds (high cloud, rising wind, up to ~20 Rm), spiral
+  **rain bands** (three logarithmic spirals, pitch 15°, from ~1.6 to ~12 Rm; a squall with a downpour, then a break
+  between bands), the **eyewall** (the strongest wind, a storm, visibility near zero) and the **eye** (calm, clear,
+  the eyewall all around on the horizon like the stands of a stadium).
+- **Wind**: the Holland (1980) profile V(r) = Vmax·√((Rm/r)^1.5·e^(1−(Rm/r)^1.5)), weaker still in the eye; Vmax from
+  **Strength** (tropical storm 28 m/s, categories 1–5: 38 … 75 m/s); it turns counter-clockwise in the north
+  (clockwise in the south, **Hemisphere**) with ~20° inflow, with gusts stronger in bands and the eyewall. The wind
+  is real air for the physics, as with the tornado (`stage.windAt`), and the clouds drift with it.
+- **Where the scene is**: **Distance** from the centre and **Direction** (where the scene lies from the centre),
+  **Eye radius** (the radius of maximum wind, 10–60 km). **Moving**: the centre goes in **Track** at **Track speed**,
+  so the scene passes through the zones (by default the cyclone comes over the scene: bands → eyewall → eye →
+  eyewall with the wind reversed → bands). **Restart** goes back to the start.
+- **Spouts in bands**: a waterspout or tornado can come with a strong band (from a 10-minute slot, repeatable).
+- The map from above: the bands, the eyewall, the eye, the scene (a dot) and its track relative to the centre from 6 h
+  ago to 12 h ahead; the line above it: the zone, the distance, the wind (from where), rain, a spout, when the eye
+  comes. Preview ×1 / ×60 / ×600.
+- The sky: a cloud layer at 1.8 km with the bands in real kilometres from the centre (they pass overhead as the
+  cyclone moves and turns, once in ~4 h) and, from the eye, the eyewall — drawn closer at the same angular size.
+
+The cyclone and the variable weather exclude each other: switching one on switches the other off; choosing a weather
+from the list or moving a weather slider switches the cyclone off. Saved with the weather (`cyclone` in the "weather"
+asset); in the scene editor's ▶ Play the cyclone goes on from where it was saved (`js/scene/weather.js`).
+
 ## Time of day
 
 A **Time** slider (local solar time at 55° N in late October — the North Atlantic convoy season) and buttons Dawn,

@@ -57,6 +57,26 @@
   <div class="btns"><button type="button" id="copy">Copy settings (JSON)</button></div>
   <p class="note" id="copied"></p>
 </aside>
+<aside class="panel" data-window="cyclone" data-title="Cyclone" data-title-pl="Cyklon">
+  <h3>Cyclone</h3>
+  <label class="chk"><input type="checkbox" id="cyOn"> A cyclone (hurricane, typhoon): the weather here comes from where the scene is against its centre</label>
+  <div class="cyNow" id="cyNow"></div>
+  <canvas class="cyMap" id="cyMap" width="240" height="240" aria-label="The cyclone from above: its bands, the eye, the scene and the track"></canvas>
+  <p class="note">Preview speed (the scene and the game run at ×1):</p>
+  <div class="btns" id="cySpeed"></div>
+  <div class="row"><span>Strength</span><select id="cyCat"></select><output></output></div>
+  <div class="row"><span>Eye radius</span><input type="range" id="cyEye" min="8" max="60" step="1"><output id="cyEyeV"></output></div>
+  <h3>Where the scene is</h3>
+  <div class="row"><span>From the centre</span><input type="range" id="cyDist" min="0" max="600" step="1"><output id="cyDistV"></output></div>
+  <div class="row"><span>Bearing</span><input type="range" id="cyBearing" min="0" max="359" step="1"><output id="cyBearingV"></output></div>
+  <label class="chk"><input type="checkbox" id="cyMoving"> It moves (the scene passes through its zones)</label>
+  <div class="row"><span>Heading to</span><input type="range" id="cyTrack" min="0" max="359" step="1"><output id="cyTrackV"></output></div>
+  <div class="row"><span>Speed</span><input type="range" id="cyTrackSpeed" min="1" max="15" step="0.5"><output id="cyTrackSpeedV"></output></div>
+  <div class="row"><span>Hemisphere</span><select id="cyHemi"><option value="north">North (turns anticlockwise)</option><option value="south">South (turns clockwise)</option></select><output></output></div>
+  <label class="chk"><input type="checkbox" id="cySpouts"> Waterspouts and tornadoes in the rain bands</label>
+  <div class="btns"><button type="button" id="cyRestart">Back to the start</button></div>
+  <p class="note">Saved with the weather for the scene editor; in ▶ Play the cyclone moves on and its wind pushes ships, vehicles and items.</p>
+</aside>
 <aside class="panel" data-window="weathercycle" data-title="Variable weather" data-title-pl="Zmienna pogoda">
   <h3>Now</h3>
   <p class="note">Switch it on in Light and weather (Variable weather, under the weather list).</p>

@@ -52,7 +52,7 @@ export const KEY = 'gameLab.assets.v1';
 export const ASSET_KINDS = {
   sea: { label: 'Sea', labelPl: 'Morze', lab: 'labs/water.html', keys: ['Hs', 'Lp', 'chop', 'spread', 'n', 'dir', 'deep', 'scatter', 'shine', 'ripples', 'crest', 'reflect'] },
   land: { label: 'Land', labelPl: 'Ląd', lab: 'labs/land.html', keys: ['map', 'water'] },
-  weather: { label: 'Weather and light', labelPl: 'Pogoda i światło', lab: 'labs/look.html', keys: ['weather', 'coverage', 'density', 'scale', 'haze', 'wind', 'rain', 'vis', 'lightning', 'time', 'sunEl', 'sunAz', 'moon', 'cycle', 'tornado'] },
+  weather: { label: 'Weather and light', labelPl: 'Pogoda i światło', lab: 'labs/look.html', keys: ['weather', 'coverage', 'density', 'scale', 'haze', 'wind', 'rain', 'vis', 'lightning', 'time', 'sunEl', 'sunAz', 'moon', 'cycle', 'tornado', 'cyclone'] },
   look: { label: 'Camera look', labelPl: 'Wygląd kamery', lab: 'labs/filters.html', keys: ['exposure', 'autoExposure', 'autoTarget', 'tone', 'contrast', 'saturation', 'vibrance', 'temperature', 'tint', 'bloom', 'vignette', 'grain', 'ca', 'distortion', 'droplets', 'dirt', 'glare', 'sharpen'] },
   sky: { label: 'Space sky', labelPl: 'Niebo kosmosu', lab: 'labs/bodies.html', keys: null },   // null: każda liczba
   ui: { label: 'Game UI', labelPl: 'UI gry', lab: 'labs/gameui.html', keys: ['format', 'version', 'name', 'skin', 'start', 'pause', 'screens', 'hud', 'windows'] },

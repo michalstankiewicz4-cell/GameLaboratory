@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.50.0 — 2026-11-21
+
+### Dodane
+- ▶ Graj: **cyklon** z pogody sceny (zasób „weather” z laboratorium wyglądu) — idzie dalej, pogoda z położenia sceny
+  względem środka (pasma, ściana oka, oko), jego wiatr działa na okręty, pojazdy, samoloty i przedmioty.
+
 ## 0.49.0 — 2026-11-21
 
 ### Dodane

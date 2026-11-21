@@ -16,3 +16,7 @@
 .wcTable > span.rowHd { text-align: left; }
 .wcTable input { width: 100%; min-width: 0; padding: 2px; font-family: var(--mono); font-size: 10px; text-align: center; }
 .wcTable input.self { opacity: .35; }
+/* okno Cyklon (js/labs/look/cyclone-window.js) */
+.cyNow { font-family: var(--mono); color: var(--head); font-size: 12px; margin: 4px 0 6px; min-height: 2.6em; }
+.cyMap { display: block; width: 100%; max-width: 240px; aspect-ratio: 1; margin: 4px auto 6px; border: 1px solid var(--line); border-radius: var(--r2); background: var(--bg); }
+#cySpeed button.on { color: var(--accent); border-color: var(--accent); }

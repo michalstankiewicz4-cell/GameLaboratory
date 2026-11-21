@@ -8,6 +8,8 @@ import { generateWorld, biomeTexture, regionTextures, regionUniforms, setRegions
 import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, hullTexture, LOOKS, SEAS } from '../../envs/water/waterkit.js';
 import { createVegetation } from '../../models/plants/vegetation.js';
 import { createTornado, tornadoWind } from '../../envs/sky/tornado.js';
+import { cycloneAt, cycloneWind, relOf } from '../../envs/sky/cyclone.js';
+import { createCycloneSky } from '../../envs/sky/cyclone-sky.js';
 
 // oświetlenie do sprawdzania filtrów: pogoda z SkyKit + pora dnia (55° N, koniec października, jak w laboratorium wyglądu)
 export const LIGHTS = {
@@ -71,6 +73,8 @@ export function createStage(renderer, scene, opts = {}) {
   let land = null;   // teren (setLand / setWorld): { T, tm, tex, btex, rtex, buoys } — mapa, siatki LandKit, tekstury; morze zna teren
   let veg = null, vegDef = null, lastDt = 0, windNow = 6;   // roślinność na terenie (setVegetation, js/models/plants/vegetation.js)
   let tornado = null;   // trąba powietrzna / tornado z pogody (pole tornado: { strength, kind }; js/envs/sky/tornado.js)
+  let cyc = null, cycA = null, cycG = 0, cycSky = null, windDir = null;   // cyklon z pogody (pole cyclone; js/envs/sky/cyclone.js): pasma i ściana oka na niebie, wiatr
+  const CW = [0, 0, 0];
   setSea();
   // atmosfera planety (ląd z planety, T.atmo): niebo dzienne przebarwione na odcień jej atmosfery (Ziemia 205°), tym
   // bledsze i ciemniejsze, im rzadsza atmosfera; bez atmosfery — niebo kosmosu (tryb nieba ustawia strona)
@@ -161,7 +165,12 @@ export function createStage(renderer, scene, opts = {}) {
     // gatunki z biomów terenu, miejsca z gruntu; lasy w kafelkach wokół kamery (pełne modele blisko, impostory dalej), trawa
     setVegetation(def) { vegDef = def || null; applyVeg(); },
     // wiatr trąby powietrznej / tornada w punkcie (m/s, świat) — fizyka środowiska (zachowania w ▶ Graj); bez wiru — zero
-    windAt(x, y, z, out = [0, 0, 0]) { return tornadoWind(tornado && tornado.state, x, y, z, out); },
+    windAt(x, y, z, out = [0, 0, 0]) {
+      tornadoWind(tornado && tornado.state, x, y, z, out);
+      if (cyc) { cycloneWind(cyc, (cyc.t || 0) + cycG, CW, cycA); const k = Math.max(0, Math.min(1, (y + 2) / 12)) * 0.3 + 0.7; out[0] += CW[0] * k; out[2] += CW[2] * k; }   // cyklon: wiatr jednakowy w scenie, przy samej ziemi słabszy
+      return out;
+    },
+    get cyclone() { return cycA; },
     get tornado() { return tornado && tornado.state ? { x: tornado.state.x, z: tornado.state.z, kind: tornado.kind, vmax: tornado.state.vmax * tornado.state.fade, rc: tornado.state.rc } : null; },
     get vegetation() { return veg ? veg.counts : null; },
     get land() { return land ? land.T : null; },
@@ -213,6 +222,11 @@ export function createStage(renderer, scene, opts = {}) {
       const tw = !space && w.tornado && w.tornado.on !== false && w.tornado.strength > 0 ? w.tornado : null;
       if (tw && !tornado) tornado = createTornado(scene);
       if (tornado) tornado.set(tw);
+      // cyklon: niebo (pasma, ściana oka) i wiatr z jego położenia; kierunek wiatru niesie chmury
+      cyc = !space && w.cyclone && w.cyclone.on ? { ...w.cyclone } : null;
+      cycA = cyc ? cycloneAt(cyc) : null; cycG = 0;   // stan cyklonu na chwilę podania pogody; porywy liczą się dalej w tick
+      if (cyc && !cycSky) cycSky = createCycloneSky(scene);
+      windDir = w.windDir || (cycA ? cycA.dir : null);
       if (veg) { veg.light(sun, hemi, scene.fog, scene.environmentIntensity); veg.wind(windNow); }
       if (space) {   // niebo kosmosu: słońce białe i pełne (bez atmosfery i chmur), kierunek z pory dnia; prawie bez rozproszonego
         sunSeen = 1; sun.color.setRGB(1, 0.97, 0.92); sun.intensity = 3.2;
@@ -237,10 +251,11 @@ export function createStage(renderer, scene, opts = {}) {
     },
     // krok czasu: fale, przesunięcie, dryf chmur (laboratorium z własną kamerą woła tick, potem follow)
     tick(dt) {
-      t += dt; shift += shiftSpeed * dt; lastDt = dt;
+      t += dt; shift += shiftSpeed * dt; lastDt = dt; cycG += dt;
       WU.uTime.value = t; WU.uShift.value = shift;
       const k = stage.wind == null ? 1 : stage.wind * 0.3;
-      skyU.uCloudOff.value.x += dt * clouds[0] * k; skyU.uCloudOff.value.y += dt * clouds[1] * k;
+      if (windDir) { const m = Math.hypot(clouds[0], clouds[1]) * 1.4; skyU.uCloudOff.value.x += dt * windDir[0] * m * k; skyU.uCloudOff.value.y += dt * windDir[1] * m * k; }   // chmury z wiatrem (cyklon)
+      else { skyU.uCloudOff.value.x += dt * clouds[0] * k; skyU.uCloudOff.value.y += dt * clouds[1] * k; }
       envT += dt;
       return t;
     },
@@ -252,6 +267,10 @@ export function createStage(renderer, scene, opts = {}) {
       if (veg) { veg.visible = surfaceKind === 'land'; if (surfaceKind === 'land') veg.update(camera, lastDt); }
       if (opts.fogHeight && !space) { const f = fogBase / (1 + Math.max(0, camera.position.y - 40) / 300); scene.fog.density = f; WU.uFogDen.value = f; }
       if (veg) veg.fog(scene.fog.density);
+      if (cycSky) {
+        cycSky.update(camera, cyc ? { rel: relOf(cyc), Rm: cyc.eye, sign: cyc.hemisphere === 'south' ? -1 : 1, at: cycA, ct: (cyc.t || 0) + cycG } : null, { light: WU.uLight.value, fog: scene.fog, sunDir, t });
+        if (!cyc) { cycSky.dispose(); cycSky = null; }
+      }
       if (tornado) {
         tornado.update(lastDt, camera, { isWater: (x, z) => stage.isWater(x, z, 0.5), groundAt: (x, z) => (land && surfaceKind === 'land' ? sampleHeight(land.T, x, z) : 0), light: WU.uLight.value, fog: scene.fog });
         if (!tornado.state) { tornado.dispose(); tornado = null; }

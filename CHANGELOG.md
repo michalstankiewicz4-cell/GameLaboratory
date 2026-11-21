@@ -3,6 +3,21 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.97.0 · wygląd 1.7.0 · edytor sceny 0.50.0 — 2026-11-21 (cyklon)
+
+### Dodane
+- **Cyklon w pogodzie** (`js/envs/sky/cyclone.js`): za duży na model, więc pole pogody — pogoda sceny z jej położenia
+  względem środka: obrzeża (wysokie chmury, rosnący wiatr), spiralne pasma deszczu (szkwał z ulewą, potem przerwa),
+  ściana oka (najsilniejszy wiatr, burza, widoczność prawie zero) i oko (cisza, przejaśnienie). Wiatr z profilu
+  Hollanda (siła: burza tropikalna, kategorie 1–5), obrót zależny od półkuli, z napływem do środka i porywami. Cyklon
+  wędruje, więc scena przechodzi przez strefy (domyślnie oko przechodzi nad sceną); w pasmach mogą się zrodzić trąby.
+- **Niebo cyklonu** (`js/envs/sky/cyclone-sky.js`): warstwa chmur z pasmami w prawdziwych kilometrach od środka
+  (przesuwają się nad sceną) i ściana oka dookoła, gdy scena jest w oku; chmury dryfują z wiatrem cyklonu.
+- Wiatr cyklonu dla fizyki w `stage.windAt` (jak przy tornadzie); pole `cyclone` pogody, zapis z pogodą dla sceny.
+- Laboratorium wyglądu: okno **Cyclone** — mapa z góry (pasma, oko, scena i jej droga), strefa i wiatr teraz,
+  podgląd ×1 / ×60 / ×600, siła, promień oka, odległość i kierunek, wędrówka, półkula, trąby w pasmach.
+- Edytor sceny: w ▶ Graj cyklon idzie dalej od miejsca z zasobu (`js/scene/weather.js`).
+
 ## Program 0.96.0 · wygląd 1.6.0 · edytor sceny 0.49.0 — 2026-11-21 (trąba powietrzna i tornado)
 
 ### Dodane

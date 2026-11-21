@@ -12,6 +12,7 @@ import { createStage } from '../shared/stage.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 import { attachWeatherCycle } from '../shared/weather-cycle-ui.js';
 import { weatherWindow } from './weather-window.js';
+import { cycloneWindow } from './cyclone-window.js';
 import { LookPipeline, AutoResolution, LOOK_PRESETS, LOOK_DEFAULTS } from '../../render/sea/look.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
@@ -145,7 +146,22 @@ $('weather').addEventListener('change', () => { if (S.sky.tornado && S.sky.torna
 wc.onChange(() => { if (!(S.sky.cycle && S.sky.cycle.on)) keepOn(); });
 const wcWin = weatherWindow({ wc, get: () => S.sky.cycle, set: (c) => { S.sky.cycle = { ...c, on: wc.on }; save(); } });
 // ruszenie suwaka pogody wyłącza zmienną pogodę (zostaje to, co ustawione ręcznie)
-SKY_SLIDERS.forEach((k) => $(k).addEventListener('input', () => { if (wc.on) { wc.setOn(false, true); keepOn(); } }));
+SKY_SLIDERS.forEach((k) => $(k).addEventListener('input', () => { if (wc.on) { wc.setOn(false, true); keepOn(); } if (cyWin.on) cyWin.setOn(false); }));
+// cyklon (js/envs/sky/cyclone.js, okno Cyclone): liczby pogody z położenia sceny względem środka; włączony wyłącza
+// zmienną pogodę, a wybór pogody z listy, ruszenie suwaka pogody albo włączenie zmiennej pogody — wyłącza cyklon
+const cyWin = cycloneWindow({
+  get: () => S.sky.cyclone, set: (c) => { S.sky.cyclone = c; save(); },
+  apply: (p) => {
+    if (!p) { S.sky.windDir = null; updateSky(); return; }
+    const { weather, windDir, cyclone, tornado, ...num } = p;
+    Object.assign(S.sky, num, { weather, windDir, cyclone: { ...cyclone, on: true } }); $('weather').value = weather;   // lista: najbliższa pogoda
+    if (cyclone.spouts) S.sky.tornado = tornado;
+    bolts.S.rate = S.sky.lightning; showSky(); showTw(); updateSky();
+  },
+  stopOthers: () => { if (wc.on) { wc.setOn(false, true); keepOn(); } },
+});
+$('weather').addEventListener('change', (e) => { if (e.isTrusted && cyWin.on) cyWin.setOn(false); });
+wc.onChange(() => { if (wc.on && cyWin.on) cyWin.setOn(false); });
 // dla AI: LookApi.weatherCycle — włącz / wyłącz, ustawienia, pogoda teraz, nadchodzące
 window.LookApi = {
   weatherCycle: {
@@ -176,6 +192,7 @@ $('wxLoad').onclick = () => {
   Object.assign(S.sky, a); $('weather').value = WEATHER[S.sky.weather] ? S.sky.weather : 'custom';
   for (const k of WX_KEYS) if ($(k) && k !== 'weather') { $(k).value = S.sky[k]; const o = $(k + 'V'); if (o) o.textContent = k === 'time' ? fmtTime(S.sky[k]) : fmtSky[k] ? fmtSky[k](S.sky[k]) : S.sky[k]; }
   if (a.cycle) { const { on, ...o } = a.cycle; wc.cycle.set(o); wc.setOn(!!on); wcWin.fill(); }
+  if (a.cyclone) { cyWin.cyclone.set(a.cyclone); cyWin.setOn(!!a.cyclone.on); cyWin.fill(); }
   bolts.S.rate = S.sky.lightning; $('wxName').value = n; showTw(); updateSky(); save();
   $('wxNote').textContent = `Loaded "${n}".`;
 };

@@ -231,6 +231,10 @@ mgła, morze WaterKit, płaski grunt albo teren LandKit z wodami RegionKit, mapa
 - Trąba powietrzna / tornado z pogody (pole `tornado` światła: `{ on, strength, kind }`; zmienna pogoda — w burzy):
   `stage.tornado` → `{ x, z, kind, vmax, rc }`, wiatr w punkcie `stage.windAt(x, y, z, out)` (m/s) — zachowania w ▶ Graj
   (`world.windAt`, [`../behaviors/README.md`](../behaviors/README.md)).
+- Cyklon z pogody (pole `cyclone` światła, `js/envs/sky/cyclone.js`): pogoda z położenia sceny względem środka (pasma,
+  ściana oka, oko), niebo cyklonu (pasma nad głową, ściana oka z oka — `js/envs/sky/cyclone-sky.js`), wiatr cyklonu
+  w `stage.windAt` (z porywami), chmury z wiatrem (`windDir`); `stage.cyclone` → `cycloneAt` (strefa, wiatr, odległość).
+  W ▶ Graj cyklon idzie dalej (`js/scene/weather.js`, pierwszeństwo przed zmienną pogodą).
 - Roślinność na terenie `setVegetation(zasób „vegetation” | null)` (`js/models/plants/vegetation.js`): gatunki z biomów
   terenu (północny, równiny, pustynia), miejsca z gruntu (woda, wysokość, nachylenie) — reguły laboratorium roślin;
   lasy w kafelkach 256 m w promieniu `radius` wokół kamery (to samo ziarno i kafelek — te same rośliny), pełne modele
