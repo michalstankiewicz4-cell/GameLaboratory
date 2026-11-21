@@ -10,6 +10,7 @@
 
    v: [x, y, z] in the model's own units (Y up, the face toward +Z);
    t: triangles, three indices each. */
+import '../../life/lifekit.js';   // LifeKit
 window.LifeKit.data = window.LifeKit.data || {};
 window.LifeKit.data.bustHead = {
   credit: "Head and neck shaped after “Lowpoly face model” by void (sketchfab.com/void22), CC BY 4.0 — changed.",

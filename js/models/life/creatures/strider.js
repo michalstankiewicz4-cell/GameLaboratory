@@ -12,6 +12,9 @@
    ears and eyes are rigid on their bones. The hide is painted per seed:
    countershading (dark back, pale belly), a pattern (stripes, spots or
    banded legs), mottling, a fine hair grain for the bump. */
+import { THREE } from '../../../core/three-global.js';
+import '../lifekit.js';   // LifeKit
+import '../move/quad.js';
 (function () {
 "use strict";
 const LK = window.LifeKit, U = LK.util;

@@ -75,7 +75,7 @@ Każde jest też w zakładce **API** konsoli swojego laboratorium (JSON). Wywoł
 
 | API | Laboratorium | Najważniejsze | Przykład |
 |---|---|---|---|
-| `CityApi` | `city.html` | `make(opis)` (także `{ landmark: 'pkin' }` — budynek Warszawy z mapy), `spec`, `types`, `landmarks`, `footprints`, `info`, `night(0…1)`, `save(nazwa)` → `building` | `CityApi.make({ type: 'tower', floors: 30 })` |
+| `CityApi` | `city.html` | `make(opis)` (także `{ landmark: 'defilad-1' }` — budynek Warszawy z mapy), `spec`, `types`, `landmarks`, `footprints`, `info`, `night(0…1)`, `save(nazwa)` → `building` | `CityApi.make({ type: 'tower', floors: 30 })` |
 | `MaterialApi` | `materials.html` | `make(opis)`, `presets`, `kinds`, `def`, `maps()` (PNG), `save(nazwa)` → `material` | `MaterialApi.make({ kind: 'plate', color: '#6d6a66', rust: 0.6 })` |
 | `ArtApi` | `art.html` | `render(spec)` → PNG, `spec()`, `lists`, `exam({ kind, seed, profile, views })` — ekspertyza | `await ArtApi.render({ subject: 'landscape', seed: 7 })` |
 | `EffectsApi` | `effects.html` | `play(kind, { from, to \| at, dir \| path })`, `set(kind, liczby)`, `save(nazwa)` → `effect` | `EffectsApi.play('explosion', { at: [0, 2, 0] })` |

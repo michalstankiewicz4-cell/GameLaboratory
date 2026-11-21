@@ -3,22 +3,23 @@
 // js/models/city/landmarks/osm-data.js (moduł ES, bez pobierania w trakcie działania). Dane © współtwórcy OpenStreetMap
 // (ODbL). Uruchamiane w GitHub Actions (.github/workflows/city-osm.yml — stąd jest dostęp do Overpass) albo lokalnie:
 //   node tools/city-osm.mjs            (dopisuje brakujące; FORCE=1 — pobiera wszystkie od nowa)
-// Budynek: nazwa (wyrażenie), punkt i promień szukania; części — building:part, których środek leży w obrysie budynku.
+// Budynek: adres (to, co widać w laboratorium — bez nazw własnych budynków), element OSM, punkt i promień szukania;
+// części — building:part, których środek leży w obrysie budynku.
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
 export const LANDMARKS = [
-  { id: 'pkin', name: 'Pałac Kultury i Nauki', re: 'Pałac Kultury', lat: 52.23175, lon: 21.00586, r: 220 },
-  { id: 'centralna', name: 'Warszawa Centralna (dworzec)', re: 'Warszawa Centralna|Dworzec Centralny', lat: 52.22880, lon: 21.00330, r: 260 },
-  { id: 'zlota44', name: 'Złota 44', re: 'Złota 44', lat: 52.22975, lon: 21.00290, r: 160 },
-  { id: 'intercontinental', name: 'InterContinental', re: 'InterContinental', lat: 52.23140, lon: 21.00290, r: 160 },
-  { id: 'varso', name: 'Varso Tower', re: 'Varso Tower|Varso Place|Varso 3|Varso III', lat: 52.22890, lon: 20.99780, r: 260 },
-  { id: 'spire', name: 'Warsaw Spire', re: 'Warsaw Spire|Spire', lat: 52.23270, lon: 20.98380, r: 220 },
-  { id: 'rondo1', name: 'Rondo 1', re: 'Rondo 1', lat: 52.23380, lon: 21.00050, r: 180 },
-  { id: 'cosmopolitan', name: 'Cosmopolitan', re: 'Cosmopolitan', lat: 52.23490, lon: 21.00180, r: 180 },
-  { id: 'wtt', name: 'Warsaw Trade Tower', re: 'Warsaw Trade Tower|WTT', lat: 52.23830, lon: 20.98250, r: 600 },
+  { id: 'defilad-1', name: 'pl. Defilad 1', osm: 'relation/1319250', lat: 52.23175, lon: 21.00586, r: 220 },
+  { id: 'jerozolimskie-54', name: 'Al. Jerozolimskie 54', osm: 'way/367491792', lat: 52.22880, lon: 21.00330, r: 260 },
+  { id: 'zlota-44', name: 'Złota 44', osm: 'way/33068248', lat: 52.22975, lon: 21.00290, r: 160 },
+  { id: 'emilii-plater-49', name: 'Emilii Plater 49', osm: 'way/30611691', lat: 52.23140, lon: 21.00290, r: 160 },
+  { id: 'chmielna-69', name: 'Chmielna 69', osm: 'way/693894333', lat: 52.22890, lon: 20.99780, r: 260 },
+  { id: 'europejski-1', name: 'pl. Europejski 1', osm: 'way/256332339', lat: 52.23270, lon: 20.98380, r: 220 },
+  { id: 'rondo-onz-1', name: 'rondo ONZ 1', osm: 'way/30621990', lat: 52.23380, lon: 21.00050, r: 180 },
+  { id: 'twarda-2-4', name: 'Twarda 2/4', osm: 'way/367491791', lat: 52.23490, lon: 21.00180, r: 180 },
+  { id: 'chlodna-51', name: 'Chłodna 51', osm: 'way/239006640', lat: 52.23830, lon: 20.98250, r: 600 },
 ];
-const KEEP = ['name', 'building', 'building:part', 'height', 'min_height', 'building:levels', 'building:min_level', 'roof:shape', 'roof:height', 'roof:levels', 'roof:colour', 'building:colour', 'building:material', 'roof:material'];
+const KEEP = ['building', 'building:part', 'height', 'min_height', 'building:levels', 'building:min_level', 'roof:shape', 'roof:height', 'roof:levels', 'roof:colour', 'building:colour', 'building:material', 'roof:material'];
 const UA = 'GameLaboratory-city/1.0 (+https://github.com/michalstankiewicz4-cell/GameLaboratory)';
 const SERVERS = ['https://overpass-api.de/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
 
@@ -68,15 +69,12 @@ const r2 = (p) => p.map(([x, z]) => [Math.round(x * 100) / 100, Math.round(z * 1
 
 async function landmark(L) {
   const q = `[out:json][timeout:90];(nwr["building"](around:${L.r},${L.lat},${L.lon});nwr["building:part"](around:${L.r},${L.lat},${L.lon}););out geom;`;
-  const els = await overpass(q), re = new RegExp(L.re, 'i');
-  const named = els.filter((e) => e.tags && e.tags.building && re.test(e.tags.name || ''));
-  if (!named.length) throw new Error(`${L.id}: no building named /${L.re}/ (found: ${[...new Set(els.filter((e) => e.tags && e.tags.name).map((e) => e.tags.name))].slice(0, 30).join(' | ')})`);
-  // najwyższy pasujący budynek (przy tej samej wysokości — największy)
-  let main = null, mainShape = null, best = 0, bestK = -1;
-  for (const e of named) for (const s of shapeOf(e, L.lat, L.lon)) {
-    const a = Math.abs(area(s.outer)), k = (parseFloat(e.tags.height) || 0) * 1e7 + a;
-    if (k > bestK) { bestK = k; best = a; main = e; mainShape = s; }
-  }
+  const els = await overpass(q);
+  const main = els.find((e) => `${e.type}/${e.id}` === L.osm && e.tags && e.tags.building);
+  if (!main) throw new Error(`${L.id}: no building ${L.osm} within ${L.r} m`);
+  // obrys budynku: największy (relacja może mieć kilka)
+  let mainShape = null, best = 0;
+  for (const s of shapeOf(main, L.lat, L.lon)) { const a = Math.abs(area(s.outer)); if (a > best) { best = a; mainShape = s; } }
   // części: building:part ze środkiem w obrysie (i nie większe od budynku)
   const parts = [];
   for (const e of els) {
@@ -91,9 +89,9 @@ async function landmark(L) {
   for (const [x, z] of mainShape.outer) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); z0 = Math.min(z0, z); z1 = Math.max(z1, z); }
   const cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, sh = (p) => r2(p.map(([x, z]) => [x - cx, z - cz]));
   const fix = (s) => ({ ...s, outer: sh(s.outer), holes: s.holes.map(sh) });
-  console.log(`${L.id}: ${main.type}/${main.id} "${main.tags.name}", ${Math.round(best)} m², ${parts.length} parts`);
+  console.log(`${L.id}: ${main.type}/${main.id}, ${Math.round(best)} m², ${parts.length} parts`);
   return {
-    name: L.name, osm: `${main.type}/${main.id}`, osmName: main.tags.name, tags: tagsOf(main.tags),
+    name: L.name, osm: `${main.type}/${main.id}`, tags: tagsOf(main.tags),
     lat: Math.round((L.lat - cz / 110574) * 1e6) / 1e6, lon: Math.round((L.lon + cx / (111320 * Math.cos(L.lat * Math.PI / 180))) * 1e6) / 1e6,
     ...fix(mainShape), parts: parts.map(fix),
   };
@@ -104,13 +102,13 @@ const FILE = 'js/models/city/landmarks/osm-data.js';
 const old = existsSync(FILE) && !process.env.FORCE ? (await import(pathToFileURL(FILE).href)).default : {};
 const out = {}, errors = [];
 for (const L of LANDMARKS) {
-  const query = { re: L.re, lat: L.lat, lon: L.lon, r: L.r };
+  const query = { osm: L.osm, lat: L.lat, lon: L.lon, r: L.r };
   if (old[L.id] && JSON.stringify(old[L.id].query) === JSON.stringify(query)) { out[L.id] = old[L.id]; continue; }   // zmieniony wpis — od nowa
   let last = null;
   for (let k = 0; k < 3 && !out[L.id]; k++) {
-    try { out[L.id] = { ...(await landmark(L)), query }; } catch (e) { last = e; console.error(e.message); if (/no building named/.test(e.message)) break; await new Promise((r) => setTimeout(r, 20000)); }
+    try { out[L.id] = { ...(await landmark(L)), query }; } catch (e) { last = e; console.error(e.message); if (/no building /.test(e.message)) break; await new Promise((r) => setTimeout(r, 20000)); }
   }
-  if (!out[L.id] && old[L.id] && !/no building named/.test(String(last && last.message))) out[L.id] = old[L.id];   // nie odpowiedział — zostaje to, co było
+  if (!out[L.id] && old[L.id] && !/no building /.test(String(last && last.message))) out[L.id] = old[L.id];   // nie odpowiedział — zostaje to, co było
   if (!out[L.id] && last) errors.push(L.id + ': ' + last.message);
   await new Promise((r) => setTimeout(r, 3000));
 }

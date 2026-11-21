@@ -120,7 +120,6 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
 ## Z remanentu (listopad 2026, do decyzji)
 - [ ] D6: wspólne pomocnicze `$()` / `el()` (np. nowy plik w `js/labkit/`).
 - [ ] F3: dane głowy człowieka jako plik `.bin` (wczytywany asynchronicznie).
-- [ ] F4: kity Space jako importy ES zamiast globali `window.*`.
 - [ ] Laboratorium skórek bez CSP (atrybuty `style=` w makiecie i w `js/labs/skins/skins.js`).
 
 ## Pomysły na laboratoria przeniesione z TODO.md w Battle

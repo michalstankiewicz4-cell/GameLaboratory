@@ -92,6 +92,7 @@
    to this file bumps the program's version (ui/data/versions.js, CHANGELOG.md;
    CLAUDE.md, "Wersjonowanie"). English comments.
    ======================================================================= */
+import { THREE } from '../../core/three-global.js';
 window.BodyKit = (function () {
 "use strict";
 
@@ -718,3 +719,7 @@ return { GROUPS, COMMON_PARAMS, PLANET_PARAMS, PLANET_DEFAULTS, QUALITY_OCTAVES,
          // the internals the kind files build with — not a public API
          _: { KINDS, PLANET_DEFAULTS, defaultValues, GLSL_BODY, GLSL_NOISE, GLSL_SPHERE_VERTEX, GROUPS, HOLE_KM, ROCK_KM, blackbody, bodyUniforms, hueColor, makeBillboard, makeBodyHandle, seedVec } };
 })();
+
+// moduł ES: kit do importu (window.BodyKit zostaje dla stron i skryptów, które go czytają)
+export const BodyKit = window.BodyKit;
+export default BodyKit;

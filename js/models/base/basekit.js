@@ -1,7 +1,7 @@
 /* =======================================================================
    BASEKIT — planetary base modules (window.BaseKit)
    =======================================================================
-   A classic script like ShipKit and BodyKit: the building lab
+   An ES module (also window.BaseKit) like ShipKit and BodyKit: the building lab
    (buildings.html) and the surface lab (surface.html) use it; the game can
    later. Built from ShipKit's generators (plating, solar cells, struts) —
    needs THREE and window.ShipKit. Not in the game yet (docs/labs/surface.md).
@@ -27,6 +27,8 @@
      disposeModule(module)
    Renderer: construction needs renderer.localClippingEnabled = true.
    ======================================================================= */
+import { THREE } from '../../core/three-global.js';
+import '../ships-space/shipkit.js';   // ShipKit
 window.BaseKit = (function () {
 "use strict";
 const SK = window.ShipKit;
@@ -314,3 +316,7 @@ function modelStats(group) { return SK.modelStats(group); }
 
 return { MODULES, buildModule, disposeModule, modelStats };
 })();
+
+// moduł ES: kit do importu (window.BaseKit zostaje dla stron i skryptów, które go czytają)
+export const BaseKit = window.BaseKit;
+export default BaseKit;

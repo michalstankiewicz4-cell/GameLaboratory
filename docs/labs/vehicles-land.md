@@ -10,7 +10,7 @@ with MarineKit's amphibian on its list ([marine.md](../models/marine.md)).
 
 | File | What it is |
 |---|---|
-| `js/models/vehicles/vehiclekit.js` | **VehicleKit** (`window.VehicleKit`), a classic script like ShipKit, BodyKit and BaseKit. It holds the vehicles, their animation, a simple driving model and the dust. It is built from ShipKit's generators (plating, solar cells, struts) and needs THREE and ShipKit. Not in the game, nor in the surface lab, yet. |
+| `js/models/vehicles/vehiclekit.js` | **VehicleKit** (`window.VehicleKit`), an ES module like ShipKit, BodyKit and BaseKit. It holds the vehicles, their animation, a simple driving model and the dust. It is built from ShipKit's generators (plating, solar cells, struts) and needs THREE and ShipKit. Not in the game, nor in the surface lab, yet. |
 | `labs/vehicles-land.html` | The lab. Rough ground with sliders, AUTO driving (wandering, turning back toward the middle) or WASD, NIGHT, DUST and WORK. |
 
 ## Road vehicles (RoadKit)

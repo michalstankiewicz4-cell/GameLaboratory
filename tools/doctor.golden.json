@@ -68,7 +68,7 @@
    "triangles": 13910
   }
  },
- "city/osm-centralna": {
+ "city/osm-jerozolimskie-54": {
   "counts": {
    "sliver": 2,
    "zfight": 1
@@ -84,7 +84,7 @@
    "triangles": 56210
   }
  },
- "city/osm-cosmopolitan": {
+ "city/osm-twarda-2-4": {
   "counts": {},
   "fingerprint": {
    "drawCalls": 9,
@@ -97,7 +97,7 @@
    "triangles": 185722
   }
  },
- "city/osm-intercontinental": {
+ "city/osm-emilii-plater-49": {
   "counts": {
    "zfight": 1
   },
@@ -112,7 +112,7 @@
    "triangles": 276522
   }
  },
- "city/osm-pkin": {
+ "city/osm-defilad-1": {
   "counts": {
    "sliver": 1
   },
@@ -127,7 +127,7 @@
    "triangles": 467144
   }
  },
- "city/osm-rondo1": {
+ "city/osm-rondo-onz-1": {
   "counts": {
    "seethrough": 1,
    "sliver": 1,
@@ -144,7 +144,7 @@
    "triangles": 429290
   }
  },
- "city/osm-spire": {
+ "city/osm-europejski-1": {
   "counts": {},
   "fingerprint": {
    "drawCalls": 10,
@@ -157,7 +157,7 @@
    "triangles": 199394
   }
  },
- "city/osm-varso": {
+ "city/osm-chmielna-69": {
   "counts": {
    "seethrough": 1,
    "sliver": 1,
@@ -174,7 +174,7 @@
    "triangles": 617606
   }
  },
- "city/osm-wtt": {
+ "city/osm-chlodna-51": {
   "counts": {
    "seethrough": 1,
    "sliver": 1,
@@ -191,7 +191,7 @@
    "triangles": 322860
   }
  },
- "city/osm-zlota44": {
+ "city/osm-zlota-44": {
   "counts": {
    "seethrough": 1,
    "sliver": 2,

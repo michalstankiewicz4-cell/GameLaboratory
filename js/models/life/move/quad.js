@@ -18,6 +18,8 @@
    the cannon bone are set by the phase, the upper two bones solved from
    the hip to the hock (the law of cosines), the knee bending its own way.
    Layers on top: graze, alert, look. */
+import { THREE } from '../../../core/three-global.js';
+import '../lifekit.js';   // LifeKit
 (function () {
 "use strict";
 const LK = window.LifeKit, TAU = Math.PI * 2;

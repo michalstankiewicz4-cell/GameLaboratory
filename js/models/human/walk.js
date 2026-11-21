@@ -20,6 +20,7 @@
    heel lands); the foot stays level in the stance, rolls off the toes,
    lifts them in the swing. The cycle's length comes from how far the
    stance foot travels, so the feet don't slide at the chosen speed. */
+import '../life/lifekit.js';   // LifeKit
 (function () {
 "use strict";
 const LK = window.LifeKit;

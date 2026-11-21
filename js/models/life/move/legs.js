@@ -11,6 +11,8 @@
    The spine sways in a travelling wave — gently with legs, strongly
    without them (a glider moves by it alone). Layers: look (the head
    around), low (the body crouched). */
+import { THREE } from '../../../core/three-global.js';
+import '../lifekit.js';   // LifeKit
 (function () {
 "use strict";
 const LK = window.LifeKit, TAU = Math.PI * 2;

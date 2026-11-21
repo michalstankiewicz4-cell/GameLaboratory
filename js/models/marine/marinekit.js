@@ -1,7 +1,7 @@
 /* =======================================================================
    MARINEKIT — the sea and what sails it (window.MarineKit)
    =======================================================================
-   A classic script like the other kits: the vehicle labs use its vessels
+   An ES module (also window.MarineKit) like the other kits: the vehicle labs use its vessels
    (water page: skimmer, barge, diver; land page: the amphibian) and the scene
    editor (family "Sea robots"). Vessels are built from ShipKit's generators
    (plating, struts); the amphibian borrows VehicleKit's wheels. Needs THREE,
@@ -33,6 +33,9 @@
        opts: { pose, speed, steer, lights, work, wake }
      disposeVessel(vessel), makeWake(), modelStats(group), hullGeometry(…)
    ======================================================================= */
+import { THREE } from '../../core/three-global.js';
+import '../ships-space/shipkit.js';   // ShipKit
+import '../vehicles/vehiclekit.js';   // VehicleKit
 window.MarineKit = (function () {
 "use strict";
 const SK = window.ShipKit, VK = window.VehicleKit;
@@ -367,3 +370,7 @@ function modelStats(group) { return SK.modelStats(group); }
 
 return { VESSELS, buildVessel, disposeVessel, makeWake, modelStats, hullGeometry };
 })();
+
+// moduł ES: kit do importu (window.MarineKit zostaje dla stron i skryptów, które go czytają)
+export const MarineKit = window.MarineKit;
+export default MarineKit;

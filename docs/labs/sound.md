@@ -11,7 +11,7 @@ ship generator". Lab first (labs 1.3.0); the game later.
 
 | File | What it is |
 |---|---|
-| `js/audio/musickit/musickit.js` | **MusicKit** (`window.MusicKit`), a classic script, no dependencies: `create({ params })` → a player (`start`, `stop`, `setParams` live, `say`, `analyser`, `stream`), `PRESETS`, `LAYERS`, `SCALES`, `NOTES`. Not in the game yet. |
+| `js/audio/musickit/musickit.js` (+ `data.js`, `compose.js`) | **MusicKit** (ES module `export MusicKit`, also `window.MusicKit`): `create({ params, ctx, out, mixer })` → a player (`start`, `stop`, `setParams` live, `say`, `analyser`, `stream`), `PRESETS`, `SONGS`, `LAYERS`, `SCALES`, `NOTES`. `data.js` — notes, scales, moods, songs, rhythms; `compose.js` — a song's melody and the MIDI file. In the scene: `js/scene/music.js`. |
 | `labs/sound.html` + `js/labs/sound/sound.js` | The lab: PLAY, MOODS, SEED, KEY, CHARACTER (tempo, density, brightness, space, volume), LAYERS (a level each), THE ROBOT'S VOICE (its lines, how often), RECORD (.webm), COPY SETTINGS; a picture of the sound in the middle. |
 | SAVE FOR THE SCENE | The settings as the named asset **music** (`js/scene/assets.js`); the scene editor plays it in ▶ Play (environment: Music, Action music — `js/scene/music.js`, [`../audio/README.md`](../audio/README.md)). |
 | `js/audio/voice/voicekit.js` | **VoiceKit** (speech lab, [`sound-speech.md`](sound-speech.md)): MusicKit's robot voice (`VoiceKit.speak`) and whisper layer (`VoiceKit.murmur`) moved there (program 0.84.0). |

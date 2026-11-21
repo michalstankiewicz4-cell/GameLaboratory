@@ -1,7 +1,7 @@
 /* =======================================================================
    SURFACEKIT · SKY — a landing site's sky, from the star system it's in
    =======================================================================
-   A classic script after surfacekit.js (adds to window.SurfaceKit). The
+   An ES module that imports surfacekit.js (adds to window.SurfaceKit). The
    surface lab uses it. docs/labs/surface.md, "The sky".
 
    A world is one body of a SystemKit system (an orbit, or a moon of one);
@@ -35,6 +35,10 @@
            { sunDir0, sunCol0, sunDir1, sunCol1, ambient, fogColor, fog, day }
        .dispose()
    ======================================================================= */
+import { THREE } from '../../../core/three-global.js';
+import '../../../models/bodies/bodykit.js';   // BodyKit
+import './surfacekit.js';   // SurfaceKit
+import '../../space/systemkit/systemkit.js';   // SystemKit
 (function () {
 "use strict";
 const SK = window.SurfaceKit, BK = window.BodyKit;

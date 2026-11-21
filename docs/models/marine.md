@@ -9,7 +9,7 @@ is the water lab's sea from Battle; MarineKit's own sea was removed on 2026-11-0
 
 | File | What it is |
 |---|---|
-| `js/models/marine/marinekit.js` | **MarineKit** (`window.MarineKit`), a classic script like the other kits: the vessels (and their data: `foils`, `azimuth`, `wheels`, `sounds.engine`) and the wake. It needs THREE, ShipKit and VehicleKit (the amphibian's wheels: `VehicleKit.parts`). In the scene editor: the family "Sea robots". |
+| `js/models/marine/marinekit.js` | **MarineKit** (`window.MarineKit`), an ES module like the other kits: the vessels (and their data: `foils`, `azimuth`, `wheels`, `sounds.engine`) and the wake. It needs THREE, ShipKit and VehicleKit (the amphibian's wheels: `VehicleKit.parts`). In the scene editor: the family "Sea robots". |
 | `labs/vehicles-water.html`, `js/labs/vehicles-water/vehicles-water.js` | The vehicle lab's water page: the skimmer, the barge and the diver — AUTO (wandering, turning back toward the middle) or WASD + Q/E to dive, NIGHT, WAKE, WORK. |
 | `labs/vehicles-land.html`, `js/labs/vehicles-land/vehicles-land.js` | The land page: the amphibian, with the rovers' DRIVE and GROUND. |
 

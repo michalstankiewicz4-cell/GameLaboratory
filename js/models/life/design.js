@@ -26,6 +26,8 @@
        hips' positions (for the editor)
      LifeKit.design.PRESETS               { id: design }
      LifeKit.design.clean(design)         a design with its numbers in range */
+import { THREE } from '../../core/three-global.js';
+import './lifekit.js';   // LifeKit
 (function () {
 "use strict";
 const LK = window.LifeKit, U = LK.util;

@@ -1,7 +1,7 @@
 // Kity ze Space w scenie (ShipKit — statki, dron, stacja; MarineKit — roboty morskie; BodyKit — niebo; SystemKit — gotowe tła) ładowane
-// dopiero wtedy, gdy scena ich potrzebuje (powierzchnia „kosmos” albo model z rodziny space). Kity są pisane pod
-// globalne THREE: najpierw js/core/three-global.js (window.THREE z pomocnikami LIGHT_SCALE i srgbColor — kity
-// z Battle i TrainKit, które czytają window.THREE przy załadowaniu, są już wtedy załadowane), potem kity w kolejności.
+// dopiero wtedy, gdy scena ich potrzebuje (powierzchnia „kosmos” albo model z rodziny space). Kity są modułami ES:
+// same importują THREE (js/core/three-global.js — z pomocnikami LIGHT_SCALE i srgbColor) i kity, których potrzebują;
+// tu — tylko pliki wejściowe (statki, części ludzi i stworów, rodzaje ciał), w kolejności laboratoriów.
 const SHIP_FILES = ['codewing', 'scribe', 'swarmer', 'haven'];
 let loading = null;
 

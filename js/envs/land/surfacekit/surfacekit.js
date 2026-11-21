@@ -1,7 +1,7 @@
 /* =======================================================================
    SURFACEKIT — the ground of a planet, landing sites and bases
    =======================================================================
-   A classic script (window.SurfaceKit) like the other kits; the surface
+   An ES module (also window.SurfaceKit) like the other kits; the surface
    lab (surface.html) uses it, the game reads the bases (their markers on
    the planets). Needs THREE and window.BodyKit. docs/labs/surface.md.
 
@@ -39,6 +39,8 @@
          base's centre, east/north; start/dur: ms — progress from the clock)
      makeMarker(color, size)            a constant-size diamond sprite (globe markers)
    ======================================================================= */
+import { THREE } from '../../../core/three-global.js';
+import '../../../models/bodies/bodykit.js';   // BodyKit
 window.SurfaceKit = (function () {
 "use strict";
 const BK = window.BodyKit;
@@ -313,3 +315,7 @@ function makeMarker(color = 0xf8bb56, size = 0.035) {
 return { M_PER_SIZE, createSurface, latLonToDir, dirToLatLon, tangentFrame, offsetDir, greatCircle, bases, makeMarker,
          _faces: { dirToFaceUV, faceUVToDir } };
 })();
+
+// moduł ES: kit do importu (window.SurfaceKit zostaje dla stron i skryptów, które go czytają)
+export const SurfaceKit = window.SurfaceKit;
+export default SurfaceKit;

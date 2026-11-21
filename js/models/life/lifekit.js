@@ -23,6 +23,7 @@
      LifeKit.register(def), registerMove(id, move), MOVES
      LifeKit.util                      { rng, sweep, skeleton, merge, skinned, mat, ... }
    ======================================================================= */
+import { THREE } from '../../core/three-global.js';
 window.LifeKit = (function () {
 "use strict";
 
@@ -521,3 +522,7 @@ return {
   util: { rng, V3, smooth, lerp, skeleton, sweep, merge, materials, skinned, rigid, plain, weld, decimate, canvas, tex, hide },
 };
 })();
+
+// moduł ES: kit do importu (window.LifeKit zostaje dla stron i skryptów, które go czytają)
+export const LifeKit = window.LifeKit;
+export default LifeKit;

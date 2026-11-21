@@ -12,6 +12,12 @@
    four fingers, a thumb) and the feet rigid on their bones. Clothed by
    default (a flight suit, boots, a belt); "Mannequin" shows the bare
    shape — smooth, no anatomy beyond it. */
+import { THREE } from '../../core/three-global.js';
+import '../life/lifekit.js';   // LifeKit
+import './walk.js';
+import './face.js';
+import './data/bust-head.js';
+import './data/human-head.js';
 (function () {
 "use strict";
 const LK = window.LifeKit, U = LK.util;

@@ -1,7 +1,7 @@
 /* =======================================================================
    SURFACEKIT · WEATHER — what falls and blows at a landing site
    =======================================================================
-   A classic script after surfacekit.js (adds to window.SurfaceKit). The
+   An ES module that imports surfacekit.js (adds to window.SurfaceKit). The
    surface lab uses it. docs/labs/surface.md, "Weather".
 
    WEATHER lists the kinds; each says on which worlds it can happen
@@ -21,6 +21,8 @@
                                       light: 0..1 how lit the scene is
      .dispose()
    ======================================================================= */
+import { THREE } from '../../../core/three-global.js';
+import './surfacekit.js';   // SurfaceKit
 (function () {
 "use strict";
 const SK = window.SurfaceKit;

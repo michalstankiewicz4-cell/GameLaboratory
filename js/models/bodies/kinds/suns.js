@@ -1,9 +1,11 @@
 /* =======================================================================
    BODYKIT · SUNS — one kind of body (see js/models/bodies/bodykit.js and
-   docs/labs/bodies.md). A classic script loaded after bodykit.js (and after the
+   docs/labs/bodies.md). An ES module that imports bodykit.js (and is loaded after the
    kinds it uses): it registers its builder(s) in BodyKit's KINDS, which
    the groups' table names, and builds with BodyKit's shared blocks.
    ======================================================================= */
+import { THREE } from '../../../core/three-global.js';
+import '../bodykit.js';   // BodyKit
 (function () {
 "use strict";
 const { GLSL_BODY, GLSL_NOISE, GLSL_SPHERE_VERTEX, KINDS, blackbody, bodyUniforms, makeBillboard, makeBodyHandle } = BodyKit._;

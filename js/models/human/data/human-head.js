@@ -10,6 +10,7 @@
    v: the points, Int16 (x, y, z; Y up, the face toward +Z), base64 —
       x = min + (q + 32767) / 65534 · (max − min) per axis;
    t: triangles, Uint16 indices, base64. */
+import '../../life/lifekit.js';   // LifeKit
 window.LifeKit.data = window.LifeKit.data || {};
 window.LifeKit.data.humanHead = {
   credit: "Head after “Low-poly Human Head” by Chermiful (sketchfab.com/Chermiful), CC BY 4.0 — changed.",

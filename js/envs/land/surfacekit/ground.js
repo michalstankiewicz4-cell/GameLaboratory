@@ -2,7 +2,7 @@
    SURFACEKIT · GROUND — being on a planet: the ground scene, the craft,
    the descent, driving, the hop and building a base
    =======================================================================
-   A classic script after surfacekit.js, sky.js and weather.js (adds to
+   An ES module that imports surfacekit.js (after sky.js and weather.js; adds to
    window.SurfaceKit); needs ShipKit (the craft) and BaseKit (the modules).
    The surface lab and the game both run the ground through this — the lab
    is a lab, the game is the game, the ground is the same. docs/labs/surface.md.
@@ -41,6 +41,11 @@
      validate codes: "far" (BASE_RADIUS), "unloaded", "water", "lava", "steep", "close" (+ name)
        — frozen seas, ice caps and sheets are solid ground (the user's call, 2026-10-03)
    ======================================================================= */
+import { THREE } from '../../../core/three-global.js';
+import '../../../models/base/basekit.js';   // BaseKit
+import '../../../models/bodies/bodykit.js';   // BodyKit
+import '../../../models/ships-space/shipkit.js';   // ShipKit
+import './surfacekit.js';   // SurfaceKit
 (function () {
 "use strict";
 const SK = window.SurfaceKit;

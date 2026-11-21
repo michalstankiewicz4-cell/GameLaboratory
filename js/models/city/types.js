@@ -22,7 +22,7 @@
 //   roof         { type: flat | gable | hip | mansard | pyramid | dome, pitch (°), height (wysokość dachu m; 0 — ze
 //                  spadku), overhang (okap m), color, parapet (attyka m) }
 //   lit          część okien świecących nocą (0…1)
-//   landmark     budynek z mapy (landmarks/landmarks.js, np. pkin): bryła z OpenStreetMap, z opisu — tylko wygląd
+//   landmark     budynek z mapy (landmarks/landmarks.js, np. defilad-1): bryła z OpenStreetMap, z opisu — tylko wygląd
 import { PRESETS as MAT } from '../../render/materials/matkit.js';
 
 const mat = (id, over) => ({ ...MAT[id], ...over });

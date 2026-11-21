@@ -6,13 +6,12 @@
 // Nazwa muzyki: 'mood:<id>' — nastrój MusicKit (PRESETS: station, orbit, descent…), 'song:<id>' — piosenka (SONGS),
 // albo nazwa zasobu „music” z laboratorium muzyki (ustawienia MusicKit); '' — cisza.
 // createSceneMusic() → { start(env), stop(), frame(), action(s?), play(nazwa) — zmiana muzyki w grze, now }
-import '../audio/voice/voicekit.js';      // MusicKit sięga po głos i szepty przez window.VoiceKit
-import '../audio/musickit/musickit.js';   // window.MusicKit (skrypt klasyczny)
+import { MusicKit } from '../audio/musickit/musickit.js';   // sam importuje VoiceKit (głos i szepty)
 import { mixer } from '../audio/mixer.js';
 import { getAsset, listAssets } from './assets.js';
 
 export const ACTION_HOLD = 20;   // s bez głośnych zdarzeń, po których akcja wraca do muzyki zwykłej
-const MK = () => window.MusicKit;
+const MK = () => MusicKit;
 const clone = (o) => JSON.parse(JSON.stringify(o));
 
 /** Ustawienia MusicKit z nazwy muzyki albo null (cisza albo nie ma takiej). */

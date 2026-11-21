@@ -53,7 +53,7 @@ Okno nocą: numer okna z mapy + komórka z UV (piętra) albo z atrybutu `aCell` 
 
 ## Budynki z mapy (`landmarks/`)
 
-`build({ landmark: 'pkin', …styl })` (i prefabrykat z zasobem `building` z polem `landmark`) buduje budynek z danych
+`build({ landmark: 'defilad-1', …styl })` (identyfikator i nazwa budynku — adres, bez nazw własnych) (i prefabrykat z zasobem `building` z polem `landmark`) buduje budynek z danych
 OpenStreetMap: każda część (`building:part`; bez części — sam obrys budynku) to budynek CityKit z obrysem w swoim
 miejscu (`footprint.fixed`, dziedzińce — `footprint.holes`), początkiem `base` (`min_height`), kondygnacjami stylu
 i dachem z mapy (`roof:shape` → `flat`, `hip`, `gable`, `mansard`, `pyramid` — namiot, iglica, stożek, `dome` —
@@ -63,10 +63,10 @@ wspólne kafelki fasady. Zadaszenia (`building:part=roof`) — płyta 1,2 m pod 
 z mapy (hex albo nazwa CSS), inne — ze stylu. `edgeBase` przesuwa numery ścian kolejnych części (inne świecące okna).
 Części scalone w jedną siatkę na materiał (materiały kafelków wspólne dla części: `buildBuilding(…, { mats })`).
 
-Dane: `node tools/city-osm.mjs` — Overpass (punkt, promień, nazwa budynku; najwyższy pasujący, części ze środkiem
-w obrysie) → `osm-data.js`. Stąd (kontener) Overpass jest niedostępny, więc narzędzie uruchamia GitHub Actions
+Dane: `node tools/city-osm.mjs` — Overpass (punkt, promień, element OSM budynku — `way/…` albo `relation/…`; części
+ze środkiem w obrysie) → `osm-data.js`; nazwy z mapy (`name`) nie są zapisywane. Stąd (kontener) Overpass jest niedostępny, więc narzędzie uruchamia GitHub Actions
 (`.github/workflows/city-osm.yml`, po zmianie narzędzia albo ręcznie) i dopisuje wynik do `main`; pobrane zostają,
-zmieniony wpis (nazwa, punkt, promień) — od nowa, niedostępny serwer — zostają stare dane.
+zmieniony wpis (element, punkt, promień) — od nowa, niedostępny serwer — zostają stare dane.
 
 ## Ograniczenia (dziś)
 
@@ -75,4 +75,4 @@ zmieniony wpis (nazwa, punkt, promień) — od nowa, niedostępny serwer — zos
   wersja daleka jest na odległość.
 - Gzymsy na rogach wklęsłych zachodzą na siebie (wypukłe są domknięte).
 - Budynki z mapy: obrys z dziedzińcem ma zawsze dach płaski; części zachodzące na siebie w mapie dają w doktorze
-  ściany w jednej płaszczyźnie (dane, nie kit); kształty w mapie są uproszczone (np. zakrzywiona Złota 44 — wielokąt).
+  ściany w jednej płaszczyźnie (dane, nie kit); kształty w mapie są uproszczone (np. zakrzywiony budynek przy Złotej 44 — wielokąt).

@@ -1,7 +1,7 @@
 /* =======================================================================
    VEHICLEKIT — ground vehicles (window.VehicleKit)
    =======================================================================
-   A classic script like ShipKit, BodyKit and BaseKit: the vehicles lab
+   An ES module (also window.VehicleKit) like ShipKit, BodyKit and BaseKit: the vehicles lab
    (labs/vehicles-land.html) uses it, the surface lab and the game can later. Built
    from ShipKit's generators (plating, solar cells, struts) — needs THREE
    and window.ShipKit. Not in the game yet (docs/labs/vehicles-land.md).
@@ -42,6 +42,8 @@
      modelStats(group)
      parts.wheel(r, w, mats, seg), parts.mats()   building blocks for other kits
    ======================================================================= */
+import { THREE } from '../../core/three-global.js';
+import '../ships-space/shipkit.js';   // ShipKit
 window.VehicleKit = (function () {
 "use strict";
 const SK = window.ShipKit;
@@ -396,3 +398,7 @@ function modelStats(group) { return SK.modelStats(group); }
 // parts for other kits (MarineKit's amphibian): a wheel, the shared materials
 return { VEHICLES, buildVehicle, disposeVehicle, drive, makeDust, modelStats, parts: { wheel, mats } };
 })();
+
+// moduł ES: kit do importu (window.VehicleKit zostaje dla stron i skryptów, które go czytają)
+export const VehicleKit = window.VehicleKit;
+export default VehicleKit;

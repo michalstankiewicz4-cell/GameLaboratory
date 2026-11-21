@@ -48,9 +48,9 @@ Ten sam format przyjmie obrys z mapy (np. OSM w grze CityExplorer — następny 
 
 ## Budynki Warszawy (OpenStreetMap)
 
-Na liście budynków grupa **Warsaw (OpenStreetMap)**: Pałac Kultury i Nauki (z iglicą), dworzec Warszawa Centralna
-(dach na słupach), Złota 44, InterContinental, Varso, Warsaw Spire, Rondo 1, Cosmopolitan, Warsaw Trade Tower — te,
-które narzędzie znalazło w mapie. Bryła jest z mapy: obrys budynku i jego części (Simple 3D Buildings) z wysokością,
+Na liście budynków grupa **Warsaw (OpenStreetMap)**, budynki pod adresami (bez nazw własnych): pl. Defilad 1
+(z iglicą), Al. Jerozolimskie 54 (dworzec, dach na słupach), Złota 44, Emilii Plater 49, Chmielna 69, pl. Europejski 1,
+rondo ONZ 1, Twarda 2/4, Chłodna 51 — te, które narzędzie znalazło w mapie. Bryła jest z mapy: obrys budynku i jego części (Simple 3D Buildings) z wysokością,
 początkiem nad gruntem, kształtem i wysokością dachu, kolorami muru i dachu. Wygląd jest nasz — styl budynku CityKit
 (mur, okna, parter, gzymsy; okna Fasada, Parter i gzymsy, barwa dachu), z wersją bliską i wypaloną daleką. Pola
 obrysu, kondygnacji, frontu i rodzaju dachu znikają (są z mapy). Zapis pod nazwą zapamiętuje budynek i styl.
@@ -61,4 +61,4 @@ Dane: © współtwórcy OpenStreetMap (ODbL), pobierane narzędziem `tools/city-
 `window.CityApi`: `make(opis)` → opis po sprawdzeniu (i budynek), `spec`, `types`, `footprints`, `info` (wymiary,
 okna, trójkąty i wywołania obu wersji), `save(nazwa)` → zasób `building`, `night(0…1)`. Zakładka **API** w konsoli.
 Adres `labs/city.html?type=<rodzaj>` otwiera rodzaj (edytor sceny: „Otwórz w laboratorium”), `?landmark=<id>` —
-budynek Warszawy; `CityApi.make({ landmark: 'pkin', … })`, `CityApi.landmarks` — lista.
+budynek Warszawy; `CityApi.make({ landmark: 'defilad-1', … })` (identyfikator — adres), `CityApi.landmarks` — lista.

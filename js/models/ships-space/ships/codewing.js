@@ -1,9 +1,11 @@
 /* =======================================================================
    SHIPKIT · CODEWING — one ship definition (see js/models/ships-space/shipkit.js,
-   "SHIP DEFINITIONS", and docs/labs/vehicles-space.md). A classic script loaded after
+   "SHIP DEFINITIONS", and docs/labs/vehicles-space.md). An ES module that imports
    shipkit.js: it pushes its entry into ShipKit.SHIP_DEFS and builds with
    ShipKit's blocks and helpers (ShipKit._).
    ======================================================================= */
+import { THREE } from '../../../core/three-global.js';
+import '../shipkit.js';   // ShipKit
 (function () {
 "use strict";
 const { GOLD, BLUE, additiveSprite, detailHelpers, glowTextures, labelKey, makeShotEmitter, makeBrushed, makeCoreMaterial, makeEngineSet, makeExhaust, makeNavLights, makeOnlineFader, makePlating, makeScanEmitter, makeShotQueue, partsOf, rng, shadowed, sharedMaterials, strut, trackTextures } = ShipKit._;

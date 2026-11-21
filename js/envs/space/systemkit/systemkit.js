@@ -1,6 +1,6 @@
 /* =======================================================================
    SYSTEMKIT — star systems built from BodyKit's bodies.
-   A classic script (window.SystemKit), like ShipKit and BodyKit: the system
+   An ES module (also window.SystemKit), like ShipKit and BodyKit: the system
    lab (systems.html) uses it now, the game can later (other systems on the
    galaxy map). Needs THREE and window.BodyKit.
 
@@ -30,6 +30,8 @@
        handle.lightPosition        world position of the main light
        handle.dispose()
    ======================================================================= */
+import { THREE } from '../../../core/three-global.js';
+import '../../../models/bodies/bodykit.js';   // BodyKit
 window.SystemKit = (function () {
 "use strict";
 
@@ -408,3 +410,7 @@ function build(sys, { detail = 0.5 } = {}) {
 
 return { PRESETS, SKIES, random, options, build, centerExtent, centerGapOf, centerGapRange, defOf, orbitPoint };
 })();
+
+// moduł ES: kit do importu (window.SystemKit zostaje dla stron i skryptów, które go czytają)
+export const SystemKit = window.SystemKit;
+export default SystemKit;

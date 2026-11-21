@@ -24,13 +24,13 @@ repository, then `http://localhost:8000/labs/vehicles-space.html`.
 |---|---|
 | 1. `js/core/three-global.js` | Three.js r186 (`vendor/three/`) as the global `THREE`, with OrbitControls and the post-processing passes, in the graphics of the labs from Battle (CLAUDE.md, "Grafika") |
 | 3. `js/labkit/labkit.js` | What the Space labs share around the model (`window.LabKit`): slider fills, toggles, the IMAGE EFFECTS render, the camera look panel and the windows fading out after 5 idle seconds (`autoHideWindows`). Styles: `ui/style/space.css` + `ui/pages/vehicles-space.css` |
-| 4. `js/models/ships-space/shipkit.js` | **ShipKit's core**: texture generators, materials, shaders, shared effects, the building blocks, SHAPING, the model build, public API (`window.ShipKit`), and `ShipKit._`: the internals the ship files build with (not a public API) |
+| 4. `js/models/ships-space/shipkit.js` + `shipkit/` | **ShipKit** (ES module, also `window.ShipKit`): the ship definitions, the model build and the public API in `shipkit.js`; its parts in `shipkit/` — `util.js` (rng, noise), `plating.js` (hull plating), `shared.js` (materials, glow textures), `effects.js` (shots, scan, damage), `blocks.js` (solar cells, struts, engines, exhaust, nav lights, shot queue, fader), `shaping.js` (rounding, sealed joints). It imports THREE from `three-global.js` itself |
 | 4b. `js/models/ships-space/ships/codewing.js`, `scribe.js`, `swarmer.js`, `haven.js` | **One file per ship**. Each pushes its definition into `ShipKit.SHIP_DEFS` and takes what it uses from `ShipKit._`; they load after the core, in the lab's order |
 | 5. `js/labs/vehicles-space/vehicles-space.js` | The lab: sky, lights, renderer, camera, the windows' wiring, sliders. Uses only the kits' public APIs |
 
 ## ShipKit (`window.ShipKit`)
 
-Self-contained: it needs only the global `THREE` (`js/core/three-global.js`; written for r128) and a DOM
+Self-contained: it needs only `THREE` (imported from `js/core/three-global.js`; written for r128) and a DOM
 (`<canvas>` for texture generation). No renderer, scene, camera or HUD.
 
 ### API

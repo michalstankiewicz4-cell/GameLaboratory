@@ -22,6 +22,8 @@
        → { group, set(name, v), base, names, update(t, dt, state), gaze(yaw, pitch) }
      state: { lively (blinks, glances), talk, gait } — base values (the
      lab's sliders) plus the lively motion on top. */
+import { THREE } from '../../core/three-global.js';
+import '../life/lifekit.js';   // LifeKit
 (function () {
 "use strict";
 const LK = window.LifeKit, U = LK.util;

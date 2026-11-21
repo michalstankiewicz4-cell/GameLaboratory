@@ -3,6 +3,24 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.89.1 · miasto 1.1.1 — 2026-11-21 (porządki w kodzie, budynki pod adresami)
+
+### Zmienione
+- **Kity ze Space jako moduły ES**: ShipKit (i statki), BodyKit (i rodzaje ciał), BaseKit, VehicleKit, MarineKit,
+  LifeKit (i ludzie, stwory), SurfaceKit, SystemKit, MusicKit same importują `THREE` (`js/core/three-global.js`
+  eksportuje go) i kity, których potrzebują, i eksportują swój kit; `window.*` zostaje dla stron, które go czytają.
+  Kolejność ładowania wynika z importów, nie z kolejności znaczników na stronie.
+- **ShipKit podzielony** (1713 linii): `shipkit.js` — definicje statków i API; części w `js/models/ships-space/shipkit/`:
+  `util.js`, `plating.js`, `shared.js`, `effects.js`, `blocks.js`, `shaping.js`.
+- **MusicKit podzielony** (1135 linii): `musickit.js` — synteza i odtwarzacz; `data.js` — nuty, skale, nastroje,
+  piosenki; `compose.js` — melodia piosenki i plik MIDI.
+- Bez zmian w tym, co widać i słychać (kontrola kitów i doktor modeli).
+- **Budynki Warszawy pod adresami** (miasto): zamiast nazw własnych — adresy, w nazwie i identyfikatorze (`defilad-1`,
+  `jerozolimskie-54`, `zlota-44`, `emilii-plater-49`, `chmielna-69`, `europejski-1`, `rondo-onz-1`, `twarda-2-4`,
+  `chlodna-51`); dane z mapy bez tagów `name`; `tools/city-osm.mjs` wybiera budynek po elemencie OSM, nie po nazwie.
+  Bryły bez zmian. Stare identyfikatory już nie działają — zapisany zasób `building` z nimi buduje się
+  jako zwykły budynek.
+
 ## Program 0.89.0 · pojazdy — ląd 1.24.0 · efekty dźwiękowe 1.3.0 · edytor sceny 0.45.0 — 2026-11-20 (dźwięki maszyn, turbiny, szyn)
 
 ### Dodane
@@ -123,11 +141,12 @@ Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` 
 ## Program 0.83.0 · laboratorium miasta 1.1.0 · edytor sceny 0.39.1 · doktor modeli 1.3.2 — 2026-11-20 (budynki Warszawy)
 
 ### Dodane
-- **Budynki Warszawy z OpenStreetMap w laboratorium miasta** (grupa „Warsaw (OpenStreetMap)”): Pałac Kultury i Nauki
-  z iglicą, dworzec Warszawa Centralna, Złota 44, InterContinental, Varso, Warsaw Spire, Rondo 1, Cosmopolitan —
+- **Budynki Warszawy z OpenStreetMap w laboratorium miasta** (grupa „Warsaw (OpenStreetMap)”): pl. Defilad 1
+  z iglicą, dworzec przy Al. Jerozolimskich 54, Złota 44, Emilii Plater 49, Chmielna 69, pl. Europejski 1, rondo ONZ 1,
+  Twarda 2/4 —
   bryła z mapy (obrys, części z wysokościami, początkiem nad gruntem, dachami i kolorami), wygląd CityKit (styl
   każdego budynku: mur, okna, parter, gzymsy; zmieniany w oknach Fasada i Parter), z wersją bliską i wypaloną daleką
-  (Pałac Kultury: ok. 470 000 → 17 000 trójkątów). Dane © współtwórcy OpenStreetMap (ODbL).
+  (pl. Defilad 1: ok. 470 000 → 17 000 trójkątów). Dane © współtwórcy OpenStreetMap (ODbL).
 - `tools/city-osm.mjs` — pobiera budynki z Overpass do `js/models/city/landmarks/osm-data.js`; uruchamiane w GitHub
   Actions (`city-osm.yml`), wynik dopisywany do repozytorium.
 - CityKit: obrys w swoim miejscu i z dziedzińcami, część zaczynająca się nad gruntem (`base`), pas bez okien nad

@@ -39,3 +39,6 @@ const THREE = Object.assign({}, T, { ShaderMaterial, OrbitControls });
 THREE.LIGHT_SCALE = Math.PI;
 THREE.srgbColor = (c) => new T.Color(c);
 window.THREE = THREE;
+// moduł ES: kity ze Space importują THREE stąd (zamiast globalnego) — ten sam obiekt co window.THREE
+export { THREE };
+export default THREE;
