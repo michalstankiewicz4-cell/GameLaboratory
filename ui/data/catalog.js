@@ -587,6 +587,20 @@ window.GameLabCatalog =
       }
     },
     {
+      "file": "labs/effects-land.html",
+      "cat": "effects",
+      "name": "Effects Lab · land",
+      "namePl": "Laboratorium efektów · ląd",
+      "doc": "docs/labs/effects-land.md",
+      "page": "labs/effects.html",
+      "desc": "Realistic fire (FireKit): flames coloured by temperature, smoke and sparks driven by the fuel — wood, grass, rubber and tar, paper — and by the wind, flickering firelight; a campfire, a burning plank wall, tyres, a grass fire, paper and a big blaze, by day and by night.",
+      "descPl": "Realistyczny ogień (FireKit): płomienie w barwach temperatury, dym i iskry zależne od paliwa — drewno, trawa, guma i papa, papier — i od wiatru, migające światło ognia; ognisko, płonąca ściana z desek, opony, pożar trawy, papier i duży pożar, w dzień i w nocy.",
+      "kind": "lab",
+      "kit": "FireKit",
+      "phrases": ["efekty", "ląd", "ogień", "pożar", "dym"],
+      "saved": ["gameLab.effectsLand."]
+    },
+    {
       "file": "labs/gameui.html",
       "cat": "ui",
       "name": "Game UI Lab",
@@ -934,6 +948,9 @@ window.GameLabCatalog =
     "rysowanie": "drawing",
     "dyfuzja": "diffusion",
     "wybuchy": "explosions",
-    "błyskawice": "lightning"
+    "błyskawice": "lightning",
+    "ogień": "fire",
+    "pożar": "blaze",
+    "dym": "smoke"
   }
 }/*END*/;

@@ -103,6 +103,7 @@ export const PAGES = {
     ['Delete', 'Remove the selected node', 'Usuń wybrany węzeł'],
     ['Esc', 'Back to the select tool', 'Powrót do wybierania'],
   ] }],
+  'labs/effects-land.html': [{ title: ['Effects lab · land', 'Laboratorium efektów · ląd'], keys: [[SPACE, 'Light the fire again', 'Rozpal ogień ponownie']] }],
   'labs/effects.html': [{ title: ['Effects lab', 'Laboratorium efektów'], keys: [[SPACE, 'Play the effect', 'Odtwórz efekt']] }],
   'labs/sound.html': [{ title: ['Music', 'Muzyka'], keys: [[SPACE, 'Play / pause', 'Graj / pauza']] }],
   'labs/sound-effects.html': [{ title: ['Sound effects', 'Efekty dźwiękowe'], keys: [[SPACE, 'Play the sound', 'Zagraj dźwięk']] }],

@@ -3,6 +3,17 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.103.0 · efekty 1.4.1 · efekty · ląd 1.0.0 — 2026-11-24 (ogień)
+
+### Dodane
+- **FireKit** (`js/render/effects/fire/firekit.js`): realistyczny ogień z wielu źródeł naraz, liczony na GPU — płomienie
+  w barwach temperatury z poświatą, dym i iskry zależne od paliwa (drewno, trawa, guma i papa, papier) i od wiatru,
+  migające światło ognia (kilka świateł dla najsilniejszych źródeł blisko kamery).
+- **Laboratorium efektów · ląd** (`labs/effects-land.html`): strona „ląd” laboratorium efektów — ognisko, płonąca ściana
+  z desek, opony, pożar trawy, papier i kartony, duży pożar; suwaki ognia i wiatru, dzień i noc; `FireApi` dla AI.
+  Opis: `docs/labs/effects-land.md`.
+- Laboratorium efektów 1.4.1: przełącznik środowiska prowadzi na stronę „ląd”.
+
 ## Program 0.102.0 · skały 1.0.0 · materiały 1.1.0 · edytor sceny 0.54.0 — 2026-11-21 (laboratorium skał)
 
 ### Dodane

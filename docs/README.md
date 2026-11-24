@@ -67,6 +67,7 @@ W kolejności kategorii z menu Narzędzia i strony startowej (`ui/data/catalog.j
 | | Generator zombie | `labs/zombies.html` | [labs/zombies.md](labs/zombies.md) |
 | Woksele | Bloki (BlockKit: bryły z wokseli, ciecze i gaz) | `labs/blocks.html`, `js/models/blocks/` | [labs/blocks.md](labs/blocks.md) |
 | Efekty | Efekty (EffectKit: 22 efekty z odznakami — strzały, plazma, odłamki, błyskawice, czarne dziury, promienie, pola, skok, tunel, fala skanu, dym, iskry, wybuch, spalenizna, ognik) | `labs/effects.html`, `js/render/effects/` | [labs/effects.md](labs/effects.md) |
+| | Efekty · ląd (FireKit: realistyczny ogień — płomienie, dym, iskry, światło; paliwa: drewno, trawa, guma i papa, papier) | `labs/effects-land.html`, `js/render/effects/fire/` | [labs/effects-land.md](labs/effects-land.md) |
 | UI i dźwięk | UI gry (menu, HUD, okna, dialogi, skórki) | `labs/gameui.html`, `js/gameui/` | [labs/gameui.md](labs/gameui.md) |
 | UI i dźwięk | drzewka ulepszeń i badań (format `gamelab-tree`, widok promienisty i płytka drukowana, poziomy, próba, sprawdzanie, okno w UI gry) | `labs/trees.html`, `js/gameui/tree/` | [labs/trees.md](labs/trees.md) |
 | | Dźwięk *(grupa dźwięku)*: muzyka · efekty i otoczenie · mowa | `labs/sound.html`, `labs/sound-effects.html`, `labs/sound-speech.html`, `js/audio/` | [labs/sound.md](labs/sound.md), [labs/sound-effects.md](labs/sound-effects.md), [labs/sound-speech.md](labs/sound-speech.md), [audio/README.md](audio/README.md) (mikser) |
