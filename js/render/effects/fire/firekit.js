@@ -64,7 +64,7 @@ void main(){
   vec3 tur = vec3(sin(uTime * 6.0 + aSeed.z * 40.0), 0.0, cos(uTime * 5.3 + aSeed.w * 40.0)) * 0.12 * H * t;
   vec3 p = aOrg + off + vec3(0.0, y, 0.0) + lean + tur;
   // język ognia: szeroki u dołu, węższy z wysokością i z czasem; pionowy (oś pochylona z wiatrem)
-  float w = clamp(0.32 * min(aSrc.x, aSrc.y) + 0.16 * H, 0.12, 3.0) * (1.0 - 0.4 * t) * (0.7 + 0.6 * aSeed.z) * (0.6 + 0.4 * pw);
+  float w = min(clamp(0.32 * min(aSrc.x, aSrc.y) + 0.16 * H, 0.12, 3.0), 0.75 * H + 0.25) * (1.0 - 0.4 * t) * (0.7 + 0.6 * aSeed.z) * (0.6 + 0.4 * pw);   // szeroki obszar — wiele języków, nie jeden szeroki
   float hq = H * (0.5 + 0.4 * aSeed.w) * (1.0 - 0.3 * t) * (0.6 + 0.4 * pw) + w * 0.6;
   vec3 camR = normalize(vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]));
   vec3 up = normalize(vec3(uWind.x * 0.07, 1.0, uWind.z * 0.07));
@@ -81,9 +81,9 @@ void main(){
   float xx = abs(x + (n - 0.5) * 0.9 * y);
   float m = smoothstep(wdt, wdt * 0.3, xx) * smoothstep(0.0, 0.18, y) * (1.0 - smoothstep(0.45, 0.95, y + (n2 - 0.5) * 0.6)) * smoothstep(1.0, 0.8, abs(x));
   if (m < 0.01) discard;
-  float k = clamp(m * (1.15 - y * 0.75) * (1.0 - vT * 0.8) * (0.75 + 0.35 * vPow) + (n2 - 0.5) * 0.2, 0.0, 1.0);
-  vec3 c = fireRamp(k) * vTint * (0.45 + 1.6 * k * k) * uGlow;               // wiele języków nakłada się (mieszanie addytywne)
-  float a = m * pow(1.0 - vT, 0.7) * smoothstep(0.0, 0.1, vT) * 0.55;
+  float k = clamp(m * (1.05 - y * 0.8) * (1.0 - vT * 0.85) * (0.65 + 0.3 * vPow) + (n2 - 0.5) * 0.2, 0.0, 1.0);
+  vec3 c = fireRamp(k) * vTint * (0.4 + 1.25 * k * k) * uGlow;               // wiele języków nakłada się (mieszanie addytywne)
+  float a = m * pow(1.0 - vT, 0.7) * smoothstep(0.0, 0.1, vT) * 0.5;
   gl_FragColor = vec4(c * a, a);
 }`;
 const SMOKE_VS = COMMON_VS + /* glsl */`

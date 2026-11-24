@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Efekty · ląd 1.0.1 — 2026-11-24
+
+### Poprawione
+- FireKit: płomienie z szerokiego obszaru (np. pożar trawy) to wiele węższych języków zamiast kilku szerokich;
+  płomienie mniej przepalone do bieli.
+
 ## Program 0.103.0 · efekty 1.4.1 · efekty · ląd 1.0.0 — 2026-11-24 (ogień)
 
 ### Dodane
