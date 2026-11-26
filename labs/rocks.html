@@ -59,6 +59,11 @@
   <div class="row"><span>Scree</span><input type="range" id="fScree" min="0" max="2" step="0.05"><output id="fScreeV"></output></div>
   <div class="row"><span>Field seed</span><input type="number" id="fSeed" min="1" max="99999" step="1"><output></output></div>
   <p class="note">The rock kind, moss and lichen from the Rock window. Many small stones, few large ones (sizes fall off like a real rockfall); scree in drifts around the boulders.</p>
+  <h3>Rocks for the scene editor</h3>
+  <div class="row"><span>Saved</span><select id="fieldSel" title="Rocks for a scene's terrain saved under a name: pick one to load it"></select><output></output></div>
+  <div class="row"><span>Name</span><input type="text" id="fieldName" maxlength="40"><output></output></div>
+  <div class="btns"><button type="button" id="saveField">Save under this name</button><button type="button" id="delField">Delete saved</button></div>
+  <p class="note">Saved: boulders, largest, scree, moss, lichen and the seed (the rocks asset). In the scene editor, Environment → Rocks scatters them over a land terrain: the kind by biome (granite in the north, limestone on the plains, sandstone and basalt in the desert), more boulders on slopes, scree under steep ground, pebbles on beaches.</p>
 </aside>
 <aside class="panel" data-std="camera">
   <div class="btns" id="cams"></div>

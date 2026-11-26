@@ -7,6 +7,7 @@ import { worldFor } from '../../envs/land/planet.js';
 import { generateWorld, biomeTexture, regionTextures, regionUniforms, setRegions, GLSL_REGIONS } from '../../envs/land/regionkit.js';
 import { waveSet, heightAt, waterUniforms, setWaves, polarGrid, waterMaterial, hullTexture, LOOKS, SEAS } from '../../envs/water/waterkit.js';
 import { createVegetation } from '../../models/plants/vegetation.js';
+import { createRockField } from '../../models/rocks/rockfield.js';
 import { createTornado, tornadoWind } from '../../envs/sky/tornado.js';
 import { cycloneAt, cycloneWind, relOf } from '../../envs/sky/cyclone.js';
 import { createCycloneSky } from '../../envs/sky/cyclone-sky.js';
@@ -71,6 +72,7 @@ export function createStage(renderer, scene, opts = {}) {
   // 'space' — niebo kosmosu (tło daje strona, np. BodyKit): słońce bez atmosfery, bez mgły, odbicia setSpaceEnvironment
   let space = false, spaceEnv = null, lightId = 'afternoon', surfaceKind = 'sea';
   let land = null;   // teren (setLand / setWorld): { T, tm, tex, btex, rtex, buoys } — mapa, siatki LandKit, tekstury; morze zna teren
+  let rocks = null, rocksDef = null;   // skały na terenie (setRocks, js/models/rocks/rockfield.js)
   let veg = null, vegDef = null, lastDt = 0, windNow = 6;   // roślinność na terenie (setVegetation, js/models/plants/vegetation.js)
   let tornado = null;   // trąba powietrzna / tornado z pogody (pole tornado: { strength, kind }; js/envs/sky/tornado.js)
   let cyc = null, cycA = null, cycG = 0, cycSky = null, windDir = null;   // cyklon z pogody (pole cyclone; js/envs/sky/cyclone.js): pasma i ściana oka na niebie, wiatr
@@ -103,6 +105,12 @@ export function createStage(renderer, scene, opts = {}) {
     veg.set({ T: land.T, uniforms: land.tm.uniforms, btex: land.btex }, vegDef);
     land.tm.setForest(veg.forestTex, veg.def ? veg.def.season : 0);   // ściółka pod lasami
     veg.light(sun, hemi, scene.fog, scene.environmentIntensity); vegWind();
+  }
+  // skały: na terenie lądu, jak roślinność; bez ustawień — usunięte
+  function applyRocks() {
+    if (!rocksDef || !land) { if (rocks) { rocks.dispose(); rocks = null; } return; }
+    if (!rocks) rocks = createRockField(scene);
+    rocks.set({ T: land.T }, rocksDef);
   }
   const stage = {
     skyU, WU, sun, hemi, water, ground, setSea, setWaterDetail, get waterDetail() { return waterDetail; },
@@ -164,10 +172,14 @@ export function createStage(renderer, scene, opts = {}) {
       stage.setSurface(surfaceKind);
       if (was !== atmo) stage.setLight(lightId);
       if (veg || vegDef) applyVeg();
+      if (rocks || rocksDef) applyRocks();
     },
     // roślinność krajobrazu na terenie lądu: zasób „vegetation” z laboratorium roślin ({ density, grass, … }) albo null;
     // gatunki z biomów terenu, miejsca z gruntu; lasy w kafelkach wokół kamery (pełne modele blisko, impostory dalej), trawa
     setVegetation(def) { vegDef = def || null; applyVeg(); },
+    // skały na terenie (zasób „rocks” z laboratorium skał) albo null
+    setRocks(def) { rocksDef = def || null; applyRocks(); },
+    get rocks() { return rocks ? rocks.counts : null; },
     // wiatr trąby powietrznej / tornada w punkcie (m/s, świat) — fizyka środowiska (zachowania w ▶ Graj); bez wiru — zero
     windAt(x, y, z, out = [0, 0, 0]) {
       tornadoWind(tornado && tornado.state, x, y, z, out);
@@ -270,6 +282,7 @@ export function createStage(renderer, scene, opts = {}) {
       water.position.set(Math.round(camera.position.x / 2) * 2, 0, Math.round(camera.position.z / 2) * 2);
       if (land && land.tm.group.visible) land.tm.update(camera);
       if (veg) { veg.visible = surfaceKind === 'land'; if (surfaceKind === 'land') veg.update(camera, lastDt); }
+      if (rocks) { rocks.visible = surfaceKind === 'land'; if (surfaceKind === 'land') rocks.update(camera, lastDt); }
       if (opts.fogHeight && !space) { const f = fogBase / (1 + Math.max(0, camera.position.y - 40) / 300); scene.fog.density = f; WU.uFogDen.value = f; }
       if (veg) veg.fog(scene.fog.density);
       if (cycSky) {

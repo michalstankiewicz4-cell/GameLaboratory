@@ -67,7 +67,7 @@ function icosphere(sub) {
 export function rockGeometry(spec = {}) {
   const S = { ...ROCK_DEFAULTS, ...spec }, K = ROCK_KINDS[S.kind] || ROCK_KINDS.granite, SH = ROCK_SHAPES[S.shape] || ROCK_SHAPES.boulder;
   const pebble = S.shape === 'pebble', seed = (S.seed | 0) * 7919 + 13;
-  const sub = Math.max(2, Math.min(16, Math.round((pebble ? 4 : 8) * S.detail + (S.size > 3 ? 4 : 0))));   // 20·(sub+1)² triangles: 1 620 at detail 1
+  const sub = Math.max(pebble ? 1 : 2, Math.min(16, Math.round((pebble ? 4 : 8) * S.detail + (S.size > 3 ? 4 : 0))));   // 20·(sub+1)² triangles: 1 620 at detail 1
   const g = icosphere(sub), P = g.attributes.position, r = rng(seed), V = new THREE.Vector3();
   // fracture planes: each cuts the rock flat where it reaches past it (a rounded rock gets few, a hard one many)
   const cuts = [];

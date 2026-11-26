@@ -3,6 +3,17 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.104.0 · skały 1.1.0 · edytor sceny 0.55.0 — 2026-11-26 (skały na terenie)
+
+### Dodane
+- **Skały na terenie sceny** (`js/models/rocks/rockfield.js`, zasób „rocks” z laboratorium skał, okno Rumowisko →
+  *Rocks for the scene editor*): rodzaj z biomu (granit na północy, wapień i granit na równinach, piaskowiec i bazalt
+  na pustyni), miejsce z gruntu — więcej głazów na zboczach, piarg pod stromiznami, otoczaki na plażach, nic w wodzie.
+  Każdy kamień leży wzdłuż stoku, ma własne proporcje i odcień. Kafelki 128 m do 600 m od kamery, piarg do ~220 m.
+- Edytor sceny: Środowisko → **Skały**; API `env { rocks }`; lekarz sceny zna zasób; `RocksApi.saveField`.
+
+### Zmienione
+- Rumowisko w laboratorium skał: 8 wariantów kształtu, każdy kamień z własnymi proporcjami, pochyleniem i odcieniem.
 ## Efekty · ląd 1.0.1 — 2026-11-24
 
 ### Poprawione

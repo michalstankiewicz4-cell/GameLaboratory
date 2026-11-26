@@ -22,6 +22,9 @@
 //         prefabrykat „Star system” w scenie kosmosu (pole asset)
 //   vegetation — roślinność krajobrazu z laboratorium roślin (widok Krajobraz): { density, grass, grassR, lod, impostors,
 //         season, seed, radius } — lasy, zagajniki i trawa na terenie lądu sceny według biomów (js/models/plants/vegetation.js)
+//   rock — skała z laboratorium skał: { kind, shape, seed, size, detail, moss, lichen } — prefabrykaty Skały (pole asset)
+//   rocks — skały na terenie z laboratorium skał (Rumowisko): { density, max, scree, moss, lichen, seed, radius } —
+//         głazy i piarg na terenie lądu sceny według biomów i nachylenia (js/models/rocks/rockfield.js)
 //   uiskin — skórka UI gry z laboratorium UI: { base: 'space' | 'battle' | 'engine', tokens, sounds } (js/gameui/skins.js)
 //   blocks — bryła z bloków z laboratorium bloków: opis BlockKit (kształt, rozmiar, blok, ziarno, napis, warstwy,
 //         mats — materiały bloków stałych jako opisy MatKit, matRefs — co było wybrane w laboratorium);
@@ -60,6 +63,7 @@ export const ASSET_KINDS = {
   uiskin: { label: 'Game UI skin', labelPl: 'Skórka UI gry', lab: 'labs/gameui.html', keys: ['base', 'tokens', 'sounds'] },
   plant: { label: 'Plant', labelPl: 'Roślina', lab: 'labs/plants.html', keys: ['species', 'seed', 'size', 'detail', 'season'] },
   rock: { label: 'Rock', labelPl: 'Skała', lab: 'labs/rocks.html', keys: ['kind', 'shape', 'seed', 'size', 'detail', 'moss', 'lichen'] },
+  rocks: { label: 'Rocks on the terrain', labelPl: 'Skały na terenie', lab: 'labs/rocks.html', keys: ['density', 'max', 'scree', 'moss', 'lichen', 'seed', 'radius'] },
   system: { label: 'Star system', labelPl: 'Układ planetarny', lab: 'labs/systems.html', keys: ['name', 'seed', 'sky', 'centers', 'centerGap', 'orbits'] },
   vegetation: { label: 'Vegetation', labelPl: 'Roślinność', lab: 'labs/plants.html', keys: ['density', 'grass', 'grassR', 'lod', 'impostors', 'season', 'seed', 'radius'] },
   cave: { label: 'Cave', labelPl: 'Jaskinia', lab: 'labs/caves.html', keys: ['seed', 'length', 'branches', 'width', 'winding', 'chambers', 'rough', 'cell', 'drips', 'rubble', 'lakes', 'lava', 'rock', 'wet', 'relief'] },

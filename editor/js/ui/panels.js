@@ -149,6 +149,12 @@ export function createPanels(store, actions) {
         ...(curVeg && !vegs.includes(curVeg) ? [el('option', { value: curVeg, textContent: t('env.seaMissing', { name: curVeg }) })] : []));
       $('vegAsset').value = curVeg; $('vegAsset').disabled = !S.env.land;
       $('vegRow').hidden = $('vegNote').hidden = S.env.surface !== 'land';
+      // skały: tylko na terenie lądu (zasób z laboratorium skał)
+      const rks = listAssets('rocks'), curRk = S.env.rocks || '';
+      $('rocksAsset').replaceChildren(el('option', { value: '', textContent: t('env.vegNone') }), ...rks.map((n) => el('option', { value: n, textContent: n })),
+        ...(curRk && !rks.includes(curRk) ? [el('option', { value: curRk, textContent: t('env.seaMissing', { name: curRk }) })] : []));
+      $('rocksAsset').value = curRk; $('rocksAsset').disabled = !S.env.land;
+      $('rocksRow').hidden = $('rocksNote').hidden = S.env.surface !== 'land';
       // niebo (dla każdej powierzchni): domyślne dla powierzchni, dzienne, gotowe tła kosmosu (SystemKit, lista po
       // załadowaniu kitów) i niebo zapisane w laboratorium ciał niebieskich
       const skies = listAssets('sky'), presets = skyPresets(), curSky = S.env.sky || '';
@@ -247,6 +253,7 @@ export function createPanels(store, actions) {
   $('surface').addEventListener('change', () => store.setEnv({ surface: $('surface').value }));
   $('landAsset').addEventListener('change', () => actions.build(() => store.setEnv({ land: $('landAsset').value })));
   $('vegAsset').addEventListener('change', () => actions.build(() => store.setEnv({ vegetation: $('vegAsset').value })));
+  $('rocksAsset').addEventListener('change', () => actions.build(() => store.setEnv({ rocks: $('rocksAsset').value })));
   $('caveGlow').addEventListener('change', () => store.setEnv({ caveGlow: $('caveGlow').checked }));
   $('caveAsset').addEventListener('change', () => actions.build(() => store.setEnv({ cave: $('caveAsset').value })));
   $('skyAsset').addEventListener('change', () => store.setEnv({ sky: $('skyAsset').value }));

@@ -176,6 +176,10 @@ export function createWorld(container, store, onWarn) {
     const vegDef = env.surface === 'land' && env.vegetation ? getAsset('vegetation', env.vegetation) : null;
     if (env.surface === 'land' && env.vegetation && !vegDef && onWarn) onWarn('vegetation:' + env.vegetation);
     stage.setVegetation(vegDef && landDef ? vegDef : null);
+    // skały: zasób „rocks” z laboratorium skał na terenie lądu (bez terenu — nic); brak zasobu — ostrzeżenie
+    const rocksDef = env.surface === 'land' && env.rocks ? getAsset('rocks', env.rocks) : null;
+    if (env.surface === 'land' && env.rocks && !rocksDef && onWarn) onWarn('rocks:' + env.rocks);
+    stage.setRocks(rocksDef && landDef ? rocksDef : null);
     syncCave(env);
     syncSpace(env);   // przed światłem: tryb nieba decyduje o słońcu, mgle i odbiciach
     // światło: gotowe (LIGHTS) albo zasób „weather” z laboratorium wyglądu; brak zasobu — popołudnie i ostrzeżenie

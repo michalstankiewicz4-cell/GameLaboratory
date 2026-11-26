@@ -39,8 +39,10 @@ triangles.
 ## Boulder field
 
 *Field*: up to ~140 boulders on an 80 m disc, their sizes from a power law (many small, few large — **Largest** sets
-the top), and scree in drifts around and below them (**Scree**: up to ~1 800 stones of 5–35 cm). A few variants of each
-shape, drawn instanced (one draw call per variant). The kind, moss and lichen come from the Rock window.
+the top), and scree in drifts around and below them (**Scree**: up to ~1 800 stones of 5–35 cm). Eight variants of each
+shape, drawn instanced (one draw call per variant), and no two stones alike: each is stretched along its own axes
+(±25 %), leans a little and has its own shade (instance colour, ±12 %, a little warmer or cooler). The kind, moss and
+lichen come from the Rock window.
 
 ## Saved under a name — a rock for the scene
 
@@ -52,7 +54,17 @@ version (half the detail).
 For AI: `RocksApi.make(spec)`, `field({ density, max, scree, seed })`, `info()`, `get()`, `kinds`, `shapes`,
 `save(name)`, `load(name)`, `saved()`.
 
-## Next
+## Rocks on a scene's terrain (1.1.0)
 
-Rocks scattered over a scene's terrain by biome and slope, like the vegetation (boulders on slopes, scree under
-cliffs, pebbles on beaches) — the next part.
+*Field* → *Rocks for the scene editor*: boulders, largest, scree, moss, lichen and the seed as the named asset `rocks`.
+In the scene editor, Environment → Rocks (on a land terrain from the land lab) scatters them with the rules in
+`js/models/rocks/rockfield.js` (`scatterRocks`):
+
+- **Kind by biome**: granite in the north (some limestone), limestone and granite on the plains, sandstone in the
+  desert with basalt on its steep ground.
+- **Place by the ground**: more boulders on slopes and high ground, few on flat lowland meadows (half on the plains),
+  very steep faces shed them; scree under steep ground and pebbles on beaches; nothing in the water.
+- Each stone lies along the slope (half of it), with its own proportions and shade; six variants per kind and shape,
+  instanced. Tiles of 128 m within 600 m of the camera; scree only within ~220 m.
+
+For AI: `RocksApi.saveField(name)`, `loadField(name)`, `fields()`; in the scene `{ "cmd": "env", "rocks": name }`.

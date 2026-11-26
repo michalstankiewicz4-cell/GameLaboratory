@@ -241,6 +241,9 @@ mgła, morze WaterKit, płaski grunt albo teren LandKit z wodami RegionKit, mapa
   blisko, impostory dalej, trawa wokół kamery; światło, mgła i wiatr ze sceny (drzewa bujają się, a liście i trawa drgają z siłą wiatru
   pogody — pełna przy 24 m/s — i w jego kierunku: wiatr cyklonu albo kierunek dryfu chmur). W edytorze — `env.vegetation` (tylko na
   terenie z zasobu lądu); `stage.vegetation` → liczby (rośliny, blisko, daleko, kafelki, trawa).
+- Skały na terenie `setRocks(zasób „rocks” | null)` (`js/models/rocks/rockfield.js`): rodzaj z biomu, miejsce z nachylenia
+  (głazy na zboczach, piarg pod stromiznami, otoczaki na plażach), każdy kamień inny; kafelki 128 m do 600 m, piarg do
+  ~220 m. W edytorze — `env.rocks` (tylko na terenie z zasobu lądu); `stage.rocks` → liczby (kamienie, kafelki, warianty).
 - Morze przy terenie zna teren (płycizny, przybój, barwy i prądy wód, lód, olej); fale powtarzają się co rozmiar mapy.
 - Ląd z planety (`T.atmo`): niebo dzienne w odcieniu jej atmosfery (`tintAtmosphere` w `setLight`); bez atmosfery
   `stage.airless` — strona daje niebo kosmosu; planeta bez mórz (`T.noSea`) — bez wody wokół wycinka.

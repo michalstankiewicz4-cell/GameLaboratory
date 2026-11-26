@@ -190,6 +190,27 @@ $('delRock').onclick = () => { const n = $('savedSel').value; if (!n) return; re
 $('savedSel').onchange = () => { const n = $('savedSel').value; if (n) { $('saveName').value = n; loadRock(n); } };
 fillSaved();
 
+/* ---------------- rocks for a scene's terrain: the "rocks" asset (js/models/rocks/rockfield.js) ---------------- */
+const fieldOf = () => ({ density: S.fDensity, max: S.fMax, scree: S.fScree, moss: S.moss, lichen: S.lichen, seed: S.fSeed, radius: 600 });
+function fillFields() {
+  const names = listAssets('rocks');
+  $('fieldSel').replaceChildren(el('option', { value: '', textContent: names.length ? '—' : 'none yet' }), ...names.map((n) => el('option', { value: n, textContent: n })));
+}
+function saveField(n) { n = String(n || '').trim(); if (!n) throw new Error('give the rocks a name'); if (!saveAsset('rocks', n, fieldOf())) throw new Error('the browser did not let me save'); fillFields(); $('fieldSel').value = n; return n; }
+function loadField(n) {
+  const a = getAsset('rocks', n); if (!a) throw new Error(`no saved rocks "${n}"`);
+  const map = { density: 'fDensity', max: 'fMax', scree: 'fScree', moss: 'moss', lichen: 'lichen', seed: 'fSeed' };
+  for (const [k, sk] of Object.entries(map)) if (a[k] != null) S[sk] = +a[k];
+  for (const [k, f] of Object.entries(fmt)) { $(k).value = S[k]; $(k + 'V').textContent = f(S[k]); }
+  $('fSeed').value = S.fSeed;
+  if (S.mode !== 'field') setMode('field'); else rebuild(true);
+  return fieldOf();
+}
+$('saveField').onclick = () => { try { status(`Saved "${saveField($('fieldName').value)}".`); } catch (e) { status(e.message); } };
+$('delField').onclick = () => { const n = $('fieldSel').value; if (!n) return; removeAsset('rocks', n); fillFields(); status(`Deleted "${n}".`); };
+$('fieldSel').onchange = () => { const n = $('fieldSel').value; if (n) { $('fieldName').value = n; loadField(n); } };
+fillFields();
+
 /* ---------------- loop ---------------- */
 function resize() { renderer.setSize(VS().w, VS().h, false); camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix(); look.resize(VS().w, VS().h); }
 addEventListener('resize', resize);
@@ -208,7 +229,8 @@ function frame() {
 
 /* ---------------- for an AI ---------------- */
 // RocksApi.make(spec) → the rock's data (size, volume, mass…); field({ density, max, scree, seed }); kinds, shapes;
-// save(name) → the "rock" asset, load(name), saved(), get()
+// save(name) → the "rock" asset, load(name), saved(), get(); saveField(name) → the "rocks" asset (rocks on a scene's
+// terrain), loadField(name), fields()
 window.RocksApi = {
   kinds: Object.fromEntries(Object.entries(ROCK_KINDS).map(([k, v]) => [k, v.name])),
   shapes: Object.fromEntries(Object.entries(ROCK_SHAPES).map(([k, v]) => [k, v.name])),
@@ -217,6 +239,8 @@ window.RocksApi = {
   info: () => ({ mode: S.mode, spec: spec(), tris: Math.round(shown.tris), stones: shown.count, ...(shown.info ? { size: shown.info.size, volume: +shown.info.volume.toFixed(4), mass: Math.round(shown.info.mass) } : {}) }),
   get: spec,
   save: (n) => ({ saved: saveRock(n) }), load: (n) => loadRock(n), saved: () => listAssets('rock'),
+  // rocks for a scene's terrain (the "rocks" asset): saveField(name), loadField(name), fields()
+  saveField: (n) => ({ saved: saveField(n) }), loadField: (n) => loadField(n), fields: () => listAssets('rocks'),
 };
 
 updateSky(); resize();

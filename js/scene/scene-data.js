@@ -6,6 +6,7 @@
 //   env: { surface: 'sea' | 'land' | 'space' | 'underground', light: 'afternoon' | 'noon' | 'dusk' | 'overcast' | nazwa zasobu „weather”, look: '' | nazwa profilu,
 //          land: '' | nazwa zasobu „ląd” (teren z laboratorium lądu; '' — płaski grunt),
 //          vegetation: '' | nazwa zasobu „vegetation” (roślinność z laboratorium roślin na terenie lądu; '' — bez roślin),
+//          rocks: '' | nazwa zasobu „rocks” (skały z laboratorium skał na terenie lądu; '' — bez skał),
 //          sea: '' | nazwa zasobu „morze” (js/scene/assets.js; '' — morze domyślne),
 //          sky: '' | 'day' | 'preset:<id>' | nazwa zasobu „niebo” (każda powierzchnia; '' — domyślne: morze i ląd —
 //          dzienne, kosmos — Deep field; js/scene/space.js),
@@ -27,7 +28,7 @@
 export const FORMAT = 'gamelab-scene', VERSION = 1;
 
 export function emptyScene(name = 'New scene') {
-  return { format: FORMAT, version: VERSION, name, env: { surface: 'sea', light: 'afternoon', look: '', sea: '', sky: '', land: '', vegetation: '', ui: '', cave: '', caveGlow: true, music: '', musicAction: '' }, objects: [] };
+  return { format: FORMAT, version: VERSION, name, env: { surface: 'sea', light: 'afternoon', look: '', sea: '', sky: '', land: '', vegetation: '', rocks: '', ui: '', cave: '', caveGlow: true, music: '', musicAction: '' }, objects: [] };
 }
 
 let seq = 0;

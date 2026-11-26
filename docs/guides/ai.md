@@ -55,7 +55,7 @@ Najważniejsze polecenia (pełna tabela: [`../../editor/README.md`](../../editor
 | Polecenie | Co robi |
 |---|---|
 | `help`, `describe`, `prefabs [family]`, `assets [kind]` | co można: polecenia, scena jako dane, modele do dodania, zasoby z nazwą |
-| `env { surface, light, look, sea, land, vegetation, sky, ui, cave, music, musicAction }` | środowisko: `sea` / `land` / `space` / `underground`; zasoby środowiska |
+| `env { surface, light, look, sea, land, vegetation, rocks, sky, ui, cave, music, musicAction }` | środowisko: `sea` / `land` / `space` / `underground`; zasoby środowiska |
 | `add { prefab, name, pos, ground, rot, scale, behavior, asset, shot, sound }` | dodaje model (`prefab` z `prefabs`; `ground: true` — stawia go na terenie pod `pos`) |
 | `camera { pos, target, fov }` | kamera widoku (`target` — punkt albo obiekt); bez pól — odczyt |
 | `set { id \| name, … , sound, soundRange, orbit }`, `move`, `remove` | zmienia obiekt |

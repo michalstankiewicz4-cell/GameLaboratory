@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.55.0 — 2026-11-26
+
+### Dodane
+- Środowisko → **Skały**: głazy i piarg z laboratorium skał (zasób „rocks”) na terenie lądu, według biomów
+  i nachylenia; `{ "cmd": "env", "rocks": name }`.
+
 ## 0.54.0 — 2026-11-21
 
 ### Dodane
