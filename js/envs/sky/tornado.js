@@ -9,7 +9,7 @@
 // wodna) … 100 m/s (silne tornado), promień rdzenia 10 … 120 m.
 //   tornadoWind(T, x, y, z, out) → out [vx, vy, vz] m/s (T: { x, z, vmax, rc, base, top, spin })
 //   vortexOf(strength) → { vmax, rc, top } — liczby wiru z siły
-// createTornado(scene) → { set({ strength, kind } | null), update(dt, camera, { isWater, groundAt, at }), windAt(x, y, z, out),
+// createTornado(scene) → { set({ strength, kind, rc?, top?, vmax? } | null) (rc, top, vmax — wir na miarę zamiast liczb z siły), update(dt, camera, { isWater, groundAt, at }), windAt(x, y, z, out),
 //   state (T albo null), kind ('water' | 'land' | null), dispose() }
 import * as THREE from '../../../vendor/three/three.module.js';
 
@@ -102,7 +102,10 @@ export function createTornado(scene) {
   const dp = new Float32Array(DEBRIS * 3), dg = new THREE.BufferGeometry(), seeds = new Float32Array(DEBRIS * 4);
   for (let i = 0; i < DEBRIS; i++) { seeds[i * 4] = Math.random() * 6.283; seeds[i * 4 + 1] = Math.random(); seeds[i * 4 + 2] = Math.random(); seeds[i * 4 + 3] = Math.random(); }
   dg.setAttribute('position', new THREE.BufferAttribute(dp, 3));
-  const dm = new THREE.PointsMaterial({ size: 3, sizeAttenuation: true, color: 0x7a6650, transparent: true, opacity: 0.55, depthWrite: false });
+  // miękka okrągła drobina pyłu (kwadratowe punkty wyglądały jak konfetti)
+  const dc = document.createElement('canvas'); dc.width = dc.height = 64;
+  { const g = dc.getContext('2d'), gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.45, 'rgba(255,255,255,0.45)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); }
+  const dm = new THREE.PointsMaterial({ size: 3, sizeAttenuation: true, color: 0x7a6650, transparent: true, opacity: 0.55, depthWrite: false, map: new THREE.CanvasTexture(dc) });
   const debris = new THREE.Points(dg, dm); debris.frustumCulled = false; group.add(debris);
 
   let T = null, def = null, kind = null, time = 0, heading = Math.random() * 6.283, want = 0, life = 0;
@@ -113,6 +116,7 @@ export function createTornado(scene) {
       if (!d || !(d.strength > 0)) { want = 0; return; }
       def = { ...TORNADO_DEFAULTS, ...d }; want = 1;
       const V = vortexOf(clamp(def.strength, 0, 1));
+      if (d.rc > 0) V.rc = d.rc; if (d.top > 0) V.top = d.top; if (d.vmax > 0) V.vmax = d.vmax;   // wir na miarę (np. mała trąba gracza)
       if (!T) T = { x: 0, z: 0, base: 0, spin: 1, fade: 0, placed: false, ...V };
       Object.assign(T, V);
     },
@@ -150,8 +154,9 @@ export function createTornado(scene) {
       funnel.scale.set(1, T.top, 1);
       cloud.position.y = T.top; cloud.scale.setScalar(T.rc * 14); CU.uAlpha.value = 0.85 * T.fade;
       // cząstki: spirala w górę wokół podstawy; woda — biały pył, ląd — kurz i ciemne szczątki
-      dm.color.setRGB(...(w ? [0.85, 0.88, 0.9] : [0.45, 0.38, 0.3])); dm.opacity = (w ? 0.35 : 0.6) * T.fade; dm.size = w ? 4 + 4 * s : 2 + 3 * s;
-      const rise = (w ? 40 : 60) + 140 * s, R = T.rc;
+      // rozmiar drobin i wysokość wznoszenia nie większe niż pozwala rdzeń (mała trąba ma mały pył)
+      dm.color.setRGB(...(w ? [0.85, 0.88, 0.9] : [0.45, 0.38, 0.3])); dm.opacity = (w ? 0.35 : 0.6) * T.fade; dm.size = Math.min(w ? 4 + 4 * s : 2 + 3 * s, 0.35 + T.rc * 0.2);
+      const rise = Math.min((w ? 40 : 60) + 140 * s, T.rc * 3 + 8), R = T.rc;
       for (let i = 0; i < DEBRIS; i++) {
         const a0 = seeds[i * 4], f = (seeds[i * 4 + 1] + time * (0.08 + 0.12 * seeds[i * 4 + 2])) % 1;
         const r = R * (0.4 + 2.2 * seeds[i * 4 + 3]) * (1 - 0.5 * f), ang = a0 + time * (T.vmax / Math.max(r, 5)) * 0.6;

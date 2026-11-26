@@ -3,6 +3,21 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.105.1 · wygląd 1.8.1 · doktor modeli 1.6.0 — 2026-11-26 (z Tornado.io: doktor i trąba)
+
+### Dodane
+- Doktor modeli — ulepszenia z Tornado.io (był tam kopią): `opts.ground` (grunt pod modelem: `seethrough` nie patrzy
+  spod ziemi, `facing` liczy grunt jako trafienie), części powielane (`InstancedMesh`) łączą w `floating` to, czego
+  dotykają; filtr rodziny `python3 tools/doctor.py rocks/` (strona `?only=`), `--update` z filtrem przepisuje tylko tę
+  część wzorca.
+- Trąba powietrzna: wir na miarę `set({ strength, kind, rc, top, vmax })` (promień rdzenia, wysokość, prędkość
+  zamiast liczb z siły) — z Tornado.io.
+
+### Zmienione
+- Pył i bryzga trąby: miękkie okrągłe drobiny zamiast kwadratowych (kolor i krycie bez zmian); wielkość drobin
+  i wysokość wznoszenia nie większe, niż pozwala rdzeń.
+- Doktor: `facing` zaczyna promienie najwyżej 1 cm od ściany (było 0,2 % modelu).
+
 ## Doktor modeli 1.5.1 — 2026-11-26 (normalne przy nierównej skali)
 
 ### Poprawione

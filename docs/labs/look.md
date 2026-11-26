@@ -55,7 +55,12 @@ water a waterspout (a pale, thin, bending funnel, white spray at its foot), over
 with dust and debris); **Kind** can force either. **Strength** sets everything at once: the top wind speed 18 m/s
 (a weak waterspout) … 100 m/s (a violent tornado), the core radius 10 … 120 m, the funnel's width and height and the
 amount of spray or dust. Above the funnel a turning wall cloud. It wanders over the map (6–15 m/s) and fades in and out
-over a few seconds.
+over a few seconds. The spray and dust are soft round specks, no bigger and rising no higher than the core allows
+(a small whirl has small dust; 1.8.1).
+
+In code a whirl can also be given its own size instead of the numbers from strength:
+`set({ strength, kind, rc, top, vmax })` — core radius, height and top speed (from Tornado.io, where the player is a small
+whirl).
 
 Its wind is real air for the physics (a Rankine vortex: solid-body spin inside the core, falling off as 1/r outside;
 inflow at the ground, an updraft in the core weakening with height): `stage.windAt(x, y, z)`. In the scene editor's

@@ -63,6 +63,16 @@ wskazywał jedną część.
 Części bez nazwy opisuje rodzaj bryły, wymiary i kolor (np. `box 0.45×0.07×0.65 #ffffff`), bez numeru — kopie jednej
 części mają jedną nazwę, więc ich wyniki łączą się w jeden „×n” (dotyczy też lustrzanych kopii w `facing` i `seethrough`).
 
+Opcje źródła (`opts` z `build()`), oprócz opisanych przy testach:
+- `ground` — wysokość gruntu, na którym model stoi (ulice, wyposażenie, budynki): nikt nie ogląda go spod ziemi —
+  `seethrough` pomija punkty widzenia pod gruntem i promienie, które najpierw trafiają w grunt, a `facing` liczy grunt
+  jako trafienie promienia w dół;
+- `planeEps` — odległość, która dla `zfight` jest „tą samą płaszczyzną” (domyślnie 0,06 % modelu; drobne przedmioty
+  w milimetrach potrzebują mniej).
+
+Części powielane (`InstancedMesh` — słupki, pręty, stopnie) same nie są badane, ale w `floating` łączą to, czego
+dotykają (wcześniej rury barierek „wisiały w powietrzu”, bo słupki były dla testu niewidoczne).
+
 Wyjątki dla zamierzonych przypadków: `userData.doctorOk = 'floating'` (albo tablica testów) na części lub jej przodku.
 
 Badane są widoczne siatki (bez instancjonowanych i szkieletowych) z materiałami, które coś rysują i nie są
@@ -74,11 +84,17 @@ nieprzezroczyste trójkąty (`isSolid`). Przegląd 2026-11-26: żaden model z li
 
 - Strona: `tools/doctor.html` bada jeden model naraz — ten, z którym się otwiera (`?model=sea/lab/blyskawica`, bez tego pierwszy z listy), a każdy następny, gdy się go wybierze; „Examine all” (albo `?all=1`) bada całą listę. `window.doctorReport` — wyniki jako dane.
 - Bez okna: `python3 tools/doctor.py` (porównanie z wzorcem), `--update` (nowy wzorzec), `--shots` (zrzuty).
+  Jedna rodzina: `python3 tools/doctor.py rocks/` (modele, których id zaczyna się od podanego; porównanie z ich częścią
+  wzorca, `--update` przepisuje tylko ją; strona: `tools/doctor.html?only=rocks/`). Filtr bez żadnego modelu — błąd.
 - Strona ładuje kity Space przez `js/core/three-global.js` — w grafice Battle, jak laboratoria (od 0.12.0;
   wcześniej w trybie legacy r128). Na wyniki doktora nie ma to wpływu.
 
 ## Zmiany
 
+- **2026-11-26 (v1.6.0)** — z Tornado.io (doktor był tam kopią i dostał ogólne ulepszenia): `opts.ground` (grunt pod
+  modelem w `seethrough` i `facing`), części powielane łączą w `floating`, `facing` zaczyna promienie najwyżej 1 cm od
+  ściany (było 0,2 % modelu — na 40-metrowej ulicy 8 cm, więcej niż krawężnik); filtr rodziny
+  `python3 tools/doctor.py rocks/` (`?only=`).
 - **2026-11-26 (v1.5.1)** — `seethrough` przelicza normalną ściany macierzą normalną (odwrotną transponowaną),
   a nie samą macierzą świata: przy nierównej skali osi macierz przechyla normalną z jej ściany, więc ściana widziana
   z przodu mogła wyjść jako widziana od tyłu (fałszywa dziura). Stanowisko testowe ma zamkniętą bryłę rozciągniętą

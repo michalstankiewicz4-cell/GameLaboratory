@@ -20,6 +20,7 @@ import { models as testModels } from './sources/test-bench.js';
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
 const params = new URLSearchParams(location.search);
+const ONLY = params.get('only') || '';
 
 /* ---------------- the models ---------------- */
 const MODELS = [...spaceModels(), ...seaModels, ...trainModels, ...roadModels, ...tramModels, ...airModels, ...weaponModels, ...junkModels, ...cityModels, ...plantModels, ...rockModels, ...testModels];
@@ -225,6 +226,7 @@ async function open(id, again) {
 async function runAll(keep) {
   report.done = false; restoreMaterials(); selected = null;
   for (const m of MODELS) {
+    if (ONLY && !m.id.startsWith(ONLY)) continue;   // ?only=prefix: just those models (tools/doctor.py streets/)
     $('status').textContent = `examining ${m.label}…`; listModels();
     await new Promise((r) => setTimeout(r, 30));
     examineSafe(m);
@@ -233,7 +235,8 @@ async function runAll(keep) {
   report.done = true;
   listModels();
   const want = keep || params.get('model');
-  show(MODELS.some((m) => m.id === want && built[m.id]) ? want : MODELS[0].id);
+  const first = MODELS.find((m) => built[m.id]);   // with ?only= the first model on the list may not have been built
+  if (built[want]) show(want); else if (first) show(first.id);
 }
 
 /* ---------------- loop ---------------- */
@@ -248,4 +251,4 @@ function frame() {
 }
 window.__doctor = { report, built, show, highlight, get selected() { return selected; } };
 requestAnimationFrame(frame);
-if (params.get('all')) runAll(); else open(params.get('model') || MODELS[0].id);
+if (params.get('all') || ONLY) runAll(); else open(params.get('model') || MODELS[0].id);

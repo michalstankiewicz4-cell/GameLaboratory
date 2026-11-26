@@ -30,6 +30,8 @@
 //
 // API: examine(root, opts) → { findings, stats }
 //   opts.tolerance   fraction of the model's size for "touching" (default 0.004)
+//   opts.ground      y of the ground the model stands on (streets, lamps, buildings): nothing is seen from below it —
+//                    "seethrough" skips rays that meet the ground first, "facing" counts the ground as hit
 //   opts.planeEps    distance that counts as "the same plane" for zfight (default 0.06 % of the model)
 //   opts.ignoreAllow true: report allow-listed pieces too
 //   opts.checks      subset of CHECKS to run (default all)
@@ -293,7 +295,7 @@ export function examine(root, opts = {}) {
       const objs = solidAll.map((m) => m.o), saved = new Map();
       objs.forEach((o) => matsOf(o).forEach((x) => { if (!saved.has(x)) saved.set(x, x.side); x.side = THREE.DoubleSide; }));
       const ray = new THREE.Raycaster(), c = new THREE.Vector3(), nn = new THREE.Vector3(), o = new THREE.Vector3();
-      const hits = (from, dir) => { ray.set(from, dir); ray.far = L * 2; return ray.intersectObjects(objs, false).length; };
+      const gy = opts.ground, hits = (from, dir) => { ray.set(from, dir); ray.far = L * 2; return ray.intersectObjects(objs, false).length + (gy != null && dir.y < -1e-6 && from.y >= gy - 1e-4 ? 1 : 0); };   // the ground stops a ray going down
       for (const m of cand) {
         const step = Math.max(1, Math.floor(m.tris / 48));
         let inward = 0, outward = 0;
@@ -301,7 +303,9 @@ export function examine(root, opts = {}) {
           triVerts(m, k, v0, v1, v2);
           nn.crossVectors(e1.subVectors(v1, v0), e2.subVectors(v2, v0)); if (nn.lengthSq() < 1e-12 * L * L) continue;
           nn.normalize(); c.copy(v0).add(v1).add(v2).divideScalar(3).applyMatrix4(root.matrixWorld);
-          const front = hits(o.copy(c).addScaledVector(nn, 0.002 * L), nn), back = hits(o.copy(c).addScaledVector(nn, -0.002 * L), nn.clone().negate());
+          // rays start just off the face: 0.2 % of the model, at most 1 cm — a thin part (a kerb on a 40 m street) must not be
+          // stepped over
+          const off = Math.min(0.002 * L, 0.01), front = hits(o.copy(c).addScaledVector(nn, off), nn), back = hits(o.copy(c).addScaledVector(nn, -off), nn.clone().negate());
           if (front > 0 && back === 0) inward++; else if (front === 0 && back > 0) outward++;
         }
         if (inward >= 5 && inward > outward * 2) add('facing', [m], `${inward} of ${inward + outward} sampled faces point inward (reverse the triangle winding)`);
@@ -348,6 +352,10 @@ export function examine(root, opts = {}) {
       for (let a = 0; a < G; a++) for (let b = 0; b < G; b++) {
       from.copy(ctr).addScaledVector(d0, L * 1.5).addScaledVector(uu, ((a + 0.5) / G * 2 - 1) * R).addScaledVector(vv, ((b + 0.5) / G * 2 - 1) * R);
       ray.set(from, dir); ray.far = L * 3;
+      if (opts.ground != null) {   // a viewpoint under the ground sees nothing; a ray reaching the ground stops there
+        if (from.y < opts.ground) continue;
+        if (dir.y < -1e-6) ray.far = Math.min(ray.far, (from.y - opts.ground) / -dir.y);
+      }
       const h = firstHit();
       if (!h || !h.face) continue;
       const mats = matsOf(h.object), mat = Array.isArray(h.object.material) ? h.object.material[h.face.materialIndex || 0] : h.object.material;
@@ -481,9 +489,17 @@ export function examine(root, opts = {}) {
   // floating: pieces whose boxes (grown by the tolerance) reach nothing of the main body
   t = performance.now();
   if (run.has('floating')) {
-    const grown = meshes.map((m) => m.box.clone().expandByScalar(tol));
-    const comp = meshes.map((_, i) => i), find = (i) => (comp[i] === i ? i : (comp[i] = find(comp[i])));
-    const order = meshes.map((_, i) => i).sort((a, b) => meshes[a].box.min.x - meshes[b].box.min.x);   // sweep along x
+    // instanced pieces (posts, bars, steps drawn as one InstancedMesh) are not examined themselves, but they connect
+    // what they touch: their instance boxes join the sweep and are never reported
+    const ibox = [];
+    root.traverse((o) => {
+      if (!o.isInstancedMesh || !visibleInTree(o) || !o.count) return;
+      o.geometry.computeBoundingBox(); const m = new THREE.Matrix4();
+      for (let k = 0; k < o.count; k++) { o.getMatrixAt(k, m); m.premultiply(o.matrixWorld); ibox.push(o.geometry.boundingBox.clone().applyMatrix4(m)); }
+    });
+    const boxes = meshes.map((m) => m.box).concat(ibox), grown = boxes.map((b) => b.clone().expandByScalar(tol));
+    const comp = boxes.map((_, i) => i), find = (i) => (comp[i] === i ? i : (comp[i] = find(comp[i])));
+    const order = boxes.map((_, i) => i).sort((a, b) => boxes[a].min.x - boxes[b].min.x);   // sweep along x
     for (let ii = 0; ii < order.length; ii++) {
       const i = order[ii];
       for (let jj = ii + 1; jj < order.length; jj++) {
@@ -494,7 +510,10 @@ export function examine(root, opts = {}) {
     }
     const groups = new Map();
     meshes.forEach((m, i) => { const r = find(i); if (!groups.has(r)) groups.set(r, []); groups.get(r).push(m); });
-    const sorted = [...groups.values()].sort((x, y) => y.reduce((s, m) => s + m.tris, 0) - x.reduce((s, m) => s + m.tris, 0));
+    // the instances of a group count towards its size (a body of many instanced posts is still the main body)
+    const itris = new Map(); ibox.forEach((_, k) => { const r = find(meshes.length + k); itris.set(r, (itris.get(r) || 0) + 1); });
+    for (const [r, g] of groups) g.itris = itris.get(r) || 0;
+    const sorted = [...groups.values()].sort((x, y) => (y.reduce((s, m) => s + m.tris, 0) + y.itris * 12) - (x.reduce((s, m) => s + m.tris, 0) + x.itris * 12));
     sorted.slice(1).forEach((g) => {
       let gap = Infinity;
       const gb = new THREE.Box3(); g.forEach((m) => gb.union(m.box));

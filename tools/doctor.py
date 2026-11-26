@@ -7,6 +7,8 @@ and prints the findings. It fails (exit 1) when
   py tools/doctor.py              # check against the golden file
   py tools/doctor.py --update     # accept the current state as the new golden file
   py tools/doctor.py --shots      # also screenshot each model with its first finding selected (tools/out/doctor-*.png)
+  py tools/doctor.py rocks/        # only the models whose id starts with it (compared with their part of the golden
+                                   # file; with --update only that part is rewritten)
 """
 import json, os, sys, time, subprocess
 from playwright.sync_api import sync_playwright
@@ -18,6 +20,7 @@ PORT = 8780
 CHECKS = ['nan', 'inverted', 'facing', 'seethrough', 'arc', 'zfight', 'floating', 'waterline', 'poke', 'budget', 'pierce', 'hidden', 'speck', 'sliver']
 
 def main():
+    only = next((a for a in sys.argv[1:] if not a.startswith('-')), '')
     errs, fails = [], []
     srv = subprocess.Popen([sys.executable, '-m', 'http.server', str(PORT)], cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     time.sleep(1)
@@ -28,7 +31,7 @@ def main():
             pg = b.new_page(viewport={'width': 1280, 'height': 720}, bypass_csp=True)
             pg.on('pageerror', lambda e: errs.append('pageerror ' + str(e)))
             pg.on('console', lambda m: errs.append(m.type + ' ' + m.text) if m.type == 'error' else None)
-            pg.goto(f'http://localhost:{PORT}/tools/doctor.html?all=1')
+            pg.goto(f'http://localhost:{PORT}/tools/doctor.html?all=1' + (f'&only={only}' if only else ''))
             pg.wait_for_function('window.doctorReport && window.doctorReport.done', timeout=900000)
             rep = pg.evaluate('window.doctorReport')
             if '--shots' in sys.argv:
@@ -51,15 +54,20 @@ def main():
             print(f'  {f["severity"][0].upper()} {f["check"]:<9} {f["detail"][:150]}')
             print(f'              {" ; ".join(f["parts"])[:150]}' + (f'  [{" | ".join(f["src"])[:80]}]' if f['src'] else ''))
         if not r['findings']: print('  clean')
-    bench = now.get('test/bench', {}).get('counts', {})
-    missing = [c for c in CHECKS if not bench.get(c)]
-    if missing: fails.append('test bench: these checks found nothing: ' + ', '.join(missing))
+    if not now and not fails: print(f'no model id starts with "{only}": nothing was checked'); sys.exit(1)
+    if 'test/bench'.startswith(only):
+        bench = now.get('test/bench', {}).get('counts', {})
+        missing = [c for c in CHECKS if not bench.get(c)]
+        if missing: fails.append('test bench: these checks found nothing: ' + ', '.join(missing))
     if '--update' in sys.argv:
+        if only and os.path.exists(GOLDEN):   # rewrite only the filtered part
+            gold = {k: v for k, v in json.load(open(GOLDEN, encoding='utf-8')).items() if not k.startswith(only)}
+            now = {**gold, **now}
         with open(GOLDEN, 'w', encoding='utf-8') as fh: json.dump(now, fh, indent=1, sort_keys=True)
         print('\ngolden file written:', GOLDEN)
     elif os.path.exists(GOLDEN):
         gold = json.load(open(GOLDEN, encoding='utf-8'))
-        for mid in sorted(set(gold) | set(now)):
+        for mid in sorted({k for k in gold if k.startswith(only)} | set(now)):
             if gold.get(mid) != now.get(mid):
                 fails.append(f'{mid}: differs from the golden file\n    golden: {json.dumps(gold.get(mid))}\n    now:    {json.dumps(now.get(mid))}')
     else:
