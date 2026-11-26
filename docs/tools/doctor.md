@@ -26,6 +26,7 @@ wersji z Battle (historia obu — w git). Logika to wersja z Battle — ma wszys
 | `tools/doctor/sources/city.js` | budynki miasta z CityKit (wszystkie rodzaje i budynki Warszawy z mapy, wersja bliska; jedna płaszczyzna do 1 cm) |
 | `tools/doctor/sources/plants.js` | rośliny z PlantKit: każdy gatunek (ziarno 1) jako kora i liście |
 | `tools/doctor/sources/rocks.js` | skały z RockKit: każdy rodzaj w każdym kształcie (ziarno 1) jako jedna siatka |
+| `tools/doctor/sources/houses.js` | budynki z części HouseKit (każda część osobną siatką, jak przed zniszczeniem; `ground: 0`) |
 | `tools/doctor/sources/test-bench.js` | stanowisko testowe: model z jednym błędem na każdy test |
 | `tools/doctor/sources/common.js` | wspólne: koszt rysowania (trójkąty, wywołania, materiały) |
 | `tools/doctor.py` | doktor bez okna (Playwright): porównuje z `tools/doctor.golden.json` |

@@ -22,6 +22,7 @@ Zasada (CLAUDE.md): fizyka jest prawdziwa — start, ruch, skręt i zatrzymanie 
 | przedmioty na lądzie (bryły sztywne) | `land/items.js` (przedmioty złomowiska w nim: `land/junk-items.js` — `itemKit`) | ląd | przeładowarka, maszyny złomowiska, edytor sceny (`item`) |
 | maszyny złomowiska | `land/machines/` (`machines.js`: zgniatarka `crusher.js`, piec na papier `furnace.js`, piec indukcyjny `induction.js`, linia odlewnicza `casting.js` + strumień metalu `metal-flow.js`, zderzacze `statics.js`) | ląd | laboratorium budowli (maszyny złomowiska w działaniu), edytor sceny (`machine`, `solid`) |
 | deformacja blachy (DeformKit, z Tornado.io) | `land/deform/` (`shell.js`, rdzeń `shell-core.js`, osadzanie `embed.js`, zderzacze `box.js`, wątek `shell-worker.js`; opis [`deform.md`](deform.md)) | ląd | laboratorium przedmiotów (tryb Deformation: beczki pod prasą, kontener) |
+| zniszczenie budynków (DestructKit, z Tornado.io) | `land/destruct/` (`world.js`, pękanie i statyka `statics.js`, uderzenia i wiatr `impacts.js`, bryły `physics.js` + wątek, wzory `patterns.js`, materiały, rysowanie, gruz, pożary `burn.js`; opis [`destruct.md`](destruct.md)) | ląd | laboratorium miasta (tryb Destruction: budynki HouseKit i Warszawy z części, uderzenie, rzut, trąba) |
 
 ## Wiatr w scenie (trąba powietrzna, tornado, cyklon)
 

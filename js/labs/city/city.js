@@ -3,7 +3,8 @@
 // ziarno, zapis — zasób „building”), Fasada (mur z MatKit, przęsła, okna, balkony), Parter i gzymsy, Dach, Wypalona
 // fasada (rozdzielczość, paralaksa, odległość przełączania, podgląd map), Opis (JSON), Kamera, Światło, Wydajność.
 // Wersja: blisko (siatka), daleko (płaskie ściany z wypalonymi teksturami i paralaksą) albo z odległości jak w grze.
-// Obrys: gotowy kształt albo narysowany na gruncie (Draw outline). Dla AI: CityApi.
+// Obrys: gotowy kształt albo narysowany na gruncie (Draw outline). Tryb Zniszczenie (destruct/destruct.js, z Tornado.io):
+// budynek z części (HouseKit albo budynek Warszawy) w świecie DestructKit — uderzenie, rzut, trąba. Dla AI: CityApi.
 import * as THREE from '../../../vendor/three/three.module.js';
 import { createStage } from '../shared/stage.js';
 import { LookPipeline, LOOK_DEFAULTS } from '../../render/sea/look.js';
@@ -13,13 +14,14 @@ import { TYPES, TYPE_IDS, WINDOW_STYLES, GROUND_KINDS, ROOF_TYPES, FOOTPRINTS, n
 import { cleanPolygon } from '../../models/city/footprint.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 import { attachWeatherCycle } from '../shared/weather-cycle-ui.js';
+import { createDestructMode } from './destruct/destruct.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 const KEY = 'gameLab.city.v1';
 let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { saved = null; }
-const L = { src: 'type:tenement', spec: null, mode: 'auto', ppm: 64, pom: true, lodAt: 0, weather: 'fair', time: 15.5, ...(saved || {}) };
+const L = { src: 'type:tenement', spec: null, mode: 'auto', ppm: 64, pom: true, lodAt: 0, weather: 'fair', time: 15.5, labMode: 'building', ...(saved || {}) };
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(L)); } catch { /* prywatny tryb */ } };
 const status = (s) => { $('status').textContent = s || ''; };
 // budynek z mapy (OpenStreetMap): bryła z danych, wygląd — styl budynku (landmarks.js), zmieniany w oknach Fasada i Parter
@@ -60,13 +62,13 @@ async function rebuild() {
     };
     const heavy = spec.landmark || spec.floors * spec.footprint.w > 1500;
     if (heavy && window.LabLoad) await window.LabLoad.run('Building…', work); else await work();
-    for (const b of [near, far]) if (b) scene.add(b.group);
+    for (const b of [near, far]) if (b) { scene.add(b.group); if (L.labMode === 'destruct') b.group.visible = false; }
     const b = near || far, bb = new THREE.Box3().setFromObject(b.group);
     bb.getCenter(center); radius = bb.getSize(new THREE.Vector3()).length() / 2;
     stage.fitShadow(new THREE.Vector3(center.x, 0, center.z), Math.max(20, radius * 1.1));
     if (!L.lodAt) L.lodAt = Math.round(Math.min(150, Math.max(40, radius * 2)) / 5) * 5;   // dalej siatka z bliska tylko migocze (drobne ramy)
     $('lodAt').value = L.lodAt; $('lodAtV').textContent = L.lodAt + ' m';
-    showStats(); drawMaps(); pickShown(true);
+    showStats(); drawMaps(); if (L.labMode !== 'destruct') pickShown(true);
     $('jsonText').value = JSON.stringify(spec, null, 1);
     L.spec = spec; save();
   } catch (e) { status('Error: ' + e.message); if (window.LabLog) window.LabLog.add('error', e.stack || e.message); }
@@ -239,9 +241,10 @@ onAssetsChange(() => { const v = $('type').value; fill(); $('type').value = v; s
 
 /* ---------------- światło: pogoda i pora dnia (noc — okna świecą) ---------------- */
 let wxNow = null;   // liczby zmiennej pogody (js/labs/shared/weather-cycle-ui.js); null — pogoda z listy
+let dayNow = 1;
 function light() {
   const Lt = stage.setLight({ ...(wxNow || {}), weather: L.weather, time: L.time });
-  setNight(Math.min(1, Math.max(0, (1 - Lt.day) * 1.25)));
+  setNight(Math.min(1, Math.max(0, (1 - Lt.day) * 1.25))); dayNow = Lt.day;
   const h = Math.floor(L.time), m = Math.round((L.time - h) * 60);
   $('timeV').textContent = `${String(h % 24).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 }
@@ -276,6 +279,7 @@ cv.addEventListener('pointerup', (e) => {
   const click = drag && Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) < 5 && drag.b === 0;
   drag = null;
   if (click && drawing) addPoint(e);
+  else if (click && L.labMode === 'destruct') destruct.click(e);
 });
 cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.max(4, Math.min(4000, orbit.dist * Math.exp(e.deltaY * 0.001))); }, { passive: false });
 
@@ -337,6 +341,10 @@ window.CityApi = {
   get info() { const b = near || far; return b ? { ...b.info, near: near && near.stats, far: far && far.stats } : null; },
   save: (n) => { saveAsset('building', String(n), { ...spec, label: String(n) }); fill(); return true; },
   night: (k) => { L.time = k > 0.5 ? 22 : 13; light(); return k; },
+  // mode('building' | 'destruct'); destruct — the destruction mode: build(type, seed), village(), hit([x, y, z], [jx, jy, jz], r),
+  // sweep(), stop(), tornadoAt(x, z), simulate(seconds), stats(), types
+  mode: (m) => { setLabMode(m); return L.labMode; },
+  get destruct() { return destruct.api; },
 };
 function apiTab() {
   if (!window.LabConsole) return;
@@ -360,17 +368,45 @@ function frame(now) {
   const c = Math.cos(orbit.pitch);
   camera.position.set(orbit.target.x + Math.sin(orbit.yaw) * c * orbit.dist, orbit.target.y + Math.sin(orbit.pitch) * orbit.dist, orbit.target.z + Math.cos(orbit.yaw) * c * orbit.dist);
   camera.lookAt(orbit.target);
-  if (!drawing && L.mode === 'auto') pickShown();
+  if (L.labMode === 'destruct') destruct.frame(dt);
+  else if (!drawing && L.mode === 'auto') pickShown();
   stage.update(dt, camera);
   look.sun(camera, stage.sunDir);
   window.LabPerf.begin(renderer); look.render(scene, camera); window.LabPerf.end(renderer);
   requestAnimationFrame(frame);
+}
+/* ---------------- tryby: Budynek | Zniszczenie ---------------- */
+const destruct = createDestructMode({ scene, camera, canvas: cv, orbit, ui: { L, $, el, status, save }, day: () => dayNow });
+const LAB_MODES = { building: 'Building', destruct: 'Destruction' };
+const BUILD_WINDOWS = ['building', 'facade', 'ground', 'roof', 'bake', 'json'], DESTRUCT_WINDOWS = ['dbuilding', 'dtool', 'dphysics'];
+$('modes').replaceChildren(...Object.entries(LAB_MODES).map(([k, v]) => { const b = el('button', { type: 'button', textContent: v, title: k === 'destruct' ? 'A building of parts that break like they are built: hit it, throw things at it, send a tornado' : 'The building creator: near mesh and baked far facade' }); b.dataset.m = k; b.onclick = () => setLabMode(k); return b; }));
+function setLabMode(m) {
+  if (drawing) endDraw(false);
+  L.labMode = LAB_MODES[m] ? m : 'building'; save();
+  const d = L.labMode === 'destruct';
+  [...$('modes').children].forEach((b) => b.classList.toggle('on', b.dataset.m === L.labMode));
+  for (const id of ['type', 'shape', 'draw', 'mode']) $(id).hidden = d;
+  for (const id of ['dTools', 'dRebuild']) $(id).hidden = !d;
+  for (const id of ['cityNote', 'specs', 'cityApiNote']) $(id).hidden = d;
+  for (const id of ['dNote', 'dStats']) $(id).hidden = !d;
+  for (const w of BUILD_WINDOWS) document.querySelector(`.panel[data-window="${w}"]`).hidden = d;
+  for (const w of DESTRUCT_WINDOWS) document.querySelector(`.panel[data-window="${w}"]`).hidden = !d;
+  if (d) {
+    for (const b of [near, far]) if (b) b.group.visible = false;
+    status(''); destruct.enter();
+    stage.fitShadow(new THREE.Vector3(0, 0, 0), Math.max(30, destruct.size));
+  } else {
+    destruct.leave();
+    $('bName').textContent = 'City';
+    stage.fitShadow(new THREE.Vector3(center.x, 0, center.z), Math.max(20, radius * 1.1));
+    pickShown(true); aimCam('corner');
+  }
 }
 fill(); show();
 $('mode').value = L.mode; $('ppm').value = String(L.ppm); $('pom').checked = L.pom; setPom(L.pom);
 $('weather').value = L.weather; $('time').value = L.time;
 attachWeatherCycle({ select: $('weather'), apply: (p) => { wxNow = p; light(); }, every: 0.5 });
 light(); resize();
-rebuild().then(() => aimCam('corner'));
+rebuild().then(() => { if (L.labMode === 'destruct') setLabMode('destruct'); else { setLabMode('building'); aimCam('corner'); } });
 window.__city = { stage, scene, camera, orbit, get spec() { return spec; }, get near() { return near; }, get far() { return far; }, get shown() { return shown; } };
 requestAnimationFrame(frame);

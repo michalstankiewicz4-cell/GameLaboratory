@@ -8,3 +8,7 @@
 .cityApi{display:flex;flex-direction:column;gap:6px;padding:8px}
 .cityApi textarea{width:100%;background:var(--field);border:1px solid var(--line);border-radius:var(--r);color:var(--text);font-size:11px}
 .cityApi button{align-self:flex-start}
+/* tryb Zniszczenie (js/labs/city/destruct/): lista materiałów — próbka koloru, nazwa, liczba części */
+.matList{display:grid;grid-template-columns:14px 1fr auto;gap:3px 8px;align-items:center;font-size:12px;margin:4px 0 8px}
+.matList i{inline-size:12px;block-size:12px;border-radius:2px;border:1px solid var(--line2)}
+.matList b{font-family:var(--mono);font-weight:400;color:var(--dim)}

@@ -103,6 +103,10 @@ export const PAGES = {
     ['Enter', 'Finish the footprint', 'Zakończ obrys'],
     ['Backspace', 'Remove the last point', 'Usuń ostatni punkt'],
     ['Esc', 'Cancel', 'Anuluj'],
+  ] },
+  { title: ['Destruction', 'Zniszczenie'], keys: [
+    ['1 / 2 / 3', 'Tool: hit, throw, tornado', 'Narzędzie: uderzenie, rzut, trąba'],
+    ['B', 'Rebuild', 'Odbuduj'],
   ] }],
   'labs/trees.html': [{ title: ['Editing the tree', 'Edycja drzewka'], keys: [
     ['Delete', 'Remove the selected node', 'Usuń wybrany węzeł'],

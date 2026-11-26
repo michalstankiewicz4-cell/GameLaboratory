@@ -234,6 +234,84 @@
    "triangles": 78000
   }
  },
+ "houses/barn": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 44,
+   "materials": 6,
+   "size": [
+    14.99,
+    9.7,
+    10.43
+   ],
+   "triangles": 520
+  }
+ },
+ "houses/block": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 867,
+   "materials": 6,
+   "size": [
+    29.28,
+    13.1,
+    11.6
+   ],
+   "triangles": 10404
+  }
+ },
+ "houses/cottage": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 86,
+   "materials": 7,
+   "size": [
+    10.56,
+    7.32,
+    8.38
+   ],
+   "triangles": 1024
+  }
+ },
+ "houses/garage": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 17,
+   "materials": 5,
+   "size": [
+    4.02,
+    3.19,
+    6.63
+   ],
+   "triangles": 204
+  }
+ },
+ "houses/kostka": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 202,
+   "materials": 6,
+   "size": [
+    10.7,
+    7.29,
+    10.2
+   ],
+   "triangles": 2424
+  }
+ },
+ "houses/shed": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 19,
+   "materials": 5,
+   "size": [
+    3.14,
+    2.62,
+    2.88
+   ],
+   "triangles": 220
+  }
+ },
  "junkyard/barrel": {
   "counts": {},
   "fingerprint": {

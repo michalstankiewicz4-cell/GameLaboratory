@@ -56,9 +56,33 @@ początkiem nad gruntem, kształtem i wysokością dachu, kolorami muru i dachu.
 obrysu, kondygnacji, frontu i rodzaju dachu znikają (są z mapy). Zapis pod nazwą zapamiętuje budynek i styl.
 Dane: © współtwórcy OpenStreetMap (ODbL), pobierane narzędziem `tools/city-osm.mjs` ([`../models/city.md`](../models/city.md)).
 
+## Zniszczenie (1.3.0, z Tornado.io)
+
+Przełącznik **Building | Destruction** na pasku. Tryb Destruction: budynek z części (HouseKit — dom z cegły, „kostka”,
+stodoła, garaż, szopa, blok z wielkiej płyty — albo budynek Warszawy z tego laboratorium przeliczony na części) w świecie
+zniszczeń DestructKit ([`../behaviors/destruct.md`](../behaviors/destruct.md), [`../models/houses.md`](../models/houses.md))
+na gruncie laboratorium. Każda część pęka według swojego materiału (mur na warstwy i cegły, beton na płaty, deski wzdłuż
+słojów, szyba promieniście od uderzenia, dachówka rzędami, blacha arkuszami) i stoi, dopóki stoi to, na czym się opiera.
+
+- Narzędzia na pasku (klawisze 1 2 3), kliknięcie budynku: **Hit** — uderzenie w punkcie (impuls, promień), **Throw** —
+  rzut z kamery przedmiotem złomowiska albo kamieniem (prawdziwa masa i prędkość; tor balistyczny w punkt, zderzenie
+  liczy świat), **Tornado** — trąba w tym miejscu (wiatr i rdzeń z suwaków, wir na miarę `set({ rc, top, vmax })`);
+  *Go through the building* — trąba idzie przez budynek, *Stop* ją wyłącza. Szyby pękają od wiatru pierwsze, dachówki
+  i blacha odlatują, mury padają ostatnie.
+- **Rebuild** (B) — budynek od nowa. Okno **Destruction**: budynek, ziarno, *Another one*, **Village** (sześć różnych
+  budynków obok siebie — do rzutów i przejścia trąby), kolory materiałów, lista materiałów z liczbą części.
+- Okno **Debris**: tempo czasu, limit odłamków (najmniejsze leżące najdłużej znikają), pauza.
+- Opis: części całe / wszystkie, zniszczone (objętość), odłamki, w ruchu, w spoczynku, wymiary; Wydajność: siatki
+  w batchach, wierzchołki, batche (materiały), czas budowy.
+
+Pliki: `js/labs/city/destruct/` — `destruct.js` (tryb: narzędzia, krok, okna, API), `houses.js` (budynki i angielskie
+nazwy części i materiałów), `missiles.js` (przedmioty do rzucania).
+
 ## API dla AI
 
 `window.CityApi`: `make(opis)` → opis po sprawdzeniu (i budynek), `spec`, `types`, `footprints`, `info` (wymiary,
-okna, trójkąty i wywołania obu wersji), `save(nazwa)` → zasób `building`, `night(0…1)`. Zakładka **API** w konsoli.
+okna, trójkąty i wywołania obu wersji), `save(nazwa)` → zasób `building`, `night(0…1)`, `mode('building' | 'destruct')`; `destruct`: `build(rodzaj, ziarno)`,
+`village()`, `hit([x, y, z], [jx, jy, jz], promień)`, `sweep()`, `stop()`, `tornadoAt(x, z)`, `simulate(sekundy)` (bez
+rysowania, krokami 1/30 s), `stats()`, `types`, `world`. Zakładka **API** w konsoli.
 Adres `labs/city.html?type=<rodzaj>` otwiera rodzaj (edytor sceny: „Otwórz w laboratorium”), `?landmark=<id>` —
 budynek Warszawy; `CityApi.make({ landmark: 'defilad-1', … })` (identyfikator — adres), `CityApi.landmarks` — lista.

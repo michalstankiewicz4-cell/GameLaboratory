@@ -28,7 +28,7 @@ Układ folderów jest taki sam jak w kodzie:
 | Edytor sceny („Warsztat”, `editor/index.html`): obsługa, budowa, format sceny, API dla AI | [../editor/README.md](../editor/README.md), zmiany: [../editor/CHANGELOG.md](../editor/CHANGELOG.md) |
 | Silnik sceny (`js/scene/`) | [scene/README.md](scene/README.md) |
 | Lekarz sceny (`js/scene/doctor.js`) | [scene/doctor.md](scene/doctor.md) |
-| Zachowania (`js/behaviors/`): okręt i mała jednostka na wodzie, jazda po lądzie, lądowanie, lot, koło na szynie, ciąg w próżni, orbita, ciecze i gaz w kosmosie, przeładowarka, przedmioty na lądzie (bryły sztywne), maszyny złomowiska | [behaviors/README.md](behaviors/README.md) |
+| Zachowania (`js/behaviors/`): okręt i mała jednostka na wodzie, jazda po lądzie, lądowanie, lot, koło na szynie, ciąg w próżni, orbita, ciecze i gaz w kosmosie, przeładowarka, przedmioty na lądzie (bryły sztywne), maszyny złomowiska, deformacja blachy, zniszczenie budynków | [behaviors/README.md](behaviors/README.md), [behaviors/deform.md](behaviors/deform.md), [behaviors/destruct.md](behaviors/destruct.md) |
 | Dźwięk silnika (`js/audio/`: mikser, MusicKit, SfxKit, VoiceKit; dźwięk w scenie `js/scene/sounds.js`, dźwięki modeli `onSound`, dźwięki UI gry) | [audio/README.md](audio/README.md) |
 | Ustawienia gracza (`js/core/settings.js`: grafika, mysz, klawisze, dźwięk) i ich menu w UI gry | [labs/gameui.md](labs/gameui.md), „Ustawienia gry” |
 | Poziom jakości silnika (`js/render/quality.js`: szczegóły modeli z odległości, tekstury, efekty, woda, zasięg, cienie) | [guides/rendering.md](guides/rendering.md), „Poziom jakości silnika” |
@@ -52,7 +52,7 @@ W kolejności kategorii z menu Narzędzia i strony startowej (`ui/data/catalog.j
 | | Wygląd | `labs/look.html` | [labs/look.md](labs/look.md) |
 | | Filtry | `labs/filters.html` | [labs/filters.md](labs/filters.md) |
 | | Budowle | `labs/structures.html` | [labs/structures.md](labs/structures.md), [labs/structures/coastal.md](labs/structures/coastal.md), [labs/structures/super300.md](labs/structures/super300.md) |
-| | Miasto (CityKit: budynki, wypalone fasady z paralaksą) | `labs/city.html`, `js/models/city/` | [labs/city.md](labs/city.md), [models/city.md](models/city.md) |
+| | Miasto (CityKit: budynki, wypalone fasady z paralaksą) | `labs/city.html`, `js/models/city/`, `js/models/houses/` | [labs/city.md](labs/city.md), [models/city.md](models/city.md), [models/houses.md](models/houses.md) |
 | | Rośliny | `labs/plants.html` | [labs/plants.md](labs/plants.md) |
 | | Skały | `labs/rocks.html` | [labs/rocks.md](labs/rocks.md) |
 | | Przedmioty (złomowisko) | `labs/items.html`, `js/models/junkyard/` | [labs/items.md](labs/items.md), [models/junkyard.md](models/junkyard.md) |

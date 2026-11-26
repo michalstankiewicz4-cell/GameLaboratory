@@ -20,12 +20,15 @@
 <script src="../ui/shell/menubar.js"></script>
 <div id="view"></div>
 <div class="bar">
+  <div class="btns" id="modes"></div>
   <select id="type" aria-label="Building" title="A ready building or one saved under a name"></select>
   <select id="shape" aria-label="Outline" title="The building's outline"></select>
   <button type="button" id="draw" title="Click points on the ground, Enter or the first point to close, Esc to cancel">Draw outline</button>
   <select id="mode" aria-label="Version" title="Near: the mesh; far: flat walls with baked textures and parallax; by distance: switches like a game">
     <option value="auto">By distance</option><option value="near">Near (mesh)</option><option value="far">Far (baked)</option>
   </select>
+  <div class="btns" id="dTools" hidden></div>
+  <button type="button" id="dRebuild" title="Put the building up again (B)" hidden>Rebuild</button>
   <span class="sp"></span>
   <span class="dimtxt" id="status"></span>
 </div>
@@ -33,11 +36,41 @@
 <script src="../ui/shell/bars.js"></script>
 <aside class="panel" data-std="info">
   <h2 class="stdName" id="bName">City</h2>
-  <p class="stdText">A building creator: houses, tenements, blocks, skyscrapers, offices and supermarkets on any outline, with windows, entrances, shop windows, balconies, cornices and roofs placed from a short description. Near — a real mesh; far — flat walls with the facade baked into textures and parallax, so the windows still look recessed for a fraction of the cost. Drag to orbit, right-drag to pan, wheel to zoom.</p>
+  <p class="stdText" id="cityNote">A building creator: houses, tenements, blocks, skyscrapers, offices and supermarkets on any outline, with windows, entrances, shop windows, balconies, cornices and roofs placed from a short description. Near — a real mesh; far — flat walls with the facade baked into textures and parallax, so the windows still look recessed for a fraction of the cost. Drag to orbit, right-drag to pan, wheel to zoom.</p>
   <table class="specs" id="specs"></table>
-  <p class="note">For AI: CityApi in the console (API tab).</p>
+  <p class="note" id="cityApiNote">For AI: CityApi in the console (API tab).</p>
+  <p class="stdText" id="dNote" hidden></p>
+  <div class="stats" id="dStats" hidden></div>
 </aside>
-<aside class="panel" data-window="building" data-title="Building" data-title-pl="Budynek">
+<aside class="panel" data-window="dbuilding" data-title="Destruction" data-title-pl="Zniszczenie" hidden>
+  <div class="row"><span>Building</span><select id="dType"></select><output></output></div>
+  <div class="row"><span>Seed</span><input type="number" id="dSeed" min="1" max="99999" step="1"><output></output></div>
+  <div class="btns"><button type="button" id="dAnother">Another one</button><button type="button" id="dVillage">Village</button></div>
+  <label class="chk"><input type="checkbox" id="showMats"> Material colours</label>
+  <h3>Materials</h3>
+  <div class="matList" id="dMats"></div>
+  <p class="note">Each part breaks by its material: masonry in courses and bricks, concrete in slabs, boards along the grain, glass radially from the hit, roof tiles in rows, sheet metal in sheets. A part stands while what it rests on stands. DestructKit (js/behaviors/land/destruct/), buildings of parts — HouseKit (js/models/houses/).</p>
+</aside>
+<aside class="panel" data-window="dtool" data-title="Tools" data-title-pl="Narzędzia" hidden>
+  <h3>Hit</h3>
+  <div class="row"><span>Impulse</span><input type="range" id="impulse" min="100" max="30000" step="100"><output id="impulseV"></output></div>
+  <div class="row"><span>Radius</span><input type="range" id="radius" min="0.2" max="3" step="0.05"><output id="radiusV"></output></div>
+  <h3>Throw</h3>
+  <div class="row"><span>Item</span><select id="missile"></select><output></output></div>
+  <div class="row"><span>Speed</span><input type="range" id="speed" min="5" max="60" step="1"><output id="speedV"></output></div>
+  <h3>Tornado</h3>
+  <div class="row"><span>Wind</span><input type="range" id="wind" min="20" max="140" step="1"><output id="windV"></output></div>
+  <div class="row"><span>Core</span><input type="range" id="core" min="1" max="20" step="0.5"><output id="coreV"></output></div>
+  <div class="btns"><button type="button" id="sweep">Go through the building</button><button type="button" id="stop">Stop</button></div>
+  <p class="note">Click the building: a hit at that point, a throw from the camera or a tornado there (tools on the bar, keys 1 2 3). Glass breaks in the wind first, tiles and sheet metal fly off, walls fall last.</p>
+</aside>
+<aside class="panel" data-window="dphysics" data-title="Debris" data-title-pl="Odłamki" hidden>
+  <div class="row"><span>Time</span><input type="range" id="slow" min="0.05" max="1" step="0.05"><output id="slowV"></output></div>
+  <div class="row"><span>Debris</span><input type="range" id="maxFrag" min="300" max="6000" step="100"><output id="maxFragV"></output></div>
+  <label class="chk"><input type="checkbox" id="pause"> Pause</label>
+  <p class="note">Above the debris limit the smallest pieces lying longest turn to dust.</p>
+</aside>
+<aside class="panel" id="w-building" data-window="building" data-title="Building" data-title-pl="Budynek">
   <div class="row"><span>Width</span><input type="range" id="fw" min="4" max="120" step="0.5"><output id="fwV"></output></div>
   <div class="row"><span>Depth</span><input type="range" id="fd" min="4" max="120" step="0.5"><output id="fdV"></output></div>
   <div class="row" id="armRow"><span>Wing width</span><input type="range" id="farm" min="3" max="60" step="0.5"><output id="farmV"></output></div>
@@ -54,7 +87,7 @@
   <div class="btns"><button type="button" id="save">Save under this name</button><button type="button" id="del">Delete saved</button></div>
   <p class="note">A saved building is a named asset — the scene editor places it (City family, Asset field).</p>
 </aside>
-<aside class="panel" data-window="facade" data-title="Facade" data-title-pl="Fasada">
+<aside class="panel" id="w-facade" data-window="facade" data-title="Facade" data-title-pl="Fasada">
   <div class="row"><span>Wall</span><select id="wallMat"></select><output></output></div>
   <div class="row"><span>Wall colour</span><input type="color" id="wallColor"><output id="wallColorV"></output></div>
   <div class="row"><span>Bay width</span><input type="range" id="bay" min="1" max="8" step="0.1"><output id="bayV"></output></div>
@@ -73,7 +106,7 @@
   <div class="row"><span>Depth</span><input type="range" id="bDepth" min="0.5" max="2.5" step="0.05"><output id="bDepthV"></output></div>
   <div class="row"><span>Railing</span><input type="color" id="bRail"><output id="bRailV"></output></div>
 </aside>
-<aside class="panel" data-window="ground" data-title="Ground floor and bands" data-title-pl="Parter i gzymsy">
+<aside class="panel" id="w-ground" data-window="ground" data-title="Ground floor and bands" data-title-pl="Parter i gzymsy">
   <div class="row"><span>Front</span><select id="gFront"></select><output></output></div>
   <div class="row"><span>Other walls</span><select id="gSides"></select><output></output></div>
   <div class="row"><span>Entrances</span><input type="range" id="gEnt" min="0" max="12" step="1"><output id="gEntV"></output></div>
@@ -84,7 +117,7 @@
   <label class="chk"><input type="checkbox" id="fBands"> Bands between storeys</label>
   <label class="chk"><input type="checkbox" id="topCornice"> Crowning cornice</label>
 </aside>
-<aside class="panel" data-window="roof" data-title="Roof" data-title-pl="Dach">
+<aside class="panel" id="w-roof" data-window="roof" data-title="Roof" data-title-pl="Dach">
   <div class="row"><span>Kind</span><select id="rType"></select><output></output></div>
   <div class="row"><span>Pitch</span><input type="range" id="rPitch" min="5" max="65" step="1"><output id="rPitchV"></output></div>
   <div class="row"><span>Eaves</span><input type="range" id="rOver" min="0" max="1.5" step="0.05"><output id="rOverV"></output></div>
@@ -92,7 +125,7 @@
   <div class="row"><span>Colour</span><input type="color" id="rColor"><output id="rColorV"></output></div>
   <p class="note">Gable needs a rectangle; on another outline it becomes a hip roof. A hip roof on an L or U ends in a flat top where it cannot rise further.</p>
 </aside>
-<aside class="panel" data-window="bake" data-side="right" data-title="Baked facade" data-title-pl="Wypalona fasada">
+<aside class="panel" id="w-bake" data-window="bake" data-side="right" data-title="Baked facade" data-title-pl="Wypalona fasada">
   <div class="row"><span>Resolution</span><select id="ppm"><option value="32">32 px/m</option><option value="64" selected>64 px/m</option><option value="128">128 px/m</option></select><output></output></div>
   <label class="chk"><input type="checkbox" id="pom" checked> Parallax (recesses by depth)</label>
   <div class="row"><span>Switch at</span><input type="range" id="lodAt" min="20" max="600" step="5"><output id="lodAtV"></output></div>
@@ -101,7 +134,7 @@
   <div id="maps"></div>
   <p class="note">Click a map to save it as PNG. Colour (A: wall mask), normals, height for the parallax, AO · roughness · metalness (A: window number — which ones light up at night).</p>
 </aside>
-<aside class="panel" data-window="json" data-side="right" data-title="Description (JSON)" data-title-pl="Opis (JSON)">
+<aside class="panel" id="w-json" data-window="json" data-side="right" data-title="Description (JSON)" data-title-pl="Opis (JSON)">
   <textarea id="jsonText" class="mono" rows="9" spellcheck="false"></textarea>
   <div class="btns"><button type="button" id="jsonApply">Apply</button><button type="button" id="jsonCopy">Copy</button></div>
   <p class="note" id="jsonMsg">The same description and seed give the same building.</p>

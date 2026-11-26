@@ -3,6 +3,23 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.107.0 · miasto 1.3.0 · doktor modeli 1.7.0 — 2026-11-26 (zniszczenie z Tornado.io)
+
+### Dodane
+- **Zniszczenie budynków** (DestructKit z Tornado.io) jako zachowanie `js/behaviors/land/destruct/` (ląd): części pękają
+  według materiału (mur, beton, deski, szkło, dachówka, blacha, belka), statyka podpór, odłamki jako bryły sztywne
+  (także w wątku), uderzenia, wiatr, zderzenia rzuconych przedmiotów, drobny gruz na karcie, pożary (`burn.js`, w
+  laboratorium jeszcze nieużyte). `world.js` z Tornado.io (508 linii) podzielony: świat `world.js`, pękanie i statyka
+  `statics.js`, uderzenia i wiatr `impacts.js`, łącze z wątkiem `physics-link.js`. Częściowe wysyłanie na kartę:
+  `js/render/partial-upload.js`. Opis: `docs/behaviors/destruct.md`.
+- **HouseKit** (`js/models/houses/`): budynki z części — dom z cegły, „kostka”, stodoła, garaż, szopa, blok z wielkiej
+  płyty; budynki Warszawy z laboratorium miasta przeliczone na części (`landmark-house.js`). Opis: `docs/models/houses.md`.
+- Laboratorium miasta: tryb **Destruction** (przełącznik na pasku) — narzędzia uderzenie, rzut (przedmioty złomowiska
+  i kamienie), trąba (klawisze 1 2 3), przejście trąby przez budynek, wioska sześciu budynków, odbudowa (B), okna
+  Destruction (budynek, materiały) i Debris (tempo, limit odłamków, pauza). Zachowanie jak w Tornado.io (wyniki w tym
+  samym zakresie co dwa przebiegi oryginału). `CityApi.mode('destruct')`, `CityApi.destruct`. Pliki: `js/labs/city/destruct/`.
+- Doktor modeli: budynki HouseKit (`houses/…`, każda część osobną siatką; wszystkie czyste).
+
 ## Program 0.106.0 · przedmioty 1.2.0 — 2026-11-26 (deformacja z Tornado.io)
 
 ### Dodane
