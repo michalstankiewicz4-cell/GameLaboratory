@@ -1410,9 +1410,7 @@
   }
  },
  "space/ship/swarmer": {
-  "counts": {
-   "seethrough": 1
-  },
+  "counts": {},
   "fingerprint": {
    "drawCalls": 32,
    "materials": 13,

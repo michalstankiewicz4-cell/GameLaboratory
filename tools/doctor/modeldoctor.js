@@ -68,6 +68,8 @@ const v0 = new THREE.Vector3(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3
 const matsOf = (o) => (Array.isArray(o.material) ? o.material : [o.material]);
 
 function visibleInTree(o) { for (; o; o = o.parent) if (!o.visible) return false; return true; }
+// a mesh with several materials is examined only when all of them are solid: one transparent group drops the whole mesh
+// (its solid triangles too) — no model has such a mesh yet (docs/tools/doctor.md)
 function isSolid(o) {
   if (!o.isMesh || o.isInstancedMesh || o.isSkinnedMesh || !visibleInTree(o)) return false;
   return matsOf(o).every((m) => m && m.visible !== false && SOLID_MATS.some((k) => m[k]) && !(m.transparent && m.opacity < 0.95)
@@ -316,7 +318,7 @@ export function examine(root, opts = {}) {
     const ray = new THREE.Raycaster(), ctr = all.getCenter(new THREE.Vector3()).applyMatrix4(root.matrixWorld), dir = new THREE.Vector3(), from = new THREE.Vector3(), nw = new THREE.Vector3();
     const dirs = [];
     for (const x of [-1, 0, 1]) for (const y of [-1, 0, 1]) for (const z of [-1, 0, 1]) if (x || y || z) dirs.push(new THREE.Vector3(x, y, z).normalize());
-    const back = new Map(), front = new Map(), sides = new Map();
+    const back = new Map(), front = new Map(), sides = new Map(), normalMats = new Map();
     objs.forEach((o) => matsOf(o).forEach((x) => { if (!sides.has(x)) sides.set(x, x.side); x.side = THREE.DoubleSide; }));   // so backs are hit too
     // the first hit, the same as intersectObjects(objs)[0] (both sides of every face, as the check sets them), found
     // through a bounding-volume tree of each piece's triangles in world space instead of testing every triangle
@@ -350,7 +352,10 @@ export function examine(root, opts = {}) {
       if (!h || !h.face) continue;
       const mats = matsOf(h.object), mat = Array.isArray(h.object.material) ? h.object.material[h.face.materialIndex || 0] : h.object.material;
       if (!mats.length || sides.get(mat) !== THREE.FrontSide) continue;
-      nw.copy(h.face.normal).transformDirection(h.object.matrixWorld);   // (already the drawn side for a mirrored piece: the face normal goes through the mirror too)
+      // the normal matrix (inverse transpose), not the matrix itself: under a non-uniform scale the matrix tilts a
+      // normal off its face; for a mirrored piece this is already the drawn side (the face normal goes through the mirror too)
+      let nm = normalMats.get(h.object); if (!nm) normalMats.set(h.object, nm = new THREE.Matrix3().getNormalMatrix(h.object.matrixWorld));
+      nw.copy(h.face.normal).applyMatrix3(nm).normalize();
       const map = nw.dot(dir) > 0.05 ? back : front;
       map.set(h.object, (map.get(h.object) || 0) + 1);
       }

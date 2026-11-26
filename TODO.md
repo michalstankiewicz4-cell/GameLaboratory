@@ -136,7 +136,7 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
 - [ ] Przetłumaczyć okna laboratoriów na polski (teraz po polsku są pasek menu, strona startowa, tytuły okien standardowych, konsola i okno Wydajność).
 
 ## Modele — błędy znalezione przez doktora (po stronie gry, chyba że doktor nauczy się je naprawiać)
-- [ ] Dziury: talerz anteny (haven), kadłub (swarmer), kadłuby (skimmer, barka, amfibia), półkula (scout).
+- [ ] Dziury: talerz anteny (haven), kadłuby (skimmer, barka, amfibia), półkula (scout). (Kadłub swarmera to był fałszywy alarm — nierówna skala, doktor 1.5.1.)
 - [ ] Migotanie zlicowanych ścian z teksturą: hauler, crawler.
 - [ ] Wiszące części: scribe (korona), constructor, scout, skimmer, amfibia.
 - [ ] Orzeł: działko 40 mm zasłonięte w części łuku.

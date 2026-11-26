@@ -20,6 +20,8 @@ export function testBench() {
   const cup = new THREE.BoxGeometry(1, 1, 1).toNonIndexed(), cp = cup.attributes.position.array.slice(18);   // a box missing its +x side
   const cupG = new THREE.BufferGeometry(); cupG.setAttribute('position', new THREE.Float32BufferAttribute(cp, 3)); cupG.computeVertexNormals();
   put('box with a missing side', cupG, grey, 1.4, 2.5, 7);
+  // no mistake: a closed solid stretched along one axis (non-uniform scale) — its tilted faces must not count as seen from behind
+  put('stretched octahedron', new THREE.OctahedronGeometry(0.5), grey, 0, 2.5, -3).scale.set(3, 1, 1);
   put('floating box', new THREE.BoxGeometry(1, 1, 1), grey, 0, 7, 2);
   put('crate under water', new THREE.BoxGeometry(1, 1, 1), grey, 0, -0.5, 0);
   put('fender through the side', new THREE.BoxGeometry(0.5, 0.5, 0.5), grey, 2.1, 1, -2);

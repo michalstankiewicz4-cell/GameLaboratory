@@ -3,6 +3,17 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Doktor modeli 1.5.1 — 2026-11-26 (normalne przy nierównej skali)
+
+### Poprawione
+- `seethrough` (dziura): normalna ściany przeliczana macierzą normalną, nie macierzą świata — przy nierównej skali
+  osi ściana widziana z przodu mogła wyjść jako widziana od tyłu. Na stanowisku testowym zamknięta bryła rozciągnięta
+  wzdłuż jednej osi (bez błędu; przed poprawką fałszywa dziura). Jedyna zmiana w modelach: znika fałszywa dziura w kadłubie
+  swarmera (kadłub ściśnięty 0,62 × 1 × 1), wpisana dotąd w TODO jako błąd do naprawy. Zgłoszenie z przeglądu
+  ChatGPT (`AI_COLLABORATION.md`).
+- Opis doktora: które siatki są badane — siatka z choć jedną przezroczystą grupą materiałów wypada z testów w całości
+  (dziś żaden model takiej nie ma).
+
 ## Program 0.105.0 · rośliny 1.8.0 · doktor 1.5.0 · edytor sceny 0.56.0 — 2026-11-26 (krzewy i kaktusy)
 
 ### Dodane

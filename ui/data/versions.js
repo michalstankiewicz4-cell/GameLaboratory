@@ -37,7 +37,7 @@
     "labs/effects.html": "1.4.1",
     "labs/effects-land.html": "1.0.1",
     "labs/zombies.html": "1.2.1",
-    "tools/doctor.html": "1.5.0",
+    "tools/doctor.html": "1.5.1",
     "labs/transform.html": "1.3.0",
     "tools/kitcheck.html": "1.0.8",
     "labs/filters.html": "0.6.0",

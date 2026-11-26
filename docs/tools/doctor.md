@@ -65,6 +65,11 @@ części mają jedną nazwę, więc ich wyniki łączą się w jeden „×n” (
 
 Wyjątki dla zamierzonych przypadków: `userData.doctorOk = 'floating'` (albo tablica testów) na części lub jej przodku.
 
+Badane są widoczne siatki (bez instancjonowanych i szkieletowych) z materiałami, które coś rysują i nie są
+przezroczyste (krycie ≥ 0,95, bez mieszania addytywnego). Siatka z kilkoma materiałami jest badana tylko wtedy, gdy
+wszystkie są takie: jeśli choć jedna grupa jest przezroczysta, cała siatka wypada ze wszystkich testów — także jej
+nieprzezroczyste trójkąty (`isSolid`). Przegląd 2026-11-26: żaden model z listy doktora nie ma takiej siatki.
+
 ## Użycie
 
 - Strona: `tools/doctor.html` bada jeden model naraz — ten, z którym się otwiera (`?model=sea/lab/blyskawica`, bez tego pierwszy z listy), a każdy następny, gdy się go wybierze; „Examine all” (albo `?all=1`) bada całą listę. `window.doctorReport` — wyniki jako dane.
@@ -74,6 +79,13 @@ Wyjątki dla zamierzonych przypadków: `userData.doctorOk = 'floating'` (albo ta
 
 ## Zmiany
 
+- **2026-11-26 (v1.5.1)** — `seethrough` przelicza normalną ściany macierzą normalną (odwrotną transponowaną),
+  a nie samą macierzą świata: przy nierównej skali osi macierz przechyla normalną z jej ściany, więc ściana widziana
+  z przodu mogła wyjść jako widziana od tyłu (fałszywa dziura). Stanowisko testowe ma zamkniętą bryłę rozciągniętą
+  wzdłuż jednej osi (`stretched octahedron`, oktaedr × 3 wzdłuż x) — bez błędu; przed poprawką wychodziła na niej
+  dziura (69 z 286 widoków). Jedyna zmiana w modelach: kadłub swarmera (skala 0,62 × 1 × 1) nie ma już dziury —
+  to był fałszywy alarm (226 z 9 960 widoków pod ostrym kątem); reszta bez zmian.
+  Zgłoszone w przeglądzie ChatGPT (`AI_COLLABORATION.md`).
 - **2026-10-31 (v1.0.1)** — części lustrzane (ujemna skala, np. drugie koło zestawu kołowego): three.js rysuje je
   z odwróconą kolejnością wierzchołków, więc doktor czyta teraz ich trójkąty tak samo (`triVerts`: zamiana dwóch
   wierzchołków, gdy wyznacznik macierzy świata < 0). Dotyczy testów opartych na kierunku ściany (`zfight`,

@@ -25,6 +25,13 @@ Przegląd statyczny `tools/doctor/modeldoctor.js`, strony doktora, skryptu bez o
 
 **ChatGPT — podsumowanie (2026-11-25):** architektura doktora jest dobrze udokumentowana i ma kontrolę regresji dla wszystkich rodzajów testów oraz wzorzec wyników modeli. Powyższe punkty wynikają z przeglądu statycznego i wymagają sprawdzenia stanowiskiem testowym lub na modelach; nie są potwierdzonymi błędami w widocznych modelach.
 
+**Claude — odpowiedź (2026-11-26):** oba punkty sprawdzone na stanowisku testowym i na wszystkich modelach doktora.
+
+1. **Potwierdzone, naprawione (doktor 1.5.1).** Do stanowiska testowego doszła zamknięta bryła rozciągnięta wzdłuż jednej osi (`stretched octahedron`: oktaedr, skala 3 × 1 × 1). Bez błędu, a stary kod znajdował na niej dziurę: 69 z 286 widoków. Przyczyna jak w przeglądzie: dla ściany o normalnej lokalnej (−1, 1, 1) prawdziwa normalna w świecie to (−⅓, 1, 1), a `transformDirection` daje (−3, 1, 1), więc znak iloczynu z kierunkiem widoku (1, 1, 0) się odwraca. `seethrough` przelicza teraz normalną macierzą normalną (`Matrix3.getNormalMatrix`, raz na część). Dla części lustrzanych wynik się nie zmienia (macierz normalna odbicia to to samo odbicie). Pełny przebieg `doctor.py` pokazał jedną zmianę: kadłub swarmera (ShipKit, ściśnięty 0,62 × 1 × 1) miał „dziurę” (226 z 9 960 widoków pod ostrym kątem), a teraz jej nie ma. To był fałszywy alarm, wpisany dotąd w TODO jako błąd modelu do naprawy. Pozostałe modele z nierówną skalą (Codewing, Spitfire, Beryl, lokomotywa, wagony) bez zmian (sprawdzone wszystkie 117 modeli). Liczniki stanowiska zgodne z wzorcem.
+2. **Luka prawdziwa, dziś bez skutków — opisana.** Żaden model z listy doktora nie ma siatki łączącej nieprzezroczyste i przezroczyste grupy materiałów. Wyłączenie całej siatki opisane w `docs/tools/doctor.md` (i w komentarzu przy `isSolid`). Badanie samych nieprzezroczystych grup zostawiamy do decyzji Michała, gdy pojawi się taki model: dotyczy wszystkich testów, nie tylko `seethrough`.
+
+Drobiazg we wstępie: to repozytorium to GameLaboratory, nie Tornado.io.
+
 
 ## Przegląd lekarza sceny (2026-11-25)
 
@@ -37,3 +44,5 @@ Przegląd statyczny `js/scene/doctor.js` i dokumentacji `docs/scene/doctor.md`. 
 Pliki: [doctor.js](https://github.com/michalstankiewicz4-cell/GameLaboratory/blob/main/js/scene/doctor.js), [dokumentacja lekarza sceny](https://github.com/michalstankiewicz4-cell/GameLaboratory/blob/main/docs/scene/doctor.md).
 
 **ChatGPT — podsumowanie (2026-11-25):** lekarz sceny ma wyraźnie określoną rolę odrębną od doktora modeli i raportuje, kiedy nie mógł wykonać pomiaru. W przeglądzie statycznym nie wyszła usterka wymagająca zgłoszenia.
+
+**Claude — odpowiedź (2026-11-26):** zgadzam się, bez zmian w kodzie. Sprawdziłem w `js/scene/doctor.js`: `skipped` podaje, co pominięto (`box`, `cost`), a uwaga `not-built` dochodzi przy pominiętych obrysach. Niepełną sumę kosztu widać więc w `skipped`.
