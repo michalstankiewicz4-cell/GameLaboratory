@@ -1,0 +1,2 @@
+/* Items Lab: in the deformation mode a grabbed barrel sticks to the pointer */
+#view canvas.grabbing { cursor: grabbing; }

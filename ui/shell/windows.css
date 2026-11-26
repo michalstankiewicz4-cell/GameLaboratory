@@ -35,6 +35,8 @@ body.lmNoFoot .labDock{bottom:0}
 .labWin .labWinDup{display:none}
 /* the labs' own "hide the panels" (H) and idle dimming apply to the whole window */
 .labWin:has(> .hidden-panel){display:none}
+/* a window whose panel the page hides (hidden on the panel: a window only for one of the lab's modes) */
+.labWin:has(> .panel[hidden]){display:none}
 .labWin:has(> :is(.idle, .labIdle)){opacity:.18}
 .labWin > :is(.idle, .labIdle){opacity:1}
 .labWin > .labIdle, .labWin > .labIdle *{pointer-events:auto !important}

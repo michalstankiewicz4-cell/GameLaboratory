@@ -76,8 +76,11 @@ export function build(lod = 0, variant = 0) {
 }
 
 export const info = {
-  id: 'barrel', name: 'Beczka stalowa 200 l', version: '1.0.0',
+  id: 'barrel', name: 'Beczka stalowa 200 l', version: '1.1.0',
   mass: 18, material: 'stal', variants: VARIANTS.length,
   crush: { x: 12, y: 45, z: 12 }, minScale: { x: 0.25, y: 0.2, z: 0.25 },
   collider: { type: 'cyl', r: 0.292, h: HT, segs: 18 },
+  // powłoka z blachy do deformacji (js/models/junkyard/shells.js → js/behaviors/land/deform/): rzadka bryła obrotowa
+  // ściany (32 × 16) z wpuszczonym dnem i wiekiem; rMax — obręcze toczne (do podpór)
+  shell: { type: 'drum', r: R, h: HT, lid: 0.24, lidY: 0.0142, rMax: R + 0.011, segs: 32, rows: 16, rings: 3, ringsInset: 6 },
 };

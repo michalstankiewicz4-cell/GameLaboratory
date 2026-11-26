@@ -93,6 +93,11 @@ export const PAGES = {
       ['Delete', 'Remove the module under the pointer', 'Usuń moduł pod kursorem'],
     ] },
   ],
+  'labs/items.html': [{ title: ['Items lab · Deformation', 'Laboratorium przedmiotów · Deformacja'], keys: [
+    ['R', 'Start over (new barrels, presses up)', 'Od nowa (nowe beczki, prasy do góry)'],
+    ['U', 'Lift the presses', 'Podnieś prasy'],
+    ['W / A / S / D', 'Move the camera', 'Przesuwanie kamery'],
+  ] }],
   'labs/blocks.html': [{ title: ['Blocks lab', 'Laboratorium bloków'], keys: [['Shift', 'While biting: the left button orbits (held)', 'Przy gryzieniu: lewy przycisk obraca widok (przytrzymany)']] }],
   'labs/city.html': [{ title: ['Drawing a footprint', 'Rysowanie obrysu'], keys: [
     ['Enter', 'Finish the footprint', 'Zakończ obrys'],

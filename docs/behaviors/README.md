@@ -21,6 +21,7 @@ Zasada (CLAUDE.md): fizyka jest prawdziwa — start, ruch, skręt i zatrzymanie 
 | przeładowarka z chwytakiem | `land/grapple.js` (jazda: `land/drive.js`) | ląd | laboratorium pojazdów — ląd (przeładowarka JunkKit z przedmiotami ze złomowiska), edytor sceny (`grapple`) |
 | przedmioty na lądzie (bryły sztywne) | `land/items.js` (przedmioty złomowiska w nim: `land/junk-items.js` — `itemKit`) | ląd | przeładowarka, maszyny złomowiska, edytor sceny (`item`) |
 | maszyny złomowiska | `land/machines/` (`machines.js`: zgniatarka `crusher.js`, piec na papier `furnace.js`, piec indukcyjny `induction.js`, linia odlewnicza `casting.js` + strumień metalu `metal-flow.js`, zderzacze `statics.js`) | ląd | laboratorium budowli (maszyny złomowiska w działaniu), edytor sceny (`machine`, `solid`) |
+| deformacja blachy (DeformKit, z Tornado.io) | `land/deform/` (`shell.js`, rdzeń `shell-core.js`, osadzanie `embed.js`, zderzacze `box.js`, wątek `shell-worker.js`; opis [`deform.md`](deform.md)) | ląd | laboratorium przedmiotów (tryb Deformation: beczki pod prasą, kontener) |
 
 ## Wiatr w scenie (trąba powietrzna, tornado, cyklon)
 

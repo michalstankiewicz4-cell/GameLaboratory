@@ -28,7 +28,7 @@ przedmiotów). Doktor modeli: `tools/doctor/sources/junkyard.js`.
 | pot | Garnek nierdzewny 6 l | Ø 240 (z uchwytami 347) × 152 mm | 1,6 kg | naczynie r 121, h 152 + uchwyty | 3 · 6 · 3 | 1.0.1 |
 | newspapers | Gazety związane sznurkiem | 420 × 300 × 220 mm | 12,5 kg | prostopadłościan | 25 · 60 · 25 | 1.0.1 |
 | box | Karton zamknięty (F0201) | 400 × 300 × 300 mm | 4 kg | prostopadłościan | 1 · 1,6 · 1 | 1.0.0 |
-| barrel | Beczka stalowa 200 l (1A1) | Ø 585 × 880 mm | 18 kg | walec r 292, h 880 | 12 · 45 · 12 | 1.0.0 |
+| barrel | Beczka stalowa 200 l (1A1) | Ø 585 × 880 mm | 18 kg | walec r 292, h 880 | 12 · 45 · 12 | 1.1.0 |
 | ingot | Sztabka (aluminium / stal / mieszanka) | 400 × 120 × 80 mm | 8,6 / 25 / 16,6 kg | bryła wypukła | — | 1.0.1 |
 | ingot-small | Mała sztabka (aluminium) | 250 × 80 × 50 mm | 2,2 kg | bryła wypukła | — | 1.0.0 |
 
@@ -85,6 +85,9 @@ Oś Y przedmiotu = oś opony / walca. Opór — siła, od której przedmiot zacz
 - Wieko i dno osobnymi krążkami z płaskim UV i własną teksturą (pierścienie usztywniające, rdza przy brzegu).
 - Korki gwintowane z kołnierzem i 8 żeberkami; 2 wgniecenia ścianki (losowe, stałe dla wariantu).
 - Farba: zacieki, rysy, odpryski, łaty rdzy (mapa szorstkości i metaliczności), rdza wzdłuż rąbków i obręczy.
+- Powłoka do deformacji (1.1.0): `info.shell` — rzadka bryła obrotowa ściany (32 × 16) z wpuszczonym dnem i wiekiem;
+  siatkę buduje `shells.js` (`shellGeometry(opis, { inset })`), gniecie zachowanie DeformKit
+  ([`../behaviors/deform.md`](../behaviors/deform.md)). Model rysowany bez zmian.
 
 ## Otoczenie
 

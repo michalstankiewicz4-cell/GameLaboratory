@@ -14,6 +14,7 @@
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../ui/style/sea.css">
 <link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="../ui/pages/items.css">
 </head>
 <!-- Laboratorium przedmiotów (js/labs/items/): przedmioty JunkKit (js/models/junkyard/, ze Złomowiska). -->
 <body class="lab viewFits">
@@ -24,8 +25,10 @@
 <script src="../ui/shell/loader.js"></script>
 <div id="view"></div>
 <div class="bar">
+  <div class="btns" id="modes"></div>
   <select id="item" aria-label="Item" title="An item from the junkyard"></select>
   <select id="variant" aria-label="Variant" title="The item's variant"></select>
+  <select id="dScene" aria-label="Set-up" title="Deformation: the barrels on a board under five presses, or in a container under one" hidden></select>
   <span class="sp"></span>
   <span class="dimtxt" id="status"></span>
 </div>
@@ -33,7 +36,7 @@
   <h2 class="stdName" id="itName"></h2>
   <p class="stdText" id="itNote">Junk built from code at real scale and mass: the near model (LOD 0) and the far one (LOD 1), its collision shape and how hard it is to crush along each axis.</p>
 </aside>
-<aside class="panel" data-window="item" data-title="Item" data-title-pl="Przedmiot">
+<aside class="panel" data-window="item" data-title="Item" data-title-pl="Przedmiot" id="itemPanel">
   <div class="stats" id="itStats"></div>
   <h3>Show</h3>
   <label class="chk"><input type="checkbox" id="lod1"> Far model (LOD 1)</label>
@@ -41,6 +44,17 @@
   <label class="chk"><input type="checkbox" id="coll"> Collision shape (convex parts)</label>
   <label class="chk"><input type="checkbox" id="pair" checked> Near and far side by side</label>
   <p class="note">The collision shape is the one a physics engine gets: convex parts (a tyre — a ring with flat sides, a pot — an open cup). The crush resistance: the force from which the item starts to give way along the axis; the minimum scale — how far it can be crushed.</p>
+</aside>
+<aside class="panel" data-window="deform" data-title="Deformation" data-title-pl="Deformacja" id="deformPanel" hidden>
+  <h3>Press</h3>
+  <div class="row"><span>Speed</span><input type="range" id="dSpeed" min="0" max="50" step="0.5" title="How fast the presses come down (from zero — they stand)"><output id="dSpeedV"></output></div>
+  <div class="btns"><button type="button" id="dLift" title="The presses up, 20 cm/s (U)">Lift the presses</button><button type="button" id="dReset" title="New barrels, the presses up (R)">Start over</button></div>
+  <div class="row" id="dAlphaRow"><span>Walls</span><input type="range" id="dAlpha" min="0" max="1" step="0.05" title="How see-through the container's walls are"><output id="dAlphaV"></output></div>
+  <label class="chk" title="The collision boxes, the barrels' physics mesh with its particles, their bounding boxes and the grabbed particles"><input type="checkbox" id="dDebug"> Colliders</label>
+  <h3>Barrels</h3>
+  <div class="stats" id="dStats"></div>
+  <h3>How it works</h3>
+  <p class="note">The barrel is the plain JunkKit model; DeformKit (js/behaviors/land/deform/) attaches to it. Every vertex of its sparse shell (from the item's data) is a particle. Edges keep their length (the sheet hardly stretches), pairs across an edge keep the bend (the sheet's stiffness); past the yield limit the new shape stays — the crush is permanent. The press, the supports and the ground push the particles with friction; the barrels in the container push each other. Each barrel runs in its own thread. A click grabs a barrel (up lifts it), the next lets go; W A S D move the camera.</p>
 </aside>
 <aside class="panel" data-std="camera">
   <div class="btns" id="cams"></div>

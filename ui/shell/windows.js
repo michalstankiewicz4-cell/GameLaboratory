@@ -120,9 +120,10 @@ function setDocked(w, on, quiet) {
 const viewSubs = new Set();
 let viewKey = "";
 function layoutView() {
-  // a dock whose windows are all hidden (H — .hidden-panel on the panel inside; CSS :has cannot nest) goes away, so the
+  // a dock whose windows are all hidden (H — .hidden-panel on the panel inside, or a panel the page hid itself; CSS :has
+  // cannot nest) goes away, so the
   // view takes its place
-  for (const d of Object.values(docks)) d.classList.toggle("noWins", ![...d.children].some((w) => w.classList.contains("labWin") && !w.hidden && !w.querySelector(":scope > .hidden-panel")));
+  for (const d of Object.values(docks)) d.classList.toggle("noWins", ![...d.children].some((w) => w.classList.contains("labWin") && !w.hidden && !w.querySelector(":scope > .hidden-panel, :scope > .panel[hidden]")));
   const vis = (side) => { const d = docks[side]; return d && getComputedStyle(d).display !== "none" ? d.getBoundingClientRect().width : 0; };
   const con = document.querySelector(".labConsole.lcDocked:not([hidden])");
   const L = Math.round(vis("left")), R = Math.round(vis("right")), B = con ? Math.round(con.getBoundingClientRect().height) : 0;

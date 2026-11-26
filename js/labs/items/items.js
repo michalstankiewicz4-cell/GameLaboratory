@@ -1,7 +1,8 @@
 // Items Lab: JunkKit's items (js/models/junkyard/, from the junkyard game, with history) one at a time on a patch of
 // ground under the SkyKit sky — the near model (LOD 0) and the far one (LOD 1) side by side, variants, wireframe, the
 // collision shape as convex parts (shapes.js — what a physics engine gets) and the item's data: size, mass, material,
-// crush resistance along each axis, the smallest it can be crushed to. For an AI: window.ItemsApi.
+// crush resistance along each axis, the smallest it can be crushed to. Mode Deformation (deform/deform.js, from
+// Tornado.io): steel drums as sheet-metal shells (js/behaviors/land/deform/) crushed under presses. For an AI: window.ItemsApi.
 import * as THREE from '../../../vendor/three/three.module.js';
 import { ConvexGeometry } from '../../../vendor/three/addons/geometries/ConvexGeometry.js';
 import { WEATHER, skyUniforms, skyDome, applySky, skyEnvironment } from '../../envs/sky/skykit.js';
@@ -10,6 +11,7 @@ import { MODELS, junkEntry } from '../../models/junkyard/registry.js';
 import { applyTextures, setAnisotropy } from '../../models/junkyard/textures.js';
 import { shapeParts } from '../../models/junkyard/shapes.js';
 import { attachWeatherCycle } from '../shared/weather-cycle-ui.js';
+import { createDeformMode } from './deform/deform.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -18,8 +20,10 @@ const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag)
 const KEY = 'gameLab.items.v1';
 const ITEMS = MODELS.filter((m) => m.group === 'items');
 let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { saved = null; }
-const S = { id: 'tire-car', variant: 0, lod1: false, wire: false, coll: false, pair: true, weather: 'fair', sunEl: 34, sunAz: 210, ...(saved || {}) };
-{ const q = new URLSearchParams(location.search).get('item'); if (q) { S.id = q; S.variant = 0; } }   // „Open in the lab” from the scene editor
+const S = { mode: 'item', id: 'tire-car', variant: 0, lod1: false, wire: false, coll: false, pair: true, weather: 'fair', sunEl: 34, sunAz: 210,
+  dScene: 'board', dSpeed: 0, dAlpha: 0.35, dDebug: false, ...(saved || {}) };
+if (S.mode !== 'deform') S.mode = 'item';
+{ const q = new URLSearchParams(location.search).get('item'); if (q) { S.id = q; S.variant = 0; S.mode = 'item'; } }   // „Open in the lab” from the scene editor
 if (!ITEMS.some((m) => m.id === S.id)) S.id = ITEMS[0].id;
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { /* private mode */ } };
 const status = (t) => { $('status').textContent = t || ''; };
@@ -125,12 +129,15 @@ function frameCam() {
   Object.assign(sun.shadow.camera, { left: -s, right: s, top: s, bottom: -s, near: 0.1, far: s * 12 }); sun.shadow.camera.updateProjectionMatrix();
 }
 const CAMS = { Orbit: { yaw: 0.75, pitch: 0.35 }, Front: { yaw: 0, pitch: 0.12 }, Side: { yaw: Math.PI / 2, pitch: 0.12 }, 'From above': { yaw: 0.3, pitch: 1.35 } };
-$('cams').replaceChildren(...Object.entries(CAMS).map(([k, v]) => { const b = el('button', { type: 'button', textContent: k }); b.onclick = () => Object.assign(orbit, v); return b; }));
+const itemCams = () => $('cams').replaceChildren(...Object.entries(CAMS).map(([k, v]) => { const b = el('button', { type: 'button', textContent: k }); b.onclick = () => Object.assign(orbit, v); return b; }));
 const cv = renderer.domElement; let drag = null;
-cv.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY }; cv.setPointerCapture(e.pointerId); });
-cv.addEventListener('pointermove', (e) => { if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag = { x: e.clientX, y: e.clientY };
-  orbit.yaw -= dx * 0.005; orbit.pitch = Math.max(-0.05, Math.min(1.5, orbit.pitch + dy * 0.004)); });
-cv.addEventListener('pointerup', () => { drag = null; });
+cv.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY }; cv.setPointerCapture(e.pointerId); });
+cv.addEventListener('pointermove', (e) => {
+  if (S.mode === 'deform') deform.move(e);   // a grabbed barrel follows the pointer
+  if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY;
+  if (Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) > 4) drag.moved = true;
+  if (drag.moved) { orbit.yaw -= dx * 0.005; orbit.pitch = Math.max(-0.05, Math.min(1.5, orbit.pitch + dy * 0.004)); } });
+cv.addEventListener('pointerup', (e) => { const click = drag && !drag.moved; drag = null; if (click && e.button === 0 && S.mode === 'deform') deform.click(e); });
 cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.min(60, Math.max(0.05, orbit.dist * Math.exp(e.deltaY * 0.0011))); }, { passive: false });
 
 /* ---------------- panels ---------------- */
@@ -149,7 +156,10 @@ for (const [k, u] of [['sunEl', '°'], ['sunAz', '°']]) {
 /* ---------------- loop ---------------- */
 function resize() { renderer.setSize(VS().w, VS().h, false); camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix(); look.resize(VS().w, VS().h); }
 addEventListener('resize', resize);
-function frame() {
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.1, ((now || performance.now()) - last) / 1000); last = now || performance.now();
+  if (S.mode === 'deform') { deform.frame(dt); moveKeys(dt); }
   const c = Math.cos(orbit.pitch);
   camera.position.set(orbit.target.x + Math.sin(orbit.yaw) * c * orbit.dist, orbit.target.y + Math.sin(orbit.pitch) * orbit.dist, orbit.target.z + Math.cos(orbit.yaw) * c * orbit.dist);
   camera.position.y = Math.max(0.01, camera.position.y); camera.lookAt(orbit.target);
@@ -164,12 +174,51 @@ function frame() {
 
 /* ---------------- for an AI ---------------- */
 // ItemsApi.list() — the items; show(id, { variant, lod1, wire, coll, pair }) → the item's data; info() — the shown one
+// mode('item' | 'deform'); deform — the deformation mode: speed(cm/s), lift(), scene('board' | 'container'), alpha(0–1),
+//   reset(), state(), run(seconds) → Promise
 window.ItemsApi = {
+  async mode(m) { await setMode(m); return S.mode; },
+  get deform() { return deform.api; },
   list: () => ITEMS.map((m) => ({ id: m.id, name: m.name, namePl: m.namePl })),
   async show(id, o = {}) { Object.assign(S, o); if (o.variant == null) S.variant = 0; await load(id); return window.ItemsApi.info(); },
   info: () => ({ id: S.id, variant: S.variant, size: size.toArray().map((v) => +v.toFixed(4)), ...JSON.parse(JSON.stringify({ ...mod.info, collider: undefined })), lod: built }),
 };
 
-updateSky(); resize();
-load(S.id).then(() => status(''), (e) => status(e.message));
+/* ---------------- modes: Item | Deformation ---------------- */
+const deform = createDeformMode({ scene, camera, canvas: cv, orbit, ui: { S, $, el, status, save } });
+const MODES = { item: 'Item', deform: 'Deformation' }, NOTE = $('itNote').textContent;
+$('modes').replaceChildren(...Object.entries(MODES).map(([k, v]) => { const b = el('button', { type: 'button', textContent: v, title: k === 'deform' ? 'Steel drums crushed under presses (sheet metal that stays bent)' : 'One item: near and far model, collision shape, data' }); b.dataset.m = k; b.onclick = () => setMode(k); return b; }));
+async function setMode(m) {
+  S.mode = MODES[m] ? m : 'item'; save();
+  [...$('modes').children].forEach((b) => b.classList.toggle('on', b.dataset.m === S.mode));
+  const d = S.mode === 'deform';
+  $('item').hidden = d; $('variant').hidden = d || $('variant').options.length < 2; $('dScene').hidden = !d;
+  $('itemPanel').hidden = d; $('deformPanel').hidden = !d;
+  holder.visible = !d;
+  if (d) {
+    $('itName').textContent = 'Barrels under a press';
+    camera.near = 0.01; camera.updateProjectionMatrix();
+    Object.assign(sun.shadow.camera, { left: -9, right: 9, top: 9, bottom: -9, near: 0.1, far: 120 }); sun.shadow.camera.updateProjectionMatrix();
+    await deform.enter();
+  } else {
+    deform.leave(); $('itNote').textContent = NOTE; itemCams();
+    if (mod) { info(); frameCam(); }
+  }
+}
+// W A S D move the camera (deformation mode: the board is 13 m wide)
+const held = new Set(), fwd = new THREE.Vector3(), side = new THREE.Vector3();
+addEventListener('keydown', (e) => { if (!e.target.closest('input,select,textarea') && ['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) held.add(e.code); });
+addEventListener('keyup', (e) => held.delete(e.code));
+addEventListener('blur', () => held.clear());
+function moveKeys(dt) {
+  if (!held.size) return;
+  const f = (held.has('KeyW') ? 1 : 0) - (held.has('KeyS') ? 1 : 0), s = (held.has('KeyD') ? 1 : 0) - (held.has('KeyA') ? 1 : 0);
+  if (!f && !s) return;
+  fwd.set(-Math.sin(orbit.yaw), 0, -Math.cos(orbit.yaw)); side.set(-fwd.z, 0, fwd.x);
+  const v = Math.max(1, orbit.dist) * 0.8 * dt;   // faster from far away
+  orbit.target.addScaledVector(fwd, f * v).addScaledVector(side, s * v);
+}
+
+updateSky(); resize(); itemCams();
+load(S.id).then(() => { status(''); if (S.mode === 'deform') setMode('deform'); }, (e) => status(e.message));
 requestAnimationFrame(frame);

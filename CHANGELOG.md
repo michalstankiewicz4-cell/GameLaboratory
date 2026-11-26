@@ -3,6 +3,23 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.106.0 · przedmioty 1.2.0 — 2026-11-26 (deformacja z Tornado.io)
+
+### Dodane
+- **Deformacja blachy** (DeformKit z Tornado.io) jako zachowanie `js/behaviors/land/deform/` (ląd): powłoka PBD
+  z plastycznością, utrzymaniem kształtu, zderzeniami z gruntem, prasą i podporami, między powłokami, chwytem; każda
+  powłoka może liczyć się w swoim wątku. Podział na pliki: rdzeń `shell-core.js`, powłoka `shell.js`, osadzanie
+  modelu `embed.js`, zderzacze `box.js`, wątek `shell-worker.js`. Opis: `docs/behaviors/deform.md`.
+- Beczka JunkKit 1.1.0: opis powłoki z blachy w danych (`info.shell`), siatkę fizyczną buduje `js/models/junkyard/shells.js`
+  — model rysowany bez zmian, nie wie o deformacji.
+- Laboratorium przedmiotów: tryb **Deformation** (przełącznik na pasku) — plansza (pięć beczek pod prasami: pionowo,
+  23°, 45°, 68° w kołyskach, bokiem między klinami) i kontener (siedem beczek w dwóch warstwach, jedna prasa); okno
+  Deformation (prędkość prasy, podnieś prasy U, od nowa R, przezroczystość ścian, podgląd zderzaczy, zgniecenie każdej
+  beczki), chwytanie beczki myszą, W A S D. Wyniki takie same jak w Tornado.io (sprawdzone na tych samych krokach).
+  `ItemsApi.mode('deform')`, `ItemsApi.deform`. Pliki: `js/labs/items/deform/`.
+- Okna laboratoriów: okno, którego panel strona ukryje (`hidden` na panelu — okno tylko dla jednego trybu), znika
+  całe, także w trybie Panele (`ui/shell/windows.js`, `windows.css`).
+
 ## Program 0.105.1 · wygląd 1.8.1 · doktor modeli 1.6.0 — 2026-11-26 (z Tornado.io: doktor i trąba)
 
 ### Dodane
