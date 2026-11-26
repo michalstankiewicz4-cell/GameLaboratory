@@ -75,7 +75,7 @@ function buildSpecimen() {
   window.LabPerf.model(spec, ms);   // the specimen: the Performance window's Model (ui/shell/labwin.js)
   $('spStats').replaceChildren(...[['Height', `${plant.height.toFixed(1)} m`], ['Crown radius', `${plant.radius.toFixed(1)} m`], ['Biomes', sp.biomes.map((b) => BIOMES[b].label.replace(/ \(.*/, '')).join(', ')]]
     .flatMap(([a, b]) => [el('span', { textContent: a }), el('b', { textContent: String(b) })]));
-  orbit.target.set(plant.radius * (S.compare ? 1.3 : 0), plant.height * 0.45, 0); orbit.dist = Math.max(10, plant.height * (S.compare ? 2.6 : 2.0));
+  orbit.target.set(plant.radius * (S.compare ? 1.3 : 0), plant.height * 0.45, 0); orbit.dist = Math.max(1.6, plant.radius * 2.4, plant.height * (S.compare ? 2.6 : 2.0));   // low shrubs and dwarf shrubs close up too
 }
 
 /* ---------------- landscape: terrain, water, forest, grass ---------------- */
@@ -178,12 +178,12 @@ cv.addEventListener('pointermove', (e) => {
   if (S.mode === 'landscape') { free.yaw -= dx * 0.004; free.pitch = Math.max(-1.45, Math.min(1.2, free.pitch - dy * 0.004)); }
   else { orbit.yaw -= dx * 0.005; orbit.pitch = Math.max(-0.05, Math.min(1.5, orbit.pitch + dy * 0.004)); }
 });
-cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.min(400, Math.max(2, orbit.dist * Math.exp(e.deltaY * 0.0011))); }, { passive: false });
+cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.min(400, Math.max(0.6, orbit.dist * Math.exp(e.deltaY * 0.0011))); }, { passive: false });
 function placeCamera(dt) {
   if (S.mode === 'specimen') {
     const c = Math.cos(orbit.pitch);
     camera.position.set(orbit.target.x + Math.sin(orbit.yaw) * c * orbit.dist, orbit.target.y + Math.sin(orbit.pitch) * orbit.dist, orbit.target.z + Math.cos(orbit.yaw) * c * orbit.dist);
-    camera.position.y = Math.max(0.4, camera.position.y); camera.lookAt(orbit.target);
+    camera.position.y = Math.max(0.15, camera.position.y); camera.lookAt(orbit.target);
     return;
   }
   const f = new THREE.Vector3(Math.sin(free.yaw) * Math.cos(free.pitch), Math.sin(free.pitch), Math.cos(free.yaw) * Math.cos(free.pitch));

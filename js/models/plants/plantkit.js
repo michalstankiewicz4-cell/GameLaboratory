@@ -24,6 +24,21 @@ export const SPECIES = {
   juniper: { name: 'Common juniper', latin: 'Juniperus communis', kind: 'shrub', height: [1.5, 4], biomes: ['temperate', 'plains'], leaf: 'juniper', bark: 'juniper', note: 'An evergreen shrub of several stems, columnar or spreading, with prickly blue-green needles; on heaths and dry slopes.' },
   saltbush: { name: 'Desert saltbush', latin: 'Atriplex sp.', kind: 'shrub', height: [0.6, 1.4], biomes: ['desert'], leaf: 'saltbush', bark: 'acacia', note: 'A low, rounded grey-green bush of small fleshy leaves; tolerates salt and drought.' },
 };
+// krzewy, krzewinki, paprocie, trawy kępowe i kaktusy (etap 4, 0.105.0)
+Object.assign(SPECIES, {
+  hazel: { name: 'Common hazel', latin: 'Corylus avellana', kind: 'shrub', deciduous: true, height: [3, 6], biomes: ['temperate', 'plains'], leaf: 'hazel', bark: 'hazel', note: 'A shrub of many straight stems from one base, arching outwards; smooth, shiny grey-brown bark with pale lenticels; round, doubly toothed leaves. Forest edges and understorey.' },
+  hawthorn: { name: 'Common hawthorn', latin: 'Crataegus monogyna', kind: 'shrub', deciduous: true, height: [3, 7], biomes: ['plains', 'temperate'], leaf: 'hawthorn', bark: 'hawthorn', note: 'A dense, thorny shrub or small tree with a rounded crown; small, deeply lobed leaves and dark red haws in autumn. Hedges and field edges.' },
+  blackthorn: { name: 'Blackthorn', latin: 'Prunus spinosa', kind: 'shrub', deciduous: true, height: [1.5, 4], biomes: ['plains', 'temperate'], leaf: 'blackthorn', bark: 'blackthorn', note: 'A low, dense thicket of dark, spiny stems; small oval leaves and blue-black sloes with a pale bloom. Spreads by suckers along hedges and edges.' },
+  blueberry: { name: 'Bilberry', latin: 'Vaccinium myrtillus', kind: 'dwarf', deciduous: true, height: [0.2, 0.5], biomes: ['temperate'], leaf: 'blueberry', bark: null, note: 'A dwarf shrub of green, angled stems and small bright oval leaves, with dark blue berries; carpets the floor of conifer forests, red in autumn.' },
+  heather: { name: 'Common heather', latin: 'Calluna vulgaris', kind: 'dwarf', height: [0.25, 0.6], biomes: ['temperate'], leaf: 'heather', bark: null, note: 'A low evergreen dwarf shrub of tiny scale-like leaves, covered in pale purple flower spikes in late summer; heaths and sandy pine woods.' },
+  fern: { name: 'Bracken', latin: 'Pteridium aquilinum', kind: 'fern', deciduous: true, height: [0.6, 1.6], biomes: ['temperate', 'plains'], leaf: 'fern', bark: null, note: 'Large, finely divided fronds rising from creeping roots, held almost level; turns rust-brown in autumn. Forest floors, clearings and heaths.' },
+  mugo: { name: 'Mountain pine', latin: 'Pinus mugo', kind: 'shrub', height: [1.5, 4], biomes: ['temperate'], leaf: 'pine', bark: 'mugo', note: 'A creeping pine: stems lie along the ground and turn up at the ends, forming a dense thicket in the subalpine belt above the forest.' },
+  creosote: { name: 'Creosote bush', latin: 'Larrea tridentata', kind: 'shrub', height: [1, 3], biomes: ['desert'], leaf: 'creosote', bark: 'creosote', note: 'An open, vase-shaped shrub of many slender grey stems from the base; tiny dark olive, resinous leaflets and small yellow flowers. The commonest desert shrub.' },
+  thornbush: { name: 'Desert thorn', latin: 'Lycium sp.', kind: 'shrub', height: [0.8, 2], biomes: ['desert'], leaf: 'thornbush', bark: 'thornbush', note: 'A tangled, spiny shrub of zigzag grey stems with sparse small fleshy leaves; drops them in drought.' },
+  spinifex: { name: 'Spinifex', latin: 'Triodia sp.', kind: 'grass', height: [0.4, 1], biomes: ['desert'], leaf: 'spinifex', bark: null, note: 'A hummock grass: a dense dome of rolled, needle-sharp leaves, dying in the middle as it grows into a ring on sand and stony plains.' },
+  saguaro: { name: 'Saguaro', latin: 'Carnegiea gigantea', kind: 'cactus', height: [4, 12], biomes: ['desert'], leaf: 'saguaro', bark: 'saguaro', note: 'A columnar cactus, ribbed and lined with spines; the first arms grow out and turn upwards after 75–100 years (some never grow any); white, waxy flowers at the tips from April to June.' },
+  opuntia: { name: 'Prickly pear', latin: 'Opuntia sp.', kind: 'cactus', height: [0.8, 2.2], biomes: ['desert'], leaf: 'opuntia', bark: 'opuntia', note: 'A cactus of flat oval pads, one growing from the edge of another, dotted with areoles of spines; yellow flowers and red fruit on the pad rims.' },
+});
 export const SPECIES_IDS = Object.keys(SPECIES);
 
 /* ---------------- canvas textures ---------------- */
@@ -112,6 +127,93 @@ const LEAF_DRAW = {
       g.fillStyle = hsl(85 + r() * 25, 10 + r() * 10, 42 + r() * 16); g.beginPath(); g.ellipse(x, y, 4 + r() * 3, 3 + r() * 2, r() * 3, 0, 7); g.fill();
     }
   },
+  hazel(g, W, H, r) {                                                   // sprays of round, toothed leaves
+    for (let i = 0; i < 230; i++) {
+      const x = W * (0.08 + r() * 0.84), y = H * (0.08 + r() * 0.84), L = 22 + r() * 14, dx = W / 2 - x, dy = H / 2 - y;
+      if (dx * dx + dy * dy > (W * 0.45) ** 2) continue;
+      g.save(); g.translate(x, y); g.rotate(r() * 6.28); g.fillStyle = hsl(82 + r() * 18, 36 + r() * 16, 20 + r() * 16);
+      g.beginPath(); for (let a = 0; a <= 6.3; a += 0.25) { const rr = L * (0.5 + 0.06 * (Math.round(a * 4) % 2)) * (1 - 0.25 * Math.max(0, Math.sin(a))); g.lineTo(Math.cos(a) * rr * 0.9, Math.sin(a) * rr); } g.fill();
+      g.strokeStyle = hsl(80, 30, 32, 0.6); g.lineWidth = 1.2; g.beginPath(); g.moveTo(0, L * 0.5); g.lineTo(0, -L * 0.45); g.stroke(); g.restore();
+    }
+  },
+  hawthorn(g, W, H, r) {                                                // small lobed leaves, twigs with thorns, a few dark red haws
+    for (let k = 0; k < 18; k++) { const x = W * (0.1 + r() * 0.8), y = H * (0.1 + r() * 0.8), a = r() * 6.28; stroke(g, x, y, x + Math.cos(a) * 60, y + Math.sin(a) * 60, 2.4, '#3b3029'); }
+    for (let i = 0; i < 520; i++) {
+      const x = W * (0.06 + r() * 0.88), y = H * (0.06 + r() * 0.88), dx = W / 2 - x, dy = H / 2 - y; if (dx * dx + dy * dy > (W * 0.46) ** 2) continue;
+      const L = 11 + r() * 7; g.save(); g.translate(x, y); g.rotate(r() * 6.28); g.fillStyle = hsl(90 + r() * 25, 32 + r() * 18, 18 + r() * 14);
+      for (const [ox, oy, s] of [[0, -L * 0.45, 0.32], [-L * 0.3, -L * 0.1, 0.28], [L * 0.3, -L * 0.1, 0.28], [-L * 0.22, L * 0.25, 0.24], [L * 0.22, L * 0.25, 0.24]]) { g.beginPath(); g.ellipse(ox, oy, L * s, L * s * 0.8, 0, 0, 7); g.fill(); }
+      g.restore();
+    }
+    for (let i = 0; i < 46; i++) { const x = W * (0.15 + r() * 0.7), y = H * (0.15 + r() * 0.7); g.fillStyle = hsl(355 + r() * 8, 65, 26 + r() * 10); g.beginPath(); g.arc(x, y, 4 + r() * 2, 0, 7); g.fill(); }
+  },
+  blackthorn(g, W, H, r) {                                              // dark spiny twigs, small oval leaves, blue-black sloes
+    for (let k = 0; k < 26; k++) { let x = W * (0.1 + r() * 0.8), y = H * (0.1 + r() * 0.8); for (let s = 0; s < 4; s++) { const a = r() * 6.28, nx = x + Math.cos(a) * 34, ny = y + Math.sin(a) * 34; stroke(g, x, y, nx, ny, 2.6, '#241c1a'); stroke(g, nx, ny, nx + Math.cos(a + 0.9) * 12, ny + Math.sin(a + 0.9) * 12, 1.4, '#241c1a'); x = nx; y = ny; } }
+    for (let i = 0; i < 700; i++) {
+      const x = W * (0.06 + r() * 0.88), y = H * (0.06 + r() * 0.88), dx = W / 2 - x, dy = H / 2 - y; if (dx * dx + dy * dy > (W * 0.46) ** 2) continue;
+      g.fillStyle = hsl(85 + r() * 25, 28 + r() * 16, 17 + r() * 12); g.beginPath(); g.ellipse(x, y, 4 + r() * 3, 8 + r() * 4, r() * 6.28, 0, 7); g.fill();
+    }
+    for (let i = 0; i < 40; i++) { const x = W * (0.15 + r() * 0.7), y = H * (0.15 + r() * 0.7); g.fillStyle = hsl(235 + r() * 15, 25, 22 + r() * 8); g.beginPath(); g.arc(x, y, 5 + r() * 2, 0, 7); g.fill(); g.fillStyle = 'rgba(190,200,220,0.35)'; g.beginPath(); g.arc(x - 1.5, y - 1.5, 2.5, 0, 7); g.fill(); }
+  },
+  blueberry(g, W, H, r) {                                               // green angled stems, small bright oval leaves, a few dark blue berries
+    for (let k = 0; k < 40; k++) { const x = W * (0.1 + r() * 0.8), y = H * (0.1 + r() * 0.8), a = r() * 6.28; stroke(g, x, y, x + Math.cos(a) * 40, y + Math.sin(a) * 40, 2, hsl(100, 40, 28)); }
+    for (let i = 0; i < 900; i++) {
+      const x = W * (0.06 + r() * 0.88), y = H * (0.06 + r() * 0.88), dx = W / 2 - x, dy = H / 2 - y; if (dx * dx + dy * dy > (W * 0.46) ** 2) continue;
+      g.fillStyle = hsl(95 + r() * 20, 45 + r() * 15, 26 + r() * 14); g.beginPath(); g.ellipse(x, y, 4 + r() * 2, 7 + r() * 3, r() * 6.28, 0, 7); g.fill();
+    }
+    for (let i = 0; i < 60; i++) { const x = W * (0.12 + r() * 0.76), y = H * (0.12 + r() * 0.76); g.fillStyle = hsl(232 + r() * 12, 35, 18 + r() * 8); g.beginPath(); g.arc(x, y, 3.5 + r() * 1.5, 0, 7); g.fill(); }
+  },
+  heather(g, W, H, r) {                                                 // fine scale-leaved shoots, pale purple flower spikes at the tips
+    for (let k = 0; k < 120; k++) {
+      const x = W * (0.08 + r() * 0.84), y0 = H * (0.95 - r() * 0.15), y1 = H * (0.1 + r() * 0.4), sway = (r() - 0.5) * 40;
+      for (let i = 0; i < 26; i++) { const t = i / 26, xx = x + sway * t, yy = y0 + (y1 - y0) * t; stroke(g, xx, yy, xx + (r() - 0.5) * 10, yy - 6, 2.4, hsl(110 + r() * 30, 22 + r() * 14, 16 + r() * 12)); }
+      for (let i = 0; i < 9; i++) { const t = 0.75 + i / 36, xx = x + sway * t, yy = y0 + (y1 - y0) * t; g.fillStyle = hsl(300 + r() * 20, 30 + r() * 20, 48 + r() * 14); g.beginPath(); g.arc(xx + (r() - 0.5) * 6, yy, 2.6, 0, 7); g.fill(); }
+    }
+  },
+  fern(g, W, H, r) {                                                    // one bipinnate frond: rachis up the middle, pinnae with pinnules
+    const cx = W / 2; stroke(g, cx, H, cx, H * 0.02, 4, '#5b6b30');
+    for (let y = H * 0.9; y > H * 0.04; y -= 18) {
+      const t = 1 - y / H, L = W * 0.46 * Math.sin(Math.min(1, t * 1.05) * Math.PI * 0.92) + 6;
+      for (const s of [-1, 1]) {
+        const ex = cx + s * L, ey = y - L * 0.35; stroke(g, cx, y, ex, ey, 2.2, '#56682e');
+        for (let q = 0.12; q < 1; q += 0.09) { const px = cx + (ex - cx) * q, py = y + (ey - y) * q, pl = (1 - q) * 14 + 4; for (const s2 of [-1, 1]) { g.fillStyle = hsl(85 + r() * 20, 40 + r() * 15, 24 + r() * 12); g.beginPath(); g.ellipse(px, py + s2 * pl * 0.5, 3, pl * 0.55, s * 0.4, 0, 7); g.fill(); } }
+      }
+    }
+  },
+  creosote(g, W, H, r) {                                                // thin grey twigs, tiny dark olive leaflets, small yellow flowers
+    for (let k = 0; k < 30; k++) { const x = W * (0.1 + r() * 0.8), y = H * (0.1 + r() * 0.8), a = -1.57 + (r() - 0.5) * 1.6; stroke(g, x, y, x + Math.cos(a) * 70, y + Math.sin(a) * 70, 1.6, '#5e5a52'); }
+    for (let i = 0; i < 1100; i++) {
+      const x = W * (0.06 + r() * 0.88), y = H * (0.06 + r() * 0.88), dx = W / 2 - x, dy = H / 2 - y; if (dx * dx + dy * dy > (W * 0.46) ** 2) continue;
+      g.fillStyle = hsl(70 + r() * 20, 30 + r() * 15, 18 + r() * 10); g.beginPath(); g.ellipse(x, y, 2.4, 4.2, r() * 6.28, 0, 7); g.fill();
+    }
+    for (let i = 0; i < 50; i++) { g.fillStyle = hsl(50 + r() * 8, 85, 55); g.beginPath(); g.arc(W * (0.12 + r() * 0.76), H * (0.12 + r() * 0.76), 3, 0, 7); g.fill(); }
+  },
+  thornbush(g, W, H, r) {                                               // zigzag grey stems with thorns, sparse fleshy leaves
+    for (let k = 0; k < 22; k++) { let x = W * (0.1 + r() * 0.8), y = H * (0.1 + r() * 0.8), a = r() * 6.28; for (let s = 0; s < 6; s++) { a += (s % 2 ? 0.7 : -0.7); const nx = x + Math.cos(a) * 26, ny = y + Math.sin(a) * 26; stroke(g, x, y, nx, ny, 2.2, '#6d665c'); stroke(g, nx, ny, nx + Math.cos(a + 1.5) * 9, ny + Math.sin(a + 1.5) * 9, 1.2, '#8a8070'); x = nx; y = ny; } }
+    for (let i = 0; i < 300; i++) { const x = W * (0.08 + r() * 0.84), y = H * (0.08 + r() * 0.84), dx = W / 2 - x, dy = H / 2 - y; if (dx * dx + dy * dy > (W * 0.45) ** 2) continue; g.fillStyle = hsl(90 + r() * 25, 22 + r() * 12, 30 + r() * 12); g.beginPath(); g.ellipse(x, y, 2.5, 6, r() * 6.28, 0, 7); g.fill(); }
+  },
+  spinifex(g, W, H, r) {                                                // a fan of rolled, needle-sharp blades from the base
+    for (let i = 0; i < 260; i++) {
+      const a = -Math.PI / 2 + (r() - 0.5) * 2.4, L = H * (0.55 + r() * 0.4), x0 = W / 2 + (r() - 0.5) * W * 0.25;
+      stroke(g, x0, H, x0 + Math.cos(a) * L, H + Math.sin(a) * L, 3, hsl(55 + r() * 30, 25 + r() * 20, 36 + r() * 18));
+    }
+  },
+  saguaro(g, W, H, r) {                                                 // a crown of white flowers with yellow centres
+    for (let i = 0; i < 9; i++) {
+      const x = W * (0.2 + r() * 0.6), y = H * (0.2 + r() * 0.6);
+      for (let p = 0; p < 7; p++) { const a = p / 7 * 6.28; g.fillStyle = hsl(50, 30, 90 + r() * 6); g.beginPath(); g.ellipse(x + Math.cos(a) * 13, y + Math.sin(a) * 13, 10, 6, a, 0, 7); g.fill(); }
+      g.fillStyle = hsl(48, 80, 55); g.beginPath(); g.arc(x, y, 7, 0, 7); g.fill();
+    }
+  },
+  opuntia(g, W, H, r) {                                                 // one oval pad: green, areoles with spines; a few red fruits on the rim
+    g.fillStyle = hsl(95, 32, 34); g.beginPath(); g.ellipse(W / 2, H / 2, W * 0.42, H * 0.47, 0, 0, 7); g.fill();
+    const gr = g.createRadialGradient(W * 0.45, H * 0.4, 10, W / 2, H / 2, W * 0.48); gr.addColorStop(0, 'rgba(170,200,110,0.25)'); gr.addColorStop(1, 'rgba(20,40,10,0.35)'); g.fillStyle = gr; g.beginPath(); g.ellipse(W / 2, H / 2, W * 0.42, H * 0.47, 0, 0, 7); g.fill();
+    for (let j = 0; j < 9; j++) for (let i = 0; i < 7; i++) {
+      const x = W * (0.2 + i * 0.1 + (j % 2) * 0.05), y = H * (0.1 + j * 0.1), dx = (x - W / 2) / (W * 0.4), dy = (y - H / 2) / (H * 0.45); if (dx * dx + dy * dy > 1) continue;
+      g.fillStyle = hsl(45, 40, 70); g.beginPath(); g.arc(x, y, 4, 0, 7); g.fill();
+      for (let s = 0; s < 3; s++) { const a = r() * 6.28; stroke(g, x, y, x + Math.cos(a) * 14, y + Math.sin(a) * 14, 1.2, 'rgba(235,225,190,0.9)'); }
+    }
+    for (let i = 0; i < 3; i++) { const a = -1.2 + i * 0.6; g.fillStyle = hsl(345, 65, 38); g.beginPath(); g.ellipse(W / 2 + Math.cos(a - 1.57) * W * 0.4, H / 2 + Math.sin(a - 1.57) * H * 0.44, 16, 22, a, 0, 7); g.fill(); }
+  },
   frond(g, W, H, r) {                                                   // two pinnate fronds side by side: live (left half), dry (right half)
     for (const [x0, dead] of [[0, false], [W / 2, true]]) {
       const cx = x0 + W / 4;
@@ -126,13 +228,14 @@ const LEAF_DRAW = {
     }
   },
 };
-const LEAF_SIZE = { frond: [512, 1024] };
+const LEAF_SIZE = { frond: [512, 1024], fern: [512, 1024], spinifex: [512, 512] };
+const LEAF_OWN_OUTLINE = new Set(['frond', 'fern', 'spinifex', 'opuntia', 'saguaro']);   // drawn with their own outline: no round cut
 const _leafTex = {};
 export function leafTexture(kind) {
   if (_leafTex[kind]) return _leafTex[kind];
   const [W, H] = LEAF_SIZE[kind] || [512, 512], [c, g] = cnv(W, H);
   LEAF_DRAW[kind](g, W, H, rng(kind.length * 977));
-  if (kind !== 'frond') {                                               // an irregular, rounded outline: no card edges in the silhouette
+  if (!LEAF_OWN_OUTLINE.has(kind)) {                                    // an irregular, rounded outline: no card edges in the silhouette
     const d = g.getImageData(0, 0, W, H), r = rng(kind.length * 31), N = 16, nz = Array.from({ length: N * N }, () => r());
     const vn = (x, y) => { const xi = Math.floor(x), yi = Math.floor(y), fx = x - xi, fy = y - yi, a = (i, j) => nz[((j % N + N) % N) * N + ((i % N + N) % N)];
       return (a(xi, yi) * (1 - fx) + a(xi + 1, yi) * fx) * (1 - fy) + (a(xi, yi + 1) * (1 - fx) + a(xi + 1, yi + 1) * fx) * fy; };
@@ -155,9 +258,18 @@ const BARK_DRAW = {
   palm: { base: [104, 84, 60], diamonds: true, contrast: 0.5 },
   acacia: { base: [70, 58, 48], furrows: true, contrast: 0.45 },
   juniper: { base: [92, 58, 40], shreds: true, contrast: 0.5 },
+  hazel: { base: [112, 92, 72], lenticels: true, contrast: 0.2 },
+  hawthorn: { base: [96, 88, 78], furrows: true, contrast: 0.45 },
+  blackthorn: { base: [44, 36, 34], plates: true, contrast: 0.4 },
+  mugo: { base: [78, 72, 66], plates: true, contrast: 0.5 },
+  creosote: { base: [112, 106, 96], furrows: true, contrast: 0.3 },
+  thornbush: { base: [118, 110, 98], shreds: true, contrast: 0.35 },
+  saguaro: { base: [70, 100, 58], ribs: 16, contrast: 0.35 },
+  opuntia: { base: [74, 108, 56], contrast: 0.2 },
 };
 const _barkTex = {};
 export function barkTexture(kind) {
+  kind = kind || 'juniper';   // plants without woody stems (ferns, dwarf shrubs, grass): their few stems take juniper bark
   if (_barkTex[kind]) return _barkTex[kind];
   const W = 256, H = 512, [c, g] = cnv(W, H), d = g.createImageData(W, H), r = rng(kind.length * 131 + 7), B = BARK_DRAW[kind];
   const N = 64, n1 = Array.from({ length: N * N }, () => r());
@@ -168,12 +280,13 @@ export function barkTexture(kind) {
     if (B.furrows) { const f = Math.abs(Math.sin((x + vn(x, y, 40) * 60) / W * Math.PI * 7)); v *= 0.45 + 0.75 * Math.pow(f, 0.6); }
     if (B.plates) { const f = vn(x * 1.4, y * 0.8, 9); v *= 0.6 + 0.6 * f; }
     if (B.shreds) { const f = Math.abs(Math.sin((x + vn(x, y, 60) * 40) / W * Math.PI * 14)); v *= 0.6 + 0.5 * f; }
+    if (B.ribs) { const f = Math.cos(x / W * Math.PI * 2 * B.ribs); v *= 0.62 + 0.38 * (0.5 + 0.5 * f); if (f > 0.85 && (y % 22) < 3) v = 1.6; }   // ribs, the areoles on their crests
     if (B.diamonds) { const u = ((x / W * 6 + y / H * 4) % 1 + 1) % 1, w = ((x / W * 6 - y / H * 4) % 1 + 1) % 1; v *= 0.45 + 0.9 * Math.min(1, Math.min(u, 1 - u, w, 1 - w) * 5); }
     let [R, G, Bc] = B.base, k = 1 + (v - 0.5) * 2 * B.contrast;
-    if (B.lenticels) {                                                   // birch: black horizontal lenticels and dark patches
+    if (B.lenticels && kind === 'birch') {                              // birch: black horizontal lenticels and dark patches
       const l = vn(x * 0.25, y * 3, 6), p = vn(x, y, 50);
       if (l > 0.72) k *= 0.25; if (p > 0.7) k *= 0.35 + (1 - p) * 1.5;
-    }
+    } else if (B.lenticels) { if (vn(x * 0.3, y * 2.5, 5) > 0.78) k *= 1.5; }   // hazel: pale lenticels on smooth bark
     const i = (y * W + x) * 4; d.data[i] = Math.min(255, R * k); d.data[i + 1] = Math.min(255, G * k); d.data[i + 2] = Math.min(255, Bc * k); d.data[i + 3] = 255;
   }
   g.putImageData(d, 0, 0);
@@ -194,7 +307,8 @@ class Geo {
   }
 }
 // A tapered tube along a polyline (parallel-transport frames); wind(t 0..1 along it) → [sway, flutter, phase]
-function tube(G, pts, rads, segs, wind, texW = 0.6, texH = 1.6) {
+// ribs: n ribs along the tube, depth (share of the radius) — cacti
+function tube(G, pts, rads, segs, wind, texW = 0.6, texH = 1.6, ribs = 0, ribDepth = 0) {
   const n = pts.length, T = [];
   for (let i = 0; i < n; i++) T.push(pts[Math.min(n - 1, i + 1)].clone().sub(pts[Math.max(0, i - 1)]).normalize());
   let N = Math.abs(T[0].y) < 0.9 ? V(0, 1, 0).cross(T[0]).normalize() : V(1, 0, 0).cross(T[0]).normalize();
@@ -205,7 +319,8 @@ function tube(G, pts, rads, segs, wind, texW = 0.6, texH = 1.6) {
     const Bn = T[i].clone().cross(N).normalize(), w = wind(i / (n - 1));
     for (let s = 0; s <= segs; s++) {
       const a = s / segs * Math.PI * 2, d = N.clone().multiplyScalar(Math.cos(a)).addScaledVector(Bn, Math.sin(a));
-      G.vert(pts[i].clone().addScaledVector(d, rads[i]), d, s / segs * reps, len / texH, w);
+      const rr = ribs ? rads[i] * (1 - ribDepth * (0.5 - 0.5 * Math.cos(a * ribs))) : rads[i];
+      G.vert(pts[i].clone().addScaledVector(d, rr), d, s / segs * reps, len / texH, w);
     }
   }
   for (let i = 0; i < n - 1; i++) for (let s = 0; s < segs; s++) {
@@ -403,7 +518,131 @@ const GROW = {
     }
     return { bark, leaf, H, R: W + 0.3, crown: crownC };
   },
+  // a shrub of many stems from one base, arching outwards; leaf tufts along the upper two thirds (hazel, creosote)
+  hazel(r, H, d) { return stemShrub(r, H, d, { stems: [7, 14], spread: 0.55, arch: 0.18, tuft: [0.9, 0.6], fill: 1, rad: 0.035 }); },
+  creosote(r, H, d) { return stemShrub(r, H, d, { stems: [12, 22], spread: 0.45, arch: 0.02, tuft: [0.5, 0.35], fill: 0.55, rad: 0.015 }); },
+  // dense rounded crowns of twiggy, thorny stems (hawthorn: a short trunk; blackthorn and desert thorn: a low thicket)
+  hawthorn(r, H, d) { return thicket(r, H, d, { trunk: H * 0.35, width: 0.75, n: 60, tuft: [1.0, 0.6], rad: 0.09 }); },
+  blackthorn(r, H, d) { return thicket(r, H, d, { trunk: 0, width: 1.1, n: 46, tuft: [0.8, 0.5], rad: 0.035 }); },
+  thornbush(r, H, d) { return thicket(r, H, d, { trunk: 0, width: 1.0, n: 26, tuft: [0.6, 0.4], rad: 0.03 }); },
+  // dwarf shrubs: a low mound of leafy tufts (bilberry carpets, heather cushions)
+  blueberry(r, H, d) { return mound(r, H, d, { width: 1.6, n: 22, tuft: [0.35, 0.2] }); },
+  heather(r, H, d) { return mound(r, H, d, { width: 1.3, n: 20, tuft: [0.4, 0.25] }); },
+  fern(r, H, d) {                                                       // bracken: fronds rising from the ground, bending out almost level
+    const leaf = new Geo(), n = 6 + Math.floor(r() * 6), crownC = V(0, H * 0.5, 0);
+    for (let k = 0; k < n; k++) {
+      const yaw = k / n * 6.28 + (r() - 0.5) * 0.6, L = H * (0.9 + r() * 0.5), steps = Math.max(4, Math.round(7 * d));
+      const pts = limb(V((r() - 0.5) * 0.15, 0, (r() - 0.5) * 0.15), dirAt(yaw, 1.15 - r() * 0.3), L, steps, V(Math.sin(yaw), -0.6, Math.cos(yaw)).normalize(), 0.55);
+      ribbon(leaf, pts, (t) => 0.32 * L * Math.sin(Math.min(1, t * 1.05) * Math.PI * 0.92) + 0.03, (t) => [0.04 * L * t, 0.4 + 0.6 * t, r()], 0.5, true);
+    }
+    return { bark: new Geo(), leaf, H, R: H * 1.1, crown: crownC };
+  },
+  spinifex(r, H, d) {                                                   // a hummock: crossed fans of spiky blades, densest in a ring
+    const leaf = new Geo(), W = H * (1.4 + r() * 0.8), n = Math.round(14 * Math.min(1.3, d)), crownC = V(0, H * 0.4, 0);
+    for (let k = 0; k < n; k++) {
+      const a = r() * 6.28, rr = W * 0.5 * Math.sqrt(0.25 + 0.75 * r()), c = V(Math.sin(a) * rr, 0, Math.cos(a) * rr), yaw = r() * 6.28, sz = H * (0.8 + r() * 0.4);
+      for (let q = 0; q < 2; q++) card(leaf, c, V(0, 1, 0), dirAt(yaw + q * 1.57, 0), sz * 1.2, sz, V(c.x, W * 0.5, c.z).normalize(), [0.03 * sz, 0.4, r()]);
+    }
+    return { bark: new Geo(), leaf, H, R: W * 0.6, crown: crownC };
+  },
+  mugo(r, H, d) {                                                       // a creeping pine: stems along the ground turning up, needle tufts at the ends
+    const bark = new Geo(), leaf = new Geo(), W = H * (1.4 + r() * 0.8), stems = 8 + Math.floor(r() * 7), crownC = V(0, H * 0.5, 0);
+    for (let k = 0; k < stems; k++) {
+      const yaw = k / stems * 6.28 + (r() - 0.5) * 0.7, out = W * (0.15 + r() * 0.3), base = V(Math.sin(yaw) * 0.1, 0.05, Math.cos(yaw) * 0.1);
+      const knee = V(Math.sin(yaw) * out, 0.15 + r() * 0.25, Math.cos(yaw) * out), tip = knee.clone().add(V(Math.sin(yaw) * 0.4, H * (0.6 + r() * 0.4), Math.cos(yaw) * 0.4));
+      const pts = [base, base.clone().lerp(knee, 0.5).add(V(0, 0.1, 0)), knee, knee.clone().lerp(tip, 0.5), tip];
+      tube(bark, pts, [0.06, 0.05, 0.04, 0.03, 0.012], 4, (t) => [swayAt(t * H, H) * 0.6, 0, r()]);
+      // needles all along: on the creeping part too, so the thicket is green down to the ground
+      for (let q = 0; q < Math.round(12 * Math.min(1.3, d)); q++) {
+        const t = r(), c = (t < 0.4 ? base.clone().lerp(knee, 0.3 + t / 0.4 * 0.7) : knee.clone().lerp(tip, (t - 0.4) / 0.6)).add(V((r() - 0.5) * 0.7, (r() - 0.2) * 0.4, (r() - 0.5) * 0.7));
+        tuft(leaf, c, 0.9 + r() * 0.5, c.clone().sub(crownC).add(V(0, 1, 0)).normalize(), [swayAt(c.y, H) * 0.6, 1, r()], r);
+      }
+    }
+    return { bark, leaf, H, R: W * 0.8, crown: crownC };
+  },
+  saguaro(r, H, d) {                                                    // a ribbed column with arms that grow out and turn up; flowers at the tips
+    const bark = new Geo(), leaf = new Geo(), R = 0.28 + H * 0.012, segs = Math.max(16, Math.round(32 * d)), crownC = V(0, H * 0.6, 0);
+    const col = []; for (let i = 0; i <= 12; i++) { const t = i / 12; col.push(V(0, H * t, 0)); }
+    tube(bark, col, col.map((_, i) => R * (i === 12 ? 0.55 : i === 11 ? 0.9 : 1)), segs, (t) => [0.004 * H * t, 0, r()], 0.25, 0.8, 16, 0.14);
+    const arms = H < 5.5 || r() < 0.15 ? 0 : 1 + Math.floor(r() * Math.min(4, (H - 5.5) / 1.5 + 1));   // the first arms come late; some saguaros never grow any
+    const tips = [col[12]];
+    for (let k = 0; k < arms; k++) {
+      const yaw = k * 2.3 + r() * 0.8, y0 = H * (0.35 + r() * 0.3), out = R * 2.4 + r() * 0.7, up = H * (0.25 + r() * 0.3), ar = R * (0.65 + r() * 0.15);
+      const dir = V(Math.sin(yaw), 0, Math.cos(yaw)), p0 = V(0, y0, 0);
+      const pts = [p0.clone().addScaledVector(dir, R * 0.5), p0.clone().addScaledVector(dir, out * 0.6).add(V(0, 0.05, 0)), p0.clone().addScaledVector(dir, out).add(V(0, out * 0.4, 0)),
+        p0.clone().addScaledVector(dir, out * 1.05).add(V(0, out * 0.4 + up * 0.5, 0)), p0.clone().addScaledVector(dir, out * 1.05).add(V(0, out * 0.4 + up, 0))];
+      tube(bark, pts, pts.map((_, i) => ar * (i === 4 ? 0.55 : 1)), Math.max(12, Math.round(24 * d)), () => [0.004 * H, 0, r()], 0.25, 0.8, 14, 0.14);
+      tips.push(pts[4]);
+    }
+    for (const t of tips) for (let q = 0; q < 2; q++) card(leaf, t.clone().add(V(0, -0.05, 0)), V(0, 1, 0), dirAt(q * 1.57 + r(), 0), 0.45, 0.25, V(0, 1, 0), [0.004 * H, 0.2, r()]);
+    return { bark, leaf, H, R: 1.8, crown: crownC };
+  },
+  opuntia(r, H, d) {                                                    // pads: each grows from the rim of another, in a loose fan
+    const bark = new Geo(), leaf = new Geo(), crownC = V(0, H * 0.5, 0), pads = [];
+    tube(bark, [V(), V(0, 0.25, 0)], [0.1, 0.08], 8, () => [0, 0, 0]);     // the woody base
+    const grow = (base, yaw, tilt, s, lvl) => {
+      const side = V(Math.cos(yaw), 0, -Math.sin(yaw)), up = V(0, Math.cos(tilt), 0).addScaledVector(side, Math.sin(tilt)).normalize(), h = 0.38 * s;   // leans in its own plane: a fan
+      card(leaf, base, up, side, h * 0.8, h, side.clone().cross(up).normalize(), [0.01, 0.1, r()]);
+      pads.push(1);
+      if (lvl >= 4 || base.y + up.y * h > H) return;
+      const kids = lvl === 0 ? 2 + (r() < 0.6 ? 1 : 0) : 1 + (r() < 0.75 ? 1 : 0);
+      for (let k = 0; k < kids; k++) {
+        const along = 0.7 + r() * 0.25, offs = (k - (kids - 1) / 2) * 0.35;
+        grow(base.clone().addScaledVector(up, h * along).addScaledVector(side, offs * h * 0.9), yaw + (r() - 0.5) * 1.4, Math.max(-0.9, Math.min(1.2, tilt + (k - (kids - 1) / 2) * 0.8 + (r() - 0.5) * 0.8)), s * (0.85 + r() * 0.2), lvl + 1);
+      }
+    };
+    grow(V(0, 0.2, 0), r() * 6.28, 0.1, 1 + H * 0.2, 0);
+    return { bark, leaf, H, R: H * 0.7, crown: crownC };
+  },
 };
+// shrubs from one base: straight stems fanning out and arching, tufts along them
+function stemShrub(r, H, d, o) {
+  const bark = new Geo(), leaf = new Geo(), crownC = V(0, H * 0.55, 0), n = o.stems[0] + Math.floor(r() * (o.stems[1] - o.stems[0]));
+  for (let k = 0; k < n; k++) {
+    const yaw = r() * 6.28, L = H * (0.75 + r() * 0.35), pts = limb(V((r() - 0.5) * 0.2, 0, (r() - 0.5) * 0.2), dirAt(yaw, 1.5 - o.spread * (0.4 + r() * 0.8)), L, 4, V(Math.sin(yaw), -0.3, Math.cos(yaw)).normalize(), o.arch);
+    tube(bark, pts, pts.map((_, i) => o.rad * (1 - i / 5) + 0.006), 3, (t) => [swayAt(t * L, H) * 1.5, 0, r()]);
+    const nt = Math.max(1, Math.round(4 * o.fill * Math.min(1.3, d) * (L / 2.5 + 0.5)));
+    for (let q = 0; q < nt; q++) {
+      const t = 0.35 + 0.65 * (q + r()) / nt, i0 = Math.min(pts.length - 2, Math.floor(t * (pts.length - 1))), c = pts[i0].clone().lerp(pts[i0 + 1], t * (pts.length - 1) - i0);
+      tuft(leaf, c, o.tuft[0] + r() * o.tuft[1], c.clone().sub(crownC).add(V(0, H * 0.3, 0)).normalize(), [swayAt(c.y, H) * 1.5, 1, r()], r);
+    }
+  }
+  return { bark, leaf, H, R: H * 0.6, crown: crownC };
+}
+// a dense, rounded crown of short crooked stems (thorny shrubs), optionally on a short trunk
+function thicket(r, H, d, o) {
+  const bark = new Geo(), leaf = new Geo(), W = H * o.width * (0.8 + r() * 0.4) * 0.5, cy = o.trunk ? o.trunk + (H - o.trunk) * 0.5 : H * 0.5, crownC = V(0, cy, 0);
+  if (o.trunk) tube(bark, [V(), V((r() - 0.5) * 0.2, o.trunk * 0.5, 0), V((r() - 0.5) * 0.3, o.trunk, (r() - 0.5) * 0.3)], [o.rad, o.rad * 0.85, o.rad * 0.7], 6, (t) => [swayAt(t * o.trunk, H), 0, r()]);
+  const n = Math.round(o.n * Math.min(1.3, d) * Math.max(0.6, H / 3));
+  const ry = (H - (o.trunk || 0)) * 0.55;
+  for (let k = 0; k < n; k++) {
+    const a = r() * 6.28, e = (r() - 0.25) * 1.5, c = V(Math.sin(a) * Math.cos(e) * W, cy + Math.sin(e) * ry, Math.cos(a) * Math.cos(e) * W).multiplyScalar(1).lerp(crownC, 0.25 * r());
+    c.y = Math.max(0.15, c.y);
+    if (k % 3 === 0) { const from = o.trunk ? V(0, o.trunk, 0) : V((r() - 0.5) * 0.3, 0, (r() - 0.5) * 0.3); tube(bark, [from, from.clone().lerp(c, 0.5).add(V((r() - 0.5) * 0.4, 0, (r() - 0.5) * 0.4)), c], [o.rad * 0.5, o.rad * 0.35, 0.008], 3, (t) => [swayAt(c.y * t, H), 0, r()]); }
+    tuft(leaf, c, o.tuft[0] + r() * o.tuft[1], c.clone().sub(crownC).add(V(0, H * 0.2, 0)).normalize(), [swayAt(c.y, H) * 1.3, 1, r()], r);
+  }
+  return { bark, leaf, H, R: W + 0.4, crown: crownC };
+}
+// a low mound of tufts (dwarf shrubs)
+function mound(r, H, d, o) {
+  const bark = new Geo(), leaf = new Geo(), W = H * o.width * (0.8 + r() * 0.5), crownC = V(0, H * 0.3, 0), n = Math.round(o.n * Math.min(1.3, d));
+  for (let k = 0; k < n; k++) {
+    const a = r() * 6.28, rr = W * Math.sqrt(r()), c = V(Math.sin(a) * rr, H * (0.35 + 0.5 * (1 - (rr / W) ** 2)) * (0.7 + 0.3 * r()), Math.cos(a) * rr);
+    tuft(leaf, c, H * (o.tuft[0] / 0.35) * (0.8 + r() * 0.5) * 0.5 + o.tuft[1] * r() * H, c.clone().sub(crownC).add(V(0, H, 0)).normalize(), [0.02 + 0.02 * H, 1, r()], r);
+  }
+  return { bark, leaf, H, R: W + 0.1, crown: crownC };
+}
+// a leafy ribbon along a curved axis, lying flat (normal up), its width by t — fern fronds; uv across 0…1, along 0…1
+function ribbon(G, pts, width, wind, uvW = 1, flat = false) {
+  const n = pts.length - 1, b = G.count;
+  for (let i = 0; i <= n; i++) {
+    const t = i / n, tg = pts[Math.min(n, i + 1)].clone().sub(pts[Math.max(0, i - 1)]).normalize(), sd = perp(tg), up = tg.clone().cross(sd).normalize();
+    if (up.y < 0) up.negate();
+    const w = width(t), nrm = up.clone().add(V(0, flat ? 0.6 : 0.3, 0)).normalize(), wd = wind(t);
+    G.vert(pts[i].clone().addScaledVector(sd, -w), nrm, 0, t, wd); G.vert(pts[i].clone().addScaledVector(sd, w), nrm, uvW * 2 > 1 ? 1 : uvW * 2, t, wd);
+  }
+  for (let i = 0; i < n; i++) { const a = b + i * 2; G.i.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+}
 
 // One plant: { bark, leaf: BufferGeometry, height, radius, crown } — size 0.4..1.2 scales a mature height within the species' range
 export function growPlant(id, { seed = 1, size = 1, detail = 1 } = {}) {
@@ -448,7 +687,10 @@ function addWind(m, wu, leafy, extraFrag = '') {
   m.customProgramCacheKey = () => 'plant-' + (leafy ? 'leaf' : 'bark') + extraFrag.length;
 }
 // autumn: deciduous foliage turns yellow (birch) or russet (oak), each leaf cluster at its own pace
+const autumn = (r, g, b) => `diffuseColor.rgb = mix(diffuseColor.rgb, vec3(${r}, ${g}, ${b}) * (0.7 + 0.5 * dot(diffuseColor.rgb, vec3(1.0))), smoothstep(vPhase * 0.6, vPhase * 0.6 + 0.4, uSeason));`;
 const AUTUMN = {
+  hazel: autumn(0.8, 0.66, 0.2), hawthorn: autumn(0.62, 0.3, 0.12), blackthorn: autumn(0.7, 0.55, 0.18),
+  blueberry: autumn(0.72, 0.16, 0.12), fern: autumn(0.6, 0.34, 0.14),
   birch: 'diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.85, 0.66, 0.16) * (0.7 + 0.5 * dot(diffuseColor.rgb, vec3(1.0))), smoothstep(vPhase * 0.6, vPhase * 0.6 + 0.4, uSeason));',
   oak: 'diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.6, 0.36, 0.14) * (0.7 + 0.5 * dot(diffuseColor.rgb, vec3(1.0))), smoothstep(vPhase * 0.6, vPhase * 0.6 + 0.4, uSeason));',
 };

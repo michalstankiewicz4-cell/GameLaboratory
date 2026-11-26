@@ -1,4 +1,4 @@
-# Plants Lab — trees, palms, shrubs and grass
+# Plants Lab — trees, palms, shrubs, ferns, cacti and grass
 
 `labs/plants.html` (`js/labs/plants/plants.js`), kits `js/models/plants/plantkit.js` (single plants) and `js/models/plants/forestkit.js` (many
 plants: impostors, forests, grass). Everything is grown from code — no image files: bark and foliage are drawn on
@@ -18,6 +18,30 @@ stay in LandKit.
 | Umbrella thorn acacia *Vachellia tortilis* | 5–11 m | desert | short trunk splitting into 3–5 ascending limbs; a wide, flat crown (as wide as the tree is tall or wider) of tiny leaflets, about 1.5 m thick |
 | Common juniper *Juniperus communis* | 1.5–4 m | northern, plains | shrub of 4–8 stems, columnar to spreading, prickly blue-green foliage; on heaths and dry slopes |
 | Desert saltbush *Atriplex* sp. | 0.6–1.4 m | desert | low rounded grey-green mound of small fleshy leaves |
+
+Shrubs, dwarf shrubs, a fern, a hummock grass and cacti (1.8.0):
+
+| Species | Height | Biomes | Habit modelled |
+|---|---|---|---|
+| Common hazel *Corylus avellana* | 3–6 m | northern, plains | 7–14 straight stems from one base fanning out and arching; smooth grey-brown bark with pale lenticels; round, doubly toothed leaves; yellow in autumn. Forest edges, understorey |
+| Common hawthorn *Crataegus monogyna* | 3–7 m | plains, northern | short trunk and a dense rounded crown of crooked twigs; small deeply lobed leaves, dark red haws; russet in autumn. Hedges, copse edges |
+| Blackthorn *Prunus spinosa* | 1.5–4 m | plains, northern | a low thicket of dark spiny stems from the ground; small oval leaves, blue-black sloes with a pale bloom |
+| Bilberry *Vaccinium myrtillus* | 0.2–0.5 m | northern | a low mound of bright oval leaves with dark berries; carpets conifer forests; red in autumn |
+| Common heather *Calluna vulgaris* | 0.25–0.6 m | northern | a cushion of fine scale-leaved shoots with pale purple flower spikes; heaths, pine woods, above the tree line |
+| Bracken *Pteridium aquilinum* | 0.6–1.6 m | northern, plains | 6–12 bipinnate fronds rising from the ground and bending out almost level; rust-brown in autumn |
+| Mountain pine *Pinus mugo* | 1.5–4 m | northern (high) | creeping stems along the ground turning up at the ends with pine needle tufts; a thicket 2–5 m wide in the subalpine belt above the forest |
+| Creosote bush *Larrea tridentata* | 1–3 m | desert | an open vase of 12–22 slender grey stems from the base; tiny dark olive leaflets and small yellow flowers |
+| Desert thorn *Lycium* sp. | 0.8–2 m | desert | a tangle of zigzag grey spiny stems with sparse small fleshy leaves |
+| Spinifex *Triodia* sp. | 0.4–1 m | desert | a hummock of spiky rolled blades, crossed fans densest towards a ring |
+| Saguaro *Carnegiea gigantea* | 4–12 m | desert | a ribbed column (16 ribs in the geometry, areoles on the crests in the bark), up to 5 arms from ~5.5 m tall (the first arms come after 75–100 years) that grow out and turn up; white flowers at the tips |
+| Prickly pear *Opuntia* sp. | 0.8–2.2 m | desert | flat oval pads, each from the rim of another, in a loose fan up to 4 levels; areoles with spines, red fruit on the rims |
+
+**Where they grow** (`scatterArea`): in northern forests an understorey beside the trees (bilberry, bracken, heather
+under pines) and hazel at the forest edges; above the tree line mountain pine, higher heather; open northern ground —
+heather heaths, juniper, hazel near the forest. On the plains hedges of hawthorn, blackthorn and hazel at the copses'
+edges, bracken under the trees. In the desert creosote, saltbush, spinifex, desert thorn and prickly pear on the flats,
+saguaros on stony slopes.
+
 
 Each plant is grown from a seed (the same seed gives the same plant); *Size* scales a mature height inside the species'
 range. Triangles per plant at detail 1: roughly 0.2k (saltbush) … 10k (spruce).
@@ -95,9 +119,15 @@ beyond, grass around the camera; light, fog and wind from the scene. For AI: `Pl
   [Phoenix dactylifera](https://en.wikipedia.org/wiki/Date_palm), [Vachellia tortilis](https://en.wikipedia.org/wiki/Vachellia_tortilis),
   [Juniperus communis](https://en.wikipedia.org/wiki/Juniperus_communis), [Atriplex](https://en.wikipedia.org/wiki/Atriplex)
   — heights and habit; the branching rules are a simplification of those descriptions, not botanical growth models.
+- 1.8.0: [Corylus avellana](https://en.wikipedia.org/wiki/Corylus_avellana), [Crataegus monogyna](https://en.wikipedia.org/wiki/Crataegus_monogyna),
+  [Prunus spinosa](https://en.wikipedia.org/wiki/Prunus_spinosa), [Vaccinium myrtillus](https://en.wikipedia.org/wiki/Vaccinium_myrtillus),
+  [Calluna vulgaris](https://en.wikipedia.org/wiki/Calluna), [Pteridium aquilinum](https://en.wikipedia.org/wiki/Pteridium_aquilinum),
+  [Pinus mugo](https://en.wikipedia.org/wiki/Pinus_mugo), [Larrea tridentata](https://en.wikipedia.org/wiki/Larrea_tridentata),
+  [Lycium](https://en.wikipedia.org/wiki/Lycium), [Triodia](https://en.wikipedia.org/wiki/Triodia_(plant)),
+  [Carnegiea gigantea](https://en.wikipedia.org/wiki/Saguaro), [Opuntia](https://en.wikipedia.org/wiki/Opuntia).
 
 ## Not yet
 
-Flowers and undergrowth (ferns, heather as objects, reeds at the water), fallen trees and dead wood, a smooth
+Flowers and more undergrowth (reeds at the water), fallen trees and dead wood, a smooth
 cross-fade between full models and impostors (now a hard switch at the distance), impostors with autumn colours
 (they keep the summer bake), plants in the Land Lab and the game, rocks (their own lab).

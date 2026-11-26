@@ -3,6 +3,22 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.105.0 · rośliny 1.8.0 · doktor 1.5.0 · edytor sceny 0.56.0 — 2026-11-26 (krzewy i kaktusy)
+
+### Dodane
+- **12 nowych roślin** (PlantKit): leszczyna, głóg, tarnina (krzewy), borówka czarna i wrzos (krzewinki), orlica
+  (paproć), kosodrzewina (płożąca sosna), krzew kreozotowy, kolcowój, spinifeks (kępa trawy), saguaro i opuncja
+  (kaktusy) — każda z własnym pokrojem, korą i liśćmi rysowanymi w kodzie; jesienią leszczyna żółknie, głóg
+  i orlica rdzawieją, borówka czerwienieje. Saguaro ma żebra w bryle i ramiona dopiero od ok. 5,5 m (część nigdy).
+- **Gdzie rosną** (roślinność na terenie): runo w lasach północy (borówka, orlica, wrzos pod sosnami), leszczyna na
+  skrajach lasu, nad granicą lasu kosodrzewina, wyżej wrzos; na równinach żywopłoty z głogu, tarniny i leszczyny na
+  skrajach zagajników; na pustyni kreozot, łoboda, spinifeks, kolcowój i opuncje na równinach, saguaro na
+  kamienistych stokach.
+- Doktor modeli sprawdza też skały (RockKit: 4 rodzaje × 5 kształtów).
+
+### Zmienione
+- Laboratorium roślin: kamera podchodzi bliżej do niskich roślin (krzewinki, kępy), można ją przybliżyć do 0,6 m.
+
 ## Program 0.104.0 · skały 1.1.0 · edytor sceny 0.55.0 — 2026-11-26 (skały na terenie)
 
 ### Dodane

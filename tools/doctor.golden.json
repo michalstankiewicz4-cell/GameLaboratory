@@ -538,6 +538,103 @@
    "triangles": 1394
   }
  },
+ "plants/blackthorn": {
+  "counts": {
+   "seethrough": 1
+  },
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 2,
+   "size": [
+    3.59,
+    2.5,
+    3.39
+   ],
+   "triangles": 300
+  }
+ },
+ "plants/blueberry": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    1.34,
+    0.56,
+    1.36
+   ],
+   "triangles": 132
+  }
+ },
+ "plants/creosote": {
+  "counts": {
+   "seethrough": 1
+  },
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 2,
+   "size": [
+    1.29,
+    1.64,
+    1.75
+   ],
+   "triangles": 432
+  }
+ },
+ "plants/fern": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    2.91,
+    0.99,
+    2.29
+   ],
+   "triangles": 140
+  }
+ },
+ "plants/hawthorn": {
+  "counts": {
+   "seethrough": 1
+  },
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 2,
+   "size": [
+    3.61,
+    4.07,
+    3.58
+   ],
+   "triangles": 642
+  }
+ },
+ "plants/hazel": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 2,
+   "size": [
+    6.41,
+    3.37,
+    6.72
+   ],
+   "triangles": 474
+  }
+ },
+ "plants/heather": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    1.37,
+    0.61,
+    1.36
+   ],
+   "triangles": 120
+  }
+ },
  "plants/juniper": {
   "counts": {
    "seethrough": 1
@@ -553,6 +650,19 @@
    "triangles": 204
   }
  },
+ "plants/mugo": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 2,
+   "size": [
+    6.28,
+    4.62,
+    7.19
+   ],
+   "triangles": 936
+  }
+ },
  "plants/oak": {
   "counts": {
    "seethrough": 1
@@ -566,6 +676,21 @@
     18.7
    ],
    "triangles": 1420
+  }
+ },
+ "plants/opuntia": {
+  "counts": {
+   "seethrough": 1
+  },
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 2,
+   "size": [
+    0.96,
+    1.66,
+    2.65
+   ],
+   "triangles": 48
   }
  },
  "plants/palm": {
@@ -598,6 +723,21 @@
    "triangles": 1840
   }
  },
+ "plants/saguaro": {
+  "counts": {
+   "seethrough": 1
+  },
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 2,
+   "size": [
+    0.74,
+    7.57,
+    0.74
+   ],
+   "triangles": 772
+  }
+ },
  "plants/saltbush": {
   "counts": {},
   "fingerprint": {
@@ -609,6 +749,19 @@
     2.02
    ],
    "triangles": 204
+  }
+ },
+ "plants/spinifex": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    0.93,
+    0.48,
+    0.89
+   ],
+   "triangles": 56
   }
  },
  "plants/spruce": {
@@ -624,6 +777,21 @@
     12.59
    ],
    "triangles": 10144
+  }
+ },
+ "plants/thornbush": {
+  "counts": {
+   "seethrough": 1
+  },
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 2,
+   "size": [
+    2.17,
+    2.11,
+    2.17
+   ],
+   "triangles": 168
   }
  },
  "road/abrams": {
@@ -687,6 +855,266 @@
     18.48
    ],
    "triangles": 81376
+  }
+ },
+ "rocks/basalt-block": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    1.6,
+    1.21,
+    1.2
+   ],
+   "triangles": 1620
+  }
+ },
+ "rocks/basalt-boulder": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    1.6,
+    1.09,
+    1.41
+   ],
+   "triangles": 1620
+  }
+ },
+ "rocks/basalt-pebble": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    1.6,
+    0.83,
+    1.2
+   ],
+   "triangles": 500
+  }
+ },
+ "rocks/basalt-slab": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    1.6,
+    0.44,
+    1.28
+   ],
+   "triangles": 1620
+  }
+ },
+ "rocks/basalt-spire": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    0.8,
+    1.54,
+    0.72
+   ],
+   "triangles": 1620
+  }
+ },
+ "rocks/granite-block": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    1.6,
+    1.21,
+    1.2
+   ],
+   "triangles": 1620
+  }
+ },
+ "rocks/granite-boulder": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    1.6,
+    1.09,
+    1.41
+   ],
+   "triangles": 1620
+  }
+ },
+ "rocks/granite-pebble": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    1.6,
+    0.83,
+    1.2
+   ],
+   "triangles": 500
+  }
+ },
+ "rocks/granite-slab": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    1.6,
+    0.44,
+    1.28
+   ],
+   "triangles": 1620
+  }
+ },
+ "rocks/granite-spire": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    0.8,
+    1.54,
+    0.72
+   ],
+   "triangles": 1620
+  }
+ },
+ "rocks/limestone-block": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    1.6,
+    1.21,
+    1.2
+   ],
+   "triangles": 1620
+  }
+ },
+ "rocks/limestone-boulder": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    1.6,
+    1.09,
+    1.41
+   ],
+   "triangles": 1620
+  }
+ },
+ "rocks/limestone-pebble": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    1.6,
+    0.83,
+    1.2
+   ],
+   "triangles": 500
+  }
+ },
+ "rocks/limestone-slab": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    1.6,
+    0.43,
+    1.28
+   ],
+   "triangles": 1620
+  }
+ },
+ "rocks/limestone-spire": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    0.8,
+    1.54,
+    0.72
+   ],
+   "triangles": 1620
+  }
+ },
+ "rocks/sandstone-block": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    1.6,
+    1.21,
+    1.2
+   ],
+   "triangles": 1620
+  }
+ },
+ "rocks/sandstone-boulder": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    1.6,
+    1.09,
+    1.41
+   ],
+   "triangles": 1620
+  }
+ },
+ "rocks/sandstone-pebble": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    1.6,
+    0.83,
+    1.2
+   ],
+   "triangles": 500
+  }
+ },
+ "rocks/sandstone-slab": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    1.6,
+    0.43,
+    1.28
+   ],
+   "triangles": 1620
+  }
+ },
+ "rocks/sandstone-spire": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    0.8,
+    1.54,
+    0.72
+   ],
+   "triangles": 1620
   }
  },
  "sea/game/bb": {

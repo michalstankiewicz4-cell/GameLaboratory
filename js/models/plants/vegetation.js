@@ -57,24 +57,31 @@ export function scatterArea(T, x0, z0, x1, z1, { density = 1, forestSeed } = {},
     if (sl > 0.7) continue;
     const b = biomeAt(T, mx, mz), u = mx / size, v = mz / size, dw = water(mx, mz);
     const forestN = forestNoise(u, v, fs);
-    let id = null;
+    let id = null, under = null;                                        // under: runo (krzewinki, paprocie) obok drzewa w lesie
     const roll = r();
     if (roll < b.temperate) {                                            // północ: lasy świerkowe i sosnowe, brzozy na skrajach, jałowiec na wrzosowisku
-      if (rel(h) > 0.55 || sl > 0.55) continue;
-      if (forestN > 0.0) id = pick([['spruce', 0.55 - rel(h) * 0.4], ['pine', 0.3 + rel(h) * 0.4 + (sl > 0.3 ? 0.3 : 0)], ['birch', forestN < 0.12 ? 0.35 : 0.1]]);
-      else if (r() < 0.12) id = pick([['birch', 0.5], ['juniper', 0.8], ['pine', 0.2]]);
-    } else if (roll < b.temperate + b.plains) {                         // równiny: zagajniki dębów i brzóz, samotne dęby w polach, brzozy nad wodą
-      if (forestN > 0.18) id = pick([['oak', 0.5], ['birch', 0.3], ['pine', 0.2]]);
+      if (rel(h) > 0.55 || sl > 0.55) {                                 // nad granicą lasu: kosodrzewina, wyżej wrzos
+        if (sl < 0.62 && rel(h) < 0.8 && r() < 0.35) id = rel(h) < 0.7 ? 'mugo' : 'heather';
+      } else if (forestN > 0.0) {
+        id = pick([['spruce', 0.55 - rel(h) * 0.4], ['pine', 0.3 + rel(h) * 0.4 + (sl > 0.3 ? 0.3 : 0)], ['birch', forestN < 0.12 ? 0.35 : 0.1], ['hazel', forestN < 0.06 ? 0.25 : 0.03]]);
+        if (r() < 0.6) under = pick([['blueberry', 0.55], ['fern', 0.3], ['heather', id === 'pine' ? 0.25 : 0.03]]);
+      } else if (r() < (forestN > -0.06 ? 0.2 : 0.12)) id = pick([['birch', 0.5], ['juniper', 0.8], ['pine', 0.2], ['heather', 1.2], ['hazel', forestN > -0.06 ? 0.6 : 0.05], ['fern', 0.3]]);
+    } else if (roll < b.temperate + b.plains) {                         // równiny: zagajniki dębów i brzóz, samotne dęby w polach, brzozy nad wodą, krzewy na skrajach
+      if (forestN > 0.18) { id = pick([['oak', 0.5], ['birch', 0.3], ['pine', 0.2], ['hazel', 0.15]]); if (r() < 0.35) under = pick([['fern', 0.6], ['hazel', 0.2]]); }
+      else if (forestN > 0.1 && r() < 0.25) id = pick([['hawthorn', 0.4], ['blackthorn', 0.4], ['hazel', 0.2]]);   // skraj zagajnika: żywopłot krzewów
       else if (dw < 60 && r() < 0.3) id = 'birch';
       else if (r() < 0.02) id = 'oak';
       else if (r() < 0.02) id = 'juniper';
-    } else {                                                            // pustynia: palmy w oazach przy wodzie, akacje tu i tam, zarośla łobody
+      else if (r() < 0.015) id = pick([['hawthorn', 0.5], ['blackthorn', 0.5]]);
+    } else {                                                            // pustynia: palmy w oazach przy wodzie, akacje, krzewy kreozotowe, kępy, kaktusy
       if (dw < 110 && h < 8) { if (r() < 0.3) id = 'palm'; }
       else if (r() < 0.03 && sl < 0.3) id = 'acacia';
-      else if (r() < 0.12 && sl < 0.4) id = 'saltbush';
+      else if (r() < 0.012 && sl > 0.05 && sl < 0.45) id = 'saguaro';   // na kamienistych stokach
+      else if (r() < 0.1 && sl < 0.35) id = pick([['saltbush', 0.35], ['creosote', 0.4], ['spinifex', 0.35], ['thornbush', 0.12], ['opuntia', 0.12]]);
     }
     if (!id) continue;
     out.push({ id, x: px, y: h - 0.05, z: pz, yaw: r() * 6.283, s: 0.75 + r() * 0.45, v: Math.floor(r() * 3) });
+    if (under) { const ux = px + (r() - 0.5) * step * 0.8, uz = pz + (r() - 0.5) * step * 0.8; out.push({ id: under, x: ux, y: sampleHeight(T, wrap(ux), wrap(uz)) - 0.03, z: uz, yaw: r() * 6.283, s: 0.75 + r() * 0.45, v: Math.floor(r() * 3) }); }
   }
   return out;
 }

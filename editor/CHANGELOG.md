@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.56.0 — 2026-11-26
+
+### Dodane
+- Rośliny: 12 nowych gatunków w rodzinie Rośliny (krzewy, krzewinki, paproć, kosodrzewina, krzewy pustynne, kaktusy)
+  i w roślinności na terenie (runo w lasach, żywopłoty, krzewy pustyni, saguaro na stokach).
+
 ## 0.55.0 — 2026-11-26
 
 ### Dodane

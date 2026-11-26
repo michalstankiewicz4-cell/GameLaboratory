@@ -14,6 +14,7 @@ import { models as weaponModels } from './sources/weapons.js';
 import { models as junkModels } from './sources/junkyard.js';
 import { models as cityModels } from './sources/city.js';
 import { models as plantModels } from './sources/plants.js';
+import { models as rockModels } from './sources/rocks.js';
 import { models as testModels } from './sources/test-bench.js';
 
 const $ = (id) => document.getElementById(id);
@@ -21,7 +22,7 @@ const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag)
 const params = new URLSearchParams(location.search);
 
 /* ---------------- the models ---------------- */
-const MODELS = [...spaceModels(), ...seaModels, ...trainModels, ...roadModels, ...tramModels, ...airModels, ...weaponModels, ...junkModels, ...cityModels, ...plantModels, ...testModels];
+const MODELS = [...spaceModels(), ...seaModels, ...trainModels, ...roadModels, ...tramModels, ...airModels, ...weaponModels, ...junkModels, ...cityModels, ...plantModels, ...rockModels, ...testModels];
 
 /* ---------------- examining ---------------- */
 const report = { done: false, models: {} };
