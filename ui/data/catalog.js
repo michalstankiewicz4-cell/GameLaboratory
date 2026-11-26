@@ -336,6 +336,23 @@ window.GameLabCatalog =
       }
     },
     {
+      "file": "labs/streets.html",
+      "cat": "world",
+      "name": "Streets lab",
+      "namePl": "Laboratorium ulic",
+      "doc": "docs/labs/streets.md",
+      "desc": "Streets from code at real scale: city streets, avenues, country roads, paths and cycle paths with kerbs and paving slabs; crossings with traffic lights, viaducts, tunnels, an underpass, a pedestrian subway, footbridges, street lamps, Polish road signs, bollards, railings, noise walls and parking spaces.",
+      "descPl": "Ulice z kodu w prawdziwej skali: miejskie, aleje, drogi wiejskie, ścieżki i drogi dla rowerów z krawężnikami i płytami chodnikowymi; skrzyżowania z sygnalizacją, wiadukty, tunele, tunel pod terenem, przejście podziemne, kładki, latarnie, polskie znaki drogowe, słupki, barierki, ekrany dźwiękochłonne i miejsca parkingowe.",
+      "kind": "lab",
+      "kit": "StreetKit",
+      "phrases": ["ląd", "ulice", "drogi", "miasto", "skrzyżowania", "wiadukty"],
+      "saved": ["gameLab.streets."],
+      "art": {
+        "bg": ["#2b2f33", "#121416"],
+        "svg": "<path d=\"M0 92 H200\" stroke=\"#4f5a50\" stroke-width=\"2\"/><path d=\"M0 70 H200 V92 H0 Z\" fill=\"#3a3d40\"/><path d=\"M0 66 H200 V70 H0 Z\" fill=\"#9a9890\"/><path d=\"M0 92 H200 V96 H0 Z\" fill=\"#9a9890\"/><g stroke=\"#e8e8e2\" stroke-width=\"2\"><path d=\"M8 81 H28 M44 81 H64 M80 81 H100 M116 81 H136 M152 81 H172 M188 81 H200\"/></g><path d=\"M150 66 V22 Q150 16 158 16 H172\" stroke=\"#9aa0a3\" stroke-width=\"3\" fill=\"none\"/><rect x=\"166\" y=\"14\" width=\"14\" height=\"5\" fill=\"#f2d88a\"/><rect x=\"40\" y=\"34\" width=\"10\" height=\"26\" fill=\"#1c1d1f\"/><circle cx=\"45\" cy=\"40\" r=\"3\" fill=\"#ff2a14\"/><circle cx=\"45\" cy=\"47\" r=\"3\" fill=\"#4a3a10\"/><circle cx=\"45\" cy=\"54\" r=\"3\" fill=\"#123a22\"/><path d=\"M45 60 V66\" stroke=\"#9aa0a3\" stroke-width=\"2\"/>"
+      }
+    },
+    {
       "file": "labs/plants.html",
       "cat": "world",
       "name": "Plants lab",
@@ -827,6 +844,10 @@ window.GameLabCatalog =
     "opony": "tyres",
     "deformacja": "deformation",
     "zniszczenie": "destruction",
+    "ulice": "streets",
+    "drogi": "roads",
+    "skrzyżowania": "crossings",
+    "wiadukty": "viaducts",
     "ulepszenia": "upgrades",
     "badania": "research",
     "sztuka": "art",

@@ -1624,6 +1624,699 @@
    "triangles": 4168
   }
  },
+ "streets/bollards-chain": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 2,
+   "size": [
+    6.24,
+    1.08,
+    0.24
+   ],
+   "triangles": 708
+  }
+ },
+ "streets/bollards-concrete": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 1,
+   "size": [
+    6.6,
+    0.6,
+    0.6
+   ],
+   "triangles": 192
+  }
+ },
+ "streets/bollards-delineator": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 4,
+   "materials": 3,
+   "size": [
+    4.11,
+    1,
+    0.12
+   ],
+   "triangles": 48
+  }
+ },
+ "streets/bollards-steel": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 4,
+   "materials": 2,
+   "size": [
+    6.12,
+    1,
+    0.12
+   ],
+   "triangles": 256
+  }
+ },
+ "streets/bollards-warsaw": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 4,
+   "materials": 1,
+   "size": [
+    6.24,
+    1.08,
+    0.24
+   ],
+   "triangles": 608
+  }
+ },
+ "streets/crossing-3": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 89,
+   "materials": 5,
+   "size": [
+    78.5,
+    0.17,
+    48.5
+   ],
+   "triangles": 4932
+  }
+ },
+ "streets/crossing-4": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 121,
+   "materials": 5,
+   "size": [
+    78.5,
+    0.17,
+    78.5
+   ],
+   "triangles": 6354
+  }
+ },
+ "streets/footbridge": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 128,
+   "materials": 5,
+   "size": [
+    14.67,
+    6.47,
+    24.46
+   ],
+   "triangles": 3396
+  }
+ },
+ "streets/footbridge-back": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 142,
+   "materials": 5,
+   "size": [
+    9.86,
+    6.47,
+    25.45
+   ],
+   "triangles": 3744
+  }
+ },
+ "streets/footbridge-lift": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 168,
+   "materials": 7,
+   "size": [
+    17.24,
+    8.64,
+    24.46
+   ],
+   "triangles": 3616
+  }
+ },
+ "streets/lamp-double": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 8,
+   "materials": 4,
+   "size": [
+    0.28,
+    9.34,
+    4.12
+   ],
+   "triangles": 224
+  }
+ },
+ "streets/lamp-modern": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 3,
+   "size": [
+    0.28,
+    8.34,
+    2.19
+   ],
+   "triangles": 160
+  }
+ },
+ "streets/lamp-old": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 4,
+   "materials": 4,
+   "size": [
+    0.3,
+    9.11,
+    1.9
+   ],
+   "triangles": 68
+  }
+ },
+ "streets/lamp-park": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 9,
+   "materials": 2,
+   "size": [
+    0.48,
+    4.9,
+    0.56
+   ],
+   "triangles": 740
+  }
+ },
+ "streets/milepost-hm": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 6,
+   "materials": 2,
+   "size": [
+    0.12,
+    0.8,
+    0.12
+   ],
+   "triangles": 12
+  }
+ },
+ "streets/milepost-km": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 7,
+   "materials": 3,
+   "size": [
+    0.15,
+    1.11,
+    0.23
+   ],
+   "triangles": 24
+  }
+ },
+ "streets/noise-glass": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 8,
+   "materials": 4,
+   "size": [
+    12.2,
+    4.05,
+    0.3
+   ],
+   "triangles": 256
+  }
+ },
+ "streets/noise-metal": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 11,
+   "materials": 4,
+   "size": [
+    12.2,
+    4.05,
+    0.3
+   ],
+   "triangles": 308
+  }
+ },
+ "streets/noise-mixed": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 13,
+   "materials": 5,
+   "size": [
+    12.2,
+    4.05,
+    0.3
+   ],
+   "triangles": 404
+  }
+ },
+ "streets/parking-angled": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 3,
+   "materials": 3,
+   "size": [
+    31.86,
+    0,
+    5.72
+   ],
+   "triangles": 32
+  }
+ },
+ "streets/parking-parallel": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 3,
+   "materials": 3,
+   "size": [
+    30.12,
+    0,
+    2.62
+   ],
+   "triangles": 26
+  }
+ },
+ "streets/parking-perpendicular": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 3,
+   "materials": 3,
+   "size": [
+    32.32,
+    0,
+    5.12
+   ],
+   "triangles": 38
+  }
+ },
+ "streets/rail-city": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 4,
+   "materials": 1,
+   "size": [
+    10.06,
+    1.02,
+    0.06
+   ],
+   "triangles": 420
+  }
+ },
+ "streets/rail-guardrail": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 3,
+   "materials": 1,
+   "size": [
+    10,
+    0.85,
+    0.34
+   ],
+   "triangles": 344
+  }
+ },
+ "streets/rail-u12a": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 4,
+   "materials": 2,
+   "size": [
+    10.14,
+    1.13,
+    0.14
+   ],
+   "triangles": 436
+  }
+ },
+ "streets/sign-A-16": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 5,
+   "size": [
+    0.9,
+    2.79,
+    0.07
+   ],
+   "triangles": 68
+  }
+ },
+ "streets/sign-A-17": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 5,
+   "size": [
+    0.9,
+    2.79,
+    0.07
+   ],
+   "triangles": 68
+  }
+ },
+ "streets/sign-A-7": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 5,
+   "size": [
+    0.9,
+    2.79,
+    0.07
+   ],
+   "triangles": 68
+  }
+ },
+ "streets/sign-B-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 5,
+   "size": [
+    0.6,
+    2.59,
+    0.07
+   ],
+   "triangles": 68
+  }
+ },
+ "streets/sign-B-2": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 5,
+   "size": [
+    0.6,
+    2.59,
+    0.07
+   ],
+   "triangles": 68
+  }
+ },
+ "streets/sign-B-20": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 5,
+   "size": [
+    0.6,
+    2.59,
+    0.07
+   ],
+   "triangles": 68
+  }
+ },
+ "streets/sign-B-33": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 5,
+   "size": [
+    0.6,
+    2.59,
+    0.07
+   ],
+   "triangles": 68
+  }
+ },
+ "streets/sign-B-36": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 5,
+   "size": [
+    0.6,
+    2.59,
+    0.07
+   ],
+   "triangles": 68
+  }
+ },
+ "streets/sign-C-12": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 5,
+   "size": [
+    0.6,
+    2.59,
+    0.07
+   ],
+   "triangles": 68
+  }
+ },
+ "streets/sign-C-13": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 5,
+   "size": [
+    0.6,
+    2.59,
+    0.07
+   ],
+   "triangles": 68
+  }
+ },
+ "streets/sign-D-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 5,
+   "size": [
+    0.85,
+    2.75,
+    0.07
+   ],
+   "triangles": 68
+  }
+ },
+ "streets/sign-D-18": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 5,
+   "size": [
+    0.6,
+    2.59,
+    0.07
+   ],
+   "triangles": 68
+  }
+ },
+ "streets/sign-D-18-T-29": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 7,
+   "materials": 7,
+   "size": [
+    0.6,
+    2.59,
+    0.07
+   ],
+   "triangles": 72
+  }
+ },
+ "streets/sign-D-6": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 5,
+   "size": [
+    0.6,
+    2.59,
+    0.07
+   ],
+   "triangles": 68
+  }
+ },
+ "streets/signal": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 16,
+   "materials": 10,
+   "size": [
+    0.68,
+    4.46,
+    0.63
+   ],
+   "triangles": 560
+  }
+ },
+ "streets/signal-arm": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 17,
+   "materials": 10,
+   "size": [
+    4.13,
+    5.66,
+    0.49
+   ],
+   "triangles": 648
+  }
+ },
+ "streets/street-avenue": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 23,
+   "materials": 7,
+   "size": [
+    40,
+    0.17,
+    23.3
+   ],
+   "triangles": 3680
+  }
+ },
+ "streets/street-city": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 18,
+   "materials": 5,
+   "size": [
+    40,
+    0.17,
+    14.8
+   ],
+   "triangles": 1830
+  }
+ },
+ "streets/street-curve": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 20,
+   "materials": 5,
+   "size": [
+    46.57,
+    0.17,
+    39.29
+   ],
+   "triangles": 2468
+  }
+ },
+ "streets/street-cycle": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 16,
+   "materials": 4,
+   "size": [
+    40,
+    0.06,
+    6.4
+   ],
+   "triangles": 1510
+  }
+ },
+ "streets/street-path": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 7,
+   "materials": 2,
+   "size": [
+    40,
+    0.09,
+    1.96
+   ],
+   "triangles": 1120
+  }
+ },
+ "streets/street-village": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 9,
+   "materials": 3,
+   "size": [
+    40,
+    0.18,
+    10.2
+   ],
+   "triangles": 1440
+  }
+ },
+ "streets/subway": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 24,
+   "materials": 5,
+   "size": [
+    4.6,
+    4.8,
+    34.82
+   ],
+   "triangles": 796
+  }
+ },
+ "streets/trough": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 12,
+   "materials": 1,
+   "size": [
+    60,
+    7.05,
+    19.1
+   ],
+   "triangles": 1944
+  }
+ },
+ "streets/tunnel-arch": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 7,
+   "materials": 4,
+   "size": [
+    61,
+    12.9,
+    38.3
+   ],
+   "triangles": 7148
+  }
+ },
+ "streets/tunnel-box": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 8,
+   "materials": 4,
+   "size": [
+    61,
+    7.9,
+    46.5
+   ],
+   "triangles": 1520
+  }
+ },
+ "streets/viaduct": {
+  "counts": {
+   "speck": 1
+  },
+  "fingerprint": {
+   "drawCalls": 231,
+   "materials": 200,
+   "size": [
+    190.03,
+    10.28,
+    22.26
+   ],
+   "triangles": 19780
+  }
+ },
+ "streets/viaduct-curve": {
+  "counts": {
+   "speck": 1
+  },
+  "fingerprint": {
+   "drawCalls": 271,
+   "materials": 234,
+   "size": [
+    191.83,
+    11.8,
+    104.8
+   ],
+   "triangles": 23214
+  }
+ },
  "test/bench": {
   "counts": {
    "arc": 1,

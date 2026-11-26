@@ -3,6 +3,21 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.108.0 · ulice 1.0.0 · doktor modeli 1.8.0 — 2026-11-26 (laboratorium ulic z Tornado.io)
+
+### Dodane
+- **Laboratorium ulic** (`labs/streets.html`, kategoria Świat, obok laboratorium miasta): 22 próbki — prosta ulica, łuk,
+  skrzyżowania (4 i 3 wloty, sygnalizatory, znaki), aleja, droga wiejska, ścieżka, droga dla rowerów, sygnalizator,
+  wiadukty (prosty, na łuku, łącznica), tunele (przez górę, z podporami, pod równym terenem), kładki (schody, schody
+  naprzemienne, winda), przejście podziemne, latarnie i znaki, słupki, barierki i ekrany, miejsca parkingowe. Okna
+  Section, Street furniture, Traffic lights; scena bazowa laboratoriów (niebo, pogoda, także zmienna, słońce).
+  `StreetsApi`. Pliki: `js/labs/streets/` (`streets.js`, `scenes.js`, `build.js`, `ground.js`, `en.js`).
+- **StreetKit** (`js/models/streets/`): plik z Tornado.io (1193 linie) podzielony na 13 części (nawierzchnie i przekroje,
+  geometria, ulica i skrzyżowanie, sygnalizator, latarnie, znaki, wiadukt, słupki i barierki, pikietaż, parkingi, tunele,
+  kładka, przejście podziemne); `streetkit.js` eksportuje całość jak dotąd. Opis: `docs/models/streets.md`.
+- `js/labs/shared/saved.js` (z Tornado.io): ostrożne wczytywanie zapisanych ustawień laboratorium.
+- Doktor modeli: ulice (`streets/…`, 53 modele; czyste, poza informacją o drobnych słupkach poręczy wiaduktu).
+
 ## Program 0.107.0 · miasto 1.3.0 · doktor modeli 1.7.0 — 2026-11-26 (zniszczenie z Tornado.io)
 
 ### Dodane

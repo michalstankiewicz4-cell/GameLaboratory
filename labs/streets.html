@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Streets Lab — procedural streets, crossings, viaducts and tunnels | GameLaboratory</title>
+<meta name="description" content="GameLaboratory streets lab: streets from code at real scale — city streets, avenues, country roads, crossings with traffic lights, viaducts, tunnels, footbridges, a pedestrian subway, street lamps, Polish road signs, bollards, railings, noise walls and parking spaces.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/streets.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Streets Lab — procedural streets and road structures">
+<meta property="og:description" content="Streets, crossings, viaducts, tunnels, footbridges, lamps and road signs built from code.">
+<meta property="og:url" content="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/streets.html">
+<meta property="og:image" content="https://michalstankiewicz4-cell.github.io/GameLaboratory/assets/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="../assets/favicon-32.png">
+<link rel="stylesheet" href="../ui/style/sea.css">
+<link rel="stylesheet" href="../ui/ui.css">
+</head>
+<!-- Laboratorium ulic (js/labs/streets/, z Tornado.io): próbki StreetKit (js/models/streets/). -->
+<body class="lab viewFits">
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/shell/menubar.js"></script>
+<script src="../ui/shell/loader.js"></script>
+<div id="view"></div>
+<div class="bar">
+  <select id="scene" aria-label="Sample" title="What to show"></select>
+  <select id="profile" aria-label="Section" title="The route's cross-section"></select>
+  <span class="sp"></span>
+  <span class="dimtxt" id="status"></span>
+</div>
+<aside class="panel" data-std="info">
+  <h2 class="stdName" id="sName"></h2>
+  <p class="stdText" id="sNote"></p>
+  <div class="stats" id="sStats"></div>
+  <p class="note">For AI: StreetsApi in the console.</p>
+</aside>
+<aside class="panel" data-window="section" data-title="Section" data-title-pl="Przekrój">
+  <h3>Road</h3>
+  <div class="row"><span>Lanes</span><input type="range" id="lanes" min="1" max="4" step="1"><output id="lanesV"></output></div>
+  <div class="row"><span>Lane width</span><input type="range" id="laneW" min="1.5" max="4" step="0.05"><output id="laneWV"></output></div>
+  <div class="row"><span>Surface</span><select id="road"></select><output></output></div>
+  <label class="chk"><input type="checkbox" id="marks"> Road markings</label>
+  <h3>Pavement</h3>
+  <div class="row"><span>Width</span><input type="range" id="walkW" min="0" max="6" step="0.1"><output id="walkWV"></output></div>
+  <div class="row"><span>Kerb</span><input type="range" id="curbH" min="0" max="0.25" step="0.01"><output id="curbHV"></output></div>
+  <div class="row"><span>Surface</span><select id="walk" title="A kind of paving slabs or another surface"></select><output></output></div>
+  <h3>Crossing</h3>
+  <div class="row"><span>Kerb radius</span><input type="range" id="corner" min="4" max="15" step="0.5"><output id="cornerV"></output></div>
+  <p class="note">A cross-section is strips from the axis outwards: road, kerb, pavement, green strip (or a gravel shoulder). Surfaces from MatKit, markings in paint. Sizes in metres, as on Polish streets.</p>
+</aside>
+<aside class="panel" data-window="furniture" data-title="Street furniture" data-title-pl="Wyposażenie">
+  <h3>Lamps</h3>
+  <label class="chk"><input type="checkbox" id="lamps"> Lamps along the streets</label>
+  <div class="row"><span>Kind</span><select id="lampType"></select><output></output></div>
+  <div class="row"><span>Every</span><input type="range" id="lampEvery" min="15" max="50" step="1"><output id="lampEveryV"></output></div>
+  <div class="row"><span>Lit</span><select id="lampsOn"><option value="auto">After dusk</option><option value="on">Always</option><option value="off">Never</option></select><output></output></div>
+  <h3>Signs</h3>
+  <label class="chk"><input type="checkbox" id="signs"> Signs at crossings</label>
+  <h3>Parking</h3>
+  <div class="row"><span>Spaces</span><select id="parking" title="A parking lane by the road (samples with one line, a two-lane street)"></select><output></output></div>
+  <label class="chk"><input type="checkbox" id="parkDisabled"> Spaces for disabled people</label>
+  <h3>Bollards and railings</h3>
+  <label class="chk"><input type="checkbox" id="bollards"> Bollards by the kerb</label>
+  <div class="row"><span>Bollard</span><select id="bollardType"></select><output></output></div>
+  <label class="chk"><input type="checkbox" id="rails"> Railing by the kerb</label>
+  <div class="row"><span>Railing</span><select id="railType"></select><output></output></div>
+  <label class="chk"><input type="checkbox" id="mileposts"> Mileposts every 100 m</label>
+  <h3>Noise walls</h3>
+  <label class="chk"><input type="checkbox" id="noise"> Noise walls along the street and on viaducts</label>
+  <div class="row"><span>Kind</span><select id="noiseType"></select><output></output></div>
+  <div class="row"><span>Height</span><input type="range" id="noiseH" min="2" max="6" step="0.5"><output id="noiseHV"></output></div>
+  <p class="note">The Lamps and signs sample shows every kind of lamp and sign. After dusk (the sun below 4°) the lamps light up and light the street.</p>
+</aside>
+<aside class="panel" data-window="signals" data-title="Traffic lights" data-title-pl="Sygnalizacja">
+  <div class="row"><span>Mode</span><select id="signal" title="The lights' cycle or a fixed state"></select><output></output></div>
+  <div class="row"><span>Now</span><b id="sigNow">—</b><output></output></div>
+  <p class="note">The Polish cycle: green 20 s, amber 3 s, red, red and amber 1.5 s; two phases in turn with 2 s of red everywhere. Traffic lights stand at the crossings and in the Traffic lights sample.</p>
+</aside>
+<aside class="panel" data-std="camera">
+  <div class="btns" id="cams"></div>
+  <p class="note">Drag to orbit, wheel to zoom.</p>
+</aside>
+<aside class="panel" data-std="light">
+  <div class="row"><span>Weather</span><select id="weather"></select><output></output></div>
+  <div class="row"><span>Sun height</span><input type="range" id="sunEl" min="-6" max="70" step="1"><output id="sunElV"></output></div>
+  <div class="row"><span>Sun bearing</span><input type="range" id="sunAz" min="0" max="360" step="2"><output id="sunAzV"></output></div>
+</aside>
+<aside class="panel" data-std="perf">
+  <div class="stats" id="stats"></div>
+</aside>
+<div class="foot">
+  <span id="fps"></span>
+  <span class="sp"></span>
+  <span>GameLaboratory</span>
+</div>
+<script src="../ui/shell/perf.js"></script>
+<script src="../ui/shell/labwin.js"></script>
+<script src="../ui/shell/windows.js"></script>
+<script type="module" src="../js/labs/streets/streets.js"></script>
+</body>
+</html>
