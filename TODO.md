@@ -8,6 +8,47 @@ Propozycje czekające na decyzję i rzeczy odłożone. Zrobione przenoś do `CHA
 - Kreator budynków — etap 2 (CityExplorer: budynki z obrysów OSM z CityKit) odłożony: gry CityExplorer już nie
   rozwijamy (właściciel, 2026-11-21). Etap 1 — laboratorium miasta (0.82.0–0.83.0, adresy 0.89.1).
 
+## Teren i pogoda — dalsze etapy (właściciel, 2026-11-21)
+Etapy 1–3 zrobione (0.100.0–0.104.0: cienie nierówności, nawierzchnia i ściółka, laboratorium skał i skały na terenie).
+- [ ] **Etap 4 — krzaki i kaktusy** (laboratorium roślin): leszczyna, głóg, tarnina; borówka, wrzos, paprocie;
+  kosodrzewina; krzewy pustynne (kreozot, kolczaste, kępy suchych traw); kaktusy.
+- [ ] **Etap 5 — nowe biomy** (laboratorium lądu): tajga i tundra, góry (alpejski), step i sawanna, mokradła — grunt,
+  roślinność, skały. Duże: dzielić na części.
+- [ ] **Rzeczy niesione wiatrem** (jak w GTA): liście, gazety, śmieci, kurz — efekt, nie obiekty gry; lista z włączaniem
+  i wyłączaniem zależnie od środowiska (miasto, las, pustynia).
+- [ ] **Wir pyłowy / piaskowy** (dust devil) przy tornadzie i pogodzie.
+- [ ] **Kałuże po deszczu** z odbiciami; **odbicie trąby powietrznej** (lejek i wirująca chmura) w wodzie.
+- [ ] **Cienie**: ostre i ciemne przy styku, miękkie i jaśniejsze dalej (PCSS), cień kontaktowy, jakość cieni w opcjach;
+  prześwity słońca przez korony; przeświecanie liścia pod słońce i kartki.
+
+## Do obgadania — tematy od właściciela (2026-11-21…26)
+Listy pojęć do omówienia: co warto, gdzie (które laboratorium), ile kosztuje. ✔ — jest, ◐ — częściowo, ○ — brak.
+- **Cienie i światło**: ◐ okluzja otoczenia (teren: widoczność nieba z mapy wysokości; MatKit: mapy AO; brak SSAO /
+  GTAO / HBAO+), ○ PCSS, ○ kaskady cieni (CSM), ○ cienie kontaktowe, ○ GI (VXGI, SDF), ○ ray tracing, ✔ mapy cieni,
+  ○ światło wolumetryczne / snopy (god rays), ○ mgła wolumetryczna (froxele), ○ profile IES.
+- **Materiały**: ◐ przeświecanie / SSS (trawa pod światło; brak SSS skóry, liści, wosku), ◐ transmisja i refrakcja
+  (woda), ○ kaustyka, ◐ paralaksa (fasady CityKit; brak POM w MatKit), ✔ filtrowanie anizotropowe (jakość silnika),
+  ○ odbicia anizotropowe, ✔ clearcoat (statki), ○ iryzacja cienkiej warstwy, ◐ odbicia (mapa otoczenia z nieba,
+  odbicia morza; brak SSR i sond odbić), ✔ triplanar (RockKit), ◐ kalkomanie (uszkodzenia), ○ teksturowanie
+  stochastyczne, ✔ starzenie (mech na górnych ścianach skał, MatKit).
+- **Atmosfera**: ◐ niebo (SkyKit: niebo z pogodą; nie fizyczne rozpraszanie Rayleigha i Mie), ✔ ACES i bloom (potok
+  kamery: także AgX, Hable).
+- **Proceduralność**: ✔ szum gradientowy i fBm, ◐ Voronoi / Worley (piana morska), ◐ zniekształcanie domeny (teren),
+  ✔ erozja kropli (LandKit; brak termicznej), ○ marching cubes / dual contouring (prawdziwe jaskinie i nawisy), ○ WFC,
+  ◐ L-systemy (PlantKit rośnie drzewa własnymi regułami), ✔ SDF i raymarching (postacie SDF), ○ instancjonowanie na GPU
+  z compute (WebGL2 nie ma compute — WebGPU), ○ pękanie Voronoi, ◐ IK (nogi zwierząt LifeKit), ○ dynamika drugiego
+  rzędu, ○ aktywne ragdolle, ○ boidy (stada, ławice, roje), ◐ animacja w shaderze (wiatr w roślinach; brak VAT).
+- **Post-processing**: ✔ bloom, winieta, ziarno, aberracja chromatyczna, wyostrzanie, tonowanie, ◐ wygładzanie (MSAA,
+  FXAA w części laboratoriów; brak SMAA, TAA, FSR), ○ głębia ostrości z bokeh, ○ LUT 3D, ○ kontury (Sobel), ○ filtry
+  odszumiające (bilateralny, À-Trous) — potrzebne dopiero przy SSAO lub ray tracingu.
+- **Dźwięk**: ◐ filtry DSP i obwiednie (SfxKit), ○ synteza modalna (zderzenia z materiału i masy), ○ synteza
+  granularna, ○ modelowanie fizyczne (Karplus-Strong, falowody), ◐ pogłos (splotowy w muzyce; brak akustyki
+  przestrzeni z geometrii), ○ warstwowanie i przejścia muzyki adaptacyjnej, ○ łańcuchy Markowa i gramatyki muzyczne,
+  ✔ synteza formantowa i mowa „gibberish” (VoiceKit), ○ synteza dyfonowa, ○ modulacja głosu stanem postaci,
+  ○ lip-sync (wizemy).
+- **HLSL / GLSL**: GameLaboratory pisze shadery w GLSL (WebGL2, three.js r186); HLSL dotyczy DirectX — do omówienia,
+  czy i jak (np. przy WebGPU: WGSL).
+
 ## Pomysły (właściciel, czekają na decyzję)
 - [ ] **Wiki w menu Pomoc**: artykuły o laboratoriach, modelach, środowiskach i zjawiskach, z małymi ilustracjami
   generowanymi w laboratoriach (`ArtApi`) — bez wysokiej rozdzielczości i efektów, chyba że ilustracja tego wymaga.
