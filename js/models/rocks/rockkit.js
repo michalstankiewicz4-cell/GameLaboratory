@@ -35,7 +35,7 @@ export const ROCK_SHAPES = {
 export const ROCK_DEFAULTS = { kind: 'granite', shape: 'boulder', seed: 1, size: 1.6, detail: 1, moss: 0.3, lichen: 0.3 };
 
 /* ---------------- noise (3D, deterministic) ---------------- */
-function rng(seed) { let s = (seed >>> 0) || 1; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; }
+import { lcg as rng } from '../../core/rng.js';   // generator z ziarnem (js/core/rng.js)
 function hash3(x, y, z, seed) {
   let h = Math.imul(x, 374761393) ^ Math.imul(y, 668265263) ^ Math.imul(z, 2147483647) ^ Math.imul(seed, 1442695041);
   h = Math.imul(h ^ (h >>> 13), 1274126177); h ^= h >>> 16;

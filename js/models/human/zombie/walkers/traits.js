@@ -39,7 +39,7 @@ const FRAMES=8;
 
 // ---------- specimens ----------
 const rulesEl=document.getElementById('rules');
-function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+import { mulberry32 as mulberry } from '../../../../core/rng.js';   // generator z ziarnem (js/core/rng.js)
 // Oklab: a colour space where distance matches how different two colours look
 function oklab([r,g,b]){
   const f=c=>{c/=255;return c<=.04045?c/12.92:Math.pow((c+.055)/1.055,2.4);};

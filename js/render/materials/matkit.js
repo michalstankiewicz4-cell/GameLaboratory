@@ -64,7 +64,7 @@ export const PRESETS = {
 const clamp = (x, a = 0, b = 1) => (x < a ? a : x > b ? b : x);
 const lerp = (a, b, t) => a + (b - a) * t;
 const hex = (h) => { const n = parseInt(String(h).replace('#', ''), 16) || 0; return [(n >> 16) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255]; };
-function rng(seed) { let s = (seed >>> 0) || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
+import { xorshift32 as rng } from '../../core/rng.js';   // generator z ziarnem (js/core/rng.js)
 // szum wartości zawinięty: siatka P × P (na cały kafelek), więc szum łączy się na brzegach kafelka
 function tileNoise(seed, P) {
   const r = rng(seed), t = new Float32Array(P * P); for (let i = 0; i < t.length; i++) t[i] = r();

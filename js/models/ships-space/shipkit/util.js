@@ -5,10 +5,7 @@ import { THREE } from '../../../core/three-global.js';
 // =====================================================================
 // Small procedural toolkit: seeded RNG + tileable value noise / fBm.
 // =====================================================================
-function rng(seed) {
-  let s = seed >>> 0;
-  return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
-}
+import { lcgRaw as rng } from '../../../core/rng.js';   // generator z ziarnem (js/core/rng.js)
 // Tileable 2D value noise on a (cx × cy) lattice, sampled in [0,1)².
 function valueNoise(rand, cx, cy) {
   const g = new Float32Array(cx * cy);

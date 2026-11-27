@@ -3,7 +3,8 @@
 import * as THREE from '../../../vendor/three/three.module.js';
 import { mergeList } from '../ships-sea/geom.js';
 
-export function rng(seed = 1) { let s = seed >>> 0; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; }
+import { lcgRaw } from '../../core/rng.js';   // generator z ziarnem (js/core/rng.js)
+export const rng = (seed = 1) => lcgRaw(seed);   // domyślne ziarno 1 (jak dotąd)
 
 /* ---------------- armour units ---------------- */
 // Tetrapod (Danel & Anglès d'Auriac, 1950): four tapered legs from one centre along the tetrahedron's axes. h = overall

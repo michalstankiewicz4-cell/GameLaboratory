@@ -9,7 +9,8 @@
 // impostors' baking (none) and the shadow pass (same sway), so shadows move with the trees.
 import * as THREE from '../../../vendor/three/three.module.js';
 
-export function rng(seed = 1) { let s = (seed >>> 0) || 1; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; }
+import { lcg as rng } from '../../core/rng.js';   // generator z ziarnem (js/core/rng.js)
+export { rng };
 const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
 
 /* ---------------- species ---------------- */

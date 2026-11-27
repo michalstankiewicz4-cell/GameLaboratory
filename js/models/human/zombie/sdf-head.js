@@ -124,7 +124,8 @@ export const FIXED={2:[[30,10,22],[30,10,22],[52,16,30],[52,16,30]],
   5:[[50,12,24],[96,24,36],[140,40,44],[170,60,56]]};
 
 // --- seeded randomness, so a specimen can be reproduced ---
-export function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+import { mulberry32 as mulberry } from '../../../core/rng.js';   // generator z ziarnem (js/core/rng.js)
+export { mulberry };
 export function makeZombie(sd){
   const r=mulberry(sd),pick=a=>a[Math.floor(r()*a.length)];
   const z={seed:sd,skin:pick(SKINS),eye:pick(EYES),shirt:pick(SHIRTS),

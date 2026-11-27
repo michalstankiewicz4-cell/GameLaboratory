@@ -130,10 +130,7 @@ const REVERB_SEND = { beat: 0.2, arp: 0.7 };
 // the ostinato's figures (indices into the chord), one per piece (the seed)
 const MOTIFS = [[0, 1, 2, 1, 0, 1, 2, 1], [0, 2, 1, 2, 0, 2, 1, 2], [2, 1, 0, 1, 2, 1, 0, 1], [0, 1, 2, 3, 2, 1, 2, 1]];
 
-function rng(seed) {
-  let a = seed >>> 0 || 1;
-  return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
-}
+import { mulberry32nz as rng } from '../../core/rng.js';   // generator z ziarnem (js/core/rng.js)
 const hz = (midi) => 440 * Math.pow(2, (midi - 69) / 12);
 const clone = (o) => JSON.parse(JSON.stringify(o));
 

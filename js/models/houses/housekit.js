@@ -19,7 +19,7 @@ export const HOUSE_TYPES = {
 };
 export const HOUSE_IDS = Object.keys(HOUSE_TYPES);
 
-function rng(seed = 1) { let s = (seed >>> 0) || 1; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; }
+import { lcg as rng } from '../../core/rng.js';   // generator z ziarnem (js/core/rng.js)
 const R = (a, b, r) => a + (b - a) * r();
 const rect = (x0, y0, x1, y1) => [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
 const V = (x, y, z) => new THREE.Vector3(x, y, z);

@@ -41,7 +41,7 @@ export const DEFAULTS = {
 };
 
 /* ---------------- tools ---------------- */
-function rng(seed) { let s = (seed >>> 0) || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
+import { xorshift32 as rng } from '../../core/rng.js';   // generator z ziarnem (js/core/rng.js)
 const clamp = (x, a = 0, b = 1) => (x < a ? a : x > b ? b : x);
 const hex = (h) => { const n = parseInt(h.slice(1), 16); return [(n >> 16) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255]; };
 const css = (c, a = 1) => `rgba(${Math.round(clamp(c[0]) * 255)},${Math.round(clamp(c[1]) * 255)},${Math.round(clamp(c[2]) * 255)},${a})`;

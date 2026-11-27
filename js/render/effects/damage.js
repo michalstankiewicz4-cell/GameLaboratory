@@ -12,7 +12,7 @@ import * as THREE from '../../../vendor/three/three.module.js';
 
 const DT = 1 / 60;
 // z ShipKit: rng, szum, tekstury dymu, spalenizny i poświaty
-function rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+import { lcgRaw as rng } from '../../core/rng.js';   // generator z ziarnem (js/core/rng.js)
 function valueNoise(rand, cx, cy) {
   const g = new Float32Array(cx * cy); for (let i = 0; i < g.length; i++) g[i] = rand();
   const at = (x, y) => g[((y % cy + cy) % cy) * cx + ((x % cx + cx) % cx)];

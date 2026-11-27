@@ -4,7 +4,7 @@
 //  planet gem potion coin tree rock fire slime — and seamless tiles: grass sand stone water (animated) lava (animated)
 import { PixelImage, hex, shade, oklab, fromOklab } from './core.js';
 
-const rng = (seed) => { let s = (seed >>> 0) || 1; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; };
+import { lcg as rng } from '../../core/rng.js';   // generator z ziarnem (js/core/rng.js)
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const BAYER4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => (v + 0.5) / 16);
 // value noise on a lattice that repeats every `p` cells (seamless tiles), smooth

@@ -3,6 +3,16 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.111.9 — 2026-11-27 (wspólne generatory liczb losowych)
+
+### Zmienione
+- `js/core/rng.js`: generatory z ziarnem w jednym miejscu — `lcg`, `lcgRaw`, `mulberry32`, `mulberry32nz`, `xorshift32`;
+  korzysta z nich 20 plików (rośliny, skały, budynki z części, regiony, pixel art, efekty, ShipKit, nabrzeża, głowy SDF,
+  chodzące, ekspertyza, bloki, pogoda, wyładowania, muzyka, życie, jaskinie, MatKit, laboratorium sztuki), a
+  `js/core/util.js` oddaje `mulberry32` stąd. Wspólne są tylko te, które dają dokładnie te same liczby (sprawdzone:
+  200 losowań dla 12 ziaren w każdym pliku; doktor modeli — wszystkie modele bez zmian). Inne warianty (ziarno mnożone,
+  przesunięcie bez znaku) zostały w swoich plikach, bo inne liczby zmieniłyby wygląd.
+
 ## Program 0.111.8 — 2026-11-27 (wspólna kamera orbitalna laboratoriów)
 
 ### Zmienione

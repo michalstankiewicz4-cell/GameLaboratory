@@ -112,4 +112,5 @@ export function touching(p, q, min = 0.01, tol = 2e-3) {
   }
   return false;
 }
-export function rng(seed = 1) { let s = (seed >>> 0) || 1; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; }
+import { lcg as rng } from '../../core/rng.js';   // generator z ziarnem (js/core/rng.js)
+export { rng };

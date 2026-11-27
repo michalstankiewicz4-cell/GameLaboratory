@@ -49,7 +49,7 @@ export const BIOME_CHART = { temperate: null, plains: [104, 128, 60], desert: [1
 
 const sm = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
-function rng(seed) { let s = (seed >>> 0) || 1; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; }
+import { lcg as rng } from '../../core/rng.js';   // generator z ziarnem (js/core/rng.js)
 // sea floor offshore (c metres from the coast) and a beach rising inland, capped by the land height L
 function coastH(c, L, depth) {
   if (c >= 0) return -(0.8 + 3 * sm(0, 150, c) + (depth - 3.8) * Math.pow(sm(0, 3200, c), 0.8));

@@ -4,7 +4,7 @@
    ===================================================================== */
 const S=2;let W=640,H=480,IW=W*S,IH=H*S,G=110,BW=1,BH=1;
 const mk=(w,h)=>{const c=document.createElement('canvas');c.width=w;c.height=h;return c};
-function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+import { mulberry32 as rng } from '../../../core/rng.js';   // generator z ziarnem (js/core/rng.js)
 const pick=(a,r)=>a[Math.floor(r()*a.length)];
 function shuffle(a,r){for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 const range=(a,b,s)=>{const o=[];for(let i=a;i<=b+1e-9;i+=s)o.push(i);return o};
