@@ -286,6 +286,7 @@ function help() {
     link(t("Documentation", "Dokumentacja"), DOCS, { blank: true }),
     link(t("What's new", "Co nowego"), REPO + "CHANGELOG.md", { blank: true }),
     link(t("Repository (GitHub)", "Repozytorium (GitHub)"), "https://github.com/michalstankiewicz4-cell/GameLaboratory", { blank: true }),
+    link(t("License (MIT)", "Licencja (MIT)"), REPO + "LICENSE", { blank: true }),
     el("div", "lmSep"),
     action(t("Keyboard shortcuts", "Klawiszologia"), keysDialog),
     action(t("Engine diagram", "Schemat silnika"), engineMap),

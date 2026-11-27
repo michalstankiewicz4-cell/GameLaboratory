@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.110.1 — 2026-11-27 (licencja)
+
+### Dodane
+- Plik `LICENSE`: licencja MIT (© 2026 Michał Stankiewicz) i licencje części cudzych (Three.js — MIT, czcionki — SIL
+  OFL 1.1, dane budynków Warszawy — © współtwórcy OpenStreetMap, ODbL). Menu Pomoc → **Licencja (MIT)**.
+
 ## Program 0.110.0 · edytor sceny 0.58.0 — 2026-11-27 (scena „Tornado z miastem”)
 
 ### Dodane
