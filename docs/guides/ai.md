@@ -8,7 +8,8 @@ repozytorium — [`../../CLAUDE.md`](../../CLAUDE.md); mapa wszystkich dokument�
 ## 1. Jak pracować
 
 1. **Otwórz stronę.** Online: <https://michalstankiewicz4-cell.github.io/GameLaboratory/> (strona startowa: wszystkie
-   laboratoria, filtr po frazach). Lokalnie: `python3 -m http.server 8000` w katalogu repozytorium, potem
+   laboratoria, filtr po frazach i kategoriach, gotowe sceny). Gotowa scena od razu w edytorze:
+   `editor/index.html?scene=<id>` (`harbour`, `tornadoTown`, `engine` — lista: `scenes` w `ui/data/catalog.js`). Lokalnie: `python3 -m http.server 8000` w katalogu repozytorium, potem
    `http://localhost:8000/` (moduły ES — plik otwarty z dysku nie zadziała).
 2. **Sprawdź, czy strona żyje:** **Konsola** po prawej na pasku narzędzi — dziennik (`window.LabLog.entries`): błędy,
    ostrzeżenia, etapy ładowania, najnowsze na górze. Zakładka **API** w konsoli — polecenia JSON tej strony.

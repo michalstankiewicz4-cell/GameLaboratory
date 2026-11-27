@@ -127,7 +127,7 @@ i zostawił decyzję o przebudowie układu folderów.
 Docelowy układ:
 
 ```
-editor/            główny program (edytor sceny); później strona startowa może prowadzić najpierw tutaj
+editor/            główny program (edytor sceny); strona startowa prowadzi tu przyciskiem „Otwórz edytor sceny” i kartami scen
 engine/            silnik, wspólny dla edytora, laboratoriów i gier:
   scene/           scena jako dane, prefabrykaty, (później) zasoby z nazwą       ← dziś js/scene/
   models/          kity modeli                                                    ← dziś js/models/

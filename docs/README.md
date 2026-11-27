@@ -4,7 +4,9 @@
 i laboratoriów, przepisy, granice.
 
 Mapa dokumentacji. Zasady pracy: [`../CLAUDE.md`](../CLAUDE.md); zmiany: [`../CHANGELOG.md`](../CHANGELOG.md);
-UI (paski, okna, konsola, karta ładowania, style): [`../ui/README.md`](../ui/README.md).
+UI (paski, okna, konsola, karta ładowania, style, motywy Dzień i Noc): [`../ui/README.md`](../ui/README.md);
+plany: [`../TODO.md`](../TODO.md); współpraca AI (przeglądy ChatGPT, częste błędy AI w modelach):
+[`../AI_COLLABORATION.md`](../AI_COLLABORATION.md).
 
 Układ folderów jest taki sam jak w kodzie:
 

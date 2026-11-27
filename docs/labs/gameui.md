@@ -1,7 +1,7 @@
 # Laboratorium UI gry (`labs/gameui.html`)
 
 Interfejs gry jako **dane** nad żywą sceną (scena bazowa: morze i niebo, kamera krąży): ekrany menu, HUD, okna w grze
-i okno dialogowe postaci i narratora. Wygląd to **skórka** — oddzielona od wyglądu laboratoriów (ciemne szkło, złoto;
+i okno dialogowe postaci i narratora. Wygląd to **skórka** — oddzielona od wyglądu laboratoriów (motywy Dzień i Noc z
 `ui/style/tokens.css`). Silnik: `js/gameui/` (bez Three.js, wspólny dla laboratorium, przyszłego ▶ Graj edytora i gier).
 Strona: `js/labs/gameui/gameui.js`, przykłady `js/labs/gameui/samples.js`, arkusz `ui/pages/gameui.css`.
 

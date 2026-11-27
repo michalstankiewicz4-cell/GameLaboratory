@@ -8,7 +8,9 @@ It covers the labs that came from Battle; every other lab (and the scene editor)
 
 ## Opening the labs
 
-- **Online:** <https://michalstankiewicz4-cell.github.io/GameLaboratory/> (the start page lists every lab).
+- **Online:** <https://michalstankiewicz4-cell.github.io/GameLaboratory/> (the start page: a side column with the sections and the categories as
+  badges that filter the labs, the ready scenes, every lab and tool). **SCENES** in the menu bar opens the scene editor
+  with a ready scene.
 - **Locally:** in the repository folder run `python3 -m http.server 8000` (Windows: `py -m http.server 8000`) and open `http://localhost:8000/`
   (pages are ES modules: opening the file directly from disk does not work).
 - A desktop browser with a real graphics card is assumed; the labs show fps and draw calls, and most have
@@ -22,10 +24,11 @@ It covers the labs that came from Battle; every other lab (and the scene editor)
 | Pan | drag with the right mouse button |
 | Zoom | mouse wheel |
 | Camera presets | the buttons in the **Camera** window |
-| Windows | OPTIONS → Windows opens and closes them; every lab has **Description** (left), its own windows, **Camera**, **Light and weather** and **Performance** (right). By default they are **panels** at the edges (the view in the free middle); the pin on a title bar undocks one, **Windows \| Panels** on the toolbar switches all |
+| Windows | OPTIONS → Windows opens and closes them; every lab has **Description** (left), its own windows, **Camera**, **Light and weather** and **Performance** (right). By default they are **panels** at the edges (the view in the free middle); the pin on a title bar undocks one, **Windows \| Panels** on the toolbar switches all; drag a panel's inner edge to make it wider or narrower (double-click: the default) |
+| Day / night | OPTIONS → **Look** (Automatic — the system's, Day, Night) or the sun / moon at the right end of the menu bar: the light canvas or the dark one, on every page |
 | Forget everything | OPTIONS → **Reset saved settings** clears all GameLaboratory keeps in this browser (settings, windows, assets, scenes) |
 | Hide the windows (clean view, screenshots) | **H** |
-| The log | **Console** on the right of the top bar: errors, warnings, loading steps, newest first |
+| The log | **Console** on the right of the top bar: errors, warnings, loading steps, newest first; the kinds as tabs with icons and counts (a kind with no entries has no tab), a text filter (OPTIONS → Console hides it); docked at the bottom, drag its top edge to change its height |
 | Keep a result | **Save** under a name where the lab has it (an asset the scene editor picks from a list), or **Copy settings (JSON)** |
 | Settings survive a reload | yes (stored in the browser); "Reset" buttons where they exist |
 | Sound | the sound group (music · effects · speech); the volumes in **Mixer** windows are the game's (Options → Sound) |

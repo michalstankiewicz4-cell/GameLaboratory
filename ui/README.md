@@ -22,7 +22,7 @@ same in both themes.
 | `tokens.css` | colours (also the category colours `--cat-<id>`) for both themes (night on `:root`, day on `:root[data-theme="day"]`; also `--accentSoft`, `--onAccent`, `--info`, `--off`, `--chip`, `--overlay`, `--shadow`, `--shadowHi`), fonts, radii, the heights of the menu bar and the two bars (`--menuH`, `--barH`, `--footH`) — every other file uses these; in a cascade layer, so a page with its own theme keeps its values, while the menu bar, its dialog and the two bars always get these |
 | `fonts.css` | the self-hosted fonts (`fonts/`, latin + latin-ext) |
 | `base.css` | thin scroll bars without arrow buttons, everywhere |
-| `controls.css` | what is inside a window (`.labWin`) or any `.labUi`: buttons (`.tBtn`, `.btn`, `.btns button`), sliders (gold up to `--fill`), check boxes, radio buttons, drop-downs, fields, headings |
+| `controls.css` | what is inside a window (`.labWin`) or any `.labUi`: buttons (`.tBtn`, `.btn`, `.btns button`), sliders (the accent up to `--fill`), check boxes, radio buttons, drop-downs, fields, headings |
 | `space.css` | the page and panels of the labs from Space (`#hud`, `#opt`, `.hudPanel`, rows, sliders' labels) |
 | `sea.css` | the page and panels of the labs from Battle (`.panel`, rows, the doctor's lists) |
 
