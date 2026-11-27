@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.112.3 — 2026-11-27 (poprawka: LifeKit)
+
+### Poprawione
+- `js/models/life/lifekit.js`: import generatora liczb (0.111.9) trafił do środka funkcji opakowującej kit — błąd
+  „Unexpected token '{'” w laboratoriach życia, człowieka, edytora stworów i pojazdów · kosmos (oraz wszędzie, gdzie
+  ładuje się LifeKit). Import przeniesiony na początek modułu. Sprawdzone: każdy moduł zmieniony dziś wczytuje się
+  w przeglądarce.
+
 ## Efekty · ląd 1.0.3 — 2026-11-27 (wspólna scena bazowa)
 
 ### Zmienione

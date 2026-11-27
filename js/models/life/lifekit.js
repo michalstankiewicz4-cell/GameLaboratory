@@ -24,6 +24,7 @@
      LifeKit.util                      { rng, sweep, skeleton, merge, skinned, mat, ... }
    ======================================================================= */
 import { THREE } from '../../core/three-global.js';
+import { mulberry32nz as rng } from '../../core/rng.js';   // generator z ziarnem (js/core/rng.js)
 window.LifeKit = (function () {
 "use strict";
 
@@ -31,7 +32,6 @@ const CREATURES = [], MOVES = {};
 function register(def) { CREATURES.push(def); }
 function registerMove(id, move) { MOVES[id] = move; }
 
-import { mulberry32nz as rng } from '../../core/rng.js';   // generator z ziarnem (js/core/rng.js)
 const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
 const smooth = (x) => { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); };
 const lerp = (a, b, t) => a + (b - a) * t;
