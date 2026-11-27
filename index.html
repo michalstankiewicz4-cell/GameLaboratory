@@ -307,13 +307,15 @@ function sideCats() {
   }
 }
 sideCats();
-// the two logos (the menu bar's, the side column's): back to the top, the category chosen on the left let go
+// the two logos (the menu bar's, the side column's) and HOME in the side menu: back to the top, the category chosen
+// on the left let go
 function homeTop(e) {
   e.preventDefault();
   if (catOn) { catOn = null; sideCats(); chips(); applyFilter(); }
   scrollTo({ top: 0, behavior: "smooth" });
 }
 document.querySelector(".side .brand").addEventListener("click", homeTop);
+document.querySelector('#sideNav a[href="#top"]').addEventListener("click", homeTop);
 { const h = document.querySelector("#labMenu .lmHome"); if (h) h.addEventListener("click", homeTop); }
 // the side menu marks the section in view
 { const nav = [...document.querySelectorAll("#sideNav a[href^='#']")], secs = nav.map((a) => document.querySelector(a.getAttribute("href")));

@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.113.13 — 2026-11-27 (strona startowa: Strona główna odznacza kategorię)
+
+### Zmienione
+- Strona startowa: pozycja „Strona główna” w bocznym menu też odznacza wybraną kategorię i przewija na górę (jak oba
+  logo).
+
 ## Program 0.113.12 — 2026-11-27 (strona startowa: logo odznacza kategorię)
 
 ### Zmienione
