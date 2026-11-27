@@ -74,6 +74,28 @@ function build() {
   const list = el("div", "lcList"), count = el("div", "lcCount");
   const body = el("div", "lcBody"); body.append(kinds, tools, list, count);
   win.append(head, body);
+  // docked at the bottom: its top edge is a grip — drag to change the height (90 px up to 75 % of the window; double-click:
+  // the default 30 %), kept with the console's settings, the same on every page (--conH on <html>)
+  const grip = el("div", "lcGrip"); grip.title = t("Drag to resize the console (double-click: default)", "Przeciągnij, by zmienić wysokość konsoli (dwuklik: domyślna)");
+  win.append(grip);
+  const setH = (h) => {
+    if (h == null) { delete st.h; document.documentElement.style.removeProperty("--conH"); }
+    else { st.h = Math.round(Math.min(innerHeight * 0.75, Math.max(90, h))); document.documentElement.style.setProperty("--conH", st.h + "px"); }
+    if (window.LabView) window.LabView.update();
+  };
+  if (st.h > 0) setH(st.h);
+  grip.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0) return;
+    e.preventDefault(); grip.setPointerCapture(e.pointerId); grip.classList.add("on"); document.body.classList.add("lmResizingV");
+    const bottom = win.getBoundingClientRect().bottom;
+    const move = (ev) => setH(bottom - ev.clientY);
+    const end = () => {
+      grip.classList.remove("on"); document.body.classList.remove("lmResizingV"); save();
+      grip.removeEventListener("pointermove", move); grip.removeEventListener("pointerup", end); grip.removeEventListener("pointercancel", end);
+    };
+    grip.addEventListener("pointermove", move); grip.addEventListener("pointerup", end); grip.addEventListener("pointercancel", end);
+  });
+  grip.addEventListener("dblclick", () => { setH(null); save(); });
   document.body.append(win);
 
   // tabs: the log, then the page's own (only shown when there is more than one)
@@ -108,7 +130,9 @@ function build() {
   const match = (e) => (st.kind === "all" || e.level === st.kind) && (!st.q || (e.msg + " " + e.level + " " + (e.page || "")).toLowerCase().includes(st.q.toLowerCase()));
   const row = (e) => {
     const r = el("div", "lcRow lc-" + e.level);
-    r.append(el("span", "lcTime", stamp(e.time)), el("span", "lcKind", LABEL[e.level] || e.level), el("span", "lcPage", e.page || ""), el("span", "lcMsg", e.msg));
+    // the kind as its icon (the same as on its tab); its name in the tooltip
+    const k = el("span", "lcIco lk-" + e.level); k.innerHTML = ICON[e.level] || ICON.log; k.title = LABEL[e.level] || e.level;
+    r.append(k, el("span", "lcTime", stamp(e.time)), el("span", "lcPage", e.page || ""), el("span", "lcMsg", e.msg));
     return r;
   };
   function render() {

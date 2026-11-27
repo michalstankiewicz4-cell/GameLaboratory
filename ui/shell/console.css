@@ -17,24 +17,22 @@ body > .bar .sp + .lcBtn{margin-left:0}
 .labConsole .lcIco{display:inline-flex;color:var(--dim)}
 .labConsole .lcIco svg{width:15px;height:15px;display:block}
 .labConsole .lcIco .g{fill:none;stroke:var(--onAccent);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
-.labConsole .lk-all .lcIco{color:var(--accent)}
-.labConsole .lk-error .lcIco{color:var(--err)}
-.labConsole .lk-warn .lcIco{color:var(--accent)}
-.labConsole .lk-load .lcIco{color:var(--ok)}
-.labConsole .lk-info .lcIco{color:var(--info)}
-.labConsole .lk-log .lcIco{color:var(--dim)}
+.labConsole :is(.lk-all .lcIco, .lcIco.lk-all){color:var(--accent)}
+.labConsole :is(.lk-error .lcIco, .lcIco.lk-error){color:var(--err)}
+.labConsole :is(.lk-warn .lcIco, .lcIco.lk-warn){color:var(--accent)}
+.labConsole :is(.lk-load .lcIco, .lcIco.lk-load){color:var(--ok)}
+.labConsole :is(.lk-info .lcIco, .lcIco.lk-info){color:var(--info)}
+.labConsole :is(.lk-log .lcIco, .lcIco.lk-log){color:var(--dim)}
 .labConsole .lcTools input{flex:1;min-width:0}
 .labConsole .lcTools .btn{flex:none}
 .labConsole .lcList{flex:1;min-height:0;overflow:auto;border:1px solid var(--line);border-radius:6px;background:var(--bg);
   font:11.5px/1.45 var(--mono);color:var(--text)}
-.labConsole .lcRow{display:grid;grid-template-columns:auto auto auto 1fr;gap:8px;padding:3px 8px;border-bottom:1px solid var(--line);align-items:baseline}
+.labConsole .lcRow{display:grid;grid-template-columns:auto auto auto 1fr;gap:8px;padding:4px 8px;border-bottom:1px solid var(--line);align-items:center}
+.labConsole .lcRow .lcIco svg{width:14px;height:14px}
 .labConsole .lcTime{color:var(--dim);white-space:nowrap}
-.labConsole .lcKind{min-width:62px;color:var(--dim);text-transform:uppercase;font-size:10px;letter-spacing:.6px}
 .labConsole .lcPage{color:var(--dim);white-space:nowrap}
 .labConsole .lcMsg{white-space:pre-wrap;word-break:break-word}
-.labConsole .lc-error .lcKind, .labConsole .lc-error .lcMsg{color:var(--err)}
-.labConsole .lc-warn .lcKind{color:var(--accent)}
-.labConsole .lc-load .lcKind{color:var(--ok)}
+.labConsole .lc-error .lcMsg{color:var(--err)}
 .labConsole .lcCount{font:11px var(--mono);color:var(--dim);text-align:right}
 /* tabs in the title bar: the log and the page's own (window.LabConsole.addTab) */
 .labConsole .labWinTitle{flex:none}
@@ -45,7 +43,14 @@ body > .bar .sp + .lcBtn{margin-left:0}
 .labConsole .lcTab.on{color:var(--accent);border-color:var(--accent)}
 .labConsole .lcBody[hidden]{display:none}
 /* docked at the bottom between the side panels (Panels: ui/shell/windows.js) */
-.labConsole.lcDocked{left:var(--viewL,0px) !important;right:var(--viewR,0px) !important;top:auto !important;bottom:var(--footH);width:auto;height:30vh;
-  min-height:140px;border-radius:0;border-width:1px 0 0;box-shadow:none;resize:vertical;z-index:18;background:var(--menuBg)}
+.labConsole.lcDocked{left:var(--viewL,0px) !important;right:var(--viewR,0px) !important;top:auto !important;bottom:var(--footH);width:auto;
+  height:var(--conH,30vh) !important;min-height:90px;border-radius:0;border-width:1px 0 0;box-shadow:none;resize:none;z-index:18;background:var(--menuBg)}
+/* the grip on its top edge when docked (ui/shell/console.js): drag to resize, a thin accent line under the pointer */
+.labConsole .lcGrip{display:none;position:absolute;inset-inline:0;top:0;height:6px;z-index:3;cursor:ns-resize;touch-action:none}
+.labConsole.lcDocked .lcGrip{display:block}
+.labConsole .lcGrip::after{content:"";position:absolute;inset-inline:0;top:0;height:2px;background:transparent;transition:background .15s}
+.labConsole .lcGrip:hover::after, .labConsole .lcGrip.on::after{background:var(--accent)}
+body.lmResizingV{cursor:ns-resize;user-select:none}
+body.lmResizingV :is(#view, .labDock){pointer-events:none}
 body.lmNoFoot .labConsole.lcDocked{bottom:0}
 .labConsole.lcDocked .labWinHead{cursor:default}

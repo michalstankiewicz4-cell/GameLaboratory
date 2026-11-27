@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.113.9 — 2026-11-27 (konsola: ikony wpisów, wysokość przeciąganiem)
+
+### Zmienione
+- Konsola: każdy wpis ma ikonę swojego rodzaju (ta sama co na zakładce; nazwa rodzaju w podpowiedzi) zamiast napisu
+  BŁĄD / UWAGA / INFO.
+- Konsola przypięta na dole: wysokość zmienia się przeciągnięciem jej górnej krawędzi, jak szerokość bocznych paneli
+  (90 px – 75 % okna, dwuklik — domyślne 30 %); zapamiętana, ta sama na wszystkich stronach.
+
 ## Program 0.113.8 — 2026-11-27 (konsola: zakładki rodzajów z ikonami)
 
 ### Zmienione
