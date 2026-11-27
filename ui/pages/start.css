@@ -142,3 +142,6 @@ h2::after{ order:1; }
 .tag.tool{ color:var(--tool); border-color:color-mix(in srgb, var(--tool) 40%, transparent); background:color-mix(in srgb, var(--tool) 8%, transparent); }
 @media (max-width:900px){ .side{ display:none; } main{ padding-inline-start:28px; } .hero{ grid-template-columns:1fr; } .hero .pic{ min-height:180px; } }
 @media (max-width:600px){ h1{ font-size:32px; } main{ padding:64px 16px 50px; } .hero .txt{ padding:24px 20px; } }
+/* the console docked at the bottom (ui/shell/console.css): from the side column's edge, not the screen's */
+body:has(> .side) .labConsole.lcDocked{ inset-inline-start:var(--sideW) !important; }
+@media (max-width:900px){ body:has(> .side) .labConsole.lcDocked{ inset-inline-start:0 !important; } }

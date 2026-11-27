@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.113.7 — 2026-11-27 (strona startowa: konsola przy bocznym menu)
+
+### Zmienione
+- Strona startowa: konsola przypięta na dole zaczyna się przy bocznej kolumnie (menu), a nie przy lewej krawędzi
+  ekranu (`ui/pages/start.css`); na wąskim ekranie, gdzie kolumny nie ma — od krawędzi.
+
 ## Program 0.113.6 — 2026-11-27 (strona startowa: biały napis zaznaczonej pozycji)
 
 ### Zmienione
