@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.115.2 — 2026-11-27 (Szybki dostęp: cztery najczęściej otwierane)
+
+### Zmienione
+- Strona startowa, Szybki dostęp: cztery najczęściej otwierane laboratoria zamiast dwóch — razem z przypiętym
+  i ostatnio otwartym sześć miejsc, dwa pełne rzędy po trzy.
+
 ## Program 0.115.1 — 2026-11-27 (przyciski: kolejność i trzy tryby)
 
 ### Zmienione

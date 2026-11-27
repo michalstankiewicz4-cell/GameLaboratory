@@ -189,7 +189,7 @@ function ordered(items, ids) {
   if (!ids) return items;
   return items.slice().sort((a, b) => { const i = ids.indexOf(a.file), j = ids.indexOf(b.file); return (i < 0 ? 1e9 : i) - (j < 0 ? 1e9 : j); });
 }
-// ---------- QUICK ACCESS: the pinned one, the last opened, the two most opened ----------
+// ---------- QUICK ACCESS: the pinned one, the last opened, the four most opened ----------
 // The visits are counted by the menu bar on every lab and tool page
 // (ui/shell/menubar.js); the pin is chosen here. Nothing shows twice.
 const PIN_KEY = "labsHub.pin";
@@ -221,7 +221,7 @@ function quick() {
   slots.push(["last", tr("Last opened", "Ostatnio otwarte"), last, tr("Last opened", "Ostatnio otwarte"), tr("The lab you were in last will wait here.", "Tu poczeka laboratorium, w którym byłeś ostatnio.")]);
   if (last) used.add(last);
   const most = Object.keys(visits).filter((f) => known(f) && !used.has(f)).sort((a, b) => visits[b] - visits[a]);
-  [0, 1].forEach((k) => slots.push(["most", tr("Most opened", "Najczęściej otwierane") + (most[k] ? " · " + visits[most[k]] + "×" : ""), most[k] || null, tr("Most opened", "Najczęściej otwierane"), tr("The labs you open most will show up here.", "Tu pojawią się laboratoria, które otwierasz najczęściej.")]));
+  [0, 1, 2, 3].forEach((k) => slots.push(["most", tr("Most opened", "Najczęściej otwierane") + (most[k] ? " · " + visits[most[k]] + "×" : ""), most[k] || null, tr("Most opened", "Najczęściej otwierane"), tr("The labs you open most will show up here.", "Tu pojawią się laboratoria, które otwierasz najczęściej.")]));
   slots.forEach(([kind, badge, file, emptyTitle, emptyText]) => {
     if (!file) {
       const e = document.createElement("div"); e.className = "empty";
