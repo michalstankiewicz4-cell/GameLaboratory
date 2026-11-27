@@ -21,7 +21,7 @@
     "labs/life.html": "1.5.0",
     "labs/human.html": "1.3.0",
     "labs/structures.html": "1.6.0",
-    "labs/city.html": "1.3.0",
+    "labs/city.html": "1.3.1",
     "labs/streets.html": "1.0.0",
     "labs/mechanics.html": "1.0.2",
     "labs/water.html": "1.5.0",

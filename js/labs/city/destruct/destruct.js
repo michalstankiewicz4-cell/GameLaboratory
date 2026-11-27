@@ -164,6 +164,7 @@ export function createDestructMode({ scene, camera, canvas, orbit, ui, day }) {
     leave() { active = false; if (world) { stop(); world.clear(); } status(''); },
     click(e) { act(e); },
     frame(rdt) {
+      if (!active || !world) return;   // zapamiętany tryb Zniszczenie: pętla rusza przed wejściem w tryb (po zbudowaniu budynku)
       simStep(L.pause ? 0 : rdt * L.slow);
       if ((statT += rdt) > 0.25) { statT = 0; stats(); }
     },
