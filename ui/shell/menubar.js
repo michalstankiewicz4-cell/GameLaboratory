@@ -387,13 +387,17 @@ bar.appendChild(ver);
 const SUN = '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6 13 13M3 13l1.4-1.4M11.6 4.4 13 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
 const MOON = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 10.2A5.8 5.8 0 0 1 5.8 2.5a5.8 5.8 0 1 0 7.7 7.7Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
 themeBtn = el("button", "lmTheme"); themeBtn.type = "button";
+// three modes, one click each: automatic (the system's) → day → night → automatic; the icon shows the mode chosen
+const AUTO = '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 2a6 6 0 0 1 0 12Z" fill="currentColor"/></svg>';
+const THEME_NEXT = { auto: "day", day: "night", night: "auto" };
+const THEME_NAME = { auto: t("automatic (the system's)", "automatycznie (jak w systemie)"), day: t("day (light)", "dzień (jasny)"), night: t("night (dark)", "noc (ciemny)") };
 function themeIcon() {
-  const day = themeNow() === "day";
-  themeBtn.innerHTML = day ? MOON : SUN;
-  themeBtn.title = day ? t("Night (dark look)", "Noc (ciemny wygląd)") : t("Day (light look)", "Dzień (jasny wygląd)");
+  const c = themeChoice();
+  themeBtn.innerHTML = c === "day" ? SUN : c === "night" ? MOON : AUTO;
+  themeBtn.title = t("Look: ", "Wygląd: ") + THEME_NAME[c] + t(" — click: ", " — kliknij: ") + THEME_NAME[THEME_NEXT[c]];
   themeBtn.setAttribute("aria-label", themeBtn.title);
 }
-themeBtn.addEventListener("click", () => setTheme(themeNow() === "day" ? "night" : "day"));
+themeBtn.addEventListener("click", () => setTheme(THEME_NEXT[themeChoice()]));
 themeIcon();
 bar.appendChild(themeBtn);
 // the start page has no bars (ui/pages/start.css): the menu bar is a small cluster at the top right — the language,
@@ -403,18 +407,22 @@ if (START) {
   // round icon buttons, each with its tooltip
   const ICO = (d) => `<svg viewBox="0 0 18 18" aria-hidden="true"><path d="${d}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   const iconBtn = (b, svg, tip) => { b.innerHTML = svg; b.title = tip; b.setAttribute("aria-label", tip); b.classList.add("lmIcon"); };
-  const other = LANG === "pl" ? "en" : "pl";
+  // the language, three modes like OPTIONS → Language: automatic (the browser's) → Polski → English → automatic;
+  // the chip on the globe shows the mode chosen (AUTO, PL, EN)
+  const choice = LANGS[URL_LANG] ? URL_LANG : LANG_CHOICE, next = { auto: "pl", pl: "en", en: "auto" }[choice] || "auto";
+  const LNAME = { auto: t("automatic (the browser's)", "automatycznie (jak w przeglądarce)"), pl: "polski", en: "English" };
   const lang = el("button", "lmLang"); lang.type = "button";
   iconBtn(lang, ICO("M9 1.8a7.2 7.2 0 1 0 0 14.4A7.2 7.2 0 0 0 9 1.8ZM1.8 9h14.4M9 1.8c2 2 2.9 4.4 2.9 7.2S11 14.2 9 16.2C7 14.2 6.1 11.8 6.1 9S7 3.8 9 1.8Z"),
-    t("Language: English — switch to Polski", "Język: polski — przełącz na English"));
-  lang.append(el("span", "lmLangCode", LANG.toUpperCase()));
+    t("Language: ", "Język: ") + LNAME[choice] + t(" — click: ", " — kliknij: ") + LNAME[next]);
+  lang.append(el("span", "lmLangCode", choice === "auto" ? "AUTO" : choice.toUpperCase()));
   lang.addEventListener("click", () => {
-    try { localStorage.setItem(LANG_KEY, other); } catch (e) { /* storage blocked */ }
+    try { if (next === "auto") localStorage.removeItem(LANG_KEY); else localStorage.setItem(LANG_KEY, next); } catch (e) { /* storage blocked */ }
     reloadLang();
   });
-  bar.insertBefore(lang, bar.querySelector('.lmTop[data-menu="help"]'));
-  iconBtn(bar.querySelector('.lmTop[data-menu="help"] > button'), ICO("M9 16.2A7.2 7.2 0 1 0 9 1.8a7.2 7.2 0 0 0 0 14.4ZM6.9 6.9a2.2 2.2 0 1 1 3 2c-.6.3-.9.8-.9 1.4v.4M9 13v.1"), t("Help", "Pomoc"));
+  const help = bar.querySelector('.lmTop[data-menu="help"]');
+  iconBtn(help.querySelector("button"), ICO("M9 16.2A7.2 7.2 0 1 0 9 1.8a7.2 7.2 0 0 0 0 14.4ZM6.9 6.9a2.2 2.2 0 1 1 3 2c-.6.3-.9.8-.9 1.4v.4M9 13v.1"), t("Help", "Pomoc"));
   themeBtn.classList.add("lmIcon");
+  bar.append(help, themeBtn, lang);   // in this order: Help, day / night / automatic, the language
 }
 function closeAll() { bar.querySelectorAll(".lmTop.open").forEach((t) => t.classList.remove("open")); }
 document.addEventListener("pointerdown", (e) => { if (!bar.contains(e.target)) closeAll(); });

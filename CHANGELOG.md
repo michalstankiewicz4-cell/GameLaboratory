@@ -3,6 +3,16 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.115.1 — 2026-11-27 (przyciski: kolejność i trzy tryby)
+
+### Zmienione
+- Strona startowa: przyciski w prawym górnym rogu w kolejności Pomoc, wygląd, język.
+- Przycisk wyglądu (strona startowa i pasek menu laboratoriów) ma trzy tryby, po kliknięciu kolejno: automatycznie
+  (jak w systemie) → dzień → noc; ikona pokazuje wybrany tryb (koło w połowie wypełnione, słońce, księżyc),
+  podpowiedź — wybrany i następny.
+- Przycisk języka na stronie startowej ma trzy tryby jak OPCJE → Język: automatycznie (jak w przeglądarce) → polski →
+  angielski; plakietka na globusie: AUTO, PL albo EN.
+
 ## Program 0.115.0 — 2026-11-27 (strona startowa: wyszukiwanie u góry)
 
 ### Dodane
