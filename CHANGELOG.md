@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.111.7 — 2026-11-27 (O laboratoriach)
+
+### Dodane
+- Pomoc → O laboratoriach: autorzy (aplikacja stworzona w całości przy pomocy vibe codingu przez Michała Stankiewicza
+  i Claude Opus 5.5), kontakt, podziękowania dla ekipy forum programistycznego 4Programmers.net z logo
+  (`assets/4programmers.png`, bez czarnego tła).
+
 ## Program 0.111.6 — 2026-11-27 (wygląd i materiały budynków z części w modelach)
 
 ### Zmienione

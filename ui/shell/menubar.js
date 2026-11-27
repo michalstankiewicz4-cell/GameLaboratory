@@ -112,7 +112,7 @@ function dialog(title, rows, note) {
   box.appendChild(el("h3", null, title));
   if (rows && rows.length) {
     const t = el("table");
-    rows.forEach(([k, v]) => { const tr = el("tr"); tr.append(el("td", null, k), el("td", null, v)); t.appendChild(tr); });
+    rows.forEach(([k, v]) => { const tr = el("tr"), td = el("td"); if (v instanceof Node) td.appendChild(v); else td.textContent = v; tr.append(el("td", null, k), td); t.appendChild(tr); });   // wartość: tekst albo węzeł (logo)
     box.appendChild(t);
   }
   if (note) box.appendChild(el("p", null, note));
@@ -281,6 +281,12 @@ function tools() {
   TOOLS.forEach((t) => d.push(link(t.name, ROOT + t.file, { on: me === t, cat: t.cat })));
   return d;
 }
+// podziękowania dla forum 4Programmers.net: logo (assets/4programmers.png, bez czarnego tła) i tekst
+function thanks4p() {
+  const s = el("span", "lmThanks"), img = el("img"); img.src = ROOT + "assets/4programmers.png"; img.alt = ""; img.width = 20; img.height = 22;
+  s.append(img, document.createTextNode(t("to the whole team of the 4Programmers.net programming forum", "dla całej ekipy forum programistycznego 4Programmers.net")));
+  return s;
+}
 function help() {
   return [
     link(t("Documentation", "Dokumentacja"), DOCS, { blank: true }),
@@ -291,7 +297,10 @@ function help() {
     action(t("Keyboard shortcuts", "Klawiszologia"), keysDialog),
     action(t("Engine diagram", "Schemat silnika"), engineMap),
     action(t("About the labs", "O laboratoriach"), () => dialog("GameLaboratory", [[t("What", "Co to"), t("an engine for AI in the browser: laboratories of models and worlds — space, land and water", "silnik dla AI w przeglądarce: laboratoria modeli i światów — kosmos, ląd i woda")],
-      [t("Program", "Program"), "v" + APP_VERSION], ...(me && V.labs[me.file] ? [[isTool ? t("This tool", "To narzędzie") : t("This lab", "To laboratorium"), "v" + V.labs[me.file]]] : []), [t("Code", "Kod"), "MIT, github.com/michalstankiewicz4-cell/GameLaboratory"]],
+      [t("Program", "Program"), "v" + APP_VERSION], ...(me && V.labs[me.file] ? [[isTool ? t("This tool", "To narzędzie") : t("This lab", "To laboratorium"), "v" + V.labs[me.file]]] : []), [t("Code", "Kod"), "MIT, github.com/michalstankiewicz4-cell/GameLaboratory"],
+      [t("Made by", "Autorzy"), t("created entirely with vibe coding by Michał Stankiewicz and Claude Opus 5.5", "aplikacja stworzona w całości przy pomocy vibe codingu przez Michała Stankiewicza i Claude Opus 5.5")],
+      [t("Contact", "Kontakt"), "+48 797 486 355"],
+      [t("Thanks", "Podziękowania"), thanks4p()]],
       t("Every lab has its own version; the program has one too.", "Każde laboratorium ma własną wersję; program też ma swoją."))),
   ];
 }

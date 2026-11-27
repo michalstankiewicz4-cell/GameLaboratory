@@ -112,3 +112,6 @@
   #lmDialog .emLabs, #lmDialog .emDown { margin-left: 0; }
   #lmDialog .emLabRow, #lmDialog .emOver { grid-template-columns: 1fr 1fr; }
 }
+/* O laboratoriach: podziękowania z logo */
+#lmDialog .lmThanks { display: inline-flex; align-items: center; gap: 8px; }
+#lmDialog .lmThanks img { flex: none; }
