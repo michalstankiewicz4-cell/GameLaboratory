@@ -3,6 +3,32 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.113.0 — 2026-11-27 (wygląd: Dzień i Noc, nowa strona startowa, Sceny)
+
+### Dodane
+- Motyw **Dzień** — jasny canvas (ciepłe tło `#F5F0E9`, panele `#FFF9F2`, akcent pomarańczowy `#F47D50`, granatowy
+  tekst `#273247`, delikatne cienie) — obok **Nocy** (dotychczasowy ciemny wygląd z Battle). Domyślnie jak w systemie;
+  OPCJE → Wygląd (Automatycznie / Dzień / Noc) i słońce / księżyc na prawym końcu paska menu; zapamiętany w
+  przeglądarce, wspólny dla wszystkich stron (`ui/style/tokens.css`, `ui/shell/menubar.js`).
+- Menu **SCENY** na pasku menu: edytor sceny i gotowe sceny (Port, Tornado z miastem, Układ silnika) — otwierają
+  edytor z wybraną sceną (`editor/index.html?scene=<id>`, edytor 0.60.0; lista: `scenes` w `ui/data/catalog.js`).
+- Szerokość bocznych paneli (tryb Panele) zmienia się przeciągnięciem ich wewnętrznej krawędzi (240 px – 45 % okna,
+  dwuklik — domyślna); ta sama na wszystkich stronach, zapamiętana (`ui/shell/windows.js`).
+- Strona startowa jak na zrzucie „Canvas”: boczna kolumna (sekcje, kategorie jako filtr laboratoriów), baner z hasłem,
+  przyciskami i obrazkiem, karty gotowych scen z obrazkami (`assets/scenes/`), potem Szybki dostęp, Laboratoria,
+  Narzędzia.
+
+### Zmienione
+- Okna i panele: większe zaokrąglenia (14 / 9 px), cienie z tokenów, wybrane przyciski z delikatnym tłem akcentu,
+  okno pojawia się z krótką animacją, panel wsuwa się od krawędzi (bez animacji przy „ogranicz ruch” w systemie).
+- Kolory wpisane w arkusze powłoki, kontrolek, laboratoriów z Battle, SDF Walkers, języka i obrazów — teraz z tokenów,
+  więc zmieniają się z motywem.
+
+### Poprawione
+- SDF Walkers 0.23.6: laboratorium nie startowało („Cannot use import statement outside a module”) — przy wspólnych
+  generatorach liczb (0.112.1) dostał `import`, a jest zwykłym skryptem; generator znów jest w pliku (te same liczby
+  co `mulberry32` z `js/core/rng.js`).
+
 ## Program 0.112.6 — 2026-11-27 (doktor modeli: wiszące zastrzały)
 
 ### Dodane

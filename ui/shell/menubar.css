@@ -17,9 +17,9 @@
   box-shadow: none; transform: none; letter-spacing: normal; text-transform: none; outline-offset: 0; }
 #labMenu button, #labMenu a { box-shadow: none; text-shadow: none; letter-spacing: normal; text-transform: none; }
 #labMenu button:active { transform: none; }
-#labMenu .lmTop > button:hover, #labMenu .lmTop.open > button { background: var(--line); color: #fff; }
+#labMenu .lmTop > button:hover, #labMenu .lmTop.open > button { background: var(--line); color: var(--hoverText); }
 #labMenu .lmDrop { position: absolute; left: 0; top: 28px; min-width: 240px; padding: 6px; border-radius: 10px; background: var(--card);
-  border: 1px solid var(--line); box-shadow: 0 12px 32px rgba(0, 0, 0, .45); display: none;
+  border: 1px solid var(--line); box-shadow: var(--shadow); display: none;
   max-height: calc(100vh - 40px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--line2) transparent; }
 #labMenu .lmDrop::-webkit-scrollbar { width: 6px; }
 #labMenu .lmDrop::-webkit-scrollbar-button { display: none; }
@@ -36,7 +36,7 @@
 #labMenu .lmItem.lmGrpOn { background: var(--field); color: var(--head); }
 #labMenu .lmItem.lmGrpOn .lmChk:empty::before { content: "●"; color: var(--glow); }
 #labMenu .lmItem .lmChk { width: 12px; color: var(--accent); }
-#labMenu .lmItem[aria-disabled="true"] { color: #4a5363; cursor: default; background: none; }
+#labMenu .lmItem[aria-disabled="true"] { color: var(--off); cursor: default; background: none; }
 #labMenu .lmSep { height: 1px; margin: 5px 6px; background: var(--line); }
 /* the category of a lab (catalog "cat"): a heading and a coloured dot at each item, its name in the tooltip */
 #labMenu .lmDot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--dot, var(--dim)); }
@@ -55,10 +55,14 @@
 #labMenu .lmVer:hover { color: var(--head); border-color: var(--line2); }
 #labMenu .lmWhere + .lmVer { margin-left: 12px; }
 #labMenu .lmTop:last-of-type + .lmVer { margin-left: auto; }
-#lmDialog { position: fixed; inset: 0; z-index: 1001; display: none; align-items: center; justify-content: center; background: rgba(5, 6, 9, .55); }
+#labMenu .lmTheme { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 26px; height: 24px; margin-inline-start: 8px;
+  padding: 0; border: 0; border-radius: 6px; background: none; color: var(--dim); cursor: pointer; }
+#labMenu .lmTheme:hover { background: var(--line); color: var(--accent); }
+#labMenu .lmTheme svg { width: 15px; height: 15px; display: block; }
+#lmDialog { position: fixed; inset: 0; z-index: 1001; display: none; align-items: center; justify-content: center; background: var(--overlay); }
 #lmDialog.open { display: flex; }
 #lmDialog .lmBox { width: min(460px, calc(100vw - 32px)); padding: 20px 22px; border-radius: 14px; background: var(--card); border: 1px solid var(--line);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, .5); font: 14px/1.5 var(--font); color: var(--text); }
+  box-shadow: var(--shadowHi); font: 14px/1.5 var(--font); color: var(--text); }
 #lmDialog h3 { margin: 0 0 12px; font-size: 17px; color: var(--head); }
 #lmDialog table { width: 100%; border-collapse: collapse; }
 #lmDialog td { padding: 5px 0; border-bottom: 1px solid var(--line); vertical-align: top; }

@@ -3,6 +3,13 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.60.0 — 2026-11-27
+
+### Dodane
+- Adres `?scene=<id>` otwiera edytor z gotową sceną (menu SCENY na pasku menu, karty scen na stronie startowej);
+  potem znika z adresu.
+- Motyw Dzień / Noc (wspólny dla wszystkich stron, OPCJE → Wygląd).
+
 ## 0.59.1 — 2026-11-27
 
 ### Dodane

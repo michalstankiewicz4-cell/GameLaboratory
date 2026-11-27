@@ -19,13 +19,20 @@ export function createToolbar(store, controls, actions) {
   // gotowe sceny (editor/js/scenes/): wybór wczytuje scenę jak plik; lista wraca do „Sceny…”
   const list = $('sceneList');
   for (const sc of SCENES) { const o = document.createElement('option'); o.value = sc.id; o.textContent = t('scenes.' + sc.id); list.append(o); }
-  list.addEventListener('change', () => {
-    const sc = SCENES.find((x) => x.id === list.value); list.value = ''; list.blur(); if (!sc) return;
+  const openScene = (sc) => {
     const name = t('scenes.' + sc.id);
     for (const a of sc.assets || []) if (!getAsset(a.kind, a.name)) saveAsset(a.kind, a.name, a.data);   // zasoby sceny (pogoda z tornadem…)
     // kadr po zbudowaniu modeli (przed budową scena nie ma jeszcze obrysu)
     Promise.resolve(actions.build(() => { store.load(sc.build(name)); controls.frameAll(); })).then(() => controls.frameAll()); actions.status(t('status.sceneLoaded', { name }));
+  };
+  list.addEventListener('change', () => {
+    const sc = SCENES.find((x) => x.id === list.value); list.value = ''; list.blur(); if (sc) openScene(sc);
   });
+  // ?scene=<id> w adresie (menu Sceny na pasku menu, strona startowa): ta scena zamiast ostatniej; adres bez niego,
+  // żeby odświeżenie nie wczytało jej znowu
+  { const u = new URL(location.href), id = u.searchParams.get('scene'), sc = SCENES.find((x) => x.id === id);
+    if (id) { u.searchParams.delete('scene'); history.replaceState(history.state, '', u.href); }
+    if (sc) setTimeout(() => openScene(sc), 0); }
   // cofnij / ponów: przyciski aktywne, gdy jest co cofać
   $('undo').addEventListener('click', actions.undo); $('redo').addEventListener('click', actions.redo);
   const histState = () => { const p = actions.play.playing; $('undo').disabled = p || !store.canUndo; $('redo').disabled = p || !store.canRedo; };

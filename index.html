@@ -68,25 +68,45 @@
 <script src="ui/shell/menubar.js"></script>
 <div class="bar"><span class="sp"></span></div>
 <div class="foot"><span class="sp"></span><span>GameLaboratory · MIT</span></div>
-<main>
-  <header>
-    <div>
+<aside class="side">
+  <a class="brand" href="#top"><span class="mark"></span><span><b>GameLaboratory</b><small data-pl="Buduj. Testuj. Graj.">Build. Test. Play.</small></span></a>
+  <nav class="sideNav" id="sideNav">
+    <a href="#top" class="on"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M2.5 8 9 2.5 15.5 8v7.5h-4.2v-4.5H6.7v4.5H2.5Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-pl="Strona główna">Home</span></a>
+    <a href="#labsSec"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M7 2.5h4M7.8 2.5v4.6L3.2 14.3a1 1 0 0 0 .9 1.4h9.8a1 1 0 0 0 .9-1.4l-4.6-7.2V2.5M5 11h8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-pl="Laboratoria">Laboratories</span></a>
+    <a href="#scenesSec"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M2.5 4.5h13v9h-13ZM2.5 7.5h13M6 4.5v3M12 4.5v3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-pl="Sceny">Scenes</span></a>
+    <a href="#toolsSec"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M11.5 2.8a3.4 3.4 0 0 0-3.9 4.6L2.8 12.2a1.4 1.4 0 0 0 2 2l4.8-4.8a3.4 3.4 0 0 0 4.6-3.9l-2 2-1.9-.4-.4-1.9Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-pl="Narzędzia">Tools</span></a>
+    <a href="editor/index.html"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M3 15l1-3.5L12.2 3.3a1.4 1.4 0 0 1 2 0l.5.5a1.4 1.4 0 0 1 0 2L6.5 14Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-pl="Edytor sceny">Scene editor</span></a>
+  </nav>
+  <div class="sideLabel" data-pl="Kategorie">Categories</div>
+  <div class="sideCats" id="sideCats"></div>
+</aside>
+<main id="top">
+  <section class="hero">
+    <div class="txt">
       <h1>Game<span>Laboratory</span></h1>
       <p class="lead" data-pl="Silnik dla AI w przeglądarce: laboratoria modeli i światów — kosmos, ląd i woda. Każde laboratorium buduje, kształtuje i testuje modele zestawami, które dzieli z pozostałymi.">An engine for AI in the browser: laboratories of models and worlds — space, land and water. Each lab builds, shapes and tests models with the kits it shares with the other labs.</p>
+      <div class="cta">
+        <a class="primary" href="editor/index.html"><span data-pl="Otwórz edytor sceny">Open the scene editor</span> →</a>
+        <a href="#labsSec" data-pl="Przeglądaj laboratoria">Browse the labs</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="nLabs">–</b><span data-pl="laboratoria">labs</span></div>
+        <div class="stat"><b id="nScenes">–</b><span data-pl="sceny">scenes</span></div>
+        <div class="stat"><b id="nTools">–</b><span data-pl="narzędzia">tools</span></div>
+        <div class="stat"><b id="labsVer">–</b><span data-pl="program">program</span></div>
+      </div>
     </div>
-    <div class="stats">
-      <div class="stat"><b id="nLabs">–</b><span data-pl="laboratoria">labs</span></div>
-      <div class="stat"><b id="nTools">–</b><span data-pl="narzędzia">tools</span></div>
-      <div class="stat"><b id="labsVer">–</b><span data-pl="program">program</span></div>
-    </div>
-  </header>
+    <div class="pic"><img src="assets/scenes/harbour.jpg" alt=""></div>
+  </section>
   <h2 data-pl="Szybki dostęp">Quick access</h2>
   <div class="grid quick" id="quick"></div>
-  <h2 data-pl="Laboratoria">Laboratories</h2>
+  <h2 id="scenesSec" data-pl="Sceny">Scenes</h2>
+  <div class="grid" id="scenes"></div>
+  <h2 id="labsSec" data-pl="Laboratoria">Laboratories</h2>
   <div class="filter" id="filter"><input id="fSearch" type="search" autocomplete="off"><div class="chips" id="fChips"></div></div>
   <div class="noMatch" id="noMatch" hidden></div>
   <div class="grid" id="labs"></div>
-  <h2 data-pl="Narzędzia">Tools</h2>
+  <h2 id="toolsSec" data-pl="Narzędzia">Tools</h2>
   <div class="grid" id="tools"></div>
 </main>
 <script>
@@ -253,6 +273,49 @@ function remember(grid) {
 }
 function render() { quick(); fill("labs", LABS, "labs"); fill("tools", TOOLS, "tools"); applyFilter(); }
 
+// ---------- SCENES: the scene editor's ready scenes (catalog "scenes"); a card opens the editor with that scene ----------
+const SCENES = CAT.scenes || [];
+function sceneCards() {
+  const box = document.getElementById("scenes"); box.textContent = "";
+  for (const sc of SCENES) {
+    const a = document.createElement("a"); a.className = "tile scene"; a.href = window.LabMenu.ROOT + "editor/index.html?scene=" + encodeURIComponent(sc.id);
+    a.innerHTML = '<div class="art"><img alt="" loading="lazy"></div><div class="body"><div class="name"><span></span></div><div class="desc"></div><span class="go"></span></div>';
+    a.querySelector("img").src = window.LabMenu.ROOT + sc.img;
+    a.querySelector(".name span").textContent = PL ? sc.namePl || sc.name : sc.name;
+    a.querySelector(".desc").textContent = PL ? sc.descPl || sc.desc : sc.desc;
+    a.querySelector(".go").textContent = tr("Open in the editor →", "Otwórz w edytorze →");
+    box.appendChild(a);
+  }
+}
+sceneCards();
+
+// ---------- the side column: the categories filter the labs and tools (one at a time; again — all) ----------
+let catOn = null;
+function sideCats() {
+  const box = document.getElementById("sideCats"); box.textContent = "";
+  for (const id of Object.keys(CAT.cats || {})) {
+    const n = ALL.filter((x) => x.cat === id).length; if (!n) continue;
+    const b = document.createElement("button"); b.type = "button"; b.dataset.cat = id; if (catOn === id) b.className = "on";
+    const d = document.createElement("span"); d.className = "dot"; const k = document.createElement("span"); k.className = "n"; k.textContent = n;
+    b.append(d, document.createTextNode(catName(id)), k);
+    b.addEventListener("click", () => {
+      catOn = catOn === id ? null : id; sideCats(); chips(); applyFilter();
+      if (catOn) document.getElementById("labsSec").scrollIntoView({ behavior: "smooth" });
+    });
+    box.appendChild(b);
+  }
+}
+sideCats();
+// the side menu marks the section in view
+{ const nav = [...document.querySelectorAll("#sideNav a[href^='#']")], secs = nav.map((a) => document.querySelector(a.getAttribute("href")));
+  const mark = () => {
+    const y = (parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0) + 8;
+    let k = 0; secs.forEach((s, i) => { if (s && s.getBoundingClientRect().top <= y) k = i; });
+    if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) k = secs.length - 1;
+    nav.forEach((a, i) => a.classList.toggle("on", i === k));
+  };
+  addEventListener("scroll", mark, { passive: true }); mark(); }
+
 // ---------- the filter: phrases (all the chosen ones) and words typed (name, description, phrases) ----------
 const chosen = new Set();
 let showAll = false;
@@ -278,9 +341,9 @@ function chips() {
     m.textContent = showAll ? tr("fewer", "mniej") : tr("all phrases", "wszystkie frazy") + " (" + all.length + ")";
     m.addEventListener("click", () => { showAll = !showAll; chips(); }); fChips.appendChild(m);
   }
-  if (chosen.size || fSearch.value) {
+  if (chosen.size || fSearch.value || catOn) {
     const c = document.createElement("button"); c.type = "button"; c.className = "chip clear"; c.textContent = tr("clear ✕", "wyczyść ✕");
-    c.addEventListener("click", () => { chosen.clear(); fSearch.value = ""; chips(); applyFilter(); }); fChips.appendChild(c);
+    c.addEventListener("click", () => { chosen.clear(); fSearch.value = ""; catOn = null; sideCats(); chips(); applyFilter(); }); fChips.appendChild(c);
   }
 }
 function applyFilter() {
@@ -289,10 +352,10 @@ function applyFilter() {
   for (const id of ["labs", "tools"]) document.getElementById(id).querySelectorAll(".tile").forEach((t) => {
     const f = t.dataset.file, ph = PHRASES[f] || [], it = ALL.find((x) => x.file === f);
     const text = fold([it ? it.name : "", it && it.nameEn || "", f, (INFO[f] || [""])[0], INFO_PL[f] || "", ...ph, ...ph.map((w) => PHRASE_EN[w] || "")].join(" "));
-    const ok = [...chosen].every((w) => ph.includes(w)) && words.every((w) => text.includes(w));
+    const ok = (!catOn || (it && it.cat === catOn)) && [...chosen].every((w) => ph.includes(w)) && words.every((w) => text.includes(w));
     t.classList.toggle("out", !ok); if (ok) shown++;
   });
-  const active = chosen.size || words.length;
+  const active = chosen.size || words.length || catOn;
   noMatch.hidden = !active || shown > 0;
   noMatch.textContent = tr("No lab matches — clear the filter.", "Żadne laboratorium nie pasuje — wyczyść filtr.");
   // with a filter on, the tools' heading goes when none of them is left
@@ -370,6 +433,7 @@ document.addEventListener("keydown", (e) => {
 });
 document.getElementById("nLabs").textContent = LABS.length;
 document.getElementById("nTools").textContent = TOOLS.length;
+document.getElementById("nScenes").textContent = SCENES.length;
 document.getElementById("labsVer").textContent = "v" + window.LabMenu.APP_VERSION;
 })();
 </script>

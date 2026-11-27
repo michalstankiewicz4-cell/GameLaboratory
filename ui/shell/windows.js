@@ -34,9 +34,9 @@ const state = load(), wins = [];
 let zTop = 20;
 const PL = () => lang() === "pl";
 // the two panels windows dock into (created on the first docking)
-const docks = {};
+const docks = {}, grips = {};
 function dock(side) {
-  if (!docks[side]) { const d = document.createElement("div"); d.className = "labDock " + side; document.body.appendChild(d); docks[side] = d; }
+  if (!docks[side]) { const d = document.createElement("div"); d.className = "labDock " + side; document.body.appendChild(d); docks[side] = d; grip(side); }
   return docks[side];
 }
 
@@ -116,6 +116,37 @@ function setDocked(w, on, quiet) {
   pinTitle(w);
   if (!quiet) { (state[w.id] = state[w.id] || {}).docked = on; save(); }
 }
+// the panels' widths: dragged by the grip on a panel's inner edge (--dockL, --dockR on <html>; the same on every page,
+// kept in this browser: gamelab.dockw { left, right }); 240 px up to 45 % of the window
+const DW_KEY = "gamelab.dockw", DW_MIN = 240;
+const dockW = (() => { try { return JSON.parse(localStorage.getItem(DW_KEY) || "{}") || {}; } catch (e) { return {}; } })();
+const dwMax = () => Math.max(DW_MIN, Math.round(innerWidth * 0.45));
+function setDockW(side, w) {
+  dockW[side] = Math.round(Math.min(dwMax(), Math.max(DW_MIN, w)));
+  document.documentElement.style.setProperty(side === "left" ? "--dockL" : "--dockR", dockW[side] + "px");
+}
+for (const side of ["left", "right"]) if (dockW[side] > 0) setDockW(side, dockW[side]);
+function grip(side) {
+  const g = document.createElement("div"); g.className = "labDockGrip " + side; g.hidden = true;
+  g.title = PL() ? "Przeciągnij, by zmienić szerokość panelu (dwuklik: domyślna)" : "Drag to resize the panel (double-click: default)";
+  g.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0) return;
+    e.preventDefault(); g.setPointerCapture(e.pointerId); g.classList.add("on"); document.body.classList.add("lmResizing");
+    const move = (ev) => { setDockW(side, side === "left" ? ev.clientX : innerWidth - ev.clientX); layoutView(); };
+    const end = () => {
+      g.classList.remove("on"); document.body.classList.remove("lmResizing");
+      g.removeEventListener("pointermove", move); g.removeEventListener("pointerup", end); g.removeEventListener("pointercancel", end);
+      try { localStorage.setItem(DW_KEY, JSON.stringify(dockW)); } catch (err) { /* storage blocked */ }
+    };
+    g.addEventListener("pointermove", move); g.addEventListener("pointerup", end); g.addEventListener("pointercancel", end);
+  });
+  g.addEventListener("dblclick", () => {
+    delete dockW[side]; document.documentElement.style.removeProperty(side === "left" ? "--dockL" : "--dockR");
+    try { localStorage.setItem(DW_KEY, JSON.stringify(dockW)); } catch (err) { /* storage blocked */ }
+    layoutView();
+  });
+  document.body.appendChild(g); grips[side] = g;
+}
 // the free middle between the panels (and the console under it): CSS variables and LabView for the pages that fit their view
 const viewSubs = new Set();
 let viewKey = "";
@@ -127,6 +158,7 @@ function layoutView() {
   const vis = (side) => { const d = docks[side]; return d && getComputedStyle(d).display !== "none" ? d.getBoundingClientRect().width : 0; };
   const con = document.querySelector(".labConsole.lcDocked:not([hidden])");
   const L = Math.round(vis("left")), R = Math.round(vis("right")), B = con ? Math.round(con.getBoundingClientRect().height) : 0;
+  for (const side in grips) grips[side].hidden = !(side === "left" ? L : R);
   const root = document.documentElement.style;
   root.setProperty("--viewL", L + "px"); root.setProperty("--viewR", R + "px"); root.setProperty("--viewB", B + "px");
   const k = [L, R, B].join(","); if (k === viewKey) return; viewKey = k;

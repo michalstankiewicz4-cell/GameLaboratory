@@ -75,7 +75,7 @@
 
 ## Wygląd (UI)
 
-- Jeden wygląd wszędzie: styl laboratoriów Battle (ciemne szkło, cienka linia, złote nagłówki i kontrolki). Czcionka Space Grotesk, liczby IBM Plex Mono, cienkie paski przewijania bez strzałek. Kolory tylko z tokenów (`ui/style/tokens.css`).
+- Jeden wygląd wszędzie, w dwóch motywach (właściciel, 2026-11-27): **Dzień** — jasny canvas (tło `#F5F0E9`, panele `#FFF9F2`, akcent pomarańczowy `#F47D50`, tekst `#273247`, delikatne cienie) i **Noc** — styl laboratoriów Battle (ciemne szkło, cienka linia, złote nagłówki i kontrolki). Domyślnie jak w systemie; wybór w OPCJE → Wygląd i słońce / księżyc na pasku menu (`<html data-theme>`, `ui/shell/menubar.js`). Zaokrąglenia `--r` / `--r2`, cienkie obramowania. Czcionka Space Grotesk, liczby IBM Plex Mono, cienkie paski przewijania bez strzałek. Kolory tylko z tokenów (`ui/style/tokens.css`) — kolor wpisany w arkusz nie zmienia się z motywem.
 - Strona linkuje `ui/ui.css`, potem `ui/style/space.css` lub `ui/style/sea.css`, potem `ui/pages/<lab>.css`. Bez bloków `<style>` i atrybutów `style=` w stronach (CSP `style-src 'self'`); skrypty ustawiają style przez CSSOM. W CSP potrzebne `font-src 'self'`.
 - Kierunek tekstu (właściciel, 2026-11-21): nowy CSS — w laboratoriach, UI gry (`js/gameui/css/`) i edytorze — pisany właściwościami logicznymi (`margin-inline-start`, `padding-inline-end`, `inset-inline-start`, `border-inline-start`, `text-align: start`) zamiast `left`/`right`, żeby jedna wersja działała w LTR i RTL (przełącznik RTL i przejście starych arkuszy — na końcu, `TODO.md`, „Język”).
 - Arkusze paska menu i konsoli (`ui/shell/menubar.css`, `console.css`) są w `ui/ui.css` (strona startowa linkuje je sama), żeby pasek menu rysował się od razu ze stroną.
@@ -96,6 +96,7 @@
 
 ## Strona startowa
 
+- Strona startowa (jak zrzut „Canvas”, właściciel 2026-11-27): boczna kolumna (sekcje, kategorie jako filtr), baner z hasłem i obrazkiem, Szybki dostęp, Sceny, Laboratoria, Narzędzia. Gotowe sceny edytora: `scenes` w katalogu (te same id co `editor/js/scenes/scenes.js`, obrazek w `assets/scenes/`) — karta na stronie startowej i menu SCENY na pasku menu otwierają `editor/index.html?scene=<id>`.
 - Rejestr laboratoriów i narzędzi: `ui/data/catalog.js` (nazwa EN/PL, dokument, opis EN/PL, kit, frazy, klucze ustawień, obrazek kafelka) — czytają go pasek menu, strona startowa i `tools/sitemap.py`. Nowe laboratorium = wpis w katalogu + wersja w `ui/data/versions.js`, potem `python3 tools/sitemap.py`.
 - Każde laboratorium ma kilka fraz, które je opisują (np. woda, kosmos, planeta, układy) — używa ich filtr laboratoriów na stronie startowej (`phrases` w katalogu, po angielsku `phraseEn`; nowa fraza potrzebuje obu).
 - Strona startowa pochodzi z gry kosmicznej (Space).

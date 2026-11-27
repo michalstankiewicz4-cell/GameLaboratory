@@ -1,5 +1,7 @@
-/* GameLaboratory UI — design tokens: colours, fonts, radii. Every other file in ui/ uses these.
-   The look of the labs from Battle: dark glass, a thin line, gold headings and controls.
+/* GameLaboratory UI — design tokens: colours, fonts, radii, shadows. Every other file in ui/ uses these.
+   Two themes (OPTIONS → Look; ui/shell/menubar.js sets <html data-theme="day|night">, automatic: the system's):
+   night — the look of the labs from Battle: dark glass, a thin line, gold headings and controls;
+   day — the light canvas: warm paper, white panels, an orange accent, dark navy text.
    In a cascade layer, so a page with its own theme (SDF Walkers, the start page) keeps its own values on :root;
    the menu bar, its dialog and the lab's two bars always get these. */
 @layer gamelab.tokens{
@@ -36,16 +38,66 @@
   --cat-tools:#9aa6b4;
   /* pogody (zmienna pogoda, laboratorium wyglądu): od pogodnej do burzy */
   --wx-clear:#7fc8f2; --wx-fair:#a8d6ee; --wx-broken:#a3aebb; --wx-overcast:#76818f; --wx-rain:#5d88bd; --wx-fog:#c3c9d1; --wx-storm:#8d6fd0;
-  --ok:#5fd0a0;
+  --ok:#5fd0a0;            /* works, done */
   --err:#e04b50;
+  --info:#4fa3d8;          /* technical information */
+  --onAccent:#14110a;      /* text and ticks on the accent */
+  --accentSoft:rgba(242,184,75,.12);   /* the background of what is chosen */
+  --off:#4a5363;           /* disabled */
+  --hoverText:#fff;        /* a menu item under the pointer */
+  --chip:rgba(12,15,19,.8);/* a label over the 3D view (dimensions, split line) */
+  --overlay:rgba(5,6,9,.55);/* behind a dialog, over a busy page */
+  --shadow:0 12px 32px rgba(0,0,0,.4);
+  --shadowHi:0 18px 44px rgba(0,0,0,.55);
+  --scrollHover:#4c5a6e;
+  --hero1:#161c27;         /* the start page's banner: a soft gradient */
+  --hero2:#1d1a1f;
+  color-scheme:dark;
   --font:"Space Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;   /* numbers */
-  --r:12px;                /* windows, cards */
-  --r2:7px;                /* buttons, fields */
+  --r:14px;                /* windows, cards */
+  --r2:9px;                /* buttons, fields */
   --menuH:32px;            /* the menu bar (ui/shell/menubar.js) */
   --barH:44px;             /* the bar under it (ui/shell/bars.css) */
   --footH:34px;            /* the bottom bar */
   --menuBg:#0d1117;        /* the menu bar's background, opaque */
   --barBg:#0b0e12;         /* the two bars' background, opaque */
+}
+/* day: the light canvas (#F5F0E9 page, #FFF9F2 panels, #F47D50 accent, #273247 text) */
+:root[data-theme="day"], :root[data-theme="day"] :is(#labMenu, #lmDialog, body > .bar, body > .foot){
+  --bg:#f5f0e9;
+  --glass:rgba(255,249,242,.95);
+  --card:#fff9f2;
+  --field:#ffffff;
+  --line:#eadfd2;
+  --line2:#d6c5b2;
+  --text:#3a4354;
+  --head:#273247;
+  --dim:#7a8191;
+  --accent:#f47d50;
+  --plum:#9a5cc6;
+  --cat-world:#1fae90;
+  --cat-machines:#a8865a;
+  --cat-life:#5ea83a;
+  --cat-voxels:#2f93d6;
+  --cat-tools:#7d8896;
+  --badge-point:#8794a8;
+  --ok:#2e9e6a;
+  --err:#d9443f;
+  --info:#3a7bd5;
+  --onAccent:#ffffff;
+  --accentSoft:rgba(244,125,80,.12);
+  --off:#bdb4a8;
+  --hoverText:var(--head);
+  --chip:rgba(255,249,242,.92);
+  --overlay:rgba(60,45,30,.28);
+  --shadow:0 6px 22px rgba(110,72,40,.10);
+  --shadowHi:0 14px 36px rgba(110,72,40,.18);
+  --scrollHover:#c2ae98;
+  --hero1:#fff4ea;
+  --hero2:#ffe1cc;
+  --menuBg:#fff9f2;
+  --barBg:#fbf6f0;
+  color-scheme:light;
 }
 }

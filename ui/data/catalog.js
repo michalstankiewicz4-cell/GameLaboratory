@@ -14,6 +14,8 @@
    "vehicles": space · water · land, "space": bodies · systems · scale, "terrain": land · caves, "sound": music · effects · speech),
    cat (the category: a coloured dot in the menu and on the tile; "cats" — their names, in order; colours:
    ui/style/tokens.css --cat-<id>). The labs are listed in category order (the menu and the start page follow it).
+   "scenes" — the scene editor's ready scenes (editor/js/scenes/scenes.js, the same ids): the menu bar's SCENES and the
+   start page's scene cards open editor/index.html?scene=<id>; img — the card's picture.
    The JSON between the markers is read by tools/sitemap.py — keep it JSON.
    ======================================================================= */
 window.GameLabCatalog =
@@ -67,6 +69,32 @@ window.GameLabCatalog =
       "namePl": "Narzędzia"
     }
   },
+  "scenes": [
+    {
+      "id": "harbour",
+      "name": "Harbour (test)",
+      "namePl": "Port (testowa)",
+      "desc": "The test scene: a harbour with ships on the sea, the land and the sky.",
+      "descPl": "Scena testowa: port ze statkami na morzu, ląd i niebo.",
+      "img": "assets/scenes/harbour.jpg"
+    },
+    {
+      "id": "tornadoTown",
+      "name": "Tornado over the town",
+      "namePl": "Tornado z miastem",
+      "desc": "A tornado over a town: the houses break the way they are built.",
+      "descPl": "Tornado nad miastem: domy pękają tak, jak są zbudowane.",
+      "img": "assets/scenes/tornado-town.jpg"
+    },
+    {
+      "id": "engine",
+      "name": "Engine layout",
+      "namePl": "Układ silnika",
+      "desc": "A motor, an inverter and controls, with real physics and wiring.",
+      "descPl": "Silnik, falownik i sterowanie, z prawdziwą fizyką i obwodem.",
+      "img": "assets/scenes/engine.jpg"
+    }
+  ],
   "labs": [
     {
       "file": "labs/vehicles-space.html",

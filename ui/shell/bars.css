@@ -20,15 +20,15 @@ body > :is(.bar, .foot) .sp{flex:1 1 auto;min-width:0}
 
 /* under the menu bar: drop-downs and buttons, 28 px high */
 body > .bar .btns{display:flex;align-items:center;gap:6px;margin:0;padding:0}
-body > .bar :is(button, select){box-sizing:border-box;height:28px;margin:0;padding:0 10px;border:1px solid var(--line);border-radius:6px;
+body > .bar :is(button, select){box-sizing:border-box;height:28px;margin:0;padding:0 10px;border:1px solid var(--line);border-radius:var(--r2);
   background-color:var(--field);color:var(--text);font:500 13px/26px var(--font);letter-spacing:0;text-transform:none;text-shadow:none;
   box-shadow:none;outline:none;filter:none;transform:none;cursor:pointer;transition:border-color .15s,color .15s}
 body > .bar :is(button, select):hover{border-color:var(--line2);color:var(--head)}
 body > .bar :is(button, select):focus-visible{border-color:var(--accent)}
 body > .bar :is(button, select):disabled{opacity:.45;cursor:default;border-color:var(--line);color:var(--text)}
-body > .bar button.on{border-color:var(--accent);color:var(--accent)}
+body > .bar button.on{border-color:var(--accent);color:var(--accent);background-color:var(--accentSoft)}
 body > .bar button.go{border-color:var(--accent);color:var(--accent);font-weight:600}
-body > .bar button.go.due{background-color:var(--accent);color:#14110a}
+body > .bar button.go.due{background-color:var(--accent);color:var(--onAccent)}
 /* a drop-down: the same box, a small arrow drawn with gradients (no image, CSP 'self') */
 body > .bar select{-webkit-appearance:none;appearance:none;max-width:260px;padding:0 28px 0 10px;font-weight:400;
   background-image:linear-gradient(45deg,transparent 50%,var(--dim) 50%),linear-gradient(135deg,var(--dim) 50%,transparent 50%);
@@ -42,12 +42,12 @@ body > .bar .seg button + button{margin-left:-1px}
 body > .bar .navSeg{display:inline-flex}
 body > .bar .navSeg button{padding:0 9px;font-size:15px;line-height:26px;border-radius:0}
 body > .bar .navSeg button + button{margin-left:-1px}
-body > .bar .navSeg button:first-child{border-radius:6px 0 0 6px}
-body > .bar .navSeg button:last-child{border-radius:0 6px 6px 0}
+body > .bar .navSeg button:first-child{border-radius:var(--r2) 0 0 var(--r2)}
+body > .bar .navSeg button:last-child{border-radius:0 var(--r2) var(--r2) 0}
 body > .bar .navSeg .navHome{display:inline-flex;align-items:center;justify-content:center}
 body > .bar .navSeg .navHome svg{width:15px;height:15px;display:block}
-body > .bar .seg button:first-child{border-radius:6px 0 0 6px}
-body > .bar .seg button:last-child{border-radius:0 6px 6px 0}
+body > .bar .seg button:first-child{border-radius:var(--r2) 0 0 var(--r2)}
+body > .bar .seg button:last-child{border-radius:0 var(--r2) var(--r2) 0}
 body > .bar .seg button.on{position:relative;z-index:1}
 /* a status or a label */
 body > .bar .dimtxt{color:var(--dim);font:400 12.5px/1.4 var(--font);white-space:nowrap}

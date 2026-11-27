@@ -9,8 +9,8 @@
   color:var(--text);font:500 13px var(--font);letter-spacing:0;text-transform:none;box-shadow:none;text-shadow:none;cursor:pointer;
   transition:border-color .15s,color .15s}
 :is(.labWin, .labUi) :is(.tBtn, .btn, .btns button):hover{border-color:var(--line2);color:var(--head);box-shadow:none}
-:is(.labWin, .labUi) :is(.tBtn, .btn, .btns button).on{border-color:var(--accent);color:var(--accent);box-shadow:none}
-:is(.labWin, .labUi) .btn.primary{background:var(--accent);border-color:var(--accent);color:#14110a;font-weight:600}
+:is(.labWin, .labUi) :is(.tBtn, .btn, .btns button).on{border-color:var(--accent);color:var(--accent);background:var(--accentSoft);box-shadow:none}
+:is(.labWin, .labUi) .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--onAccent);font-weight:600}
 
 /* sliders: a thin track, gold up to the value (--fill), a gold knob */
 :is(.labWin, .labUi) input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:18px;margin:4px 0 0;background:none;cursor:pointer}
@@ -28,14 +28,14 @@
   place-items:center;cursor:pointer}
 :is(.labWin, .labUi) input[type=radio]{border-radius:50%}
 :is(.labWin, .labUi) input:is([type=checkbox], [type=radio]):checked{background:var(--accent);border-color:var(--accent)}
-:is(.labWin, .labUi) input[type=checkbox]:checked::after{content:"";width:8px;height:4px;border:2px solid #14110a;border-top:0;border-right:0;
+:is(.labWin, .labUi) input[type=checkbox]:checked::after{content:"";width:8px;height:4px;border:2px solid var(--onAccent);border-top:0;border-right:0;
   transform:translateY(-1px) rotate(-45deg)}
-:is(.labWin, .labUi) input[type=radio]:checked::after{content:"";width:6px;height:6px;border-radius:50%;background:#14110a}
+:is(.labWin, .labUi) input[type=radio]:checked::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--onAccent)}
 :is(.labWin, .labUi) input:is([type=checkbox], [type=radio]):focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 
 /* drop-downs and fields */
 :is(.labWin, .labUi) :is(select, input[type=text], input[type=number], input[type=search], textarea){min-height:30px;padding:0 8px;
-  border:1px solid var(--line);border-radius:6px;background:var(--field);color:var(--text);font-size:13px}
+  border:1px solid var(--line);border-radius:8px;background:var(--field);color:var(--text);font-size:13px}
 :is(.labWin, .labUi) :is(select, input, textarea):focus-visible{outline:none;border-color:var(--accent)}
 :is(.labWin, .labUi) select option{background:var(--card);color:var(--text)}
 

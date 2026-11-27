@@ -1,6 +1,6 @@
 /* =======================================================================
    LABKIT · MENU BAR — the labs' and tools' common menu (OPTIONS,
-   TOOLS, HELP), always visible at the top of every lab and tool page
+   TOOLS, SCENES, HELP), always visible at the top of every lab and tool page
    =======================================================================
    A classic script with no dependencies, at the top of <body> right after ui/shell/log.js:
      a <script> of ../ui/shell/menubar.js   (a lab or a tool; the start page: ui/shell/menubar.js)
@@ -45,6 +45,28 @@ const LANG = LANGS[URL_LANG] ? URL_LANG : LANGS[LANG_CHOICE] ? LANG_CHOICE : LAN
 if (START) document.documentElement.lang = LANG;
 const PL = LANG === "pl";
 const t = (en, pl) => (PL ? pl : en);   // the bar's own words
+
+// THEME — day (the light canvas) or night (dark glass): ui/style/tokens.css, <html data-theme="day|night">. Chosen in
+// OPTIONS → Look or with the sun / moon on the bar (kept in this browser, gamelab.theme: "auto" | "day" | "night");
+// "auto" follows the system's light / dark setting, live. Set here, before the page draws. A page that draws its
+// own colours (a canvas) listens to the "gamelab-theme" event on window (detail: "day" | "night").
+const THEME_KEY = "gamelab.theme";
+let themeBtn = null;   // the sun / moon on the bar (below)
+const themeChoice = () => { try { const v = localStorage.getItem(THEME_KEY); return v === "day" || v === "night" ? v : "auto"; } catch (e) { return "auto"; } };
+const sysLight = window.matchMedia ? window.matchMedia("(prefers-color-scheme: light)") : null;
+const themeNow = () => { const c = themeChoice(); return c !== "auto" ? c : sysLight && sysLight.matches ? "day" : "night"; };
+function applyTheme() {
+  const th = themeNow(); if (document.documentElement.dataset.theme === th) return;
+  document.documentElement.dataset.theme = th;
+  window.dispatchEvent(new CustomEvent("gamelab-theme", { detail: th }));
+}
+function setTheme(v) {
+  try { if (v === "auto") localStorage.removeItem(THEME_KEY); else localStorage.setItem(THEME_KEY, v); } catch (e) { /* storage blocked: this page only */ }
+  applyTheme(); if (themeBtn) themeIcon();
+}
+applyTheme();
+if (sysLight && sysLight.addEventListener) sysLight.addEventListener("change", () => { if (themeChoice() === "auto") { applyTheme(); if (themeBtn) themeIcon(); } });
+window.addEventListener("storage", (e) => { if (e.key === THEME_KEY) { applyTheme(); if (themeBtn) themeIcon(); } });   // another tab chose
 
 // The labs and tools: ui/data/catalog.js (loaded before this script), shared with the start screen (window.LabMenu.ITEMS).
 // The names follow the language; nameEn keeps the English one.
@@ -240,6 +262,10 @@ function options() {
         const u = new URL(location.href); u.searchParams.delete("lang"); location.href = u.href;
       }, { on: LANG_CHOICE === k && !LANGS[URL_LANG] })),
     el("div", "lmSep"),
+    el("div", "lmLabel", t("Look", "Wygląd")),
+    ...[["auto", t("Automatic (system)", "Automatycznie (system)")], ["day", t("Day (light)", "Dzień (jasny)")], ["night", t("Night (dark)", "Noc (ciemny)")]].map(([k, label]) =>
+      action(label, () => setTheme(k), { on: themeChoice() === k })),
+    el("div", "lmSep"),
     action(t("Reset saved settings…", "Wyczyść zapisane ustawienia…"), () => {
       if (!confirm(t("Forget everything GameLaboratory keeps in this browser — the settings of every lab and tool, window layouts, the bars, the language, assets saved under a name, scenes, the start screen's order — and reload? This cannot be undone.",
         "Zapomnieć wszystko, co GameLaboratory trzyma w tej przeglądarce — ustawienia wszystkich laboratoriów i narzędzi, układ okien, paski, język, zasoby zapisane pod nazwą, sceny, kolejność na stronie startowej — i odświeżyć? Tego nie da się cofnąć."))) return;
@@ -281,6 +307,14 @@ function tools() {
   TOOLS.forEach((t) => d.push(link(t.name, ROOT + t.file, { on: me === t, cat: t.cat })));
   return d;
 }
+// SCENES: the scene editor's ready scenes (catalog "scenes" — the same ids as editor/js/scenes/scenes.js); each opens
+// the editor with that scene (editor/index.html?scene=<id>); the first item opens it with the last scene
+function scenes() {
+  const ed = ROOT + "editor/index.html";
+  return [link(t("Scene editor (your last scene)", "Edytor sceny (ostatnia scena)"), ed, { on: PAGE === "editor/index.html" }),
+    el("div", "lmSep"), el("div", "lmLabel", t("Ready scenes", "Gotowe sceny")),
+    ...(CAT.scenes || []).map((sc) => link(PL ? sc.namePl || sc.name : sc.name, ed + "?scene=" + encodeURIComponent(sc.id)))];
+}
 // podziękowania dla forum 4Programmers.net: logo (assets/4programmers.png, bez czarnego tła) i tekst
 function thanks4p() {
   const s = el("span", "lmThanks"), img = el("img"); img.src = ROOT + "assets/4programmers.png"; img.alt = ""; img.width = 20; img.height = 22;
@@ -309,7 +343,7 @@ const bar = el("div"); bar.id = "labMenu"; bar.lang = LANG;
 const home = el("a", "lmHome"); home.href = ROOT + "index.html"; home.title = t("Start screen", "Strona startowa");
 home.append(el("span", "lmMark"), document.createTextNode("GameLaboratory"));
 bar.appendChild(home);
-const menus = [[t("Options", "Opcje"), options], [t("Tools", "Narzędzia"), tools], [t("Help", "Pomoc"), help]];
+const menus = [[t("Options", "Opcje"), options], [t("Tools", "Narzędzia"), tools], [t("Scenes", "Sceny"), scenes], [t("Help", "Pomoc"), help]];
 menus.forEach(([name, make]) => {
   const top = el("div", "lmTop"), btn = el("button", null, name); btn.type = "button";
   const drop = el("div", "lmDrop");
@@ -334,6 +368,19 @@ if (me) bar.appendChild(where);
 const ver = el("a", "lmVer", "v" + APP_VERSION + (me && V.labs[me.file] ? " · " + (isTool ? t("tool", "narzędzie") : t("lab", "lab.")) + " v" + V.labs[me.file] : "")); ver.href = REPO + "CHANGELOG.md"; ver.target = "_blank"; ver.rel = "noopener";
 ver.title = t("Program version · this page's version — what's new", "Wersja programu · wersja tej strony — co nowego");
 bar.appendChild(ver);
+// day / night at the right end of the bar: switches between the two (the automatic choice stays in OPTIONS → Look)
+const SUN = '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6 13 13M3 13l1.4-1.4M11.6 4.4 13 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
+const MOON = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 10.2A5.8 5.8 0 0 1 5.8 2.5a5.8 5.8 0 1 0 7.7 7.7Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+themeBtn = el("button", "lmTheme"); themeBtn.type = "button";
+function themeIcon() {
+  const day = themeNow() === "day";
+  themeBtn.innerHTML = day ? MOON : SUN;
+  themeBtn.title = day ? t("Night (dark look)", "Noc (ciemny wygląd)") : t("Day (light look)", "Dzień (jasny wygląd)");
+  themeBtn.setAttribute("aria-label", themeBtn.title);
+}
+themeBtn.addEventListener("click", () => setTheme(themeNow() === "day" ? "night" : "day"));
+themeIcon();
+bar.appendChild(themeBtn);
 function closeAll() { bar.querySelectorAll(".lmTop.open").forEach((t) => t.classList.remove("open")); }
 document.addEventListener("pointerdown", (e) => { if (!bar.contains(e.target)) closeAll(); });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeAll(); dlg.classList.remove("open"); } });
@@ -361,5 +408,5 @@ if (me) {
 document.body.appendChild(dlg);
 
 // the game's version, for "About"
-window.LabMenu = { ITEMS: { LABS, TOOLS }, CATALOG: CAT, ROOT, MENU_H, APP_VERSION, VERSIONS: V, version: null, LANG, t };
+window.LabMenu = { ITEMS: { LABS, TOOLS }, CATALOG: CAT, ROOT, MENU_H, APP_VERSION, VERSIONS: V, version: null, LANG, t, theme: themeNow, setTheme };
 })();
