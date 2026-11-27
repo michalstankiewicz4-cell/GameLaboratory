@@ -33,7 +33,7 @@
     "labs/art.html": "1.3.0",
     "labs/gameui.html": "1.7.1",
     "labs/trees.html": "1.1.0",
-    "labs/items.html": "1.2.2",
+    "labs/items.html": "1.2.3",
     "labs/materials.html": "1.1.1",
     "labs/blocks.html": "1.2.0",
     "labs/effects.html": "1.4.1",

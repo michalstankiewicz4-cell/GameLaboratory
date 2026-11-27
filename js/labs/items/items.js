@@ -5,7 +5,8 @@
 // Tornado.io): steel drums as sheet-metal shells (js/behaviors/land/deform/) crushed under presses. For an AI: window.ItemsApi.
 import * as THREE from '../../../vendor/three/three.module.js';
 import { ConvexGeometry } from '../../../vendor/three/addons/geometries/ConvexGeometry.js';
-import { WEATHER, skyUniforms, skyDome, applySky, skyEnvironment } from '../../envs/sky/skykit.js';
+import { WEATHER } from '../../envs/sky/skykit.js';
+import { createStage } from '../shared/stage.js';
 import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
 import { MODELS, junkEntry } from '../../models/junkyard/registry.js';
 import { applyTextures, setAnisotropy } from '../../models/junkyard/textures.js';
@@ -42,23 +43,18 @@ $('view').append(renderer.domElement);
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(40, 1, 0.01, 8000);
 const look = new LookPipeline(renderer); look.set(LOOK_PRESETS.clean);
-const skyU = skyUniforms(), sky = skyDome(skyU, 4000); sky.renderOrder = -1; scene.add(sky);
-const hemi = new THREE.HemisphereLight(0xdfe6ec, 0x2a3a46, 0.8), sun = new THREE.DirectionalLight(0xfff0d8, 3);
+// wspólna scena bazowa laboratoriów (js/labs/shared/stage.js): niebo SkyKit, światło z pogodą, mgła, płaski grunt
+const stage = createStage(renderer, scene, { skyRadius: 4000 });
+stage.setSurface('land', 0);
+const sun = stage.sun;
 sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0002; sun.shadow.normalBias = 0.01;
-scene.add(hemi, sun, sun.target);
-const ground = new THREE.Mesh(new THREE.CircleGeometry(40, 64).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x5b554b, roughness: 0.97 }));
-ground.receiveShadow = true; scene.add(ground);
-let envRT = null, envDirty = true;
 let wxNow = null;   // liczby zmiennej pogody (js/labs/shared/weather-cycle-ui.js); null — pogoda z listy
 function updateSky() {
   const w = wxNow || WEATHER[S.weather] || WEATHER.fair;
-  const L = applySky(skyU, { ...w, sunEl: S.sunEl, sunAz: S.sunAz, moon: 0.8 });
-  sun.color.copy(L.sunColor); sun.intensity = L.sunIntensity; hemi.intensity = L.ambient; hemi.color.copy(L.sky); hemi.groundColor.copy(L.ground);
+  const L = stage.setLight({ ...w, weather: S.weather, sunEl: S.sunEl, sunAz: S.sunAz, moon: 0.8 });
   sun.userData.dir = L.sunDir.clone();
-  scene.environmentIntensity = (0.85 - w.coverage * w.density * 0.45) * (0.1 + 0.9 * L.day);
   look.sunVisible = Math.max(0, 1 - w.coverage * (0.4 + w.density * 0.6)) * L.sunSeen;
   look.set({ exposure: LOOK_PRESETS.clean.exposure * (1 + 2.6 * (1 - L.day)) });
-  envDirty = true;
 }
 
 /* ---------------- the item ---------------- */
@@ -166,7 +162,7 @@ function frame(now) {
   camera.position.y = Math.max(0.01, camera.position.y); camera.lookAt(orbit.target);
   const d = sun.userData.dir || new THREE.Vector3(0.4, 0.8, 0.3), r = Math.max(2, orbit.dist * 3);
   sun.position.copy(orbit.target).addScaledVector(d, r * 2); sun.target.position.copy(orbit.target);
-  if (envDirty) { if (envRT) envRT.dispose(); envRT = skyEnvironment(renderer, skyU); scene.environment = envRT.texture; envDirty = false; }
+  stage.update(dt, camera);   // niebo za kamerą, mgła, mapa otoczenia z nieba
   window.LabPerf.begin(renderer);
   look.render(scene, camera);
   window.LabPerf.end(renderer);

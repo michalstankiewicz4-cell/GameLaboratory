@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Przedmioty 1.2.3 — 2026-11-27 (wspólna scena bazowa)
+
+### Zmienione
+- Laboratorium przedmiotów stoi na wspólnej scenie bazowej (`js/labs/shared/stage.js`) zamiast własnego nieba, świateł
+  i gruntu; przedmioty wyglądają tak samo, grunt ma barwę wspólnej sceny.
+
 ## Skały 1.1.2 — 2026-11-27 (wspólna scena bazowa)
 
 ### Zmienione
