@@ -311,8 +311,11 @@ sideCats();
 { const nav = [...document.querySelectorAll("#sideNav a[href^='#']")], secs = nav.map((a) => document.querySelector(a.getAttribute("href")));
   const mark = () => {
     const y = (parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0) + 8;
-    let k = 0; secs.forEach((s, i) => { if (s && s.getBoundingClientRect().top <= y) k = i; });
-    if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) k = secs.length - 1;
+    // the section whose heading is the last one above the line (by its place on the page, not its place in the menu:
+    // Scenes stand above Laboratories on the page)
+    let k = 0, best = -Infinity;
+    secs.forEach((s, i) => { const top = s ? s.getBoundingClientRect().top : Infinity; if (top <= y && top > best) { best = top; k = i; } });
+    if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) k = secs.indexOf(document.getElementById("toolsSec"));
     nav.forEach((a, i) => a.classList.toggle("on", i === k));
   };
   addEventListener("scroll", mark, { passive: true }); mark(); }

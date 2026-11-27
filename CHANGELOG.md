@@ -3,6 +3,15 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.113.4 — 2026-11-27 (strona startowa: boczne menu)
+
+### Poprawione
+- Boczne menu strony startowej: po kliknięciu „Laboratoria” podświetlały się „Sceny”. Podświetlenie wybierało
+  ostatnią sekcję z listy menu nad linią, a Sceny stoją na stronie nad Laboratoriami; teraz sekcję, której nagłówek
+  jest najbliżej nad linią. Sprawdzone: każda pozycja podświetla siebie, nagłówek staje pod paskami.
+- Sprawdzone przy okazji (0.113.3): przełącznik Okna | Panele we wszystkich 40 stronach, które go mają (Okna → Panele →
+  Okna, z otwartą konsolą) — żadna się nie zawiesza; w trybie Okna nie ma powtarzających się przeliczeń układu.
+
 ## Program 0.113.3 — 2026-11-27 (Okna | Panele bez zawieszenia)
 
 ### Poprawione
