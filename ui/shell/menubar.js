@@ -389,8 +389,8 @@ function themeIcon() {
 themeBtn.addEventListener("click", () => setTheme(themeNow() === "day" ? "night" : "day"));
 themeIcon();
 bar.appendChild(themeBtn);
-// the start page has no bars (ui/pages/start.css): the menu bar is a small cluster at the top right — Options, the
-// language, Help, day / night, the console (the logo, Tools, Scenes and the version are on the page itself)
+// the start page has no bars (ui/pages/start.css): the menu bar is a small cluster at the top right — the language,
+// Help, day / night, the console (the logo, Tools, Scenes and the version are on the page itself; OPTIONS in the labs)
 if (START) {
   bar.classList.add("lmStart");
   const other = LANG === "pl" ? "en" : "pl";
