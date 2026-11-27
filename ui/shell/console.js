@@ -77,11 +77,11 @@ function build() {
   const clear = el("button", "btn", t("Clear", "Wyczyść")); clear.type = "button";
   tools.append(q);
   clear.classList.add("lcClear"); kinds.append(clear);   // Clear at the right end of the tabs' row (the filter's row can be hidden)
-  const list = el("div", "lcList"), count = el("div", "lcCount");
+  const list = el("div", "lcList");   // how many: on the kinds' tabs
   // a hidden filter filters nothing: what was typed in it is dropped
   setFilter = () => { tools.hidden = st.filter === false; if (tools.hidden && st.q) { st.q = ""; q.value = ""; save(); if (!win.hidden) render(); } };
   if (st.filter === false) { tools.hidden = true; st.q = ""; q.value = ""; }
-  const body = el("div", "lcBody"); body.append(kinds, tools, list, count);
+  const body = el("div", "lcBody"); body.append(kinds, tools, list);
   win.append(head, body);
   // docked at the bottom: its top edge is a grip — drag to change the height (90 px up to 75 % of the window; double-click:
   // the default 30 %), kept with the console's settings, the same on every page (--conH on <html>)
@@ -147,17 +147,15 @@ function build() {
   function render() {
     const shown = LOG.entries.filter(match).reverse().slice(0, 400);
     list.replaceChildren(...shown.map(row));
-    count.textContent = `${shown.length} / ${LOG.entries.length}`;
     syncKinds();
   }
   LOG.on((e) => {
     if (!win.hidden) syncKinds();
-    if (win.hidden || !match(e)) { if (!win.hidden) count.textContent = count.textContent.replace(/\/ \d+$/, "/ " + LOG.entries.length); return; }
+    if (win.hidden || !match(e)) return;
     list.prepend(row(e)); while (list.childElementCount > 400) list.lastChild.remove();
-    count.textContent = `${list.childElementCount} / ${LOG.entries.length}`;
   });
   q.oninput = () => { st.q = q.value; save(); render(); };
-  clear.onclick = () => { LOG.clear(); render(); };   // render() also resets the counts on the tabs   // also forgets the log kept for this tab
+  clear.onclick = () => { LOG.clear(); render(); };   // also forgets the log kept for this tab; render() resets the counts on the tabs
 
   // open, close, place
   const place = () => {
