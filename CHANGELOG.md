@@ -3,6 +3,18 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.114.0 — 2026-11-27 (strona startowa bez pasków)
+
+### Zmienione
+- Strona startowa bez paska menu, paska narzędzi i paska informacyjnego: boczne menu od góry do dołu, a w prawym górnym
+  rogu mały zestaw — **Opcje**, przycisk języka (**PL / EN**, przełącza na drugi), **Pomoc**, słońce / księżyc i
+  **Konsola** (`#labMenu.lmStart`). Logo, sceny, laboratoria, narzędzia i wersja są na samej stronie. Laboratoria
+  bez zmian.
+
+### Dodane
+- OPCJE → Konsola → **Pokaż konsolę** — otwiera i zamyka konsolę na każdej stronie (`LabConsole.toggle()`, zdarzenie
+  `labconsole:show`).
+
 ## Program 0.113.17 — 2026-11-27 (cienie: słabsze u góry i z lewej)
 
 ### Zmienione

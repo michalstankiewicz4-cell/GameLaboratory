@@ -288,6 +288,7 @@ function barItems() {
 function consoleItems() {
   const C = window.LabConsole; if (!C || !C.filterOn) return [];
   return [el("div", "lmSep"), el("div", "lmLabel", t("Console", "Konsola")),
+    action(t("Show the console", "Pokaż konsolę"), () => C.toggle(), { on: C.isOpen() }),
     action(t("Text filter", "Filtr tekstu"), () => C.setFilter(!C.filterOn()), { on: C.filterOn() })];
 }
 function windowItems() {
@@ -350,9 +351,9 @@ const bar = el("div"); bar.id = "labMenu"; bar.lang = LANG;
 const home = el("a", "lmHome"); home.href = ROOT + "index.html"; home.title = t("Start screen", "Strona startowa");
 home.append(el("span", "lmMark"), document.createTextNode("GameLaboratory"));
 bar.appendChild(home);
-const menus = [[t("Options", "Opcje"), options], [t("Tools", "Narzędzia"), tools], [t("Scenes", "Sceny"), scenes], [t("Help", "Pomoc"), help]];
-menus.forEach(([name, make]) => {
-  const top = el("div", "lmTop"), btn = el("button", null, name); btn.type = "button";
+const menus = [["options", t("Options", "Opcje"), options], ["tools", t("Tools", "Narzędzia"), tools], ["scenes", t("Scenes", "Sceny"), scenes], ["help", t("Help", "Pomoc"), help]];
+menus.forEach(([key, name, make]) => {
+  const top = el("div", "lmTop"), btn = el("button", null, name); btn.type = "button"; top.dataset.menu = key;
   const drop = el("div", "lmDrop");
   top.append(btn, drop);
   let hoverOpened = 0;
@@ -388,6 +389,24 @@ function themeIcon() {
 themeBtn.addEventListener("click", () => setTheme(themeNow() === "day" ? "night" : "day"));
 themeIcon();
 bar.appendChild(themeBtn);
+// the start page has no bars (ui/pages/start.css): the menu bar is a small cluster at the top right — Options, the
+// language, Help, day / night, the console (the logo, Tools, Scenes and the version are on the page itself)
+if (START) {
+  bar.classList.add("lmStart");
+  const other = LANG === "pl" ? "en" : "pl";
+  const lang = el("button", "lmLang", LANG.toUpperCase()); lang.type = "button";
+  lang.title = t("Język: Polski", "Language: English");
+  lang.addEventListener("click", () => {
+    try { localStorage.setItem(LANG_KEY, other); } catch (e) { /* storage blocked */ }
+    const u = new URL(location.href); u.searchParams.delete("lang"); location.href = u.href;
+  });
+  bar.insertBefore(lang, bar.querySelector('.lmTop[data-menu="help"]'));
+  const con = el("button", "lmCon", t("Console", "Konsola")); con.type = "button";
+  con.title = t("The page's log: errors, warnings, loading", "Dziennik strony: błędy, ostrzeżenia, ładowanie");
+  con.addEventListener("click", () => { if (window.LabConsole && window.LabConsole.toggle) window.LabConsole.toggle(); });
+  addEventListener("labconsole:show", (e) => con.classList.toggle("on", !!e.detail));
+  bar.appendChild(con);
+}
 function closeAll() { bar.querySelectorAll(".lmTop.open").forEach((t) => t.classList.remove("open")); }
 document.addEventListener("pointerdown", (e) => { if (!bar.contains(e.target)) closeAll(); });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeAll(); dlg.classList.remove("open"); } });

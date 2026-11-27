@@ -14,12 +14,15 @@ if (!LOG || document.querySelector(".labConsole")) return;
 // tabs added by the page: kept until the console is built, then shown at once
 const extra = (window.LabConsoleTabs || []).slice();   // tabs a page queued before this script ran
 let addPane = null, openTab = null;
-let setFilter = null;
+let setFilter = null, toggleWin = null;
 window.LabConsole = {
   addTab(spec) { extra.push(spec); if (addPane) addPane(spec); },
   open(id) { if (openTab) openTab(id); },
   // the text filter's row: shown or hidden (OPTIONS → Console, ui/shell/menubar.js); kept with the console's settings
   filterOn: () => st.filter !== false,
+  // open / close (OPTIONS → Console, the start page's console button); the page hears "labconsole:show" (detail: open)
+  isOpen: () => !!st.open,
+  toggle() { if (toggleWin) toggleWin(); },
   setFilter(on) { st.filter = !!on; save(); if (setFilter) setFilter(); },
 };
 const PL = window.LabMenu && window.LabMenu.LANG === "pl";
@@ -163,7 +166,7 @@ function build() {
     const x = Math.min(Math.max(st.x, 8 - 300), innerWidth - 80), y = Math.min(Math.max(st.y, 36), innerHeight - 40);
     win.style.left = x + "px"; win.style.top = y + "px"; win.style.right = "auto";
   };
-  const show = (on) => { st.open = on; win.hidden = !on; btn.classList.toggle("on", on); save(); if (on) { place(); if (st.tab === "log") render(); else if (onShow[st.tab]) onShow[st.tab](); } if (window.LabView) window.LabView.update(); };
+  const show = (on) => { st.open = on; win.hidden = !on; btn.classList.toggle("on", on); save(); dispatchEvent(new CustomEvent("labconsole:show", { detail: on })); if (on) { place(); if (st.tab === "log") render(); else if (onShow[st.tab]) onShow[st.tab](); } if (window.LabView) window.LabView.update(); };
   // window or panel: docked at the bottom between the side panels, or floating. Its own pin (st.dock: true / false);
   // without a choice it follows the toolbar switch Windows | Panels (ui/shell/windows.js, body.lmPanels); a click on that
   // switch (event "labwindows:layout") clears the choice
@@ -180,6 +183,7 @@ function build() {
   new MutationObserver(dockState).observe(document.body, { attributes: true, attributeFilter: ["class"] }); dockState();
   if (window.ResizeObserver) new ResizeObserver(() => { if (window.LabView) window.LabView.update(); }).observe(win);   // dragging its top edge
   btn.onclick = () => show(win.hidden);
+  toggleWin = () => show(win.hidden);
   close.onclick = () => show(false);
   extra.forEach(addPane); showTab(st.tab);
   show(st.open);
