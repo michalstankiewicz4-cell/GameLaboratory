@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.113.2 — 2026-11-27 (paski przewijania)
+
+### Poprawione
+- Paski przewijania w kolorze akcentu (przygaszony pomarańcz, pod kursorem pełny; tokeny `--scroll`,
+  `--scrollHover`) zamiast szarych, w obu motywach. Strona startowa nie miała arkusza pasków (`ui/style/base.css`) —
+  pokazywała szary pasek przeglądarki. W Chromium standardowe `scrollbar-width` / `scrollbar-color` wyłączały
+  reguły `::-webkit-scrollbar` i wracały strzałki — teraz tylko tam, gdzie tych reguł nie ma (Firefox).
+
 ## Program 0.113.1 — 2026-11-27 (Noc: ciemny canvas)
 
 ### Zmienione

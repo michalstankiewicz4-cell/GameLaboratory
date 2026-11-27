@@ -11,7 +11,7 @@
   --card:#1b1f28;          /* drop-downs, dialogs */
   --field:#222733;         /* buttons, fields */
   --line:#2d333f;          /* borders, separators */
-  --line2:#434b5a;         /* stronger border, scrollbar */
+  --line2:#434b5a;         /* stronger border */
   --text:#d0d5dd;
   --head:#f6f1ea;          /* titles, values (warm white) */
   --dim:#8a91a0;           /* notes, labels */
@@ -49,7 +49,8 @@
   --overlay:rgba(5,6,9,.55);/* behind a dialog, over a busy page */
   --shadow:0 12px 32px rgba(0,0,0,.4);
   --shadowHi:0 18px 44px rgba(0,0,0,.55);
-  --scrollHover:#566073;
+  --scroll:color-mix(in srgb, var(--accent) 55%, var(--line2));   /* the scrollbar's thumb: the accent, softened */
+  --scrollHover:var(--accent);
   --hero1:#1c212b;         /* the start page's banner: a soft gradient */
   --hero2:#2a1f1c;
   color-scheme:dark;
@@ -93,7 +94,8 @@
   --overlay:rgba(60,45,30,.28);
   --shadow:0 6px 22px rgba(110,72,40,.10);
   --shadowHi:0 14px 36px rgba(110,72,40,.18);
-  --scrollHover:#c2ae98;
+  --scroll:color-mix(in srgb, var(--accent) 45%, var(--line2));
+  --scrollHover:var(--accent);
   --hero1:#fff4ea;
   --hero2:#ffe1cc;
   --menuBg:#fff9f2;

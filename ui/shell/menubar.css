@@ -20,10 +20,11 @@
 #labMenu .lmTop > button:hover, #labMenu .lmTop.open > button { background: var(--line); color: var(--hoverText); }
 #labMenu .lmDrop { position: absolute; left: 0; top: 28px; min-width: 240px; padding: 6px; border-radius: 10px; background: var(--card);
   border: 1px solid var(--line); box-shadow: var(--shadow); display: none;
-  max-height: calc(100vh - 40px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--line2) transparent; }
+  max-height: calc(100vh - 40px); overflow-y: auto; overscroll-behavior: contain; }
 #labMenu .lmDrop::-webkit-scrollbar { width: 6px; }
 #labMenu .lmDrop::-webkit-scrollbar-button { display: none; }
-#labMenu .lmDrop::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 3px; }
+#labMenu .lmDrop::-webkit-scrollbar-thumb { background: var(--scroll); border-radius: 3px; }
+#labMenu .lmDrop::-webkit-scrollbar-thumb:hover { background: var(--scrollHover); }
 #labMenu .lmTop.open .lmDrop { display: block; }
 #labMenu .lmItem { display: flex; align-items: center; gap: 10px; width: 100%; height: 28px; padding: 0 10px; box-sizing: border-box; border: 0;
   border-radius: 6px; background: none; color: var(--text); font: inherit; font-weight: 400; text-align: left; text-decoration: none; cursor: pointer; }

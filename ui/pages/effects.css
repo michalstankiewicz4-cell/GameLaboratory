@@ -15,7 +15,7 @@
 .badge[data-b="point"]{--bd:var(--badge-point)} .badge[data-b="area"]{--bd:var(--badge-area)}
 button.badge{cursor:pointer;font:inherit;font-size:10.5px;box-shadow:none;text-transform:none}
 button.badge.on{background:color-mix(in srgb,var(--bd) 32%,transparent);border-color:var(--bd);color:var(--head)}
-.fxList{display:flex;flex-direction:column;gap:2px;max-height:300px;overflow-y:auto;scrollbar-width:thin}
+.fxList{display:flex;flex-direction:column;gap:2px;max-height:300px;overflow-y:auto}
 .fxItem{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 6px;border-radius:6px;cursor:pointer;font-size:12px}
 .fxItem:hover{background:var(--field)}
 .fxItem.on{background:var(--field);color:var(--head);box-shadow:inset 2px 0 0 var(--accent)}

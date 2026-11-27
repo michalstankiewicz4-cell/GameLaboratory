@@ -23,7 +23,7 @@
 /* the side panels (window or panel: ui/shell/windows.js): real panels flush with the edges, between the bars;
    a docked window is a section of the panel (its title a heading, a thin line under it), the panel scrolls */
 .labDock{position:fixed;z-index:19;top:calc(var(--menuH) + var(--barH));bottom:var(--footH);width:var(--dockL,330px);
-  display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;background:var(--menuBg)}
+  display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;background:var(--menuBg)}
 .labDock.left{left:0;border-right:1px solid var(--line);animation:labDockInL .22s cubic-bezier(.2,.7,.3,1)}
 .labDock.right{right:0;width:var(--dockR,300px);border-left:1px solid var(--line);animation:labDockInR .22s cubic-bezier(.2,.7,.3,1)}
 body.lmNoBar .labDock{top:var(--menuH)}
