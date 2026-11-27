@@ -14,9 +14,13 @@ if (!LOG || document.querySelector(".labConsole")) return;
 // tabs added by the page: kept until the console is built, then shown at once
 const extra = (window.LabConsoleTabs || []).slice();   // tabs a page queued before this script ran
 let addPane = null, openTab = null;
+let setFilter = null;
 window.LabConsole = {
   addTab(spec) { extra.push(spec); if (addPane) addPane(spec); },
   open(id) { if (openTab) openTab(id); },
+  // the text filter's row: shown or hidden (OPTIONS → Console, ui/shell/menubar.js); kept with the console's settings
+  filterOn: () => st.filter !== false,
+  setFilter(on) { st.filter = !!on; save(); if (setFilter) setFilter(); },
 };
 const PL = window.LabMenu && window.LabMenu.LANG === "pl";
 const t = (en, pl) => (PL ? pl : en);
@@ -65,13 +69,18 @@ function build() {
     const c = { all: LOG.entries.length }; for (const e of LOG.entries) c[e.level] = (c[e.level] || 0) + 1;
     for (const [v, k] of Object.entries(kindBtn)) {
       const on = v === st.kind; k.b.classList.toggle("on", on); k.b.setAttribute("aria-selected", on ? "true" : "false");
-      k.n.textContent = c[v] || 0; k.b.classList.toggle("none", !c[v] && v !== "all");
+      k.n.textContent = c[v] || 0; k.b.hidden = !c[v] && v !== "all";   // no entries of this kind: no tab
     }
+    if (kindBtn[st.kind].b.hidden) { st.kind = "all"; save(); syncKinds(); render(); }
   }
   const q = el("input"); q.type = "search"; q.placeholder = t("Filter…", "Filtr…"); q.value = st.q; q.setAttribute("aria-label", t("Filter", "Filtr"));
   const clear = el("button", "btn", t("Clear", "Wyczyść")); clear.type = "button";
-  tools.append(q, clear);
+  tools.append(q);
+  clear.classList.add("lcClear"); kinds.append(clear);   // Clear at the right end of the tabs' row (the filter's row can be hidden)
   const list = el("div", "lcList"), count = el("div", "lcCount");
+  // a hidden filter filters nothing: what was typed in it is dropped
+  setFilter = () => { tools.hidden = st.filter === false; if (tools.hidden && st.q) { st.q = ""; q.value = ""; save(); if (!win.hidden) render(); } };
+  if (st.filter === false) { tools.hidden = true; st.q = ""; q.value = ""; }
   const body = el("div", "lcBody"); body.append(kinds, tools, list, count);
   win.append(head, body);
   // docked at the bottom: its top edge is a grip — drag to change the height (90 px up to 75 % of the window; double-click:

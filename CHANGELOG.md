@@ -3,6 +3,16 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.113.10 — 2026-11-27 (konsola: tylko zakładki z wpisami, filtr w opcjach)
+
+### Zmienione
+- Konsola: zakładka rodzaju bez wpisów się nie pokazuje (Wszystko — zawsze); gdy wybrany rodzaj nie ma już wpisów,
+  wybór wraca na Wszystko. Wyczyść — na końcu rzędu zakładek.
+- Wiersz filtra tekstu można ukryć: OPCJE → Konsola → Filtr tekstu (zapamiętane, dla wszystkich stron; ukryty filtr
+  niczego nie filtruje).
+- Przypinanie (okno / panel) i zamknięcie konsoli — po prawej stronie paska tytułu, także gdy konsola nie ma
+  dodatkowych zakładek.
+
 ## Program 0.113.9 — 2026-11-27 (konsola: ikony wpisów, wysokość przeciąganiem)
 
 ### Zmienione

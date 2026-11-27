@@ -252,6 +252,7 @@ function options() {
       { on: !!document.fullscreenElement }),
     action(t("Reload this page", "Odśwież stronę"), () => location.reload()),
     ...barItems(),
+    ...consoleItems(),
     // this page's windows (ui/shell/windows.js): its options, each in a window you open and close here
     ...windowItems(),
     el("div", "lmSep"),
@@ -282,6 +283,12 @@ function barItems() {
       try { if (on) localStorage.removeItem(key); else localStorage.setItem(key, "off"); } catch (e) { /* storage blocked */ }
       document.body.classList.toggle(cls, !on);
     }, { on: barOn(key) }))];
+}
+// the console (ui/shell/console.js): its text filter's row shown or hidden, for every page
+function consoleItems() {
+  const C = window.LabConsole; if (!C || !C.filterOn) return [];
+  return [el("div", "lmSep"), el("div", "lmLabel", t("Console", "Konsola")),
+    action(t("Text filter", "Filtr tekstu"), () => C.setFilter(!C.filterOn()), { on: C.filterOn() })];
 }
 function windowItems() {
   const W = window.LabWindows; if (!W || !W.list().length) return [];
