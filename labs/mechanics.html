@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Mechanics Lab — gears, chains, belts, couplings, motor and controls | GameLaboratory</title>
+<meta name="description" content="GameLaboratory mechanics lab: machine elements from code at real scale — involute gears, planetary gears, roller chains, V-belts, shafts, couplings, cardan joints, a motor with an inverter, contactors and buttons — joined by ports into a machine, computed kinematically and physically, with an electric circuit.">
+<link rel="canonical" href="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/mechanics.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Mechanics Lab — machine elements and power transmission">
+<meta property="og:description" content="Gears, chains, belts, couplings and a motor joined by ports into a machine, with physics and an electric circuit.">
+<meta property="og:url" content="https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/mechanics.html">
+<meta property="og:image" content="https://michalstankiewicz4-cell.github.io/GameLaboratory/assets/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="../assets/favicon-32.png">
+<link rel="stylesheet" href="../ui/style/sea.css">
+<link rel="stylesheet" href="../ui/ui.css">
+<link rel="stylesheet" href="../ui/pages/mechanics.css">
+</head>
+<!-- Laboratorium mechaniki (js/labs/mechanics/, z Tornado.io): MechKit i ControlKit (js/models/mech/), napęd, fizyka i obwód (js/behaviors/land/mech/). -->
+<body class="lab viewFits">
+<script src="../ui/data/versions.js"></script>
+<script src="../ui/data/catalog.js"></script>
+<script src="../ui/shell/log.js"></script>
+<script src="../ui/shell/menubar.js"></script>
+<script src="../ui/shell/loader.js"></script>
+<div id="view"></div>
+<div class="bar">
+  <div class="btns" id="modes"><button type="button" data-mode="items" title="Each item on its own, with its settings">Items</button><button type="button" data-mode="machine" title="A machine of the items, joined by ports">Machine</button><button type="button" data-mode="physics" title="The same machine computed physically: each part moves on its own, the joints are constraints (backlash in the meshes); the speed from the inverter by the motor">Physics</button></div>
+  <span class="sp"></span>
+  <span class="dimtxt" id="status"></span>
+</div>
+<aside class="panel" data-std="info">
+  <h2 class="stdName">Power transmission</h2>
+  <p class="stdText" id="info" data-items="Each item on its own on a table: pick it in the Items window, set its parameters (teeth, module, profile, motor power…) in Settings. The Element window shows the computed data, warnings and the ports through which the item joins others." data-physics="The same machine computed physically: each part has its own angle and speed and the joints are constraints — the motor drives the rotor, the rest moves because the constraints keep it together. The meshes have real backlash from the teeth's geometry: when the direction changes the driven gear stands until the tooth crosses the gap. Speed and direction from the inverter in front of the motor: the knob, RUN / STOP, FWD / REV; the wiring — switches, contactor, buttons — works on the models." data-machine="One machine of elements joined by ports: a motor, a jaw coupling, a pair of gears, a two-stage gearbox in an acrylic housing, a roller chain, a V-belt, a flange coupling, a shaft with two cardan joints, a planetary gear and a disc brake. The speed, direction and torque of each element follow from the joints.">One machine of elements joined by ports.</p>
+  <div class="stats" id="bDrive"></div>
+  <h3>How it computes</h3>
+  <p class="note">Each element's angle follows from the motor's angle through the joints: a mesh (the teeth ratio, the direction reverses), a chain and a belt (the same direction), a cardan joint (from the cross's geometry — the ratio changes during a turn), a planetary gear (Willis). The motor accelerates the whole machine's reduced inertia; the brake loads the output, each element's torque follows from the power and the joints' efficiency.</p>
+  <p class="note">The items' and the machine's data (names, properties, materials) are in Polish, like the models' data.</p>
+</aside>
+<aside class="panel" data-window="machine" data-title="Machine" data-title-pl="Maszyna" data-side="left" id="mBar">
+  <div class="row" id="rpmCtl" title="The motor's speed set by the inverter (from zero — the motor stands)"><span>Motor</span><input type="range" id="rpm" min="0" max="1500" step="10" aria-label="Motor speed"><output id="rpmV"></output></div>
+  <div class="row" title="The brake's torque on the output shaft"><span>Brake</span><input type="range" id="brake" min="0" max="300" step="5" aria-label="Brake torque"><output id="brakeV"></output></div>
+  <div class="row" title="How see-through the acrylic housings are (0 — no panes)"><span>Housings</span><input type="range" id="alpha" min="0" max="1" step="0.05" aria-label="Housing opacity"><output id="alphaV"></output></div>
+  <label class="chk" title="The parts' collision shapes: cylinders along the axes (turning with the part) and boxes of the fixed parts"><input type="checkbox" id="hit"> Hitboxes</label>
+</aside>
+<aside class="panel" data-window="items" data-title="Items" data-title-pl="Przedmioty" data-side="left">
+  <div id="itemList"></div>
+</aside>
+<aside class="panel" data-window="settings" data-title="Settings" data-title-pl="Ustawienia" data-side="left">
+  <div id="itemSet"></div>
+</aside>
+<aside class="panel" data-window="element" data-title="Element" data-title-pl="Element" data-side="left">
+  <h3 id="selName">Click an element of the machine</h3>
+  <div class="stats" id="selProps"></div>
+  <h3>Ports</h3>
+  <ul class="ports" id="selPorts"></ul>
+</aside>
+<aside class="panel" data-window="drive" data-title="Drive" data-title-pl="Napęd" data-side="right">
+  <div class="stats list" id="bList"></div>
+  <p class="note">↺ / ↻ — the direction of turning looking along the axis. Click a name to select the element.</p>
+</aside>
+<aside class="panel" data-std="camera">
+  <div class="btns" id="cams"></div>
+  <p class="note">Drag to orbit, wheel to zoom, W A S D to move. Click an element — its properties and ports.</p>
+</aside>
+<aside class="panel" data-std="light">
+  <div class="row"><span>Weather</span><select id="weather"></select><output></output></div>
+  <div class="row"><span>Sun height</span><input type="range" id="sunEl" min="-6" max="70" step="1"><output id="sunElV"></output></div>
+  <div class="row"><span>Sun bearing</span><input type="range" id="sunAz" min="0" max="360" step="2"><output id="sunAzV"></output></div>
+</aside>
+<aside class="panel" data-std="perf">
+  <div class="stats" id="stats"></div>
+</aside>
+<div class="foot">
+  <span id="fps"></span>
+  <span class="sp"></span>
+  <span>GameLaboratory</span>
+</div>
+<script src="../ui/shell/perf.js"></script>
+<script src="../ui/shell/labwin.js"></script>
+<script src="../ui/shell/windows.js"></script>
+<script type="module" src="../js/labs/mechanics/mechanics.js"></script>
+</body>
+</html>

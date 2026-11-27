@@ -54,6 +54,7 @@ W kolejności kategorii z menu Narzędzia i strony startowej (`ui/data/catalog.j
 | | Budowle | `labs/structures.html` | [labs/structures.md](labs/structures.md), [labs/structures/coastal.md](labs/structures/coastal.md), [labs/structures/super300.md](labs/structures/super300.md) |
 | | Miasto (CityKit: budynki, wypalone fasady z paralaksą) | `labs/city.html`, `js/models/city/`, `js/models/houses/` | [labs/city.md](labs/city.md), [models/city.md](models/city.md), [models/houses.md](models/houses.md) |
 | | Ulice (StreetKit: przekroje, skrzyżowania, sygnalizatory, latarnie, znaki, wiadukty, tunele, kładki, parkingi) | `labs/streets.html`, `js/models/streets/` | [labs/streets.md](labs/streets.md), [models/streets.md](models/streets.md) |
+| Maszyny i mechanika | Mechanika (MechKit, ControlKit: zębatki, łańcuchy, pasy, sprzęgła, silnik, sterowanie; napęd, fizyka, obwód) | `labs/mechanics.html`, `js/models/mech/` | [labs/mechanics.md](labs/mechanics.md), [models/mech.md](models/mech.md) |
 | | Rośliny | `labs/plants.html` | [labs/plants.md](labs/plants.md) |
 | | Skały | `labs/rocks.html` | [labs/rocks.md](labs/rocks.md) |
 | | Przedmioty (złomowisko) | `labs/items.html`, `js/models/junkyard/` | [labs/items.md](labs/items.md), [models/junkyard.md](models/junkyard.md) |

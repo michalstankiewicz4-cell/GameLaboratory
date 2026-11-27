@@ -586,6 +586,860 @@
    "triangles": 32272
   }
  },
+ "mech/ac": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 12,
+   "materials": 9,
+   "size": [
+    0.16,
+    0.1,
+    0.13
+   ],
+   "triangles": 436
+  }
+ },
+ "mech/ac-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 16,
+   "materials": 11,
+   "size": [
+    0.16,
+    0.1,
+    0.13
+   ],
+   "triangles": 692
+  }
+ },
+ "mech/bearing": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 10,
+   "materials": 5,
+   "size": [
+    0.3,
+    0.17,
+    0.19
+   ],
+   "triangles": 2144
+  }
+ },
+ "mech/bearing-1": {
+  "counts": {
+   "hidden": 1
+  },
+  "fingerprint": {
+   "drawCalls": 14,
+   "materials": 5,
+   "size": [
+    0.3,
+    0.7,
+    0.28
+   ],
+   "triangles": 2192
+  }
+ },
+ "mech/belt": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 8,
+   "materials": 2,
+   "size": [
+    0.06,
+    0.59,
+    0.24
+   ],
+   "triangles": 11324
+  }
+ },
+ "mech/belt-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 8,
+   "materials": 2,
+   "size": [
+    0.13,
+    0.54,
+    0.43
+   ],
+   "triangles": 20412
+  }
+ },
+ "mech/brake": {
+  "counts": {
+   "sliver": 1,
+   "zfight": 1
+  },
+  "fingerprint": {
+   "drawCalls": 9,
+   "materials": 3,
+   "size": [
+    0.3,
+    0.26,
+    0.26
+   ],
+   "triangles": 15568
+  }
+ },
+ "mech/brake-1": {
+  "counts": {
+   "sliver": 1,
+   "zfight": 1
+  },
+  "fingerprint": {
+   "drawCalls": 9,
+   "materials": 3,
+   "size": [
+    0.3,
+    0.46,
+    0.46
+   ],
+   "triangles": 27904
+  }
+ },
+ "mech/button": {
+  "counts": {
+   "hidden": 1
+  },
+  "fingerprint": {
+   "drawCalls": 12,
+   "materials": 5,
+   "size": [
+    0.09,
+    0.07,
+    0.08
+   ],
+   "triangles": 1436
+  }
+ },
+ "mech/button-1": {
+  "counts": {
+   "hidden": 1
+  },
+  "fingerprint": {
+   "drawCalls": 12,
+   "materials": 5,
+   "size": [
+    0.09,
+    0.07,
+    0.08
+   ],
+   "triangles": 1436
+  }
+ },
+ "mech/button-2": {
+  "counts": {
+   "hidden": 1
+  },
+  "fingerprint": {
+   "drawCalls": 13,
+   "materials": 5,
+   "size": [
+    0.09,
+    0.07,
+    0.08
+   ],
+   "triangles": 2396
+  }
+ },
+ "mech/cardan": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 27,
+   "materials": 3,
+   "size": [
+    0.57,
+    0.08,
+    0.18
+   ],
+   "triangles": 2016
+  }
+ },
+ "mech/cardan-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 27,
+   "materials": 3,
+   "size": [
+    0.6,
+    0.08,
+    0.08
+   ],
+   "triangles": 2016
+  }
+ },
+ "mech/cardan-2": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 50,
+   "materials": 3,
+   "size": [
+    0.9,
+    0.08,
+    0.32
+   ],
+   "triangles": 3700
+  }
+ },
+ "mech/chain": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 8,
+   "materials": 2,
+   "size": [
+    0.03,
+    0.49,
+    0.18
+   ],
+   "triangles": 14640
+  }
+ },
+ "mech/chain-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 8,
+   "materials": 2,
+   "size": [
+    0.04,
+    1.19,
+    0.68
+   ],
+   "triangles": 24048
+  }
+ },
+ "mech/contactor": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 12,
+   "materials": 5,
+   "size": [
+    0.16,
+    0.08,
+    0.1
+   ],
+   "triangles": 350
+  }
+ },
+ "mech/contactor-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 12,
+   "materials": 5,
+   "size": [
+    0.16,
+    0.08,
+    0.1
+   ],
+   "triangles": 350
+  }
+ },
+ "mech/dc": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 10,
+   "materials": 8,
+   "size": [
+    0.16,
+    0.1,
+    0.13
+   ],
+   "triangles": 308
+  }
+ },
+ "mech/dc-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 10,
+   "materials": 8,
+   "size": [
+    0.16,
+    0.1,
+    0.13
+   ],
+   "triangles": 308
+  }
+ },
+ "mech/estop": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 13,
+   "materials": 6,
+   "size": [
+    0.1,
+    0.08,
+    0.1
+   ],
+   "triangles": 1892
+  }
+ },
+ "mech/flange": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 30,
+   "materials": 3,
+   "size": [
+    0.33,
+    0.15,
+    0.15
+   ],
+   "triangles": 4360
+  }
+ },
+ "mech/flange-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 36,
+   "materials": 3,
+   "size": [
+    0.33,
+    0.26,
+    0.26
+   ],
+   "triangles": 4536
+  }
+ },
+ "mech/gear": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    0.03,
+    0.14,
+    0.14
+   ],
+   "triangles": 5528
+  }
+ },
+ "mech/gear-1": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    0.03,
+    0.02,
+    0.02
+   ],
+   "triangles": 1848
+  }
+ },
+ "mech/gear-2": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 3,
+   "materials": 1,
+   "size": [
+    0.14,
+    1.28,
+    1.28
+   ],
+   "triangles": 21600
+  }
+ },
+ "mech/gear-3": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    0.03,
+    0.14,
+    0.14
+   ],
+   "triangles": 5528
+  }
+ },
+ "mech/jaw": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 23,
+   "materials": 4,
+   "size": [
+    0.32,
+    0.09,
+    0.09
+   ],
+   "triangles": 12376
+  }
+ },
+ "mech/jaw-1": {
+  "counts": {
+   "sliver": 2
+  },
+  "fingerprint": {
+   "drawCalls": 23,
+   "materials": 4,
+   "size": [
+    0.32,
+    0.16,
+    0.16
+   ],
+   "triangles": 12376
+  }
+ },
+ "mech/lamp": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 10,
+   "materials": 4,
+   "size": [
+    0.09,
+    0.07,
+    0.08
+   ],
+   "triangles": 1200
+  }
+ },
+ "mech/lamp-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 10,
+   "materials": 4,
+   "size": [
+    0.09,
+    0.07,
+    0.08
+   ],
+   "triangles": 1200
+  }
+ },
+ "mech/limit": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 6,
+   "materials": 5,
+   "size": [
+    0.03,
+    0.14,
+    0.04
+   ],
+   "triangles": 292
+  }
+ },
+ "mech/limit-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 6,
+   "materials": 5,
+   "size": [
+    0.03,
+    0.12,
+    0.03
+   ],
+   "triangles": 416
+  }
+ },
+ "mech/motor": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 15,
+   "materials": 5,
+   "size": [
+    0.42,
+    0.25,
+    0.19
+   ],
+   "triangles": 884
+  }
+ },
+ "mech/motor-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 15,
+   "materials": 5,
+   "size": [
+    0.29,
+    0.17,
+    0.14
+   ],
+   "triangles": 884
+  }
+ },
+ "mech/motor-2": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 15,
+   "materials": 5,
+   "size": [
+    0.62,
+    0.36,
+    0.28
+   ],
+   "triangles": 884
+  }
+ },
+ "mech/pair": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 4,
+   "materials": 2,
+   "size": [
+    0.04,
+    0.19,
+    0.23
+   ],
+   "triangles": 14088
+  }
+ },
+ "mech/pair-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 4,
+   "materials": 2,
+   "size": [
+    0.04,
+    0.68,
+    0.71
+   ],
+   "triangles": 23608
+  }
+ },
+ "mech/planet": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 11,
+   "materials": 4,
+   "size": [
+    0.13,
+    0.18,
+    0.18
+   ],
+   "triangles": 29520
+  }
+ },
+ "mech/planet-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 13,
+   "materials": 4,
+   "size": [
+    0.13,
+    0.16,
+    0.16
+   ],
+   "triangles": 28248
+  }
+ },
+ "mech/planet-2": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 9,
+   "materials": 4,
+   "size": [
+    0.13,
+    0.31,
+    0.3
+   ],
+   "triangles": 46200
+  }
+ },
+ "mech/pot": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 14,
+   "materials": 6,
+   "size": [
+    0.1,
+    0.08,
+    0.08
+   ],
+   "triangles": 720
+  }
+ },
+ "mech/pot-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 14,
+   "materials": 6,
+   "size": [
+    0.1,
+    0.08,
+    0.08
+   ],
+   "triangles": 720
+  }
+ },
+ "mech/pulley": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 6,
+   "materials": 1,
+   "size": [
+    0.04,
+    0.22,
+    0.22
+   ],
+   "triangles": 2364
+  }
+ },
+ "mech/pulley-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    0.04,
+    0.07,
+    0.07
+   ],
+   "triangles": 2304
+  }
+ },
+ "mech/pulley-2": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 6,
+   "materials": 1,
+   "size": [
+    0.16,
+    0.53,
+    0.53
+   ],
+   "triangles": 5436
+  }
+ },
+ "mech/ring": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    0.02,
+    0.23,
+    0.23
+   ],
+   "triangles": 11904
+  }
+ },
+ "mech/ring-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 1,
+   "materials": 1,
+   "size": [
+    0.02,
+    0.67,
+    0.67
+   ],
+   "triangles": 24576
+  }
+ },
+ "mech/selector": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 13,
+   "materials": 6,
+   "size": [
+    0.09,
+    0.07,
+    0.09
+   ],
+   "triangles": 618
+  }
+ },
+ "mech/selector-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 13,
+   "materials": 6,
+   "size": [
+    0.09,
+    0.07,
+    0.09
+   ],
+   "triangles": 618
+  }
+ },
+ "mech/shaft": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 4,
+   "materials": 2,
+   "size": [
+    0.6,
+    0.03,
+    0.03
+   ],
+   "triangles": 332
+  }
+ },
+ "mech/shaft-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 3,
+   "materials": 1,
+   "size": [
+    0.1,
+    0.07,
+    0.07
+   ],
+   "triangles": 320
+  }
+ },
+ "mech/sprocket": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 1,
+   "size": [
+    0.03,
+    0.1,
+    0.1
+   ],
+   "triangles": 5232
+  }
+ },
+ "mech/sprocket-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 1,
+   "size": [
+    0.03,
+    0.04,
+    0.04
+   ],
+   "triangles": 3216
+  }
+ },
+ "mech/sprocket-2": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 1,
+   "size": [
+    0.03,
+    0.49,
+    0.49
+   ],
+   "triangles": 14640
+  }
+ },
+ "mech/switch": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 17,
+   "materials": 5,
+   "size": [
+    0.1,
+    0.08,
+    0.09
+   ],
+   "triangles": 468
+  }
+ },
+ "mech/switch-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 17,
+   "materials": 5,
+   "size": [
+    0.12,
+    0.12,
+    0.1
+   ],
+   "triangles": 468
+  }
+ },
+ "mech/switch-2": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 13,
+   "materials": 4,
+   "size": [
+    0.1,
+    0.08,
+    0.09
+   ],
+   "triangles": 842
+  }
+ },
+ "mech/vfd": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 12,
+   "materials": 9,
+   "size": [
+    0.1,
+    0.17,
+    0.17
+   ],
+   "triangles": 492
+  }
+ },
+ "mech/vfd-1": {
+  "counts": {
+   "zfight": 1
+  },
+  "fingerprint": {
+   "drawCalls": 12,
+   "materials": 9,
+   "size": [
+    0.19,
+    0.32,
+    0.29
+   ],
+   "triangles": 492
+  }
+ },
+ "mech/vfd-2": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 12,
+   "materials": 9,
+   "size": [
+    0.07,
+    0.12,
+    0.13
+   ],
+   "triangles": 492
+  }
+ },
+ "mech/wire": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 4,
+   "size": [
+    0.47,
+    0.18,
+    0.04
+   ],
+   "triangles": 1760
+  }
+ },
+ "mech/wire-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 4,
+   "size": [
+    0.61,
+    1.25,
+    0.05
+   ],
+   "triangles": 1760
+  }
+ },
+ "mech/wire-2": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 4,
+   "size": [
+    0.09,
+    0.04,
+    0.04
+   ],
+   "triangles": 1760
+  }
+ },
  "plants/acacia": {
   "counts": {
    "seethrough": 1

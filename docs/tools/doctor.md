@@ -27,6 +27,7 @@ wersji z Battle (historia obu — w git). Logika to wersja z Battle — ma wszys
 | `tools/doctor/sources/plants.js` | rośliny z PlantKit: każdy gatunek (ziarno 1) jako kora i liście |
 | `tools/doctor/sources/rocks.js` | skały z RockKit: każdy rodzaj w każdym kształcie (ziarno 1) jako jedna siatka |
 | `tools/doctor/sources/streets.js` | ulice StreetKit: przekroje, skrzyżowania, sygnalizatory, latarnie, znaki, słupki, barierki, ekrany, pikietaż, parkingi, wiadukty, tunele, rampa, kładki, przejście podziemne |
+| `tools/doctor/sources/mech.js` | przedmioty laboratorium mechaniki (MechKit, ControlKit): ustawienia domyślne i warianty skrajne; planeEps 0,2 mm |
 | `tools/doctor/sources/houses.js` | budynki z części HouseKit (każda część osobną siatką, jak przed zniszczeniem; `ground: 0`) |
 | `tools/doctor/sources/test-bench.js` | stanowisko testowe: model z jednym błędem na każdy test |
 | `tools/doctor/sources/common.js` | wspólne: koszt rysowania (trójkąty, wywołania, materiały) |
@@ -93,6 +94,11 @@ nieprzezroczyste trójkąty (`isSolid`). Przegląd 2026-11-26: żaden model z li
 
 ## Zmiany
 
+- **2026-11-27 (v1.9.0)** — przedmioty laboratorium mechaniki (`tools/doctor/sources/mech.js`, `mech/…`, 64 modele:
+  ustawienia domyślne i warianty skrajne, planeEps 0,2 mm, stojące na blacie z gruntem pod spodem). Ostrzeżenia
+  `zfight`: hamulec tarczowy i falownik 7,5 kW (w `TODO.md`).
+- **2026-11-26 (v1.8.0)** — ulice z laboratorium ulic (`tools/doctor/sources/streets.js`, `streets/…`, 53 modele).
+- **2026-11-26 (v1.7.0)** — budynki HouseKit (`tools/doctor/sources/houses.js`, `houses/…`, każda część osobną siatką).
 - **2026-11-26 (v1.6.0)** — z Tornado.io (doktor był tam kopią i dostał ogólne ulepszenia): `opts.ground` (grunt pod
   modelem w `seethrough` i `facing`), części powielane łączą w `floating`, `facing` zaczyna promienie najwyżej 1 cm od
   ściany (było 0,2 % modelu — na 40-metrowej ulicy 8 cm, więcej niż krawężnik); filtr rodziny

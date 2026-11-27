@@ -137,7 +137,7 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
 
 ## Modele — błędy znalezione przez doktora (po stronie gry, chyba że doktor nauczy się je naprawiać)
 - [ ] Dziury: talerz anteny (haven), kadłuby (skimmer, barka, amfibia), półkula (scout). (Kadłub swarmera to był fałszywy alarm — nierówna skala, doktor 1.5.1.)
-- [ ] Migotanie zlicowanych ścian z teksturą: hauler, crawler.
+- [ ] Migotanie zlicowanych ścian z teksturą: hauler, crawler; z Tornado.io (laboratorium mechaniki): hamulec tarczowy (`mech/brake`, `mech/brake-1`), falownik 7,5 kW (`mech/vfd-1`).
 - [ ] Wiszące części: scribe (korona), constructor, scout, skimmer, amfibia.
 - [ ] Orzeł: działko 40 mm zasłonięte w części łuku.
 - [ ] Rośliny (PlantKit): otwarte końce pni i gałęzi — doktor widzi tył kory przez otwór (`seethrough`; pień w ziemi, końce gałęzi w liściach).

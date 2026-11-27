@@ -39,7 +39,7 @@ h2::after{ content:""; flex:1; height:1px; background:var(--line); }
    lights up every tile of that category (index.html, catLight) and its tooltip lists them */
 .tile[data-cat]{ --cat:var(--dim); border-top:3px solid color-mix(in srgb, var(--cat) 75%, transparent); }
 .tile[data-cat="vehicles"]{ --cat:var(--cat-vehicles); } .tile[data-cat="space"]{ --cat:var(--cat-space); }
-.tile[data-cat="world"]{ --cat:var(--cat-world); } .tile[data-cat="life"]{ --cat:var(--cat-life); }
+.tile[data-cat="world"]{ --cat:var(--cat-world); } .tile[data-cat="machines"]{ --cat:var(--cat-machines); } .tile[data-cat="life"]{ --cat:var(--cat-life); }
 .tile[data-cat="matter"]{ --cat:var(--cat-matter); } .tile[data-cat="ui"]{ --cat:var(--cat-ui); }
 .tile[data-cat="voxels"]{ --cat:var(--cat-voxels); } .tile[data-cat="effects"]{ --cat:var(--cat-effects); } .tile[data-cat="ai"]{ --cat:var(--cat-ai); } .tile[data-cat="tools"]{ --cat:var(--cat-tools); }
 .tag.cat{ display:inline-flex; align-items:center; gap:6px; cursor:help; color:var(--cat); border-color:color-mix(in srgb, var(--cat) 45%, transparent);

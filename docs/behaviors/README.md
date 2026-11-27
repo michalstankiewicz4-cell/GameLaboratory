@@ -23,6 +23,7 @@ Zasada (CLAUDE.md): fizyka jest prawdziwa — start, ruch, skręt i zatrzymanie 
 | maszyny złomowiska | `land/machines/` (`machines.js`: zgniatarka `crusher.js`, piec na papier `furnace.js`, piec indukcyjny `induction.js`, linia odlewnicza `casting.js` + strumień metalu `metal-flow.js`, zderzacze `statics.js`) | ląd | laboratorium budowli (maszyny złomowiska w działaniu), edytor sceny (`machine`, `solid`) |
 | deformacja blachy (DeformKit, z Tornado.io) | `land/deform/` (`shell.js`, rdzeń `shell-core.js`, osadzanie `embed.js`, zderzacze `box.js`, wątek `shell-worker.js`; opis [`deform.md`](deform.md)) | ląd | laboratorium przedmiotów (tryb Deformation: beczki pod prasą, kontener) |
 | zniszczenie budynków (DestructKit, z Tornado.io) | `land/destruct/` (`world.js`, pękanie i statyka `statics.js`, uderzenia i wiatr `impacts.js`, bryły `physics.js` + wątek, wzory `patterns.js`, materiały, rysowanie, gruz, pożary `burn.js`; opis [`destruct.md`](destruct.md)) | ląd | laboratorium miasta (tryb Destruction: budynki HouseKit i Warszawy z części, uderzenie, rzut, trąba) |
+| napęd maszyn, fizyka, zderzenia zębów, obwód elektryczny (z Tornado.io) | `land/mech/` (`drive.js` — porty i przełożenia, `physics.js` — XPBD na kątach: luz, sprężystość, poślizg pasa, straty, `contact.js` — bryły zębów, `circuit.js` — sieci, styczniki, falownik; opis [`../labs/mechanics.md`](../labs/mechanics.md)) | ląd | laboratorium mechaniki (tryby Maszyna i Fizyka) |
 
 ## Wiatr w scenie (trąba powietrzna, tornado, cyklon)
 

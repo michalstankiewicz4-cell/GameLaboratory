@@ -34,6 +34,10 @@ window.GameLabCatalog =
       "name": "World: water, land, look",
       "namePl": "Świat: woda, ląd, wygląd"
     },
+    "machines": {
+      "name": "Machines and mechanics",
+      "namePl": "Maszyny i mechanika"
+    },
     "life": {
       "name": "Life and characters",
       "namePl": "Życie i postacie"
@@ -400,6 +404,23 @@ window.GameLabCatalog =
       "art": {
         "bg": ["#3a352c", "#1b1915"],
         "svg": "<ellipse cx=\"100\" cy=\"92\" rx=\"80\" ry=\"9\" fill=\"#141210\" opacity=\".6\"/><circle cx=\"62\" cy=\"60\" r=\"30\" fill=\"#1c1c1e\"/><circle cx=\"62\" cy=\"60\" r=\"16\" fill=\"#2a2620\"/><circle cx=\"62\" cy=\"60\" r=\"27\" fill=\"none\" stroke=\"#2c2c2f\" stroke-width=\"3\" stroke-dasharray=\"3 3\"/><rect x=\"104\" y=\"38\" width=\"34\" height=\"52\" rx=\"3\" fill=\"#1f4f8f\"/><rect x=\"104\" y=\"50\" width=\"34\" height=\"3\" fill=\"#163a6a\"/><rect x=\"104\" y=\"74\" width=\"34\" height=\"3\" fill=\"#163a6a\"/><rect x=\"146\" y=\"70\" width=\"10\" height=\"20\" rx=\"2\" fill=\"#b3121b\"/><rect x=\"146\" y=\"70\" width=\"10\" height=\"3\" fill=\"#c8ccd0\"/><rect x=\"160\" y=\"74\" width=\"26\" height=\"16\" fill=\"#d8d2c2\"/><path d=\"M160 82H186M173 74V90\" stroke=\"#b89a6a\" stroke-width=\"1.5\"/>"
+      }
+    },
+    {
+      "file": "labs/mechanics.html",
+      "cat": "machines",
+      "name": "Mechanics lab",
+      "namePl": "Laboratorium mechaniki",
+      "doc": "docs/labs/mechanics.md",
+      "desc": "Machine elements at real scale: involute gears, a planetary gear, roller chains, V-belts, shafts, bearings, couplings, cardan joints, a motor with an inverter, contactors, buttons and switches — each on its own with its settings, or joined by ports into a machine computed kinematically and physically (backlash, elasticity, belt slip, losses, tooth collisions) with an electric circuit.",
+      "descPl": "Elementy maszyn w prawdziwej skali: zębatki o zarysie ewolwentowym, przekładnia planetarna, łańcuchy rolkowe, pasy klinowe, wały, łożyska, sprzęgła, przeguby Cardana, silnik z falownikiem, styczniki, przyciski i przełączniki — każdy osobno z ustawieniami albo połączone portami w maszynę liczoną kinematycznie i fizycznie (luz, sprężystość, poślizg pasa, straty, zderzenia zębów) z obwodem elektrycznym.",
+      "kind": "lab",
+      "kit": "MechKit",
+      "phrases": ["ląd", "mechanika", "maszyny", "zębatki", "napęd", "elektryka"],
+      "saved": ["gameLab.mechanics."],
+      "art": {
+        "bg": ["#2e2a22", "#14120e"],
+        "svg": "<g fill=\"#c9a24a\"><circle cx=\"78\" cy=\"56\" r=\"30\"/></g><g fill=\"#8e949a\"><circle cx=\"128\" cy=\"62\" r=\"18\"/></g><circle cx=\"78\" cy=\"56\" r=\"8\" fill=\"#14120e\"/><circle cx=\"128\" cy=\"62\" r=\"5\" fill=\"#14120e\"/><g stroke=\"#c9a24a\" stroke-width=\"6\"><path d=\"M78 20 V26 M78 86 V92 M42 56 H48 M108 56 H114 M53 31 L57 35 M99 77 L103 81 M53 81 L57 77 M99 35 L103 31\"/></g><g stroke=\"#8e949a\" stroke-width=\"5\"><path d=\"M128 40 V44 M128 80 V84 M106 62 H110 M146 62 H150\"/></g><path d=\"M20 96 H180\" stroke=\"#4a4438\" stroke-width=\"3\"/>"
       }
     },
     {
@@ -844,6 +865,11 @@ window.GameLabCatalog =
     "opony": "tyres",
     "deformacja": "deformation",
     "zniszczenie": "destruction",
+    "mechanika": "mechanics",
+    "maszyny": "machines",
+    "zębatki": "gears",
+    "napęd": "drive",
+    "elektryka": "electrics",
     "ulice": "streets",
     "drogi": "roads",
     "skrzyżowania": "crossings",

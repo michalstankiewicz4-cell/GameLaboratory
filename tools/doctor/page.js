@@ -17,6 +17,7 @@ import { models as plantModels } from './sources/plants.js';
 import { models as rockModels } from './sources/rocks.js';
 import { models as houseModels } from './sources/houses.js';
 import { models as streetModels } from './sources/streets.js';
+import { models as mechModels } from './sources/mech.js';
 import { models as testModels } from './sources/test-bench.js';
 
 const $ = (id) => document.getElementById(id);
@@ -25,7 +26,7 @@ const params = new URLSearchParams(location.search);
 const ONLY = params.get('only') || '';
 
 /* ---------------- the models ---------------- */
-const MODELS = [...spaceModels(), ...seaModels, ...trainModels, ...roadModels, ...tramModels, ...airModels, ...weaponModels, ...junkModels, ...cityModels, ...plantModels, ...rockModels, ...houseModels, ...streetModels, ...testModels];
+const MODELS = [...spaceModels(), ...seaModels, ...trainModels, ...roadModels, ...tramModels, ...airModels, ...weaponModels, ...junkModels, ...cityModels, ...plantModels, ...rockModels, ...houseModels, ...streetModels, ...mechModels, ...testModels];
 
 /* ---------------- examining ---------------- */
 const report = { done: false, models: {} };

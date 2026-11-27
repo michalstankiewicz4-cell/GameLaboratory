@@ -3,6 +3,31 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.109.0 · mechanika 1.0.0 · doktor modeli 1.9.0 — 2026-11-27 (laboratorium mechaniki z Tornado.io)
+
+### Dodane
+- **Laboratorium mechaniki** (`labs/mechanics.html`) w nowej kategorii **Maszyny i mechanika** (barwa mosiądzu
+  `--cat-machines`). Trzy tryby:
+  - **Items** — każdy z 27 przedmiotów osobno na stole, z ustawieniami, danymi, ostrzeżeniami i portami;
+  - **Machine** — maszyna na żeliwnym łożu z elementów połączonych portami (silnik → sprzęgło kłowe → zębatki →
+    przekładnia dwustopniowa → łańcuch → pas → przeguby Cardana → przekładnia planetarna → hamulec);
+  - **Physics** — ta sama maszyna liczona fizycznie (luz z brył zębów, sprężystość, poślizg pasa, straty) z obwodem
+    elektrycznym (wyłącznik, stycznik, falownik, przyciski, grzybek, przełącznik I-0-II).
+  Suwaki Silnik, Hamulec, Obudowy i Hitboksy w oknie Machine. `MechanicsApi`. Wyniki trybu Machine takie same jak
+  w Tornado.io.
+- **MechKit** (`js/models/mech/`): plik z Tornado.io (610 linii) podzielony na 6 części (`base.js`, `teeth.js`,
+  `gears.js`, `loops.js`, `shafts.js`, `units.js`); `mechkit.js` eksportuje całość jak dotąd. **ControlKit**
+  (`controls.js`): sterowanie i zasilanie obsługiwane na modelu. Dane fizyczne i elektryczne są w częściach. Opis:
+  `docs/models/mech.md`.
+- **Zachowania** `js/behaviors/land/mech/` (ląd): `drive.js` (napęd z portami), `physics.js` (XPBD na kątach),
+  `contact.js` (bryły zębów), `circuit.js` (obwód elektryczny).
+- Laboratorium podzielone na pliki (`js/labs/mechanics/`): `mechanics.js` (z 860 do 210 linii), `machine.js`,
+  `physics-mode.js`, `items-mode.js`, katalog `items.js` (`items-drive.js`, `items-control.js`, `items-common.js`).
+  Scena hali bez terenu: `js/labs/shared/sky-stage.js`. Opis: `docs/labs/mechanics.md`.
+- Doktor modeli: przedmioty mechaniki (`mech/…`, 64 modele: ustawienia domyślne i warianty skrajne, planeEps 0,2 mm).
+  Migotanie zlicowanych ścian w hamulcu tarczowym i falowniku 7,5 kW — w `TODO.md`.
+- Klawiszologia: laboratorium mechaniki (W A S D, H).
+
 ## Program 0.108.0 · ulice 1.0.0 · doktor modeli 1.8.0 — 2026-11-26 (laboratorium ulic z Tornado.io)
 
 ### Dodane

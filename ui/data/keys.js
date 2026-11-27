@@ -99,6 +99,7 @@ export const PAGES = {
     ['W / A / S / D', 'Move the camera', 'Przesuwanie kamery'],
   ] }],
   'labs/streets.html': [{ title: ['Streets lab', 'Laboratorium ulic'], keys: [H] }],
+  'labs/mechanics.html': [{ title: ['Mechanics lab', 'Laboratorium mechaniki'], keys: [['W / A / S / D', 'Move the camera', 'Przesuwanie kamery'], H] }],
   'labs/blocks.html': [{ title: ['Blocks lab', 'Laboratorium bloków'], keys: [['Shift', 'While biting: the left button orbits (held)', 'Przy gryzieniu: lewy przycisk obraca widok (przytrzymany)']] }],
   'labs/city.html': [{ title: ['Drawing a footprint', 'Rysowanie obrysu'], keys: [
     ['Enter', 'Finish the footprint', 'Zakończ obrys'],
