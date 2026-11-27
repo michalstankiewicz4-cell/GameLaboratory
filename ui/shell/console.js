@@ -1,6 +1,6 @@
 /* The console window: what ui/shell/menubar.js logs (window.LabLog) — errors, warnings, the console's messages, the loading
    card's steps and times — newest at the top, each with its date and time and the page it came from (the log is kept
-   for the tab until it is closed), filtered by kind and by text.
+   for the tab until it is closed), filtered by kind (tabs: all, errors, warnings, loading, info, messages — each with how many) and by text.
    A button on the right of the lab's bar (body > .bar) opens and closes it; the window floats over the lab, is
    dragged by its title and closed with ×. Where it stands and whether it is open are kept in this browser
    (gamelab.console). Loaded by ui/shell/menubar.js on every lab and tool page; its look: ui/shell/console.css.
@@ -27,6 +27,17 @@ const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catc
 const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
 const KINDS = [["all", t("All", "Wszystko")], ["error", t("Errors", "Błędy")], ["warn", t("Warnings", "Ostrzeżenia")],
   ["load", t("Loading", "Ładowanie")], ["info", t("Info", "Informacje")], ["log", t("Messages", "Komunikaty")]];
+// the kinds' icons: a shape in the kind's colour (currentColor, ui/shell/console.css) with a light sign on it (.g)
+const IC = (shape, sign) => `<svg viewBox="0 0 16 16" aria-hidden="true">${shape}<path class="g" d="${sign}"/></svg>`;
+const DISC = '<circle cx="8" cy="8" r="7" fill="currentColor"/>';
+const ICON = {
+  all: IC(DISC, "M5 5.5h6M5 8h6M5 10.5h6"),
+  error: IC(DISC, "M5.6 5.6l4.8 4.8M10.4 5.6l-4.8 4.8"),
+  warn: IC('<path d="M8 1.3 15.2 14H.8Z" fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>', "M8 6v3.6M8 11.6v.1"),
+  load: IC(DISC, "M10.9 6.3A3.2 3.2 0 1 0 11 9M11.3 4.4v2.2H9.1"),
+  info: IC(DISC, "M8 7.4V11.4M8 4.8v.1"),
+  log: IC('<path d="M2 3.5A2 2 0 0 1 4 1.5h8a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H7l-3.2 2.8V11.5H4a2 2 0 0 1-2-2Z" fill="currentColor"/>', "M5 5.3h6M5 7.8h4"),
+};
 const LABEL = { error: t("error", "błąd"), warn: t("warning", "uwaga"), load: t("loading", "ładowanie"), info: "info", log: "log" };
 const p2 = (n) => String(n).padStart(2, "0");
 const stamp = (d) => `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())} ${p2(d.getHours())}:${p2(d.getMinutes())}:${p2(d.getSeconds())}`;
@@ -40,12 +51,28 @@ function build() {
   const tabs = el("div", "lcTabs"); tabs.setAttribute("role", "tablist");
   head.append(title, tabs, pin, close);
   const tools = el("div", "lcTools");
-  const kind = el("select"); KINDS.forEach(([v, l]) => kind.add(new Option(l, v))); kind.value = st.kind; kind.setAttribute("aria-label", t("Kind", "Rodzaj"));
+  // the kinds as tabs (an icon in the kind's colour, the name, how many): one at a time
+  const kinds = el("div", "lcKinds"); kinds.setAttribute("role", "tablist"); kinds.setAttribute("aria-label", t("Kind", "Rodzaj"));
+  if (!KINDS.some(([v]) => v === st.kind)) st.kind = "all";
+  const kindBtn = {};
+  KINDS.forEach(([v, l]) => {
+    const b = el("button", "lcKt lk-" + v); b.type = "button"; b.setAttribute("role", "tab"); b.dataset.kind = v;
+    const n = el("b"), ic = el("span", "lcIco"); ic.innerHTML = ICON[v]; b.append(ic, document.createTextNode(l), n); kindBtn[v] = { b, n };
+    b.onclick = () => { st.kind = v; save(); syncKinds(); render(); };
+    kinds.append(b);
+  });
+  function syncKinds() {
+    const c = { all: LOG.entries.length }; for (const e of LOG.entries) c[e.level] = (c[e.level] || 0) + 1;
+    for (const [v, k] of Object.entries(kindBtn)) {
+      const on = v === st.kind; k.b.classList.toggle("on", on); k.b.setAttribute("aria-selected", on ? "true" : "false");
+      k.n.textContent = c[v] || 0; k.b.classList.toggle("none", !c[v] && v !== "all");
+    }
+  }
   const q = el("input"); q.type = "search"; q.placeholder = t("Filter…", "Filtr…"); q.value = st.q; q.setAttribute("aria-label", t("Filter", "Filtr"));
   const clear = el("button", "btn", t("Clear", "Wyczyść")); clear.type = "button";
-  tools.append(kind, q, clear);
+  tools.append(q, clear);
   const list = el("div", "lcList"), count = el("div", "lcCount");
-  const body = el("div", "lcBody"); body.append(tools, list, count);
+  const body = el("div", "lcBody"); body.append(kinds, tools, list, count);
   win.append(head, body);
   document.body.append(win);
 
@@ -88,15 +115,16 @@ function build() {
     const shown = LOG.entries.filter(match).reverse().slice(0, 400);
     list.replaceChildren(...shown.map(row));
     count.textContent = `${shown.length} / ${LOG.entries.length}`;
+    syncKinds();
   }
   LOG.on((e) => {
+    if (!win.hidden) syncKinds();
     if (win.hidden || !match(e)) { if (!win.hidden) count.textContent = count.textContent.replace(/\/ \d+$/, "/ " + LOG.entries.length); return; }
     list.prepend(row(e)); while (list.childElementCount > 400) list.lastChild.remove();
     count.textContent = `${list.childElementCount} / ${LOG.entries.length}`;
   });
-  kind.onchange = () => { st.kind = kind.value; save(); render(); };
   q.oninput = () => { st.q = q.value; save(); render(); };
-  clear.onclick = () => { LOG.clear(); render(); };   // also forgets the log kept for this tab
+  clear.onclick = () => { LOG.clear(); render(); };   // render() also resets the counts on the tabs   // also forgets the log kept for this tab
 
   // open, close, place
   const place = () => {

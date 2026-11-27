@@ -6,6 +6,23 @@ body > .bar .sp + .lcBtn{margin-left:0}
 .labConsole[hidden]{display:none}
 .labConsole .lcBody{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;padding:10px 12px 8px}
 .labConsole .lcTools{display:flex;gap:6px;align-items:center}
+/* the kinds as tabs (ui/shell/console.js): an icon in the kind's colour, the name, the count; the chosen one on a soft accent */
+.labConsole .lcKinds{display:flex;flex-wrap:wrap;gap:4px}
+.labConsole .lcKt{display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 11px;border:1px solid transparent;border-radius:var(--r2);
+  background:none;color:var(--text);font:500 12.5px var(--font);cursor:pointer;transition:background .15s, color .15s}
+.labConsole .lcKt:hover{color:var(--head);background:var(--field)}
+.labConsole .lcKt.on{color:var(--accent);background:var(--accentSoft);border-color:color-mix(in srgb, var(--accent) 30%, transparent)}
+.labConsole .lcKt b{font:400 11px var(--mono);color:var(--dim)}
+.labConsole .lcKt.none{opacity:.55}
+.labConsole .lcIco{display:inline-flex;color:var(--dim)}
+.labConsole .lcIco svg{width:15px;height:15px;display:block}
+.labConsole .lcIco .g{fill:none;stroke:var(--onAccent);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.labConsole .lk-all .lcIco{color:var(--accent)}
+.labConsole .lk-error .lcIco{color:var(--err)}
+.labConsole .lk-warn .lcIco{color:var(--accent)}
+.labConsole .lk-load .lcIco{color:var(--ok)}
+.labConsole .lk-info .lcIco{color:var(--info)}
+.labConsole .lk-log .lcIco{color:var(--dim)}
 .labConsole .lcTools input{flex:1;min-width:0}
 .labConsole .lcTools .btn{flex:none}
 .labConsole .lcList{flex:1;min-height:0;overflow:auto;border:1px solid var(--line);border-radius:6px;background:var(--bg);

@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.113.8 — 2026-11-27 (konsola: zakładki rodzajów z ikonami)
+
+### Zmienione
+- Konsola: rodzaj wpisów wybiera się zakładkami z ikonami zamiast listy rozwijanej — Wszystko, Błędy, Ostrzeżenia,
+  Ładowanie, Informacje, Komunikaty; każda z ikoną w kolorze rodzaju i liczbą wpisów, wybrana na delikatnym tle
+  akcentu, puste przygaszone (`ui/shell/console.js`, `console.css`).
+
 ## Program 0.113.7 — 2026-11-27 (strona startowa: konsola przy bocznym menu)
 
 ### Zmienione
