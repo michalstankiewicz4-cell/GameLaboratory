@@ -162,6 +162,11 @@ function tile(item) {
   }
   const ph = a.querySelector(".phrases");
   for (const w of PHRASES[item.file] || []) { const e = document.createElement("span"); e.className = "phrase"; e.textContent = phrase(w); ph.appendChild(e); }
+  // a square tile shows its picture and name; the rest is its tooltip: the file and version, the description, the
+  // category and kit, the phrases
+  a.title = [item.name, a.querySelector(".file").textContent, a.querySelector(".desc").textContent,
+    [item.cat ? catName(item.cat) : "", info[2]].filter(Boolean).join(" · "),
+    (PHRASES[item.file] || []).map(phrase).join(", ")].filter(Boolean).join("\n");
   return a;
 }
 // a category's chip under the pointer lights up every tile of that category
@@ -221,7 +226,7 @@ function quick() {
   slots.push(["last", tr("Last opened", "Ostatnio otwarte"), last, tr("Last opened", "Ostatnio otwarte"), tr("The lab you were in last will wait here.", "Tu poczeka laboratorium, w którym byłeś ostatnio.")]);
   if (last) used.add(last);
   const most = Object.keys(visits).filter((f) => known(f) && !used.has(f)).sort((a, b) => visits[b] - visits[a]);
-  [0, 1, 2, 3].forEach((k) => slots.push(["most", tr("Most opened", "Najczęściej otwierane") + (most[k] ? " · " + visits[most[k]] + "×" : ""), most[k] || null, tr("Most opened", "Najczęściej otwierane"), tr("The labs you open most will show up here.", "Tu pojawią się laboratoria, które otwierasz najczęściej.")]));
+  [0, 1, 2, 3].forEach((k) => slots.push(["most", tr("Most opened", "Najczęściej") + (most[k] ? " · " + visits[most[k]] + "×" : ""), most[k] || null, tr("Most opened", "Najczęściej otwierane"), tr("The labs you open most will show up here.", "Tu pojawią się laboratoria, które otwierasz najczęściej.")]));
   slots.forEach(([kind, badge, file, emptyTitle, emptyText]) => {
     if (!file) {
       const e = document.createElement("div"); e.className = "empty";
@@ -283,6 +288,7 @@ function sceneCards() {
     a.querySelector(".name span").textContent = PL ? sc.namePl || sc.name : sc.name;
     a.querySelector(".desc").textContent = PL ? sc.descPl || sc.desc : sc.desc;
     a.querySelector(".go").textContent = tr("Open in the editor →", "Otwórz w edytorze →");
+    a.title = [a.querySelector(".name span").textContent, a.querySelector(".desc").textContent, a.querySelector(".go").textContent].join("\n");
     box.appendChild(a);
   }
 }

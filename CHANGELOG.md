@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.116.0 — 2026-11-27 (strona startowa: kwadratowe kafelki)
+
+### Zmienione
+- Strona startowa: kafelki laboratoriów, narzędzi, scen i Szybkiego dostępu są kwadratowe (jak na zrzucie Canvas) —
+  obrazek i nazwa; opis, plik i wersja, kategoria i kit oraz frazy są w podpowiedzi kafelka. Plakietka „Najczęściej
+  otwierane” skrócona do „Najczęściej · n×”.
+- Mniejszy baner (niższy, mniejszy tytuł i opis) i mniejsze przyciski w nim.
+
 ## Program 0.115.6 — 2026-11-27 (pole tekstowe raz, kolory NeuroLabPA z tokenów)
 
 ### Zmienione
