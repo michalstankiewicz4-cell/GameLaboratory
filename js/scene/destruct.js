@@ -54,7 +54,7 @@ function merge(gs, tint) {
 
 export function createSceneDestruct({ scene, groundAt, windAt, tornado }) {
   const world = createWorld(scene, { ground: (x, z) => { const h = groundAt(x, z); return h == null ? 0 : h; }, wind: (x, y, z, out) => windAt(x, y, z, out) });
-  const shown = new Map(), W3 = [0, 0, 0];   // budynek świata → model prefabrykatu (chowany przy odsłonięciu)
+  const shown = new Map();   // budynek świata → model prefabrykatu (chowany przy odsłonięciu)
   world.onReveal((bld) => { const b = shown.get(bld); if (b) b.root.visible = false; });
   return {
     world,
@@ -66,10 +66,7 @@ export function createSceneDestruct({ scene, groundAt, windAt, tornado }) {
     },
     frame(dt) {
       const T = tornado();
-      if (T && dt > 0) {
-        world.windDamage(T.x, T.z, T.rc * 3, (x, y, z) => { windAt(x, y, z, W3); return Math.hypot(W3[0], W3[1], W3[2]); }, dt);
-        for (const b of world.bodies) if (b.state === 'sleep' && Math.hypot(b.p.x - T.x, b.p.z - T.z) < T.rc * 3) world.wake(b);   // gruz w zasięgu wiatru
-      }
+      world.tornadoDamage(T, windAt, dt);   // DestructKit: części w promieniu 3 rdzeni, gruz się budzi
       if (dt > 0) world.update(dt);
     },
     stop() { world.dispose(); for (const b of shown.values()) b.root.visible = true; shown.clear(); },

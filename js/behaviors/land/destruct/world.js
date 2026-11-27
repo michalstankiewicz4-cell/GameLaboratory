@@ -9,6 +9,7 @@
 //   addObject(obj3d, { m, pts, r, A, size, kind, sleep }) → body   przedmiot z własną siatką (beczka, opona…)
 //   hit(point, J, { radius })                           uderzenie: punkt [Vector3], impuls [Vector3, N·s]
 //   windDamage(x, z, R, speedAt(x, y, z), dt)           wiatr niszczy części w promieniu R (szyby pierwsze)
+//   tornadoDamage(T, windAt(x, y, z, out), dt)         trąba T { x, z, rc }: windDamage w promieniu 3 rdzeni i budzenie gruzu
 //   update(dt, { sync })                                fizyka, zderzenia, statyka, rysowanie
 //   opts.physicsWorker: adres modułu środowiska (ground, wind) — krok brył w osobnym wątku (physics-link.js,
 //     physics-worker.js), wyniki w następnej klatce; env.windState — stan wiatru wysyłany do wątku (same liczby). Bez
@@ -244,10 +245,19 @@ export function createWorld(scene, opts = {}) {
     batches.clear(); buildings.length = 0; grid.clear(); queue.clear(); fragCount = 0;
   }
   // koniec świata (scena po Stop): wszystko jak clear() i drobny gruz zdjęty ze sceny
+  // trąba / tornado T ({ x, z, rc }): wiatr windAt(x, y, z, out) niszczy części w promieniu trzech rdzeni (szyby
+  // pierwsze), uśpiony gruz w tym zasięgu się budzi (laboratorium miasta, scena — js/scene/destruct.js)
+  const W3 = [0, 0, 0];
+  function tornadoDamage(T, windAt, dt) {
+    if (!T || !(dt > 0)) return;
+    const R = T.rc * 3;
+    I.windDamage(T.x, T.z, R, (x, y, z) => { windAt(x, y, z, W3); return Math.hypot(W3[0], W3[1], W3[2]); }, dt);
+    for (const b of bodies) if (b.state === 'sleep' && Math.hypot(b.p.x - T.x, b.p.z - T.z) < R) wake(b);
+  }
   function dispose() { clear(); if (chips) { scene.remove(chips.mesh); chips.mesh.geometry.dispose(); } }
 
   return {
-    addHouse, addObject, hit: I.hit, windDamage: I.windDamage, update, removeBody, stats, clear, dispose, query, breakPart: S.breakPart, drop: S.drop, sync,
+    addHouse, addObject, hit: I.hit, windDamage: I.windDamage, tornadoDamage, update, removeBody, stats, clear, dispose, query, breakPart: S.breakPart, drop: S.drop, sync,
     bodies, buildings, env, batches, wake,
     set maxFragments(n) { maxFrag = n; },
     onBreak(f) { listeners.break.push(f); }, onReveal(f) { listeners.reveal.push(f); }, reveal, setChar, onFragment(f) { listeners.frag.push(f); },

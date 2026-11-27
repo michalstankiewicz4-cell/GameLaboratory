@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.111.3 · miasto 1.3.2 — 2026-11-27 (obrażenia od trąby w jednym miejscu)
+
+### Zmienione
+- DestructKit: `world.tornadoDamage(T, windAt, dt)` — wiatr trąby niszczy części w promieniu trzech rdzeni i budzi
+  uśpiony gruz; wcześniej ten sam kod był osobno w laboratorium miasta i w scenie (`js/scene/destruct.js`). Działanie
+  bez zmian.
+
 ## Program 0.111.2 — 2026-11-27 (schemat silnika)
 
 ### Zmienione

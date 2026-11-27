@@ -47,7 +47,7 @@ budynki z części: HouseKit ([`../models/houses.md`](../models/houses.md)).
 ## API świata
 
 `createWorld(scene, { ground, wind, maxFragments, chips, physicsWorker })` → `{ addHouse(house, { x, z, rot, hidden }),
-addObject(obj3d, { m, pts, r, A, size, kind, sleep }), hit(punkt, J, { radius }), windDamage(x, z, R, speedAt, dt),
+addObject(obj3d, { m, pts, r, A, size, kind, sleep }), hit(punkt, J, { radius }), windDamage(x, z, R, speedAt, dt), tornadoDamage(T, windAt, dt) (trąba: promień 3 rdzeni, budzi gruz),
 update(dt, { sync }), sync(), removeBody(b), stats(), clear(), query(x, z, r), breakPart, drop, reveal, setChar,
 onBreak(fn), onFragment(fn), onReveal(fn), bodies, buildings, batches, env, wake, maxFragments, time, physicsThread }`.
 

@@ -14,7 +14,6 @@ import { MISSILES, loadMissiles, makeMissile } from './missiles.js';
 export const TOOLS = { hit: 'Hit', throw: 'Throw', wind: 'Tornado' };
 export const DEFAULTS = { dType: 'cottage', dSeed: 1, dVillage: false, dTool: 'hit', impulse: 2500, radius: 0.6, missile: 'barrel', speed: 30, wind: 75, core: 4, slow: 1, maxFrag: 2500, pause: false, showMats: false };
 const VILLAGE = [['cottage', -14, 6, 0.1], ['kostka', 6, 8, -0.05], ['barn', -8, -16, 0.02], ['garage', 18, -4, 1.57], ['shed', -26, -4, 0.4], ['block', 14, -26, 0]];
-const W3 = [0, 0, 0];
 
 export function createDestructMode({ scene, camera, canvas, orbit, ui, day }) {
   const { L, $, el, status, save } = ui;
@@ -128,12 +127,7 @@ export function createDestructMode({ scene, camera, canvas, orbit, ui, day }) {
       else tornado.set({ strength: Math.min(1, L.wind / 100), rc: L.core, top: 30 + L.core * 12, vmax: L.wind, kind: 'land' });
     }
     tornado.update(dt, camera, { at: twist ? [twist.x, twist.z] : null, groundAt: () => 0, isWater: () => false, light: Math.min(1, day() + 0.2) });
-    if (twist && tornado.state && dt > 0) {
-      const T = tornado.state;
-      world.windDamage(T.x, T.z, T.rc * 3, (x, y, z) => { tornadoWind(T, x, y, z, W3); return Math.hypot(W3[0], W3[1], W3[2]); }, dt);
-      // sleeping debris within the wind's reach wake up
-      for (const b of world.bodies) if (b.state === 'sleep' && Math.hypot(b.p.x - T.x, b.p.z - T.z) < T.rc * 3) world.wake(b);
-    }
+    if (twist && tornado.state) { const T = tornado.state; world.tornadoDamage(T, (x, y, z, out) => tornadoWind(T, x, y, z, out), dt); }   // DestructKit
     if (dt > 0) world.update(dt); else world.sync();
   }
 
