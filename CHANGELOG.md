@@ -3,6 +3,11 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.116.3 — 2026-11-27 (boczne menu: Sceny przed Laboratoriami)
+
+### Zmienione
+- Boczne menu strony startowej: Sceny przed Laboratoriami (jak sekcje na stronie).
+
 ## Program 0.116.2 — 2026-11-27 (Szybki dostęp w jednym rzędzie)
 
 ### Zmienione
