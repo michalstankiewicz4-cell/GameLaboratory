@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.112.2 · items 1.2.2 · mechanics 1.0.5 — 2026-11-27 (W A S D z kamery orbitalnej)
+
+### Zmienione
+- Kamera orbitalna laboratoriów (`js/labs/shared/orbit.js`): `watchKeys()` i `moveKeys(dt, near)` — przesuwanie W A S D;
+  laboratoria przedmiotów (tryb Deformation) i mechaniki korzystają z niego zamiast własnych kopii. Działanie bez zmian.
+
 ## Program 0.112.1 — 2026-11-27 (wspólny szum wartości)
 
 ### Zmienione

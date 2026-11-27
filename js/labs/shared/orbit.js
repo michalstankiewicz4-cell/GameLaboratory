@@ -8,6 +8,7 @@
 //       place(camera, lift)   kamera na sferze wokół celu (lift — dodatkowa wysokość celu) i patrzy na cel
 //       position(camera, lift) samo położenie na sferze (laboratorium samo kieruje kamerę)
 //       pan(forward, side, v) przesunięcie celu w płaszczyźnie (W A S D) o v w kierunku patrzenia
+//       watchKeys()           słuchanie W A S D (raz), moveKeys(dt, near) — w klatce: przesuwanie o max(near, dist)·0,8·dt
 import * as THREE from '../../../vendor/three/three.module.js';
 
 export function createOrbit(o = {}) {
@@ -26,5 +27,17 @@ export function createOrbit(o = {}) {
     camera.position.set(t.x + Math.sin(orbit.yaw) * c * orbit.dist, t.y + lift + Math.sin(orbit.pitch) * orbit.dist, t.z + Math.cos(orbit.yaw) * c * orbit.dist);
   };
   orbit.pan = (f, s, v) => { const fx = -Math.sin(orbit.yaw), fz = -Math.cos(orbit.yaw); orbit.target.x += (fx * f - fz * s) * v; orbit.target.z += (fz * f + fx * s) * v; };
+  // W A S D: przytrzymane klawisze (poza polami formularza) przesuwają cel; szybciej z daleka
+  const held = new Set();
+  orbit.watchKeys = () => {
+    addEventListener('keydown', (e) => { if (!(e.target.closest && e.target.closest('input,select,textarea')) && ['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) held.add(e.code); });
+    addEventListener('keyup', (e) => held.delete(e.code)); addEventListener('blur', () => held.clear());
+    return orbit;
+  };
+  orbit.moveKeys = (dt, near = 0.6) => {
+    if (!held.size) return;
+    const f = (held.has('KeyW') ? 1 : 0) - (held.has('KeyS') ? 1 : 0), s = (held.has('KeyD') ? 1 : 0) - (held.has('KeyA') ? 1 : 0);
+    if (f || s) orbit.pan(f, s, Math.max(near, orbit.dist) * 0.8 * dt);
+  };
   return orbit;
 }

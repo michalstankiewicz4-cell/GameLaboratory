@@ -64,7 +64,7 @@ function loop(now) {
   if (S.mode === 'machine') { drive.step(dt, { rpm: S.rpm, brake: S.brake }); applyAngles(); }
   else if (S.mode === 'physics') stepPhysics(dt);   // obwód, regulator, napęd fizyczny (js/behaviors/land/mech/engine-layout.js)
   else items.frame(dt);
-  moveKeys(dt);
+  orbit.moveKeys(dt, 0.6);
   if ((statT += dt) > 0.2) { statT = 0; stats(); }
   if (sel) selBox.update();
   if (S.hit && hitG.visible) syncHit();
@@ -149,14 +149,7 @@ function endPointer() { if (ctl) { ctl.api.release(ctl.name); ctl = null; stats(
 cv.addEventListener('pointercancel', endPointer); cv.addEventListener('lostpointercapture', () => { if (ctl) endPointer(); }); addEventListener('blur', endPointer);
 cv.addEventListener('pointerup', (e) => { if (ctl) { ctl.api.release(ctl.name); ctl = null; stats(); return; } const click = drag && !drag.moved; drag = null; if (click && e.button === 0 && S.mode !== 'items') pick(e); });
 cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.zoomBy(e.deltaY); }, { passive: false });
-const held = new Set();
-addEventListener('keyup', (e) => held.delete(e.code)); addEventListener('blur', () => held.clear());
-function moveKeys(dt) {
-  const f = (held.has('KeyW') ? 1 : 0) - (held.has('KeyS') ? 1 : 0), s = (held.has('KeyD') ? 1 : 0) - (held.has('KeyA') ? 1 : 0);
-  if (!f && !s) return;
-  const fx = -Math.sin(orbit.yaw), fz = -Math.cos(orbit.yaw), v = Math.max(0.6, orbit.dist) * 0.8 * dt;
-  orbit.target.x += (fx * f - fz * s) * v; orbit.target.z += (fz * f + fx * s) * v;
-}
+orbit.watchKeys();   // W A S D (js/labs/shared/orbit.js)
 
 
 /* ---------------- tryb Fizyka (physics-mode.js) i tryb Przedmioty (items-mode.js) ---------------- */
@@ -191,7 +184,6 @@ for (const k of ['sunEl', 'sunAz']) { $(k).value = S[k]; $(k + 'V').textContent 
 function sky() { stage.setSky({ weather: S.weather, sunEl: S.sunEl, sunAz: S.sunAz }); }
 addEventListener('keydown', (e) => {
   if (e.target.closest('input,select,textarea')) return;
-  if (['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) held.add(e.code);
   if (e.code === 'KeyH') document.querySelectorAll('[data-window]').forEach((p) => p.classList.toggle('hidden-panel'));
 });
 

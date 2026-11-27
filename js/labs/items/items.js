@@ -160,7 +160,7 @@ addEventListener('resize', resize);
 let last = performance.now();
 function frame(now) {
   const dt = Math.min(0.1, ((now || performance.now()) - last) / 1000); last = now || performance.now();
-  if (S.mode === 'deform') { deform.frame(dt); moveKeys(dt); }
+  if (S.mode === 'deform') { deform.frame(dt); orbit.moveKeys(dt, 1); }
   const c = Math.cos(orbit.pitch);
   orbit.position(camera);
   camera.position.y = Math.max(0.01, camera.position.y); camera.lookAt(orbit.target);
@@ -207,18 +207,7 @@ async function setMode(m) {
   }
 }
 // W A S D move the camera (deformation mode: the board is 13 m wide)
-const held = new Set(), fwd = new THREE.Vector3(), side = new THREE.Vector3();
-addEventListener('keydown', (e) => { if (!e.target.closest('input,select,textarea') && ['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) held.add(e.code); });
-addEventListener('keyup', (e) => held.delete(e.code));
-addEventListener('blur', () => held.clear());
-function moveKeys(dt) {
-  if (!held.size) return;
-  const f = (held.has('KeyW') ? 1 : 0) - (held.has('KeyS') ? 1 : 0), s = (held.has('KeyD') ? 1 : 0) - (held.has('KeyA') ? 1 : 0);
-  if (!f && !s) return;
-  fwd.set(-Math.sin(orbit.yaw), 0, -Math.cos(orbit.yaw)); side.set(-fwd.z, 0, fwd.x);
-  const v = Math.max(1, orbit.dist) * 0.8 * dt;   // faster from far away
-  orbit.target.addScaledVector(fwd, f * v).addScaledVector(side, s * v);
-}
+orbit.watchKeys();   // W A S D (js/labs/shared/orbit.js)
 
 updateSky(); resize(); itemCams();
 load(S.id).then(() => { status(''); if (S.mode === 'deform') setMode('deform'); }, (e) => status(e.message));
