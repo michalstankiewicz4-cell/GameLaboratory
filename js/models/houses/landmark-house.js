@@ -13,7 +13,7 @@ import * as THREE from '../../../vendor/three/three.module.js';
 import DATA from '../city/landmarks/osm-data.js';
 import { LANDMARK_IDS, landmarkStyle, partSpec } from '../city/landmarks/landmarks.js';
 import { normalizeSpec } from '../city/types.js';
-import { registerMat } from '../../behaviors/land/destruct/materials.js';
+import { registerMat } from './materials.js';
 
 export const LANDMARKS = Object.fromEntries(LANDMARK_IDS.map((id) => [id, DATA[id].name]));
 const V = (x, y, z) => new THREE.Vector3(x, y, z);

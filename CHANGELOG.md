@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.111.6 — 2026-11-27 (wygląd i materiały budynków z części w modelach)
+
+### Zmienione
+- Materiały budynków z części (`materials.js`), bryła części (`extrude.js`) i wielokąty 2D (`geom2d.js`) przeniesione
+  z zachowania zniszczenia (`js/behaviors/land/destruct/`) do modeli `js/models/houses/` — to dane modelu, jak
+  właściwości złomowiska; zachowanie bierze je stamtąd. Wygląd budynku przed zniszczeniem (`houseModel`) z silnika
+  sceny do `js/models/houses/house-model.js`. Działanie bez zmian (doktor: budynki bez zmian).
+
 ## Mechanika 1.0.3 — 2026-11-27 (wspólna scena bazowa)
 
 ### Zmienione

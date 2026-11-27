@@ -6,7 +6,7 @@
 // na +z. id prefabrykatu: houses/<rodzaj> albo houses/lm-<budynek z mapy>.
 import { HOUSES, buildHouse } from '../models/houses/catalog.js';
 import { build as buildCity } from '../models/city/citykit.js';
-import { houseModel } from './destruct.js';
+import { houseModel } from '../models/houses/house-model.js';
 
 export function addHousePrefabs(add) {
   for (const [id, h] of Object.entries(HOUSES)) {

@@ -39,3 +39,10 @@ Doktor modeli: `houses/<rodzaj>` (każda część jako osobna siatka, jak przed 
 `HOUSES { id: { name, namePl, note, notePl } }` i `buildHouse(id, { seed })` — jedna lista budynków z części (rodzaje HouseKit
 i `lm:<budynek z mapy>`), z której biorą tryb Destruction laboratorium miasta i prefabrykaty sceny (`houses/<rodzaj>`,
 `houses/lm-<budynek>`, `js/scene/prefabs-houses.js`).
+
+## Wygląd i materiały (dane modelu)
+
+- `materials.js` — materiały części (`MATS`: wygląd z MatKit, gęstość, wytrzymałość, wzór pękania, palność; `registerMat`),
+  `extrude.js` — część jako bryła (wielokąt wyciągnięty na grubość), `geom2d.js` — wielokąty 2D; korzysta z nich
+  zachowanie zniszczenia (`js/behaviors/land/destruct/`).
+- `house-model.js` — `houseModel(house)`: wygląd budynku przed zniszczeniem, części scalone po materiale (prefabrykaty sceny).

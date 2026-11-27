@@ -7,7 +7,7 @@ budynki z części: HouseKit ([`../models/houses.md`](../models/houses.md)).
 ## Zasady
 
 - Budynek = części (HouseKit): każda to wielokąt wypukły wyciągnięty na grubość, z materiałem i podporami.
-- Materiał (`materials.js`) wybiera wzór pękania (`patterns.js`): mur — warstwy i cegły, beton — Woronoj, deski — wzdłuż
+- Materiał (`js/models/houses/materials.js`) wybiera wzór pękania (`patterns.js`): mur — warstwy i cegły, beton — Woronoj, deski — wzdłuż
   słojów, szkło — promieniście, dachówka — rzędy, blacha — arkusze, belka — odcinki. Materiał niesie też gęstość,
   wytrzymałość (`hp` — ile uderzeń w N·s na m² przekroju wytrzyma), próg wiatru (`wind` — szyby pierwsze, ściany
   ostatnie), barwę przełomu (`frac`) i wygląd (MatKit).
@@ -39,8 +39,8 @@ budynki z części: HouseKit ([`../models/houses.md`](../models/houses.md)).
 | `physics.js` | bryła sztywna (`makeBody`, `stepBody`, `applyImpulse`, `wake`) |
 | `physics-link.js`, `physics-worker.js` | krok brył w osobnym wątku (`opts.physicsWorker` — adres modułu środowiska z `ground(x, z)` i `wind(stan, x, y, z, out)`) |
 | `patterns.js` | wzory pękania wg materiału (`fracture`) |
-| `geom2d.js`, `extrude.js` | wielokąty 2D (przycinanie, Woronoj, styk) i wyciąganie części na grubość |
-| `materials.js` | materiały części (`MATS`, `registerMat` — np. budynki z laboratorium miasta) i ich wygląd |
+| `js/models/houses/geom2d.js`, `extrude.js` (w modelach) | wielokąty 2D (przycinanie, Woronoj, styk) i wyciąganie części na grubość |
+| `js/models/houses/materials.js` (w modelach) | materiały części (`MATS`, `registerMat` — np. budynki z laboratorium miasta): wygląd, gęstość, wytrzymałość, wzór pękania, palność — dane modelu, jak `js/models/junkyard/properties.js` |
 | `batches.js`, `chips.js` | rysowanie części i odłamków, drobny gruz |
 | `burn.js` | pożary |
 

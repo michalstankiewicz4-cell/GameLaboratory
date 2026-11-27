@@ -1,6 +1,6 @@
 // HouseKit — budynki złożone z prawdziwych części: fundament, ściany dzielone przez otwory na filary, podokienniki
 // i nadproża, ramy okien i szyby, drzwi, stropy, szczyty, połacie dachu, attyka, komin. Każda część ma materiał
-// (js/behaviors/land/destruct/materials.js — z niego wzór pękania), grubość, wielokąt w swoim układzie i to, na czym stoi
+// (js/models/houses/materials.js — z niego wzór pękania), grubość, wielokąt w swoim układzie i to, na czym stoi
 // (supports: części albo grunt -1) — z tego statyka: dach spada, gdy znikną ściany pod nim.
 // Metry, y w górę, środek obrysu w (0, 0, 0), front patrzy na +z.
 //   HOUSE_TYPES                           { id: { name, note } }

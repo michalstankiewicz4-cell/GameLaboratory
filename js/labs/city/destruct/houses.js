@@ -5,7 +5,7 @@
 //   HOUSES, buildHouse — from js/models/houses/catalog.js (one list for the lab and the scene's prefabs)
 //   MAT_NAMES { mat: English name }, MAT_COL / FALSE_COL { mat: '#rrggbb' } — the list's swatches, "Material colours"
 export { HOUSES, buildHouse } from '../../../models/houses/catalog.js';   // jedna lista budynków z części (EN/PL)
-import { MATS } from '../../../behaviors/land/destruct/materials.js';
+import { MATS } from '../../../models/houses/materials.js';
 
 
 const MAT_EN = { brick: 'Brick', plaster: 'Plaster on brick', blocks: 'Hollow blocks', concrete: 'Concrete', panel: 'Precast panel', wood: 'Boards', floor: 'Wooden floor',

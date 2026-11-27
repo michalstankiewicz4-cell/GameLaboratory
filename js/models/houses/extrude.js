@@ -4,7 +4,7 @@
 // kolor przełomu (np. cegła pod tynkiem, jaśniejszy beton, jasne drewno).
 // extrude(poly, { t, orig, tile, uv, frac, inset }) → BufferGeometry (position, normal, uv, color, index);
 //   userData: { c: [x, y] środek w układzie części, pts: Float32Array narożników względem środka (zderzenia), r, a }
-import * as THREE from '../../../../vendor/three/three.module.js';
+import * as THREE from '../../../vendor/three/three.module.js';
 import { centroid, onBoundary, area } from './geom2d.js';
 
 export function extrude(poly, { t = 0.2, orig = null, tile = 1, uv = [0, 0], frac = [0.8, 0.78, 0.74], z0 = 0 } = {}) {

@@ -5,8 +5,8 @@
 import * as THREE from '../../../vendor/three/three.module.js';
 import { countDraw } from './common.js';
 import { HOUSE_IDS, HOUSE_TYPES, buildHouse } from '../../../js/models/houses/housekit.js';
-import { extrude } from '../../../js/behaviors/land/destruct/extrude.js';
-import { MATS, tileOf } from '../../../js/behaviors/land/destruct/materials.js';
+import { extrude } from '../../../js/models/houses/extrude.js';
+import { MATS, tileOf } from '../../../js/models/houses/materials.js';
 
 const matCache = {};
 const houseMat = (m) => (matCache[m] ||= new THREE.MeshStandardMaterial({ color: new THREE.Color().setHSL((Object.keys(MATS).indexOf(m) * 0.137) % 1, 0.4, 0.55), name: m }));

@@ -7,7 +7,7 @@
 // createBatches(scene) → { add(geometry, matId, matrix, color?) → handle, set(handle, matrix), color(handle, c),
 //   remove(handle), prepare(matId), stats() → { geoms, verts, draws }, clear() }
 import * as THREE from '../../../../vendor/three/three.module.js';
-import { renderMaterial, MATS } from './materials.js';
+import { renderMaterial, MATS } from '../../../models/houses/materials.js';
 import { touchTex } from '../../../render/partial-upload.js';
 
 // macierz instancji = 4 teksele RGBA (16 liczb), barwa = 1 teksel (szerokość tekstur jest wielokrotnością 4)

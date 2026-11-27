@@ -5,8 +5,8 @@
 //   wind    prędkość wiatru [m/s], od której wiatr sam zaczyna niszczyć część (szyby pierwsze, ściany ostatnie)
 //   burn    tylko materiały palne: { fuel: paliwo FireKit (wood | rubber), time: czas palenia × (√pole + 1) [s] } — pożary
 //           (js/behaviors/land/destruct/burn.js); niepalne (cegła, beton, dachówka, blacha, szkło…) nie mają tego pola
-import * as THREE from '../../../../vendor/three/three.module.js';
-import { PRESETS, makeMaterial } from '../../../render/materials/matkit.js';
+import * as THREE from '../../../vendor/three/three.module.js';
+import { PRESETS, makeMaterial } from '../../render/materials/matkit.js';
 
 export const MATS = {
   brick:    { name: 'Cegła', density: 1800, hp: 900, wind: 85, pattern: 'masonry', frac: [0.86, 0.62, 0.52], tex: { ...PRESETS.brick } },

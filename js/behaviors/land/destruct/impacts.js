@@ -6,9 +6,9 @@
 //   windDamage wiatr niszczy części w promieniu R ponad progiem materiału (szyby pierwsze, ściany ostatnie)
 //   collide    szybka, ciężka bryła (przedmiot, gruz, spadająca część) uderza w część: niszczy albo odbija się
 import * as THREE from '../../../../vendor/three/three.module.js';
-import { MATS } from './materials.js';
+import { MATS } from '../../../models/houses/materials.js';
 import { wake } from './physics.js';
-import { inside, distTo, bounds } from './geom2d.js';
+import { inside, distTo, bounds } from '../../../models/houses/geom2d.js';
 
 const _p = new THREE.Vector3(), _v = new THREE.Vector3(), _n = new THREE.Vector3(), _c = new THREE.Color();
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));

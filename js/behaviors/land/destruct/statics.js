@@ -7,9 +7,9 @@
 //      cellMatrix, addPartMesh, spawnFragment, removeBody, sizeOf, chipColor, chipSize
 import * as THREE from '../../../../vendor/three/three.module.js';
 import { fracture } from './patterns.js';
-import { MATS } from './materials.js';
+import { MATS } from '../../../models/houses/materials.js';
 import { makeBody } from './physics.js';
-import { bounds, touching } from './geom2d.js';
+import { bounds, touching } from '../../../models/houses/geom2d.js';
 
 const _m = new THREE.Matrix4(), _p = new THREE.Vector3(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(1, 1, 1), _v = new THREE.Vector3(), _n = new THREE.Vector3();
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));

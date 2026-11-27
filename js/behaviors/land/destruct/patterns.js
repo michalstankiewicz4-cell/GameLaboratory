@@ -8,7 +8,7 @@
 //   sheet    blacha: całe arkusze (blacha falista, drzwi garażu), rozrywane na 1–3 części
 //   beam     belka, rama okna, słup: kawałki wzdłuż długości
 // fracture(part, hit [x, y] w układzie części, power 0…1) → komórki (wielokąty wypukłe), każda z odległością od uderzenia
-import { clipConvex, voronoi, rect, bounds, area, centroid, rng, distTo } from './geom2d.js';
+import { clipConvex, voronoi, rect, bounds, area, centroid, rng, distTo } from '../../../models/houses/geom2d.js';
 
 const lerp = (a, b, t) => a + (b - a) * t;
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));

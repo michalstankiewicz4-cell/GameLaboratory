@@ -20,12 +20,12 @@
 //   bodies (Set), buildings, removeBody(b), stats(), clear(), dispose() (clear i gruz ze sceny), onBreak(fn), onFragment(fn), onReveal(fn)
 // Body: { p, q, v, w, m, r, A, size, state 'active' | 'sleep' | 'held', kind 'frag' | 'part' | 'item', mat }
 import * as THREE from '../../../../vendor/three/three.module.js';
-import { extrude } from './extrude.js';
-import { MATS, tileOf } from './materials.js';
+import { extrude } from '../../../models/houses/extrude.js';
+import { MATS, tileOf } from '../../../models/houses/materials.js';
 import { createBatches } from './batches.js';
 import { createChips } from './chips.js';
 import { makeBody, stepBody, wake } from './physics.js';
-import { bounds, area } from './geom2d.js';
+import { bounds, area } from '../../../models/houses/geom2d.js';
 import { createStatics } from './statics.js';
 import { createImpacts } from './impacts.js';
 import { createPhysicsLink } from './physics-link.js';

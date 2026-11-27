@@ -12,7 +12,7 @@
 // Wygląd: FireKit (js/render/effects/fire/firekit.js) — źródło ognia na każdą płonącą rzecz i blok trawy.
 // createBurning({ world, fire, terrain, forest, wind: [x, z] m/s }) → { ignite(point, r) → ile zapalono, update(dt), stats(), setWind([x, z]) }
 import * as THREE from '../../../../vendor/three/three.module.js';
-import { MATS } from './materials.js';
+import { MATS } from '../../../models/houses/materials.js';
 
 // palne przedmioty (id przedmiotu JunkKit → paliwo, czas palenia [s], co zostaje)
 export const ITEM_BURN = {
