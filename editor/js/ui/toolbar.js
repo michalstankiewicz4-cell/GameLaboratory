@@ -1,5 +1,6 @@
 // Pasek narzędzi (Graj / Stop, cofnij / ponów, uchwyt, nowa scena, zapis i odczyt pliku, gotowe sceny) i klawisze edytora.
 import { SCENES } from '../scenes/scenes.js';
+import { getAsset, saveAsset } from '../../../js/scene/assets.js';
 const $ = (id) => document.getElementById(id);
 const { t } = window.EditorI18n;
 
@@ -21,6 +22,7 @@ export function createToolbar(store, controls, actions) {
   list.addEventListener('change', () => {
     const sc = SCENES.find((x) => x.id === list.value); list.value = ''; list.blur(); if (!sc) return;
     const name = t('scenes.' + sc.id);
+    for (const a of sc.assets || []) if (!getAsset(a.kind, a.name)) saveAsset(a.kind, a.name, a.data);   // zasoby sceny (pogoda z tornadem…)
     actions.build(() => { store.load(sc.build(name)); controls.frameAll(); }); actions.status(t('status.sceneLoaded', { name }));
   });
   // cofnij / ponów: przyciski aktywne, gdy jest co cofać

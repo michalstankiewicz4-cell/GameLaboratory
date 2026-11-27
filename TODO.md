@@ -52,6 +52,8 @@ Listy pojęć do omówienia: co warto, gdzie (które laboratorium), ile kosztuje
 ## Pomysły (właściciel, czekają na decyzję)
 - [ ] **Wiki w menu Pomoc**: artykuły o laboratoriach, modelach, środowiskach i zjawiskach, z małymi ilustracjami
   generowanymi w laboratoriach (`ArtApi`) — bez wysokiej rozdzielczości i efektów, chyba że ilustracja tego wymaga.
+  Język wiki (właściciel, 2026-11-27): proste zwroty objaśniane analogiami, przykładami i porównaniami, a obok nich
+  nazwy fachowe (np. materiały i odbicia — PBR), tak żeby zrozumiał każdy, a profesjonalista też się odnalazł.
 - [ ] **Laboratorium sztuki — tryb 3D**: obraz jako płaszczyzna 3D (mapa normalnych z wysokości farby, mapa szorstkości:
   werniks błyszczy, sucha farba matowa), obracanie obrazu i ruchome światło, nierówny barwnik w pociągnięciu (grubość,
   nasycenie, ziarno pigmentu), rama 3D (profil listwy, UV wzdłuż listwy) ze złoceniem (złoto płatkowe na czerwonym

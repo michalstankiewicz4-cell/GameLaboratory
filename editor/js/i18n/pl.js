@@ -20,6 +20,7 @@
   'bar.open': 'Otwórz plik', 'bar.open.tip': 'Otwórz scenę z pliku JSON',
   'bar.scenes': 'Sceny…', 'bar.scenes.tip': 'Otwórz gotową scenę (zastępuje obecną, jak otwarcie pliku)',
   'scenes.harbour': 'Port (testowa)',
+  'scenes.tornadoTown': 'Tornado z miastem',
   'tree.placeOne': 'Zbuduj: {name} — hologram pod kursorem, kliknięcie stawia',
   'place.aim': 'Budowa: {name} — wskaż grunt · R: obrót o 45° · Esc albo prawy przycisk: koniec',
   'place.ok': '{name} pasuje tutaj: kliknij, żeby zbudować · R: obrót o 45° · Esc albo prawy przycisk: koniec',

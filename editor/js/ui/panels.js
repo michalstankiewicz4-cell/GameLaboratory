@@ -39,6 +39,8 @@ const ICONS = {
   city: 'M3 21h18M5 21V8h6v13M11 21V3h8v18M7 11h2M7 15h2M14 7h2M14 11h2M14 15h2',
   creatures: 'M4 10c2-3 5-3 8-2h5l3-2v4l-3 1c-1 2-3 3-6 3H8zM7 13l-1 7M10 14l1 6M15 13l1 7M18 11l1 4',
   gear: 'M3 10h9v4H3zM12 9l4-2v10l-4-2zM18 10l3-2M18 12h4M18 14l3 2',
+  houses: 'M4 21V10l6-5l6 5v11M4 21h16M8 21v-5h4v5M18 21v-8l2 2M14 8l3-3M16 12l3-2',
+  streets: 'M8 3L5 21M16 3l3 18M12 4v3M12 10v4M12 17v3',
 };
 function familyIcon(f) {
   const NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg'), path = document.createElementNS(NS, 'path');

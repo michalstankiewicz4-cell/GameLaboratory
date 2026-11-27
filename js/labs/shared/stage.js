@@ -187,6 +187,8 @@ export function createStage(renderer, scene, opts = {}) {
       return out;
     },
     get cyclone() { return cycA; },
+    // trąba od początku (▶ Graj i Stop w scenie): nowy wir z bieżącej pogody — w miejscu startu (pole at) albo przed kamerą
+    resetTornado() { if (tornado) { tornado.dispose(); tornado = null; } stage.setLight(lightId); },
     get tornado() { return tornado && tornado.state ? { x: tornado.state.x, z: tornado.state.z, kind: tornado.kind, vmax: tornado.state.vmax * tornado.state.fade, rc: tornado.state.rc } : null; },
     get vegetation() { return veg ? veg.counts : null; },
     get land() { return land ? land.T : null; },

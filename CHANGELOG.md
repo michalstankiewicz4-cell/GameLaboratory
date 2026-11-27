@@ -3,6 +3,17 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.110.0 · edytor sceny 0.58.0 — 2026-11-27 (scena „Tornado z miastem”)
+
+### Dodane
+- Silnik sceny: zachowanie **Zniszczenie** (`js/scene/destruct.js`) — budynki z części w jednym świecie DestructKit
+  sceny; tornado z pogody niszczy części, gruz leci z wiatrem. Rodziny prefabrykatów: budynki z części
+  (`js/scene/prefabs-houses.js`) i ulice (`js/scene/prefabs-streets.js`).
+- Tornado (`js/envs/sky/tornado.js`): miejsce i kierunek startu w pogodzie (`tornado.at`, `tornado.heading`);
+  scena bazowa: `stage.resetTornado()` (▶ Graj i Stop w edytorze zaczynają trąbę od początku).
+- DestructKit: `world.dispose()` (świat i gruz zdjęte ze sceny).
+- Edytor sceny: gotowa scena **Tornado z miastem** z zasobem pogody. Szczegóły: `editor/CHANGELOG.md`.
+
 ## Edytor sceny 0.57.0 — 2026-11-27 (gotowe sceny)
 
 ### Dodane

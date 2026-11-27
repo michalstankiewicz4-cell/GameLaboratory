@@ -16,7 +16,7 @@
 //   Budynki ukryte (hidden) trafiają na kartę dopiero przy odsłonięciu (pierwsze uszkodzenie, ogień).
 //   opts.chips (domyślnie tak): drobny gruz tylko na karcie (chips.js) przy pękaniu części i rozbiciu spadającej —
 //     do oglądania, poza fizyką.
-//   bodies (Set), buildings, removeBody(b), stats(), clear(), onBreak(fn), onFragment(fn), onReveal(fn)
+//   bodies (Set), buildings, removeBody(b), stats(), clear(), dispose() (clear i gruz ze sceny), onBreak(fn), onFragment(fn), onReveal(fn)
 // Body: { p, q, v, w, m, r, A, size, state 'active' | 'sleep' | 'held', kind 'frag' | 'part' | 'item', mat }
 import * as THREE from '../../../../vendor/three/three.module.js';
 import { extrude } from './extrude.js';
@@ -243,9 +243,11 @@ export function createWorld(scene, opts = {}) {
     for (const b of [...bodies]) removeBody(b);
     batches.clear(); buildings.length = 0; grid.clear(); queue.clear(); fragCount = 0;
   }
+  // koniec świata (scena po Stop): wszystko jak clear() i drobny gruz zdjęty ze sceny
+  function dispose() { clear(); if (chips) { scene.remove(chips.mesh); chips.mesh.geometry.dispose(); } }
 
   return {
-    addHouse, addObject, hit: I.hit, windDamage: I.windDamage, update, removeBody, stats, clear, query, breakPart: S.breakPart, drop: S.drop, sync,
+    addHouse, addObject, hit: I.hit, windDamage: I.windDamage, update, removeBody, stats, clear, dispose, query, breakPart: S.breakPart, drop: S.drop, sync,
     bodies, buildings, env, batches, wake,
     set maxFragments(n) { maxFrag = n; },
     onBreak(f) { listeners.break.push(f); }, onReveal(f) { listeners.reveal.push(f); }, reveal, setChar, onFragment(f) { listeners.frag.push(f); },

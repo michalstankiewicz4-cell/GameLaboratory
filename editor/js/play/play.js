@@ -11,6 +11,7 @@ import { mixer } from '../../../js/audio/mixer.js';
 import { createSceneSounds } from '../../../js/scene/sounds.js';
 import { createSceneMusic } from '../../../js/scene/music.js';
 import { createSceneWeather } from '../../../js/scene/weather.js';
+import { createSceneDestruct } from '../../../js/scene/destruct.js';
 import { applyGraphics, refresh } from '../../../js/render/game-graphics.js';
 
 const { t, lang } = window.EditorI18n;
@@ -62,7 +63,7 @@ export function createPlay(store, world, controls, actions, events) {
     const a = me.run.actions()[n - 1]; if (!a) return;
     e.preventDefault(); act(me.obj.id, a.id);
   });
-  let runs = [], me = null, last = null, hudT = 0, items = null, machines = [];
+  let runs = [], me = null, last = null, hudT = 0, items = null, machines = [], destruct = null;
 
   function start() {
     if (runs.length) return;
@@ -75,6 +76,8 @@ export function createPlay(store, world, controls, actions, events) {
       windAt: (x, y, z, out) => world.stage.windAt(x, y, z, out),   // wiatr trąby powietrznej / tornada (pogoda sceny)
       // złomowisko: wspólny świat przedmiotów (land/items.js) — przedmioty, maszyny, przeładowarka; liczony w frame()
       get items() { return items || (items = createItems({ ground: { height: (x, z) => { const h = world.stage.terrainAt(x, z); return h == null ? 0 : h; } }, wind: (x, y, z, out) => world.stage.windAt(x, y, z, out) })); },
+      // budynki z części: wspólny świat zniszczeń sceny (js/scene/destruct.js) — tornado z pogody je niszczy; liczony w frame()
+      get destruct() { return destruct || (destruct = createSceneDestruct({ scene: world.scene, groundAt: (x, z) => world.stage.groundAt(x, z), windAt: (x, y, z, out) => world.stage.windAt(x, y, z, out), tornado: () => world.stage.tornado })); },
       scene: world.root, machines };
     runs = store.scene.objects.map((o) => {
       const id = behaviorOf(o, store.scene.env.surface), b = world.built.get(o.id); if (!id || !b) return null;
@@ -96,16 +99,19 @@ export function createPlay(store, world, controls, actions, events) {
     sounds.start(store.scene.objects, runs);
     music.start(store.scene.env);
     weather.start(store.scene.env);
+    if (world.stage.resetTornado) world.stage.resetTornado();   // tornado z pogody sceny — od miejsca startu
     if (window.LabLog) window.LabLog.add('info', 'Play: ' + runs.length + ' object(s), controlling ' + me.obj.name);
     changed();
   }
   function stop() {
     if (!runs.length) return;
     sounds.stop(); music.stop(); weather.stop();
+    if (world.stage.resetTornado) world.stage.resetTornado();
     runs.forEach((r) => { if (r.run.reset) r.run.reset(); r.b.driven = false; r.b.lodFree = false; });
     // przedmioty powstałe w grze (sztabki, puszki zgniecione) znikają ze świata
     if (items) for (const it of [...items.list]) if (it.spawned) items.remove(it);
     items = null; machines.length = 0;
+    if (destruct) { destruct.stop(); destruct = null; }
     runs = []; me = null; input.release(); playUI.stop();
     gameGraphics(false);   // wygląd edytora
     controls.setPlaying(false); document.body.classList.remove('playing');
@@ -120,6 +126,7 @@ export function createPlay(store, world, controls, actions, events) {
     const c = input.read(dt);
     runs.forEach((r) => { r.input = r === me ? c : {}; r.run.step(dt, r.input, time); });
     if (items) { items.step(dt); items.sync(); JUNK_KIT.glow(items); if (machines.length) LIQUID_TIME.value += dt; }
+    if (destruct) destruct.frame(dt);
     const p = me.b.root.position, d = p.clone().sub(last); last.copy(p);
     controls.orbit.target.add(d); world.camera.position.add(d);
     if ((hudT -= dt) <= 0) { hudT = 0.2; actions.status(hudText(me.run.hud())); }

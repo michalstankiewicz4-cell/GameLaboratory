@@ -3,6 +3,15 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.58.0 — 2026-11-27
+
+### Dodane
+- Scena **Tornado z miastem** (lista Sceny…): skrzyżowanie i ulice, dziewięć domów z części, burza z tornadem (zasób
+  pogody dołączony do sceny). W ▶ Graj tornado idzie z zachodu przez miasto, budynki pękają tak, jak są zbudowane.
+- Rodziny modeli **Budynki z części (zniszczenie)** (domy HouseKit, budynki Warszawy z części) z zachowaniem
+  **Zniszczenie** i **Ulice** (ulica miejska, aleja, droga wiejska, skrzyżowania) — z ikonami na liście.
+- ▶ Graj i Stop zaczynają tornado z pogody sceny od miejsca startu.
+
 ## 0.57.0 — 2026-11-27
 
 ### Dodane

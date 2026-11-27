@@ -23,6 +23,8 @@ import { ITEMS as GEAR, makeItem } from '../models/gear/gearkit.js';
 import { buildBody as buildBlocks, SHAPES as BLOCK_SHAPES } from '../models/blocks/blockkit.js';
 import { MODELS as JUNK } from '../models/junkyard/registry.js';
 import { TYPES as CITY_TYPES, TYPE_IDS as CITY_IDS, build as buildCity } from '../models/city/citykit.js';
+import { addHousePrefabs } from './prefabs-houses.js';
+import { addStreetPrefabs } from './prefabs-streets.js';
 
 // family: grupa na liście; surface: gdzie stoi ('sea' — na wodzie, 'land' — na gruncie, 'air' — w powietrzu)
 export const FAMILIES = {
@@ -45,6 +47,8 @@ export const FAMILIES = {
   blocks: { label: 'Blocks', labelPl: 'Bloki' },
   junkyard: { label: 'Junkyard', labelPl: 'Złomowisko' },
   city: { label: 'City buildings', labelPl: 'Budynki miasta' },
+  houses: { label: 'Buildings of parts (destruction)', labelPl: 'Budynki z części (zniszczenie)' },
+  streets: { label: 'Streets', labelPl: 'Ulice' },
   gear: { label: 'Hero items (light)', labelPl: 'Przedmioty bohatera (światło)' },
 };
 
@@ -208,6 +212,10 @@ CITY_IDS.forEach((id) => add('city/' + id, CITY_TYPES[id].label, 'city', 'land',
   const b = buildCity((o && o.asset) || { type: id }, { detail: det(o) });   // zasób z budynkiem z mapy (landmark) też
   return { root: b.group, kit: b, dispose: () => b.dispose() };
 }, { assetKind: 'building', ...LOD }));
+
+// budynki z części (zniszczenie) i ulice — z Tornado.io, w osobnych plikach
+addHousePrefabs(add);
+addStreetPrefabs(add);
 
 export const PREFABS = P;
 export const prefab = (id) => P.find((p) => p.id === id) || null;

@@ -1,7 +1,7 @@
 // Trąba powietrzna i tornado: wir powietrza od chmury do ziemi — nad wodą trąba wodna (lejek nad morzem, wodny pył
 // u podstawy), nad lądem tornado (lejek z kurzem i szczątkami); siła reguluje wszystko naraz (prędkość wiatru, szerokość
 // rdzenia, grubość lejka, ilość pyłu). Wędruje po mapie. Część pogody: pole `tornado` pogody SkyKit ({ strength 0…1,
-// kind: 'auto' | 'water' | 'land' }), stage.setLight je stawia (js/labs/shared/stage.js), zmienna pogoda wywołuje je
+// kind: 'auto' | 'water' | 'land', at?: [x, z], heading?: stopnie — miejsce i kierunek startu), stage.setLight je stawia (js/labs/shared/stage.js), zmienna pogoda wywołuje je
 // w burzy (js/envs/sky/weather-cycle.js).
 //
 // Wiatr (dla fizyki środowiska): wir Rankine'a — w rdzeniu (r < rc) obrót jak bryła sztywna, dalej słabnie jak 1/r;
@@ -118,6 +118,8 @@ export function createTornado(scene) {
       const V = vortexOf(clamp(def.strength, 0, 1));
       if (d.rc > 0) V.rc = d.rc; if (d.top > 0) V.top = d.top; if (d.vmax > 0) V.vmax = d.vmax;   // wir na miarę (np. mała trąba gracza)
       if (!T) T = { x: 0, z: 0, base: 0, spin: 1, fade: 0, placed: false, ...V };
+      // miejsce i kierunek startu (scena: trąba ma przejść przez miasto): at [x, z], heading w stopniach (0 — na +z, 90 — na +x)
+      if (d.at && !T.placed) { T.x = d.at[0]; T.z = d.at[1]; T.placed = true; T.home = [T.x, T.z]; if (d.heading != null) heading = d.heading * Math.PI / 180; }
       Object.assign(T, V);
     },
     windAt(x, y, z, out) { return tornadoWind(T, x, y, z, out); },

@@ -52,3 +52,6 @@ update(dt, { sync }), sync(), removeBody(b), stats(), clear(), query(x, z, r), b
 onBreak(fn), onFragment(fn), onReveal(fn), bodies, buildings, batches, env, wake, maxFragments, time, physicsThread }`.
 
 Bryła: `{ p, q, v, w, m, r, A, size, state: 'active' | 'sleep' | 'held', kind: 'frag' | 'part' | 'item', mat }`.
+`dispose()` — jak `clear()` i drobny gruz zdjęty ze sceny (koniec gry w scenie).
+
+W scenie (edytor, ▶ Graj): zachowanie „Zniszczenie” (`js/scene/destruct.js`, opis w [`../scene/README.md`](../scene/README.md)).

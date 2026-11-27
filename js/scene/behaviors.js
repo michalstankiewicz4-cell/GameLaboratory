@@ -19,6 +19,7 @@ import { halfExtents, shapeOf, propsOf } from '../models/junkyard/properties.js'
 import { itemKit } from '../behaviors/land/junk-items.js';
 import { createMachine, connect, MACHINE_IDS } from '../behaviors/land/machines/machines.js';
 import { addModelStatics } from '../behaviors/land/machines/statics.js';
+import { destructBehavior } from './destruct.js';
 
 // złomowisko: przedmioty, maszyny i przeładowarka dzielą jeden świat przedmiotów gry (world.items — land/items.js;
 // liczy go gra raz na klatkę po zachowaniach); moduły przedmiotów (do zgniatania i odlewania sztabek) ładowane raz
@@ -370,7 +371,8 @@ export const BEHAVIORS = {
       const off = addModelStatics(world.items, k.mod.colliders(), k.model);
       return { state: {}, step() {}, hud: () => ({ speed: 0, unit: '', throttle: 0 }), reset() { off(); } };
     },
-  },
+  },  // budynki z części: świat zniszczeń sceny (js/scene/destruct.js)
+  destruct: destructBehavior,
 };
 export const ORBIT_PERIOD = 60;
 // obrys modelu w jego układzie (bez położenia i obrotu, ze skalą) — podpory i przekrój lądującego statku
