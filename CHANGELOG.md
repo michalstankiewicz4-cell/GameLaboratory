@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Efekty · ląd 1.0.3 — 2026-11-27 (wspólna scena bazowa)
+
+### Zmienione
+- Laboratorium efektów na lądzie stoi na wspólnej scenie bazowej (`js/labs/shared/stage.js`: niebo, światło z pogodą,
+  mgła) zamiast własnego nieba i świateł; gleba pod ogniskiem (MatKit) zostaje jako część laboratorium.
+
 ## Przedmioty 1.2.3 — 2026-11-27 (wspólna scena bazowa)
 
 ### Zmienione

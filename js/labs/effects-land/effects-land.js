@@ -4,7 +4,8 @@
 // wysokość, szerokość, wiatr, dym, iskry i jasność na suwakach; pora dnia w oknie Światło (nocą widać światło ognia).
 // Dla AI: FireApi.
 import * as THREE from '../../../vendor/three/three.module.js';
-import { WEATHER, skyUniforms, skyDome, applySky, skyEnvironment } from '../../envs/sky/skykit.js';
+import { WEATHER } from '../../envs/sky/skykit.js';
+import { createStage } from '../shared/stage.js';
 import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
 import { createFire, FUELS } from '../../render/effects/fire/firekit.js';
 import { makeMaterial, PRESETS } from '../../render/materials/matkit.js';
@@ -42,29 +43,25 @@ renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
 $('view').append(renderer.domElement);
 const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0xc9d7e2, 0.004);
 const camera = new THREE.PerspectiveCamera(45, 1, 0.05, 6000);
 const look = new LookPipeline(renderer); look.set({ ...LOOK_PRESETS.clean, bloom: 0.75 });
-const skyU = skyUniforms(), sky = skyDome(skyU, 4000); sky.renderOrder = -1; scene.add(sky);
-const hemi = new THREE.HemisphereLight(0xdfe6ec, 0x2a3a46, 0.8), sun = new THREE.DirectionalLight(0xfff0d8, 3);
+// wspólna scena bazowa laboratoriów (js/labs/shared/stage.js): niebo SkyKit, światło z pogodą, mgła, płaski grunt
+const stage = createStage(renderer, scene, { skyRadius: 4000 });
+stage.setSurface('land', 0);
+const sun = stage.sun;
 sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.02;
 Object.assign(sun.shadow.camera, { left: -25, right: 25, top: 25, bottom: -25, near: 1, far: 200 });
-scene.add(hemi, sun, sun.target);
 const ground = new THREE.Mesh(new THREE.CircleGeometry(160, 96).rotateX(-Math.PI / 2),
   makeMaterial({ kind: 'rock', color: '#5d5443', color2: '#3d372c', tile: 4, roughness: 0.95, metalness: 0, cracks: 0.08, grains: 0.9, dirt: 0.4, label: 'Soil' }, { res: 512 }).material);
 { const uv = ground.geometry.attributes.uv, p = ground.geometry.attributes.position; for (let i = 0; i < p.count; i++) uv.setXY(i, p.getX(i) / 4, p.getZ(i) / 4); }
-ground.receiveShadow = true; scene.add(ground);
-let envRT = null, envDirty = true, wxNow = null, L = null;
+ground.position.y = 0.004; ground.receiveShadow = true; scene.add(ground);   // gleba pod ogniskiem — na gruncie sceny bazowej
+let wxNow = null, L = null;
 function updateSky() {
   const w = wxNow || WEATHER[S.weather] || WEATHER.fair;
-  L = applySky(skyU, { ...w, sunEl: S.sunEl, sunAz: S.sunAz, moon: 0.6 });
-  sun.color.copy(L.sunColor); sun.intensity = L.sunIntensity; hemi.intensity = L.ambient; hemi.color.copy(L.sky); hemi.groundColor.copy(L.ground);
+  L = stage.setLight({ ...w, weather: S.weather, sunEl: S.sunEl, sunAz: S.sunAz, moon: 0.6 });
   sun.userData.dir = L.sunDir.clone();
-  scene.fog.color.copy(L.fog);
-  scene.environmentIntensity = (0.85 - w.coverage * w.density * 0.45) * (0.1 + 0.9 * L.day);
   look.sunVisible = Math.max(0, 1 - w.coverage * (0.4 + w.density * 0.6)) * L.sunSeen;
   look.set({ exposure: LOOK_PRESETS.clean.exposure * (1 + 2.2 * (1 - L.day)) });
-  envDirty = true;
 }
 
 /* ---------------- ogień ---------------- */
@@ -168,7 +165,7 @@ function frame(now) {
   fire.update(dt, camera, { wind: [-Math.sin(a) * S.wind, 0, -Math.cos(a) * S.wind], light: L ? 0.15 + 0.85 * L.day : 1, sky: L ? L.sky : null });
   const d = sun.userData.dir || new THREE.Vector3(0.4, 0.8, 0.3);
   sun.position.copy(orbit.target).addScaledVector(d, 60); sun.target.position.copy(orbit.target);
-  if (envDirty) { if (envRT) envRT.dispose(); envRT = skyEnvironment(renderer, skyU); scene.environment = envRT.texture; envDirty = false; }
+  stage.update(dt, camera);   // niebo za kamerą, mgła, mapa otoczenia z nieba
   look.sun(camera, d);
   window.LabPerf.begin(renderer);
   look.render(scene, camera);

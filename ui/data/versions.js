@@ -37,7 +37,7 @@
     "labs/materials.html": "1.1.1",
     "labs/blocks.html": "1.2.0",
     "labs/effects.html": "1.4.1",
-    "labs/effects-land.html": "1.0.2",
+    "labs/effects-land.html": "1.0.3",
     "labs/zombies.html": "1.2.1",
     "tools/doctor.html": "1.9.0",
     "labs/transform.html": "1.3.1",
