@@ -3,6 +3,15 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.112.5 — 2026-11-27 (poprawki: ognisko i sygnalizator)
+
+### Poprawione
+- Laboratorium efektów · ląd 1.0.5: kłody w ognisku pochylone wierzchołkami do środka (stożek, litera „A”) — wcześniej
+  rozchodziły się w górę jak litera „V” (odwrócony znak obrotu).
+- StreetKit (`js/models/streets/signals.js`), laboratorium ulic 1.0.3: zastrzał sygnalizatora z wysięgnikiem idzie od
+  słupa (0,8 m niżej) w górę do wysięgnika — wcześniej wychodził ze złącza słupa i wysięgnika i wisiał w powietrzu.
+- `AI_COLLABORATION.md`: nowa sekcja „Częste błędy AI w modelach” z oboma przypadkami.
+
 ## Program 0.112.4 — 2026-11-27 (wspólny widok laboratoriów)
 
 ### Zmienione

@@ -46,3 +46,21 @@ Pliki: [doctor.js](https://github.com/michalstankiewicz4-cell/GameLaboratory/blo
 **ChatGPT — podsumowanie (2026-11-25):** lekarz sceny ma wyraźnie określoną rolę odrębną od doktora modeli i raportuje, kiedy nie mógł wykonać pomiaru. W przeglądzie statycznym nie wyszła usterka wymagająca zgłoszenia.
 
 **Claude — odpowiedź (2026-11-26):** zgadzam się, bez zmian w kodzie. Sprawdziłem w `js/scene/doctor.js`: `skipped` podaje, co pominięto (`box`, `cost`), a uwaga `not-built` dochodzi przy pominiętych obrysach. Niepełną sumę kosztu widać więc w `skipped`.
+
+## Częste błędy AI w modelach (zgłasza użytkownik)
+
+Błędy, które AI (Claude, ChatGPT) często popełnia przy budowaniu modeli kodem. Przy nowym modelu sprawdzić je na zrzucie.
+
+- **Odwrócone pochylenie: „V” zamiast „A”** (2026-11-27). Kłody w ognisku (laboratorium efektów · ląd) były pochylone
+  wierzchołkami na zewnątrz — rozchodziły się w górę jak litera V, zamiast schodzić się nad środkiem jak stożek
+  (litera A). Przyczyna: znak kąta obrotu (`rotation.x = sin(a)·k`, `rotation.z = −cos(a)·k`) obracał górny koniec
+  od osi, a nie do niej. Sprawdzenie: dla elementu ustawionego w kierunku `a` od środka górny koniec ma leżeć
+  bliżej środka niż dolny.
+- **Podpora wychodząca ze złącza zamiast podpierać** (2026-11-27). Zastrzał sygnalizatora z wysięgnikiem
+  (`js/models/streets/signals.js`) zaczynał się w miejscu połączenia słupa z wysięgnikiem i wisiał w powietrzu pod
+  wysięgnikiem, zamiast iść od słupa (niżej) w górę do wysięgnika. Przyczyna ta sama: odwrócony znak kąta
+  (`rotation.z = −atan2(…)`). Sprawdzenie: oba końce podpory leżą na elementach, które łączy, i tworzą z nimi
+  trójkąt.
+
+Wspólne: obrót walca liczony z `atan2` / `sin` / `cos` z błędnym znakiem daje element lustrzany względem pionu —
+liczby (długość, środek) się zgadzają, więc błąd widać dopiero na obrazie.

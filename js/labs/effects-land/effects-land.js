@@ -86,7 +86,7 @@ function buildProps() {
   if (S.scene === 'campfire') {
     const bark = mat('bark', () => new THREE.MeshStandardMaterial({ map: barkTexture('oak'), roughness: 0.95 }));
     for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2, log = add(new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.11, 1.1, 10), charred(bark, 0.55)));
-      log.position.set(Math.cos(a) * 0.18, 0.32, Math.sin(a) * 0.18); log.rotation.set(Math.sin(a) * 0.9, 0, -Math.cos(a) * 0.9); }
+      log.position.set(Math.cos(a) * 0.18, 0.32, Math.sin(a) * 0.18); log.rotation.set(-Math.sin(a) * 0.9, 0, Math.cos(a) * 0.9); }   // wierzchołki nad środkiem (A), dolne końce na zewnątrz
     for (let i = 0; i < 11; i++) { const a = i / 11 * Math.PI * 2, g = rockGeometry({ kind: 'granite', shape: 'pebble', size: 0.28, seed: 3 + i, detail: 0.75 });
       const r = add(new THREE.Mesh(g, rockMaterial('granite'))); r.position.set(Math.cos(a) * 0.85, 0.05, Math.sin(a) * 0.85); }
   } else if (S.scene === 'wall') {

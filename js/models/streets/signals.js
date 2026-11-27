@@ -40,7 +40,7 @@ export function buildTrafficLight({ arm = 0, height = 3.2, backplate = true } = 
     const ay = top + 0.9;
     // wysięgnik w −x: słup stoi po prawej stronie jezdni (ruch prawostronny), wysięgnik idzie nad pasy w lewo
     const a = add(new THREE.CylinderGeometry(0.055, 0.065, arm, 12), st, -arm / 2, ay, 0); a.rotation.z = Math.PI / 2;
-    const brace = add(new THREE.CylinderGeometry(0.025, 0.025, Math.hypot(arm * 0.45, 0.8), 8), st, -arm * 0.22, ay - 0.4, 0); brace.rotation.z = -Math.atan2(arm * 0.45, 0.8);
+    const brace = add(new THREE.CylinderGeometry(0.025, 0.025, Math.hypot(arm * 0.45, 0.8), 8), st, -arm * 0.22, ay - 0.4, 0); brace.rotation.z = Math.atan2(arm * 0.45, 0.8);   // od słupa (0,8 m niżej) w górę do wysięgnika
     hx = -(arm - 0.4); hy = ay - 0.15 - Hh; hz = 0;
     add(new THREE.CylinderGeometry(0.02, 0.02, 0.2, 8), st, hx, ay - 0.08, 0);
   } else {

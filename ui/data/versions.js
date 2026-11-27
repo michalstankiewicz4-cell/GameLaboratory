@@ -5,7 +5,7 @@
 (function () {
   "use strict";
   const V = {
-  app: "0.112.4",
+  app: "0.112.5",
   labs: {
     "labs/vehicles-space.html": "1.11.1",
     "labs/bodies.html": "1.5.3",
@@ -22,7 +22,7 @@
     "labs/human.html": "1.3.0",
     "labs/structures.html": "1.6.2",
     "labs/city.html": "1.3.6",
-    "labs/streets.html": "1.0.2",
+    "labs/streets.html": "1.0.3",
     "labs/mechanics.html": "1.0.6",
     "labs/water.html": "1.5.2",
     "labs/land.html": "1.10.2",
@@ -37,7 +37,7 @@
     "labs/materials.html": "1.1.2",
     "labs/blocks.html": "1.2.1",
     "labs/effects.html": "1.4.2",
-    "labs/effects-land.html": "1.0.4",
+    "labs/effects-land.html": "1.0.5",
     "labs/zombies.html": "1.2.1",
     "tools/doctor.html": "1.9.0",
     "labs/transform.html": "1.3.2",
