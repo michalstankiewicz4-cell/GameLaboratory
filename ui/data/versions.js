@@ -27,7 +27,7 @@
     "labs/water.html": "1.5.1",
     "labs/land.html": "1.10.1",
     "labs/plants.html": "1.8.1",
-    "labs/rocks.html": "1.1.1",
+    "labs/rocks.html": "1.1.2",
     "labs/look.html": "1.8.2",
     "labs/pixel.html": "1.2.0",
     "labs/art.html": "1.3.0",

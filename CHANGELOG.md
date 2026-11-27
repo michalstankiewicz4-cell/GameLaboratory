@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Skały 1.1.2 — 2026-11-27 (wspólna scena bazowa)
+
+### Zmienione
+- Laboratorium skał stoi na wspólnej scenie bazowej (`js/labs/shared/stage.js`: niebo, światło z pogodą, mgła, płaski
+  grunt) zamiast własnego nieba, świateł i gruntu. Skały wyglądają tak samo; grunt ma barwę wspólnej sceny.
+
 ## Program 0.112.2 · items 1.2.2 · mechanics 1.0.5 — 2026-11-27 (W A S D z kamery orbitalnej)
 
 ### Zmienione
