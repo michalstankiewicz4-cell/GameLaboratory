@@ -44,7 +44,7 @@ body.lmNoFoot main{ padding-bottom:70px; }
 
 /* the banner: name, what it is, the way in; a picture of the labs on the right */
 .hero{ position:relative; display:grid; grid-template-columns:minmax(0, 1.05fr) minmax(0, 1fr); align-items:center; min-height:300px; overflow:hidden;
-  border:1px solid var(--line); border-radius:20px; background:linear-gradient(120deg, var(--hero1), var(--hero2)); box-shadow:var(--shadow); }
+  border:1px solid var(--line); border-radius:20px; background:linear-gradient(120deg, var(--hero1), var(--hero2)); box-shadow:var(--shadowBig); }
 .hero .txt{ position:relative; z-index:1; padding:34px 36px; }
 .hero .pic{ align-self:stretch; position:relative; }
 .hero .pic img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;

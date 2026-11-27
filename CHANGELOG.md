@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.113.15 — 2026-11-27 (strona startowa: cień banera)
+
+### Zmienione
+- Strona startowa: baner (`section.hero`) ma mocniejszy, dwuwarstwowy cień — nowy token `--shadowBig` dla dużych
+  paneli (Dzień i Noc); wcześniej ten sam co kafelki, przy dużym panelu ledwie widoczny.
+
 ## Program 0.113.14 — 2026-11-27 (strona startowa: kategorie jako plakietki)
 
 ### Zmienione

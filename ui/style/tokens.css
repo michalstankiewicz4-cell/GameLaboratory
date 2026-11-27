@@ -49,6 +49,7 @@
   --overlay:rgba(5,6,9,.55);/* behind a dialog, over a busy page */
   --shadow:0 12px 32px rgba(0,0,0,.4);
   --shadowHi:0 18px 44px rgba(0,0,0,.55);
+  --shadowBig:0 20px 50px rgba(0,0,0,.6), 0 3px 10px rgba(0,0,0,.35);   /* a big panel (the start page's banner) */
   --scroll:color-mix(in srgb, var(--accent) 55%, var(--line2));   /* the scrollbar's thumb: the accent, softened */
   --scrollHover:var(--accent);
   --hero1:#1c212b;         /* the start page's banner: a soft gradient */
@@ -94,6 +95,7 @@
   --overlay:rgba(60,45,30,.28);
   --shadow:0 6px 22px rgba(110,72,40,.10);
   --shadowHi:0 14px 36px rgba(110,72,40,.18);
+  --shadowBig:0 18px 44px rgba(110,72,40,.26), 0 3px 10px rgba(110,72,40,.12);
   --scroll:color-mix(in srgb, var(--accent) 45%, var(--line2));
   --scrollHover:var(--accent);
   --hero1:#fff4ea;
