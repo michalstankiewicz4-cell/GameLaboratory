@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.113.16 — 2026-11-27 (mocniejsze cienie paneli)
+
+### Zmienione
+- Mocniejsze, dwuwarstwowe cienie pod wszystkimi panelami (`--shadow`, `--shadowHi`; Dzień i Noc): kafelki laboratoriów
+  i scen, pole wyszukiwania, przyciski banera, pływające okna laboratoriów, konsola, listy menu, karta ładowania.
+
 ## Program 0.113.15 — 2026-11-27 (strona startowa: cień banera)
 
 ### Zmienione
