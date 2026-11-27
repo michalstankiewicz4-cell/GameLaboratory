@@ -19,18 +19,22 @@ body.lmNoFoot .side{ bottom:0; }
 .brand b{ display:block; color:var(--head); font-size:17px; line-height:1.15; }
 .brand small{ display:block; color:var(--dim); font-size:12px; }
 .sideNav{ display:flex; flex-direction:column; gap:2px; }
-.sideNav a, .sideCats button{ display:flex; align-items:center; gap:10px; height:36px; padding:0 10px; border:0; border-radius:10px; background:none;
+.sideNav a{ display:flex; align-items:center; gap:10px; height:36px; padding:0 10px; border:0; border-radius:10px; background:none;
   color:var(--text); font:500 14px var(--font); text-decoration:none; text-align:start; cursor:pointer; transition:background .15s, color .15s; }
-.sideNav a:hover, .sideCats button:hover{ background:var(--accentSoft); color:var(--head); }
+.sideNav a:hover{ background:var(--accentSoft); color:var(--head); }
 /* the chosen item: the accent fading into the column's background to the right */
 .sideNav a.on{ background:linear-gradient(90deg, color-mix(in srgb, var(--accent) 92%, transparent), color-mix(in srgb, var(--accent) 68%, transparent) 50%, transparent); color:var(--onAccent); font-weight:600; }
 .sideNav svg{ flex:none; width:18px; height:18px; }
 .sideLabel{ margin:16px 10px 4px; color:var(--dim); font-size:11px; letter-spacing:1.2px; text-transform:uppercase; }
-.sideCats{ display:flex; flex-direction:column; gap:1px; }
-.sideCats button{ height:auto; min-height:32px; padding-block:5px; line-height:1.25; font-weight:400; font-size:13.5px; }
-.sideCats .dot{ flex:none; width:8px; height:8px; border-radius:50%; background:var(--cat, var(--dim)); }
-.sideCats .n{ margin-inline-start:auto; color:var(--dim); font:12px var(--mono); }
-.sideCats button.on{ background:var(--accentSoft); color:var(--head); font-weight:600; box-shadow:inset 3px 0 0 var(--cat, var(--accent)); }
+/* the categories as badges, side by side where they fit (how many labs: in the tooltip); the chosen one in its colour */
+.sideCats{ display:flex; flex-wrap:wrap; gap:6px; padding:0 4px; }
+.sideCats button{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; cursor:pointer; text-align:start;
+  border:1px solid color-mix(in srgb, var(--cat, var(--dim)) 40%, var(--line)); background:color-mix(in srgb, var(--cat, var(--dim)) 8%, transparent);
+  color:var(--text); font:500 12.5px/1.25 var(--font); transition:background .15s, color .15s, border-color .15s; }
+.sideCats button:hover{ background:color-mix(in srgb, var(--cat, var(--dim)) 18%, transparent); color:var(--head); }
+.sideCats .dot{ flex:none; width:7px; height:7px; border-radius:50%; background:var(--cat, var(--dim)); }
+.sideCats button.on{ background:var(--cat, var(--accent)); border-color:var(--cat, var(--accent)); color:var(--onAccent); }
+.sideCats button.on .dot{ background:var(--onAccent); }
 
 /* under the menu bar and the bar under it, above the bottom bar (ui/shell/bars.css; OPTIONS → Bars hides either) */
 main{ max-width:1300px; margin:0 auto; padding:calc(var(--menuH, 32px) + var(--barH, 44px) + 24px) 28px calc(var(--footH, 34px) + 40px)

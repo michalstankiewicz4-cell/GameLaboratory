@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.113.14 — 2026-11-27 (strona startowa: kategorie jako plakietki)
+
+### Zmienione
+- Strona startowa: kategorie w bocznej kolumnie to plakietki (kropka i nazwa w kolorze kategorii), obok siebie, gdy się
+  mieszczą; bez liczb — liczba laboratoriów i narzędzi w podpowiedzi. Wybrana kategoria — wypełniona swoim kolorem,
+  biały napis.
+
 ## Program 0.113.13 — 2026-11-27 (strona startowa: Strona główna odznacza kategorię)
 
 ### Zmienione

@@ -290,15 +290,16 @@ function sceneCards() {
 }
 sceneCards();
 
-// ---------- the side column: the categories filter the labs and tools (one at a time; again — all) ----------
+// ---------- the side column: the categories as badges filter the labs and tools (one at a time; again — all); how many: the tooltip ----------
 let catOn = null;
 function sideCats() {
   const box = document.getElementById("sideCats"); box.textContent = "";
   for (const id of Object.keys(CAT.cats || {})) {
     const n = ALL.filter((x) => x.cat === id).length; if (!n) continue;
     const b = document.createElement("button"); b.type = "button"; b.dataset.cat = id; if (catOn === id) b.className = "on";
-    const d = document.createElement("span"); d.className = "dot"; const k = document.createElement("span"); k.className = "n"; k.textContent = n;
-    b.append(d, document.createTextNode(catName(id)), k);
+    const d = document.createElement("span"); d.className = "dot";
+    b.append(d, document.createTextNode(catName(id)));
+    b.title = catName(id) + tr(" — labs and tools: ", " — laboratoria i narzędzia: ") + n + tr(" (click again to show all)", " (kliknij jeszcze raz, by pokazać wszystkie)");
     b.addEventListener("click", () => {
       catOn = catOn === id ? null : id; sideCats(); chips(); applyFilter();
       if (catOn) document.getElementById("labsSec").scrollIntoView({ behavior: "smooth" });
