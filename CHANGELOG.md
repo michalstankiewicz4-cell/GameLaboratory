@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.113.12 — 2026-11-27 (strona startowa: logo odznacza kategorię)
+
+### Zmienione
+- Strona startowa: kliknięcie logo GameLaboratory na pasku menu albo w bocznej kolumnie odznacza wybraną kategorię
+  (wszystkie laboratoria wracają) i przewija na górę — bez przeładowania strony. Ponowne kliknięcie wybranej kategorii
+  też ją odznacza (jak dotąd).
+
 ## Program 0.113.11 — 2026-11-27 (konsola: bez licznika na dole)
 
 ### Zmienione
