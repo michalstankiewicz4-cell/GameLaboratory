@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.113.6 — 2026-11-27 (strona startowa: biały napis zaznaczonej pozycji)
+
+### Zmienione
+- Boczne menu strony startowej: napis i ikona zaznaczonej pozycji są białe (`--onAccent`), także w motywie Dzień;
+  akcent pod napisem mocniejszy (zanika dopiero za połową paska), żeby biały był czytelny także w dłuższych nazwach.
+
 ## Program 0.113.5 — 2026-11-27 (strona startowa: zaznaczona pozycja)
 
 ### Zmienione
