@@ -9,7 +9,9 @@
 // (js/behaviors/land/mech/engine-layout.js); physics-mode.js (tryb Fizyka: okno Opis, kontrole, hitboksy), items-mode.js
 // (tryb Przedmioty), items.js (katalog przedmiotów).
 import * as THREE from '../../../vendor/three/three.module.js';
-import { createStage, WEATHER } from '../shared/sky-stage.js';
+import { createStage } from '../shared/stage.js';
+import { WEATHER } from '../../envs/sky/skykit.js';
+import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
 import * as MK from '../../models/mech/mechkit.js';
 import { KIND_NAME } from '../../behaviors/land/mech/drive.js';
 import { ITEMS } from './items.js';
@@ -26,8 +28,25 @@ const S = loadState(KEY, { mode: 'items', item: 'gear', items: {}, spin: 20, rpm
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { /* prywatny tryb */ } };
 const TAU = Math.PI * 2, X = new THREE.Vector3(1, 0, 0), Y = new THREE.Vector3(0, 1, 0);
 
-const stage = createStage($('view'), { shadow: 4096 });
-const { scene, camera, renderer } = stage;
+// wspólna scena bazowa laboratoriów (js/labs/shared/stage.js): niebo, światło z pogodą, mgła, płaski grunt; hala
+// (posadzka i lampy) — z modelu układu silnika
+const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
+const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
+$('view').append(renderer.domElement);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(50, 1, 0.05, 9000);
+const look = new LookPipeline(renderer); look.set(LOOK_PRESETS.clean);
+const base = createStage(renderer, scene, { skyRadius: 6000 });
+base.setSurface('land', 0); base.sun.shadow.mapSize.set(4096, 4096);
+const stage = {
+  setSky: ({ weather, sunEl, sunAz }) => base.setLight({ weather, sunEl, sunAz }),
+  follow: (target, r) => base.fitShadow(target, r),
+  render(dt) { base.update(dt, camera); look.sun(camera, base.sunDir); if (window.LabPerf) window.LabPerf.begin(renderer); look.render(scene, camera); if (window.LabPerf) window.LabPerf.end(renderer); },
+};
+function resize() { const v = VS(); renderer.setSize(v.w, v.h, false); camera.aspect = v.w / v.h; camera.updateProjectionMatrix(); look.resize(v.w, v.h); }
+addEventListener('resize', resize); resize();
 const M = MK.materials();
 const root = new THREE.Group(); scene.add(root);
 
@@ -52,7 +71,7 @@ function loop(now) {
   camera.position.set(orbit.target.x + Math.sin(orbit.yaw) * c * orbit.dist, orbit.target.y + Math.sin(orbit.pitch) * orbit.dist, orbit.target.z + Math.cos(orbit.yaw) * c * orbit.dist);
   camera.lookAt(orbit.target);
   stage.follow(orbit.target, 7);
-  stage.render();
+  stage.render(dt);
   requestAnimationFrame(loop);
 }
 const rpmOf = (w) => w * 60 / TAU, fmt = (v, d = 0) => v.toLocaleString('pl', { minimumFractionDigits: d, maximumFractionDigits: d });

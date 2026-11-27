@@ -23,7 +23,7 @@
     "labs/structures.html": "1.6.0",
     "labs/city.html": "1.3.4",
     "labs/streets.html": "1.0.0",
-    "labs/mechanics.html": "1.0.2",
+    "labs/mechanics.html": "1.0.3",
     "labs/water.html": "1.5.0",
     "labs/land.html": "1.10.0",
     "labs/plants.html": "1.8.0",

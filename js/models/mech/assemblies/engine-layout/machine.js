@@ -14,6 +14,7 @@ export function buildMachine({ scene, root, M, hall = true }) {
 /* ---------------- hala: posadzka, łoże, światła ---------------- */
 const floor = new THREE.Mesh(new THREE.CircleGeometry(40, 64).rotateX(-Math.PI / 2), M.concrete); floor.receiveShadow = true;
 { const uv = floor.geometry.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * 16, uv.getY(i) * 16); }
+floor.position.y = 0.003;   // nad gruntem sceny bazowej (bez migotania)
 if (hall) scene.add(floor);   // hall: posadzka i lampy (laboratorium); w scenie (js/scene/mechanics.js) bez nich — stoi na gruncie sceny
 const BED_TOP = 0.75, Y0 = 0.87, BX0 = -6.6, BX1 = 3.8, BZ0 = -0.35, BZ1 = 0.75;
 {

@@ -4,7 +4,7 @@ Z Tornado.io (przeniesione 2026-11-26), kategoria **Maszyny i mechanika**. Model
 Pliki laboratorium (`js/labs/mechanics/`): `mechanics.js` (scena, tryby, wybór, kamera, okna, API), maszyna i instalacja — model
 `js/models/mech/assemblies/engine-layout/`, fizyka układu — `js/behaviors/land/mech/engine-layout.js`; `physics-mode.js` (tryb Fizyka: okno Opis, kontrole brył zderzeń, hitboxy),
 `items-mode.js` (tryb Przedmioty: stół, ustawienia), katalog przedmiotów `items.js` (`items-drive.js`, `items-control.js`,
-`items-common.js`). Scena: `js/labs/shared/sky-stage.js` (hala bez terenu: niebo, słońce, potok kamery). Okna i pasek po
+`items-common.js`). Scena: wspólna scena bazowa laboratoriów `js/labs/shared/stage.js` (niebo, światło z pogodą, mgła, płaski grunt), hala (posadzka i lampy) z modelu układu silnika. Okna i pasek po
 angielsku; dane przedmiotów i maszyny (nazwy, właściwości, opisy w oknach Opis i Element) po polsku, jak dane modeli.
 Suwaki Silnik, Hamulec, Obudowy i Hitboksy — w oknie **Machine** (w Tornado.io były na pasku).
 

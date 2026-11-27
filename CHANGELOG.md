@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Mechanika 1.0.3 — 2026-11-27 (wspólna scena bazowa)
+
+### Zmienione
+- Laboratorium mechaniki stoi na wspólnej scenie bazowej laboratoriów (`js/labs/shared/stage.js`: niebo, światło
+  z pogodą, mgła, płaski grunt) zamiast własnej prostej sceny z Tornado.io — `js/labs/shared/sky-stage.js` usunięty.
+  Hala (posadzka i lampy) z modelu układu silnika, posadzka 3 mm nad gruntem. Wyniki trybu Machine bez zmian.
+
 ## Program 0.111.5 · miasto 1.3.4 — 2026-11-27 (jedna lista budynków z części)
 
 ### Zmienione
