@@ -3,18 +3,18 @@
 //   silnik → sprzęgło kłowe → wał → para zębatek 20 : 40 → przekładnia dwustopniowa (16 : 48, 24 : 40) w obudowie z akrylu
 //   → łańcuch 18 : 27 → pas klinowy Ø 160 : Ø 80 → sprzęgło kołnierzowe → wał przegubowy (dwa przeguby Cardana, 25°)
 //   → przekładnia planetarna (24 / 24 / 72, korona stała) → tarcza hamulca i tarcza z podziałką.
-// buildMachine({ scene, root, M }) → { drive, parts, panes, applyAngles, solved, … elementy i wymiary dla trybu Fizyka }
+// buildMachine({ scene, root, M, hall }) → { drive, parts, panes, applyAngles, solved, … elementy i wymiary dla trybu Fizyka }
 import * as THREE from '../../../vendor/three/three.module.js';
 import * as MK from '../../models/mech/mechkit.js';
 import { createDrive } from '../../behaviors/land/mech/drive.js';
 
 const TAU = Math.PI * 2, X = new THREE.Vector3(1, 0, 0), Y = new THREE.Vector3(0, 1, 0);
 
-export function buildMachine({ scene, root, M }) {
+export function buildMachine({ scene, root, M, hall = true }) {
 /* ---------------- hala: posadzka, łoże, światła ---------------- */
 const floor = new THREE.Mesh(new THREE.CircleGeometry(40, 64).rotateX(-Math.PI / 2), M.concrete); floor.receiveShadow = true;
 { const uv = floor.geometry.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * 16, uv.getY(i) * 16); }
-scene.add(floor);
+if (hall) scene.add(floor);   // hall: posadzka i lampy (laboratorium); w scenie (js/scene/mechanics.js) bez nich — stoi na gruncie sceny
 const BED_TOP = 0.75, Y0 = 0.87, BX0 = -6.6, BX1 = 3.8, BZ0 = -0.35, BZ1 = 0.75;
 {
   const bg = new THREE.BoxGeometry(BX1 - BX0, 0.08, BZ1 - BZ0), buv = bg.attributes.uv; for (let i = 0; i < buv.count; i++) buv.setXY(i, buv.getX(i) * (BX1 - BX0) / 1.2, buv.getY(i) * (BZ1 - BZ0) / 1.2);
@@ -22,7 +22,7 @@ const BED_TOP = 0.75, Y0 = 0.87, BX0 = -6.6, BX1 = 3.8, BZ0 = -0.35, BZ1 = 0.75;
   for (let x = BX0 + 0.25; x < BX1; x += 1.3) for (const z of [BZ0 + 0.08, BZ1 - 0.08]) { const leg = new THREE.Mesh(new THREE.BoxGeometry(0.1, BED_TOP - 0.08, 0.1), M.iron); leg.position.set(x, (BED_TOP - 0.08) / 2, z); leg.castShadow = leg.receiveShadow = true; root.add(leg); }
   for (const z of [BZ0 + 0.2, BZ1 - 0.2]) { const slot = new THREE.Mesh(new THREE.BoxGeometry(BX1 - BX0 - 0.1, 0.002, 0.018), M.black); slot.position.set((BX0 + BX1) / 2, BED_TOP + 0.0005, z); root.add(slot); }   // rowki teowe
 }
-for (const [x, z] of [[-5, 1.6], [-1.5, 1.8], [2, 1.6]]) {   // lampy warsztatowe nad stanowiskami
+if (hall) for (const [x, z] of [[-5, 1.6], [-1.5, 1.8], [2, 1.6]]) {   // lampy warsztatowe nad stanowiskami
   const L = new THREE.SpotLight(0xffe2b8, 18, 9, 0.75, 0.6, 1.6); L.position.set(x, 3.4, z); L.target.position.set(x, Y0, 0.15); root.add(L, L.target);
 }
 

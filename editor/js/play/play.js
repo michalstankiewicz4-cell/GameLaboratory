@@ -1,6 +1,7 @@
 // Gra w edytorze („Graj” / „Stop”): zachowania z js/scene/behaviors.js ruszają modele sceny, gracz steruje jednym z nich
 // klawiaturą (play/input.js), kamera jedzie za nim (orbita zostaje: można się obracać wokół). Dane sceny się nie
 // zmieniają — zachowania ustawiają tylko modele w świecie 3D; po „Stop” modele wracają na miejsca z danych.
+import * as THREE from '../../../vendor/three/three.module.js';
 import { BEHAVIORS, behaviorOf, bodyRank, JUNK_KIT } from '../../../js/scene/behaviors.js';
 import { createItems } from '../../../js/behaviors/land/items.js';
 import { LIQUID_TIME } from '../../../js/render/liquid.js';
@@ -64,6 +65,22 @@ export function createPlay(store, world, controls, actions, events) {
     e.preventDefault(); act(me.obj.id, a.id);
   });
   let runs = [], me = null, last = null, hudT = 0, items = null, machines = [], destruct = null;
+  // mysz w grze: zachowania z pointer() (układ silnika: wyłączniki, przyciski, pokrętła) łapią klik przed kamerą
+  const cv = world.renderer.domElement, pray = new THREE.Raycaster(), pndc = new THREE.Vector2();
+  let grabbed = null, py = 0;
+  const rayOf = (e) => { const r = cv.getBoundingClientRect(); pndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); pray.setFromCamera(pndc, world.camera); return pray.ray; };
+  cv.addEventListener('pointerdown', (e) => {
+    if (!runs.length || e.button !== 0) return;
+    const r = rayOf(e), hit = runs.find((x) => x.run.pointer && x.run.pointer('down', r.origin, r.direction, 0));
+    if (!hit) return;
+    grabbed = hit; py = e.clientY; controls.orbit.enabled = false; cv.setPointerCapture(e.pointerId); e.stopImmediatePropagation(); e.preventDefault();
+  }, { capture: true });
+  cv.addEventListener('pointermove', (e) => {
+    if (grabbed) { grabbed.run.pointer('move', null, null, e.clientY - py); py = e.clientY; e.stopImmediatePropagation(); return; }
+    if (runs.length) { const r = rayOf(e); cv.classList.toggle('grab', runs.some((x) => x.run.hover && x.run.hover(r.origin, r.direction))); }
+  }, { capture: true });
+  const letGo = (e) => { if (!grabbed) return; grabbed.run.pointer('up'); grabbed = null; controls.orbit.enabled = true; if (e) e.stopImmediatePropagation(); };
+  cv.addEventListener('pointerup', letGo, { capture: true }); cv.addEventListener('pointercancel', letGo, { capture: true });
 
   function start() {
     if (runs.length) return;
@@ -112,6 +129,7 @@ export function createPlay(store, world, controls, actions, events) {
     if (items) for (const it of [...items.list]) if (it.spawned) items.remove(it);
     items = null; machines.length = 0;
     if (destruct) { destruct.stop(); destruct = null; }
+    letGo(); cv.classList.remove('grab');
     runs = []; me = null; input.release(); playUI.stop();
     gameGraphics(false);   // wygląd edytora
     controls.setPlaying(false); document.body.classList.remove('playing');

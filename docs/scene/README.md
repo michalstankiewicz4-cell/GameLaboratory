@@ -56,7 +56,7 @@ Wpis: `{ id, label, family, surface, lab, build() → { root, kit, dispose } }`.
 - `lab`: laboratorium, w którym model się robi („Otwórz w laboratorium”).
 - Rodziny w osobnych plikach: budynki z części `houses/…` (`prefabs-houses.js`: domy HouseKit, `houses/lm-<id>` — budynki
   Warszawy z części) i ulice `streets/…` (`prefabs-streets.js`: ulica miejska, aleja, droga wiejska po 60 m, skrzyżowanie
-  z 4 wlotami i skrzyżowanie T).
+  z 4 wlotami i skrzyżowanie T); układ silnika `mech/machine` (`mechanics.js`).
 - `build({ asset, detail })`: `root` — grupa Three.js; `kit` — obiekt zwrócony przez kit (wymiary, linie kadłuba,
   `update` ruchomych części), z niego korzystają zachowania; `dispose` — zwolnienie geometrii. `lod: true` — model ma
   wersję daleką (`detail: 0.5`: mniej odcinków w kitach z `detail`, LOD 1 w JunkKit): świat edytora przełącza ją
@@ -133,6 +133,12 @@ w `update`). Silnik w grze gra dźwięk z danych modelu (`info.sounds.engine`) �
   spada. Do pierwszego uszkodzenia widać model prefabrykatu (HouseKit: części scalone po materiale `houseModel`,
   Warszawa: budynek CityKit), potem części świata. Po „Stop” świat znika, a budynki wracają całe; tornado zaczyna od
   miejsca startu przy ▶ Graj i przy Stop (`stage.resetTornado()`). Linia stanu: części stojące i odsetek zniszczenia.
+- **Układ silnika** (`mechanics`, `js/scene/mechanics.js`; prefabrykat `mech/machine`, rodzina Maszyny): maszyna
+  z laboratorium mechaniki z instalacją i regulatorem (`js/labs/mechanics/machine.js` bez posadzki i lamp hali,
+  `physics-mode.js` bez okien). W ▶ Graj ta sama fizyka i obwód co w trybie Fizyka laboratorium (hamulec 20 N·m).
+  Obsługa myszą: zachowanie z `pointer(type, origin, dir, dy)` łapie klik przed kamerą (gra edytora: `editor/js/play/play.js`),
+  `hover()` — kursor nad urządzeniem. Uruchomienie: START (S2), po rozruchu falownika (0,5 s) przełącznik S3 przez 0 na
+  I, prędkość pokrętłem potencjometru R1.
 - Nowe zachowanie: plik w `js/behaviors/<środowisko>/` (fizyka, bez sceny) i adapter tutaj.
 
 ## API sceny (`api.js`)

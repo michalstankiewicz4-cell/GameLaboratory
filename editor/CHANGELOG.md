@@ -3,6 +3,16 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.59.0 — 2026-11-27
+
+### Dodane
+- Scena **Układ silnika** (lista Sceny…): maszyna z laboratorium mechaniki z instalacją elektryczną i regulatorem;
+  w ▶ Graj fizyka i obwód, obsługa myszą na modelach (wyłączniki, przyciski, przełącznik, pokrętła; kursor nad
+  urządzeniem). Rodzina modeli **Maszyny** z ikoną.
+
+### Poprawione
+- Po wczytaniu gotowej sceny i otwarciu pliku kadr obejmuje modele po ich zbudowaniu (wcześniej przed budową — z daleka).
+
 ## 0.58.0 — 2026-11-27
 
 ### Dodane

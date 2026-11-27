@@ -22,6 +22,7 @@
   'bar.scenes': 'Scenes…', 'bar.scenes.tip': 'Open a ready scene (it replaces the current one, like opening a file)',
   'scenes.harbour': 'Harbour (test)',
   'scenes.tornadoTown': 'Tornado and the town',
+  'scenes.engine': 'Engine layout',
   'tree.placeOne': 'Build {name}: a hologram under the pointer, click to place it',
   'place.aim': 'Building {name}: aim at the ground · R: turn 45° · Esc or right-click: done',
   'place.ok': '{name} fits here: click to build it · R: turn 45° · Esc or right-click: done',

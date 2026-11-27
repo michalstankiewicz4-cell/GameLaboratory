@@ -4,8 +4,10 @@
 // Nowa scena = plik w tym folderze + wpis tutaj + tekst scenes.<id> w editor/js/i18n/en.js i pl.js. Opis: editor/README.md.
 import { harbour } from './harbour.js';
 import { tornadoTown, tornadoTownAssets } from './tornado-town.js';
+import { engine } from './engine.js';
 
 export const SCENES = [
   { id: 'harbour', build: harbour },
   { id: 'tornadoTown', build: tornadoTown, assets: tornadoTownAssets },
+  { id: 'engine', build: engine },
 ];

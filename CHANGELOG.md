@@ -3,6 +3,15 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.111.0 · edytor sceny 0.59.0 · mechanika 1.0.1 — 2026-11-27 (scena „Układ silnika”)
+
+### Dodane
+- Silnik sceny: zachowanie **mechanics** i prefabrykat `mech/machine` (`js/scene/mechanics.js`) — układ silnika
+  z laboratorium mechaniki z fizyką i obwodem w ▶ Graj; zachowania mogą obsługiwać mysz (`pointer`, `hover`).
+- Laboratorium mechaniki: `buildMachine({ hall })` (bez posadzki i lamp — dla sceny), tryb Fizyka działa bez okien
+  strony; w laboratorium bez zmian.
+- Edytor sceny: gotowa scena **Układ silnika**. Szczegóły: `editor/CHANGELOG.md`.
+
 ## Program 0.110.1 — 2026-11-27 (licencja)
 
 ### Dodane

@@ -41,6 +41,7 @@ const ICONS = {
   gear: 'M3 10h9v4H3zM12 9l4-2v10l-4-2zM18 10l3-2M18 12h4M18 14l3 2',
   houses: 'M4 21V10l6-5l6 5v11M4 21h16M8 21v-5h4v5M18 21v-8l2 2M14 8l3-3M16 12l3-2',
   streets: 'M8 3L5 21M16 3l3 18M12 4v3M12 10v4M12 17v3',
+  mech: 'M9 15a3 3 0 1 0 0-6a3 3 0 1 0 0 6M9 5v2M9 17v2M3 12h2M13 12h2M18 20a2.5 2.5 0 1 0 0-5a2.5 2.5 0 1 0 0 5M11 13l5 3',
 };
 function familyIcon(f) {
   const NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg'), path = document.createElementNS(NS, 'path');

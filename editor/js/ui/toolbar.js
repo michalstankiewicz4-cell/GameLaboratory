@@ -23,7 +23,8 @@ export function createToolbar(store, controls, actions) {
     const sc = SCENES.find((x) => x.id === list.value); list.value = ''; list.blur(); if (!sc) return;
     const name = t('scenes.' + sc.id);
     for (const a of sc.assets || []) if (!getAsset(a.kind, a.name)) saveAsset(a.kind, a.name, a.data);   // zasoby sceny (pogoda z tornadem…)
-    actions.build(() => { store.load(sc.build(name)); controls.frameAll(); }); actions.status(t('status.sceneLoaded', { name }));
+    // kadr po zbudowaniu modeli (przed budową scena nie ma jeszcze obrysu)
+    Promise.resolve(actions.build(() => { store.load(sc.build(name)); controls.frameAll(); })).then(() => controls.frameAll()); actions.status(t('status.sceneLoaded', { name }));
   });
   // cofnij / ponów: przyciski aktywne, gdy jest co cofać
   $('undo').addEventListener('click', actions.undo); $('redo').addEventListener('click', actions.redo);
@@ -39,7 +40,7 @@ export function createToolbar(store, controls, actions) {
   });
   $('fileIn').addEventListener('change', async () => {
     const f = $('fileIn').files[0]; $('fileIn').value = ''; if (!f) return;
-    try { const data = JSON.parse(await f.text()); actions.build(() => { store.load(data); controls.frameAll(); }); actions.status(t('status.opened', { file: f.name })); }
+    try { const data = JSON.parse(await f.text()); Promise.resolve(actions.build(() => { store.load(data); controls.frameAll(); })).then(() => controls.frameAll()); actions.status(t('status.opened', { file: f.name })); }
     catch (e) { actions.status(t('status.openFail', { msg: e.message })); if (window.LabLog) window.LabLog.add('error', 'Scene file: ' + e.message); }
   });
 

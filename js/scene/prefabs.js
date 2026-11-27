@@ -25,6 +25,7 @@ import { MODELS as JUNK } from '../models/junkyard/registry.js';
 import { TYPES as CITY_TYPES, TYPE_IDS as CITY_IDS, build as buildCity } from '../models/city/citykit.js';
 import { addHousePrefabs } from './prefabs-houses.js';
 import { addStreetPrefabs } from './prefabs-streets.js';
+import { buildEngineLayout } from './mechanics.js';
 
 // family: grupa na liście; surface: gdzie stoi ('sea' — na wodzie, 'land' — na gruncie, 'air' — w powietrzu)
 export const FAMILIES = {
@@ -49,6 +50,7 @@ export const FAMILIES = {
   city: { label: 'City buildings', labelPl: 'Budynki miasta' },
   houses: { label: 'Buildings of parts (destruction)', labelPl: 'Budynki z części (zniszczenie)' },
   streets: { label: 'Streets', labelPl: 'Ulice' },
+  mech: { label: 'Machines', labelPl: 'Maszyny' },
   gear: { label: 'Hero items (light)', labelPl: 'Przedmioty bohatera (światło)' },
 };
 
@@ -216,6 +218,8 @@ CITY_IDS.forEach((id) => add('city/' + id, CITY_TYPES[id].label, 'city', 'land',
 // budynki z części (zniszczenie) i ulice — z Tornado.io, w osobnych plikach
 addHousePrefabs(add);
 addStreetPrefabs(add);
+// układ silnika z laboratorium mechaniki (maszyna, instalacja, regulator; zachowanie „mechanics”)
+add('mech/machine', 'Engine layout (mechanics lab)', 'mech', 'land', 'labs/mechanics.html', () => buildEngineLayout());
 
 export const PREFABS = P;
 export const prefab = (id) => P.find((p) => p.id === id) || null;

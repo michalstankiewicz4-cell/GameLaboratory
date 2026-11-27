@@ -37,13 +37,13 @@ const world = createWorld($('view'), store, (id) => status(id.startsWith('sea:')
   : t('status.unknown', { id })));
 const controls = createControls(world, store);
 
-// budowa modeli trwa (okręty: kilka sekund): z kartą ładowania, kiedy jest co budować
+// budowa modeli trwa (okręty: kilka sekund): z kartą ładowania, kiedy jest co budować; zwraca obietnicę końca budowy
 function build(fn) {
   fn();
   const need = world.pending();
-  if (!need.length) return;
+  if (!need.length) return Promise.resolve();
   const space = need.some((o) => (prefab(o.prefab) || {}).needs === 'space') && !spaceReady();
-  window.LabLoad.run(t('load.building', { names: need.map((o) => o.name).join(', ') }), async (st) => {
+  return window.LabLoad.run(t('load.building', { names: need.map((o) => o.name).join(', ') }), async (st) => {
     if (space) { await st(t('load.space'), 0.1); await loadSpace(); }
     await st(t('load.models'), 0.2); world.syncObjects(); world.syncEnv(); controls.attach(); await st(t('load.done'), 1);
   });

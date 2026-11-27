@@ -50,3 +50,5 @@
 .docObj{margin-left:auto;color:var(--text)}
 .docText{font-size:12px;margin:2px 0 4px}
 .docRow .btn{padding:1px 8px}
+/* ▶ Graj: urządzenie pod kursorem (układ silnika — wyłącznik, przycisk, pokrętło) */
+#view canvas.grab{cursor:pointer}

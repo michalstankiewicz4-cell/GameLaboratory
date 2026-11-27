@@ -2,7 +2,8 @@
 // (js/behaviors/land/mech/circuit.js), napęd fizyczny (physics.js: luz, sprężystość, poślizg pasa, straty), bryły
 // zderzeń zębów (contact.js) i ich kontrole, hitboksy.
 //   createPhysicsMode({ scene, root, M, S, save, $, el, mc, ui }) → { reg, ELEC, phys, physStats, hitG, elecG, setHit, syncHit }
-//   mc — maszyna (machine.js); ui — { fmt, rpmOf, dirOf, select, showSel, sel } z głównego skryptu
+//   mc — maszyna (machine.js); ui — { fmt, rpmOf, dirOf, select, showSel, sel } z głównego skryptu. Używa go też scena
+//   (js/scene/mechanics.js — „Układ silnika”): bez okien ($ zwraca null), physStats tylko w laboratorium.
 import * as THREE from '../../../vendor/three/three.module.js';
 import * as MK from '../../models/mech/mechkit.js';
 import * as CK from '../../models/mech/controls.js';
@@ -382,7 +383,7 @@ function buildHit() {
 }
 function syncHit() { if (rollHit) rollHit(); for (const h of hitItems) { h.src.updateWorldMatrix(true, false); h.holder.matrixAutoUpdate = false; h.holder.matrix.copy(h.src.matrixWorld); } for (const c of hitG.children) if (c.userData.reg) c.visible = S.mode === 'physics'; }
 function setHit(on) { S.hit = on; save(); if (on && !hitItems) buildHit(); hitG.visible = on && S.mode !== 'items'; }
-$('hit').checked = S.hit; $('hit').onchange = () => setHit($('hit').checked);
+if ($('hit')) { $('hit').checked = S.hit; $('hit').onchange = () => setHit($('hit').checked); }   // bez strony (scena: js/scene/mechanics.js) — bez pola
 
   return { reg, ELEC, phys, physStats, hitG, elecG, setHit, syncHit };
 }
