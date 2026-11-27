@@ -7,7 +7,7 @@
 //   ui: { L, $, el, status, save } — the lab's state (L.d…) and helpers; day() → 0…1 daylight (the tornado's shading)
 import * as THREE from '../../../../vendor/three/three.module.js';
 import { createWorld } from '../../../behaviors/land/destruct/world.js';
-import { createTornado, tornadoWind } from '../../../envs/sky/tornado.js';
+import { tornadoWind } from '../../../envs/sky/tornado.js';
 import { HOUSES, buildHouse, matName, MAT_COL, FALSE_COL } from './houses.js';
 import { MISSILES, loadMissiles, makeMissile } from './missiles.js';
 
@@ -15,11 +15,12 @@ export const TOOLS = { hit: 'Hit', throw: 'Throw', wind: 'Tornado' };
 export const DEFAULTS = { dType: 'cottage', dSeed: 1, dVillage: false, dTool: 'hit', impulse: 2500, radius: 0.6, missile: 'barrel', speed: 30, wind: 75, core: 4, slow: 1, maxFrag: 2500, pause: false, showMats: false };
 const VILLAGE = [['cottage', -14, 6, 0.1], ['kostka', 6, 8, -0.05], ['barn', -8, -16, 0.02], ['garage', 18, -4, 1.57], ['shed', -26, -4, 0.4], ['block', 14, -26, 0]];
 
-export function createDestructMode({ scene, camera, canvas, orbit, ui, day }) {
+export function createDestructMode({ scene, camera, canvas, orbit, ui, day, stage }) {
+  const TC = stage.tornadoControl;   // trąba sceny bazowej (js/labs/shared/stage.js), sterowana stąd
   const { L, $, el, status, save } = ui;
   for (const [k, v] of Object.entries(DEFAULTS)) if (L[k] == null || typeof L[k] !== typeof v) L[k] = v;
   if (!HOUSES[L.dType]) L.dType = 'cottage';
-  let world = null, tornado = null, twist = null, house = null, builtMs = 0, statT = 0, active = false, missilesReady = false;   // twist: the tornado { x, z, vx, vz, until }
+  let world = null, twist = null, house = null, builtMs = 0, statT = 0, active = false, missilesReady = false;   // twist: the tornado { x, z, vx, vz, until }
 
   function rebuild() {
     world.clear();
@@ -92,7 +93,7 @@ export function createDestructMode({ scene, camera, canvas, orbit, ui, day }) {
     }
   }
   function sweep() { const r = Math.max(30, house.size[0] + 25); twist = { x: -r, z: (Math.random() - 0.5) * 4, vx: 5, vz: 0, until: r }; status('The tornado goes through the building'); }
-  function stop() { twist = null; if (tornado) tornado.set(null); status(''); }
+  function stop() { twist = null; TC.drive(null); status(''); }
 
   /* ---------------- window Destruction ---------------- */
   $('dType').replaceChildren(...Object.entries(HOUSES).map(([k, v]) => el('option', { value: k, textContent: v.name })));
@@ -123,11 +124,11 @@ export function createDestructMode({ scene, camera, canvas, orbit, ui, day }) {
     // the tornado: a whirl of the sliders' size, going in a straight line or standing
     if (twist) {
       twist.x += twist.vx * dt; twist.z += twist.vz * dt;
-      if (twist.x > twist.until) { twist = null; tornado.set(null); }
-      else tornado.set({ strength: Math.min(1, L.wind / 100), rc: L.core, top: 30 + L.core * 12, vmax: L.wind, kind: 'land' });
+      if (twist.x > twist.until) { twist = null; TC.drive(null); }
+      else TC.drive({ strength: Math.min(1, L.wind / 100), rc: L.core, top: 30 + L.core * 12, vmax: L.wind, kind: 'land' });
     }
-    tornado.update(dt, camera, { at: twist ? [twist.x, twist.z] : null, groundAt: () => 0, isWater: () => false, light: Math.min(1, day() + 0.2) });
-    if (twist && tornado.state) { const T = tornado.state; world.tornadoDamage(T, (x, y, z, out) => tornadoWind(T, x, y, z, out), dt); }   // DestructKit
+    const T = TC.step(dt, twist ? [twist.x, twist.z] : null, { camera, groundAt: () => 0, isWater: () => false, light: Math.min(1, day() + 0.2) });
+    if (twist && T) { world.tornadoDamage(T, (x, y, z, out) => tornadoWind(T, x, y, z, out), dt); }   // DestructKit
     if (dt > 0) world.update(dt); else world.sync();
   }
 
@@ -147,15 +148,15 @@ export function createDestructMode({ scene, camera, canvas, orbit, ui, day }) {
   return {
     api,
     enter() {
-      active = true;
+      active = true; TC.drive(null);   // trąba pogody gaśnie, steruje nią ten tryb
       if (!world) {
-        tornado = createTornado(scene);
-        world = createWorld(scene, { ground: () => 0, wind: (x, y, z, out) => (twist && tornado.state ? tornadoWind(tornado.state, x, y, z, out) : (out[0] = out[1] = out[2] = 0, out)) });
+        TC.drive(null);
+        world = createWorld(scene, { ground: () => 0, wind: (x, y, z, out) => (twist && TC.state ? tornadoWind(TC.state, x, y, z, out) : (out[0] = out[1] = out[2] = 0, out)) });
         loadMissiles().then(() => { missilesReady = true; });
       }
       setTool(L.dTool); rebuild(); frameCam();
     },
-    leave() { active = false; if (world) { stop(); world.clear(); } status(''); },
+    leave() { active = false; if (world) { stop(); world.clear(); } TC.release(); status(''); },
     click(e) { act(e); },
     frame(rdt) {
       if (!active || !world) return;   // zapamiętany tryb Zniszczenie: pętla rusza przed wejściem w tryb (po zbudowaniu budynku)

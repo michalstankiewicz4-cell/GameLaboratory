@@ -236,6 +236,10 @@ i silniki na postoju. Liczby ruchu (`SPACE_NUMBERS` w `behaviors.js`) są zało�
 
 ## Scena bazowa laboratoriów (`js/labs/shared/stage.js`)
 
+`stage.tornadoControl` — trąbą sceny steruje laboratorium (tryb Destruction laboratorium miasta): `drive(wir | null)`,
+`step(dt, at, { camera, groundAt, isWater, light })` → stan, `release()` (znów pogoda), `state`; `stage.resetTornado()` —
+trąba z pogody od miejsca startu (▶ Graj i Stop w edytorze).
+
 Edytor i laboratoria (filtry, wygląd, ląd, woda, pojazdy: kosmos, woda, ląd) stoją na tej samej scenie: niebo SkyKit, słońce i światło rozproszone,
 mgła, morze WaterKit, płaski grunt albo teren LandKit z wodami RegionKit, mapa otoczenia z nieba.
 

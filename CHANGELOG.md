@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.111.4 · miasto 1.3.3 — 2026-11-27 (jedna trąba w laboratorium miasta)
+
+### Zmienione
+- Scena bazowa (`js/labs/shared/stage.js`): `stage.tornadoControl` — laboratorium może sterować trąbą sceny (wir
+  z liczb, krok i położenie liczone przez laboratorium; `release()` — znów pogoda). Tryb Destruction laboratorium
+  miasta używa jej zamiast własnej trąby (były dwie: z pogody i z trybu). Działanie bez zmian.
+
 ## Program 0.111.3 · miasto 1.3.2 — 2026-11-27 (obrażenia od trąby w jednym miejscu)
 
 ### Zmienione

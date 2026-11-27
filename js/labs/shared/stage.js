@@ -75,6 +75,7 @@ export function createStage(renderer, scene, opts = {}) {
   let rocks = null, rocksDef = null;   // skały na terenie (setRocks, js/models/rocks/rockfield.js)
   let veg = null, vegDef = null, lastDt = 0, windNow = 6;   // roślinność na terenie (setVegetation, js/models/plants/vegetation.js)
   let tornado = null;   // trąba powietrzna / tornado z pogody (pole tornado: { strength, kind }; js/envs/sky/tornado.js)
+  let tornadoDriven = false;   // trąbą steruje laboratorium (stage.tornadoControl): pogoda jej nie stawia, tick jej nie liczy
   let cyc = null, cycA = null, cycG = 0, cycSky = null, windDir = null;   // cyklon z pogody (pole cyclone; js/envs/sky/cyclone.js): pasma i ściana oka na niebie, wiatr
   const CW = [0, 0, 0];
   // drzewa i trawa (PlantKit) z wiatrem pogody: siła z w.wind, kierunek — wiatr cyklonu (windDir) albo dryf chmur (chmury
@@ -187,6 +188,20 @@ export function createStage(renderer, scene, opts = {}) {
       return out;
     },
     get cyclone() { return cycA; },
+    // trąba sterowana przez laboratorium (laboratorium miasta, tryb Destruction — jedna trąba ze sceną bazową):
+    // drive(wir | null) — wir z liczb zamiast z pogody; step(dt, at, env) — krok i położenie liczone przez laboratorium
+    // (pauza, zwolnienie, symulacja bez rysowania; env: camera, groundAt, isWater, light) → stan trąby; release() — znów pogoda; state
+    tornadoControl: {
+      drive(d) { tornadoDriven = true; if (d && !tornado) tornado = createTornado(scene); if (tornado) tornado.set(d); },
+      step(dt, at, env = {}) {
+        if (!tornado) return null;
+        tornado.update(dt, env.camera, { at, groundAt: env.groundAt || ((x, z) => stage.groundAt(x, z)), isWater: env.isWater || ((x, z) => stage.isWater(x, z, 0.5)), light: env.light ?? WU.uLight.value, fog: scene.fog });
+        if (!tornado.state) { tornado.dispose(); tornado = null; return null; }
+        return tornado.state;
+      },
+      release() { tornadoDriven = false; if (tornado) { tornado.dispose(); tornado = null; } stage.setLight(lightId); },
+      get state() { return tornado ? tornado.state : null; },
+    },
     // trąba od początku (▶ Graj i Stop w scenie): nowy wir z bieżącej pogody — w miejscu startu (pole at) albo przed kamerą
     resetTornado() { if (tornado) { tornado.dispose(); tornado = null; } stage.setLight(lightId); },
     get tornado() { return tornado && tornado.state ? { x: tornado.state.x, z: tornado.state.z, kind: tornado.kind, vmax: tornado.state.vmax * tornado.state.fade, rc: tornado.state.rc } : null; },
@@ -238,8 +253,7 @@ export function createStage(renderer, scene, opts = {}) {
       windNow = w.wind ?? 6;
       // trąba powietrzna / tornado: z pogody (siła > 0, nie w kosmosie); bez — gaśnie
       const tw = !space && w.tornado && w.tornado.on !== false && w.tornado.strength > 0 ? w.tornado : null;
-      if (tw && !tornado) tornado = createTornado(scene);
-      if (tornado) tornado.set(tw);
+      if (!tornadoDriven) { if (tw && !tornado) tornado = createTornado(scene); if (tornado) tornado.set(tw); }
       // cyklon: niebo (pasma, ściana oka) i wiatr z jego położenia; kierunek wiatru niesie chmury
       cyc = !space && w.cyclone && w.cyclone.on ? { ...w.cyclone } : null;
       cycA = cyc ? cycloneAt(cyc) : null; cycG = 0;   // stan cyklonu na chwilę podania pogody; porywy liczą się dalej w tick
@@ -291,7 +305,7 @@ export function createStage(renderer, scene, opts = {}) {
         cycSky.update(camera, cyc ? { rel: relOf(cyc), Rm: cyc.eye, sign: cyc.hemisphere === 'south' ? -1 : 1, at: cycA, ct: (cyc.t || 0) + cycG } : null, { light: WU.uLight.value, fog: scene.fog, sunDir, t });
         if (!cyc) { cycSky.dispose(); cycSky = null; }
       }
-      if (tornado) {
+      if (tornado && !tornadoDriven) {
         tornado.update(lastDt, camera, { isWater: (x, z) => stage.isWater(x, z, 0.5), groundAt: (x, z) => (land && surfaceKind === 'land' ? sampleHeight(land.T, x, z) : 0), light: WU.uLight.value, fog: scene.fog });
         if (!tornado.state) { tornado.dispose(); tornado = null; }
       }

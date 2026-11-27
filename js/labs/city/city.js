@@ -376,7 +376,7 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 /* ---------------- tryby: Budynek | Zniszczenie ---------------- */
-const destruct = createDestructMode({ scene, camera, canvas: cv, orbit, ui: { L, $, el, status, save }, day: () => dayNow });
+const destruct = createDestructMode({ scene, camera, canvas: cv, orbit, ui: { L, $, el, status, save }, day: () => dayNow, stage });
 const LAB_MODES = { building: 'Building', destruct: 'Destruction' };
 const BUILD_WINDOWS = ['building', 'facade', 'ground', 'roof', 'bake', 'json'], DESTRUCT_WINDOWS = ['dbuilding', 'dtool', 'dphysics'];
 $('modes').replaceChildren(...Object.entries(LAB_MODES).map(([k, v]) => { const b = el('button', { type: 'button', textContent: v, title: k === 'destruct' ? 'A building of parts that break like they are built: hit it, throw things at it, send a tornado' : 'The building creator: near mesh and baked far facade' }); b.dataset.m = k; b.onclick = () => setLabMode(k); return b; }));
