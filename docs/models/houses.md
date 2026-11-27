@@ -33,3 +33,9 @@ pod nią. Materiały z opisu CityKit rejestrowane w DestructKit (`registerMat`) 
 `LANDMARKS` (`{ id: nazwa }`), `landmarkHouse(id)` → jak `buildHouse`.
 
 Doktor modeli: `houses/<rodzaj>` (każda część jako osobna siatka, jak przed zniszczeniem; `ground: 0`).
+
+## Lista (`catalog.js`)
+
+`HOUSES { id: { name, namePl, note, notePl } }` i `buildHouse(id, { seed })` — jedna lista budynków z części (rodzaje HouseKit
+i `lm:<budynek z mapy>`), z której biorą tryb Destruction laboratorium miasta i prefabrykaty sceny (`houses/<rodzaj>`,
+`houses/lm-<budynek>`, `js/scene/prefabs-houses.js`).

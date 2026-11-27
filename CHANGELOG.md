@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.111.5 · miasto 1.3.4 — 2026-11-27 (jedna lista budynków z części)
+
+### Zmienione
+- `js/models/houses/catalog.js`: jedna lista budynków z części (domy HouseKit i budynki Warszawy) z nazwami i opisami
+  po angielsku i po polsku — z niej tryb Destruction laboratorium miasta i prefabrykaty sceny (wcześniej dwie listy).
+  Prefabrykaty sceny mają teraz nazwy angielskie, jak reszta.
+
 ## Program 0.111.4 · miasto 1.3.3 — 2026-11-27 (jedna trąba w laboratorium miasta)
 
 ### Zmienione

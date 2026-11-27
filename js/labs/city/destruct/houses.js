@@ -2,26 +2,11 @@
 // housekit.js) and the Warsaw buildings of this lab (CityKit's OpenStreetMap data) turned into parts
 // (js/models/houses/landmark-house.js) — and the lab's English names for them and for the parts' materials (the models'
 // own data is in Polish, like JunkKit's).
-//   HOUSES { id: { name, note } }   ids: HouseKit's, and 'lm:<landmark>' for a Warsaw building
-//   buildHouse(id, { seed }) → house (parts for DestructKit's world.addHouse)
+//   HOUSES, buildHouse — from js/models/houses/catalog.js (one list for the lab and the scene's prefabs)
 //   MAT_NAMES { mat: English name }, MAT_COL / FALSE_COL { mat: '#rrggbb' } — the list's swatches, "Material colours"
-import { HOUSE_TYPES, buildHouse as buildHK } from '../../../models/houses/housekit.js';
-import { LANDMARKS, landmarkHouse } from '../../../models/houses/landmark-house.js';
+export { HOUSES, buildHouse } from '../../../models/houses/catalog.js';   // jedna lista budynków z części (EN/PL)
 import { MATS } from '../../../behaviors/land/destruct/materials.js';
 
-const EN = {
-  cottage: ['Brick cottage', 'A single-storey red-brick house on a foundation: a wooden floor, a gabled roof of clay tiles, a chimney.'],
-  kostka: ['Cube house', 'A two-storey 1970s house: brick walls under plaster, concrete floors, a flat felt roof with a parapet.'],
-  barn: ['Barn', 'A wooden barn of upright boards, big doors, a tall roof of corrugated sheet.'],
-  garage: ['Garage', 'A garage of hollow blocks with a sheet-metal door and a sloping sheet roof.'],
-  shed: ['Shed', 'A small wooden tool shed with a felt roof.'],
-  block: ['Panel block', 'A block of precast concrete panels, four floors above the ground floor, rows of windows, a flat roof.'],
-};
-export const HOUSES = {
-  ...Object.fromEntries(Object.keys(HOUSE_TYPES).map((k) => [k, { name: EN[k] ? EN[k][0] : HOUSE_TYPES[k].name, note: EN[k] ? EN[k][1] : HOUSE_TYPES[k].note }])),
-  ...Object.fromEntries(Object.entries(LANDMARKS).map(([id, name]) => ['lm:' + id, { name: 'Warsaw: ' + name, note: 'A building of this lab (CityKit, data © OpenStreetMap contributors): the outlines of its parts, heights, storeys and style from the map turned into parts that break by their material.' }])),
-};
-export const buildHouse = (id, o) => (id.startsWith('lm:') ? landmarkHouse(id.slice(3)) : buildHK(id, o));
 
 const MAT_EN = { brick: 'Brick', plaster: 'Plaster on brick', blocks: 'Hollow blocks', concrete: 'Concrete', panel: 'Precast panel', wood: 'Boards', floor: 'Wooden floor',
   beam: 'Beam', frame: 'Window frame', door: 'Door', glass: 'Glass', tiles: 'Roof tiles', metal: 'Corrugated sheet', tin: 'Sheet metal', ceramic: 'Ceramic cladding on brick',
