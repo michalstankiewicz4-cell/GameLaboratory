@@ -1,19 +1,10 @@
   // ===================== Tekstury proceduralne =====================
+import { valueNoise } from '../../core/noise.js';   // szum wartości (js/core/noise.js)
 const THREE = window.THREE;
   // Technika z ShipKit (laboratorium Space): jeden układ rysowany naraz na kilku płótnach —
   // kolor, szorstkość i wypukłość — więc ciemna spoina jest też wgłębiona i bardziej matowa.
   const TK = (function () {
     const rng = seed => { let s = seed >>> 0; return () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296; };
-    function valueNoise(rand, cx, cy) {
-      const g = new Float32Array(cx * cy); for (let i = 0; i < g.length; i++) g[i] = rand();
-      const at = (x, y) => g[((y % cy + cy) % cy) * cx + ((x % cx + cx) % cx)];
-      return (u, v) => {
-        const fx = u * cx, fy = v * cy, x0 = Math.floor(fx), y0 = Math.floor(fy);
-        let tx = fx - x0, ty = fy - y0; tx = tx * tx * (3 - 2 * tx); ty = ty * ty * (3 - 2 * ty);
-        const a = at(x0, y0), b = at(x0 + 1, y0), c = at(x0, y0 + 1), d = at(x0 + 1, y0 + 1);
-        return (a + (b - a) * tx) * (1 - ty) + (c + (d - c) * tx) * ty;
-      };
-    }
     function fbm(rand, bx, by, oct) {
       const L = []; for (let o = 0; o < oct; o++) L.push(valueNoise(rand, bx << o, by << o));
       return (u, v) => { let s = 0, a = 0.5, n = 0; for (const f of L) { s += f(u, v) * a; n += a; a *= 0.5; } return s / n; };

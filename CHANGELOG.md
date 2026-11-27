@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.112.1 — 2026-11-27 (wspólny szum wartości)
+
+### Zmienione
+- `js/core/noise.js` — `valueNoise(rand, cx, cy)`: szum wartości dla tekstur proceduralnych w jednym miejscu; był ten
+  sam w ShipKit (`shipkit/util.js`), TexKit pociągów (`train/texkit.js`) i efektach uszkodzeń (`effects/damage.js`).
+  Te same liczby (sprawdzone porównaniem).
+
 ## Program 0.112.0 · edytor sceny 0.59.1 — 2026-11-27 (odłamki budynków a przedmioty)
 
 ### Dodane

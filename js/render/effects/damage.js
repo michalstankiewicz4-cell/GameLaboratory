@@ -9,18 +9,11 @@
 //   step(), clear(), dispose()
 // shipDamage(model, fx) — podpina uszkodzenia statku ShipKit (model.damageSites, model.onDamage) do DamageFx
 import * as THREE from '../../../vendor/three/three.module.js';
+import { valueNoise } from '../../core/noise.js';   // szum wartości (js/core/noise.js)
 
 const DT = 1 / 60;
 // z ShipKit: rng, szum, tekstury dymu, spalenizny i poświaty
 import { lcgRaw as rng } from '../../core/rng.js';   // generator z ziarnem (js/core/rng.js)
-function valueNoise(rand, cx, cy) {
-  const g = new Float32Array(cx * cy); for (let i = 0; i < g.length; i++) g[i] = rand();
-  const at = (x, y) => g[((y % cy + cy) % cy) * cx + ((x % cx + cx) % cx)];
-  return (u, v) => { const fx = u * cx, fy = v * cy, x0 = Math.floor(fx), y0 = Math.floor(fy); let tx = fx - x0, ty = fy - y0;
-    tx = tx * tx * (3 - 2 * tx); ty = ty * ty * (3 - 2 * ty);
-    const a = at(x0, y0), b = at(x0 + 1, y0), c = at(x0, y0 + 1), d = at(x0 + 1, y0 + 1);
-    return (a + (b - a) * tx) * (1 - ty) + (c + (d - c) * tx) * ty; };
-}
 function fbm(rand, bx, by, oct) { const L = []; for (let o = 0; o < oct; o++) L.push(valueNoise(rand, bx << o, by << o));
   return (u, v) => { let s = 0, a = 0.5, n = 0; for (const f of L) { s += f(u, v) * a; n += a; a *= 0.5; } return s / n; }; }
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
