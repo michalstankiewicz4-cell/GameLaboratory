@@ -158,7 +158,8 @@ function layoutView() {
   const vis = (side) => { const d = docks[side]; return d && getComputedStyle(d).display !== "none" ? d.getBoundingClientRect().width : 0; };
   const con = document.querySelector(".labConsole.lcDocked:not([hidden])");
   const L = Math.round(vis("left")), R = Math.round(vis("right")), B = con ? Math.round(con.getBoundingClientRect().height) : 0;
-  for (const side in grips) grips[side].hidden = !(side === "left" ? L : R);
+  // only on a change: setting hidden again is still a mutation, and the MutationObserver (init) would call this again
+  for (const side in grips) { const h = !(side === "left" ? L : R); if (grips[side].hidden !== h) grips[side].hidden = h; }
   const root = document.documentElement.style;
   root.setProperty("--viewL", L + "px"); root.setProperty("--viewR", R + "px"); root.setProperty("--viewB", B + "px");
   const k = [L, R, B].join(","); if (k === viewKey) return; viewKey = k;

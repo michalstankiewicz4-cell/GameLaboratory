@@ -3,6 +3,15 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.113.3 — 2026-11-27 (Okna | Panele bez zawieszenia)
+
+### Poprawione
+- Przełączenie na **Okna** zawieszało przeglądarkę (od 0.113.0): `layoutView()` za każdym razem ustawiał ukrytym
+  uchwytom szerokości paneli `hidden` od nowa — to też zmiana atrybutu, więc obserwator zmian (`MutationObserver`)
+  wołał `layoutView()` znowu, bez końca. Teraz `hidden` zmienia się tylko, gdy ma inną wartość
+  (`ui/shell/windows.js`). Sprawdzone: przed poprawką strona przestaje odpowiadać po kliknięciu, po — odpowiada
+  od razu, powrót do Paneli działa.
+
 ## Program 0.113.2 — 2026-11-27 (paski przewijania)
 
 ### Poprawione
