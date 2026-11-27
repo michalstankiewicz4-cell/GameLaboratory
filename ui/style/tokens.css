@@ -42,7 +42,7 @@
   --err:#e04b50;
   --info:#4fa3d8;          /* technical information */
   --onAccent:#ffffff;      /* text and ticks on the accent */
-  --accentSoft:rgba(244,125,80,.15);   /* the background of what is chosen */
+  --accentSoft:rgba(250,115,35,.24);   /* the background of what is chosen: a saturated orange tint, not a salmon pink */
   --off:#4a5363;           /* disabled */
   --hoverText:#fff;        /* a menu item under the pointer */
   --chip:rgba(19,22,28,.82);/* a label over the 3D view (dimensions, split line) */
@@ -55,7 +55,7 @@
   --scroll:color-mix(in srgb, var(--accent) 55%, var(--line2));   /* the scrollbar's thumb: the accent, softened */
   --scrollHover:var(--accent);
   --hero1:#1c212b;         /* the start page's banner: a soft gradient */
-  --hero2:#2a1f1c;
+  --hero2:#36211a;
   color-scheme:dark;
   --font:"Space Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;   /* numbers */
@@ -90,7 +90,7 @@
   --err:#d9443f;
   --info:#3a7bd5;
   --onAccent:#ffffff;
-  --accentSoft:rgba(244,125,80,.12);
+  --accentSoft:rgba(250,115,35,.20);
   --off:#bdb4a8;
   --hoverText:var(--head);
   --chip:rgba(255,249,242,.92);
@@ -101,8 +101,8 @@
   --shadowSoft:1px 3px 10px -2px rgba(110,72,40,.24);
   --scroll:color-mix(in srgb, var(--accent) 45%, var(--line2));
   --scrollHover:var(--accent);
-  --hero1:#fff4ea;
-  --hero2:#ffe1cc;
+  --hero1:#ffefdc;
+  --hero2:#ffcd9f;
   --menuBg:#fff9f2;
   --barBg:#fbf6f0;
   color-scheme:light;

@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.115.3 — 2026-11-27 (bardziej nasycone tło akcentu)
+
+### Zmienione
+- Jasne tła akcentu bardziej nasycone i przesunięte z łososiowego różu w stronę pomarańczu: tło wybranych przycisków,
+  zakładek i pozycji (`--accentSoft`: Dzień 20 %, Noc 24 % nasyconego pomarańczu zamiast 12 / 15 % łososiowego) i
+  baner strony startowej (`--hero1`, `--hero2`). Sam akcent `#F47D50` bez zmian.
+
 ## Program 0.115.2 — 2026-11-27 (Szybki dostęp: cztery najczęściej otwierane)
 
 ### Zmienione
