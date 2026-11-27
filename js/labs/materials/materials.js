@@ -7,6 +7,7 @@ import { createStage, LIGHTS } from '../shared/stage.js';
 import { LookPipeline, LOOK_DEFAULTS } from '../../render/sea/look.js';
 import { KINDS, FIELDS, PRESETS, normalize, makeMaterial, canvases } from '../../render/materials/matkit.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
+import { createOrbit } from '../shared/orbit.js';
 
 const $ = (id) => document.getElementById(id);
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
@@ -163,12 +164,12 @@ $('jsonCopy').onclick = async () => { try { await navigator.clipboard.writeText(
 onAssetsChange(fillPresets);
 
 /* ---------------- kamera: orbita ---------------- */
-const orbit = { yaw: 0.7, pitch: 0.22, dist: 5.2, target: new THREE.Vector3(0, 1.1, 0) };
+const orbit = createOrbit({ yaw: 0.7, pitch: 0.22, dist: 5.2, target: new THREE.Vector3(0, 1.1, 0) , pitchMin: -0.1, pitchMax: 1.4, distMin: 1.4, distMax: 30, rot: 0.006, tilt: 0.005, zoom: 0.001 });
 let drag = null;
 renderer.domElement.addEventListener('pointerdown', (e) => { drag = [e.clientX, e.clientY]; renderer.domElement.setPointerCapture(e.pointerId); });
-renderer.domElement.addEventListener('pointermove', (e) => { if (!drag) return; orbit.yaw -= (e.clientX - drag[0]) * 0.006; orbit.pitch = Math.max(-0.1, Math.min(1.4, orbit.pitch + (e.clientY - drag[1]) * 0.005)); drag = [e.clientX, e.clientY]; });
+renderer.domElement.addEventListener('pointermove', (e) => { if (!drag) return; orbit.rotate((e.clientX - drag[0]), (e.clientY - drag[1])); drag = [e.clientX, e.clientY]; });
 renderer.domElement.addEventListener('pointerup', () => { drag = null; });
-renderer.domElement.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.max(1.4, Math.min(30, orbit.dist * Math.exp(e.deltaY * 0.001))); }, { passive: false });
+renderer.domElement.addEventListener('wheel', (e) => { e.preventDefault(); orbit.zoomBy(e.deltaY); }, { passive: false });
 
 /* ---------------- dla AI ---------------- */
 // MaterialApi: make(opis) — zastosuj (zwraca opis po sprawdzeniu); presets — gotowe; kinds — rodzaje i pola;
@@ -203,7 +204,7 @@ function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   if (L.spin) holder.rotation.y += dt * 0.25;
   const c = Math.cos(orbit.pitch);
-  camera.position.set(orbit.target.x + Math.sin(orbit.yaw) * c * orbit.dist, orbit.target.y + Math.sin(orbit.pitch) * orbit.dist, orbit.target.z + Math.cos(orbit.yaw) * c * orbit.dist);
+  orbit.position(camera);
   camera.lookAt(orbit.target);
   stage.update(dt, camera);
   look.sun(camera, stage.sunDir);

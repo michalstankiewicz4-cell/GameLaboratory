@@ -15,6 +15,7 @@ import { weatherWindow } from './weather-window.js';
 import { cycloneWindow } from './cyclone-window.js';
 import { CATEGORIES } from '../../envs/sky/cyclone.js';
 import { LookPipeline, AutoResolution, LOOK_PRESETS, LOOK_DEFAULTS } from '../../render/sea/look.js';
+import { createOrbit } from '../shared/orbit.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -275,7 +276,7 @@ $('copy').onclick = async () => { try { await navigator.clipboard.writeText(JSON
 addEventListener('keydown', (e) => { if (e.code === 'KeyH' && !e.target.closest('input,select')) document.querySelectorAll('[data-window]').forEach((p) => p.classList.toggle('hidden-panel')); });
 
 /* ---------------- camera ---------------- */
-const orbit = { target: new THREE.Vector3(0, 5, 4), dist: 135, yaw: 0.72, pitch: 0.05, want: null };
+const orbit = createOrbit({ target: new THREE.Vector3(0, 5, 4), dist: 135, yaw: 0.72, pitch: 0.05, want: null , pitchMin: -0.05, pitchMax: 1.45, distMin: 4, distMax: 2500, rot: 0.005, tilt: 0.004, zoom: 0.0011 });
 const CAMS = [['From the escort', [0, 5, 4], 135, 0.72, 0.04, 40], ['Bow wave', [5, 2, 42], 32, 1.15, 0.08, 45], ['Rusty side', [0, 3, -10], 34, 1.45, 0.1, 42],
   ['Deck aft', [0, 6, -40], 22, 2.7, 0.35, 55], ['High', [0, 3, 0], 210, 0.9, 0.5, 38], ['Bodycam', [0, 4, 8], 95, 0.6, 0.02, 78]];
 for (const [label, t, d, yaw, pitch, fov] of CAMS) $('cams').append(el('button', { type: 'button', textContent: label, onclick: () => {
@@ -291,9 +292,9 @@ cv.addEventListener('pointermove', (e) => {
   if (!drag) return;
   const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY;
   if (drag.b) { const k = orbit.dist * 0.0012, r = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 0), u = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 1); orbit.target.addScaledVector(r, -dx * k).addScaledVector(u, dy * k); }
-  else { orbit.yaw -= dx * 0.005; orbit.pitch = Math.min(1.45, Math.max(-0.05, orbit.pitch + dy * 0.004)); }
+  else { orbit.rotate(dx, dy); }
 });
-cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.min(2500, Math.max(4, orbit.dist * Math.exp(e.deltaY * 0.0011))); orbit.want = null; }, { passive: false });
+cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.zoomBy(e.deltaY); orbit.want = null; }, { passive: false });
 
 /* ---------------- measuring ---------------- */
 const frameLog = [];
@@ -348,7 +349,7 @@ function frame(now) {
     if (orbit.target.distanceTo(w.target) < 0.05 && Math.abs(w.dist - orbit.dist) < 0.05) orbit.want = null;
   }
   const c = Math.cos(orbit.pitch);
-  camera.position.set(orbit.target.x + Math.sin(orbit.yaw) * c * orbit.dist, orbit.target.y + Math.sin(orbit.pitch) * orbit.dist, orbit.target.z + Math.cos(orbit.yaw) * c * orbit.dist);
+  orbit.position(camera);
   const minY = heightAt(stage.waves, camera.position.x, camera.position.z, simT, shift) + 1.2; if (camera.position.y < minY) camera.position.y = minY;
   camera.lookAt(orbit.target);
   if (S.cam.shake > 0) {                                     // hand-held: slow sway plus a little jitter, as with a camera held on a rolling deck

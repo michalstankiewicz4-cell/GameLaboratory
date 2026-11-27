@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.111.8 — 2026-11-27 (wspólna kamera orbitalna laboratoriów)
+
+### Zmienione
+- `js/labs/shared/orbit.js` — `createOrbit`: stan kamery orbitalnej i wspólne wzory (obrót przeciąganiem, przybliżanie
+  kółkiem, położenie na sferze wokół celu, przesuwanie W A S D); każde laboratorium podaje swoje granice i czułości, więc
+  kamera działa jak dotąd. Przeszło 15 laboratoriów (wersje +0.0.1): city 1.3.5, effects-land 1.0.2, filters 0.6.1, items 1.2.1, land 1.10.1, look 1.8.2, materials 1.1.1, mechanics 1.0.4, plants 1.8.1, rocks 1.1.1, streets 1.0.1, structures 1.6.1, transform 1.3.1, vehicles-water 1.6.1, water 1.5.1. Kliknięcia, wybór i sterowanie
+  na modelach zostały w laboratoriach. Laboratorium powierzchni ma inną kamerę — bez zmian.
+
 ## Program 0.111.7 — 2026-11-27 (O laboratoriach)
 
 ### Dodane

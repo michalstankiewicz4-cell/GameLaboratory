@@ -12,6 +12,7 @@ import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '..
 import { generateWaterway, heightTexture, terrainMeshes, landUniforms, setLand, GLSL_LAND } from '../../envs/land/landkit.js';
 import { GLSL_SKY } from '../../envs/sky/skykit.js';
 import { createStage } from '../shared/stage.js';
+import { createOrbit } from '../shared/orbit.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -281,7 +282,7 @@ function renderReflection(v) {
 }
 
 /* ---------------- camera ---------------- */
-const orbit = { target: new THREE.Vector3(0, 3, 26), dist: 80, yaw: 0.75, pitch: 0.13, want: null, bridge: false };
+const orbit = createOrbit({ target: new THREE.Vector3(0, 3, 26), dist: 80, yaw: 0.75, pitch: 0.13, want: null, bridge: false , pitchMin: -0.05, pitchMax: 1.45, distMin: 4, distMax: 2500, rot: 0.005, tilt: 0.004, zoom: 0.0011 });
 const CAMS = [
   ['Bow ¾', [0, 3, 26], 80, 0.75, 0.13], ['Bow wave', [6, 1.5, 42], 26, 1.25, 0.1], ['Side, waterline', [0, 1.2, 0], 85, Math.PI / 2, 0.015],
   ['Stern ¾', [0, 3, -35], 75, 2.35, 0.15], ['Wake', [0, 0, -110], 190, 2.85, 0.42], ['Far', [0, 3, 0], 420, 0.9, 0.1], ['Bridge', null],
@@ -304,9 +305,9 @@ cv.addEventListener('pointermove', (e) => {
   if (drag.b) {
     const k = orbit.dist * 0.0012, r = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 0), u = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 1);
     orbit.target.addScaledVector(r, -dx * k).addScaledVector(u, dy * k);
-  } else { orbit.yaw -= dx * 0.005; orbit.pitch = Math.min(1.45, Math.max(-0.05, orbit.pitch + dy * 0.004)); }
+  } else { orbit.rotate(dx, dy); }
 });
-cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.min(2500, Math.max(4, orbit.dist * Math.exp(e.deltaY * 0.0011))); orbit.want = null; }, { passive: false });
+cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.zoomBy(e.deltaY); orbit.want = null; }, { passive: false });
 function placeCamera(dt, v) {
   if (orbit.want) {
     const k = 1 - Math.exp(-dt * 4), w = orbit.want;

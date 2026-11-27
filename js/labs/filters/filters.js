@@ -9,6 +9,7 @@ import { createStage, LIGHTS } from '../shared/stage.js';
 import { shipScene } from './scenes/ship.js';
 import { rigScene } from './scenes/rig.js';
 import { trainScene } from './scenes/train.js';
+import { createOrbit } from '../shared/orbit.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -60,7 +61,7 @@ function applyLight() { stage.setLight(S.light); look.sunVisible = stage.sunSeen
 function applyLook() { look.set(S.look, 'A'); look.set({ ...LOOK_DEFAULTS, exposure: S.look.exposure }, 'B'); }
 
 /* ---------------- kamera (orbita) ---------------- */
-const orbit = { target: new THREE.Vector3(), dist: 100, yaw: 0.9, pitch: 0.18 };
+const orbit = createOrbit({ target: new THREE.Vector3(), dist: 100, yaw: 0.9, pitch: 0.18 , pitchMin: -0.05, pitchMax: 1.4, distMin: 2, distMax: 4000, rot: 0.005, tilt: 0.004, zoom: 0.0011 });
 let drag = null;
 const cv = renderer.domElement;
 cv.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY, b: e.button }; cv.setPointerCapture(e.pointerId); });
@@ -70,9 +71,9 @@ cv.addEventListener('pointermove', (e) => {
   if (!drag) return;
   const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY;
   if (drag.b) { const k = orbit.dist * 0.0012, r = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 0), u = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 1); orbit.target.addScaledVector(r, -dx * k).addScaledVector(u, dy * k); }
-  else { orbit.yaw -= dx * 0.005; orbit.pitch = Math.min(1.4, Math.max(-0.05, orbit.pitch + dy * 0.004)); }
+  else { orbit.rotate(dx, dy); }
 });
-cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.min(4000, Math.max(2, orbit.dist * Math.exp(e.deltaY * 0.0011))); }, { passive: false });
+cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.zoomBy(e.deltaY); }, { passive: false });
 
 /* ---------------- panel ---------------- */
 for (const s of SCENES) $('scene').append(el('option', { value: s.id, textContent: s.label }));
@@ -164,7 +165,7 @@ function frame(now) {
   stage.update(dt, camera);
   if (model && model.update) model.update(dt);
   const c = Math.cos(orbit.pitch);
-  camera.position.set(orbit.target.x + Math.sin(orbit.yaw) * c * orbit.dist, orbit.target.y + Math.sin(orbit.pitch) * orbit.dist, orbit.target.z + Math.cos(orbit.yaw) * c * orbit.dist);
+  orbit.position(camera);
   const minY = stage.heightAt(camera.position.x, camera.position.z) + 1.2; if (camera.position.y < minY) camera.position.y = minY;
   camera.lookAt(orbit.target);
   if (S.perf.autoRes) { const s = autoRes.update(dtMs); if (s !== look.scale) { look.setScale(s); $('scale').value = s; $('scaleV').textContent = Math.round(s * 100) + '%'; } }

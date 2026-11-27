@@ -7,6 +7,7 @@ import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
 import { ROCK_KINDS, ROCK_SHAPES, ROCK_DEFAULTS, rockGeometry, rockMaterial, rockInfo } from '../../models/rocks/rockkit.js';
 import { listAssets, getAsset, saveAsset, removeAsset } from '../../scene/assets.js';
 import { attachWeatherCycle } from '../shared/weather-cycle-ui.js';
+import { createOrbit } from '../shared/orbit.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -120,7 +121,7 @@ function info() {
 }
 
 /* ---------------- camera: orbit ---------------- */
-const orbit = { target: new THREE.Vector3(0, 0.5, 0), dist: 5, yaw: 0.75, pitch: 0.3 };
+const orbit = createOrbit({ target: new THREE.Vector3(0, 0.5, 0), dist: 5, yaw: 0.75, pitch: 0.3 , pitchMin: -0.02, pitchMax: 1.5, distMin: 0.15, distMax: 300, rot: 0.005, tilt: 0.004, zoom: 0.0011 });
 function frameCam() {
   const r = S.mode === 'field' ? 30 : Math.max(...shown.size);
   orbit.target.set(0, S.mode === 'field' ? 0.5 : shown.size[1] * 0.4, 0); orbit.dist = S.mode === 'field' ? 55 : Math.max(0.4, r * 2.4);
@@ -133,9 +134,9 @@ $('cams').replaceChildren(...Object.entries(CAMS).map(([k, v]) => { const b = el
 const cv = renderer.domElement; let drag = null;
 cv.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY }; cv.setPointerCapture(e.pointerId); });
 cv.addEventListener('pointermove', (e) => { if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag = { x: e.clientX, y: e.clientY };
-  orbit.yaw -= dx * 0.005; orbit.pitch = Math.max(-0.02, Math.min(1.5, orbit.pitch + dy * 0.004)); });
+  orbit.rotate(dx, dy); });
 cv.addEventListener('pointerup', () => { drag = null; });
-cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.min(300, Math.max(0.15, orbit.dist * Math.exp(e.deltaY * 0.0011))); }, { passive: false });
+cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.zoomBy(e.deltaY); }, { passive: false });
 
 /* ---------------- panels ---------------- */
 const MODES = { specimen: 'Specimen', field: 'Field' };
@@ -216,7 +217,7 @@ function resize() { renderer.setSize(VS().w, VS().h, false); camera.aspect = VS(
 addEventListener('resize', resize);
 function frame() {
   const c = Math.cos(orbit.pitch);
-  camera.position.set(orbit.target.x + Math.sin(orbit.yaw) * c * orbit.dist, orbit.target.y + Math.sin(orbit.pitch) * orbit.dist, orbit.target.z + Math.cos(orbit.yaw) * c * orbit.dist);
+  orbit.position(camera);
   camera.position.y = Math.max(0.03, camera.position.y); camera.lookAt(orbit.target);
   const d = sun.userData.dir || new THREE.Vector3(0.4, 0.8, 0.3), r = Math.max(4, orbit.dist * 2);
   sun.position.copy(orbit.target).addScaledVector(d, r * 2); sun.target.position.copy(orbit.target);

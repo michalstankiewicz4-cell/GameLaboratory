@@ -15,6 +15,7 @@ import { cleanPolygon } from '../../models/city/footprint.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 import { attachWeatherCycle } from '../shared/weather-cycle-ui.js';
 import { createDestructMode } from './destruct/destruct.js';
+import { createOrbit } from '../shared/orbit.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
@@ -252,7 +253,7 @@ $('weather').onchange = () => { wxNow = null; L.weather = $('weather').value; sa
 $('time').oninput = () => { L.time = +$('time').value; save(); light(); };
 
 /* ---------------- kamera: orbita, przesuwanie, ujęcia ---------------- */
-const orbit = { yaw: Math.PI + 0.6, pitch: 0.25, dist: 60, target: new THREE.Vector3(0, 8, 0) };
+const orbit = createOrbit({ yaw: Math.PI + 0.6, pitch: 0.25, dist: 60, target: new THREE.Vector3(0, 8, 0) , pitchMin: -0.05, pitchMax: 1.5, distMin: 4, distMax: 4000, rot: 0.006, tilt: 0.005, zoom: 0.001 });
 const CAMS = { front: ['Front', 0, 0.12, 1.5], corner: ['Corner', 0.6, 0.25, 2.5], side: ['Side', -Math.PI / 2, 0.15, 1.7], top: ['From above', 0.4, 1.3, 2.4], far: ['Far (baked)', 0.7, 0.2, 0] };
 function aimCam(id) {
   const [, yaw, pitch, k] = CAMS[id], b = near || far;
@@ -273,7 +274,7 @@ cv.addEventListener('pointermove', (e) => {
   if (drag.b === 2 || e.shiftKey) {   // przesuwanie celu w płaszczyźnie gruntu
     const k = orbit.dist * 0.0016, s = Math.sin(orbit.yaw), c = Math.cos(orbit.yaw);
     orbit.target.x += (-dx * c - dy * s) * k; orbit.target.z += (dx * s - dy * c) * k;
-  } else { orbit.yaw -= dx * 0.006; orbit.pitch = Math.max(-0.05, Math.min(1.5, orbit.pitch + dy * 0.005)); }
+  } else { orbit.rotate(dx, dy); }
 });
 cv.addEventListener('pointerup', (e) => {
   const click = drag && Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) < 5 && drag.b === 0;
@@ -281,7 +282,7 @@ cv.addEventListener('pointerup', (e) => {
   if (click && drawing) addPoint(e);
   else if (click && L.labMode === 'destruct') destruct.click(e);
 });
-cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.max(4, Math.min(4000, orbit.dist * Math.exp(e.deltaY * 0.001))); }, { passive: false });
+cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.zoomBy(e.deltaY); }, { passive: false });
 
 /* ---------------- rysowanie obrysu na gruncie ---------------- */
 let drawing = false, pts = [], hover = null;
@@ -366,7 +367,7 @@ let last = performance.now();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   const c = Math.cos(orbit.pitch);
-  camera.position.set(orbit.target.x + Math.sin(orbit.yaw) * c * orbit.dist, orbit.target.y + Math.sin(orbit.pitch) * orbit.dist, orbit.target.z + Math.cos(orbit.yaw) * c * orbit.dist);
+  orbit.position(camera);
   camera.lookAt(orbit.target);
   if (L.labMode === 'destruct') destruct.frame(dt);
   else if (!drawing && L.mode === 'auto') pickShown();

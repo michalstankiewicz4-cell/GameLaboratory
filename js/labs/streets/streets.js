@@ -15,6 +15,7 @@ import { SCENES } from './scenes.js';
 import { buildSample } from './build.js';
 import { createGround } from './ground.js';
 import { en } from './en.js';
+import { createOrbit } from '../shared/orbit.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
@@ -123,7 +124,7 @@ for (const k of ['sunEl', 'sunAz']) { $(k).value = S[k]; $(k + 'V').textContent 
 addEventListener('keydown', (e) => { if (e.code === 'KeyH' && !e.target.closest('input,select,textarea')) document.querySelectorAll('[data-window]').forEach((p) => p.classList.toggle('hidden-panel')); });
 
 /* ---------------- camera ---------------- */
-const orbit = { target: new THREE.Vector3(0, 0, 0), dist: 45, yaw: 0.7, pitch: 0.45 };
+const orbit = createOrbit({ target: new THREE.Vector3(0, 0, 0), dist: 45, yaw: 0.7, pitch: 0.45 , pitchMin: 0.01, pitchMax: 1.52, distMin: 2, distMax: 300, rot: 0.005, tilt: 0.004, zoom: 0.0011 });
 const CAMS = { Orbit: { yaw: 0.7, pitch: 0.45, dist: 45 }, Pedestrian: { yaw: 0.25, pitch: 0.03, dist: 9 }, 'From above': { yaw: 0, pitch: 1.45, dist: 70 }, Driver: { yaw: Math.PI / 2, pitch: 0.06, dist: 16 } };
 $('cams').replaceChildren(...Object.entries(CAMS).map(([k, v]) => { const b = el('button', { type: 'button', textContent: k }); b.onclick = () => Object.assign(orbit, v); return b; }));
 function frame0() {
@@ -141,9 +142,9 @@ function frame0() {
 }
 const cv = renderer.domElement; let drag = null;
 cv.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY }; cv.setPointerCapture(e.pointerId); });
-cv.addEventListener('pointermove', (e) => { if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag = { x: e.clientX, y: e.clientY }; orbit.yaw -= dx * 0.005; orbit.pitch = Math.max(0.01, Math.min(1.52, orbit.pitch + dy * 0.004)); });
+cv.addEventListener('pointermove', (e) => { if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag = { x: e.clientX, y: e.clientY }; orbit.rotate(dx, dy); });
 cv.addEventListener('pointerup', () => { drag = null; });
-cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.min(300, Math.max(2, orbit.dist * Math.exp(e.deltaY * 0.0011))); }, { passive: false });
+cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.zoomBy(e.deltaY); }, { passive: false });
 
 /* ---------------- loop ---------------- */
 function resize() { renderer.setSize(VS().w, VS().h, false); camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix(); look.resize(VS().w, VS().h); }
@@ -157,7 +158,7 @@ function loop(now) {
   if (night !== lampsLit) { for (const L of lamps) L.on(night); lampsLit = night; }
   if (lights.length) $('sigNow').textContent = lights.map((x) => en(SIGNAL_STATES[x.tl.state])).filter((v, i, a) => a.indexOf(v) === i).join(' · ');
   const c = Math.cos(orbit.pitch);
-  camera.position.set(orbit.target.x + Math.sin(orbit.yaw) * c * orbit.dist, orbit.target.y + 1.6 + Math.sin(orbit.pitch) * orbit.dist, orbit.target.z + Math.cos(orbit.yaw) * c * orbit.dist);
+  orbit.position(camera, 1.6);
   camera.lookAt(orbit.target.x, orbit.target.y + 1, orbit.target.z);
   stage.update(dt, camera);
   look.sun(camera, stage.sunDir);

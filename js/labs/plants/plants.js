@@ -13,6 +13,7 @@ import { scatterArea, forestTexture } from '../../models/plants/vegetation.js';
 import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 import { attachWeatherCycle } from '../shared/weather-cycle-ui.js';
+import { createOrbit } from '../shared/orbit.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -149,7 +150,7 @@ function setWind() {
 }
 
 /* ---------------- cameras ---------------- */
-const orbit = { target: new THREE.Vector3(0, 8, 0), dist: 40, yaw: 0.7, pitch: 0.12 };
+const orbit = createOrbit({ target: new THREE.Vector3(0, 8, 0), dist: 40, yaw: 0.7, pitch: 0.12 , pitchMin: -0.05, pitchMax: 1.5, distMin: 0.6, distMax: 400, rot: 0.005, tilt: 0.004, zoom: 0.0011 });
 const free = { pos: new THREE.Vector3(1200, 60, 1200), yaw: 0.6, pitch: -0.1, walk: false };
 let cam = 'Orbit';
 const CAMS = { specimen: ['Orbit', 'Under the crown', 'From above'], landscape: ['Walk', 'Treetops', 'Low flight', 'Overview'] };
@@ -176,13 +177,13 @@ cv.addEventListener('pointerup', () => { drag = null; });
 cv.addEventListener('pointermove', (e) => {
   if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY;
   if (S.mode === 'landscape') { free.yaw -= dx * 0.004; free.pitch = Math.max(-1.45, Math.min(1.2, free.pitch - dy * 0.004)); }
-  else { orbit.yaw -= dx * 0.005; orbit.pitch = Math.max(-0.05, Math.min(1.5, orbit.pitch + dy * 0.004)); }
+  else { orbit.rotate(dx, dy); }
 });
-cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.min(400, Math.max(0.6, orbit.dist * Math.exp(e.deltaY * 0.0011))); }, { passive: false });
+cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.zoomBy(e.deltaY); }, { passive: false });
 function placeCamera(dt) {
   if (S.mode === 'specimen') {
     const c = Math.cos(orbit.pitch);
-    camera.position.set(orbit.target.x + Math.sin(orbit.yaw) * c * orbit.dist, orbit.target.y + Math.sin(orbit.pitch) * orbit.dist, orbit.target.z + Math.cos(orbit.yaw) * c * orbit.dist);
+    orbit.position(camera);
     camera.position.y = Math.max(0.15, camera.position.y); camera.lookAt(orbit.target);
     return;
   }

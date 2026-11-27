@@ -15,6 +15,7 @@ import * as newspapers from '../../models/junkyard/items/newspapers.js';
 import * as box from '../../models/junkyard/items/box.js';
 import { applyTextures } from '../../models/junkyard/textures.js';
 import { attachWeatherCycle } from '../shared/weather-cycle-ui.js';
+import { createOrbit } from '../shared/orbit.js';
 
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 const $ = (id) => document.getElementById(id);
@@ -112,16 +113,16 @@ function buildProps() {
 }
 
 /* ---------------- kamera ---------------- */
-const orbit = { target: new THREE.Vector3(0, 1, 0), dist: 9, yaw: 0.6, pitch: 0.22 };
+const orbit = createOrbit({ target: new THREE.Vector3(0, 1, 0), dist: 9, yaw: 0.6, pitch: 0.22 , pitchMin: -0.02, pitchMax: 1.5, distMin: 1, distMax: 200, rot: 0.005, tilt: 0.004, zoom: 0.0011 });
 function frameCam() { const h = Math.max(S.height, 1), wide = S.scene === 'grass' ? 18 : S.scene === 'blaze' ? 14 : 0; orbit.dist = Math.max(4, h * 3 + wide); orbit.target.set(0, h * 0.5, 0); }
 const CAMS = { Orbit: { yaw: 0.6, pitch: 0.22 }, Low: { yaw: 0.4, pitch: 0.05 }, Side: { yaw: Math.PI / 2, pitch: 0.12 }, 'From above': { yaw: 0.3, pitch: 1.2 } };
 $('cams').replaceChildren(...Object.entries(CAMS).map(([k, v]) => { const b = el('button', { type: 'button', textContent: k }); b.onclick = () => Object.assign(orbit, v); return b; }));
 const cv = renderer.domElement; let drag = null;
 cv.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY }; cv.setPointerCapture(e.pointerId); });
 cv.addEventListener('pointermove', (e) => { if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag = { x: e.clientX, y: e.clientY };
-  orbit.yaw -= dx * 0.005; orbit.pitch = Math.max(-0.02, Math.min(1.5, orbit.pitch + dy * 0.004)); });
+  orbit.rotate(dx, dy); });
 cv.addEventListener('pointerup', () => { drag = null; });
-cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.min(200, Math.max(1, orbit.dist * Math.exp(e.deltaY * 0.0011))); }, { passive: false });
+cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.zoomBy(e.deltaY); }, { passive: false });
 
 /* ---------------- panele ---------------- */
 $('scene').replaceChildren(...Object.entries(SCENES).map(([k, v]) => el('option', { value: k, textContent: v.label })));
@@ -161,7 +162,7 @@ let last = performance.now(), statT = 0;
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   const c = Math.cos(orbit.pitch);
-  camera.position.set(orbit.target.x + Math.sin(orbit.yaw) * c * orbit.dist, orbit.target.y + Math.sin(orbit.pitch) * orbit.dist, orbit.target.z + Math.cos(orbit.yaw) * c * orbit.dist);
+  orbit.position(camera);
   camera.position.y = Math.max(0.1, camera.position.y); camera.lookAt(orbit.target);
   const a = S.windDir * Math.PI / 180;   // wiatr „z” kierunku: wieje w przeciwną stronę
   fire.update(dt, camera, { wind: [-Math.sin(a) * S.wind, 0, -Math.cos(a) * S.wind], light: L ? 0.15 + 0.85 * L.day : 1, sky: L ? L.sky : null });

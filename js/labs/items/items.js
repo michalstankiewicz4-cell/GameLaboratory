@@ -12,6 +12,7 @@ import { applyTextures, setAnisotropy } from '../../models/junkyard/textures.js'
 import { shapeParts } from '../../models/junkyard/shapes.js';
 import { attachWeatherCycle } from '../shared/weather-cycle-ui.js';
 import { createDeformMode } from './deform/deform.js';
+import { createOrbit } from '../shared/orbit.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -120,7 +121,7 @@ function info() {
 }
 
 /* ---------------- camera: orbit ---------------- */
-const orbit = { target: new THREE.Vector3(0, 0.2, 0), dist: 1.5, yaw: 0.75, pitch: 0.35 };
+const orbit = createOrbit({ target: new THREE.Vector3(0, 0.2, 0), dist: 1.5, yaw: 0.75, pitch: 0.35 , pitchMin: -0.05, pitchMax: 1.5, distMin: 0.05, distMax: 60, rot: 0.005, tilt: 0.004, zoom: 0.0011 });
 function frameCam() {
   const r = Math.max(size.x, size.y, size.z), w = S.pair ? Math.max(size.x, size.z) * 1.4 : 0;
   orbit.target.set(w / 2, size.y * 0.45, 0); orbit.dist = Math.max(0.25, (r + w) * 1.6);
@@ -136,9 +137,9 @@ cv.addEventListener('pointermove', (e) => {
   if (S.mode === 'deform') deform.move(e);   // a grabbed barrel follows the pointer
   if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY;
   if (Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) > 4) drag.moved = true;
-  if (drag.moved) { orbit.yaw -= dx * 0.005; orbit.pitch = Math.max(-0.05, Math.min(1.5, orbit.pitch + dy * 0.004)); } });
+  if (drag.moved) { orbit.rotate(dx, dy); } });
 cv.addEventListener('pointerup', (e) => { const click = drag && !drag.moved; drag = null; if (click && e.button === 0 && S.mode === 'deform') deform.click(e); });
-cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.min(60, Math.max(0.05, orbit.dist * Math.exp(e.deltaY * 0.0011))); }, { passive: false });
+cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.zoomBy(e.deltaY); }, { passive: false });
 
 /* ---------------- panels ---------------- */
 $('item').replaceChildren(...ITEMS.map((m) => el('option', { value: m.id, textContent: m.name })));
@@ -161,7 +162,7 @@ function frame(now) {
   const dt = Math.min(0.1, ((now || performance.now()) - last) / 1000); last = now || performance.now();
   if (S.mode === 'deform') { deform.frame(dt); moveKeys(dt); }
   const c = Math.cos(orbit.pitch);
-  camera.position.set(orbit.target.x + Math.sin(orbit.yaw) * c * orbit.dist, orbit.target.y + Math.sin(orbit.pitch) * orbit.dist, orbit.target.z + Math.cos(orbit.yaw) * c * orbit.dist);
+  orbit.position(camera);
   camera.position.y = Math.max(0.01, camera.position.y); camera.lookAt(orbit.target);
   const d = sun.userData.dir || new THREE.Vector3(0.4, 0.8, 0.3), r = Math.max(2, orbit.dist * 3);
   sun.position.copy(orbit.target).addScaledVector(d, r * 2); sun.target.position.copy(orbit.target);

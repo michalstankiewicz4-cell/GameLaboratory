@@ -4,6 +4,7 @@
 import * as THREE from '../../../vendor/three/three.module.js';
 import { PostPipeline } from '../../render/sea/post.js';
 import { transformShip, KINDS } from '../../models/ships-sea/transform.js';
+import { createOrbit } from '../shared/orbit.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -147,7 +148,7 @@ bindRange('fleet', (v) => v, buildFleet);
 $('useLod').onchange = buildFleet;
 
 /* ---------------- camera ---------------- */
-const orbit = { target: new THREE.Vector3(0, 4, 0), dist: 120, yaw: 0.85, pitch: 0.2, want: null };
+const orbit = createOrbit({ target: new THREE.Vector3(0, 4, 0), dist: 120, yaw: 0.85, pitch: 0.2, want: null , pitchMin: -0.1, pitchMax: 1.5, distMin: 5, distMax: 4000, rot: 0.005, tilt: 0.004, zoom: 0.0011 });
 const CAMS = [['Close', [0, 4, 10], 70, 0.85], ['LOD1 range', [0, 4, 0], 320, 0.9], ['LOD2 range', [0, 4, 0], 900, 0.9], ['Stern', [0, 3, -50], 40, 2.6], ['Bridge', [0, 9, 22], 30, 1.0], ['Fleet', [0, 0, 0], 2200, 0.6]];
 for (const [label, t, dist, yaw] of CAMS) $('cams').append(el('button', { type: 'button', textContent: label, onclick: () => { orbit.want = { target: new THREE.Vector3(...t), dist, yaw, pitch: label === 'Fleet' ? 0.55 : 0.2 }; } }));
 let drag = null, moved = 0;
@@ -166,9 +167,9 @@ cv.addEventListener('pointermove', (e) => {
   }
   const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY; moved += Math.abs(dx) + Math.abs(dy);
   if (drag.b) { const k = orbit.dist * 0.0012, r = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 0), u = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 1); orbit.target.addScaledVector(r, -dx * k).addScaledVector(u, dy * k); }
-  else { orbit.yaw -= dx * 0.005; orbit.pitch = Math.min(1.5, Math.max(-0.1, orbit.pitch + dy * 0.004)); }
+  else { orbit.rotate(dx, dy); }
 });
-cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.min(4000, Math.max(5, orbit.dist * Math.exp(e.deltaY * 0.0011))); orbit.want = null; }, { passive: false });
+cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.zoomBy(e.deltaY); orbit.want = null; }, { passive: false });
 addEventListener('keydown', (e) => { if (e.code === 'KeyH' && !e.target.closest('input,select')) document.querySelectorAll('[data-window]').forEach((p) => p.classList.toggle('hidden-panel')); });
 
 /* ---------------- loop ---------------- */
@@ -184,7 +185,7 @@ function frame(now) {
     if (orbit.target.distanceTo(w.target) < 0.05 && Math.abs(w.dist - orbit.dist) < 0.05) orbit.want = null;
   }
   const c = Math.cos(orbit.pitch);
-  camera.position.set(orbit.target.x + Math.sin(orbit.yaw) * c * orbit.dist, orbit.target.y + Math.sin(orbit.pitch) * orbit.dist, orbit.target.z + Math.cos(orbit.yaw) * c * orbit.dist);
+  orbit.position(camera);
   camera.lookAt(orbit.target); camera.far = Math.max(9000, orbit.dist * 4); camera.updateProjectionMatrix();
   sky.position.copy(camera.position);
   DAMAGE.uniforms.uDamageT.value = now / 1000;

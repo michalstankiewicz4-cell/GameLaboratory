@@ -11,6 +11,7 @@ import { signalLamp } from '../../models/ships-sea/lights.js';
 import { SEAS, LOOKS } from '../../envs/water/waterkit.js';
 import { createStage } from '../shared/stage.js';
 import { createCraft, craftDef } from '../../behaviors/water/craft.js';
+import { createOrbit } from '../shared/orbit.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -96,10 +97,10 @@ const grid = new THREE.GridHelper(300, 30, 0xf2b84b, 0x6a7a88); grid.position.y 
 grid.material.transparent = true; grid.material.opacity = 0.45; scene.add(grid);
 
 /* ---------------- orbit camera ---------------- */
-const orbit = { target: new THREE.Vector3(0, 4, 0), dist: 125, yaw: 0.85, pitch: 0.22, want: null };
+const orbit = createOrbit({ target: new THREE.Vector3(0, 4, 0), dist: 125, yaw: 0.85, pitch: 0.22, want: null , pitchMin: -0.6, pitchMax: 1.5, distMin: 3, distMax: 900, rot: 0.005, tilt: 0.004, zoom: 0.0011 });
 function applyCamera() {
   const c = Math.cos(orbit.pitch);
-  camera.position.set(orbit.target.x + Math.sin(orbit.yaw) * c * orbit.dist, orbit.target.y + Math.sin(orbit.pitch) * orbit.dist, orbit.target.z + Math.cos(orbit.yaw) * c * orbit.dist);
+  orbit.position(camera);
   camera.lookAt(orbit.target);
 }
 let drag = null;
@@ -111,10 +112,10 @@ renderer.domElement.addEventListener('pointermove', (e) => {
   if (drag.b === 2 || drag.b === 1 || drag.shift) {
     const k = orbit.dist * 0.0012, r = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 0), u = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 1);
     orbit.target.addScaledVector(r, -dx * k).addScaledVector(u, dy * k);
-  } else { orbit.yaw -= dx * 0.005; orbit.pitch = Math.min(1.5, Math.max(-0.6, orbit.pitch + dy * 0.004)); }
+  } else { orbit.rotate(dx, dy); }
 });
 renderer.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
-renderer.domElement.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.min(900, Math.max(3, orbit.dist * Math.exp(e.deltaY * 0.0011))); orbit.want = null; }, { passive: false });
+renderer.domElement.addEventListener('wheel', (e) => { e.preventDefault(); orbit.zoomBy(e.deltaY); orbit.want = null; }, { passive: false });
 renderer.domElement.addEventListener('dblclick', (e) => {
   const r = new THREE.Raycaster(); r.setFromCamera(new THREE.Vector2((e.clientX - VS().x) / VS().w * 2 - 1, -((e.clientY - VS().y) / VS().h) * 2 + 1), camera);
   const hit = cur() && r.intersectObject(cur(), true)[0];

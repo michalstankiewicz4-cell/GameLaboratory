@@ -17,6 +17,7 @@ import { MODELS as JUNK, junkEntry } from '../../models/junkyard/registry.js';
 import { applyTextures as junkTextures, setAnisotropy as junkAniso } from '../../models/junkyard/textures.js';
 import { createJunkWork } from './junk-work.js';
 import { attachWeatherCycle } from '../shared/weather-cycle-ui.js';
+import { createOrbit } from '../shared/orbit.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -242,7 +243,7 @@ function stepJack(dt) {
 }
 
 /* ---------------- camera ---------------- */
-const orbit = { target: new THREE.Vector3(0, 20, 0), dist: 210, yaw: 2.4, pitch: 0.18, want: null };
+const orbit = createOrbit({ target: new THREE.Vector3(0, 20, 0), dist: 210, yaw: 2.4, pitch: 0.18, want: null , pitchMin: -1.2, pitchMax: 1.45, distMin: 5, distMax: 3000, rot: 0.005, tilt: 0.004, zoom: 0.0011 });
 // camera presets per structure: [label, target, distance, yaw, pitch] (yaw: 0 looks from +z, π/2 from the sea side +x)
 function camsFor() {
   if (onLand && junkCams) return junkCams;
@@ -266,9 +267,9 @@ cv.addEventListener('contextmenu', (e) => e.preventDefault());
 cv.addEventListener('pointermove', (e) => {
   if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY;
   if (drag.b) { const k = orbit.dist * 0.0012, r = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 0), u = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 1); orbit.target.addScaledVector(r, -dx * k).addScaledVector(u, dy * k); }
-  else { orbit.yaw -= dx * 0.005; orbit.pitch = Math.max(-1.2, Math.min(1.45, orbit.pitch + dy * 0.004)); }
+  else { orbit.rotate(dx, dy); }
 });
-cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.min(3000, Math.max(5, orbit.dist * Math.exp(e.deltaY * 0.0011))); orbit.want = null; }, { passive: false });
+cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.zoomBy(e.deltaY); orbit.want = null; }, { passive: false });
 addEventListener('keydown', (e) => { if (e.code === 'KeyH' && !e.target.closest('input,select')) document.querySelectorAll('[data-window]').forEach((p) => p.classList.toggle('hidden-panel')); });
 
 /* ---------------- loop ---------------- */
@@ -291,7 +292,7 @@ function frame(now) {
     if (orbit.target.distanceTo(w.target) < 0.05 && Math.abs(w.dist - orbit.dist) < 0.05) orbit.want = null;
   }
   const c = Math.cos(orbit.pitch);
-  camera.position.set(orbit.target.x + Math.sin(orbit.yaw) * c * orbit.dist, orbit.target.y + Math.sin(orbit.pitch) * orbit.dist, orbit.target.z + Math.cos(orbit.yaw) * c * orbit.dist);
+  orbit.position(camera);
   camera.position.y = Math.max(camera.position.y, onLand ? 0.3 : -S.depth + 2);
   camera.lookAt(orbit.target);
   // under the surface: blue-green murk instead of the sky's haze

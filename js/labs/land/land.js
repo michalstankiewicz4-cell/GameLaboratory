@@ -16,6 +16,7 @@ import { createStage } from '../shared/stage.js';
 import { worldFor, PLANETS } from '../../envs/land/planet.js';
 import { loadSpace, spaceReady } from '../../scene/space.js';
 import { attachWeatherCycle } from '../shared/weather-cycle-ui.js';
+import { createOrbit } from '../shared/orbit.js';
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
@@ -272,7 +273,7 @@ fillLand(); onAssetsChange(() => fillLand($('landList').value));
 $('copy').onclick = async () => { try { await navigator.clipboard.writeText(JSON.stringify(S.map, null, 1)); $('copied').textContent = 'Copied. Paste it into the chat to keep this map.'; } catch { $('copied').textContent = 'Clipboard blocked by the browser.'; } };
 
 /* ---------------- cameras ---------------- */
-const orbit = { yaw: 2.6, pitch: 0.16, dist: 190 };
+const orbit = createOrbit({ yaw: 2.6, pitch: 0.16, dist: 190 , pitchMin: -0.05, pitchMax: 1.45, distMin: 30, distMax: 9000, rot: 0.005, tilt: 0.004, zoom: 0.0011 });
 const free = { pos: new THREE.Vector3(), yaw: 0, pitch: -0.25 };
 let camMode = 'Chase';
 const CAMS = { Chase: { yaw: 2.6, pitch: 0.16, dist: 190 }, Bridge: { yaw: 0, pitch: 0, dist: 0 }, Overview: { yaw: 2.2, pitch: 0.75, dist: 2600 }, 'Free flight': null };
@@ -300,9 +301,9 @@ cv.addEventListener('pointerup', () => { drag = null; });
 cv.addEventListener('pointermove', (e) => {
   if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY;
   if (camMode === 'Free flight') { free.yaw -= dx * 0.004; free.pitch = Math.max(-1.45, Math.min(1.2, free.pitch - dy * 0.004)); }
-  else { orbit.yaw -= dx * 0.005; orbit.pitch = Math.max(-0.05, Math.min(1.45, orbit.pitch + dy * 0.004)); }
+  else { orbit.rotate(dx, dy); }
 });
-cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.dist = Math.min(9000, Math.max(30, orbit.dist * Math.exp(e.deltaY * 0.0011))); }, { passive: false });
+cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.zoomBy(e.deltaY); }, { passive: false });
 
 /* ---------------- loop ---------------- */
 function resize() { renderer.setSize(VS().w, VS().h, false); camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix(); look.resize(VS().w, VS().h); }
