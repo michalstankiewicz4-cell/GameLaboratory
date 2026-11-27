@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.113.17 — 2026-11-27 (cienie: słabsze u góry i z lewej)
+
+### Zmienione
+- Cienie paneli (`--shadow`, `--shadowHi`, `--shadowBig`, Dzień i Noc): u góry i z lewej o połowę słabsze, na dole
+  i z prawej jak dotąd — światło jak z lewej u góry. Przesunięte w prawo i w dół, ściągnięte ujemnym rozmyciem;
+  wartości dobrane pomiarem (suma przyciemnienia tła przy każdej krawędzi: góra i lewa ≈ 50 % poprzedniej, dół
+  i prawa ≈ 100 %).
+
 ## Program 0.113.16 — 2026-11-27 (mocniejsze cienie paneli)
 
 ### Zmienione
