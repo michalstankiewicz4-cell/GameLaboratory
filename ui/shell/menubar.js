@@ -98,9 +98,10 @@ const me = all.find((x) => x.file === PAGE) || null;
 
 // styles: ui/shell/menubar.css and ui/shell/console.css come with the page (ui/ui.css; the start page links them), so the
 // bar is drawn at once with everything else — a sheet added from here arrived late and the bar showed after the page's bars.
-// the console window and its button on the bar (ui/shell/console.js, its sheet ui/shell/console.css), on every page
+// the console window and its button on the bar (ui/shell/console.js, its sheet ui/shell/console.css), on every lab and
+// tool page — not on the start page (the log, window.LabLog, still keeps its entries there)
 {
-  const cj = document.createElement("script"); cj.src = ROOT + "ui/shell/console.js"; document.head.appendChild(cj);
+  if (!START) { const cj = document.createElement("script"); cj.src = ROOT + "ui/shell/console.js"; document.head.appendChild(cj); }
   // back / forward at the start of the toolbar (ui/shell/nav.js), on every page
   const nj = document.createElement("script"); nj.src = ROOT + "ui/shell/nav.js"; document.head.appendChild(nj);
 }
@@ -396,7 +397,7 @@ themeBtn.addEventListener("click", () => setTheme(themeNow() === "day" ? "night"
 themeIcon();
 bar.appendChild(themeBtn);
 // the start page has no bars (ui/pages/start.css): the menu bar is a small cluster at the top right — the language,
-// Help, day / night, the console (the logo, Tools, Scenes and the version are on the page itself; OPTIONS in the labs)
+// Help, day / night (the logo, Tools, Scenes and the version are on the page itself; OPTIONS and the console in the labs)
 if (START) {
   bar.classList.add("lmStart");
   // round icon buttons, each with its tooltip
@@ -414,11 +415,6 @@ if (START) {
   bar.insertBefore(lang, bar.querySelector('.lmTop[data-menu="help"]'));
   iconBtn(bar.querySelector('.lmTop[data-menu="help"] > button'), ICO("M9 16.2A7.2 7.2 0 1 0 9 1.8a7.2 7.2 0 0 0 0 14.4ZM6.9 6.9a2.2 2.2 0 1 1 3 2c-.6.3-.9.8-.9 1.4v.4M9 13v.1"), t("Help", "Pomoc"));
   themeBtn.classList.add("lmIcon");
-  const con = el("button", "lmCon"); con.type = "button";
-  iconBtn(con, ICO("M2.5 3.5h13v11h-13ZM5.5 7.5l2.2 1.8-2.2 1.8M9.5 11.2h3"), t("Console — the page's log: errors, warnings, loading", "Konsola — dziennik strony: błędy, ostrzeżenia, ładowanie"));
-  con.addEventListener("click", () => { if (window.LabConsole && window.LabConsole.toggle) window.LabConsole.toggle(); });
-  addEventListener("labconsole:show", (e) => con.classList.toggle("on", !!e.detail));
-  bar.appendChild(con);
 }
 function closeAll() { bar.querySelectorAll(".lmTop.open").forEach((t) => t.classList.remove("open")); }
 document.addEventListener("pointerdown", (e) => { if (!bar.contains(e.target)) closeAll(); });

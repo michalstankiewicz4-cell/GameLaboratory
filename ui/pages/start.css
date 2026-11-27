@@ -5,8 +5,8 @@
 @font-face{ font-family:"Space Grotesk"; font-weight:300 700; src:url(../../fonts/space-grotesk-var-latin.woff2) format("woff2"); }
 @font-face{ font-family:"IBM Plex Mono"; font-weight:400; src:url(../../fonts/ibm-plex-mono-400-latin.woff2) format("woff2"); }
 :root{ --lab:var(--accent); --tool:var(--cat-ui); --game:var(--cat-world); --sideW:236px; --sideGap:16px; scroll-padding-top:20px;
-  /* no menu bar, toolbar or info bar here: the side column runs from top to bottom, the menu bar is a cluster at the
-     top right (ui/shell/menubar.css, #labMenu.lmStart); the console docks at the very bottom */
+  /* no menu bar, toolbar, info bar or console here: the side panel runs from top to bottom, the menu bar is a few icon
+     buttons at the top right (ui/shell/menubar.css, #labMenu.lmStart) */
   --menuH:0px; --barH:0px; --footH:0px; }
 *{ box-sizing:border-box; }
 html,body{ margin:0; min-height:100%; background:var(--bg); color:var(--text); font:15px/1.5 var(--font); }
@@ -147,8 +147,3 @@ h2::after{ order:1; }
 .tag.tool{ color:var(--tool); border-color:color-mix(in srgb, var(--tool) 40%, transparent); background:color-mix(in srgb, var(--tool) 8%, transparent); }
 @media (max-width:900px){ .side{ display:none; } main{ padding-inline-start:28px; } .hero{ grid-template-columns:1fr; } .hero .pic{ min-height:180px; } }
 @media (max-width:600px){ h1{ font-size:32px; } main{ padding:64px 16px 50px; } .hero .txt{ padding:24px 20px; } }
-/* the console docked at the bottom (ui/shell/console.css): from the side column's edge, not the screen's */
-body:has(> .side) .labConsole.lcDocked{ inset-inline-start:calc(var(--sideW) + 2 * var(--sideGap)) !important; }
-@media (max-width:900px){ body:has(> .side) .labConsole.lcDocked{ inset-inline-start:0 !important; } }
-/* the floating console opens under the menu cluster (ui/shell/console.js places it at --menuH + --barH + 8 px) */
-.labConsole{ --menuH:64px; }

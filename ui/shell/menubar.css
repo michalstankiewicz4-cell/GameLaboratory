@@ -121,8 +121,8 @@
 #lmDialog .lmThanks { display: inline-flex; align-items: center; gap: 8px; }
 #lmDialog .lmThanks img { flex: none; }
 /* the start page (no bars): the menu bar is a few round icon buttons at the top right, each with a tooltip and a light
-   shadow — the language, Help, day / night, the console (ui/shell/menubar.js); the logo, Tools, Scenes and the version
-   are on the page itself, OPTIONS in the labs */
+   shadow — the language, Help, day / night (ui/shell/menubar.js); the logo, Tools, Scenes and the version are on the
+   page itself, OPTIONS and the console in the labs */
 #labMenu.lmStart { left: auto; right: auto; inset-inline-end: 20px; top: 16px; height: 40px; padding: 0; gap: 10px; border: 0; background: none;
   box-shadow: none; }
 #labMenu.lmStart :is(.lmHome, .lmVer, .lmTop[data-menu="options"], .lmTop[data-menu="tools"], .lmTop[data-menu="scenes"]) { display: none; }
@@ -131,7 +131,6 @@
   box-shadow: var(--shadowSoft); cursor: pointer; transition: color .15s, border-color .15s, background .15s; }
 #labMenu.lmStart .lmIcon svg { width: 19px; height: 19px; display: block; }
 #labMenu.lmStart .lmIcon:hover, #labMenu.lmStart .lmTop.open > button.lmIcon { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); background: var(--card); }
-#labMenu.lmStart .lmCon.on { color: var(--accent); border-color: var(--accent); background: var(--accentSoft); }
 /* the language's code on its globe, a small chip at the lower right */
 #labMenu.lmStart .lmLangCode { position: absolute; inset-inline-end: -4px; bottom: -3px; padding: 1px 4px; border-radius: 6px; background: var(--accent);
   color: var(--onAccent); font: 600 9px/1.2 var(--mono); letter-spacing: .3px; }
