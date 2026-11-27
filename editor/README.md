@@ -17,7 +17,7 @@ dostosowywać (zasoby z nazwą, wspólne zachowania).
   (przycisk **Badaj** na pasku; kafelek „Lekarz sceny” na stronie startowej otwiera edytor z tym oknem, `editor/index.html?doctor`: problemy w scenie i poprawki, `docs/scene/doctor.md`), **Kamera**,
   **Wydajność**; OPCJE → Okna. **Okna | Panele** na pasku (domyślnie Panele): w Panelach okna są panelami przy krawędziach, konsola na dole
   pośrodku, a widok 3D zajmuje wolny środek (`body.viewFits`).
-- Pasek narzędzi: cofnij · domek · ponów (przeglądarka), **▶ Graj / ■ Stop**, **Cofnij / Ponów** (zmiany sceny), uchwyt **Przesuń / Obróć / Skaluj**, **Nowa**, **Zapisz plik**, **Otwórz plik**.
+- Pasek narzędzi: cofnij · domek · ponów (przeglądarka), **▶ Graj / ■ Stop**, **Cofnij / Ponów** (zmiany sceny), uchwyt **Przesuń / Obróć / Skaluj**, **Nowa**, **Zapisz plik**, **Otwórz plik**, **Sceny…** (gotowe sceny z `editor/js/scenes/`: wybór wczytuje scenę jak plik, zastępując obecną — można cofnąć; na razie **Port (testowa)**, ta sama co pierwsza scena przy pustej pamięci przeglądarki).
 - Klawisze: Ctrl+Z — cofnij, Ctrl+Y / Ctrl+Shift+Z — ponów; W / E / R — przesuń, obróć, skaluj; Delete — usuń; Ctrl+D — powiel; F — pokaż wybrany; Esc — środowisko;
   H — chowa okna. Kliknięcie modelu wybiera go.
 - **Graj** (P; Esc — Stop): zachowania ruszają modele (okręty płyną i kołyszą się na falach, samolot lata), gracz steruje
@@ -65,6 +65,8 @@ editor/
   js/play/play.js       gra: zachowania w ruchu, gracz, kamera za graczem, linia stanu
   js/play/gameui-play.js UI gry sceny (env.ui) w ▶ Graj: nakładka, stan gracza, zdarzenia, Esc
   js/play/input.js      klawiatura gracza → sterowanie (dźwignia maszyn / gazu, stery, podwozie, klapy)
+  js/scenes/            gotowe sceny (lista Sceny… na pasku): scenes.js — rejestr (id, funkcja budująca dane sceny), harbour.js — Port;
+                        nowa scena = plik + wpis w scenes.js + tekst scenes.<id> w en.js i pl.js
   js/i18n/              en.js, pl.js, i18n.js (klasyczne skrypty przed ui/shell/windows.js)
   README.md, CHANGELOG.md
 ```

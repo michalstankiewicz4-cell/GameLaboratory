@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Edytor sceny 0.57.0 — 2026-11-27 (gotowe sceny)
+
+### Dodane
+- Edytor sceny: lista **Sceny…** na pasku — gotowe sceny wczytywane jak plik (`editor/js/scenes/`); na razie Port
+  (testowa). Szczegóły: `editor/CHANGELOG.md`.
+
 ## Program 0.109.0 · mechanika 1.0.0 · doktor modeli 1.9.0 — 2026-11-27 (laboratorium mechaniki z Tornado.io)
 
 ### Dodane

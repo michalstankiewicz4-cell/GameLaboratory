@@ -1,4 +1,5 @@
-// Pasek narzędzi (Graj / Stop, cofnij / ponów, uchwyt, nowa scena, zapis i odczyt pliku) i klawisze edytora.
+// Pasek narzędzi (Graj / Stop, cofnij / ponów, uchwyt, nowa scena, zapis i odczyt pliku, gotowe sceny) i klawisze edytora.
+import { SCENES } from '../scenes/scenes.js';
 const $ = (id) => document.getElementById(id);
 const { t } = window.EditorI18n;
 
@@ -14,6 +15,14 @@ export function createToolbar(store, controls, actions) {
     actions.status(t('status.saved'));
   });
   $('loadFile').addEventListener('click', () => $('fileIn').click());
+  // gotowe sceny (editor/js/scenes/): wybór wczytuje scenę jak plik; lista wraca do „Sceny…”
+  const list = $('sceneList');
+  for (const sc of SCENES) { const o = document.createElement('option'); o.value = sc.id; o.textContent = t('scenes.' + sc.id); list.append(o); }
+  list.addEventListener('change', () => {
+    const sc = SCENES.find((x) => x.id === list.value); list.value = ''; list.blur(); if (!sc) return;
+    const name = t('scenes.' + sc.id);
+    actions.build(() => { store.load(sc.build(name)); controls.frameAll(); }); actions.status(t('status.sceneLoaded', { name }));
+  });
   // cofnij / ponów: przyciski aktywne, gdy jest co cofać
   $('undo').addEventListener('click', actions.undo); $('redo').addEventListener('click', actions.redo);
   const histState = () => { const p = actions.play.playing; $('undo').disabled = p || !store.canUndo; $('redo').disabled = p || !store.canRedo; };
@@ -24,7 +33,7 @@ export function createToolbar(store, controls, actions) {
   actions.play.onChange((on) => {
     playBtn.textContent = t(on ? 'bar.stop' : 'bar.play'); playBtn.title = t(on ? 'bar.stop.tip' : 'bar.play.tip'); playBtn.classList.toggle('on', on);
     histState();
-    document.querySelectorAll('#mode button, #newScene, #saveFile, #loadFile, #treeWin :is(input, select, button), #propsWin :is(input, select, button)').forEach((b) => { b.disabled = on; });
+    document.querySelectorAll('#mode button, #newScene, #saveFile, #loadFile, #sceneList, #treeWin :is(input, select, button), #propsWin :is(input, select, button)').forEach((b) => { b.disabled = on; });
   });
   $('fileIn').addEventListener('change', async () => {
     const f = $('fileIn').files[0]; $('fileIn').value = ''; if (!f) return;

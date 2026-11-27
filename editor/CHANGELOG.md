@@ -3,6 +3,13 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.57.0 — 2026-11-27
+
+### Dodane
+- **Sceny…** na pasku narzędzi: gotowe sceny (`editor/js/scenes/`), wybór wczytuje scenę jak plik (zastępuje obecną,
+  można cofnąć). Pierwsza: **Port (testowa)** — ta sama scena, którą edytor tworzy przy pustej pamięci przeglądarki
+  (teraz z `editor/js/scenes/harbour.js`). Kolejne (tornado z miastem, układ silnika) dojdą z ich modelami.
+
 ## 0.56.0 — 2026-11-26
 
 ### Dodane

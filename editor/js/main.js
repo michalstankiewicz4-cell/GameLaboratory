@@ -18,22 +18,17 @@ import { musicNames } from '../../js/scene/music.js';
 import { createSoundRange } from './world/sound-range.js';
 import { createDoctorPanel } from './ui/doctor-panel.js';
 import { onAssetsChange, listAssets, ASSET_KINDS } from '../../js/scene/assets.js';
-import { emptyScene, makeObject } from '../../js/scene/scene-data.js';
 import { prefab, PREFABS } from '../../js/scene/prefabs.js';
 import { loadSpace, spaceReady, skyPresets } from '../../js/scene/space.js';
+import { harbour } from './scenes/harbour.js';
 
 const { t } = window.EditorI18n;
 const $ = (id) => document.getElementById(id);
 const step = (n, f) => window.LabLoad && window.LabLoad.step(n, f);
 const status = (s) => { $('status').textContent = s || ''; };
 
-// pierwsza scena (pusta pamięć przeglądarki): dwa okręty na morzu, żeby było co oglądać
-function firstScene() {
-  const s = emptyScene(t('scene.startName'));
-  s.objects.push(makeObject('sea/blyskawica', 'ORP Błyskawica', [0, 0, 0]));
-  const b = makeObject('sea/orzel', 'ORP Orzeł', [45, 0, -30]); b.rot = [0, 20, 0]; s.objects.push(b);
-  return s;
-}
+// pierwsza scena (pusta pamięć przeglądarki): gotowa scena „Port” (editor/js/scenes/), żeby było co oglądać
+const firstScene = () => harbour(t('scene.startName'));
 
 step(t('load.renderer'), 0.1);
 const store = createStore(firstScene);
