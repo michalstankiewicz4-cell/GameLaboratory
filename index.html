@@ -134,6 +134,45 @@ const phrase = (w) => (PL ? w : PHRASE_EN[w] || w);
 const STATUS = { tool: tr("Tool", "Narzędzie") };
 const catName = (id) => { const c = (CAT.cats || {})[id]; return c ? (PL ? c.namePl : c.name) : ""; };
 const LABS = window.LabMenu.ITEMS.LABS.filter((l) => !l.page || l.art), TOOLS = window.LabMenu.ITEMS.TOOLS;   // another page of a lab gets a tile when it has its own picture
+// ---------- the tiles' tip: a card beside the tile under the pointer (or in focus) with what the square tile leaves out ----------
+const TIPS = new WeakMap();
+const tipEl = document.createElement("div"); tipEl.className = "tileTip"; tipEl.setAttribute("role", "tooltip"); document.body.appendChild(tipEl);
+let tipFor = null, tipTimer = 0;
+function tipShow(t) {
+  const d = TIPS.get(t); if (!d) return;
+  tipFor = t; tipEl.textContent = "";
+  const add = (cls, text, parent = tipEl) => { const e = document.createElement("div"); e.className = cls; if (text != null) e.textContent = text; parent.appendChild(e); return e; };
+  add("tt-name", d.name);
+  if (d.file) add("tt-file", d.file);
+  if (d.desc) add("tt-desc", d.desc);
+  if (d.cat || d.kit || d.kind) {
+    const m = add("tt-meta");
+    if (d.cat) { const c = add("tt-cat", null, m); c.dataset.cat = d.cat; const i = document.createElement("i"); c.append(i, document.createTextNode(catName(d.cat))); }
+    if (d.kind) add("tt-tag", d.kind, m);
+    if (d.kit) add("tt-tag", d.kit, m);
+  }
+  if (d.phrases && d.phrases.length) { const p = add("tt-phrases"); for (const w of d.phrases) add("tt-phrase", w, p); }
+  if (d.go) add("tt-go", d.go);
+  // beside the tile: on the right, or on the left when there is no room; level with its top, kept on the screen
+  tipEl.classList.add("on");
+  const r = t.getBoundingClientRect(), w = tipEl.offsetWidth, h = tipEl.offsetHeight, gap = 10;
+  let x = r.right + gap; if (x + w > innerWidth - 8) x = r.left - gap - w; if (x < 8) x = Math.max(8, Math.min(innerWidth - w - 8, r.left));
+  let y = Math.max(8, Math.min(innerHeight - h - 8, r.top));
+  if (x === r.left || (x > r.left - w && x < r.right)) y = r.bottom + gap + h < innerHeight ? r.bottom + gap : Math.max(8, r.top - gap - h);   // over or under, when not beside
+  tipEl.style.left = Math.round(x) + "px"; tipEl.style.top = Math.round(y) + "px";
+}
+function tipHide() { clearTimeout(tipTimer); tipFor = null; tipEl.classList.remove("on"); }
+document.addEventListener("pointerover", (e) => {
+  const t = e.target.closest && e.target.closest(".tile");
+  if (t === tipFor) return;
+  clearTimeout(tipTimer);
+  if (!t || !TIPS.has(t) || document.body.classList.contains("reordering")) { tipHide(); return; }
+  tipTimer = setTimeout(() => tipShow(t), tipFor ? 0 : 280);   // a short wait; moving from tile to tile shows the next at once
+});
+document.addEventListener("pointerleave", tipHide);
+document.addEventListener("focusin", (e) => { const t = e.target.closest && e.target.closest(".tile"); if (t && TIPS.has(t)) tipShow(t); else tipHide(); });
+addEventListener("scroll", tipHide, { passive: true });
+document.addEventListener("pointerdown", tipHide);
 function tile(item) {
   const a = document.createElement("a"), art = ART[item.file], info = INFO[item.file] || ["", "lab", ""];
   a.className = "tile"; a.href = window.LabMenu.ROOT + item.file;
@@ -162,11 +201,10 @@ function tile(item) {
   }
   const ph = a.querySelector(".phrases");
   for (const w of PHRASES[item.file] || []) { const e = document.createElement("span"); e.className = "phrase"; e.textContent = phrase(w); ph.appendChild(e); }
-  // a square tile shows its picture and name; the rest is its tooltip: the file and version, the description, the
-  // category and kit, the phrases
-  a.title = [item.name, a.querySelector(".file").textContent, a.querySelector(".desc").textContent,
-    [item.cat ? catName(item.cat) : "", info[2]].filter(Boolean).join(" · "),
-    (PHRASES[item.file] || []).map(phrase).join(", ")].filter(Boolean).join("\n");
+  // a square tile shows its picture and name; the rest is its tip (below, tileTip): the file and version, the
+  // description, the category and kit, the phrases
+  TIPS.set(a, { name: item.name, file: a.querySelector(".file").textContent, desc: a.querySelector(".desc").textContent,
+    cat: item.cat, kit: info[2], kind: STATUS[info[1]] || "", phrases: (PHRASES[item.file] || []).map(phrase) });
   return a;
 }
 // a category's chip under the pointer lights up every tile of that category
@@ -288,7 +326,7 @@ function sceneCards() {
     a.querySelector(".name span").textContent = PL ? sc.namePl || sc.name : sc.name;
     a.querySelector(".desc").textContent = PL ? sc.descPl || sc.desc : sc.desc;
     a.querySelector(".go").textContent = tr("Open in the editor →", "Otwórz w edytorze →");
-    a.title = [a.querySelector(".name span").textContent, a.querySelector(".desc").textContent, a.querySelector(".go").textContent].join("\n");
+    TIPS.set(a, { name: a.querySelector(".name span").textContent, desc: a.querySelector(".desc").textContent, go: a.querySelector(".go").textContent });
     box.appendChild(a);
   }
 }

@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.116.1 — 2026-11-27 (strona startowa: własna podpowiedź kafelka)
+
+### Zmienione
+- Podpowiedź kafelka to własna karta zamiast dymka przeglądarki: nazwa, plik i wersja, pełny opis, kategoria (w jej
+  kolorze), rodzaj i kit, frazy jako plakietki; na scenach — „Otwórz w edytorze →”. Pokazuje się obok kafelka (z prawej,
+  a gdy brak miejsca — z lewej), po krótkiej chwili; przechodząc z kafelka na kafelek — od razu; także przy fokusie
+  z klawiatury. Znika przy przewijaniu, kliknięciu i przeciąganiu kafelków.
+
 ## Program 0.116.0 — 2026-11-27 (strona startowa: kwadratowe kafelki)
 
 ### Zmienione
