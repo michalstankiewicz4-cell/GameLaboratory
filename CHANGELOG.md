@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.115.0 — 2026-11-27 (strona startowa: wyszukiwanie u góry)
+
+### Dodane
+- Strona startowa: pasek wyszukiwania u góry, obok przycisków-ikon (jak na zrzucie Canvas) — szuka w nazwach, opisach
+  (po polsku i angielsku), frazach i plikach laboratoriów i narzędzi oraz w nazwach i opisach scen; pierwszy wynik
+  przewija się w widok. Zastępuje pole wyszukiwania pod nagłówkiem Laboratoria (frazy zostają tam). Strona przewija
+  się pod pasem tła, więc nic nie prześwituje za paskiem i ikonami.
+
 ## Program 0.114.5 — 2026-11-27 (strona startowa bez konsoli)
 
 ### Zmienione

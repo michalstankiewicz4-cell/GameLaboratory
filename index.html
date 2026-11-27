@@ -78,6 +78,7 @@
   <div class="sideLabel" data-pl="Kategorie">Categories</div>
   <div class="sideCats" id="sideCats"></div>
 </aside>
+<label class="topSearch" for="fSearch"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M8 13.5A5.5 5.5 0 1 0 8 2.5a5.5 5.5 0 0 0 0 11ZM12 12l3.8 3.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><input id="fSearch" type="search" autocomplete="off"></label>
 <main id="top">
   <section class="hero">
     <div class="txt">
@@ -101,7 +102,7 @@
   <h2 id="scenesSec" data-pl="Sceny">Scenes</h2>
   <div class="grid" id="scenes"></div>
   <h2 id="labsSec" data-pl="Laboratoria">Laboratories</h2>
-  <div class="filter" id="filter"><input id="fSearch" type="search" autocomplete="off"><div class="chips" id="fChips"></div></div>
+  <div class="filter" id="filter"><div class="chips" id="fChips"></div></div>
   <div class="noMatch" id="noMatch" hidden></div>
   <div class="grid" id="labs"></div>
   <h2 id="toolsSec" data-pl="Narzędzia">Tools</h2>
@@ -276,7 +277,7 @@ const SCENES = CAT.scenes || [];
 function sceneCards() {
   const box = document.getElementById("scenes"); box.textContent = "";
   for (const sc of SCENES) {
-    const a = document.createElement("a"); a.className = "tile scene"; a.href = window.LabMenu.ROOT + "editor/index.html?scene=" + encodeURIComponent(sc.id);
+    const a = document.createElement("a"); a.className = "tile scene"; a.dataset.scene = sc.id; a.href = window.LabMenu.ROOT + "editor/index.html?scene=" + encodeURIComponent(sc.id);
     a.innerHTML = '<div class="art"><img alt="" loading="lazy"></div><div class="body"><div class="name"><span></span></div><div class="desc"></div><span class="go"></span></div>';
     a.querySelector("img").src = window.LabMenu.ROOT + sc.img;
     a.querySelector(".name span").textContent = PL ? sc.namePl || sc.name : sc.name;
@@ -332,7 +333,9 @@ document.querySelector('#sideNav a[href="#top"]').addEventListener("click", home
 const chosen = new Set();
 let showAll = false;
 const fSearch = document.getElementById("fSearch"), fChips = document.getElementById("fChips"), noMatch = document.getElementById("noMatch");
-fSearch.placeholder = tr("Search the labs…", "Szukaj laboratoriów…");
+// the search at the top: names, descriptions (both languages), phrases and files of the labs and tools, and the scenes
+fSearch.placeholder = tr("Search labs, tools, scenes…", "Szukaj laboratoriów, narzędzi, scen…");
+fSearch.setAttribute("aria-label", tr("Search", "Szukaj"));
 const fold = (x) => x.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ł/g, "l");
 function counts() {
   const c = new Map();
@@ -367,6 +370,14 @@ function applyFilter() {
     const ok = (!catOn || (it && it.cat === catOn)) && [...chosen].every((w) => ph.includes(w)) && words.every((w) => text.includes(w));
     t.classList.toggle("out", !ok); if (ok) shown++;
   });
+  // the scenes: by the words typed only (they have no category or phrases)
+  let scenesShown = 0;
+  document.querySelectorAll("#scenes .tile").forEach((t) => {
+    const sc = SCENES.find((x) => x.id === t.dataset.scene) || {};
+    const ok = words.every((w) => fold([sc.name, sc.namePl, sc.desc, sc.descPl, sc.id].join(" ")).includes(w));
+    t.classList.toggle("out", !ok); if (ok) scenesShown++;
+  });
+  const sg = document.getElementById("scenes"); sg.style.display = scenesShown ? "" : "none"; sg.previousElementSibling.style.display = scenesShown ? "" : "none";
   const active = chosen.size || words.length || catOn;
   noMatch.hidden = !active || shown > 0;
   noMatch.textContent = tr("No lab matches — clear the filter.", "Żadne laboratorium nie pasuje — wyczyść filtr.");
@@ -374,7 +385,15 @@ function applyFilter() {
   const tools = document.getElementById("tools"), anyTool = !!tools.querySelector(".tile:not(.out)");
   tools.style.display = anyTool ? "" : "none"; tools.previousElementSibling.style.display = anyTool ? "" : "none";
 }
-fSearch.addEventListener("input", () => { chips(); applyFilter(); });
+fSearch.addEventListener("input", () => {
+  chips(); applyFilter();
+  // typing at the top: the first thing found comes into view (its section's heading at the top), unless it already is
+  if (!fSearch.value.trim()) return;
+  const first = document.querySelector("#scenes .tile:not(.out), #labs .tile:not(.out), #tools .tile:not(.out)");
+  if (!first) { document.getElementById("labsSec").scrollIntoView({ behavior: "smooth" }); return; }
+  const r = first.getBoundingClientRect();
+  if (r.top < 84 || r.bottom > innerHeight) first.parentElement.previousElementSibling.scrollIntoView({ behavior: "smooth" });
+});
 chips();
 render();
 

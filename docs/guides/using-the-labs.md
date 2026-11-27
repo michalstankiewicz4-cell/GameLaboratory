@@ -8,8 +8,9 @@ It covers the labs that came from Battle; every other lab (and the scene editor)
 
 ## Opening the labs
 
-- **Online:** <https://michalstankiewicz4-cell.github.io/GameLaboratory/> (the start page: a side column with the sections and the categories as
-  badges that filter the labs, the ready scenes, every lab and tool). **SCENES** in the menu bar opens the scene editor
+- **Online:** <https://michalstankiewicz4-cell.github.io/GameLaboratory/> (the start page: a side panel with the sections and the categories as
+  badges that filter the labs, a search at the top that looks in names and descriptions, the ready scenes, every lab
+  and tool). **SCENES** in the menu bar opens the scene editor
   with a ready scene.
 - **Locally:** in the repository folder run `python3 -m http.server 8000` (Windows: `py -m http.server 8000`) and open `http://localhost:8000/`
   (pages are ES modules: opening the file directly from disk does not work).
