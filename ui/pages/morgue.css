@@ -7,4 +7,4 @@
 .sheet dt{color:var(--dim)} .sheet dd{margin:0;color:var(--head)}
 .swatches{display:flex;gap:2px;margin-top:10px}
 .swatches span{width:18px;height:18px;border-radius:2px}
-.err{color:#e04b50}
+.err{color:var(--err)}

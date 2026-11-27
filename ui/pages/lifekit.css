@@ -1,4 +1,5 @@
-/* The life lab (labs/life.html): its own rules, on top of ui/ui.css and ui/style/space.css. */
+/* The labs on LifeKit — life (labs/life.html) and human (labs/human.html): their shared rules, on top of ui/ui.css and
+   ui/style/space.css (the two pages had the same sheet twice). */
 #creTabs{ display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:6px; }
 #creTabs .tBtn{ height:28px; }
 #creTabs .creGroup{ grid-column:1 / -1; font-size:11px; letter-spacing:1.4px; color:var(--dim); text-transform:uppercase; margin-top:4px; }

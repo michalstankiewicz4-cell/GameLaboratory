@@ -82,7 +82,7 @@
 #lmDialog .lmBox.lmWide { width: min(980px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto; }
 #lmDialog .emMap { display: flex; flex-direction: column; gap: 0; font-size: 12.5px; }
 #lmDialog .emTop { display: flex; align-items: center; gap: 8px; }
-#lmDialog .emNode { display: flex; flex-direction: column; gap: 3px; padding: 7px 9px; border: 1px solid var(--line2); border-radius: var(--r2); background: var(--field); }
+#lmDialog .emNode { position: relative; display: flex; flex-direction: column; gap: 3px; padding: 7px 9px; border: 1px solid var(--line2); border-radius: var(--r2); background: var(--field); }
 #lmDialog .emNode b { color: var(--head); font-weight: 600; }
 #lmDialog .emNode span { color: var(--dim); font-size: 11.5px; line-height: 1.35; }
 #lmDialog .emInput { width: 128px; flex: none; }
@@ -92,7 +92,6 @@
 #lmDialog .emPipe { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
 #lmDialog .emPipe .emNode { flex: 1 1 0; min-width: 72px; }
 #lmDialog .emScreen { border-style: dashed; }
-#lmDialog .emSide { align-self: flex-end; color: var(--dim); font-family: var(--mono); font-size: 11.5px; }
 #lmDialog .emFlow { color: var(--accent); text-align: center; font-size: 11.5px; }
 #lmDialog .emScene { border-color: var(--accent); background: var(--card); align-items: center; text-align: center; padding: 10px 14px; }
 #lmDialog .emScene b { color: var(--accent); letter-spacing: .08em; }
@@ -103,7 +102,6 @@
 #lmDialog .emDown { color: var(--accent); text-align: center; font-size: 11.5px; margin: 4px 0 6px 136px; }
 #lmDialog .emOver { display: grid; grid-template-columns: 3fr 1fr; gap: 6px; }
 #lmDialog .emUi { border-color: var(--accent); }
-#lmDialog .emNode { position: relative; }
 #lmDialog .emNode.st-part { border-style: dashed; }
 #lmDialog .emNode.st-plan { border-style: dotted; opacity: .72; }
 #lmDialog .emSt { order: -1; font-style: normal; line-height: 1; font-size: 10px; color: var(--dim); font-family: var(--mono); }

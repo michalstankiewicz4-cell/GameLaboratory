@@ -7,7 +7,7 @@ a{color:var(--rot)}
 .panel h2{display:flex;align-items:center;gap:10px;font-size:20px;color:var(--fg);margin:0}
 .num{display:inline-grid;place-items:center;width:28px;height:28px;background:var(--rot);color:var(--bg);font-size:16px}
 h3{font-family:var(--display);font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:6px 0 0;font-weight:500}
-.btn{font-family:var(--display);font-size:16px;letter-spacing:.04em;padding:10px 14px;background:var(--rot);color:var(--bg);cursor:pointer;box-shadow:0 4px 0 #5d6a3f}
+.btn{cursor:pointer;font-family:var(--body);font-size:13px;letter-spacing:0;padding:6px 12px;background:var(--field);color:var(--rot);border:1px solid var(--rot);border-radius:var(--r2);box-shadow:none}
 .ghost{cursor:pointer}
 .datarow{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:center}
 .dataactions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
@@ -101,6 +101,5 @@ footer{margin-top:8px}
 .chatin button{font-size:15px;padding:9px 14px}
 
 /* ---- GameLaboratory: the look of the labs from Battle (tokens in ui/pages/walkers.css) ---- */
-.btn{font-family:var(--body);font-size:13px;letter-spacing:0;padding:6px 12px;background:var(--field);color:var(--rot);border:1px solid var(--rot);border-radius:var(--r2);box-shadow:none}
 .btn:active{transform:none;box-shadow:none}
 .toks .a, .msg.net{background:var(--accentSoft)}

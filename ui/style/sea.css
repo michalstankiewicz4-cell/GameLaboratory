@@ -2,7 +2,6 @@
    and the model doctor: the page, the top bar, the side panels, the doctor's lists. Load after ui/ui.css.
    --lab and --card2 are the old names of --accent and --field (ui/style/tokens.css). */
 :root{--card2:var(--field);--lab:var(--accent);--sea:var(--info)}
-*{box-sizing:border-box}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:14px/1.45 var(--font)}
 a{color:var(--lab)}
 button,select,input{font:inherit;color:inherit}
@@ -70,4 +69,10 @@ button,select,input{font:inherit;color:inherit}
 .minimap{display:block;width:100%;height:auto;aspect-ratio:1;border:1px solid var(--line);border-radius:8px;cursor:crosshair;image-rendering:pixelated;background:var(--bg)}
 .row input[type=number]{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:6px;padding:2px 4px;height:24px;color:inherit;font:inherit}
 .status{font-family:var(--mono);font-size:12px;color:var(--lab);min-height:16px}
-
+/* the material's maps as a grid of tiles (MatKit: the materials lab, the city lab's baked facade); a page sets the tile's
+   height (aspect-ratio or auto) */
+#maps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0}
+.mapTile{margin:0;cursor:pointer}
+.mapTile canvas{display:block;width:100%;border:1px solid var(--line);border-radius:var(--r);image-rendering:auto}
+.mapTile:hover canvas{border-color:var(--accent)}
+.mapTile figcaption{font-size:10px;color:var(--dim);text-align:center;margin-top:2px}

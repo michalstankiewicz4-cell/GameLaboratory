@@ -3,6 +3,24 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.115.5 — 2026-11-27 (przegląd CSS: powtórzenia i kolory)
+
+### Zmienione (porządek, bez zmiany wyglądu — sprawdzone porównaniem stylu każdego elementu przed i po)
+- Reguły z tym samym selektorem w jednym pliku połączone w jedną: SDF Walkers 0.23.7 (`walkers.css` — 13 reguł: dawny
+  wygląd NeuroLabPA i nadpisanie GameLaboratory w jednym miejscu), laboratorium języka 0.24.2 (`.btn`), Pixel Studio
+  1.2.1 (`.pix`, `.loader .go`), strona startowa (`h2::after`), pasek menu (`#lmDialog .emNode`); usunięta nieużywana
+  `.emSide`.
+- `* { box-sizing: border-box }` raz, w `ui/style/base.css` (było w `sea.css`, `space.css` i `start.css`).
+- Laboratoria życia 1.5.1 i człowieka 1.3.1 miały dwa identyczne arkusze — teraz jeden wspólny `ui/pages/lifekit.css`
+  (`life.css` i `human.css` usunięte).
+- Siatka map materiału (`#maps`, `.mapTile`) z laboratoriów materiałów 1.1.3 i miasta 1.3.7 — raz, w `ui/style/sea.css`.
+
+### Poprawione
+- Dzień w SDF Walkers, laboratorium języka 0.24.2 i obrazów 0.29.2: pola wyboru, suwaki i listy były ciemne (strona
+  wymuszała `color-scheme: dark`); tło karty ładowania, przycisk w oknie sieci i cień okna — z tokenów.
+- Kolory zamiast dawnego złota i wpisanych czerwieni — z tokenów: Pixel Studio 1.2.1 (ocena, wagi uwag, karta
+  ładowania), laboratorium układów 1.5.2 (obwódka etykiety), Kostnica SDF 1.1.1 (błąd).
+
 ## Program 0.115.4 — 2026-11-27 (przycisk Pomocy: kolor po najechaniu)
 
 ### Poprawione

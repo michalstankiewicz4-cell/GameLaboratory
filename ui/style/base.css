@@ -1,6 +1,7 @@
 /* GameLaboratory UI — base: thin scrollbars without arrow buttons, everywhere, in the accent (--scroll, --scrollHover).
    Chromium and Safari: the ::-webkit-scrollbar rules (no arrows). The standard scrollbar-width / scrollbar-color only
    where those do not exist (Firefox): in Chromium they would switch the ::-webkit- rules off and bring the arrows back. */
+*{box-sizing:border-box}
 @supports not selector(::-webkit-scrollbar){*{scrollbar-width:thin;scrollbar-color:var(--scroll) transparent}}
 ::-webkit-scrollbar{width:8px;height:8px}
 ::-webkit-scrollbar-track,::-webkit-scrollbar-corner{background:transparent}
