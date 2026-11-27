@@ -16,6 +16,8 @@ a{ color:inherit; }
 .side{ position:fixed; z-index:4; top:var(--sideGap); bottom:var(--sideGap); inset-inline-start:var(--sideGap); width:var(--sideW);
   display:flex; flex-direction:column; gap:4px; padding:18px 14px; overflow-y:auto; background:var(--card); border:1px solid var(--line);
   border-radius:20px; box-shadow:var(--shadow); }   /* a panel floating beside the page, like the other panels */
+/* taller than the screen: it scrolls on its own; the scrollbar keeps clear of the rounded corners */
+.side::-webkit-scrollbar-track{ margin-block:16px; }
 .brand{ display:flex; align-items:center; gap:10px; margin:0 4px 14px; text-decoration:none; }
 .brand .mark{ flex:none; width:34px; height:34px; border-radius:10px; background:conic-gradient(from 210deg, var(--info), var(--accent), var(--cat-world), var(--info)); }
 .brand b{ display:block; color:var(--head); font-size:17px; line-height:1.15; }

@@ -7,7 +7,8 @@ Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` 
 
 ### Zmienione
 - Strona startowa: lewe menu to panel — odsunięty 16 px od krawędzi ekranu, zaokrąglony, z obramowaniem i cieniem jak
-  pozostałe panele (`--sideGap`); treść i przypięta konsola zaczynają się za nim.
+  pozostałe panele (`--sideGap`); treść i przypięta konsola zaczynają się za nim. Gdy menu nie mieści się w oknie,
+  przewija się własnym paskiem, odsuniętym od zaokrąglonych rogów.
 
 ## Program 0.114.3 — 2026-11-27 (strona startowa: przyciski-ikony)
 
