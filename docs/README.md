@@ -27,6 +27,8 @@ Układ folderów jest taki sam jak w kodzie:
 | Rozbiór laboratoriów: co z każdego idzie do modeli, zachowań, środowisk i zasobów | [guides/lab-breakdown.md](guides/lab-breakdown.md) |
 | Edytor sceny („Warsztat”, `editor/index.html`): obsługa, budowa, format sceny, API dla AI | [../editor/README.md](../editor/README.md), zmiany: [../editor/CHANGELOG.md](../editor/CHANGELOG.md) |
 | Silnik sceny (`js/scene/`) | [scene/README.md](scene/README.md) |
+| Gotowe sceny edytora (Port, Tornado z miastem, Układ silnika; `editor/js/scenes/`) | [../editor/README.md](../editor/README.md) („Obsługa”, „Budowa”) |
+| Wspólne warstwy laboratoriów i silnika: scena bazowa `js/labs/shared/stage.js` (z `tornadoControl`), kamera orbitalna `js/labs/shared/orbit.js`, generatory z ziarnem `js/core/rng.js` | [scene/README.md](scene/README.md) („Scena bazowa laboratoriów”) |
 | Lekarz sceny (`js/scene/doctor.js`) | [scene/doctor.md](scene/doctor.md) |
 | Zachowania (`js/behaviors/`): okręt i mała jednostka na wodzie, jazda po lądzie, lądowanie, lot, koło na szynie, ciąg w próżni, orbita, ciecze i gaz w kosmosie, przeładowarka, przedmioty na lądzie (bryły sztywne), maszyny złomowiska, deformacja blachy, zniszczenie budynków | [behaviors/README.md](behaviors/README.md), [behaviors/deform.md](behaviors/deform.md), [behaviors/destruct.md](behaviors/destruct.md) |
 | Dźwięk silnika (`js/audio/`: mikser, MusicKit, SfxKit, VoiceKit; dźwięk w scenie `js/scene/sounds.js`, dźwięki modeli `onSound`, dźwięki UI gry) | [audio/README.md](audio/README.md) |
@@ -54,10 +56,10 @@ W kolejności kategorii z menu Narzędzia i strony startowej (`ui/data/catalog.j
 | | Budowle | `labs/structures.html` | [labs/structures.md](labs/structures.md), [labs/structures/coastal.md](labs/structures/coastal.md), [labs/structures/super300.md](labs/structures/super300.md) |
 | | Miasto (CityKit: budynki, wypalone fasady z paralaksą) | `labs/city.html`, `js/models/city/`, `js/models/houses/` | [labs/city.md](labs/city.md), [models/city.md](models/city.md), [models/houses.md](models/houses.md) |
 | | Ulice (StreetKit: przekroje, skrzyżowania, sygnalizatory, latarnie, znaki, wiadukty, tunele, kładki, parkingi) | `labs/streets.html`, `js/models/streets/` | [labs/streets.md](labs/streets.md), [models/streets.md](models/streets.md) |
-| Maszyny i mechanika | Mechanika (MechKit, ControlKit: zębatki, łańcuchy, pasy, sprzęgła, silnik, sterowanie; napęd, fizyka, obwód) | `labs/mechanics.html`, `js/models/mech/` | [labs/mechanics.md](labs/mechanics.md), [models/mech.md](models/mech.md) |
 | | Rośliny | `labs/plants.html` | [labs/plants.md](labs/plants.md) |
 | | Skały | `labs/rocks.html` | [labs/rocks.md](labs/rocks.md) |
 | | Przedmioty (złomowisko) | `labs/items.html`, `js/models/junkyard/` | [labs/items.md](labs/items.md), [models/junkyard.md](models/junkyard.md) |
+| Maszyny i mechanika | Mechanika (MechKit, ControlKit: zębatki, łańcuchy, pasy, sprzęgła, silnik, sterowanie; napęd, fizyka, obwód) | `labs/mechanics.html`, `js/models/mech/` | [labs/mechanics.md](labs/mechanics.md), [models/mech.md](models/mech.md) |
 | Życie i postacie | Życie, edytor stworów | `labs/life.html`, `labs/creator.html` | [labs/life.md](labs/life.md) |
 | | Człowiek | `labs/human.html` | [labs/human.md](labs/human.md) |
 | | Przedmioty bohatera | `labs/gear.html` | [labs/gear.md](labs/gear.md) |

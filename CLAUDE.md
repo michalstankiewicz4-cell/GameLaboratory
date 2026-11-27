@@ -24,6 +24,7 @@
 - `js/behaviors/` — zachowania (napęd i ruch) podpinane do modeli; każde deklaruje, w których środowiskach działa.
 - `ui/` — całe UI (opis: `ui/README.md`): `ui/ui.css` (jedno wejście), `ui/style/` (tokeny, czcionki, kontrolki, motywy `space.css` i `sea.css`), `ui/shell/` (dziennik, pasek menu, paski, okna, okna standardowe, wydajność, konsola, karta ładowania, przełącznik środowiska), `ui/data/` (katalog, wersje, klawiszologia `keys.js` — Pomoc → Klawiszologia; nowy skrót klawiszowy = wpis tam), `ui/pages/` (style stron).
 - `js/audio/` — dźwięk: mikser silnika `mixer.js` (szyny muzyki, otoczenia, efektów, mowy i interfejsu z głośnościami gracza `settings.audio` — Opcje → Dźwięk UI gry; dźwięk przestrzenny), MusicKit (muzyka), SfxKit `sfx/` (efekty i tła miejsc), VoiceKit `voice/` (mowa); bez plików dźwiękowych. Laboratoria: grupa dźwięku (`labs/sound.html` muzyka · `sound-effects.html` · `sound-speech.html`).
+- Wspólne pomocniki: generatory liczb z ziarnem `js/core/rng.js` (nowy kod bierze stąd; inny algorytm zmienia wygląd modeli), kamera orbitalna laboratoriów `js/labs/shared/orbit.js` (`createOrbit`), trąba sceny bazowej sterowana z laboratorium `stage.tornadoControl`.
 - `js/render/`, `js/labkit/` — wspólne warstwy. Materiały (PBR, starzenie): MatKit `js/render/materials/matkit.js`, laboratorium `labs/materials.html` — nowe materiały brać stąd.
 - `js/gameui/` — UI gry jako dane (ekrany menu, HUD, okna gry, okno dialogowe; format `gamelab-ui`), ze skórkami gier (`js/gameui/skins.js`, arkusze `js/gameui/css/`) i ich dźwiękami (`js/gameui/sounds.js`, szyna interfejsu miksera; głosy postaci w dialogu z VoiceKit) oddzielonymi od wyglądu laboratoriów; laboratorium: `labs/gameui.html` (opis `docs/labs/gameui.md`).
 - `tools/` — narzędzia (doktor modeli, kitcheck, `paths.py` — sprawdzanie ścieżek).
@@ -34,12 +35,13 @@
 
 - Fizyka jest częścią środowiska — nie ma osobnego laboratorium fizyki.
 - Trzy środowiska, każde ze swoimi prawami: próżnia (ciąg, orbity), woda (wyporność, fale, opór), ląd (grawitacja, tarcie, kontakt z podłożem, szyny).
+- Bryły sztywne na lądzie: przedmioty (`land/items.js`) i odłamki budynków (`land/destruct/`) to dwa silniki połączone `land/bodies-link.js`; jeden wspólny silnik — w planie (`TODO.md`).
 - Zachowanie testuje się w laboratorium środowiska, do którego należy (np. koło na szynie — ląd). Zachowania przechodzące między ośrodkami — przez przełącznik środowiska w laboratorium danej rodziny modeli.
 
 ## Podział materiału (decyzje)
 
 - Środowisko ląd = laboratorium lądu z Battle; woda = laboratorium wody z Battle. Ze Space (surface, marine) można uzupełnić tylko to, czego Battle nie ma.
-- Części modelu (sprężyny, podwozie, wózki, zestawy kołowe, sprzęgi) należą do modelu (`js/models/`), bo będą podłączane.
+- Części modelu (sprężyny, podwozie, wózki, zestawy kołowe, sprzęgi) należą do modelu (`js/models/`), bo będą podłączane. Zestawy z części (np. układ silnika `js/models/mech/assemblies/engine-layout/`) też są modelami; ich fizyka — zachowaniem (`js/behaviors/land/mech/engine-layout.js`). Dane materiałów modelu (wygląd, gęstość, wytrzymałość — np. `js/models/houses/materials.js`) są w modelu.
 - Tory kolejowe to modele budowli lądowych (`js/models/structures/railway/`); nabrzeża i falochrony — `structures/coastal/`, platforma — `structures/offshore/`.
 - Pociąg (TrainKit, `js/models/train/`): dane w `data.js` (wymiary, profil koła, zderzaki, sprzęgi) są wspólne dla modelu i przyszłego zachowania „koło na szynie” (środowisko ląd). Oglądany w laboratorium pojazdów. Fizyka i rozjazdy z aTrain są przeniesione jako zachowanie „koło na szynie” (`js/behaviors/rail/`: `physics.js` — obliczenia bez zmian, `rail.js` — podpięcie do modelu); sieć torowa z rozjazdami: `js/models/structures/railway/network.js`. Fizyka musi pozostać prawdziwa: żadnego przyklejania do toru ani warunków logicznych zamiast sił.
 

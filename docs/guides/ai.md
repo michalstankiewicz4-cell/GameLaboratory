@@ -66,9 +66,12 @@ Najważniejsze polecenia (pełna tabela: [`../../editor/README.md`](../../editor
 | `events [n]` | ostatnie zdarzenia szyny (akcje, efekty, wybory w dialogu) |
 
 Rodziny prefabrykatów: `sea/`, `road/`, `tram/`, `train/`, `air/`, `structures/`, `weapons/`, `space/`, `marine/`,
-`rovers/`, `plants/`, `caves/`, `base/`, `bodies/`, `humans/`, `creatures/`, `blocks/`, `junkyard/`, `city/`.
+`rovers/`, `plants/`, `rocks/`, `caves/`, `base/`, `bodies/`, `humans/`, `creatures/`, `blocks/`, `junkyard/`, `city/`, `houses/`
+(budynki z części — zniszczenie), `streets/` (ulice i skrzyżowania), `mech/` (układ silnika).
 Zachowania (fizyka): okręt i mała jednostka na wodzie, jazda po lądzie, lot, ciąg w próżni, lądowanie, orbita, budowa,
-przeładowarka, przedmioty i maszyny złomowiska — [`../behaviors/README.md`](../behaviors/README.md).
+przeładowarka, przedmioty i maszyny złomowiska, zniszczenie budynków (tornado z pogody sceny), układ silnika (fizyka i obwód,
+obsługa myszą) — [`../behaviors/README.md`](../behaviors/README.md). Gotowe sceny do nauki: edytor → Sceny… (Port, Tornado
+z miastem, Układ silnika).
 
 ## 4. API laboratoriów
 

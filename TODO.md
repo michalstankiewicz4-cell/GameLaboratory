@@ -54,6 +54,10 @@ Listy pojęć do omówienia: co warto, gdzie (które laboratorium), ile kosztuje
   generowanymi w laboratoriach (`ArtApi`) — bez wysokiej rozdzielczości i efektów, chyba że ilustracja tego wymaga.
   Język wiki (właściciel, 2026-11-27): proste zwroty objaśniane analogiami, przykładami i porównaniami, a obok nich
   nazwy fachowe (np. materiały i odbicia — PBR), tak żeby zrozumiał każdy, a profesjonalista też się odnalazł.
+- [ ] **Wspólny silnik brył sztywnych na lądzie** (właściciel, 2026-11-27): jeden świat brył zamiast dwóch połączonych
+  (przedmioty `land/items.js` — impulsy, SAT, krok 1/240 s; odłamki budynków `land/destruct/physics.js` — narożniki,
+  wiatr; dziś łącznik `land/bodies-link.js`), z powłokami deformacji jako bryłami miękkimi. Wyniki laboratoriów
+  (przedmioty, maszyny złomowiska, przeładowarka, zniszczenie, deformacja) porównane przed i po.
 - [ ] **Najczęstsze błędy AI** (właściciel, 2026-11-27): dokument w Pomocy (może w wiki) — błędy, które AI (Claude)
   popełnia najczęściej przy modelach i scenach, i które z nich rozwiązuje doktor modeli.
 - [ ] **Laboratorium sztuki — tryb 3D**: obraz jako płaszczyzna 3D (mapa normalnych z wysokości farby, mapa szorstkości:

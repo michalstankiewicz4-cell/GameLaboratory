@@ -69,17 +69,17 @@ Ten schemat narysowany ramkami: menu **Pomoc → Schemat silnika** na każdej st
 | Scripts | zachowania: `js/behaviors/` (koło na szynie, okręt na wodzie, lot) — [opis](../behaviors/README.md) |
 | Graphics + FX | `js/render/` (wygląd kamery, filtry, widzenie; poziom jakości `quality.js`, ustawienia grafiki gracza `game-graphics.js`) |
 | Input | `editor/js/play/input.js` — czynności z klawiszami z ustawień gracza (`js/core/settings.js`, `settings.keys`) |
-| Physics | prawa środowisk w zachowaniach (`js/behaviors/`), bryły sztywne na lądzie `js/behaviors/land/items.js` |
+| Physics | prawa środowisk w zachowaniach (`js/behaviors/`): bryły sztywne na lądzie (przedmioty `land/items.js`, odłamki budynków `land/destruct/` — połączone `land/bodies-link.js`), deformacja blachy `land/deform/`, fizyka maszyn i obwody `land/mech/` |
 | Audio | `js/audio/` (mikser, MusicKit, SfxKit, VoiceKit, słuchanie modeli), dźwięk w scenie `js/scene/sounds.js`, dźwięki UI `js/gameui/sounds.js` |
 | UI i Debug | `ui/shell/` (okna, `LabPerf`, konsola, `LabLog`, karta ładowania) |
-| Jobs/Workers | wątki nauki w laboratoriach języka i obrazów |
+| Jobs/Workers | wątki nauki w laboratoriach języka i obrazów; fizyka odłamków (`land/destruct/physics-worker.js`) i deformacji (`land/deform/shell-worker.js`) we własnych wątkach |
 | Scene (dane) | `js/scene/scene-data.js` (format `gamelab-scene`), prefabrykaty `js/scene/prefabs.js` — [opis](../scene/README.md) |
 | Zasoby z nazwą | `js/scene/assets.js` — ustawienia zapisane w laboratoriach pod nazwą (morze z laboratorium wody), scena trzyma nazwę |
 | API dla AI | `js/scene/api.js` — polecenia JSON na scenie (zakładka API w konsoli edytora, `window.sceneApi`) |
 | Scripts w scenie | `js/scene/behaviors.js` — zachowania podpięte do prefabrykatów (okręt, lot), pole `behavior` obiektu |
-| Debug + Editor | edytor sceny `editor/` (hierarchia, właściwości, uchwyt, zapis do pliku, ▶ Graj) — [opis](../../editor/README.md) |
+| Debug + Editor | edytor sceny `editor/` (hierarchia, właściwości, uchwyt, zapis do pliku, ▶ Graj, gotowe sceny) — [opis](../../editor/README.md) |
 
-Brakuje: jednej pętli silnika dla gier (edytor ma swoją, z trybem gry), laboratoriów na wspólnej scenie (dziś każde buduje własną
+Brakuje: jednego silnika brył sztywnych na lądzie (dziś dwa połączone — `TODO.md`), jednej pętli silnika dla gier (edytor ma swoją, z trybem gry), laboratoriów na wspólnej scenie (dziś każde buduje własną
 scenę Three.js; widok w wolnym środku mają już wszystkie, 0.35.0), pada i dotyku w warstwie Input, sieci, zapisu stanu gry.
 
 ## Kolejność (propozycja, do decyzji właściciela)
