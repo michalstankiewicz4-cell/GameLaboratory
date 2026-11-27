@@ -1,12 +1,12 @@
-// Laboratorium mechaniki — maszyna na żeliwnym łożu (z Tornado.io): hala (posadzka, łoże, lampy), elementy MechKit
+// Układ silnika (zestaw MechKit; z laboratorium mechaniki, z Tornado.io) — maszyna na żeliwnym łożu: hala (posadzka, łoże, lampy), elementy MechKit
 // połączone portami w napędzie (js/behaviors/land/mech/drive.js), obrazowanie kątów (applyAngles).
 //   silnik → sprzęgło kłowe → wał → para zębatek 20 : 40 → przekładnia dwustopniowa (16 : 48, 24 : 40) w obudowie z akrylu
 //   → łańcuch 18 : 27 → pas klinowy Ø 160 : Ø 80 → sprzęgło kołnierzowe → wał przegubowy (dwa przeguby Cardana, 25°)
 //   → przekładnia planetarna (24 / 24 / 72, korona stała) → tarcza hamulca i tarcza z podziałką.
 // buildMachine({ scene, root, M, hall }) → { drive, parts, panes, applyAngles, solved, … elementy i wymiary dla trybu Fizyka }
-import * as THREE from '../../../vendor/three/three.module.js';
-import * as MK from '../../models/mech/mechkit.js';
-import { createDrive } from '../../behaviors/land/mech/drive.js';
+import * as THREE from '../../../../../vendor/three/three.module.js';
+import * as MK from '../../mechkit.js';
+import { createDrive } from '../../../../behaviors/land/mech/drive.js';
 
 const TAU = Math.PI * 2, X = new THREE.Vector3(1, 0, 0), Y = new THREE.Vector3(0, 1, 0);
 

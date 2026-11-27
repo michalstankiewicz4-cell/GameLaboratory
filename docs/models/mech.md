@@ -41,5 +41,10 @@ Każda część niesie swoje dane — laboratorium tylko je czyta i dokłada geo
   fazowe, częstotliwość, układ sieci). Kabel: `R` żyły, długość, masa.
 - **Zachowania** (`js/behaviors/land/mech/`): `drive.js` (sprawność połączenia z `phys.eta` części, która je tworzy),
   `physics.js`, `contact.js`, `circuit.js` — bez stałych części.
-- **Tylko w laboratorium** (dane tej maszyny, nie części): rozmieszczenie, połączenia napędu, schemat instalacji
-  elektrycznej (lista połączeń zacisków), długości kabli wynikające z ułożenia.
+- **Zestaw „Układ silnika”** (dane tej maszyny, nie części; właściciel, 2026-11-27 — z laboratorium do modeli):
+  `js/models/mech/assemblies/engine-layout/` — `machine.js` (rozmieszczenie na łożu, połączenia portów w napędzie),
+  `installation.js` (regulator, urządzenia, kable z długościami z ułożenia, lista połączeń zacisków), wejście
+  `engine-layout.js` (`buildEngineLayout({ hall })`). Fizyka układu (luz ze stref brył zębów, sztywności, łańcuch, pas,
+  łożyska, krok klatki) — zachowanie `js/behaviors/land/mech/engine-layout.js` (`createEngineLayoutPhysics({ mc })`).
+  Korzystają z nich laboratorium mechaniki i scena (`js/scene/mechanics.js`). W laboratorium zostały: okno Opis,
+  kontrole brył zderzeń i hitboksy (`js/labs/mechanics/physics-mode.js`).

@@ -3,6 +3,15 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.111.1 · mechanika 1.0.2 — 2026-11-27 (układ silnika jako model)
+
+### Zmienione
+- Układ silnika przeniesiony z laboratorium mechaniki: model `js/models/mech/assemblies/engine-layout/` (`machine.js` —
+  maszyna i połączenia portów, `installation.js` — regulator, urządzenia, kable i lista połączeń zacisków,
+  `engine-layout.js` — wejście) i zachowanie `js/behaviors/land/mech/engine-layout.js` (fizyka układu i krok klatki).
+  Laboratorium i scena „Układ silnika” biorą je z tego samego miejsca; w laboratorium zostały okno Opis, kontrole brył
+  zderzeń i hitboksy. Wyniki bez zmian (tryb Maszyna jak w Tornado.io, silnik w scenie 888 obr/min przy 30 Hz).
+
 ## Program 0.111.0 · edytor sceny 0.59.0 · mechanika 1.0.1 — 2026-11-27 (scena „Układ silnika”)
 
 ### Dodane

@@ -134,8 +134,8 @@ w `update`). Silnik w grze gra dźwięk z danych modelu (`info.sounds.engine`) �
   Warszawa: budynek CityKit), potem części świata. Po „Stop” świat znika, a budynki wracają całe; tornado zaczyna od
   miejsca startu przy ▶ Graj i przy Stop (`stage.resetTornado()`). Linia stanu: części stojące i odsetek zniszczenia.
 - **Układ silnika** (`mechanics`, `js/scene/mechanics.js`; prefabrykat `mech/machine`, rodzina Maszyny): maszyna
-  z laboratorium mechaniki z instalacją i regulatorem (`js/labs/mechanics/machine.js` bez posadzki i lamp hali,
-  `physics-mode.js` bez okien). W ▶ Graj ta sama fizyka i obwód co w trybie Fizyka laboratorium (hamulec 20 N·m).
+  z laboratorium mechaniki z instalacją i regulatorem (model `js/models/mech/assemblies/engine-layout/` bez posadzki
+  i lamp hali, fizyka układu `js/behaviors/land/mech/engine-layout.js`, tworzona raz przy pierwszym ▶ Graj). W ▶ Graj ta sama fizyka i obwód co w trybie Fizyka laboratorium (hamulec 20 N·m).
   Obsługa myszą: zachowanie z `pointer(type, origin, dir, dy)` łapie klik przed kamerą (gra edytora: `editor/js/play/play.js`),
   `hover()` — kursor nad urządzeniem. Uruchomienie: START (S2), po rozruchu falownika (0,5 s) przełącznik S3 przez 0 na
   I, prędkość pokrętłem potencjometru R1.

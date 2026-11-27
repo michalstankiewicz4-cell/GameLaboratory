@@ -1,8 +1,8 @@
 # Laboratorium mechaniki (`labs/mechanics.html`)
 
 Z Tornado.io (przeniesione 2026-11-26), kategoria **Maszyny i mechanika**. Modele: [`../models/mech.md`](../models/mech.md).
-Pliki laboratorium (`js/labs/mechanics/`): `mechanics.js` (scena, tryby, wybór, kamera, okna, API), `machine.js`
-(maszyna na łożu i połączenia portów), `physics-mode.js` (tryb Fizyka: regulator, obwód, fizyka, bryły zderzeń, hitboxy),
+Pliki laboratorium (`js/labs/mechanics/`): `mechanics.js` (scena, tryby, wybór, kamera, okna, API), maszyna i instalacja — model
+`js/models/mech/assemblies/engine-layout/`, fizyka układu — `js/behaviors/land/mech/engine-layout.js`; `physics-mode.js` (tryb Fizyka: okno Opis, kontrole brył zderzeń, hitboxy),
 `items-mode.js` (tryb Przedmioty: stół, ustawienia), katalog przedmiotów `items.js` (`items-drive.js`, `items-control.js`,
 `items-common.js`). Scena: `js/labs/shared/sky-stage.js` (hala bez terenu: niebo, słońce, potok kamery). Okna i pasek po
 angielsku; dane przedmiotów i maszyny (nazwy, właściwości, opisy w oknach Opis i Element) po polsku, jak dane modeli.
@@ -185,5 +185,10 @@ Każda część niesie swoje dane — laboratorium tylko je czyta i dokłada geo
   fazowe, częstotliwość, układ sieci). Kabel: `R` żyły, długość, masa.
 - **Zachowania** (`js/behaviors/land/mech/`): `drive.js` (sprawność połączenia z `phys.eta` części, która je tworzy),
   `physics.js`, `contact.js`, `circuit.js` — bez stałych części.
-- **Tylko w laboratorium** (dane tej maszyny, nie części): rozmieszczenie, połączenia napędu, schemat instalacji
-  elektrycznej (lista połączeń zacisków), długości kabli wynikające z ułożenia.
+- **Zestaw „Układ silnika”** (dane tej maszyny, nie części; właściciel, 2026-11-27 — z laboratorium do modeli):
+  `js/models/mech/assemblies/engine-layout/` — `machine.js` (rozmieszczenie na łożu, połączenia portów w napędzie),
+  `installation.js` (regulator, urządzenia, kable z długościami z ułożenia, lista połączeń zacisków), wejście
+  `engine-layout.js` (`buildEngineLayout({ hall })`). Fizyka układu (luz ze stref brył zębów, sztywności, łańcuch, pas,
+  łożyska, krok klatki) — zachowanie `js/behaviors/land/mech/engine-layout.js` (`createEngineLayoutPhysics({ mc })`).
+  Korzystają z nich laboratorium mechaniki i scena (`js/scene/mechanics.js`). W laboratorium zostały: okno Opis,
+  kontrole brył zderzeń i hitboksy (`js/labs/mechanics/physics-mode.js`).

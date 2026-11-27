@@ -5,14 +5,16 @@
 //   → łańcuch 18 : 27 → pas klinowy Ø 160 : Ø 80 → sprzęgło kołnierzowe → wał przegubowy (dwa przeguby Cardana, 25°)
 //   → przekładnia planetarna (24 / 24 / 72, korona stała) → tarcza hamulca i tarcza z podziałką.
 // Kliknięcie elementu — jego właściwości, porty i to, co przez nie płynie. Dla AI: MechanicsApi. Z Tornado.io; części:
-// machine.js (maszyna), physics-mode.js (tryb Fizyka), items-mode.js (tryb Przedmioty), items.js (katalog przedmiotów).
+// maszyna i instalacja — model układu silnika (js/models/mech/assemblies/engine-layout/), fizyka układu — zachowanie
+// (js/behaviors/land/mech/engine-layout.js); physics-mode.js (tryb Fizyka: okno Opis, kontrole, hitboksy), items-mode.js
+// (tryb Przedmioty), items.js (katalog przedmiotów).
 import * as THREE from '../../../vendor/three/three.module.js';
 import { createStage, WEATHER } from '../shared/sky-stage.js';
 import * as MK from '../../models/mech/mechkit.js';
 import { KIND_NAME } from '../../behaviors/land/mech/drive.js';
 import { ITEMS } from './items.js';
 import { loadState } from '../shared/saved.js';
-import { buildMachine } from './machine.js';
+import { buildMachine } from '../../models/mech/assemblies/engine-layout/machine.js';
 import { createPhysicsMode } from './physics-mode.js';
 import { createItemsMode } from './items-mode.js';
 
@@ -40,7 +42,7 @@ const selBox = new THREE.BoxHelper(new THREE.Object3D(), 0xf2c14e); selBox.visib
 function loop(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   if (S.mode === 'machine') { drive.step(dt, { rpm: S.rpm, brake: S.brake }); applyAngles(); }
-  else if (S.mode === 'physics') { ELEC.tick(dt); reg.api.tick(dt); const on = reg.api.powered && (reg.api.run || Math.abs(reg.api.f) > 0.05); phys.step(dt, { w0: reg.api.f * 4 * Math.PI / 4, brake: S.brake, on }); ELEC.power(phys.state.Tm, phys.state.omega, on); applyAngles(); }   // silnik 4-biegunowy: ω_syn = 4π f / p
+  else if (S.mode === 'physics') stepPhysics(dt);   // obwód, regulator, napęd fizyczny (js/behaviors/land/mech/engine-layout.js)
   else items.frame(dt);
   moveKeys(dt);
   if ((statT += dt) > 0.2) { statT = 0; stats(); }
@@ -138,7 +140,7 @@ function moveKeys(dt) {
 
 
 /* ---------------- tryb Fizyka (physics-mode.js) i tryb Przedmioty (items-mode.js) ---------------- */
-const { reg, ELEC, phys, physStats, hitG, elecG, setHit, syncHit } = createPhysicsMode({ scene, root, M, S, save, $, el, mc, ui: { fmt, rpmOf, dirOf, select, showSel, get sel() { return sel; } } });
+const { reg, ELEC, phys, physStats, hitG, elecG, setHit, syncHit, stepPhysics } = createPhysicsMode({ scene, root, M, S, save, $, el, mc, ui: { fmt, rpmOf, dirOf, select, showSel, get sel() { return sel; } } });
 const items = createItemsMode({ scene, M, S, save, $, el, orbit });
 
 function setMode(m) {
