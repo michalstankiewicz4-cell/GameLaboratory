@@ -22,7 +22,8 @@ body.lmNoFoot .side{ bottom:0; }
 .sideNav a, .sideCats button{ display:flex; align-items:center; gap:10px; height:36px; padding:0 10px; border:0; border-radius:10px; background:none;
   color:var(--text); font:500 14px var(--font); text-decoration:none; text-align:start; cursor:pointer; transition:background .15s, color .15s; }
 .sideNav a:hover, .sideCats button:hover{ background:var(--accentSoft); color:var(--head); }
-.sideNav a.on{ background:var(--accent); color:var(--onAccent); box-shadow:var(--shadow); }
+/* the chosen item: the accent fading into the column's background to the right */
+.sideNav a.on{ background:linear-gradient(90deg, color-mix(in srgb, var(--accent) 82%, transparent), color-mix(in srgb, var(--accent) 38%, transparent) 55%, transparent); color:var(--head); font-weight:600; }
 .sideNav svg{ flex:none; width:18px; height:18px; }
 .sideLabel{ margin:16px 10px 4px; color:var(--dim); font-size:11px; letter-spacing:1.2px; text-transform:uppercase; }
 .sideCats{ display:flex; flex-direction:column; gap:1px; }
