@@ -10,8 +10,8 @@ import { shipScene } from './scenes/ship.js';
 import { rigScene } from './scenes/rig.js';
 import { trainScene } from './scenes/train.js';
 import { createOrbit } from '../shared/orbit.js';
+import { viewSize as VS, fitTo } from '../shared/view.js';   // widok w wolnym środku (js/labs/shared/view.js)
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
-const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
 const SCENES = [shipScene('blyskawica'), shipScene('orzel'), rigScene, trainScene];
 const SLIDERS = [['exposure', 'Exposure', 0.3, 2.5, 0.05], ['autoTarget', 'Auto exposure target', 0.08, 0.5, 0.01], ['contrast', 'Contrast', 0.7, 1.5, 0.01],
@@ -157,7 +157,7 @@ $('measure').onclick = async () => {
 
 /* ---------------- pętla ---------------- */
 const autoRes = new AutoResolution();
-function resize() { renderer.setSize(VS().w, VS().h, false); camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix(); look.resize(VS().w, VS().h); }
+function resize() { fitTo(renderer, camera, look); }
 addEventListener('resize', resize);
 let last = performance.now(), frames = 0, fpsT = last;
 function frame(now) {

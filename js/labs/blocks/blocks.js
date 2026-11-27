@@ -14,9 +14,10 @@ import { Gases } from '../../behaviors/space/gases.js';
 import { PRESETS } from '../../render/materials/matkit.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 import { createEffects } from '../../render/effects/effects.js';
+import { viewSize as VS, fitTo } from '../shared/view.js';   // widok w wolnym środku (js/labs/shared/view.js)
 
 const $ = (id) => document.getElementById(id);
-const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
+
 const KEY = 'gameLab.blocks.v1';
 const clone = (o) => JSON.parse(JSON.stringify(o));
 let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { saved = null; }
@@ -223,7 +224,7 @@ function apiTab() {
 if (window.LabConsole) apiTab(); else addEventListener('load', apiTab);
 
 /* ---------------- pętla: zachowania stałym krokiem 1/60 s ---------------- */
-function resize() { renderer.setSize(VS().w, VS().h, false); camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix(); look.resize(VS().w, VS().h); if (gases) gases.setView(VS().h, camera.fov); }
+function resize() { fitTo(renderer, camera, look); if (gases) gases.setView(VS().h, camera.fov); }
 addEventListener('resize', resize);
 let last = performance.now(), acc = 0, t = 0, cntT = 0;
 function frame(now) {

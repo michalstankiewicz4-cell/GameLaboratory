@@ -58,6 +58,12 @@ Listy pojęć do omówienia: co warto, gdzie (które laboratorium), ile kosztuje
   (przedmioty `land/items.js` — impulsy, SAT, krok 1/240 s; odłamki budynków `land/destruct/physics.js` — narożniki,
   wiatr; dziś łącznik `land/bodies-link.js`), z powłokami deformacji jako bryłami miękkimi. Wyniki laboratoriów
   (przedmioty, maszyny złomowiska, przeładowarka, zniszczenie, deformacja) porównane przed i po.
+- [ ] **Laboratoria budowli i roślin na wspólnej scenie bazowej** (punkt 3 porządków, 2026-11-27; skały, przedmioty
+  i efekty · ląd już przeszły): budowle mają własne morze z płyciznami i przyboją z wysokości budowli (potrzebna
+  funkcja sceny bazowej „płycizny z wysokości modelu” bez rysowania terenu), rośliny — własny krajobraz (teren i las),
+  który powiela teren i roślinność sceny bazowej.
+- [ ] **Zapisane ustawienia laboratoriów przez `js/labs/shared/saved.js`** (właściciel, 2026-11-27): stopniowo, przy
+  okazji zmian w danym laboratorium (dziś: mechanika, ulice).
 - [ ] **Najczęstsze błędy AI** (właściciel, 2026-11-27): dokument w Pomocy (może w wiki) — błędy, które AI (Claude)
   popełnia najczęściej przy modelach i scenach, i które z nich rozwiązuje doktor modeli.
 - [ ] **Laboratorium sztuki — tryb 3D**: obraz jako płaszczyzna 3D (mapa normalnych z wysokości farby, mapa szorstkości:

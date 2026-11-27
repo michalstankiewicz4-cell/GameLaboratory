@@ -2,7 +2,8 @@
 // public APIs. Moved out of the page (2026-10-03) so the page is markup and styles.
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
-const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
+import { viewSize as VS } from '../shared/view.js';   // widok w wolnym środku (js/labs/shared/view.js)
+
 (() => {
 "use strict";
 const $ = (id) => document.getElementById(id);

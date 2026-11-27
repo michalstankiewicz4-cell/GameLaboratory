@@ -16,10 +16,11 @@ import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '..
 import { attachWeatherCycle } from '../shared/weather-cycle-ui.js';
 import { createDestructMode } from './destruct/destruct.js';
 import { createOrbit } from '../shared/orbit.js';
+import { viewSize as VS, fitTo } from '../shared/view.js';   // widok w wolnym środku (js/labs/shared/view.js)
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
-const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
+
 const KEY = 'gameLab.city.v1';
 let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { saved = null; }
 const L = { src: 'type:tenement', spec: null, mode: 'auto', ppm: 64, pom: true, lodAt: 0, weather: 'fair', time: 15.5, labMode: 'building', ...(saved || {}) };
@@ -361,7 +362,7 @@ function apiTab() {
 if (window.LabConsole) apiTab(); else addEventListener('load', apiTab);
 
 /* ---------------- pętla ---------------- */
-function resize() { renderer.setSize(VS().w, VS().h, false); camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix(); look.resize(VS().w, VS().h); }
+function resize() { fitTo(renderer, camera, look); }
 addEventListener('resize', resize);
 let last = performance.now();
 function frame(now) {

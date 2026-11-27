@@ -16,10 +16,11 @@ import { buildSample } from './build.js';
 import { createGround } from './ground.js';
 import { en } from './en.js';
 import { createOrbit } from '../shared/orbit.js';
+import { viewSize as VS, fitTo } from '../shared/view.js';   // widok w wolnym środku (js/labs/shared/view.js)
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
-const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
+
 const KEY = 'gameLab.streets.v1';
 const DEFAULTS = { bollards: false, bollardType: 'steel', rails: false, railType: 'u12a', noise: false, noiseType: 'metal', noiseH: 4, mileposts: false, parking: 'none', parkDisabled: true, lamps: true, lampType: 'modern', lampEvery: 30, signs: true, lampsOn: 'auto', signal: 'cycle', scene: 'straight', profile: 'city', lanes: 2, laneW: 3.25, road: 'asphalt', marks: true, walkW: 2.5, curbH: 0.14, walk: 'slabs', corner: 6, weather: 'fair', sunEl: 32, sunAz: 215 };
 // allowed values (saved settings and StreetsApi.set — a value removed from the program does not break the page)
@@ -147,7 +148,7 @@ cv.addEventListener('pointerup', () => { drag = null; });
 cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.zoomBy(e.deltaY); }, { passive: false });
 
 /* ---------------- loop ---------------- */
-function resize() { renderer.setSize(VS().w, VS().h, false); camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix(); look.resize(VS().w, VS().h); }
+function resize() { fitTo(renderer, camera, look); }
 addEventListener('resize', resize);
 let last = performance.now(), lampsLit = null;
 function loop(now) {

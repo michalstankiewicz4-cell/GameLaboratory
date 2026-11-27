@@ -19,9 +19,10 @@ import { WORLD_DEFAULTS } from "../../envs/land/regionkit.js";
 import { hearModel } from "../../audio/model-sounds.js";
 import { mixer } from "../../audio/mixer.js";
 import { createRailSounds } from "../../audio/rail-sounds.js";
+import { viewSize as VS } from '../shared/view.js';   // widok w wolnym środku (js/labs/shared/view.js)
 const tramSounds = createRailSounds();   // the tram's wheels on rails: the physics' acoustic events (aTrain)
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
-const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
+
 (() => {
 "use strict";
 const $ = (id) => document.getElementById(id);

@@ -20,6 +20,7 @@ import { buildMachine } from '../../models/mech/assemblies/engine-layout/machine
 import { createPhysicsMode } from './physics-mode.js';
 import { createItemsMode } from './items-mode.js';
 import { createOrbit } from '../shared/orbit.js';
+import { viewSize as VS, fitTo } from '../shared/view.js';   // widok w wolnym środku (js/labs/shared/view.js)
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
@@ -31,7 +32,7 @@ const TAU = Math.PI * 2, X = new THREE.Vector3(1, 0, 0), Y = new THREE.Vector3(0
 
 // wspólna scena bazowa laboratoriów (js/labs/shared/stage.js): niebo, światło z pogodą, mgła, płaski grunt; hala
 // (posadzka i lampy) — z modelu układu silnika
-const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
+
 const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
@@ -46,11 +47,10 @@ const stage = {
   follow: (target, r) => base.fitShadow(target, r),
   render(dt) { base.update(dt, camera); look.sun(camera, base.sunDir); if (window.LabPerf) window.LabPerf.begin(renderer); look.render(scene, camera); if (window.LabPerf) window.LabPerf.end(renderer); },
 };
-function resize() { const v = VS(); renderer.setSize(v.w, v.h, false); camera.aspect = v.w / v.h; camera.updateProjectionMatrix(); look.resize(v.w, v.h); }
+function resize() { fitTo(renderer, camera, look); }
 addEventListener('resize', resize); resize();
 const M = MK.materials();
 const root = new THREE.Group(); scene.add(root);
-
 
 /* ---------------- maszyna (machine.js) ---------------- */
 const mc = buildMachine({ scene, root, M });
@@ -150,7 +150,6 @@ cv.addEventListener('pointercancel', endPointer); cv.addEventListener('lostpoint
 cv.addEventListener('pointerup', (e) => { if (ctl) { ctl.api.release(ctl.name); ctl = null; stats(); return; } const click = drag && !drag.moved; drag = null; if (click && e.button === 0 && S.mode !== 'items') pick(e); });
 cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.zoomBy(e.deltaY); }, { passive: false });
 orbit.watchKeys();   // W A S D (js/labs/shared/orbit.js)
-
 
 /* ---------------- tryb Fizyka (physics-mode.js) i tryb Przedmioty (items-mode.js) ---------------- */
 const { reg, ELEC, phys, physStats, hitG, elecG, setHit, syncHit, stepPhysics } = createPhysicsMode({ scene, root, M, S, save, $, el, mc, ui: { fmt, rpmOf, dirOf, select, showSel, get sel() { return sel; } } });

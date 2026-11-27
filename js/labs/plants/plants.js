@@ -14,8 +14,8 @@ import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
 import { attachWeatherCycle } from '../shared/weather-cycle-ui.js';
 import { createOrbit } from '../shared/orbit.js';
+import { viewSize as VS, fitTo } from '../shared/view.js';   // widok w wolnym środku (js/labs/shared/view.js)
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
-const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
@@ -289,7 +289,7 @@ function setMode(m) {
 $('modes').replaceChildren(...[['specimen', 'Specimen'], ['landscape', 'Landscape']].map(([m, t]) => { const b = el('button', { type: 'button', textContent: t, onclick: () => setMode(m) }); b.dataset.m = m; return b; }));
 
 /* ---------------- loop ---------------- */
-function resize() { renderer.setSize(VS().w, VS().h, false); camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix(); look.resize(VS().w, VS().h); }
+function resize() { fitTo(renderer, camera, look); }
 addEventListener('resize', resize);
 let last = performance.now(), simT = 0, frames = 0, fpsT = last, lodT = 0;
 const tmpV = new THREE.Vector3();

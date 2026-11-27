@@ -5,8 +5,8 @@ import * as THREE from '../../../vendor/three/three.module.js';
 import { PostPipeline } from '../../render/sea/post.js';
 import { transformShip, KINDS } from '../../models/ships-sea/transform.js';
 import { createOrbit } from '../shared/orbit.js';
+import { viewSize as VS, fitTo } from '../shared/view.js';   // widok w wolnym środku (js/labs/shared/view.js)
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
-const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
@@ -173,7 +173,7 @@ cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.zoomBy(e.deltaY)
 addEventListener('keydown', (e) => { if (e.code === 'KeyH' && !e.target.closest('input,select')) document.querySelectorAll('[data-window]').forEach((p) => p.classList.toggle('hidden-panel')); });
 
 /* ---------------- loop ---------------- */
-function resize() { renderer.setSize(VS().w, VS().h, false); camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix(); post.resize(VS().w, VS().h); }
+function resize() { fitTo(renderer, camera, post); }
 addEventListener('resize', resize); resize();
 let last = performance.now(), frames = 0, fpsT = last, frameMs = [];
 function frame(now) {

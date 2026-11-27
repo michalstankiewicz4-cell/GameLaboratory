@@ -16,8 +16,8 @@ import { cycloneWindow } from './cyclone-window.js';
 import { CATEGORIES } from '../../envs/sky/cyclone.js';
 import { LookPipeline, AutoResolution, LOOK_PRESETS, LOOK_DEFAULTS } from '../../render/sea/look.js';
 import { createOrbit } from '../shared/orbit.js';
+import { viewSize as VS, fitTo } from '../shared/view.js';   // widok w wolnym środku (js/labs/shared/view.js)
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
-const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
@@ -320,7 +320,7 @@ $('measure').onclick = async () => {
 
 /* ---------------- loop ---------------- */
 const autoRes = new AutoResolution();
-function resize() { renderer.setSize(VS().w, VS().h, false); camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix(); look.resize(VS().w, VS().h); }
+function resize() { fitTo(renderer, camera, look); }
 addEventListener('resize', resize);
 let last = performance.now(), simT = 0, shift = 0, frames = 0, fpsT = last;
 const motion = { h: 0, p: 0, r: 0, vh: 0, vp: 0, vr: 0 };

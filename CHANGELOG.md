@@ -3,6 +3,16 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.112.4 — 2026-11-27 (wspólny widok laboratoriów)
+
+### Zmienione
+- `js/labs/shared/view.js`: `viewSize()` (widok w wolnym środku) i `fitTo(renderer, camera, …)` (renderer, kamera
+  i potok obrazu na rozmiar widoku) — zamiast tej samej linii i tego samego wzoru w 24 laboratoriach (wersje
+  +0.0.1: blocks 1.2.1, bodies 1.5.3, caves 1.3.1, city 1.3.6, effects-land 1.0.4, effects 1.4.2, filters 0.6.2, gameui 1.7.2, gear 1.2.1, items 1.2.4, land 1.10.2, look 1.8.3, materials 1.1.2, mechanics 1.0.6, plants 1.8.2, rocks 1.1.3, streets 1.0.2, structures 1.6.2, systems 1.5.1, transform 1.3.2, vehicles-land 1.25.1, vehicles-space 1.11.1, vehicles-water 1.6.2, water 1.5.2). Działanie bez zmian (sprawdzone: każde laboratorium wczytuje się, widok ma rozmiar
+  wolnego środka po zmianie okna).
+- TODO: budowle i rośliny na wspólnej scenie bazowej (potrzebne funkcje sceny), zapisane ustawienia przez `saved.js`
+  stopniowo.
+
 ## Program 0.112.3 — 2026-11-27 (poprawka: LifeKit)
 
 ### Poprawione

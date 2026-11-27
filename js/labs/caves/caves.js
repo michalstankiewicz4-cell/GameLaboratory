@@ -8,8 +8,8 @@ import { buildCave, setRock, ROCKS, CAVE_DEFAULTS } from '../../models/caves/cav
 import { FreeCam } from '../../labkit/freecam.js';
 import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from '../../scene/assets.js';
+import { viewSize as VS, fitTo } from '../shared/view.js';   // widok w wolnym środku (js/labs/shared/view.js)
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
-const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}) => Object.assign(document.createElement(tag), props);
@@ -123,7 +123,7 @@ onAssetsChange(fillSaved); fillSaved();
 window.CaveApi = { save: (n) => ({ saved: saveCave(n) }), load: (n) => loadCave(n), saved: () => listAssets('cave'), get: () => Object.fromEntries(CAVE_KEYS.map((k) => [k, S[k]])) };
 
 /* ---------------- loop ---------------- */
-function resize() { renderer.setSize(VS().w, VS().h, false); camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix(); look.resize(VS().w, VS().h); }
+function resize() { fitTo(renderer, camera, look); }
 addEventListener('resize', resize);
 let last = performance.now();
 function frame(now) {

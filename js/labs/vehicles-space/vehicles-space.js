@@ -9,8 +9,9 @@ import { loadSpace } from "../../scene/space.js";
 import { createEffectLibrary, FX_KINDS, FX_BADGES, STEP as FX_STEP } from "../../render/effects/effects.js";
 import { DamageFx, shipDamage } from "../../render/effects/damage.js";
 import { listAssets, getAsset, onAssetsChange } from "../../scene/assets.js";
+import { viewSize as VS } from '../shared/view.js';   // widok w wolnym środku (js/labs/shared/view.js)
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
-const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
+
 (() => {
 "use strict";
 

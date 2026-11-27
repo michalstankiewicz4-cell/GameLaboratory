@@ -17,8 +17,8 @@ import * as box from '../../models/junkyard/items/box.js';
 import { applyTextures } from '../../models/junkyard/textures.js';
 import { attachWeatherCycle } from '../shared/weather-cycle-ui.js';
 import { createOrbit } from '../shared/orbit.js';
+import { viewSize as VS, fitTo } from '../shared/view.js';   // widok w wolnym środku (js/labs/shared/view.js)
 
-const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
 const KEY = 'gameLab.effectsLand.v1';
@@ -153,7 +153,7 @@ attachWeatherCycle({ select: $('weather'), apply: (p) => { wxNow = p; updateSky(
 for (const k of ['sunEl', 'sunAz']) { $(k).value = S[k]; $(k + 'V').textContent = S[k] + '°'; $(k).oninput = () => { S[k] = +$(k).value; $(k + 'V').textContent = S[k] + '°'; updateSky(); save(); }; }
 
 /* ---------------- pętla ---------------- */
-function resize() { const v = VS(); renderer.setSize(v.w, v.h, false); camera.aspect = v.w / v.h; camera.updateProjectionMatrix(); look.resize(v.w, v.h); }
+function resize() { fitTo(renderer, camera, look); }
 addEventListener('resize', resize);
 let last = performance.now(), statT = 0;
 function frame(now) {

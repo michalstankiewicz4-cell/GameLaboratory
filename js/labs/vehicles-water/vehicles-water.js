@@ -12,8 +12,8 @@ import { SEAS, LOOKS } from '../../envs/water/waterkit.js';
 import { createStage } from '../shared/stage.js';
 import { createCraft, craftDef } from '../../behaviors/water/craft.js';
 import { createOrbit } from '../shared/orbit.js';
+import { viewSize as VS, fitTo } from '../shared/view.js';   // widok w wolnym środku (js/labs/shared/view.js)
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
-const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
@@ -400,7 +400,7 @@ function scaleBar() {
 }
 
 /* ---------------- loop ---------------- */
-function resize() { renderer.setSize(VS().w, VS().h, false); camera.aspect = VS().w / VS().h; camera.updateProjectionMatrix(); post.resize(VS().w, VS().h); }
+function resize() { fitTo(renderer, camera, post); }
 addEventListener('resize', resize);
 let last = performance.now(), frames = 0, fpsT = last;
 function frame(now) {

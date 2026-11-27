@@ -6,12 +6,12 @@
    ======================================================================= */
 // the 3D view's box (ui/shell/windows.js, LabView): the free middle between the panels, or the whole window
 import { listAssets, getAsset, saveAsset, removeAsset, onAssetsChange } from "../../scene/assets.js";
-const VS = () => (window.LabView && window.LabView.size ? window.LabView.size() : { w: innerWidth, h: innerHeight, x: 0, y: 0 });
+import { viewSize as VS } from '../shared/view.js';   // widok w wolnym środku (js/labs/shared/view.js)
+
 (() => {
 "use strict";
 
 const makeGlow = LabKit.makeGlow;
-
 
 // =====================================================================
 // Renderer, scene, camera, controls
@@ -304,7 +304,6 @@ LabKit.autoHideWindows();   // every window of the page fades when idle
 // (CSS max-height on #hud/#opt), so switching tabs (other sliders) never
 // changes the UI size.
 // =====================================================================
-
 
 // =====================================================================
 // Animation
