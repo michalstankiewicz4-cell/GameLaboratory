@@ -3,6 +3,14 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.114.2 — 2026-11-27 (przycisk języka)
+
+### Poprawione
+- Przycisk języka na stronie startowej (i OPCJE → Język w laboratoriach) nie działał, gdy w adresie była sekcja
+  (`#labsSec` — po kliknięciu pozycji bocznego menu): przejście pod ten sam adres tylko przewijało, strona nie
+  wczytywała się w nowym języku. Teraz przy niezmienionym adresie strona się przeładowuje (`reloadLang()`,
+  `ui/shell/menubar.js`). Sprawdzone: z sekcją, z `?lang=` i bez — za każdym razem PL → EN.
+
 ## Program 0.114.1 — 2026-11-27 (strona startowa bez Opcji)
 
 ### Zmienione

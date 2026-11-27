@@ -44,6 +44,12 @@ const LANG = LANGS[URL_LANG] ? URL_LANG : LANGS[LANG_CHOICE] ? LANG_CHOICE : LAN
 // the start page is translated whole; a lab keeps its own language (its panels: <html lang>) and the bar gets LANG
 if (START) document.documentElement.lang = LANG;
 const PL = LANG === "pl";
+// after a language is chosen: the page again, without ?lang= — reloaded when the address stays the same (an address
+// with only a #section differs in nothing else, and going to it would only scroll, not load the page in the new language)
+function reloadLang() {
+  const u = new URL(location.href); u.searchParams.delete("lang");
+  if (u.href === location.href) location.reload(); else location.href = u.href;
+}
 const t = (en, pl) => (PL ? pl : en);   // the bar's own words
 
 // THEME — day (the light canvas) or night (dark glass): ui/style/tokens.css, <html data-theme="day|night">. Chosen in
@@ -260,7 +266,7 @@ function options() {
     ...[["auto", t("Automatic (browser)", "Automatycznie (przeglądarka)")], ["en", "English"], ["pl", "Polski"]].map(([k, label]) =>
       action(label, () => {
         try { if (k === "auto") localStorage.removeItem(LANG_KEY); else localStorage.setItem(LANG_KEY, k); } catch (e) { /* storage blocked */ }
-        const u = new URL(location.href); u.searchParams.delete("lang"); location.href = u.href;
+        reloadLang();
       }, { on: LANG_CHOICE === k && !LANGS[URL_LANG] })),
     el("div", "lmSep"),
     el("div", "lmLabel", t("Look", "Wygląd")),
@@ -398,7 +404,7 @@ if (START) {
   lang.title = t("Język: Polski", "Language: English");
   lang.addEventListener("click", () => {
     try { localStorage.setItem(LANG_KEY, other); } catch (e) { /* storage blocked */ }
-    const u = new URL(location.href); u.searchParams.delete("lang"); location.href = u.href;
+    reloadLang();
   });
   bar.insertBefore(lang, bar.querySelector('.lmTop[data-menu="help"]'));
   const con = el("button", "lmCon", t("Console", "Konsola")); con.type = "button";
