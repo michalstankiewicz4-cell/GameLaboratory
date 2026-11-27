@@ -3,6 +3,12 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.113.1 — 2026-11-27 (Noc: ciemny canvas)
+
+### Zmienione
+- Motyw **Noc** to teraz ciemna wersja canvasu: granatowe tło i szkło okien, ten sam pomarańczowy akcent `#F47D50`
+  co w Dniu (wcześniej złoty), ciepłobiałe tytuły (`ui/style/tokens.css`).
+
 ## Program 0.113.0 — 2026-11-27 (wygląd: Dzień i Noc, nowa strona startowa, Sceny)
 
 ### Dodane

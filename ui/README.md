@@ -2,8 +2,8 @@
 
 One look for every lab, tool and the start page, in two themes (OPTIONS → Look, or the sun / moon at the right end
 of the menu bar; automatic: the system's light / dark setting): **Day** — the light canvas (warm paper `#F5F0E9`,
-panels `#FFF9F2`, an orange accent `#F47D50`, navy text `#273247`, soft shadows); **Night** — the labs from Battle
-(dark glass, a thin line, gold headings and controls). Rounded corners (`--r` 14 px, `--r2` 9 px), thin borders.
+panels `#FFF9F2`, an orange accent `#F47D50`, navy text `#273247`, soft shadows); **Night** — the dark canvas
+(deep navy glass, a thin line, the same orange accent, warm white titles). Rounded corners (`--r` 14 px, `--r2` 9 px), thin borders.
 Font: Space Grotesk; numbers: IBM Plex Mono. Colours only from the tokens — a colour written in a sheet stays the
 same in both themes.
 
