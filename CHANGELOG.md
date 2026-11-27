@@ -3,6 +3,17 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.112.6 — 2026-11-27 (doktor modeli: wiszące zastrzały)
+
+### Dodane
+- Doktor modeli 1.10.0: test `dangling` (ostrzeżenie) — ukośny pręt (zastrzał, podpora) trzymany tylko przy jednym
+  końcu, z dolnym końcem wiszącym w powietrzu, jak dawny zastrzał sygnalizatora wychodzący ze złącza słupa i wysięgnika.
+  Maszty, anteny i wysięgniki (wolny koniec u góry) są pomijane, szyba trzyma swoją ramę. Stanowisko testowe ma dwa
+  zastrzały (zły i dobry). Sprawdzone: dawny błąd sygnalizatora zgłoszony, 240 modeli bez fałszywych alarmów. Opis:
+  `docs/tools/doctor.md`.
+- `AI_COLLABORATION.md`: informacja o nowym teście przy częstych błędach AI; kopia przeglądów i błędów z Tornado.io
+  (do analizy).
+
 ## Program 0.112.5 — 2026-11-27 (poprawki: ognisko i sygnalizator)
 
 ### Poprawione

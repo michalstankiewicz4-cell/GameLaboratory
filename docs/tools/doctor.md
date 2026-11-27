@@ -55,6 +55,7 @@ wskazywał jedną część.
 | `arc` | ostrzeżenie | linia ognia działa trafia we własny model w zakresie obrotu (`opts.mounts`) |
 | `zfight` | ostrzeżenie | ściany dwóch części w jednej płaszczyźnie — migoczą; tylko tam, gdzie widać (nie wewnątrz trzeciej zamkniętej bryły) |
 | `floating` | ostrzeżenie | część niczego nie dotyka |
+| `dangling` | ostrzeżenie | ukośny pręt (zastrzał, podpora; walec co najmniej 8× dłuższy niż gruby, 10°–80° od pionu) trzymany tylko przy jednym końcu, a dolny koniec wisi w powietrzu — np. zastrzał wychodzący ze złącza słupa i wysięgnika zamiast podpierać wysięgnik od słupa; szczegóły niżej |
 | `waterline` | ostrzeżenie | część nad kadłubem sięga pod linię wody (`opts.waterline`) |
 | `poke` | ostrzeżenie | element wystaje przez burtę (`opts.hullSide`) |
 | `budget` | ostrzeżenie | model przekracza budżet gry (`opts.budget`) |
@@ -75,6 +76,14 @@ Opcje źródła (`opts` z `build()`), oprócz opisanych przy testach:
 
 Części powielane (`InstancedMesh` — słupki, pręty, stopnie) same nie są badane, ale w `floating` łączą to, czego
 dotykają (wcześniej rury barierek „wisiały w powietrzu”, bo słupki były dla testu niewidoczne).
+
+`dangling` — punkty wzdłuż osi pręta (21): punkt jest trzymany, gdy powierzchnia innej części (także przezroczystej —
+rama stoi na szybie) albo grunt (`ground`) jest bliżej niż promień pręta plus tolerancja, albo punkt leży wewnątrz innej
+zamkniętej bryły. Zgłaszany jest pręt trzymany jednym ciągłym odcinkiem od jednego końca, krótszym niż połowa pręta,
+i nigdzie poza nim — i tylko wtedy, gdy wolny koniec jest niżej niż trzymany (wisi). Wolny koniec u góry to maszt,
+wysięgnik żurawia albo antena — zamierzone. Pręt skrzyżowany po drodze z inną częścią (kłody oparte o siebie) ma drugi
+punkt podparcia. Nie łapie odwróconego pochylenia „V” zamiast „A” (kłody ogniska stojące na gruncie z wolnymi
+wierzchołkami w górze wyglądają dla testu jak maszty) — opis błędu: `AI_COLLABORATION.md`, „Częste błędy AI w modelach”.
 
 Wyjątki dla zamierzonych przypadków: `userData.doctorOk = 'floating'` (albo tablica testów) na części lub jej przodku.
 

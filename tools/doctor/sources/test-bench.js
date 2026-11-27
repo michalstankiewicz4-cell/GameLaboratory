@@ -23,6 +23,15 @@ export function testBench() {
   // no mistake: a closed solid stretched along one axis (non-uniform scale) — its tilted faces must not count as seen from behind
   put('stretched octahedron', new THREE.OctahedronGeometry(0.5), grey, 0, 2.5, -3).scale.set(3, 1, 1);
   put('floating box', new THREE.BoxGeometry(1, 1, 1), grey, 0, 7, 2);
+  // dangling: two posts with arms; the brace on z = −1 comes out of the post–arm joint (1.5, 3.95) and its lower end hangs
+  // in the air (found), the one on
+  // z = +1 runs from the post up to the arm (not found)
+  for (const [z, ok] of [[-1, false], [1, true]]) {
+    put('brace post', new THREE.CylinderGeometry(0.08, 0.08, 2, 12), grey, 1.5, 3, z);
+    put('brace arm', new THREE.CylinderGeometry(0.06, 0.06, 2, 12), grey, 0.5, 3.95, z).rotation.z = Math.PI / 2;
+    const b = put(ok ? 'good brace' : 'dangling brace', new THREE.CylinderGeometry(0.03, 0.03, Math.hypot(0.9, 0.8), 8), blue, 1.05, 3.55, z);
+    b.rotation.z = (ok ? 1 : -1) * Math.atan2(0.9, 0.8);
+  }
   put('crate under water', new THREE.BoxGeometry(1, 1, 1), grey, 0, -0.5, 0);
   put('fender through the side', new THREE.BoxGeometry(0.5, 0.5, 0.5), grey, 2.1, 1, -2);
   put('hidden box', new THREE.BoxGeometry(0.5, 0.5, 0.5), red, -1, 1, -4);

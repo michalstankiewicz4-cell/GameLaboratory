@@ -16,6 +16,8 @@
 //   arc        a gun's line of fire hits its own ship inside the mount's training arc         warning (AA: info)
 //   zfight     two pieces' faces in one plane, overlapping — they flicker                     warning
 //   floating   a piece that touches nothing of the rest of the model                          warning
+//   dangling   a slanted rod (a brace, a strut) held at one end only, the other, lower end hanging in the air      warning
+//              (a brace coming out of the joint instead of supporting it from below)
 //   waterline  a piece above the hull reaching below the waterline (y < 0)                    warning
 //   poke       a fitting sticking out through the hull side below the deck edge               warning
 //   budget     the merged model is over the game's per-ship budget (triangles, draw calls)    warning
@@ -44,8 +46,8 @@
 //                    own frame, for "pierce"; opts.pierceOk(a, b) → true for crossings that are meant
 import * as THREE from '../../vendor/three/three.module.js';
 
-export const CHECKS = ['nan', 'inverted', 'facing', 'seethrough', 'arc', 'zfight', 'floating', 'waterline', 'poke', 'budget', 'pierce', 'hidden', 'speck', 'sliver'];
-export const SEVERITY = { nan: 'error', inverted: 'error', facing: 'error', seethrough: 'error', arc: 'warning', zfight: 'warning', floating: 'warning', waterline: 'warning', poke: 'warning', budget: 'warning', pierce: 'warning', hidden: 'info', speck: 'info', sliver: 'info' };
+export const CHECKS = ['nan', 'inverted', 'facing', 'seethrough', 'arc', 'zfight', 'floating', 'dangling', 'waterline', 'poke', 'budget', 'pierce', 'hidden', 'speck', 'sliver'];
+export const SEVERITY = { nan: 'error', inverted: 'error', facing: 'error', seethrough: 'error', arc: 'warning', zfight: 'warning', floating: 'warning', dangling: 'warning', waterline: 'warning', poke: 'warning', budget: 'warning', pierce: 'warning', hidden: 'info', speck: 'info', sliver: 'info' };
 export const ABOUT = {
   nan: 'positions that are not numbers (broken maths)',
   inverted: 'closed shape built inside-out: its outside is culled',
@@ -54,6 +56,7 @@ export const ABOUT = {
   arc: 'gun line of fire hits the own ship inside the training arc',
   zfight: 'faces of two pieces in one plane overlap and flicker',
   floating: 'piece touches nothing of the main body',
+  dangling: 'slanted rod held at its upper end only: the lower end hangs in the air',
   waterline: 'piece above the hull reaches below the waterline',
   poke: 'fitting sticks out through the hull side',
   budget: 'over the per-ship budget of the game',
@@ -522,6 +525,68 @@ export function examine(root, opts = {}) {
     });
   }
   lap('floating', t);
+
+  // dangling: slanted rods (cylinders at least 8× longer than thick, 10°…80° from the vertical) — braces, struts, logs.
+  // Points along the axis: one is held when another piece's surface (or the ground, opts.ground) is within the rod's
+  // radius plus the tolerance, or the point lies inside another closed piece. A rod held in one unbroken stretch from one
+  // end, shorter than half of it, and nowhere else is reported: a brace is meant to connect two things. Its body
+  // crossing another piece (logs leaning together) is a second hold. Only a free end LOWER than the held one is reported
+  // (it hangs); a free end up is a mast, a boom or an antenna. See-through pieces (glass) hold too. Instanced pieces
+  // are not seen (allow-list: doctorOk = 'dangling').
+  t = performance.now();
+  if (run.has('dangling')) {
+    const tri = new THREE.Triangle(), cp = new THREE.Vector3(), mw = new THREE.Matrix4(), pa = new THREE.Vector3(), pb = new THREE.Vector3(), pr = new THREE.Vector3();
+    const dray = new THREE.Raycaster(), ddir = new THREE.Vector3(0.3113, 0.8271, 0.4679).normalize(), dw = new THREE.Vector3();
+    const inside = (pt, other) => {   // ray parity, the piece made two-sided for the cast
+      const mats = matsOf(other.o), sides = mats.map((x) => x.side);
+      mats.forEach((x) => { x.side = THREE.DoubleSide; });
+      dray.set(dw.copy(pt).applyMatrix4(root.matrixWorld), ddir);
+      let hits = 0, last = -1;
+      for (const h of dray.intersectObject(other.o, false)) { if (h.distance - last > 1e-5) hits++; last = h.distance; }
+      mats.forEach((x, i) => { x.side = sides[i]; });
+      return hits % 2 === 1;
+    };
+    const near = (pt, reach, other) => {
+      if (other.box.distanceToPoint(pt) > reach) return false;
+      if (closedShape(other.g) && other.box.containsPoint(pt) && inside(pt, other)) return true;
+      const r2 = reach * reach;
+      for (let k = 0; k < other.tris; k++) {
+        triVerts(other, k, v0, v1, v2); tri.set(v0, v1, v2); tri.closestPointToPoint(pt, cp);
+        if (cp.distanceToSquared(pt) <= r2) return true;
+      }
+      return false;
+    };
+    // see-through pieces (glass, a windscreen) hold too: a frame stands on its glass
+    const clear = [];
+    root.traverse((o) => { if (o.isMesh && !o.isInstancedMesh && !o.isSkinnedMesh && visibleInTree(o) && !isSolid(o) && o.geometry && o.geometry.attributes.position) { const c = collect(o, 0, toRoot); if (c && c.tris) clear.push(c); } });
+    const N = 21;
+    for (const m of meshes) {
+      const p = m.g.parameters;
+      if (m.nan || m.g.type !== 'CylinderGeometry' || !p) continue;
+      mw.multiplyMatrices(toRoot, m.o.matrixWorld);
+      pa.set(0, -p.height / 2, 0).applyMatrix4(mw); pb.set(0, p.height / 2, 0).applyMatrix4(mw);
+      const len = pa.distanceTo(pb), rad = Math.max(p.radiusTop, p.radiusBottom) * new THREE.Vector3().setFromMatrixColumn(mw, 0).length();
+      if (!(len > 8 * rad) || len < 4 * tol) continue;
+      const tilt = Math.acos(Math.min(1, Math.abs(pb.y - pa.y) / len)) * 180 / Math.PI;
+      if (tilt < 10 || tilt > 80) continue;
+      const reach = rad + tol, others = meshes.concat(clear).filter((x) => x !== m && !x.nan && x.box.distanceToPoint(pa) <= len + reach);
+      const held = [];
+      for (let i = 0; i < N; i++) {
+        pr.lerpVectors(pa, pb, i / (N - 1));
+        held.push((opts.ground != null && pr.y <= opts.ground + reach) || others.some((x) => near(pr, reach, x)));
+      }
+      const at = held.map((h, i) => (h ? i : -1)).filter((i) => i >= 0);
+      if (!at.length) continue;                                     // held nowhere: that is "floating"
+      // one unbroken run of held points from one end, shorter than half the rod, the other end free
+      const end = N - 1, run1 = at[at.length - 1] - at[0] === at.length - 1;
+      const oneEnd = run1 && at.length - 1 < end / 2 && (at[0] === 0 || at[at.length - 1] === end);
+      if (!oneEnd) continue;
+      const freeEnd = at[0] === 0 ? pb : pa, heldEnd = at[0] === 0 ? pa : pb;
+      if (freeEnd.y >= heldEnd.y) continue;                         // the free end up: a mast, a boom, an antenna
+      add('dangling', [m], `slanted rod (${tilt.toFixed(0)}° from vertical, ${len.toFixed(2)} m) held at one end only; the other end hangs free at ${freeEnd.x.toFixed(2)}, ${freeEnd.y.toFixed(2)}, ${freeEnd.z.toFixed(2)}`);
+    }
+  }
+  lap('dangling', t);
 
   // waterline: pieces that are not part of the underwater body but reach below y = 0
   if (run.has('waterline') && opts.waterline) meshes.forEach((m) => {
