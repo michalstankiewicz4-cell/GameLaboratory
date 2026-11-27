@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.111.2 — 2026-11-27 (schemat silnika)
+
+### Zmienione
+- Pomoc → Schemat silnika: budynki z części, ulice, elementy maszyn i układ silnika, skały; zachowania zniszczenia
+  i układu silnika; fizyka — odłamki budynków, deformacja blachy, fizyka maszyn i obwody; Jobs/Workers częściowo
+  (fizyka odłamków i deformacji we własnym wątku); gotowe sceny w edytorze.
+
 ## Miasto 1.3.1 — 2026-11-27 (poprawka)
 
 ### Poprawione
