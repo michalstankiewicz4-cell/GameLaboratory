@@ -14,14 +14,14 @@
 .graphbox .node{cursor:pointer}
 .graphbox .node rect{fill:var(--bg);stroke:var(--line);stroke-width:1.2}
 .graphbox .node.sel rect,.graphbox .node:hover rect{stroke:var(--rot);stroke-width:2}
-.graphbox .node.io rect{fill:rgba(156,172,112,.14)}
+.graphbox .node.io rect{fill:var(--accentSoft)}
 .graphbox .node text{fill:var(--fg);font-family:var(--body);font-size:13px}
 .graphbox .node text.p{fill:var(--muted);font-size:11px}
 .graphbox .edge{stroke:var(--muted);stroke-width:1.2;fill:none}
-.graphbox .shape{fill:#7fa6d8;font-family:var(--mono);font-size:11px}
+.graphbox .shape{fill:var(--info);font-family:var(--mono);font-size:11px}
 .graphbox .frame{fill:none;stroke:var(--rot);stroke-dasharray:5 4;stroke-width:1.2}
 .graphbox .frametxt{fill:var(--rot);font-family:var(--display);font-size:13px}
-.graphbox .res{stroke:#c9a86a;stroke-width:1.2;fill:none;stroke-dasharray:3 3}
+.graphbox .res{stroke:var(--accent);stroke-width:1.2;fill:none;stroke-dasharray:3 3}
 .graphside{display:grid;gap:12px}
 .graphinfo{background:var(--panel);border:1px solid var(--line);padding:12px 14px;min-height:5em}
 .graphinfo h4{margin:0 0 6px;font-family:var(--display);font-weight:500;color:var(--rot);letter-spacing:.04em}
@@ -60,7 +60,8 @@
 .guessintro{max-width:90ch;margin:0}
 .guessrow{display:flex;flex-wrap:wrap;gap:20px;align-items:start}
 .pad{display:grid;gap:8px}
-#pad{width:256px;height:256px;background:#f2f2f2;border:1px solid var(--line);cursor:crosshair;touch-action:none}
+#pad{width:256px;height:256px;background:#f2f2f2;   /* the drawing pad: light paper in both themes */
+  border:1px solid var(--line);cursor:crosshair;touch-action:none}
 .padctl{display:flex;flex-wrap:wrap;gap:8px}
 .padctl button{font-size:14px;padding:6px 10px}
 .seen{display:grid;gap:6px;justify-items:center;color:var(--muted);font-size:12px}

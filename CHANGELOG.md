@@ -3,6 +3,18 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.115.6 — 2026-11-27 (pole tekstowe raz, kolory NeuroLabPA z tokenów)
+
+### Zmienione
+- Pole tekstowe w panelu (`.panel textarea`) raz, w `ui/style/sea.css` — było w laboratoriach miasta 1.3.8, materiałów
+  1.1.4 i UI gry 1.7.3; laboratorium drzewek 1.1.1 zmienia tylko zaokrąglenie. Sprawdzone porównaniem stylu: w żadnym
+  z ośmiu laboratoriów z tym motywem nic się nie zmieniło.
+- Strony z NeuroLabPA — kolory z motywu zamiast własnych: SDF Walkers 0.23.8 (czerwień „krwi” i odrzuceń → `--err`, tło
+  wybranych znaczników, szachownica arkusza, uchwyt okna sieci; usunięte niewidoczne zielone cienie przycisków),
+  laboratorium języka 0.24.3 (czerwień ograniczeń i przeuczenia → `--err`, podświetlenia tokenów i wiadomości → akcent
+  i `--info`; usunięte dwa nadpisywane tła), laboratorium obrazów 0.29.3 (schemat sieci: wejście/wyjście, kształty,
+  połączenia rezydualne → akcent i `--info`). Pole do rysowania zostaje jasne w obu motywach.
+
 ## Program 0.115.5 — 2026-11-27 (przegląd CSS: powtórzenia i kolory)
 
 ### Zmienione (porządek, bez zmiany wyglądu — sprawdzone porównaniem stylu każdego elementu przed i po)

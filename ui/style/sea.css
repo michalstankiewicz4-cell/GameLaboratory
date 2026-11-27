@@ -76,3 +76,5 @@ button,select,input{font:inherit;color:inherit}
 .mapTile canvas{display:block;width:100%;border:1px solid var(--line);border-radius:var(--r);image-rendering:auto}
 .mapTile:hover canvas{border-color:var(--accent)}
 .mapTile figcaption{font-size:10px;color:var(--dim);text-align:center;margin-top:2px}
+/* a text area in a panel (JSON descriptions, API commands): the same in every lab with this theme */
+.panel textarea{width:100%;box-sizing:border-box;background:var(--field);border:1px solid var(--line);border-radius:var(--r);color:var(--text);font-size:11px;resize:vertical}

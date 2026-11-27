@@ -1,7 +1,7 @@
 /* Laboratorium drzewek (labs/trees.html): okna laboratorium. Widoki drzewka i ich podpowiedzi: js/gameui/css/tree.css. */
 #view .pcb-svg{width:100%;height:100%}
 #view{overflow:hidden;background:var(--bg)}
-.panel textarea{width:100%;box-sizing:border-box;background:var(--field);border:1px solid var(--line);border-radius:var(--r2);color:var(--text);font-size:11px;resize:vertical}
+.panel textarea{border-radius:var(--r2)}
 .parents{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0}
 .parents button{background:var(--field);border:1px solid var(--line);border-radius:var(--r2);padding:1px 7px;font-size:11.5px;cursor:pointer}
 .parents button:hover{border-color:var(--err)}

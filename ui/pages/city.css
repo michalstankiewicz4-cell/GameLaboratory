@@ -1,6 +1,5 @@
 /* Laboratorium miasta (labs/city.html): mapy wypalonych kafelków fasady w oknie Wypalona fasada, zakładka API. */
 .mapTile canvas{height:auto}
-.panel textarea{width:100%;box-sizing:border-box;background:var(--field);border:1px solid var(--line);border-radius:var(--r);color:var(--text);font-size:11px;resize:vertical}
 .cityApi{display:flex;flex-direction:column;gap:6px;padding:8px}
 .cityApi textarea{width:100%;background:var(--field);border:1px solid var(--line);border-radius:var(--r);color:var(--text);font-size:11px}
 .cityApi button{align-self:flex-start}

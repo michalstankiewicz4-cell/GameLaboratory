@@ -1,6 +1,6 @@
 /* base reset (the claude.ai artifact host supplied this; a standalone page needs its own) */
 *,*::before,*::after{box-sizing:border-box}
-:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--blood:#a8383a;--panel:var(--glass);--fg:var(--text);--muted:var(--dim);--rot:var(--accent);--asphalt:var(--card);--display:system-ui,-apple-system,"Segoe UI",sans-serif;--body:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,Consolas,monospace}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--blood:var(--err);--panel:var(--glass);--fg:var(--text);--muted:var(--dim);--rot:var(--accent);--asphalt:var(--card);--display:system-ui,-apple-system,"Segoe UI",sans-serif;--body:system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,Consolas,monospace}
 body{margin:0;font-family:var(--body);line-height:1.5;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));font-size:14px}
 img{max-width:100%}
 [hidden]{display:none!important}
@@ -39,8 +39,8 @@ canvas.pix,img.pix{display:block;image-rendering:pixelated;height:auto}
 aside{display:grid;gap:20px;min-width:0}
 .controls{display:grid;gap:12px}
 .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-button{font-family:var(--display);font-size:18px;letter-spacing:.04em;padding:12px 16px;background:var(--rot);color:var(--bg);border:0;cursor:pointer;box-shadow:0 4px 0 #5d6a3f}
-button:active{transform:translateY(3px);box-shadow:0 1px 0 #5d6a3f}
+button{font-family:var(--display);font-size:18px;letter-spacing:.04em;padding:12px 16px;background:var(--rot);color:var(--bg);border:0;cursor:pointer}
+button:active{transform:translateY(3px)}
 button:disabled{opacity:.45;cursor:default}
 button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--fg);outline-offset:3px}
 label{display:grid;gap:4px;color:var(--muted);font-size:14px}
@@ -69,7 +69,7 @@ h2{font-family:var(--display);font-size:16px;letter-spacing:.08em;text-transform
 .modelbox h3{font-family:var(--display);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px;font-weight:500}
 .modelbox ul{list-style:none;margin:0;padding:0;display:grid;gap:3px;font-variant-numeric:tabular-nums}
 .modelbox li{display:flex;justify-content:space-between;gap:12px}
-.up{color:var(--rot)} .down{color:#d0605e}
+.up{color:var(--rot)} .down{color:var(--err)}
 .meter{height:6px;background:var(--line);margin-top:6px}
 .meter i{display:block;height:100%;background:var(--rot)}
 .inline{display:flex;align-items:center;gap:8px;color:var(--fg)}
@@ -92,11 +92,11 @@ h2{font-family:var(--display);font-size:16px;letter-spacing:.08em;text-transform
 .tagrow{display:flex;flex-wrap:wrap;gap:4px}
 .tagrow button{font-family:var(--body);font-size:12px;letter-spacing:0;padding:3px 7px;background:transparent;color:var(--muted);border:1px solid var(--line);box-shadow:none}
 .tagrow button:active{transform:none}
-.tagrow button[aria-pressed="true"]{color:var(--fg);border-color:#d0605e;background:rgba(168,56,58,.25)}
+.tagrow button[aria-pressed="true"]{color:var(--fg);border-color:var(--err);background:color-mix(in srgb, var(--err) 25%, transparent)}
 
 .out{display:grid;grid-template-columns:auto minmax(0,1fr);gap:24px;align-items:start;border-top:1px solid var(--line);padding-top:24px}
 @media (max-width:860px){.out{grid-template-columns:1fr}}
-.sheetbox{background-color:#3a3646;background-image:linear-gradient(45deg,#2e2b38 25%,transparent 25%,transparent 75%,#2e2b38 75%),linear-gradient(45deg,#2e2b38 25%,transparent 25%,transparent 75%,#2e2b38 75%);background-size:16px 16px;background-position:0 0,8px 8px;padding:8px;overflow:auto;max-height:720px;border:1px solid var(--line);max-width:100%}
+.sheetbox{background-color:var(--field);background-image:linear-gradient(45deg,var(--line) 25%,transparent 25%,transparent 75%,var(--line) 75%),linear-gradient(45deg,var(--line) 25%,transparent 25%,transparent 75%,var(--line) 75%);background-size:16px 16px;background-position:0 0,8px 8px;padding:8px;overflow:auto;max-height:720px;border:1px solid var(--line);max-width:100%}
 .sheetbox img{max-width:none}
 .json{display:grid;gap:10px;min-width:0}
 .json pre{margin:0;background:var(--panel);border:1px solid var(--line);padding:12px;font-family:var(--mono);font-size:12px;line-height:1.45;overflow:auto;max-height:520px;color:var(--fg)}
@@ -114,7 +114,7 @@ h2{font-family:var(--display);font-size:16px;letter-spacing:.08em;text-transform
 .hud-foot{font-size:12px;color:var(--muted);margin:0;padding-right:18px}
 .hud-head:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
 .hud-grip{position:absolute;right:0;bottom:0;width:22px;height:22px;pointer-events:auto;cursor:nwse-resize;touch-action:none;
-  background:linear-gradient(135deg,transparent 50%,rgba(156,172,112,.55) 50%,rgba(156,172,112,.55) 58%,transparent 58%,transparent 70%,rgba(156,172,112,.55) 70%,rgba(156,172,112,.55) 78%,transparent 78%)}
+  background:linear-gradient(135deg,transparent 50%,color-mix(in srgb, var(--accent) 55%, transparent) 50%,color-mix(in srgb, var(--accent) 55%, transparent) 58%,transparent 58%,transparent 70%,color-mix(in srgb, var(--accent) 55%, transparent) 70%,color-mix(in srgb, var(--accent) 55%, transparent) 78%,transparent 78%)}
 
 header .xlink{font-size:14px}
 header .xlink a{color:var(--rot);font-family:var(--display);letter-spacing:.04em}
