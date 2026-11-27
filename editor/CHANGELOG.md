@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.59.1 — 2026-11-27
+
+### Dodane
+- ▶ Graj: odłamki budynków z części i przedmioty złomowiska w jednej scenie zderzają się
+  (`js/behaviors/land/bodies-link.js`).
+
 ## 0.59.0 — 2026-11-27
 
 ### Dodane

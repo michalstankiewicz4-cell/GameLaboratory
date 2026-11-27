@@ -133,6 +133,7 @@ w `update`). Silnik w grze gra dźwięk z danych modelu (`info.sounds.engine`) �
   spada. Do pierwszego uszkodzenia widać model prefabrykatu (HouseKit: części scalone po materiale `houseModel`,
   Warszawa: budynek CityKit), potem części świata. Po „Stop” świat znika, a budynki wracają całe; tornado zaczyna od
   miejsca startu przy ▶ Graj i przy Stop (`stage.resetTornado()`). Linia stanu: części stojące i odsetek zniszczenia.
+  Gdy w scenie są też przedmioty złomowiska, odłamki i przedmioty zderzają się (`js/behaviors/land/bodies-link.js`).
 - **Układ silnika** (`mechanics`, `js/scene/mechanics.js`; prefabrykat `mech/machine`, rodzina Maszyny): maszyna
   z laboratorium mechaniki z instalacją i regulatorem (model `js/models/mech/assemblies/engine-layout/` bez posadzki
   i lamp hali, fizyka układu `js/behaviors/land/mech/engine-layout.js`, tworzona raz przy pierwszym ▶ Graj). W ▶ Graj ta sama fizyka i obwód co w trybie Fizyka laboratorium (hamulec 20 N·m).

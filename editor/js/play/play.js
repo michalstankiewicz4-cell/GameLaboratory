@@ -13,6 +13,7 @@ import { createSceneSounds } from '../../../js/scene/sounds.js';
 import { createSceneMusic } from '../../../js/scene/music.js';
 import { createSceneWeather } from '../../../js/scene/weather.js';
 import { createSceneDestruct } from '../../../js/scene/destruct.js';
+import { linkBodies } from '../../../js/behaviors/land/bodies-link.js';
 import { applyGraphics, refresh } from '../../../js/render/game-graphics.js';
 
 const { t, lang } = window.EditorI18n;
@@ -64,7 +65,7 @@ export function createPlay(store, world, controls, actions, events) {
     const a = me.run.actions()[n - 1]; if (!a) return;
     e.preventDefault(); act(me.obj.id, a.id);
   });
-  let runs = [], me = null, last = null, hudT = 0, items = null, machines = [], destruct = null;
+  let runs = [], me = null, last = null, hudT = 0, items = null, machines = [], destruct = null, bodiesLink = null;
   // mysz w grze: zachowania z pointer() (układ silnika: wyłączniki, przyciski, pokrętła) łapią klik przed kamerą
   const cv = world.renderer.domElement, pray = new THREE.Raycaster(), pndc = new THREE.Vector2();
   let grabbed = null, py = 0;
@@ -128,6 +129,7 @@ export function createPlay(store, world, controls, actions, events) {
     // przedmioty powstałe w grze (sztabki, puszki zgniecione) znikają ze świata
     if (items) for (const it of [...items.list]) if (it.spawned) items.remove(it);
     items = null; machines.length = 0;
+    if (bodiesLink) { bodiesLink.unlink(); bodiesLink = null; }
     if (destruct) { destruct.stop(); destruct = null; }
     letGo(); cv.classList.remove('grab');
     runs = []; me = null; input.release(); playUI.stop();
@@ -145,6 +147,8 @@ export function createPlay(store, world, controls, actions, events) {
     runs.forEach((r) => { r.input = r === me ? c : {}; r.run.step(dt, r.input, time); });
     if (items) { items.step(dt); items.sync(); JUNK_KIT.glow(items); if (machines.length) LIQUID_TIME.value += dt; }
     if (destruct) destruct.frame(dt);
+    // odłamki budynków i przedmioty złomowiska w jednej scenie: zderzają się (js/behaviors/land/bodies-link.js)
+    if (items && destruct) { if (!bodiesLink) bodiesLink = linkBodies(items, destruct.world); bodiesLink.frame(); }
     const p = me.b.root.position, d = p.clone().sub(last); last.copy(p);
     controls.orbit.target.add(d); world.camera.position.add(d);
     if ((hudT -= dt) <= 0) { hudT = 0.2; actions.status(hudText(me.run.hud())); }

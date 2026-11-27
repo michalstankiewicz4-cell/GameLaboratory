@@ -3,6 +3,16 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.112.0 · edytor sceny 0.59.1 — 2026-11-27 (odłamki budynków a przedmioty)
+
+### Dodane
+- `js/behaviors/land/bodies-link.js` — połączenie światów brył na lądzie: odłamki budynków (DestructKit) i luźne
+  przedmioty (beczki, opony, puszki — `land/items.js`) zderzają się. Odłamki bliskie przedmiotom wchodzą do świata
+  przedmiotów jako bryły ruchome, a odrzut, który dały przedmiotom, wraca do nich co krok 1/240 s. Każdy świat liczy się
+  jak dotąd, więc laboratoria działają bez zmian; to połączenie dwóch silników, nie jeden wspólny. Próba: odłamek
+  40 kg przy 10 m/s uderza w beczkę 18 kg — beczka odlatuje z ok. 11 m/s, odłamek zwalnia do ok. 1 m/s.
+- Edytor sceny, ▶ Graj: w scenie z budynkami z części i przedmiotami złomowiska łączy oba światy.
+
 ## Program 0.111.9 — 2026-11-27 (wspólne generatory liczb losowych)
 
 ### Zmienione
