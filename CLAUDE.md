@@ -96,7 +96,7 @@
 
 ## Strona startowa
 
-- Strona startowa (jak zrzut „Canvas”, właściciel 2026-11-27): boczna kolumna (sekcje, kategorie jako filtr), baner z hasłem i obrazkiem, Szybki dostęp, Sceny, Laboratoria, Narzędzia. Gotowe sceny edytora: `scenes` w katalogu (te same id co `editor/js/scenes/scenes.js`, obrazek w `assets/scenes/`) — karta na stronie startowej i menu SCENY na pasku menu laboratoriów otwierają `editor/index.html?scene=<id>`.
+- Strona startowa (jak zrzut „Canvas”, właściciel 2026-11-27): boczne menu jako panel (odsunięty od krawędzi, zaokrąglony, z cieniem; sekcje, kategorie jako filtr), baner z hasłem i obrazkiem, Szybki dostęp, Sceny, Laboratoria, Narzędzia. Gotowe sceny edytora: `scenes` w katalogu (te same id co `editor/js/scenes/scenes.js`, obrazek w `assets/scenes/`) — karta na stronie startowej i menu SCENY na pasku menu laboratoriów otwierają `editor/index.html?scene=<id>`.
 - Rejestr laboratoriów i narzędzi: `ui/data/catalog.js` (nazwa EN/PL, dokument, opis EN/PL, kit, frazy, klucze ustawień, obrazek kafelka) — czytają go pasek menu, strona startowa i `tools/sitemap.py`. Nowe laboratorium = wpis w katalogu + wersja w `ui/data/versions.js`, potem `python3 tools/sitemap.py`.
 - Każde laboratorium ma kilka fraz, które je opisują (np. woda, kosmos, planeta, układy) — używa ich filtr laboratoriów na stronie startowej (`phrases` w katalogu, po angielsku `phraseEn`; nowa fraza potrzebuje obu).
 - Strona startowa pochodzi z gry kosmicznej (Space).
