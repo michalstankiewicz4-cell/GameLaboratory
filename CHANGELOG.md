@@ -3,6 +3,13 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.114.3 — 2026-11-27 (strona startowa: przyciski-ikony)
+
+### Zmienione
+- Strona startowa: przyciski w prawym górnym rogu to okrągłe ikony z podpowiedziami i lekkim cieniem (nowy token
+  `--shadowSoft`) — język (globus z plakietką PL / EN), Pomoc (znak zapytania, otwiera menu), słońce / księżyc,
+  Konsola (okno terminala; podświetlona, gdy otwarta).
+
 ## Program 0.114.2 — 2026-11-27 (przycisk języka)
 
 ### Poprawione

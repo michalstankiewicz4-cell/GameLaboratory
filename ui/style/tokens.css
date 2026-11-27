@@ -50,7 +50,8 @@
   /* shadows: light from the top left — above and on the left about half as strong as below and on the right */
   --shadow:5px 17px 32px -6px rgba(0,0,0,.5), 2px 4px 6px rgba(0,0,0,.3);
   --shadowHi:8px 25px 44px -8px rgba(0,0,0,.6), 3px 5px 10px rgba(0,0,0,.35);
-  --shadowBig:8px 28px 50px -8px rgba(0,0,0,.6), 3px 6px 10px rgba(0,0,0,.35);   /* a big panel (the start page's banner) */
+  --shadowBig:8px 28px 50px -8px rgba(0,0,0,.6), 3px 6px 10px rgba(0,0,0,.35);
+  --shadowSoft:1px 3px 10px -2px rgba(0,0,0,.55);   /* a light shadow: small round buttons */   /* a big panel (the start page's banner) */
   --scroll:color-mix(in srgb, var(--accent) 55%, var(--line2));   /* the scrollbar's thumb: the accent, softened */
   --scrollHover:var(--accent);
   --hero1:#1c212b;         /* the start page's banner: a soft gradient */
@@ -97,6 +98,7 @@
   --shadow:3px 10px 26px -4px rgba(110,72,40,.17), 1px 3px 6px rgba(110,72,40,.08);
   --shadowHi:5px 18px 40px -6px rgba(110,72,40,.24), 2px 4px 10px rgba(110,72,40,.10);
   --shadowBig:6px 21px 44px -6px rgba(110,72,40,.26), 2px 4px 10px rgba(110,72,40,.12);
+  --shadowSoft:1px 3px 10px -2px rgba(110,72,40,.24);
   --scroll:color-mix(in srgb, var(--accent) 45%, var(--line2));
   --scrollHover:var(--accent);
   --hero1:#fff4ea;

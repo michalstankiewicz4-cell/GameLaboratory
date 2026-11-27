@@ -399,16 +399,23 @@ bar.appendChild(themeBtn);
 // Help, day / night, the console (the logo, Tools, Scenes and the version are on the page itself; OPTIONS in the labs)
 if (START) {
   bar.classList.add("lmStart");
+  // round icon buttons, each with its tooltip
+  const ICO = (d) => `<svg viewBox="0 0 18 18" aria-hidden="true"><path d="${d}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const iconBtn = (b, svg, tip) => { b.innerHTML = svg; b.title = tip; b.setAttribute("aria-label", tip); b.classList.add("lmIcon"); };
   const other = LANG === "pl" ? "en" : "pl";
-  const lang = el("button", "lmLang", LANG.toUpperCase()); lang.type = "button";
-  lang.title = t("Język: Polski", "Language: English");
+  const lang = el("button", "lmLang"); lang.type = "button";
+  iconBtn(lang, ICO("M9 1.8a7.2 7.2 0 1 0 0 14.4A7.2 7.2 0 0 0 9 1.8ZM1.8 9h14.4M9 1.8c2 2 2.9 4.4 2.9 7.2S11 14.2 9 16.2C7 14.2 6.1 11.8 6.1 9S7 3.8 9 1.8Z"),
+    t("Language: English — switch to Polski", "Język: polski — przełącz na English"));
+  lang.append(el("span", "lmLangCode", LANG.toUpperCase()));
   lang.addEventListener("click", () => {
     try { localStorage.setItem(LANG_KEY, other); } catch (e) { /* storage blocked */ }
     reloadLang();
   });
   bar.insertBefore(lang, bar.querySelector('.lmTop[data-menu="help"]'));
-  const con = el("button", "lmCon", t("Console", "Konsola")); con.type = "button";
-  con.title = t("The page's log: errors, warnings, loading", "Dziennik strony: błędy, ostrzeżenia, ładowanie");
+  iconBtn(bar.querySelector('.lmTop[data-menu="help"] > button'), ICO("M9 16.2A7.2 7.2 0 1 0 9 1.8a7.2 7.2 0 0 0 0 14.4ZM6.9 6.9a2.2 2.2 0 1 1 3 2c-.6.3-.9.8-.9 1.4v.4M9 13v.1"), t("Help", "Pomoc"));
+  themeBtn.classList.add("lmIcon");
+  const con = el("button", "lmCon"); con.type = "button";
+  iconBtn(con, ICO("M2.5 3.5h13v11h-13ZM5.5 7.5l2.2 1.8-2.2 1.8M9.5 11.2h3"), t("Console — the page's log: errors, warnings, loading", "Konsola — dziennik strony: błędy, ostrzeżenia, ładowanie"));
   con.addEventListener("click", () => { if (window.LabConsole && window.LabConsole.toggle) window.LabConsole.toggle(); });
   addEventListener("labconsole:show", (e) => con.classList.toggle("on", !!e.detail));
   bar.appendChild(con);
