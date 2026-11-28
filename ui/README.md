@@ -39,7 +39,7 @@ same in both themes.
 | `nav.js` | back · home · forward: three joined buttons first on every toolbar — the browser's history and the start page; greyed out when there is nowhere to go. Loaded by the menu bar |
 | `console.css` + `console.js` (window or panel: its own pin docks it at the bottom between the panels or lets it float; the Windows \| Panels switch resets that) | the console window: the log, newest first, date and time, the page, the kinds as tabs with icons and counts (All, Errors, Warnings, Loading, Info, Messages; a kind with no entries has no tab) and the same icon on every entry, Clear at the end of the tabs' row, a text filter (its row hidden from OPTIONS → Console → Text filter); window | panel and close at the right end of its title bar; docked, its top edge is a grip — drag to change its height (90 px up to 75 % of the window, double-click: 30 %; `--conH`, kept in `gamelab.console`); a button on the right of the toolbar. Tabs: the log first, then the page's own (`window.LabConsole.addTab({ id, title, titlePl, el })`, or queued in `window.LabConsoleTabs` before the console loads) |
 | `loader.css` + `loader.js` | the loading card: a ring, a plain sentence, the step being done, a bar with a percentage (see below) |
-| `envswitch.css` + `envswitch.js` | the environment switch: space · water · land, in the toolbar; a greyed-out position has no page |
+| `envswitch.css` + `envswitch.js` | the environment switch: space · water · land, in the toolbar; a greyed-out position has no page. The group switch (`.groupSwitch`, `data-group`): the labs of one catalog group — space, terrain, sound, life, SDF characters |
 
 ## data/
 

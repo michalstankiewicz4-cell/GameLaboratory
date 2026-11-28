@@ -49,10 +49,11 @@ W kolejności kategorii z menu Narzędzia i strony startowej (`ui/data/catalog.j
 | Kosmos | Ciała niebieskie *(grupa kosmosu)* | `labs/bodies.html` | [labs/bodies.md](labs/bodies.md) |
 | | Układy *(grupa kosmosu)* | `labs/systems.html` | [labs/systems.md](labs/systems.md) |
 | | Skala *(grupa kosmosu)* | `labs/scale.html` | [labs/scale.md](labs/scale.md) |
-| | Powierzchnia, budynki | `labs/surface.html`, `labs/buildings.html` | [labs/surface.md](labs/surface.md) |
+| | Budynki (moduły bazy BaseKit) | `labs/buildings.html` | [labs/surface.md](labs/surface.md) |
 | Świat | Woda | `labs/water.html` | [labs/water.md](labs/water.md) |
 | | Ląd *(grupa terenu)* | `labs/land.html` | [labs/land.md](labs/land.md) |
 | | Jaskinie *(grupa terenu; jaskinia jako obiekt albo teren planszy — podziemie)* | `labs/caves.html` | [labs/caves.md](labs/caves.md) |
+| | Powierzchnia *(grupa terenu; ląd na planecie z jej globu, zejście, jazda, baza)* | `labs/surface.html` | [labs/surface.md](labs/surface.md) |
 | | Wygląd | `labs/look.html` | [labs/look.md](labs/look.md) |
 | | Filtry | `labs/filters.html` | [labs/filters.md](labs/filters.md) |
 | | Budowle | `labs/structures.html` | [labs/structures.md](labs/structures.md), [labs/structures/coastal.md](labs/structures/coastal.md), [labs/structures/super300.md](labs/structures/super300.md) |
@@ -62,18 +63,18 @@ W kolejności kategorii z menu Narzędzia i strony startowej (`ui/data/catalog.j
 | | Skały | `labs/rocks.html` | [labs/rocks.md](labs/rocks.md) |
 | | Przedmioty (złomowisko) | `labs/items.html`, `js/models/junkyard/` | [labs/items.md](labs/items.md), [models/junkyard.md](models/junkyard.md) |
 | Maszyny i mechanika | Mechanika (MechKit, ControlKit, ClockKit, FluidKit, OptiKit: zębatki, łańcuchy, pasy, sprzęgła, łożyska, zamiana ruchu, silnik, sterowanie, zegar, czujniki, płyny, optyka; napęd, fizyka, obwód) | `labs/mechanics.html`, `js/models/mech/` | [labs/mechanics.md](labs/mechanics.md), [models/mech.md](models/mech.md) |
-| Życie i postacie | Życie, edytor stworów | `labs/life.html`, `labs/creator.html` | [labs/life.md](labs/life.md) |
-| | Człowiek | `labs/human.html` | [labs/human.md](labs/human.md) |
+| Życie i postacie | Życie, edytor stworów *(grupa życia)* | `labs/life.html`, `labs/creator.html` | [labs/life.md](labs/life.md) |
+| | Człowiek *(grupa życia)* | `labs/human.html` | [labs/human.md](labs/human.md) |
 | | Przedmioty bohatera | `labs/gear.html` | [labs/gear.md](labs/gear.md) |
-| | Kostnica SDF | `labs/morgue.html` | [labs/morgue.md](labs/morgue.md) |
-| | SDF Walkers | `labs/walkers.html` | [labs/walkers/README.md](labs/walkers/README.md), [labs/walkers/roadmap.md](labs/walkers/roadmap.md) |
+| | Kostnica SDF *(grupa postaci SDF)* | `labs/morgue.html` | [labs/morgue.md](labs/morgue.md) |
+| | SDF Walkers *(grupa postaci SDF)* | `labs/walkers.html` | [labs/walkers/README.md](labs/walkers/README.md), [labs/walkers/roadmap.md](labs/walkers/roadmap.md) |
+| | Generator zombie *(grupa postaci SDF)* | `labs/zombies.html` | [labs/zombies.md](labs/zombies.md) |
 | Materiały i grafika | Materiały (MatKit: PBR, starzenie) | `labs/materials.html`, `js/render/materials/` | [labs/materials.md](labs/materials.md) |
 | | Sztuka (obrazy 2D, ekspertyza) | `labs/art.html`, `js/render/art/` | [labs/art.md](labs/art.md) (obiekty: [labs/art/](labs/art/)) |
 | | Pixel Studio | `labs/pixel.html` | [labs/pixel/README.md](labs/pixel/README.md) |
-| | Generator zombie | `labs/zombies.html` | [labs/zombies.md](labs/zombies.md) |
 | Woksele | Bloki (BlockKit: bryły z wokseli, ciecze i gaz) | `labs/blocks.html`, `js/models/blocks/` | [labs/blocks.md](labs/blocks.md) |
-| Efekty | Efekty (EffectKit: 22 efekty z odznakami — strzały, plazma, odłamki, błyskawice, czarne dziury, promienie, pola, skok, tunel, fala skanu, dym, iskry, wybuch, spalenizna, ognik) | `labs/effects.html`, `js/render/effects/` | [labs/effects.md](labs/effects.md) |
-| | Efekty · ląd (FireKit: realistyczny ogień — płomienie, dym, iskry, światło; paliwa: drewno, trawa, guma i papa, papier) | `labs/effects-land.html`, `js/render/effects/fire/` | [labs/effects-land.md](labs/effects-land.md) |
+| Efekty | Efekty *(grupa efektów)* (EffectKit: 22 efekty z odznakami — strzały, plazma, odłamki, błyskawice, czarne dziury, promienie, pola, skok, tunel, fala skanu, dym, iskry, wybuch, spalenizna, ognik) | `labs/effects.html`, `js/render/effects/` | [labs/effects.md](labs/effects.md) |
+| | Efekty · ląd *(grupa efektów)* (FireKit: realistyczny ogień — płomienie, dym, iskry, światło; paliwa: drewno, trawa, guma i papa, papier) | `labs/effects-land.html`, `js/render/effects/fire/` | [labs/effects-land.md](labs/effects-land.md) |
 | UI i dźwięk | UI gry (menu, HUD, okna, dialogi, skórki) | `labs/gameui.html`, `js/gameui/` | [labs/gameui.md](labs/gameui.md) |
 | UI i dźwięk | drzewka ulepszeń i badań (format `gamelab-tree`, widok promienisty i płytka drukowana, poziomy, próba, sprawdzanie, okno w UI gry) | `labs/trees.html`, `js/gameui/tree/` | [labs/trees.md](labs/trees.md) |
 | | Dźwięk *(grupa dźwięku)*: muzyka · efekty i otoczenie · mowa | `labs/sound.html`, `labs/sound-effects.html`, `labs/sound-speech.html`, `js/audio/` | [labs/sound.md](labs/sound.md), [labs/sound-effects.md](labs/sound-effects.md), [labs/sound-speech.md](labs/sound-speech.md), [audio/README.md](audio/README.md) (mikser) |
