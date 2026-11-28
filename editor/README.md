@@ -45,7 +45,7 @@ dostosowywać (zasoby z nazwą, wspólne zachowania).
 
 ## Języki
 
-Angielski (domyślny) i polski. Język wybiera się w OPCJE → Język, tak jak na całej stronie; strona ma
+Angielski (domyślny) i polski. Język wybiera się przyciskiem języka (globus) na pasku menu, tak jak na całej stronie; strona ma
 `<html data-lang-default="en">`, więc przy „Automatycznie” zostaje angielski. Teksty: `js/i18n/en.js` i `js/i18n/pl.js`
 (te same klucze; brakujący klucz pokazuje tekst angielski). W HTML: `data-i18n` (tekst), `data-i18n-tip` (podpowiedź),
 `data-i18n-win` (tytuł okna); w skryptach `EditorI18n.t('klucz', { zmienna })`. Nowy tekst = klucz w obu plikach.

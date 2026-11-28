@@ -1,5 +1,5 @@
 // Scene editor · languages. A classic script after en.js and pl.js and before ui/shell/windows.js, so the windows get
-// their titles in the right language. The language is the menu bar's (OPTIONS → Language); the editor page sets
+// their titles in the right language. The language is the menu bar's (the language button, a globe); the editor page sets
 // <html data-lang-default="en">, so until Polish is chosen it is English.
 //   data-i18n="key"        → the element's text
 //   data-i18n-tip="key"    → its title (tooltip)

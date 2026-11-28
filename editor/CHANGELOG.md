@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.60.2 — 2026-11-28
+
+### Zmienione
+- Pasek menu: Pomoc, wygląd i język jako okrągłe ikony na prawym końcu, jak na stronie startowej (język przeniesiony
+  z OPCJE).
+
 ## 0.60.1 — 2026-11-28
 
 ### Zmienione

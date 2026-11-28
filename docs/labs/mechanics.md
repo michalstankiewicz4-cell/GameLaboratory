@@ -354,11 +354,13 @@ Fizyka luźnej części (tryb Fizyka) — moment reakcji z fizyki napędu:
 
 ## Języki (polski i angielski)
 
-- Język z paska menu (`window.LabMenu.LANG`: Opcje → Język albo `?lang=en` / `?lang=pl`). Strona GameLaboratory jest po
+- Język z paska menu (`window.LabMenu.LANG`: przycisk języka — globus — albo `?lang=en` / `?lang=pl`). Strona GameLaboratory jest po
   angielsku z tekstami polskimi w `data-pl` (treść), `data-tip-pl` (podpowiedź), `data-aria-pl` i `data-<tryb>-pl`
   (opisy trybów w oknie Opis); dane modeli i katalogu są po polsku.
 - `js/labs/mechanics/lang.js`: `T(pl, en)` — tekst w kodzie w obu językach; `tr(tekst)` — tekst polski tłumaczony
-  słownikiem `lang-en.js` (najpierw cały, potem fragmentami, najdłuższe pierwsze, na granicach słów; wynik w pamięci
+  słownikiem `lang-en.js` (składa części z `lang-en/`: `common.js` — fragmenty wspólne, `ui.js`, `transmission.js`,
+  `machine.js`, `electric.js`, `energy.js`, `signals.js`, `fluid.js`, `optics.js`; nowy tekst — do części, która go
+  używa) (najpierw cały, potem fragmentami, najdłuższe pierwsze, na granicach słów; wynik w pamięci
   podręcznej); `LOC` — zapis liczb; `translateDom()` — statyczne teksty strony w bieżącym języku.
 - `tr` działa przy wyświetlaniu: pomocnik `el()` (treść i podpowiedź), nazwa wybranego elementu, wyjścia suwaków,
   wiersze okna Wydajność (`perfRows`). Nowy tekst po polsku w nazwie, właściwości albo wierszu — wpis w `lang-en.js`

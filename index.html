@@ -67,7 +67,7 @@
 <script src="ui/shell/log.js"></script>
 <script src="ui/shell/menubar.js"></script>
 <aside class="side">
-  <a class="brand" href="#top"><span class="mark"></span><span><b>GameLaboratory</b><small data-pl="Buduj. Testuj. Graj.">Build. Test. Play.</small></span></a>
+  <a class="brand" href="#top"><span class="mark"></span><span><b>GameLaboratory</b><small data-lab-version="app"></small></span></a>
   <nav class="sideNav" id="sideNav">
     <a href="#top" class="on"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M2.5 8 9 2.5 15.5 8v7.5h-4.2v-4.5H6.7v4.5H2.5Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-pl="Strona główna">Home</span></a>
     <a href="#scenesSec"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M2.5 4.5h13v9h-13ZM2.5 7.5h13M6 4.5v3M12 4.5v3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-pl="Sceny">Scenes</span></a>
@@ -111,7 +111,7 @@
 <script>
 (() => {
 "use strict";
-// language: chosen by the menu bar (OPTIONS → Language; ui/shell/menubar.js) — English or Polish
+// language: chosen by the menu bar (the language button; ui/shell/menubar.js) — English or Polish
 const PL = window.LabMenu.LANG === "pl", tr = window.LabMenu.t;
 // a language chosen by the address (?lang=pl / ?lang=en) is its own page for search engines
 { const q = new URLSearchParams(location.search).get("lang"); const c = document.querySelector('link[rel="canonical"]');

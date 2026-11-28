@@ -3,6 +3,27 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.117.2 — 2026-11-28 (pasek menu: Pomoc, wygląd i język jak na stronie startowej)
+
+### Zmienione
+- Pasek menu na każdej stronie (laboratoria, narzędzia, edytor): na prawym końcu, jak na stronie startowej i w tej samej
+  kolejności, okrągłe przyciski-ikony z podpowiedziami — Pomoc (otwiera menu Pomoc; zniknęło z rzędu menu), wygląd
+  (trzy tryby: automatycznie → dzień → noc) i język (globus z plakietką AUTO / PL / EN: automatycznie → polski →
+  angielski). Język przeniesiony z OPCJE na globus.
+- Miniatura linków `assets/og-image.jpg`: nowa strona startowa (jasny canvas, Szybki dostęp).
+- Strona startowa: pod nazwą GameLaboratory w bocznym menu numer wersji programu zamiast hasła „Buduj. Testuj. Graj.”.
+
+## Laboratorium mechaniki 1.1.2 — 2026-11-28
+
+### Zmienione
+- Słownik polski → angielski podzielony według części laboratorium: `js/labs/mechanics/lang-en/` (wspólne fragmenty,
+  strona i okna, transmisja, maszyna, elektryka, energia, sygnały, płyny, optyka); `lang-en.js` je składa.
+
+## Edytor sceny 0.60.2 — 2026-11-28
+
+### Zmienione
+- Pasek menu: Pomoc, wygląd i język jako ikony na prawym końcu (jak na stronie startowej).
+
 ## Program 0.117.1 — 2026-11-28 (przegląd ostrzeżeń doktora w mechanice z Tornado.io; sprawdzanie składni)
 
 ### Poprawione

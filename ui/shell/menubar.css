@@ -55,11 +55,19 @@
   text-decoration: none; font-weight: 500; }
 #labMenu .lmVer:hover { color: var(--head); border-color: var(--line2); }
 #labMenu .lmWhere + .lmVer { margin-left: 12px; }
-#labMenu .lmTop:last-of-type + .lmVer { margin-left: auto; }
-#labMenu .lmTheme { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 26px; height: 24px; margin-inline-start: 8px;
-  padding: 0; border: 0; border-radius: 6px; background: none; color: var(--dim); cursor: pointer; }
-#labMenu .lmTheme:hover { background: var(--line); color: var(--accent); }
-#labMenu .lmTheme svg { width: 15px; height: 15px; display: block; }
+#labMenu .lmTop + .lmVer { margin-left: auto; }
+/* the right end of the bar (every page): Help, the look, the language — round icon buttons as on the start page, smaller */
+#labMenu .lmHelp { margin-inline-start: 10px; }
+#labMenu .lmIcon, #labMenu .lmTop > button.lmIcon { position: relative; display: inline-flex; align-items: center; justify-content: center; flex: none;
+  width: 24px; height: 24px; margin: 0; margin-inline-start: 6px; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: var(--card);
+  color: var(--head); box-shadow: var(--shadowSoft); cursor: pointer; transition: color .15s, border-color .15s, background .15s; }
+#labMenu .lmTop > button.lmIcon { margin: 0; }
+#labMenu .lmIcon svg { width: 14px; height: 14px; display: block; }
+#labMenu .lmIcon:hover, #labMenu .lmTop > button.lmIcon:hover, #labMenu .lmTop.open > button.lmIcon { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); background: var(--card); }
+/* the language's code on its globe, a small chip at the lower right */
+#labMenu .lmLangCode { position: absolute; inset-inline-end: -5px; bottom: -4px; padding: 0 3px; border-radius: 5px; background: var(--accent);
+  color: var(--onAccent); font: 600 7.5px/1.25 var(--mono); letter-spacing: .2px; }
+#labMenu .lmHelp .lmDrop { left: auto; inset-inline-end: 0; }
 #lmDialog { position: fixed; inset: 0; z-index: 1001; display: none; align-items: center; justify-content: center; background: var(--overlay); }
 #lmDialog.open { display: flex; }
 #lmDialog .lmBox { width: min(460px, calc(100vw - 32px)); padding: 20px 22px; border-radius: 14px; background: var(--card); border: 1px solid var(--line);
@@ -124,12 +132,8 @@
 #labMenu.lmStart { left: auto; right: auto; inset-inline-end: 20px; top: 16px; height: 40px; padding: 0; gap: 10px; border: 0; background: none;
   box-shadow: none; }
 #labMenu.lmStart :is(.lmHome, .lmVer, .lmTop[data-menu="options"], .lmTop[data-menu="tools"], .lmTop[data-menu="scenes"]) { display: none; }
-#labMenu.lmStart .lmIcon, #labMenu.lmStart .lmTop > button.lmIcon { position: relative; display: inline-flex; align-items: center; justify-content: center;
-  width: 40px; height: 40px; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: var(--card); color: var(--head);
-  box-shadow: var(--shadowSoft); cursor: pointer; transition: color .15s, border-color .15s, background .15s; }
-#labMenu.lmStart .lmIcon svg { width: 19px; height: 19px; display: block; }
-#labMenu.lmStart .lmIcon:hover, #labMenu.lmStart .lmTop > button.lmIcon:hover, #labMenu.lmStart .lmTop.open > button.lmIcon { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); background: var(--card); }
-/* the language's code on its globe, a small chip at the lower right */
-#labMenu.lmStart .lmLangCode { position: absolute; inset-inline-end: -4px; bottom: -3px; padding: 1px 4px; border-radius: 6px; background: var(--accent);
-  color: var(--onAccent); font: 600 9px/1.2 var(--mono); letter-spacing: .3px; }
+#labMenu.lmStart .lmIcon, #labMenu.lmStart .lmTop > button.lmIcon { width: 40px; height: 40px; margin: 0; }
+#labMenu.lmStart .lmHelp { margin: 0; }
+#labMenu.lmStart .lmIcon svg { width: 19px; height: 19px; }
+#labMenu.lmStart .lmLangCode { inset-inline-end: -4px; bottom: -3px; padding: 1px 4px; border-radius: 6px; font-size: 9px; line-height: 1.2; letter-spacing: .3px; }
 #labMenu.lmStart .lmDrop { left: auto; inset-inline-end: 0; top: 46px; width: max-content; max-width: min(380px, calc(100vw - 40px)); }

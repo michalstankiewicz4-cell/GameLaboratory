@@ -1,4 +1,4 @@
-// Język laboratorium mechaniki: polski i angielski (wybór z paska menu — Opcje → Język; ?lang=en / ?lang=pl).
+// Język laboratorium mechaniki: polski i angielski (wybór z paska menu — przycisk języka; ?lang=en / ?lang=pl).
 //   T(pl, en) — tekst w bieżącym języku; tr(tekst) — tekst polski przetłumaczony słownikiem (lang-en.js): najpierw cały,
 //   potem fragmentami (najdłuższe pierwsze, na granicach słów); LOC — zapis liczb (pl-PL: przecinek, en-US: kropka);
 //   translateDom() — statyczne teksty strony: po polsku data-pl (treść), data-tip-pl (podpowiedź), data-aria-pl,
