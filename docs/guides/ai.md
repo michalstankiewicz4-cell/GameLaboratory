@@ -30,15 +30,15 @@ Jednostki: metry, stopnie, sekundy; Y w górę; kurs 0 — wzdłuż +Z. Teksty i
 
 ## 2. Co jest — laboratoria i co tworzą
 
-| Grupa | Laboratorium (`labs/…`) | Tworzy / pokazuje | Zasób | API |
+| Grupa | Laboratorium (`labs/…`; ` · ` — jedna grupa z przełącznikiem) | Tworzy / pokazuje | Zasób | API |
 |---|---|---|---|---|
 | Pojazdy | `vehicles-space.html` · `vehicles-water.html` · `vehicles-land.html` | statki kosmiczne, okręty i roboty morskie, pojazdy drogowe, tramwaj, pociąg, samolot, łaziki, przeładowarka — z jazdą siłami | — | — |
-| Kosmos | `bodies.html`, `systems.html`, `scale.html`, `surface.html`, `buildings.html` | ciała niebieskie, układy, skala, powierzchnia planety, moduły bazy | `sky` (niebo kosmosu) | — |
-| Świat | `water.html`, `land.html`, `caves.html`, `look.html`, `filters.html` | morze, ląd (teren, wody, biomy), jaskinie, pogoda i światło, wygląd kamery | `sea`, `land`, `cave`, `weather`, `look` | `CaveApi` |
+| Kosmos | `bodies.html`, `systems.html`, `scale.html`, `buildings.html` | ciała niebieskie, układy, skala, moduły bazy | `sky` (niebo kosmosu) | — |
+| Świat | `water.html`, `land.html` · `caves.html` · `surface.html`, `look.html`, `filters.html` | morze, ląd (teren, wody, biomy), jaskinie, powierzchnia planety, pogoda i światło, wygląd kamery | `sea`, `land`, `cave`, `weather`, `look` | `CaveApi` |
 | Świat | `structures.html`, `city.html`, `plants.html`, `items.html` | budowle wodne, budynki miasta (także Warszawa z OpenStreetMap), rośliny i roślinność krajobrazu, przedmioty złomowiska | `building`, `plant`, `vegetation` | `CityApi`, `PlantApi`, `ItemsApi` |
-| Życie | `life.html`, `creator.html`, `human.html`, `gear.html`, `morgue.html`, `walkers.html` | zwierzęta, edytor stworów, człowiek, przedmioty bohatera (światło), głowy SDF, postacie SDF z siecią ocen | — | — |
-| Materia | `materials.html`, `art.html`, `pixel.html`, `zombies.html` | materiały PBR ze starzeniem, obrazy i ekspertyza, pixel art, generator zombie | `material`, `image` | `MaterialApi`, `ArtApi` |
-| Woksele, efekty | `blocks.html`, `effects.html` | bryły z bloków (ciecze, gaz), efekty (strzały, wybuchy, pola, skok…) | `blocks`, `effect` | `BlocksApi`, `EffectsApi` |
+| Życie | `life.html` · `creator.html` · `human.html`, `gear.html`, `morgue.html` · `walkers.html` · `zombies.html` | zwierzęta, edytor stworów, człowiek, przedmioty bohatera (światło), głowy SDF, postacie SDF z siecią ocen, generator zombie | — | — |
+| Materia | `materials.html`, `art.html`, `pixel.html` | materiały PBR ze starzeniem, obrazy i ekspertyza, pixel art | `material`, `image` | `MaterialApi`, `ArtApi` |
+| Woksele, efekty | `blocks.html`, `effects.html` · `effects-land.html` | bryły z bloków (ciecze, gaz), efekty (strzały, wybuchy, pola, skok…), ogień na lądzie | `blocks`, `effect` | `BlocksApi`, `EffectsApi` |
 | UI | `gameui.html`, `trees.html` | UI gry (menu, HUD, okna, dialog, skórki i ich dźwięki, głosy, podgląd kontrolek), drzewka ulepszeń | `ui`, `uiskin`, `tree` | `GameUIApi`, `TreeApi` |
 | Dźwięk | `sound.html` · `sound-effects.html` · `sound-speech.html` | muzyka, efekty i tła miejsc, mowa (głosy postaci) | `music`, `sound`, `ambience`, `voice` | `SfxApi`, `VoiceApi` |
 | AI | `lang.html`, `img.html` | małe sieci języka i obrazów, uczone w przeglądarce | — | — |
