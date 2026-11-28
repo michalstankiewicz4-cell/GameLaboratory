@@ -34,6 +34,9 @@
 #labMenu .lmItem.lmGlow[data-group="space"] { --glow: var(--plum); }
 #labMenu .lmItem.lmGlow[data-group="terrain"] { --glow: var(--terrain); }
 #labMenu .lmItem.lmGlow[data-group="sound"] { --glow: var(--sound); }
+#labMenu .lmItem.lmGlow[data-group="effects"] { --glow: var(--cat-effects); }
+#labMenu .lmItem.lmGlow[data-group="life"] { --glow: var(--cat-life); }
+#labMenu .lmItem.lmGlow[data-group="sdf"] { --glow: var(--sdf); }
 #labMenu .lmItem.lmGrpOn { background: var(--field); color: var(--head); }
 #labMenu .lmItem.lmGrpOn .lmChk:empty::before { content: "●"; color: var(--glow); }
 #labMenu .lmItem .lmChk { width: 12px; color: var(--accent); }

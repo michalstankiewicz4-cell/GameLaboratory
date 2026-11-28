@@ -25,8 +25,9 @@
   --cat-life:#8fd45e;
   --cat-matter:#e8925a;
   --cat-voxels:#5fb8f0;
-  --terrain:#d08a4e;
-  --sound:#9a8cff;     /* grupa laboratoriów dźwięku (muzyka · efekty · mowa): poświata w menu, podświetlenie kafelków */   /* grupa laboratoriów terenu (ląd · jaskinie): poświata w menu, podświetlenie kafelków */
+  --terrain:#d08a4e;   /* grupa laboratoriów terenu (ląd · jaskinie · powierzchnia): poświata w menu, podświetlenie kafelków */
+  --sound:#9a8cff;     /* grupa laboratoriów dźwięku (muzyka · efekty · mowa): poświata w menu, podświetlenie kafelków */
+  --sdf:#7fd6ff;       /* grupa postaci SDF i pixel art (Kostnica · Walkers · generator zombie): poświata, podświetlenie kafelków */
   --cat-effects:#ff7a5c;
   /* odznaki efektów (laboratorium efektów): lot, w miejscu, punktowy, obszarowy */
   --badge-flight:#ffb35a;
@@ -83,6 +84,7 @@
   --cat-world:#1fae90;
   --cat-machines:#a8865a;
   --cat-life:#5ea83a;
+  --sdf:#2b8bbf;
   --cat-voxels:#2f93d6;
   --cat-tools:#7d8896;
   --badge-point:#8794a8;

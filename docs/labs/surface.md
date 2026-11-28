@@ -7,6 +7,11 @@ materials are delivered and processed), all simple and automated for now.
 For now everything is stored in **this browser only** (localStorage), and each
 player sees only their own base. Later this may move to the server.
 
+The surface lab is in the **Terrain** group (land · caves · surface: one switch on the bar, one glow in the menu;
+category World, 2026-11-28) — the land lab has only a flat 1:1 cut of a planet's ground at its equator, this lab the
+whole planet: the globe, the ground on the sphere around the player, the system's sky, the descent, driving, the hop
+and the base.
+
 ## Contents
 
 - Files

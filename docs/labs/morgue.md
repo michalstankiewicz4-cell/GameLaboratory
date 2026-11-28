@@ -1,6 +1,7 @@
 # SDF Morgue (`labs/morgue.html`)
 
-Przeniesione z artefaktu claude.ai „SDF Morgue”. Głowa zombie liczona w shaderze WebGL2 jako pixel art.
+Przeniesione z artefaktu claude.ai „SDF Morgue”. Głowa zombie liczona w shaderze WebGL2 jako pixel art. W grupie **postaci SDF i pixel art** z SDF Walkers i generatorem
+zombie (przełącznik Kostnica · Walkers · Generator na pasku, kategoria Życie, 2026-11-28).
 
 - **Model:** `js/models/human/zombie/sdf-head.js` — shadery (funkcje odległości: elipsoidy, kapsuły, prostopadłościany,
   gładkie sumy i różnice; raymarching 110 kroków, miękki cień, okluzja, światło brzegowe; światło w 4 tonach),

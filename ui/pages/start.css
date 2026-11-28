@@ -74,6 +74,9 @@ h2::after{ content:""; flex:1; height:1px; background:var(--line); order:1; }
 .tile[data-group="space"]{ --glow:var(--plum); }
 .tile[data-group="terrain"]{ --glow:var(--terrain); }
 .tile[data-group="sound"]{ --glow:var(--sound); }
+.tile[data-group="effects"]{ --glow:var(--cat-effects); }
+.tile[data-group="life"]{ --glow:var(--cat-life); }
+.tile[data-group="sdf"]{ --glow:var(--sdf); }
 .tile.grpOn{ transform:translateY(-3px); border-color:color-mix(in srgb, var(--glow) 60%, transparent);
   box-shadow:var(--shadowHi), 0 0 18px color-mix(in srgb, var(--glow) 30%, transparent); }
 /* the category (catalog "cat", colours --cat-<id>): a coloured top edge, a chip with a dot; the chip under the pointer

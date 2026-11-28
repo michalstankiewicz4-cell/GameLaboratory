@@ -11,7 +11,8 @@
    phrases (Polish; their English in phraseEn — a new phrase needs both),
    saved (localStorage key prefixes), art (the tile: bg + svg, or img),
    group + tab / tabPl (labs that belong together — one background, one glow in the menu, a switch on the bar:
-   "vehicles": space · water · land, "space": bodies · systems · scale, "terrain": land · caves, "sound": music · effects · speech),
+   "vehicles": space · water · land, "space": bodies · systems · scale, "terrain": land · caves · surface, "sound": music · effects · speech,
+   "effects": space · land, "life": life · creature editor · human, "sdf": morgue · walkers · zombie generator),
    cat (the category: a coloured dot in the menu and on the tile; "cats" — their names, in order; colours:
    ui/style/tokens.css --cat-<id>). The labs are listed in category order (the menu and the start page follow it).
    "scenes" — the scene editor's ready scenes (editor/js/scenes/scenes.js, the same ids): the menu bar's SCENES and the
@@ -214,23 +215,6 @@ window.GameLabCatalog =
       }
     },
     {
-      "file": "labs/surface.html",
-      "cat": "space",
-      "name": "Surface lab",
-      "namePl": "Laboratorium powierzchni",
-      "doc": "docs/labs/surface.md",
-      "desc": "Land on a planet: terrain from its own look, sky, weather, day and night, a base.",
-      "descPl": "Ląd na planecie: teren z jej własnego wyglądu, niebo, pogoda, dzień i noc, baza.",
-      "kind": "game",
-      "kit": "SurfaceKit",
-      "phrases": ["ląd", "planeta", "lądowanie", "baza", "pogoda"],
-      "saved": ["gameLab.bases"],
-      "art": {
-        "bg": ["#16304a", "#0b1420"],
-        "svg": "<circle cx=\"150\" cy=\"30\" r=\"10\" fill=\"#ffd9a0\"/><path d=\"M0 74 Q40 54 78 66 T150 62 T200 70 V100 H0 Z\" fill=\"#2c5a4a\"/><path d=\"M0 84 Q50 70 100 80 T200 78 V100 H0 Z\" fill=\"#1d3f35\"/><path d=\"M84 66 a12 12 0 0 1 24 0 Z\" fill=\"#9fe8de\"/><rect x=\"95\" y=\"20\" width=\"2\" height=\"46\" fill=\"#f2b84b\" opacity=\".6\"/>"
-      }
-    },
-    {
       "file": "labs/buildings.html",
       "cat": "space",
       "name": "Building lab",
@@ -299,6 +283,26 @@ window.GameLabCatalog =
       "art": {
         "bg": ["#1c1a17", "#0b0a09"],
         "svg": "<path d=\"M0 100 L0 30 Q30 10 60 28 Q90 46 120 22 Q150 0 200 26 L200 100 Z\" fill=\"#2b2620\"/><path d=\"M20 100 Q40 60 80 62 Q120 64 150 52 Q175 44 190 70 L190 100 Z\" fill=\"#0b0a09\"/><path d=\"M70 28 L74 44 L78 30 Z M110 30 L113 48 L116 30 Z M140 18 L143 34 L146 20 Z\" fill=\"#d8cdb8\" opacity=\".8\"/><path d=\"M95 100 L99 82 L103 100 Z\" fill=\"#d8cdb8\" opacity=\".7\"/><ellipse cx=\"130\" cy=\"88\" rx=\"34\" ry=\"5\" fill=\"#2b6f9a\" opacity=\".55\"/><path d=\"M30 86 L100 58 L100 74 Z\" fill=\"#fff3d6\" opacity=\".18\"/>"
+      }
+    },
+    {
+      "file": "labs/surface.html",
+      "cat": "world",
+      "group": "terrain",
+      "tab": "Surface",
+      "tabPl": "Powierzchnia",
+      "name": "Surface lab",
+      "namePl": "Laboratorium powierzchni",
+      "doc": "docs/labs/surface.md",
+      "desc": "Land on a planet: terrain from its own look, sky, weather, day and night, a base.",
+      "descPl": "Ląd na planecie: teren z jej własnego wyglądu, niebo, pogoda, dzień i noc, baza.",
+      "kind": "game",
+      "kit": "SurfaceKit",
+      "phrases": ["ląd", "planeta", "lądowanie", "baza", "pogoda"],
+      "saved": ["gameLab.bases"],
+      "art": {
+        "bg": ["#1c1a17", "#0b0a09"],
+        "svg": "<circle cx=\"150\" cy=\"30\" r=\"10\" fill=\"#ffd9a0\"/><path d=\"M0 74 Q40 54 78 66 T150 62 T200 70 V100 H0 Z\" fill=\"#2c5a4a\"/><path d=\"M0 84 Q50 70 100 80 T200 78 V100 H0 Z\" fill=\"#1d3f35\"/><path d=\"M84 66 a12 12 0 0 1 24 0 Z\" fill=\"#9fe8de\"/><rect x=\"95\" y=\"20\" width=\"2\" height=\"46\" fill=\"#f2b84b\" opacity=\".6\"/>"
       }
     },
     {
@@ -454,6 +458,9 @@ window.GameLabCatalog =
     {
       "file": "labs/life.html",
       "cat": "life",
+      "group": "life",
+      "tab": "Life",
+      "tabPl": "Życie",
       "name": "Life lab",
       "namePl": "Laboratorium życia",
       "doc": "docs/labs/life.md",
@@ -470,6 +477,9 @@ window.GameLabCatalog =
     {
       "file": "labs/creator.html",
       "cat": "life",
+      "group": "life",
+      "tab": "Creature editor",
+      "tabPl": "Edytor stworów",
       "name": "Creature editor",
       "namePl": "Edytor stworów",
       "doc": "docs/labs/life.md",
@@ -480,13 +490,16 @@ window.GameLabCatalog =
       "phrases": ["życie", "stwory", "chód", "nogi"],
       "saved": ["creatorLab."],
       "art": {
-        "bg": ["#2a2416", "#110e08"],
+        "bg": ["#203a2e", "#0b1611"],
         "svg": "<path d=\"M40 60 Q70 30 110 42 T170 34\" fill=\"none\" stroke=\"#e8c79a\" stroke-width=\"10\" stroke-linecap=\"round\"/><g stroke=\"#e8c79a\" stroke-width=\"4\" stroke-linecap=\"round\"><path d=\"M75 44 L68 80 M95 42 L100 80 M125 40 L118 80 M145 38 L152 80\"/></g><g fill=\"#f8bb56\"><circle cx=\"40\" cy=\"60\" r=\"5\"/><circle cx=\"80\" cy=\"40\" r=\"5\"/><circle cx=\"120\" cy=\"41\" r=\"5\"/><circle cx=\"170\" cy=\"34\" r=\"5\"/></g><g fill=\"#36d6b5\"><circle cx=\"75\" cy=\"44\" r=\"4\"/><circle cx=\"145\" cy=\"38\" r=\"4\"/></g>"
       }
     },
     {
       "file": "labs/human.html",
       "cat": "life",
+      "group": "life",
+      "tab": "Human",
+      "tabPl": "Człowiek",
       "name": "Human lab",
       "namePl": "Laboratorium człowieka",
       "doc": "docs/labs/human.md",
@@ -496,7 +509,7 @@ window.GameLabCatalog =
       "kit": "LifeKit · human",
       "phrases": ["człowiek", "postać", "chód", "twarz", "animacja"],
       "art": {
-        "bg": ["#2e2636", "#120e17"],
+        "bg": ["#203a2e", "#0b1611"],
         "svg": "<g fill=\"none\" stroke=\"#e8d2b8\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M100 40 V66 M100 66 L88 92 M100 66 L114 90 M100 46 L84 62 M100 46 L118 58\"/></g><circle cx=\"100\" cy=\"27\" r=\"9\" fill=\"#e8d2b8\"/><path d=\"M0 92 H200\" stroke=\"#5fd0a0\" stroke-width=\"2\" opacity=\".5\"/><g stroke=\"#5fd0a0\" stroke-width=\"1.5\" opacity=\".45\"><path d=\"M30 92 V86 M60 92 V86 M140 92 V86 M170 92 V86\"/></g>"
       }
     },
@@ -520,6 +533,9 @@ window.GameLabCatalog =
     {
       "file": "labs/morgue.html",
       "cat": "life",
+      "group": "sdf",
+      "tab": "Morgue",
+      "tabPl": "Kostnica",
       "name": "SDF Morgue",
       "namePl": "Kostnica SDF",
       "doc": "docs/labs/morgue.md",
@@ -536,6 +552,9 @@ window.GameLabCatalog =
     {
       "file": "labs/walkers.html",
       "cat": "life",
+      "group": "sdf",
+      "tab": "Walkers",
+      "tabPl": "Walkers",
       "name": "SDF Walkers",
       "namePl": "SDF Walkers",
       "doc": "docs/labs/walkers/README.md",
@@ -548,6 +567,26 @@ window.GameLabCatalog =
       "art": {
         "bg": ["#1e1b2b", "#15131f"],
         "svg": "<g transform=\"translate(30 18)\"><rect x=\"6\" y=\"0\" width=\"10\" height=\"10\" fill=\"#9cac70\"/><rect x=\"4\" y=\"10\" width=\"14\" height=\"22\" fill=\"#6b5b95\"/><rect x=\"5\" y=\"32\" width=\"5\" height=\"14\" fill=\"#3a3550\"/><rect x=\"12\" y=\"32\" width=\"5\" height=\"18\" fill=\"#3a3550\"/></g><g transform=\"translate(70 20)\"><rect x=\"6\" y=\"0\" width=\"10\" height=\"10\" fill=\"#9cac70\"/><rect x=\"4\" y=\"10\" width=\"14\" height=\"22\" fill=\"#4f7aa8\"/><rect x=\"5\" y=\"32\" width=\"5\" height=\"18\" fill=\"#3a3550\"/><rect x=\"12\" y=\"32\" width=\"5\" height=\"14\" fill=\"#3a3550\"/></g><g transform=\"translate(110 18)\"><rect x=\"6\" y=\"0\" width=\"10\" height=\"10\" fill=\"#9cac70\"/><rect x=\"4\" y=\"10\" width=\"14\" height=\"22\" fill=\"#5f9e7a\"/><rect x=\"5\" y=\"32\" width=\"5\" height=\"14\" fill=\"#3a3550\"/><rect x=\"12\" y=\"32\" width=\"5\" height=\"18\" fill=\"#3a3550\"/></g><g transform=\"translate(150 20)\"><rect x=\"6\" y=\"0\" width=\"10\" height=\"10\" fill=\"#9cac70\"/><rect x=\"4\" y=\"10\" width=\"14\" height=\"22\" fill=\"#a8583a\"/><rect x=\"5\" y=\"32\" width=\"5\" height=\"18\" fill=\"#3a3550\"/><rect x=\"12\" y=\"32\" width=\"5\" height=\"14\" fill=\"#3a3550\"/></g><circle cx=\"100\" cy=\"86\" r=\"3\" fill=\"#f2b84b\"/><circle cx=\"86\" cy=\"86\" r=\"3\" fill=\"#9cac70\"/><circle cx=\"114\" cy=\"86\" r=\"3\" fill=\"#9cac70\"/><path d=\"M86 86 H114\" stroke=\"#9cac70\" stroke-width=\"1\"/>"
+      }
+    },
+    {
+      "file": "labs/zombies.html",
+      "cat": "life",
+      "group": "sdf",
+      "tab": "Generator",
+      "tabPl": "Generator",
+      "name": "Zombie Generator",
+      "namePl": "Generator zombie",
+      "doc": "docs/labs/zombies.md",
+      "desc": "Original zombies from a seed, animated in 8 directions, exported as Unity sprite sheets (JSON, slicer script, ZIP).",
+      "descPl": "Oryginalne zombie z ziarna, animowane w 8 kierunkach, eksportowane jako arkusze sprite'ów dla Unity (JSON, skrypt cięcia, ZIP).",
+      "kind": "lab",
+      "kit": "Pixel Studio",
+      "phrases": ["zombie", "postać", "sprite", "animacja", "Unity"],
+      "saved": ["gameLab.zombies."],
+      "art": {
+        "bg": ["#1e1b2b", "#15131f"],
+        "svg": "<rect x=\"86\" y=\"12\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"94\" y=\"12\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"102\" y=\"12\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"78\" y=\"20\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"86\" y=\"20\" width=\"8\" height=\"8\" fill=\"#e8e04a\"/><rect x=\"94\" y=\"20\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"102\" y=\"20\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"110\" y=\"20\" width=\"8\" height=\"8\" fill=\"#e8e04a\"/><rect x=\"86\" y=\"28\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"94\" y=\"28\" width=\"8\" height=\"8\" fill=\"#5a1b1b\"/><rect x=\"102\" y=\"28\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"94\" y=\"36\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"86\" y=\"44\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"94\" y=\"44\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"102\" y=\"44\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"78\" y=\"52\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"94\" y=\"52\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"110\" y=\"52\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"86\" y=\"60\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"102\" y=\"60\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"86\" y=\"68\" width=\"8\" height=\"8\" fill=\"#3a3a44\"/><rect x=\"102\" y=\"68\" width=\"8\" height=\"8\" fill=\"#3a3a44\"/><rect x=\"86\" y=\"76\" width=\"8\" height=\"8\" fill=\"#3a3a44\"/><rect x=\"102\" y=\"76\" width=\"8\" height=\"8\" fill=\"#3a3a44\"/>"
       }
     },
     {
@@ -602,23 +641,6 @@ window.GameLabCatalog =
       }
     },
     {
-      "file": "labs/zombies.html",
-      "cat": "matter",
-      "name": "Zombie Generator",
-      "namePl": "Generator zombie",
-      "doc": "docs/labs/zombies.md",
-      "desc": "Original zombies from a seed, animated in 8 directions, exported as Unity sprite sheets (JSON, slicer script, ZIP).",
-      "descPl": "Oryginalne zombie z ziarna, animowane w 8 kierunkach, eksportowane jako arkusze sprite'ów dla Unity (JSON, skrypt cięcia, ZIP).",
-      "kind": "lab",
-      "kit": "Pixel Studio",
-      "phrases": ["zombie", "postać", "sprite", "animacja", "Unity"],
-      "saved": ["gameLab.zombies."],
-      "art": {
-        "bg": ["#2a2020", "#120b0b"],
-        "svg": "<rect x=\"86\" y=\"12\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"94\" y=\"12\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"102\" y=\"12\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"78\" y=\"20\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"86\" y=\"20\" width=\"8\" height=\"8\" fill=\"#e8e04a\"/><rect x=\"94\" y=\"20\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"102\" y=\"20\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"110\" y=\"20\" width=\"8\" height=\"8\" fill=\"#e8e04a\"/><rect x=\"86\" y=\"28\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"94\" y=\"28\" width=\"8\" height=\"8\" fill=\"#5a1b1b\"/><rect x=\"102\" y=\"28\" width=\"8\" height=\"8\" fill=\"#9db07c\"/><rect x=\"94\" y=\"36\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"86\" y=\"44\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"94\" y=\"44\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"102\" y=\"44\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"78\" y=\"52\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"94\" y=\"52\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"110\" y=\"52\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"86\" y=\"60\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"102\" y=\"60\" width=\"8\" height=\"8\" fill=\"#4b5a6e\"/><rect x=\"86\" y=\"68\" width=\"8\" height=\"8\" fill=\"#3a3a44\"/><rect x=\"102\" y=\"68\" width=\"8\" height=\"8\" fill=\"#3a3a44\"/><rect x=\"86\" y=\"76\" width=\"8\" height=\"8\" fill=\"#3a3a44\"/><rect x=\"102\" y=\"76\" width=\"8\" height=\"8\" fill=\"#3a3a44\"/>"
-      }
-    },
-    {
       "file": "labs/blocks.html",
       "cat": "voxels",
       "name": "Blocks Lab",
@@ -638,6 +660,9 @@ window.GameLabCatalog =
     {
       "file": "labs/effects.html",
       "cat": "effects",
+      "group": "effects",
+      "tab": "Space",
+      "tabPl": "Kosmos",
       "name": "Effects Lab",
       "namePl": "Laboratorium efektów",
       "doc": "docs/labs/effects.md",
@@ -655,6 +680,9 @@ window.GameLabCatalog =
     {
       "file": "labs/effects-land.html",
       "cat": "effects",
+      "group": "effects",
+      "tab": "Land",
+      "tabPl": "Ląd",
       "name": "Effects Lab · land",
       "namePl": "Laboratorium efektów · ląd",
       "doc": "docs/labs/effects-land.md",
@@ -664,7 +692,11 @@ window.GameLabCatalog =
       "kind": "lab",
       "kit": "FireKit",
       "phrases": ["efekty", "ląd", "ogień", "pożar", "dym"],
-      "saved": ["gameLab.effectsLand."]
+      "saved": ["gameLab.effectsLand."],
+      "art": {
+        "bg": ["#1a1020", "#07050c"],
+        "svg": "<path d=\"M44 90 L156 78 M44 78 L156 90\" stroke=\"#6b4426\" stroke-width=\"6\" stroke-linecap=\"round\"/><path d=\"M76 84 Q60 62 78 42 Q82 58 92 54 Q86 34 102 14 Q108 40 122 50 Q138 66 122 84 Z\" fill=\"#ff7a3c\" opacity=\".9\"/><path d=\"M88 84 Q80 70 90 58 Q94 66 100 64 Q98 54 106 46 Q118 62 110 84 Z\" fill=\"#ffd36a\"/><circle cx=\"132\" cy=\"30\" r=\"2\" fill=\"#ffb35a\"/><circle cx=\"64\" cy=\"26\" r=\"1.6\" fill=\"#ffb35a\" opacity=\".8\"/><circle cx=\"142\" cy=\"48\" r=\"1.4\" fill=\"#ff7a3c\"/><path d=\"M118 20 q10 -8 4 -16 q12 4 6 18\" fill=\"none\" stroke=\"#8a8f99\" stroke-width=\"2\" opacity=\".5\"/>"
+      }
     },
     {
       "file": "labs/gameui.html",

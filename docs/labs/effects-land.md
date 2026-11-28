@@ -2,7 +2,7 @@
 
 Strona „ląd” laboratorium efektów (przełącznik środowiska: kosmos — `labs/effects.html`, ląd — ta strona). Realistyczny
 ogień: **FireKit** (`js/render/effects/fire/firekit.js`). Strona `js/labs/effects-land/effects-land.js`, arkusz
-`ui/pages/effects.css`.
+`ui/pages/effects.css`. W grupie **Efekty** (własny kafelek na stronie startowej i pozycja w menu, 2026-11-28).
 
 ## FireKit
 

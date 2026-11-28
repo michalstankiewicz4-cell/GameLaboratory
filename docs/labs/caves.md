@@ -40,7 +40,7 @@ style is chosen in the water lab. The hero's light sources and ways of seeing ha
 
 ## Saved under a name — a cave for the scene
 
-The lab is in the **Terrain** group with the land lab (land · caves: one switch on the bar, one glow in the menu) — a
+The lab is in the **Terrain** group with the land lab (land · caves · surface: one switch on the bar, one glow in the menu) — a
 cave is terrain too. Window *Cave* → *Save*: the shape and the rock (the `CAVE_DEFAULTS` keys) as the named asset
 `cave` (`js/scene/assets.js`); the list loads one back (the page reloads with it). For AI: `CaveApi.save(name)`,
 `load(name)`, `saved()`, `get()`.

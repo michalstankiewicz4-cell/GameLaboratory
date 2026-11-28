@@ -3,7 +3,8 @@
 Part of Pixel Studio (not part of the game). Original zombies made from a seed, animated, exported as sprite sheets
 that drop straight into a Unity project. Live: <https://michalstankiewicz4-cell.github.io/GameLaboratory/labs/zombies.html>.
 Made as a gift for the author of a zombie game whose sprites use this sheet layout; nothing of that game is in here —
-every zombie is generated from code.
+every zombie is generated from code. In the **SDF and pixel-art characters** group with SDF Morgue and SDF Walkers
+(the Morgue · Walkers · Generator switch on the bar; category Life since 2026-11-28, before — Matter).
 
 ## The sheet
 

@@ -3,6 +3,21 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.118.2 — 2026-11-28 (grupy laboratoriów: teren z powierzchnią, efekty, życie, postacie SDF)
+
+### Zmienione
+- Grupa terenu: ląd · jaskinie · **powierzchnia** — laboratorium powierzchni 1.4.1 ma na pasku przełącznik grupy,
+  przeszło z kategorii Kosmos do Świat (za jaskiniami) i ma tło kafelka jaskiń. Zostaje osobnym laboratorium (glob,
+  ląd na kuli, niebo układu, zejście, jazda, baza — tego ląd nie ma; punkt w `TODO.md` rozliczony).
+- Grupa **efektów**: efekty (kosmos) · efekty na lądzie — przełącznik środowiska był już na pasku; teraz efekty na
+  lądzie (1.0.6) mają własny kafelek na stronie startowej (ognisko, tło laboratorium efektów) i pozycję w menu,
+  a obie strony wspólną poświatę (`--cat-effects`) i podświetlenie (efekty 1.4.3).
+- Grupa **życia**: życie · edytor stworów · człowiek (1.5.2, 1.4.1, 1.3.2) — przełącznik grupy na pasku, wspólne tło
+  kafelków, poświata `--cat-life`.
+- Grupa **postaci SDF i pixel art**: Kostnica SDF · SDF Walkers · generator zombie (1.1.2, 0.23.9, 1.2.2) — przełącznik
+  grupy na pasku, wspólne tło kafelków, poświata `--sdf` (nowy token, oba motywy); generator zombie przeszedł
+  z kategorii Materia do Życie, za SDF Walkers.
+
 ## Program 0.118.1 — 2026-11-28 (telefon: pasek menu i boczne menu strony startowej)
 
 ### Poprawione

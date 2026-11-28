@@ -1,7 +1,7 @@
 # Human lab (labs/human.html)
 
 Split from the life lab (2026-11-01, the user's call: humans and their animation get a lab of their own).
-The humans are built on LifeKit (`js/models/life/lifekit.js`, described in `docs/labs/life.md`: how a body is built).
+The humans are built on LifeKit (`js/models/life/lifekit.js`, described in `docs/labs/life.md`: how a body is built). In the **Life** group with the life lab and the creature editor (a switch on the bar, 2026-11-28).
 
 ## Files
 

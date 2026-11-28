@@ -5,7 +5,8 @@ Efekty z Hive Hunger (przeniesione z historią, 0.67.0) w kosmosie, bez grawitac
 (`js/render/effects/effects.js`) — wspólne wejście do siedmiu efektów z gry (`js/render/effects/`: `shots.js`,
 `orbs.js`, `debris.js`, `lightning.js`, `zaps.js`, `bubbles.js`, `black-holes.js`, tekstury `textures.js`; obliczenia
 bez zmian, liczby na klatkę 60 Hz). Strona `js/labs/effects/effects.js`, arkusz `ui/pages/effects.css`; kategoria
-w menu i na stronie startowej: **Efekty**.
+w menu i na stronie startowej: **Efekty**; grupa **Efekty** z laboratorium efektów · ląd (przełącznik środowiska
+kosmos · ląd na pasku, wspólna poświata w menu i wspólne tło kafelków, 2026-11-28).
 
 | Efekt | Id | Gdzie gra | Co robi |
 |---|---|---|---|

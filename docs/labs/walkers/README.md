@@ -3,6 +3,7 @@
 > laboratorium języka to `labs/lang.html` (`js/labs/lang/`, teksty `data/lang/`, narzędzia `tools/lang/`), laboratorium obrazów
 > to `labs/img.html` (`js/labs/img/`, rysunki `data/img/`, narzędzie `tools/img/`).
 > Pierwotne SDF Morgue: `docs/labs/morgue/sdf-morgue-original.html`. Ścieżki niżej są obecne (po przeniesieniu).
+> Grupa **postaci SDF i pixel art** z Kostnicą SDF i generatorem zombie: przełącznik Kostnica · Walkers · Generator na pasku (2026-11-28).
 
 # SDF Walkers
 

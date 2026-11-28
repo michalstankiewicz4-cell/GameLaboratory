@@ -2,6 +2,9 @@
 
 > **Humans moved to their own lab** — `labs/human.html`, models in `js/models/human/`; see `docs/labs/human.md`. This lab keeps the other life forms (animals) and LifeKit itself; the creature editor is `labs/creator.html`.
 
+The life lab, the creature editor and the human lab are the **Life** group (life · creature editor · human: one switch
+on the bar, one glow in the menu, one tile background; 2026-11-28) — all three stand on LifeKit.
+
 
 Life forms, built from blocks the way ShipKit builds ships. Started
 2026-10-05 (labs 1.9.0), the user's plan: creatures as background to

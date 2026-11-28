@@ -117,8 +117,8 @@ albo zasób z nazwą — bez osobnych światów w laboratoriach. Spis stanu (0.6
     (jezioro w jaskini a morze obok), rzeka kończąca się w niczym, obiekt wiszący nad otworem albo wbity w ścianę
     jaskini, światło przeciekające tam, gdzie go nie powinno być (słońce w jaskini); później — wygląd z kilku ujęć
     (porównanie zrzutów).
-- [ ] **Powierzchnia (surface):** to, czego ląd z planety jeszcze nie przejął (grunt SurfaceKit, zejście, jazda) —
-  rozliczyć i zamknąć albo połączyć z laboratorium lądu.
+- [x] **Powierzchnia (surface):** rozliczona (właściciel, 2026-11-28): zostaje osobnym laboratorium w grupie terenu
+  (ląd · jaskinie · powierzchnia) — ma glob, ląd na kuli, niebo układu, zejście, jazdę i bazę, których ląd nie ma.
 - [ ] **Edytor stworów (creator), transformator (transform):** wynik jako prefabrykat sceny.
 - [ ] **Postacie SDF i pixel art** (generator zombie, Kostnica SDF, SDF Walkers, Pixel Studio): postacie i sprite'y jako
   zasoby (np. dla gier 2D i HUD); laboratoria języka i obrazów — rozstrzygnąć, czy należą do silnika.
