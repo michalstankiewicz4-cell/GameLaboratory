@@ -63,3 +63,5 @@ body > .foot .scale i{display:block;height:6px;border:1px solid var(--text);bord
 body.pageFlow{padding-top:calc(var(--menuH) + var(--barH) + 24px);padding-bottom:calc(var(--footH) + 24px)}
 body.pageFlow.lmNoBar{padding-top:calc(var(--menuH) + 24px)}
 body.pageFlow.lmNoFoot{padding-bottom:24px}
+/* a narrow screen (a phone upright, up to 640 px): the toolbar scrolls sideways like a row of tabs (no scrollbar) */
+@media (max-width:640px){body > .bar{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;overscroll-behavior-x:contain}body > .bar::-webkit-scrollbar{display:none}body > .bar .sp{flex:1 0 8px}}

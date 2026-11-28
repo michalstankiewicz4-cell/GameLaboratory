@@ -3,6 +3,17 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.118.1 — 2026-11-28 (telefon: pasek menu i boczne menu strony startowej)
+
+### Poprawione
+- Pasek menu na telefonie w pionie (do 640 px): samo logo (bez napisu), nazwa laboratorium skrócona z „…”, wersje na
+  górze menu Pomoc; Pomoc, wygląd i język zostają na prawym końcu (wcześniej wypadały poza ekran). Menu otwierają się
+  na całą szerokość ekranu pod paskiem.
+- Pasek narzędzi na telefonie przewija się w bok (palcem), jak rząd zakładek — wcześniej część przycisków była poza
+  ekranem.
+- Strona startowa na ekranie do 900 px: boczne menu (sekcje, edytor, kategorie) jako szuflada otwierana przyciskiem ☰
+  obok wyszukiwania; zamyka ją tło, Esc albo wybór sekcji lub kategorii.
+
 ## Program 0.118.0 — 2026-11-28 (telefon w pionie: podgląd na górze, okna w szufladzie)
 
 ### Poprawione

@@ -331,6 +331,8 @@ function thanks4p() {
 }
 function help() {
   return [
+    // a narrow screen (a phone upright): the versions, not on the bar there, at the top of Help
+    el("div", "lmLabel lmVerNarrow", "v" + APP_VERSION + (me && V.labs[me.file] ? " · " + (isTool ? t("tool", "narzędzie") : t("lab", "lab.")) + " v" + V.labs[me.file] : "")),
     link(t("Documentation", "Dokumentacja"), DOCS, { blank: true }),
     link(t("What's new", "Co nowego"), REPO + "CHANGELOG.md", { blank: true }),
     link(t("Repository (GitHub)", "Repozytorium (GitHub)"), "https://github.com/michalstankiewicz4-cell/GameLaboratory", { blank: true }),
@@ -349,7 +351,7 @@ function help() {
 
 const bar = el("div"); bar.id = "labMenu"; bar.lang = LANG;
 const home = el("a", "lmHome"); home.href = ROOT + "index.html"; home.title = t("Start screen", "Strona startowa");
-home.append(el("span", "lmMark"), document.createTextNode("GameLaboratory"));
+home.append(el("span", "lmMark"), el("span", "lmBrand", "GameLaboratory"));
 bar.appendChild(home);
 const menus = [["options", t("Options", "Opcje"), options], ["tools", t("Tools", "Narzędzia"), tools], ["scenes", t("Scenes", "Sceny"), scenes], ["help", t("Help", "Pomoc"), help]];
 menus.forEach(([key, name, make]) => {
@@ -370,7 +372,7 @@ menus.forEach(([key, name, make]) => {
   bar.appendChild(top);
 });
 const where = el("div", "lmWhere");
-where.append(document.createTextNode(isTool ? t("Tool · ", "Narzędzie · ") : t("Lab · ", "Laboratorium · ")), el("b", null, me ? me.name : t("Start screen", "Strona startowa")));
+where.append(el("span", null, isTool ? t("Tool · ", "Narzędzie · ") : t("Lab · ", "Laboratorium · ")), el("b", null, me ? me.name : t("Start screen", "Strona startowa")));
 if (me) bar.appendChild(where);
 // the labs' version, linked to what changed
 const ver = el("a", "lmVer", "v" + APP_VERSION + (me && V.labs[me.file] ? " · " + (isTool ? t("tool", "narzędzie") : t("lab", "lab.")) + " v" + V.labs[me.file] : "")); ver.href = REPO + "CHANGELOG.md"; ver.target = "_blank"; ver.rel = "noopener";

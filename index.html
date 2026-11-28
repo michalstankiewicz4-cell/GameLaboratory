@@ -78,6 +78,9 @@
   <div class="sideLabel" data-pl="Kategorie">Categories</div>
   <div class="sideCats" id="sideCats"></div>
 </aside>
+<!-- a narrow screen (up to 900 px): the side menu is a drawer opened by ☰ beside the search -->
+<button type="button" class="sideTog" id="sideTog"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M3 5h12M3 9h12M3 13h12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+<div class="sideBack" id="sideBack"></div>
 <label class="topSearch" for="fSearch"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M8 13.5A5.5 5.5 0 1 0 8 2.5a5.5 5.5 0 0 0 0 11ZM12 12l3.8 3.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><input id="fSearch" type="search" autocomplete="off"></label>
 <main id="top">
   <section class="hero">
@@ -510,6 +513,21 @@ document.getElementById("nLabs").textContent = LABS.length;
 document.getElementById("nTools").textContent = TOOLS.length;
 document.getElementById("nScenes").textContent = SCENES.length;
 document.getElementById("labsVer").textContent = "v" + window.LabMenu.APP_VERSION;
+// a narrow screen: the side menu as a drawer — ☰ opens it; the backdrop, Esc, a section, the editor or a category
+// closes it (the page shows what was chosen)
+{
+  const tog = document.getElementById("sideTog"), back = document.getElementById("sideBack"), side = document.querySelector(".side");
+  const set = (on) => {
+    document.body.classList.toggle("sideOpen", on);
+    tog.setAttribute("aria-expanded", on ? "true" : "false");
+    tog.title = on ? tr("Close the menu", "Zamknij menu") : tr("Menu", "Menu"); tog.setAttribute("aria-label", tog.title);
+  };
+  set(false);
+  tog.addEventListener("click", () => set(!document.body.classList.contains("sideOpen")));
+  back.addEventListener("click", () => set(false));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && document.body.classList.contains("sideOpen")) set(false); });
+  side.addEventListener("click", (e) => { if (e.target.closest("a, .sideCats button")) set(false); });
+}
 })();
 </script>
 </body>

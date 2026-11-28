@@ -159,7 +159,19 @@ body::before{ content:""; position:fixed; z-index:4; top:0; height:72px; inset-i
 .topSearch svg{ flex:none; width:17px; height:17px; }
 .topSearch input{ flex:1; min-width:0; height:100%; border:0; background:none; outline:none; color:var(--head); font:14px var(--font); }
 .topSearch input::placeholder{ color:var(--dim); }
-@media (max-width:900px){ .topSearch{ inset-inline-start:16px; width:calc(100vw - 32px - 170px); } }
+@media (max-width:900px){ .topSearch{ inset-inline-start:68px; width:calc(100vw - 84px - 170px); } }
+/* a narrow screen (up to 900 px): ☰ beside the search opens the side menu as a drawer from the edge, over a dimmed page */
+.sideTog, .sideBack{ display:none; }
+@media (max-width:900px){
+  .sideTog{ position:fixed; z-index:5; top:16px; inset-inline-start:16px; display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px;
+    padding:0; border:1px solid var(--line); border-radius:50%; background:var(--card); color:var(--head); box-shadow:var(--shadowSoft); cursor:pointer; }
+  .sideTog svg{ width:19px; height:19px; }
+  .sideTog:hover, body.sideOpen .sideTog{ color:var(--accent); border-color:color-mix(in srgb, var(--accent) 45%, var(--line)); }
+  body.sideOpen .side{ display:flex; z-index:7; width:min(var(--sideW), calc(100vw - 2 * var(--sideGap))); animation:sideIn .2s cubic-bezier(.2,.7,.3,1); }
+  body.sideOpen .sideBack{ display:block; position:fixed; z-index:6; inset:0; background:var(--overlay); }
+}
+@keyframes sideIn{ from{ opacity:0; transform:translateX(-16px); } to{ opacity:1; transform:none; } }
+@media (prefers-reduced-motion:reduce){ body.sideOpen .side{ animation:none; } }
 /* the tiles' tip (index.html, tileTip): a card beside the tile with the description, file and version, category, kit and
    phrases — wider and easier to read than the browser's tooltip */
 .tileTip{ position:fixed; z-index:60; inset-inline-start:0; top:0; width:min(360px, calc(100vw - 16px)); padding:14px 16px 15px; border:1px solid var(--line);
