@@ -66,4 +66,27 @@ body.viewFits.lmNoBar :is(#view, .viewLayer){top:var(--menuH)}
 body.viewFits.lmNoFoot :is(#view, .viewLayer){bottom:0}
 body.viewFits:not(.vfFull) :is(#view, .viewLayer){left:var(--viewL,0px);right:var(--viewR,0px);bottom:calc(var(--footH) + var(--viewB,0px))}
 body.viewFits.lmNoFoot:not(.vfFull) :is(#view, .viewLayer){bottom:var(--viewB,0px)}
-@media (max-width:640px){.labWin,.labWin.right{width:calc(100vw - 16px)}.labDock,.labDock.right{width:calc(100vw - 16px)}.labDockGrip{display:none}}
+/* a narrow screen (a phone upright, body.lmNarrow — ui/shell/windows.js): the view on top across the whole width, every
+   window in one drawer at the bottom — a row of tabs (one window at a time) and a button sliding it up and down */
+.labDrawer{display:none}
+body.lmNarrow .labDrawer{position:fixed;z-index:21;left:0;right:0;bottom:var(--footH);display:flex;flex-direction:column;height:44px;
+  background:var(--menuBg);border-top:1px solid var(--line);box-shadow:var(--shadow);transition:height .22s cubic-bezier(.2,.7,.3,1)}
+body.lmNarrow.lmNoFoot .labDrawer{bottom:0}
+body.lmNarrow .labDrawer.empty{display:none}
+body.lmNarrow .labDrawer.open{height:min(52vh, calc(100vh - var(--menuH) - var(--barH) - var(--footH) - 120px))}
+@media (prefers-reduced-motion:reduce){body.lmNarrow .labDrawer{transition:none}}
+.labDrawerHead{flex:none;display:flex;align-items:center;gap:6px;height:43px;padding-inline:6px;border-bottom:1px solid var(--line)}
+.labDrawer:not(.open) .labDrawerHead{border-bottom:0}
+.labDrawerTog{flex:none;width:32px;height:30px;border:1px solid var(--line);border-radius:var(--r);background:var(--card);color:var(--accent);
+  font:600 14px var(--font);cursor:pointer}
+.labDrawerTabs{flex:1;min-width:0;display:flex;gap:4px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+.labDrawerTabs::-webkit-scrollbar{display:none}
+.labDrawerTabs > button{flex:none;height:30px;padding:0 10px;border:1px solid transparent;border-radius:var(--r);background:none;color:var(--dim);
+  font:600 11px var(--font);letter-spacing:1px;text-transform:uppercase;white-space:nowrap;cursor:pointer}
+.labDrawerTabs > button.on{border-color:var(--line);background:var(--card);color:var(--accent)}
+.labDrawerBody{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden}
+.labDrawer:not(.open) .labDrawerBody{display:none}
+.labDrawer .labWin:not(.drSel){display:none}
+.labDrawer .labWin .labWinHead{display:none}
+body.lmNarrow :is(.labDock, .labDockGrip, .winSeg, .fitSeg){display:none !important}
+body.lmNarrow .labWin:not(.docked){width:calc(100vw - 16px)}

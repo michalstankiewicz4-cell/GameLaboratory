@@ -57,3 +57,6 @@ body.lmResizingV{cursor:ns-resize;user-select:none}
 body.lmResizingV :is(#view, .labDock){pointer-events:none}
 body.lmNoFoot .labConsole.lcDocked{bottom:0}
 .labConsole.lcDocked .labWinHead{cursor:default}
+/* a narrow screen: the docked console sits on the windows' drawer (ui/shell/windows.js, --drawerH) */
+body.lmNarrow .labConsole.lcDocked{bottom:calc(var(--footH) + var(--drawerH,0px))}
+body.lmNarrow.lmNoFoot .labConsole.lcDocked{bottom:var(--drawerH,0px)}

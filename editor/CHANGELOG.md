@@ -3,6 +3,12 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.60.3 — 2026-11-28
+
+### Poprawione
+- Telefon w pionie: scena na górze na całą szerokość, okna w szufladzie na dole (zakładki, ▴ / ▾) — wcześniej panele
+  zasłaniały scenę w całości.
+
 ## 0.60.2 — 2026-11-28
 
 ### Zmienione

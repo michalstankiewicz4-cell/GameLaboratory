@@ -3,6 +3,16 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.118.0 — 2026-11-28 (telefon w pionie: podgląd na górze, okna w szufladzie)
+
+### Poprawione
+- Na telefonie w pionie (ekran do 640 px) podgląd 3D był niewidoczny: oba boczne panele zajmowały całą szerokość,
+  a na scenę zostawało 0 px. Teraz podgląd jest na górze na całą szerokość, a wszystkie okna są w jednej szufladzie na
+  dole — rząd zakładek (jedno okno naraz) i przycisk ▴ / ▾, który wysuwa ją do około połowy ekranu (podgląd się
+  zmniejsza, ale zostaje widoczny) i zsuwa do samych zakładek. Konsola przypięta na dole stoi na szufladzie. Panele,
+  ich uchwyty i przełączniki Okna | Panele oraz Środek | Całość są tam schowane; ułożenie okien na szerszym ekranie
+  zostaje bez zmian. Wszystkie laboratoria 3D z oknami i edytor sceny.
+
 ## Program 0.117.2 — 2026-11-28 (pasek menu: Pomoc, wygląd i język jak na stronie startowej)
 
 ### Zmienione

@@ -23,6 +23,10 @@
    info bar, under the panels (body.vfFull; gamelab.viewfit, the same on every page). LabView.size() gives the view's
    box ({ w, h, x, y }); when #view changes size the page gets a "resize" event, so a lab sizes its renderer from
    LabView.size() in its usual resize handler and turns pointer coordinates into the view's (x, y).
+   A narrow screen (a phone upright, up to 640 px wide; body.lmNarrow): the view stays on top across the whole width,
+   every window goes into one drawer at the bottom — a row of tabs (one window at a time) and a button that slides the
+   drawer up (about half the screen) and down (only the tabs); the windows' own docking and places are kept for wider
+   screens. The drawer's height is part of the view's free middle (--viewB) and --drawerH (the console sits on it).
    ======================================================================= */
 (function () {
 "use strict";
@@ -49,6 +53,7 @@ function place(w, x, y) { w.el.style.left = x + "px"; w.el.style.top = y + "px";
 function front(w) { w.el.style.zIndex = ++zTop; }
 function show(w, open) {
   w.open = open; w.el.hidden = !open;
+  if (narrow() && open) { drSel = w.id; drawerOpen(true); }
   if (open && !w.docked) { front(w); requestAnimationFrame(() => clamp(w)); }
   (state[w.id] = state[w.id] || {}).open = open; save();
 }
@@ -103,6 +108,7 @@ function pinTitle(w) {
 // into the side panel (in the page's order) or back to a floating window where it stood
 function setDocked(w, on, quiet) {
   w.docked = on; w.el.classList.toggle("docked", on);
+  if (narrow() && drawer) { w.el.classList.add("docked"); pinTitle(w); if (!quiet) { (state[w.id] = state[w.id] || {}).docked = on; save(); } return; }   // in the drawer until the screen is wide again
   if (on) {
     const d = dock(w.side), after = wins.slice(wins.indexOf(w) + 1).find((x) => x.docked && x.side === w.side && x.el.parentNode === d);
     d.insertBefore(w.el, after ? after.el : null);
@@ -147,6 +153,59 @@ function grip(side) {
   });
   document.body.appendChild(g); grips[side] = g;
 }
+// a narrow screen: one drawer at the bottom with every window, one at a time (tabs), slid up and down by its button
+const NARROW = window.matchMedia ? matchMedia("(max-width: 640px)") : { matches: false, addEventListener() {} };
+const narrow = () => NARROW.matches;
+let drawer = null, drBody = null, drTabs = null, drTog = null, drSel = null, drKey = "";
+function drawerEl() {
+  if (drawer) return drawer;
+  drawer = document.createElement("div"); drawer.className = "labDrawer";
+  const head = document.createElement("div"); head.className = "labDrawerHead";
+  drTog = document.createElement("button"); drTog.type = "button"; drTog.className = "labDrawerTog";
+  drTog.addEventListener("click", () => drawerOpen(!drawer.classList.contains("open")));
+  drTabs = document.createElement("div"); drTabs.className = "labDrawerTabs"; drTabs.setAttribute("role", "tablist");
+  drBody = document.createElement("div"); drBody.className = "labDrawerBody";
+  head.append(drTog, drTabs); drawer.append(head, drBody); document.body.appendChild(drawer);
+  drawer.addEventListener("transitionend", (e) => { if (e.target === drawer) { viewKey = ""; layoutView(); } });   // the view follows the slide's end
+  drawerOpen(false);
+  return drawer;
+}
+function drawerOpen(on) {
+  if (!drawer) return;
+  drawer.classList.toggle("open", on);
+  drTog.textContent = on ? "▾" : "▴";
+  drTog.title = on ? (PL() ? "Zsuń okna" : "Slide the windows down") : (PL() ? "Wysuń okna" : "Slide the windows up");
+  drTog.setAttribute("aria-label", drTog.title);
+  drKey = ""; layoutView();
+}
+// the windows that can show now: open, and not hidden by the page (H, or a window only for another mode)
+const shown = (w) => w.open && !w.el.hidden && !w.el.querySelector(":scope > .hidden-panel, :scope > .panel[hidden]");
+function drawerTabs() {
+  const vis = wins.filter(shown);
+  if (!vis.some((w) => w.id === drSel)) drSel = vis.length ? vis[0].id : null;
+  const key = vis.map((w) => w.id + ":" + w.title()).join("|") + "#" + drSel;
+  if (key === drKey) return; drKey = key;   // rebuilt only on a change: the classes below would wake the observer again
+  drawer.classList.toggle("empty", !vis.length);
+  drTabs.replaceChildren(...vis.map((w) => {
+    const b = document.createElement("button"); b.type = "button"; b.setAttribute("role", "tab"); b.textContent = w.title();
+    b.className = w.id === drSel ? "on" : ""; b.setAttribute("aria-selected", w.id === drSel ? "true" : "false");
+    b.addEventListener("click", () => { drSel = w.id; drKey = ""; drawerOpen(true); });
+    return b;
+  }));
+  for (const w of wins) w.el.classList.toggle("drSel", w.id === drSel);
+}
+function applyNarrow() {
+  const on = narrow();
+  document.body.classList.toggle("lmNarrow", on);
+  if (on) {
+    drawerEl();
+    for (const w of wins) { drBody.appendChild(w.el); w.el.classList.add("docked"); ["left", "right", "top", "maxHeight", "zIndex"].forEach((k) => { w.el.style[k] = ""; }); }
+  } else if (drawer) {
+    for (const w of wins) { w.el.classList.remove("drSel"); if (w.el.parentNode === drBody) setDocked(w, w.docked, true); }
+  }
+  drKey = ""; syncSwitch();
+}
+
 // the free middle between the panels (and the console under it): CSS variables and LabView for the pages that fit their view
 const viewSubs = new Set();
 let viewKey = "";
@@ -157,12 +216,16 @@ function layoutView() {
   for (const d of Object.values(docks)) d.classList.toggle("noWins", ![...d.children].some((w) => w.classList.contains("labWin") && !w.hidden && !w.querySelector(":scope > .hidden-panel, :scope > .panel[hidden]")));
   const vis = (side) => { const d = docks[side]; return d && getComputedStyle(d).display !== "none" ? d.getBoundingClientRect().width : 0; };
   const con = document.querySelector(".labConsole.lcDocked:not([hidden])");
-  const L = Math.round(vis("left")), R = Math.round(vis("right")), B = con ? Math.round(con.getBoundingClientRect().height) : 0;
+  const nar = narrow() && drawer;
+  if (nar) drawerTabs();
+  const DH = nar ? Math.round(drawer.getBoundingClientRect().height) : 0;
+  const L = nar ? 0 : Math.round(vis("left")), R = nar ? 0 : Math.round(vis("right")), B = (con ? Math.round(con.getBoundingClientRect().height) : 0) + DH;
+  document.documentElement.style.setProperty("--drawerH", DH + "px");
   // only on a change: setting hidden again is still a mutation, and the MutationObserver (init) would call this again
   for (const side in grips) { const h = !(side === "left" ? L : R); if (grips[side].hidden !== h) grips[side].hidden = h; }
   const root = document.documentElement.style;
   root.setProperty("--viewL", L + "px"); root.setProperty("--viewR", R + "px"); root.setProperty("--viewB", B + "px");
-  const k = [L, R, B].join(","); if (k === viewKey) return; viewKey = k;
+  const k = [L, R, B, DH].join(","); if (k === viewKey) return; viewKey = k;
   viewSubs.forEach((f) => { try { f(); } catch (e) { /* a page's listener */ } });
 }
 window.LabView = {
@@ -259,6 +322,8 @@ function init() {
   document.querySelectorAll("[data-window]").forEach(make);
   toolbarSwitch();
   syncSwitch();
+  if (narrow()) applyNarrow();
+  NARROW.addEventListener("change", applyNarrow);
   addEventListener("resize", layoutView);
   watchView();
   new MutationObserver(() => layoutView()).observe(document.body, { attributes: true, attributeFilter: ["class", "hidden"], subtree: true });
