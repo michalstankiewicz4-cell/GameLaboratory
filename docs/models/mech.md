@@ -28,15 +28,15 @@ oprawy łożysk i silnik — miejsca śrub (`userData.mounts`).
 
 | Folder / plik | Co |
 |---|---|
-| `common.js` | wspólne materiały i pomocniki nowych kitów |
-| `clock/` | ClockKit: koła zegarowe, wychwyt Grahama z kotwicą, sprężyny (naciskowa, spiralna w bębnie, skrętna), zapadka, koło zamachowe, tarcza, zegar — regulator |
-| `mechanisms/` | dźwignia (rodzaje 1–3), zatrzask z wyzwalaczem |
-| `power/` | akumulator (AGM, NMC, LiFePO4) |
-| `relays/` | przekaźnik czasowy, przekaźnik sygnałowy w gnieździe |
-| `regulators/` | regulator PID, regulator odśrodkowy Watta |
-| `sensors/` | czujnik indukcyjny, enkoder, bariera optyczna |
-| `fluid/` | FluidKit: rury, węże (także przezroczysty), źródła, pompy (zębata, tłokowa, odśrodkowa), zawory, rozdzielacz, siłownik, zbiorniki, przyrządy, przenośnik |
-| `optics.js`, `optics/` | OptiKit: lustro; soczewki, pryzmaty, oprawy, źródła (laser, LED), odbiorniki (fotodioda, ekran) |
+| `common.js` | wspólne materiały i pomocniki nowych kitów (język podpisów `EN`, tekstury z płótna, naklejki, tworzywa, poświaty) |
+| `clock/` | ClockKit (`index.js`): `wheels.js` koła zegarowe, `escapement.js` wychwyt Grahama z kotwicą, `springs.js` sprężyny (naciskowa, spiralna w bębnie, skrętna), `ratchet.js` zapadka, `flywheel.js` koło zamachowe, `dial.js` tarcza, `regulator.js` zegar — regulator |
+| `mechanisms/` | `lever.js` dźwignia (rodzaje 1–3), `latch.js` zatrzask z wyzwalaczem |
+| `power/` | `battery.js` akumulator (AGM, NMC, LiFePO4) |
+| `relays/` | `timer.js` przekaźnik czasowy, `signal.js` przekaźnik sygnałowy w gnieździe |
+| `regulators/` | `pid.js` regulator PID, `governor.js` regulator odśrodkowy Watta |
+| `sensors/` | `inductive.js` czujnik indukcyjny, `encoder.js` enkoder, `optical.js` bariera optyczna |
+| `fluid/` | FluidKit (`index.js`): `pipes.js` rury i węże (także przezroczysty), `supply.js` źródła, `pumps.js` pompy (zębata, tłokowa, odśrodkowa), `valves.js` zawory i rozdzielacz, `cylinder.js` siłownik, `tanks.js` zbiorniki, `instruments.js` przyrządy, `conveyor.js` przenośnik, `util.js` materiały cieczy i pomocniki |
+| `optics.js`, `optics/` | OptiKit: `optics.js` lustro; `optics/` (`index.js`): `lens.js` soczewki, `prism.js` pryzmaty, `mount.js` słupek z podstawą i materiały optyczne, `sources.js` laser i LED, `receivers.js` fotodioda i ekran |
 
 Zachowania tych kitów: `js/behaviors/land/mech/` (`escapement.js`, `sensors.js`, `signal.js`, `timer-relay.js`, `pid.js`,
 `governor.js`, `relay.js`, `latch.js`, `battery.js`, `fluid.js`, `hydraulics.js`, `hydraulic-axis.js`, `conveyor.js`,
