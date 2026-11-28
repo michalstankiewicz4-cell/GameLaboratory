@@ -27,7 +27,7 @@ wersji z Battle (historia obu — w git). Logika to wersja z Battle — ma wszys
 | `tools/doctor/sources/plants.js` | rośliny z PlantKit: każdy gatunek (ziarno 1) jako kora i liście |
 | `tools/doctor/sources/rocks.js` | skały z RockKit: każdy rodzaj w każdym kształcie (ziarno 1) jako jedna siatka |
 | `tools/doctor/sources/streets.js` | ulice StreetKit: przekroje, skrzyżowania, sygnalizatory, latarnie, znaki, słupki, barierki, ekrany, pikietaż, parkingi, wiadukty, tunele, rampa, kładki, przejście podziemne |
-| `tools/doctor/sources/mech.js` | przedmioty laboratorium mechaniki (MechKit, ControlKit): ustawienia domyślne i warianty skrajne; planeEps 0,2 mm |
+| `tools/doctor/sources/mech.js` | przedmioty laboratorium mechaniki (MechKit, ControlKit, ClockKit, FluidKit, OptiKit i reszta `js/models/mech/`): ustawienia domyślne i warianty skrajne (`MECH_VARIANTS`); planeEps 0,2 mm |
 | `tools/doctor/sources/houses.js` | budynki z części HouseKit (każda część osobną siatką, jak przed zniszczeniem; `ground: 0`) |
 | `tools/doctor/sources/test-bench.js` | stanowisko testowe: model z jednym błędem na każdy test |
 | `tools/doctor/sources/common.js` | wspólne: koszt rysowania (trójkąty, wywołania, materiały) |
@@ -60,6 +60,7 @@ wskazywał jedną część.
 | `poke` | ostrzeżenie | element wystaje przez burtę (`opts.hullSide`) |
 | `budget` | ostrzeżenie | model przekracza budżet gry (`opts.budget`) |
 | `pierce` | ostrzeżenie | zderzacz przechodzi na wylot przez cienki zderzacz — np. zsyp przez ściankę kosza: to, co się zsuwa, staje na ściance (`opts.colliders`) |
+| `clash` | ostrzeżenie | w złożeniu (`opts.components` — osobne modele sceny) część jednego modelu wchodzi w zamkniętą bryłę innego głębiej niż `opts.clashDepth` (domyślnie 0,3 mm) — np. łeb śruby w podporze, część przez obudowę; szczegóły niżej |
 | `hidden` | info | część w całości wewnątrz innej |
 | `speck` | info | część za mała, by ją zobaczyć |
 | `sliver` | info | trójkąty-igły, które źle się cieniują |
@@ -84,6 +85,16 @@ i nigdzie poza nim — i tylko wtedy, gdy wolny koniec jest niżej niż trzymany
 wysięgnik żurawia albo antena — zamierzone. Pręt skrzyżowany po drodze z inną częścią (kłody oparte o siebie) ma drugi
 punkt podparcia. Nie łapie odwróconego pochylenia „V” zamiast „A” (kłody ogniska stojące na gruncie z wolnymi
 wierzchołkami w górze wyglądają dla testu jak maszty) — opis błędu: `AI_COLLABORATION.md`, „Częste błędy AI w modelach”.
+
+`clash` (z Tornado.io, 2026-11-28) — złożenie, nie pojedynczy model: działa, gdy źródło albo strona poda osobne modele
+(`opts.components`; część należy do najbliższego przodka z listy). Wierzchołek części jednego modelu leży w zamkniętej
+bryle innego modelu i zostaje w niej po przesunięciu o `clashDepth` w ±x, ±y, ±z — styk powierzchni i pasowanie (wał
+w otworze) nie są kolizją. Wynik podaje głębokość (≥ …) i miejsce. Pasowanie zamierzone: `userData.doctorOk = 'clash'`
+na części (trzpień śruby w otworze gwintowanym); para modeli zamierzona — `opts.clashOk(a, b)`. Strona z całą sceną:
+`python3 tools/doctor.py --scene <strona>` — strona wystawia `window.LabScene = { prepare?() (async), root(),
+components() → [Object3D], clashOk?(a, b) }` (laboratorium mechaniki: wszystkie modele maszyny, śruby, krzyżaki,
+regulator i urządzenia instalacji). Przy okazji w MechKit: faza wyciągnięć do środka (`bevelOffset = −bevelSize` —
+obrys i otwory nominalne), faza ograniczona do 0,3 średniego odcinka obrysu (drobne zęby).
 
 Wyjątki dla zamierzonych przypadków: `userData.doctorOk = 'floating'` (albo tablica testów) na części lub jej przodku.
 

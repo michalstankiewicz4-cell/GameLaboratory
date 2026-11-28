@@ -1,10 +1,102 @@
-// Laboratorium mechaniki — przedmioty transmisji ruchu: zębatki i przekładnie, łańcuchy, pasy, wały i łożyska, sprzęgła, napęd.
-import * as THREE from '../../../vendor/three/three.module.js';
-import * as MK from '../../models/mech/mechkit.js';
-import { createDrive } from '../../behaviors/land/mech/drive.js';
-import { TAU, X, Y, mm, kg, kgcm2, P, MATS, matName, CHAINS, shaftBit, spinAll, contactRatio } from './items-common.js';
+// Transmisja ruchu (kategoria 1): zamiana ruchu, łożyska, zębatki i przekładnie, łańcuchy, pasy, wały, sprzęgła, napęd.
+// Przedmiot: { id, name, group, params, build(p) → { group, update(θ), info, live?, warn?, ports } } (opis w ../items.js).
+import * as THREE from '../../../../vendor/three/three.module.js';
+import * as MK from '../../../models/mech/mechkit.js';
+import { createDrive, ujointEta } from '../../../behaviors/land/mech/drive.js';
+import { LOC } from '../lang.js';
+import { cardanCheck, cardanMax } from './cardan.js';
+import { TAU, X, Y, mm, kg, kgcm2, P, MATS, matName, CHAINS, shaftBit, spinAll, num, portsOf, contactRatio } from './util.js';
 
-export const DRIVE_ITEMS = [
+export const TRANSMISSION = [
+  {
+    id: 'rackpinion', name: 'Listwa zębata z zębnikiem', group: 'Zamiana ruchu',
+    params: [
+      { key: 'm', label: 'Moduł', type: 'select', options: [[0.001, 'm 1'], [0.0015, 'm 1,5'], [0.002, 'm 2'], [0.003, 'm 3']], def: 0.0015 },
+      { key: 'z', label: 'Zęby zębnika', type: 'range', min: 12, max: 40, step: 1, def: 16 },
+      { key: 'n', label: 'Zęby listwy', type: 'range', min: 16, max: 80, step: 1, def: 40 },
+    ],
+    build(p) {
+      const g = new THREE.Group(), rk = MK.rack({ m: p.m, n: p.n, w: 0.012 }), pin = MK.gear({ z: p.z, m: p.m, w: 0.012, bore: Math.min(0.008, p.m * p.z / 2 * 0.4) }), rp = p.m * p.z / 2, L = rk.userData.L;
+      rk.rotation.x = -Math.PI / 2; rk.position.z = L / 2; pin.position.y = rp; g.add(rk, pin);
+      const d = createDrive(), eg = d.add({ id: 'g', J: 0, frame: { o: new THREE.Vector3(0, rp, 0), axis: X, ref: Y } }), er = d.add({ id: 'r', J: 0, dof: 'lin', frame: { o: new THREE.Vector3(0, 0, L / 2), axis: new THREE.Vector3(0, 0, -1), ref: Y } });
+      d.connect('g', 'mesh', 'r', 'mesh', 'rack', { m: p.m, z: p.z, y0: 0 }); d.solve('g');
+      const A = Math.max(0.3, (L / 2 - Math.PI * p.m * 3) / rp);   // obrót wahadłowy: listwa nie zjeżdża z zębnika
+      return { group: g, update: (t) => { d.pose(A * Math.sin(t / A)); pin.userData.spin.rotation.x = eg.theta; rk.userData.slide.position.y = er.theta; },
+        info: [['Zębnik', `z = ${p.z}, d_p = ${mm(2 * rp)}`], ['Listwa', `${p.n} zębów, ${mm(L, 0)}, podziałka ${mm(Math.PI * p.m, 2)}`], ['Przesuw na obrót zębnika', mm(Math.PI * p.m * p.z, 1)], ['Przełożenie', `${num(rp * 1000, 2)} mm/rad (siła = moment / r_p)`],
+          ['Sprawność', `${num(rk.userData.phys.eta * 100)} %`], ['Luz (z pocienienia zębów)', mm(2 * rk.userData.phys.luz, 2)], ['Masa listwy', kg(rk.userData.mass)]],
+        ports: portsOf(pin, rk) };
+    },
+  },
+  {
+    id: 'crank', name: 'Mechanizm korbowy', group: 'Zamiana ruchu',
+    params: [
+      { key: 'r', label: 'Promień korby', type: 'range', min: 0.02, max: 0.08, step: 0.005, unit: 'mm', def: 0.05 },
+      { key: 'l', label: 'Korbowód', type: 'range', min: 0.1, max: 0.4, step: 0.01, unit: 'mm', def: 0.22 },
+    ],
+    build(p) {
+      const g = new THREE.Group(), r = p.r, l = Math.max(p.l, 2.2 * r), xr = 0.03;
+      const disc = MK.shaft({ len: 0.012, r: r + 0.015 }); disc.position.x = -0.006; g.add(disc);   // tarcza korby
+      const pin = new THREE.Mesh(MK.cyl(0.006, 0.026, 20), MK.materials().steel); pin.position.set(0.006 + 0.013 - disc.position.x, r, 0); disc.userData.spin.add(pin);
+      const rod = MK.conRod({ l }); g.add(rod);
+      const sl = MK.slider({ len: 0.06, w: 0.04, h: 0.03, travel: 2 * r + 0.02 });
+      sl.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(new THREE.Vector3(-1, 0, 0), new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 1, 0)));
+      sl.position.set(xr + sl.userData.pin.x, 0, l); g.add(sl);
+      const d = createDrive(), ec = d.add({ id: 'c', J: 0, frame: { o: new THREE.Vector3(), axis: X, ref: Y } }), es = d.add({ id: 's', J: 0, dof: 'lin', frame: { o: new THREE.Vector3(xr, 0, l), axis: new THREE.Vector3(0, 0, 1), ref: Y } });
+      d.connect('c', 'b', 's', 'pin', 'crank', { r, l }); d.solve('c');
+      const lam = r / l, A = new THREE.Vector3(), B = new THREE.Vector3();
+      return { group: g, update: (t) => { d.pose(t); disc.userData.spin.rotation.x = t; sl.userData.slide.position.y = es.theta; pin.getWorldPosition(A); g.worldToLocal(A).setX(xr); rod.userData.pose(A, B.set(xr, 0, l + es.theta)); },
+        info: [['Skok', mm(2 * r, 0)], ['λ = r / l', num(lam, 3)], ['Przyspieszenie suwaka (maks.)', `r·ω²·(1 + λ) = ${num(r * (1 + lam), 4)}·ω² m/s²`], ['Prędkość średnia', `2·skok·n = ${num(4 * r, 3)}·n m/s (n — obr/s)`],
+          ['Sprawność', `${num(rod.userData.phys.eta * 100)} % (dwa sworznie)`], ['Martwe położenia', '0° i 180° — korba nie ruszy z suwaka'], ['Masa suwaka', kg(sl.userData.mass)], ['Masa korbowodu', kg(rod.userData.mass)]],
+        ports: [P('shaft', 'Wał korby — wał'), ...portsOf(sl)] };
+    },
+  },
+  {
+    id: 'leadscrew', name: 'Śruba pociągowa z nakrętką', group: 'Zamiana ruchu',
+    params: [
+      { key: 'kind', label: 'Rodzaj', type: 'select', options: [['ball', 'kulowa'], ['trap', 'trapezowa Tr']], def: 'ball' },
+      { key: 'd', label: 'Średnica', type: 'select', options: [[0.016, 'Ø 16'], [0.02, 'Ø 20'], [0.025, 'Ø 25'], [0.032, 'Ø 32']], def: 0.02 },
+      { key: 'lead', label: 'Skok', type: 'select', options: [[0.004, '4 mm'], [0.005, '5 mm'], [0.01, '10 mm'], [0.02, '20 mm']], def: 0.01 },
+      { key: 'len', label: 'Długość', type: 'range', min: 0.2, max: 1, step: 0.05, unit: 'mm', def: 0.5 },
+    ],
+    build(p) {
+      const g = new THREE.Group(), sc = MK.leadScrew({ d: p.d, lead: p.lead, len: p.len, kind: p.kind, thread: [0.04, p.len - 0.04] }), nt = MK.screwNut({ d: p.d, lead: p.lead, kind: p.kind, hc: 0.06, travel: p.len - 0.15 });
+      sc.position.x = -p.len / 2; g.add(sc, nt);
+      const d = createDrive(), es = d.add({ id: 's', J: 0, frame: { o: new THREE.Vector3(-p.len / 2, 0, 0), axis: X, ref: Y } }), en = d.add({ id: 'n', J: 0, dof: 'lin', frame: { o: new THREE.Vector3(), axis: X, ref: Y } });
+      d.connect('s', 'thread', 'n', 'thread', 'screw', { lead: p.lead }); d.solve('s');
+      const A = (p.len / 2 - 0.08) / p.lead * TAU, lam = Math.atan(p.lead / (Math.PI * p.d * 0.9)), rho = Math.atan(0.1 / Math.cos(15 * Math.PI / 180));
+      const eta = p.kind === 'ball' ? sc.userData.phys.eta : Math.tan(lam) / Math.tan(lam + rho), self = p.kind !== 'ball' && lam < rho;
+      return { group: g, update: (t) => { d.pose(A * Math.sin(t / A)); sc.userData.spin.rotation.x = es.theta; nt.userData.slide.position.x = en.theta; },
+        info: [['Przesuw na obrót', mm(p.lead, 0)], ['Kąt wzniosu gwintu', `${num(lam * 180 / Math.PI, 1)}°`], ['Sprawność', `${num(eta * 100)} %${p.kind === 'ball' ? ' (kulki toczą się)' : ' (tarcie ślizgowe, μ = 0,1)'}`],
+          ['Samohamowność', self ? 'tak — obciążenie nie obróci śruby' : 'nie — siła na nakrętce obraca śrubę (potrzebny hamulec)'], ['Siła z momentu 1 N·m', `${num(TAU * eta / p.lead)} N`], ['Masa śruby', kg(sc.userData.mass)]],
+        ports: portsOf(sc, nt) };
+    },
+  },
+  /* ---------------- łożyska ---------------- */
+  {
+    id: 'rolling', name: 'Łożysko (rodzaje)', group: 'Łożyska',
+    params: [
+      { key: 'type', label: 'Rodzaj', type: 'select', options: Object.entries(MK.BEARINGS).map(([k, v]) => [k, v.name]), def: 'ball' },
+      { key: 'd', label: 'Średnica wału', type: 'select', options: [[0.02, 'Ø 20'], [0.025, 'Ø 25'], [0.03, 'Ø 30'], [0.04, 'Ø 40']], def: 0.025 },
+      { key: 'P', label: 'Obciążenie', type: 'range', min: 100, max: 10000, step: 100, unit: 'N', def: 1500 },
+      { key: 'n', label: 'Prędkość', type: 'range', min: 50, max: 6000, step: 50, unit: 'obr/min', def: 1450 },
+    ],
+    build(p) {
+      const b = MK.rollingBearing({ type: p.type, d: p.d }), u = b.userData, D = u.data, s = shaftBit(0.12, p.d / 2);
+      const g = new THREE.Group(); g.add(b, s);
+      const L10 = D.p ? (D.C / p.P) ** D.p : 0, L10h = L10 * 1e6 / (60 * p.n), M = D.mu * p.P * p.d / 2, pv = p.type === 'plain' ? p.P / (p.d * u.B) / 1e6 * (Math.PI * p.d * p.n / 60) : 0;
+      const warn = [];
+      if (p.n > D.n) warn.push(`Prędkość powyżej granicznej (${num(D.n)} obr/min).`);
+      if (D.C0 && p.P > D.C0) warn.push('Obciążenie powyżej nośności statycznej C0 — trwałe odkształcenia bieżni.');
+      if (p.type === 'plain' && pv > 1.6) warn.push(`p·v = ${num(pv, 2)} MPa·m/s — powyżej 1,6 (przegrzanie tulei).`);
+      if (p.type === 'thrust') warn.push('Łożysko wzdłużne przenosi tylko siły osiowe — obciążenie traktowane jako osiowe.');
+      return { group: g, warn, update: (t) => { u.spin.rotation.x = t; s.userData.spin.rotation.x = t; u.cage.rotation.x = t * u.cageRatio; },
+        info: [['Rodzaj', D.name], ['Wymiary d × D × B', `${num(p.d * 1000)} × ${num(u.D * 1000, 1)} × ${num(u.B * 1000, 2)} mm`], ['Przenosi', D.load],
+          ...(D.C ? [['Nośność C / C0', `${num(D.C / 1000, 1)} / ${num(D.C0 / 1000, 1)} kN`], ['Trwałość L10', `${num(L10, 1)} mln obr. = ${num(L10h)} h przy ${num(p.n)} obr/min`]] : [['Nacisk p·v', `${num(pv, 2)} MPa·m/s (dop. 1,6)`]]),
+          ['Moment tarcia', `μ·P·d/2 = ${num(M * 1000, 1)} N·mm (μ = ${num(D.mu, 4)})`], ['Straty mocy', `${num(M * p.n * TAU / 60, 2)} W`], ['Prędkość graniczna', `${num(D.n)} obr/min`],
+          ...(u.Z ? [['Elementy toczne', `${u.Z} × Ø ${num(u.Dw * 1000, 2)} mm, koszyk ${num(u.cageRatio, 3)}·n`]] : []), ['Masa', kg(u.mass)]],
+        ports: portsOf(b) };
+    },
+  },
   {
     id: 'gear', name: 'Zębatka walcowa', group: 'Zębatki i przekładnie',
     params: [
@@ -44,7 +136,7 @@ export const DRIVE_ITEMS = [
       const d = createDrive(), ea = d.add({ id: 'a', J: 0, frame: { o: a.position.clone(), axis: X, ref: Y } }), eb = d.add({ id: 'b', J: 0, frame: { o: b.position.clone(), axis: X, ref: Y } });
       d.connect('a', 'mesh', 'b', 'mesh', 'mesh', { za: p.z1, zb: p.z2 }); d.solve('a');
       return { group: g, view: { yaw: 1.2, pitch: 0.25 }, update: (t) => { d.pose(t); a.userData.spin.rotation.x = ea.theta; b.userData.spin.rotation.x = eb.theta; },
-        info: [['Przełożenie', `i = ${p.z2}/${p.z1} = ${(p.z2 / p.z1).toLocaleString('pl', { maximumFractionDigits: 3 })}`], ['Odległość osi', mm(a0)], ['Kierunek', 'przeciwny'], ['Wskaźnik przyporu (ok.)', contactRatio(p.z1, p.z2).toLocaleString('pl', { maximumFractionDigits: 2 })], ['Masa razem', kg(a.userData.mass + b.userData.mass)]],
+        info: [['Przełożenie', `i = ${p.z2}/${p.z1} = ${(p.z2 / p.z1).toLocaleString(LOC, { maximumFractionDigits: 3 })}`], ['Odległość osi', mm(a0)], ['Kierunek', 'przeciwny'], ['Wskaźnik przyporu (ok.)', contactRatio(p.z1, p.z2).toLocaleString(LOC, { maximumFractionDigits: 2 })], ['Masa razem', kg(a.userData.mass + b.userData.mass)]],
         ports: [P('in', 'Wał zębnika (wejście)'), P('out', 'Wał koła (wyjście)')] };
     },
   },
@@ -59,10 +151,10 @@ export const DRIVE_ITEMS = [
     ],
     build(p) {
       const g = MK.planetary(p), u = g.userData, warn = [];
-      if (!u.assemblyOk) warn.push(`(zs + zr) / n = ${u.assembly.toLocaleString('pl', { maximumFractionDigits: 2 })} — niecałkowite: satelitów nie da się rozstawić równo.`);
+      if (!u.assemblyOk) warn.push(`(zs + zr) / n = ${u.assembly.toLocaleString(LOC, { maximumFractionDigits: 2 })} — niecałkowite: satelitów nie da się rozstawić równo.`);
       if (!u.clearanceOk) warn.push('Satelity zachodzą na siebie — za dużo satelitów albo za duże.');
       return { group: g, warn, view: { yaw: -0.9, pitch: 0.25 }, update: (t) => u.update(t),
-        info: [['Koło koronowe', `${u.zr} zębów (zr = zs + 2·zp)`], ['Przełożenie (korona stała)', `i = 1 + zr/zs = ${u.ratio.toLocaleString('pl', { maximumFractionDigits: 3 })}`], ['Kierunek wyjścia', 'ten sam co wejście'], ['Promień jarzma', mm(u.RC)], ['Średnica zewnętrzna', mm(u.R * 2)], ['Masa', kg(u.mass)]],
+        info: [['Koło koronowe', `${u.zr} zębów (zr = zs + 2·zp)`], ['Przełożenie (korona stała)', `i = 1 + zr/zs = ${u.ratio.toLocaleString(LOC, { maximumFractionDigits: 3 })}`], ['Kierunek wyjścia', 'ten sam co wejście'], ['Promień jarzma', mm(u.RC)], ['Średnica zewnętrzna', mm(u.R * 2)], ['Masa', kg(u.mass)]],
         ports: [P('sun', 'Koło słoneczne (wejście)'), P('ring', 'Koło koronowe', 'podparcie'), P('carrier', 'Jarzmo (wyjście)')] };
     },
   },
@@ -111,7 +203,7 @@ export const DRIVE_ITEMS = [
       s1.userData.spin.children.forEach((c) => { c.rotation.x = path.a1; }); s2.userData.spin.children.forEach((c) => { c.rotation.x = path.a2 - path.U2 * TAU / p.z2; });
       const ch = MK.chainLoop(path, D.N, { p: C.p, d1: C.d1, type: p.type }); g.add(ch);
       return { group: g, view: { yaw: 1.25, pitch: 0.2 }, update: (t) => { s1.userData.spin.rotation.x = t; s2.userData.spin.rotation.x = t * p.z1 / p.z2 + path.seat.phase2; ch.userData.update(t * p.z1 / TAU); },
-        info: [['Przełożenie', `i = ${p.z2}/${p.z1} = ${(p.z2 / p.z1).toLocaleString('pl', { maximumFractionDigits: 3 })}`], ['Kierunek', 'ten sam'], ['Liczba ogniw', `${D.N} (parzysta — bez ogniwa przejściowego)`], ['Odległość osi (dobrana)', mm(D.D)], ['Długość łańcucha', mm(D.N * C.p, 0)], ['Masa łańcucha', kg(ch.userData.mass)]],
+        info: [['Przełożenie', `i = ${p.z2}/${p.z1} = ${(p.z2 / p.z1).toLocaleString(LOC, { maximumFractionDigits: 3 })}`], ['Kierunek', 'ten sam'], ['Liczba ogniw', `${D.N} (parzysta — bez ogniwa przejściowego)`], ['Odległość osi (dobrana)', mm(D.D)], ['Długość łańcucha', mm(D.N * C.p, 0)], ['Masa łańcucha', kg(ch.userData.mass)]],
         ports: [P('in', 'Wał koła czynnego (wejście)'), P('out', 'Wał koła biernego (wyjście)')] };
     },
   },
@@ -147,7 +239,7 @@ export const DRIVE_ITEMS = [
       const wrap = Math.PI - 2 * Math.asin((p.d2 - p.d1) / (2 * a));
       return { group: g, view: { yaw: 1.25, pitch: 0.2 }, update: (t) => { q1.userData.spin.rotation.x = t; q2.userData.spin.rotation.x = t * p.d1 / p.d2; belt.userData.update(t * p.d1 / 2); },
         warn: wrap < 120 * Math.PI / 180 ? ['Kąt opasania koła czynnego poniżej 120° — pas może się ślizgać.'] : [],
-        info: [['Przełożenie', `i = ${Math.round(p.d2 * 1000)}/${Math.round(p.d1 * 1000)} = ${(p.d2 / p.d1).toLocaleString('pl', { maximumFractionDigits: 3 })}`], ['Kierunek', 'ten sam'], ['Długość pasa (skuteczna)', `${L} mm`], ['Kąt opasania (koło czynne)', `${Math.round(wrap * 180 / Math.PI)}°`], ['Masa pasów', kg(belt.userData.mass)]],
+        info: [['Przełożenie', `i = ${Math.round(p.d2 * 1000)}/${Math.round(p.d1 * 1000)} = ${(p.d2 / p.d1).toLocaleString(LOC, { maximumFractionDigits: 3 })}`], ['Kierunek', 'ten sam'], ['Długość pasa (skuteczna)', `${L} mm`], ['Kąt opasania (koło czynne)', `${Math.round(wrap * 180 / Math.PI)}°`], ['Masa pasów', kg(belt.userData.mass)]],
         ports: [P('in', 'Wał koła czynnego (wejście)'), P('out', 'Wał koła biernego (wyjście)')] };
     },
   },
@@ -162,7 +254,7 @@ export const DRIVE_ITEMS = [
     build(p) {
       const g = MK.shaft({ len: p.len, r: p.d / 2, mat: p.mat, key: p.key }); g.position.x = -p.len / 2; const h = new THREE.Group(); h.add(g); const u = g.userData;
       const kt = u.phys.k;   // G·J_p / L — z danych wału (MechKit.PHYS, G wg materiału)
-      return { group: h, update: spinAll(g), info: [['Masa', kg(u.mass)], ['Bezwładność', kgcm2(u.J)], ['Materiał', matName(p.mat)], ['Sztywność skrętna', `${Math.round(kt).toLocaleString('pl')} N·m/rad (${(kt * Math.PI / 180).toLocaleString('pl', { maximumFractionDigits: 1 })} N·m na 1°)`], ['Smukłość l/d', Math.round(p.len / p.d).toString()]],
+      return { group: h, update: spinAll(g), info: [['Masa', kg(u.mass)], ['Bezwładność', kgcm2(u.J)], ['Materiał', matName(p.mat)], ['Sztywność skrętna', `${Math.round(kt).toLocaleString(LOC)} N·m/rad (${(kt * Math.PI / 180).toLocaleString(LOC, { maximumFractionDigits: 1 })} N·m na 1°)`], ['Smukłość l/d', Math.round(p.len / p.d).toString()]],
         ports: [P('a', 'Koniec A'), P('b', 'Koniec B'), P('mid', 'Osadzenie (koła, sprzęgła, łożyska)')] };
     },
   },
@@ -188,7 +280,7 @@ export const DRIVE_ITEMS = [
       const r = p.r / 2, c = MK.jawCoupling({ r, bore: Math.min(0.0125, r * 0.4), spider: p.spider }), g = new THREE.Group(), spin = new THREE.Group(); g.add(spin); spin.add(c.a, c.spider, c.b);
       const sa = shaftBit(0.12, Math.min(0.0125, r * 0.4)), sb = shaftBit(0.12, Math.min(0.0125, r * 0.4)); sa.position.x = -0.12 - 0.04; sb.position.x = 0.04; g.add(sa, sb);
       return { group: g, update: (t) => { spin.rotation.x = t; sa.userData.spin.rotation.x = t; sb.userData.spin.rotation.x = t; },
-        info: [['Rodzaj', 'podatne, kłowe (3 kły na piaście)'], ['Gwiazda', MK.SPIDER[p.spider].name], ['Sztywność skrętna (wielkość 19)', `${c.phys.k.toLocaleString('pl')} N·m/rad`], ['Tłumienie', p.spider === '64D' ? 'małe (twarda)' : 'duże (miękka)'], ['Kompensuje', 'niewspółosiowość, tłumi drgania'], ['Masa', kg(c.mass)]],
+        info: [['Rodzaj', 'podatne, kłowe (3 kły na piaście)'], ['Gwiazda', MK.SPIDER[p.spider].name], ['Sztywność skrętna (wielkość 19)', `${c.phys.k.toLocaleString(LOC)} N·m/rad`], ['Tłumienie', p.spider === '64D' ? 'małe (twarda)' : 'duże (miękka)'], ['Kompensuje', 'niewspółosiowość, tłumi drgania'], ['Masa', kg(c.mass)]],
         ports: [P('a', 'Piasta A'), P('b', 'Piasta B')] };
     },
   },
@@ -237,9 +329,14 @@ export const DRIVE_ITEMS = [
         const a = pinA.clone().applyAxisAngle(axA, ta), bb = pinB.clone().applyAxisAngle(axB, tb); bb.addScaledVector(a, -bb.dot(a)).normalize();
         cr.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(new THREE.Vector3().crossVectors(a, bb), a, bb));
       };
-      const out = p.double ? e.c : e.b, f3 = (v) => v.toLocaleString('pl', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+      const out = p.double ? e.c : e.b, f3 = (v) => v.toLocaleString(LOC, { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+      // fizyka przegubu: sprawność od kąta (dane krzyżaka), luz w łożyskach igiełkowych, kolizje w pełnym obrocie, kąt graniczny
+      const ph = cr1.userData.phys, eta = ujointEta(b, ph), chk = cardanCheck(p.beta), mx = cardanMax();
+      const phys = [['Sprawność (od kąta)', `${f3(eta * 100).replace(/0$/, '')} %${p.double ? ` na przegub, ${f3(eta * eta * 100).replace(/0$/, '')} % razem` : ''}`],
+        ['Luz kątowy (łożyska krzyżaka)', `${(2 * ph.clear / ph.R * 180 / Math.PI).toLocaleString(LOC, { maximumFractionDigits: 3 })}° (luz promieniowy ${ph.clear * 1e6} µm)`],
+        ['Kolizje w obrocie', chk.clash ? `TAK — ${chk.pair} przy ${chk.at}°` : 'brak (widełki i krzyżak, 24 położenia)'], ['Największy kąt łamania', `${mx.beta.toLocaleString(LOC, { maximumFractionDigits: 1 })}°${mx.pair ? ` (dalej: ${mx.pair})` : ''}`]];
       const info = () => [['Kąt łamania', `${p.beta}°`], ['Przełożenie chwilowe', `ω₂/ω₁ = ${f3(Math.abs(out.r || 1))}`], ['Wał pośredni / bierny (pojedynczy)', `${f3(Math.cos(b))} … ${f3(1 / Math.cos(b))} × ω₁`], ['Wyjście', p.double ? 'równomierne — układ Z znosi nierównomierność' : 'nierównomierne — przyspiesza i zwalnia 2 razy na obrót']];
-      return { group: g, live: info, info: info(), view: { yaw: 0.35, pitch: 0.55 }, ports: [P('in', 'Wał czynny'), P('out', 'Wał bierny')],
+      return { group: g, live: () => [...info(), ...phys], info: [...info(), ...phys], warn: chk.clash ? [`Widełki i krzyżak kolidują przy ${p.beta}° — największy kąt bez kolizji: ${mx.beta.toLocaleString(LOC, { maximumFractionDigits: 1 })}°.`] : [], view: { yaw: 0.35, pitch: 0.55 }, ports: [P('in', 'Wał czynny'), P('out', 'Wał bierny')],
         update: (t) => {
           d.pose(t); sA.userData.spin.rotation.x = e.a.theta; sB.userData.spin.rotation.x = e.b.theta;
           pose(cr1, Y, e.a.theta, X, zq, e.b.theta, dir);
@@ -257,7 +354,7 @@ export const DRIVE_ITEMS = [
     build(p) {
       const g = MK.motor(p), u = g.userData, h = new THREE.Group(); g.position.y = -u.H; h.add(g);
       return { group: h, rest: true, update: spinAll(g),
-        info: [['Wielkość mechaniczna', `${u.spec.frame} (oś ${mm(u.H, 0)} nad łapami)`], ['Obroty synchroniczne', `${Math.round(u.nSync)} obr/min`], ['Obroty znamionowe (ok.)', `${Math.round(u.nRated)} obr/min`], ['Moment znamionowy', `${u.Tn.toLocaleString('pl', { maximumFractionDigits: 1 })} N·m`], ['Wał', `Ø ${mm(u.shaftD, 0)} × ${mm(u.shaftL, 0)}`], ['Masa', kg(u.mass)], ['Bezwładność wirnika', kgcm2(u.J)]],
+        info: [['Wielkość mechaniczna', `${u.spec.frame} (oś ${mm(u.H, 0)} nad łapami)`], ['Obroty synchroniczne', `${Math.round(u.nSync)} obr/min`], ['Obroty znamionowe (ok.)', `${Math.round(u.nRated)} obr/min`], ['Moment znamionowy', `${u.Tn.toLocaleString(LOC, { maximumFractionDigits: 1 })} N·m`], ['Wał', `Ø ${mm(u.shaftD, 0)} × ${mm(u.shaftL, 0)}`], ['Masa', kg(u.mass)], ['Bezwładność wirnika', kgcm2(u.J)]],
         ports: [P('out', 'Wał wyjściowy'), P('power', 'Zasilanie 3 × 400 V', 'energia elektryczna'), P('base', 'Łapy (mocowanie)', 'mocowanie')] };
     },
   },
@@ -274,4 +371,5 @@ export const DRIVE_ITEMS = [
         ports: [P('shaft', 'Wał (obciążenie)', 'obciążenie'), P('ctl', 'Docisk zacisku', 'sterowanie')] };
     },
   },
+  /* ---------------- sterowanie: obsługa na modelu (klik, przeciąganie) ---------------- */
 ];

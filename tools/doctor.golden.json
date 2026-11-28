@@ -612,32 +612,140 @@
    "triangles": 692
   }
  },
+ "mech/accumulator": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 5,
+   "size": [
+    0.09,
+    0.22,
+    0.09
+   ],
+   "triangles": 952
+  }
+ },
+ "mech/accumulator-1": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 5,
+   "size": [
+    0.14,
+    0.31,
+    0.14
+   ],
+   "triangles": 952
+  }
+ },
+ "mech/ballValve": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 11,
+   "materials": 5,
+   "size": [
+    0.12,
+    0.05,
+    0.07
+   ],
+   "triangles": 2680
+  }
+ },
+ "mech/ballValve-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 11,
+   "materials": 5,
+   "size": [
+    0.09,
+    0.08,
+    0.13
+   ],
+   "triangles": 2680
+  }
+ },
+ "mech/barrier": {
+  "counts": {
+   "floating": 3
+  },
+  "fingerprint": {
+   "drawCalls": 13,
+   "materials": 11,
+   "size": [
+    0.28,
+    0.11,
+    0.05
+   ],
+   "triangles": 972
+  }
+ },
+ "mech/battery": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 15,
+   "materials": 12,
+   "size": [
+    0.15,
+    0.11,
+    0.13
+   ],
+   "triangles": 160
+  }
+ },
+ "mech/battery-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 3,
+   "materials": 3,
+   "size": [
+    0.09,
+    0.13,
+    0.05
+   ],
+   "triangles": 36
+  }
+ },
+ "mech/battery-2": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 3,
+   "materials": 3,
+   "size": [
+    0.09,
+    0.12,
+    0.05
+   ],
+   "triangles": 36
+  }
+ },
  "mech/bearing": {
   "counts": {},
   "fingerprint": {
-   "drawCalls": 10,
-   "materials": 5,
+   "drawCalls": 13,
+   "materials": 6,
    "size": [
     0.3,
     0.17,
     0.19
    ],
-   "triangles": 2144
+   "triangles": 3302
   }
  },
  "mech/bearing-1": {
-  "counts": {
-   "hidden": 1
-  },
+  "counts": {},
   "fingerprint": {
-   "drawCalls": 14,
-   "materials": 5,
+   "drawCalls": 17,
+   "materials": 6,
    "size": [
     0.3,
-    0.7,
-    0.28
+    0.68,
+    0.27
    ],
-   "triangles": 2192
+   "triangles": 3350
   }
  },
  "mech/belt": {
@@ -668,8 +776,7 @@
  },
  "mech/brake": {
   "counts": {
-   "sliver": 1,
-   "zfight": 1
+   "sliver": 1
   },
   "fingerprint": {
    "drawCalls": 9,
@@ -696,6 +803,36 @@
     0.46
    ],
    "triangles": 27904
+  }
+ },
+ "mech/bucket": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 11,
+   "materials": 4,
+   "size": [
+    0.23,
+    0.33,
+    0.23
+   ],
+   "triangles": 4648
+  }
+ },
+ "mech/bucket-1": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 11,
+   "materials": 4,
+   "size": [
+    0.19,
+    0.26,
+    0.18
+   ],
+   "triangles": 4648
   }
  },
  "mech/button": {
@@ -744,7 +881,9 @@
   }
  },
  "mech/cardan": {
-  "counts": {},
+  "counts": {
+   "hidden": 1
+  },
   "fingerprint": {
    "drawCalls": 27,
    "materials": 3,
@@ -753,11 +892,13 @@
     0.08,
     0.18
    ],
-   "triangles": 2016
+   "triangles": 2400
   }
  },
  "mech/cardan-1": {
-  "counts": {},
+  "counts": {
+   "hidden": 1
+  },
   "fingerprint": {
    "drawCalls": 27,
    "materials": 3,
@@ -766,11 +907,13 @@
     0.08,
     0.08
    ],
-   "triangles": 2016
+   "triangles": 2400
   }
  },
  "mech/cardan-2": {
-  "counts": {},
+  "counts": {
+   "hidden": 1
+  },
   "fingerprint": {
    "drawCalls": 50,
    "materials": 3,
@@ -779,7 +922,35 @@
     0.08,
     0.32
    ],
-   "triangles": 3700
+   "triangles": 4468
+  }
+ },
+ "mech/centrifugal": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 28,
+   "materials": 8,
+   "size": [
+    0.35,
+    0.17,
+    0.14
+   ],
+   "triangles": 3520
+  }
+ },
+ "mech/centrifugal-1": {
+  "counts": {
+   "sliver": 2
+  },
+  "fingerprint": {
+   "drawCalls": 28,
+   "materials": 7,
+   "size": [
+    0.35,
+    0.21,
+    0.16
+   ],
+   "triangles": 3520
   }
  },
  "mech/chain": {
@@ -808,6 +979,66 @@
    "triangles": 24048
   }
  },
+ "mech/checkValve": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 8,
+   "materials": 4,
+   "size": [
+    0.07,
+    0.04,
+    0.03
+   ],
+   "triangles": 2402
+  }
+ },
+ "mech/checkValve-1": {
+  "counts": {
+   "hidden": 1
+  },
+  "fingerprint": {
+   "drawCalls": 7,
+   "materials": 3,
+   "size": [
+    0.07,
+    0.04,
+    0.03
+   ],
+   "triangles": 2400
+  }
+ },
+ "mech/clearHose": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 14,
+   "materials": 6,
+   "size": [
+    0.3,
+    0.07,
+    0.02
+   ],
+   "triangles": 6164
+  }
+ },
+ "mech/clearHose-1": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 14,
+   "materials": 6,
+   "size": [
+    0.3,
+    0.06,
+    0.02
+   ],
+   "triangles": 6164
+  }
+ },
  "mech/contactor": {
   "counts": {},
   "fingerprint": {
@@ -832,6 +1063,84 @@
     0.1
    ],
    "triangles": 350
+  }
+ },
+ "mech/conveyor": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 27,
+   "materials": 12,
+   "size": [
+    0.76,
+    0.27,
+    0.2
+   ],
+   "triangles": 1904
+  }
+ },
+ "mech/crank": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 15,
+   "materials": 4,
+   "size": [
+    0.07,
+    0.17,
+    0.41
+   ],
+   "triangles": 1448
+  }
+ },
+ "mech/crank-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 15,
+   "materials": 4,
+   "size": [
+    0.07,
+    0.09,
+    0.22
+   ],
+   "triangles": 1448
+  }
+ },
+ "mech/crank-2": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 15,
+   "materials": 4,
+   "size": [
+    0.07,
+    0.25,
+    0.65
+   ],
+   "triangles": 1448
+  }
+ },
+ "mech/cspring": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 6,
+   "materials": 3,
+   "size": [
+    0.04,
+    0.09,
+    0.04
+   ],
+   "triangles": 8760
+  }
+ },
+ "mech/cspring-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 6,
+   "materials": 3,
+   "size": [
+    0.01,
+    0.23,
+    0.01
+   ],
+   "triangles": 18360
   }
  },
  "mech/dc": {
@@ -860,6 +1169,64 @@
    "triangles": 308
   }
  },
+ "mech/dirValve": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 32,
+   "materials": 19,
+   "size": [
+    0.25,
+    0.11,
+    0.11
+   ],
+   "triangles": 1226
+  }
+ },
+ "mech/encoder": {
+  "counts": {
+   "floating": 4
+  },
+  "fingerprint": {
+   "drawCalls": 12,
+   "materials": 6,
+   "size": [
+    0.14,
+    0.08,
+    0.06
+   ],
+   "triangles": 3376
+  }
+ },
+ "mech/escapement": {
+  "counts": {
+   "sliver": 2
+  },
+  "fingerprint": {
+   "drawCalls": 19,
+   "materials": 7,
+   "size": [
+    0.26,
+    0.45,
+    0.2
+   ],
+   "triangles": 10584
+  }
+ },
+ "mech/escapement-1": {
+  "counts": {
+   "sliver": 2
+  },
+  "fingerprint": {
+   "drawCalls": 19,
+   "materials": 7,
+   "size": [
+    0.26,
+    1.19,
+    0.2
+   ],
+   "triangles": 10584
+  }
+ },
  "mech/estop": {
   "counts": {},
   "fingerprint": {
@@ -880,8 +1247,8 @@
    "materials": 3,
    "size": [
     0.33,
-    0.15,
-    0.15
+    0.14,
+    0.14
    ],
    "triangles": 4360
   }
@@ -899,6 +1266,88 @@
    "triangles": 4536
   }
  },
+ "mech/floatGauge": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 24,
+   "materials": 7,
+   "size": [
+    0.22,
+    0.22,
+    0.16
+   ],
+   "triangles": 1816
+  }
+ },
+ "mech/floatGauge-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 24,
+   "materials": 7,
+   "size": [
+    0.22,
+    0.22,
+    0.16
+   ],
+   "triangles": 1816
+  }
+ },
+ "mech/fluidSource": {
+  "counts": {
+   "sliver": 5
+  },
+  "fingerprint": {
+   "drawCalls": 65,
+   "materials": 40,
+   "size": [
+    0.28,
+    0.45,
+    0.23
+   ],
+   "triangles": 12564
+  }
+ },
+ "mech/fluidSource-1": {
+  "counts": {
+   "sliver": 4
+  },
+  "fingerprint": {
+   "drawCalls": 63,
+   "materials": 39,
+   "size": [
+    0.37,
+    0.69,
+    0.23
+   ],
+   "triangles": 10192
+  }
+ },
+ "mech/flywheel": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 9,
+   "materials": 2,
+   "size": [
+    0.08,
+    0.66,
+    0.66
+   ],
+   "triangles": 2240
+  }
+ },
+ "mech/flywheel-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 9,
+   "materials": 2,
+   "size": [
+    0.08,
+    1.57,
+    1.57
+   ],
+   "triangles": 2240
+  }
+ },
  "mech/gear": {
   "counts": {},
   "fingerprint": {
@@ -906,8 +1355,8 @@
    "materials": 1,
    "size": [
     0.03,
-    0.14,
-    0.14
+    0.13,
+    0.13
    ],
    "triangles": 5528
   }
@@ -921,8 +1370,8 @@
    "materials": 1,
    "size": [
     0.03,
-    0.02,
-    0.02
+    0.01,
+    0.01
    ],
    "triangles": 1848
   }
@@ -947,10 +1396,156 @@
    "materials": 1,
    "size": [
     0.03,
-    0.14,
-    0.14
+    0.13,
+    0.13
    ],
    "triangles": 5528
+  }
+ },
+ "mech/gearPump": {
+  "counts": {
+   "floating": 1
+  },
+  "fingerprint": {
+   "drawCalls": 19,
+   "materials": 8,
+   "size": [
+    0.06,
+    0.06,
+    0.08
+   ],
+   "triangles": 10866
+  }
+ },
+ "mech/gearPump-1": {
+  "counts": {
+   "floating": 1
+  },
+  "fingerprint": {
+   "drawCalls": 19,
+   "materials": 7,
+   "size": [
+    0.08,
+    0.12,
+    0.13
+   ],
+   "triangles": 12786
+  }
+ },
+ "mech/governor": {
+  "counts": {
+   "floating": 1,
+   "sliver": 1,
+   "zfight": 1
+  },
+  "fingerprint": {
+   "drawCalls": 15,
+   "materials": 5,
+   "size": [
+    0.18,
+    0.33,
+    0.14
+   ],
+   "triangles": 5708
+  }
+ },
+ "mech/governor-1": {
+  "counts": {
+   "hidden": 1,
+   "sliver": 1,
+   "zfight": 2
+  },
+  "fingerprint": {
+   "drawCalls": 15,
+   "materials": 5,
+   "size": [
+    0.17,
+    0.33,
+    0.14
+   ],
+   "triangles": 5708
+  }
+ },
+ "mech/hose": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 13,
+   "materials": 2,
+   "size": [
+    0.28,
+    0.09,
+    0.03
+   ],
+   "triangles": 3304
+  }
+ },
+ "mech/hose-1": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 13,
+   "materials": 2,
+   "size": [
+    0.28,
+    0.08,
+    0.02
+   ],
+   "triangles": 3376
+  }
+ },
+ "mech/hydCylinder": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 24,
+   "materials": 7,
+   "size": [
+    0.3,
+    0.07,
+    0.08
+   ],
+   "triangles": 1050
+  }
+ },
+ "mech/hydCylinder-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 23,
+   "materials": 6,
+   "size": [
+    0.65,
+    0.1,
+    0.11
+   ],
+   "triangles": 1048
+  }
+ },
+ "mech/inductive": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 11,
+   "materials": 8,
+   "size": [
+    0.04,
+    0.23,
+    0.12
+   ],
+   "triangles": 14088
+  }
+ },
+ "mech/inductive-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 11,
+   "materials": 8,
+   "size": [
+    0.05,
+    0.25,
+    0.12
+   ],
+   "triangles": 11976
   }
  },
  "mech/jaw": {
@@ -962,8 +1557,8 @@
    "materials": 4,
    "size": [
     0.32,
-    0.09,
-    0.09
+    0.08,
+    0.08
    ],
    "triangles": 12376
   }
@@ -1009,6 +1604,209 @@
    "triangles": 1200
   }
  },
+ "mech/laser": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 20,
+   "materials": 10,
+   "size": [
+    0.09,
+    0.15,
+    0.49
+   ],
+   "triangles": 1514
+  }
+ },
+ "mech/laser-1": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 20,
+   "materials": 10,
+   "size": [
+    0.09,
+    0.15,
+    0.49
+   ],
+   "triangles": 1514
+  }
+ },
+ "mech/latch": {
+  "counts": {
+   "hidden": 1,
+   "zfight": 1
+  },
+  "fingerprint": {
+   "drawCalls": 17,
+   "materials": 7,
+   "size": [
+    0.3,
+    0.25,
+    0.04
+   ],
+   "triangles": 7188
+  }
+ },
+ "mech/leadscrew": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 9,
+   "materials": 3,
+   "size": [
+    0.5,
+    0.09,
+    0.06
+   ],
+   "triangles": 12932
+  }
+ },
+ "mech/leadscrew-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 9,
+   "materials": 3,
+   "size": [
+    1,
+    0.11,
+    0.09
+   ],
+   "triangles": 67076
+  }
+ },
+ "mech/ledSource": {
+  "counts": {
+   "floating": 1,
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 25,
+   "materials": 8,
+   "size": [
+    0.09,
+    0.15,
+    0.33
+   ],
+   "triangles": 1868
+  }
+ },
+ "mech/ledSource-1": {
+  "counts": {
+   "floating": 1,
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 25,
+   "materials": 8,
+   "size": [
+    0.09,
+    0.15,
+    0.33
+   ],
+   "triangles": 1868
+  }
+ },
+ "mech/lens": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 18,
+   "materials": 7,
+   "size": [
+    0.41,
+    0.15,
+    0.77
+   ],
+   "triangles": 8842
+  }
+ },
+ "mech/lens-1": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 18,
+   "materials": 7,
+   "size": [
+    0.48,
+    0.15,
+    0.73
+   ],
+   "triangles": 8842
+  }
+ },
+ "mech/lens-2": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 18,
+   "materials": 7,
+   "size": [
+    0.46,
+    0.15,
+    0.73
+   ],
+   "triangles": 8842
+  }
+ },
+ "mech/lens-3": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 18,
+   "materials": 7,
+   "size": [
+    0.11,
+    0.15,
+    0.96
+   ],
+   "triangles": 8842
+  }
+ },
+ "mech/lever": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 10,
+   "materials": 4,
+   "size": [
+    0.5,
+    0.24,
+    0.16
+   ],
+   "triangles": 428
+  }
+ },
+ "mech/lever-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 10,
+   "materials": 4,
+   "size": [
+    0.35,
+    0.26,
+    0.16
+   ],
+   "triangles": 428
+  }
+ },
+ "mech/lever-2": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 10,
+   "materials": 4,
+   "size": [
+    0.21,
+    0.24,
+    0.16
+   ],
+   "triangles": 428
+  }
+ },
  "mech/limit": {
   "counts": {},
   "fingerprint": {
@@ -1033,6 +1831,93 @@
     0.03
    ],
    "triangles": 416
+  }
+ },
+ "mech/mainspring": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 6,
+   "materials": 4,
+   "size": [
+    0.08,
+    0.08,
+    0.04
+   ],
+   "triangles": 17250
+  }
+ },
+ "mech/mainspring-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 6,
+   "materials": 4,
+   "size": [
+    0.08,
+    0.08,
+    0.04
+   ],
+   "triangles": 16056
+  }
+ },
+ "mech/mirror": {
+  "counts": {
+   "floating": 1,
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 44,
+   "materials": 25,
+   "size": [
+    0.09,
+    0.14,
+    0.36
+   ],
+   "triangles": 7836
+  }
+ },
+ "mech/mirror-1": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 39,
+   "materials": 20,
+   "size": [
+    0.14,
+    0.13,
+    0.44
+   ],
+   "triangles": 7436
+  }
+ },
+ "mech/mirror-2": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 89,
+   "materials": 26,
+   "size": [
+    0.21,
+    0.18,
+    0.37
+   ],
+   "triangles": 8376
+  }
+ },
+ "mech/mirror-3": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 44,
+   "materials": 25,
+   "size": [
+    0.29,
+    0.14,
+    0.74
+   ],
+   "triangles": 7836
   }
  },
  "mech/motor": {
@@ -1074,6 +1959,36 @@
    "triangles": 884
   }
  },
+ "mech/nozzle": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 30,
+   "materials": 29,
+   "size": [
+    0.03,
+    0.04,
+    0.02
+   ],
+   "triangles": 3900
+  }
+ },
+ "mech/nozzle-1": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 30,
+   "materials": 29,
+   "size": [
+    0.03,
+    0.04,
+    0.02
+   ],
+   "triangles": 3900
+  }
+ },
  "mech/pair": {
   "counts": {},
   "fingerprint": {
@@ -1095,9 +2010,107 @@
    "size": [
     0.04,
     0.68,
-    0.71
+    0.7
    ],
    "triangles": 23608
+  }
+ },
+ "mech/photodiode": {
+  "counts": {
+   "floating": 1,
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 24,
+   "materials": 11,
+   "size": [
+    0.08,
+    0.15,
+    0.36
+   ],
+   "triangles": 1606
+  }
+ },
+ "mech/pid": {
+  "counts": {
+   "zfight": 1
+  },
+  "fingerprint": {
+   "drawCalls": 14,
+   "materials": 14,
+   "size": [
+    0.1,
+    0.1,
+    0.09
+   ],
+   "triangles": 174
+  }
+ },
+ "mech/pipe": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 1,
+   "size": [
+    0.32,
+    0.13,
+    0.03
+   ],
+   "triangles": 1360
+  }
+ },
+ "mech/pipe-1": {
+  "counts": {
+   "hidden": 1
+  },
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 1,
+   "size": [
+    0.32,
+    0.16,
+    0.05
+   ],
+   "triangles": 1328
+  }
+ },
+ "mech/pistonPump": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 42,
+   "materials": 9,
+   "size": [
+    0.19,
+    0.17,
+    0.11
+   ],
+   "triangles": 3684
+  }
+ },
+ "mech/pistonPump-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 20,
+   "materials": 8,
+   "size": [
+    0.11,
+    0.17,
+    0.11
+   ],
+   "triangles": 1372
+  }
+ },
+ "mech/pistonPump-2": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 64,
+   "materials": 9,
+   "size": [
+    0.27,
+    0.17,
+    0.11
+   ],
+   "triangles": 5996
   }
  },
  "mech/planet": {
@@ -1165,6 +2178,51 @@
    "triangles": 720
   }
  },
+ "mech/pressureSensor": {
+  "counts": {
+   "sliver": 2
+  },
+  "fingerprint": {
+   "drawCalls": 15,
+   "materials": 9,
+   "size": [
+    0.1,
+    0.12,
+    0.03
+   ],
+   "triangles": 2472
+  }
+ },
+ "mech/prism": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 11,
+   "materials": 6,
+   "size": [
+    0.44,
+    0.15,
+    0.42
+   ],
+   "triangles": 794
+  }
+ },
+ "mech/prism-1": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 11,
+   "materials": 6,
+   "size": [
+    0.3,
+    0.15,
+    0.28
+   ],
+   "triangles": 794
+  }
+ },
  "mech/pulley": {
   "counts": {},
   "fingerprint": {
@@ -1204,6 +2262,158 @@
    "triangles": 5436
   }
  },
+ "mech/rackpinion": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 1,
+   "size": [
+    0.01,
+    0.04,
+    0.19
+   ],
+   "triangles": 4276
+  }
+ },
+ "mech/rackpinion-1": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 1,
+   "size": [
+    0.01,
+    0.06,
+    0.19
+   ],
+   "triangles": 2996
+  }
+ },
+ "mech/rackpinion-2": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 2,
+   "materials": 1,
+   "size": [
+    0.01,
+    0.06,
+    0.25
+   ],
+   "triangles": 9396
+  }
+ },
+ "mech/ratchet": {
+  "counts": {
+   "hidden": 1
+  },
+  "fingerprint": {
+   "drawCalls": 7,
+   "materials": 4,
+   "size": [
+    0.08,
+    0.1,
+    0.01
+   ],
+   "triangles": 2084
+  }
+ },
+ "mech/ratchet-1": {
+  "counts": {
+   "hidden": 1
+  },
+  "fingerprint": {
+   "drawCalls": 7,
+   "materials": 4,
+   "size": [
+    0.21,
+    0.24,
+    0.01
+   ],
+   "triangles": 4100
+  }
+ },
+ "mech/relay": {
+  "counts": {
+   "floating": 1,
+   "hidden": 2,
+   "zfight": 1
+  },
+  "fingerprint": {
+   "drawCalls": 23,
+   "materials": 11,
+   "size": [
+    0.11,
+    0.08,
+    0.1
+   ],
+   "triangles": 1908
+  }
+ },
+ "mech/reliefValve": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 7,
+   "materials": 5,
+   "size": [
+    0.03,
+    0.08,
+    0.02
+   ],
+   "triangles": 672
+  }
+ },
+ "mech/reservoir": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 27,
+   "materials": 8,
+   "size": [
+    0.44,
+    0.24,
+    0.24
+   ],
+   "triangles": 1048
+  }
+ },
+ "mech/reservoir-1": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 27,
+   "materials": 8,
+   "size": [
+    0.81,
+    0.42,
+    0.44
+   ],
+   "triangles": 1048
+  }
+ },
+ "mech/revCounter": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 6,
+   "materials": 5,
+   "size": [
+    0.06,
+    0.06,
+    0.11
+   ],
+   "triangles": 784
+  }
+ },
  "mech/ring": {
   "counts": {},
   "fingerprint": {
@@ -1228,6 +2438,114 @@
     0.67
    ],
    "triangles": 24576
+  }
+ },
+ "mech/rolling": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 16,
+   "materials": 3,
+   "size": [
+    0.12,
+    0.05,
+    0.05
+   ],
+   "triangles": 4844
+  }
+ },
+ "mech/rolling-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 19,
+   "materials": 3,
+   "size": [
+    0.12,
+    0.05,
+    0.05
+   ],
+   "triangles": 2348
+  }
+ },
+ "mech/rolling-2": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 22,
+   "materials": 3,
+   "size": [
+    0.12,
+    0.08,
+    0.08
+   ],
+   "triangles": 2516
+  }
+ },
+ "mech/rolling-3": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 20,
+   "materials": 2,
+   "size": [
+    0.12,
+    0.05,
+    0.05
+   ],
+   "triangles": 6028
+  }
+ },
+ "mech/rolling-4": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 28,
+   "materials": 2,
+   "size": [
+    0.12,
+    0.03,
+    0.03
+   ],
+   "triangles": 2332
+  }
+ },
+ "mech/rolling-5": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 5,
+   "materials": 3,
+   "size": [
+    0.12,
+    0.03,
+    0.03
+   ],
+   "triangles": 716
+  }
+ },
+ "mech/rotameter": {
+  "counts": {
+   "hidden": 1
+  },
+  "fingerprint": {
+   "drawCalls": 18,
+   "materials": 5,
+   "size": [
+    0.03,
+    0.17,
+    0.03
+   ],
+   "triangles": 1068
+  }
+ },
+ "mech/rotameter-1": {
+  "counts": {
+   "hidden": 1
+  },
+  "fingerprint": {
+   "drawCalls": 18,
+   "materials": 5,
+   "size": [
+    0.03,
+    0.17,
+    0.03
+   ],
+   "triangles": 1068
   }
  },
  "mech/selector": {
@@ -1358,6 +2676,78 @@
     0.09
    ],
    "triangles": 842
+  }
+ },
+ "mech/throttleValve": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 9,
+   "materials": 5,
+   "size": [
+    0.08,
+    0.07,
+    0.03
+   ],
+   "triangles": 556
+  }
+ },
+ "mech/throttleValve-1": {
+  "counts": {
+   "sliver": 1
+  },
+  "fingerprint": {
+   "drawCalls": 7,
+   "materials": 4,
+   "size": [
+    0.08,
+    0.06,
+    0.03
+   ],
+   "triangles": 458
+  }
+ },
+ "mech/timer": {
+  "counts": {
+   "hidden": 3,
+   "zfight": 2
+  },
+  "fingerprint": {
+   "drawCalls": 43,
+   "materials": 18,
+   "size": [
+    0.15,
+    0.1,
+    0.1
+   ],
+   "triangles": 3526
+  }
+ },
+ "mech/tspring": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 4,
+   "materials": 2,
+   "size": [
+    0.04,
+    0.04,
+    0.02
+   ],
+   "triangles": 6776
+  }
+ },
+ "mech/tspring-1": {
+  "counts": {},
+  "fingerprint": {
+   "drawCalls": 4,
+   "materials": 2,
+   "size": [
+    0.07,
+    0.06,
+    0.03
+   ],
+   "triangles": 6776
   }
  },
  "mech/vfd": {
@@ -3175,6 +4565,7 @@
   "counts": {
    "arc": 1,
    "budget": 1,
+   "clash": 1,
    "dangling": 1,
    "facing": 1,
    "floating": 1,

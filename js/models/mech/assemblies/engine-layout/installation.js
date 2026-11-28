@@ -2,12 +2,16 @@
 // źródło X0, wyłącznik główny Q1, stycznik K1, grzybek S0, STOP S1, START S2, lampka H1, potencjometr R1, przełącznik S3
 // (ControlKit) na wspólnej płycie, kable z przekrojem i długością z ułożenia, lista połączeń zacisków dla obwodu
 // (js/behaviors/land/mech/circuit.js — rozwiązuje go zachowanie). Urządzenia obsługiwane na modelu (userData.control).
-//   buildInstallation({ scene, mc, M }) → { reg, elecG, ELEC }    mc — maszyna (machine.js), M — materiały MechKit
+// Przekaźnik czasowy KT1 zasilany z cewką K1, jego styk 15–18 w obwodzie sterowania falownika (24 V → S3).
+//   buildInstallation({ scene, mc, M, hooks }) → { reg, elecG, ELEC }    mc — maszyna (machine.js), M — materiały MechKit
 import * as THREE from '../../../../../vendor/three/three.module.js';
 import * as CK from '../../controls.js';
 import { createCircuit } from '../../../../behaviors/land/mech/circuit.js';
 
-export function buildInstallation({ scene, mc, M }) {
+export function buildInstallation({ scene, mc, M, hooks = {} }) {
+  // hooks.auto() — automatyka laboratorium (przekaźnik czasowy KT1, regulator PID; js/labs/mechanics/automation.js);
+  // bez niej (scena) styk KT1 15–18 zmostkowany, wejście analogowe falownika — z potencjometru
+  const AU = () => (hooks.auto ? hooks.auto() : null), ktClosed = () => (AU() ? AU().kt.state.closed : !hooks.auto);
   const { BED_TOP, P, motorG } = mc;
 /* ---------------- tryb „Fizyka”: regulator przy silniku, napęd fizyczny, hitboksy ---------------- */
 // regulator prędkości: falownik z pokrętłem, RUN / STOP i FWD / REV na łożu przed silnikiem (obsługa na modelu)
@@ -70,6 +74,7 @@ const ELEC = (() => {
   c.wire('Q1:N2', 'K1:N', { R: Rw('W2'), name: 'W2' });
   for (const [a, b] of [['1', '2'], ['3', '4'], ['5', '6'], ['13', '14']]) c.contact(`K1:${a}`, `K1:${b}`, () => K1.api.on, 'K1');
   c.wire('K1:14', 'K1:A1', { name: 'mostek K1 14–A1' }).wire('K1:A2', 'K1:N', { name: 'mostek K1 A2–N' });
+  c.wire('K1:14', 'KT1:A1', { name: 'mostek K1 14 — KT1 A1' }).wire('KT1:A2', 'K1:N', { name: 'mostek KT1 A2 — N' });   // przekaźnik czasowy zasilany razem z cewką K1
   for (const [f, t] of [['2', 'L1'], ['4', 'L2'], ['6', 'L3']]) c.wire(`K1:${f}`, `VFD:${t}`, { R: Rw('W3'), name: 'W3' });
   c.wire('K1:1', 'S0:11', { R: Rw('W5'), name: 'W5 żyła 1' }).wire('S1:12', 'K1:13', { R: Rw('W5'), name: 'W5 żyła 2' }).wire('S2:14', 'K1:A1', { R: Rw('W5'), name: 'W5 żyła 3' }).wire('K1:N', 'H1:X2', { R: Rw('W5'), name: 'W5 żyła 4' });
   c.wire('S0:12', 'S1:11', { name: 'mostek' }).wire('S1:12', 'S2:13', { name: 'mostek' }).wire('S2:14', 'H1:X1', { name: 'mostek' });
@@ -77,18 +82,20 @@ const ELEC = (() => {
   // sterowanie falownikiem 24 V DC (zasilacz wewnętrzny falownika, działa przy zasilonym falowniku): +24 V → S3 → DI1 / DI2
   c.source('VFD24', { P: [eV.supply, 0], COM: [0, 0] }, () => reg.api.powered);
   c.wire('VFD24:P', 'VFD:+24', { name: 'falownik +24 V' }).wire('VFD24:COM', 'VFD:COM', { name: 'falownik COM' });
-  c.wire('VFD:+24', 'S3:C', { R: Rw('W7'), name: 'W7 żyła 1' }).wire('S3:13', 'VFD:DI1', { R: Rw('W7'), name: 'W7 żyła 2' }).wire('S3:23', 'VFD:DI2', { R: Rw('W7'), name: 'W7 żyła 3' });
+  c.wire('VFD:+24', 'KT1:15', { name: 'falownik +24 V → KT1 15' }).contact('KT1:15', 'KT1:18', ktClosed, 'KT1').wire('KT1:18', 'S3:C', { R: Rw('W7'), name: 'W7 żyła 1' }).wire('S3:13', 'VFD:DI1', { R: Rw('W7'), name: 'W7 żyła 2' }).wire('S3:23', 'VFD:DI2', { R: Rw('W7'), name: 'W7 żyła 3' });
   c.contact('S3:C', 'S3:13', () => S3.api.pos === 'I', 'S3 I').contact('S3:C', 'S3:23', () => S3.api.pos === 'II', 'S3 II');
   c.load('DI1', ['VFD:DI1', 'VFD:COM'], { Un: eV.supply }).load('DI2', ['VFD:DI2', 'VFD:COM'], { Un: eV.supply });
+  c.load('KT1', ['KT1:A1', 'KT1:A2'], { Un: 230 });
   c.load('K1', ['K1:A1', 'K1:A2'], { Un: eK.coilU }).load('H1', ['H1:X1', 'H1:X2'], { Un: eH.U }).load('VFD', ['VFD:L1', 'VFD:L2', 'VFD:L3'], { Un: eV.Uin });
   const st = { kOn: false, kT: 0, r: null, uK: 0, uH: 0, uV: 0, Pin: 0, I: 0, Im: 0, Uout: 0, Pel: 0, dU: 0 };
   const In = eM.In, Rline = Rw('W1') + Rw('W2') + Rw('W3');
   // co klatkę: obwód → stycznik (zadziała przy ≥ 85 % Un po 20 ms, odpada < 60 % Un), lampka, zasilanie falownika
   function tick(dt) {
-    const r = c.solve(); st.r = r; st.uK = r.U('K1'); st.uH = r.U('H1'); st.uV = r.U('VFD');
+    if (AU()) AU().ktTick(dt, st.uKT || 0);   // przekaźnik czasowy: napięcie A1–A2 z poprzedniej klatki
+    const r = c.solve(); st.r = r; st.uKT = r.U('KT1'); st.uK = r.U('K1'); st.uH = r.U('H1'); st.uV = r.U('VFD');
     if (!st.kOn) { st.kT = st.uK >= eK.pullIn * eK.coilU ? st.kT + dt : 0; if (st.kT >= eK.tClose) st.kOn = true; } else if (st.uK < eK.dropOut * eK.coilU) { st.kOn = false; st.kT = 0; }
     K1.api.coil(st.kOn); H1.api.power(st.uH / eH.U);
-    const was = reg.api.powered; reg.api.power(st.uV >= 0.85 * eV.Uin); reg.api.ai(eV.aiMax * R1.api.ratio());
+    const was = reg.api.powered; reg.api.power(st.uV >= 0.85 * eV.Uin); reg.api.ai(AU() ? AU().aiOut(eV.aiMax * R1.api.ratio(), dt) : eV.aiMax * R1.api.ratio());
     const r2 = was === reg.api.powered ? r : c.solve();   // zasilanie falownika się zmieniło — jego 24 V też
     st.uDI1 = r2.U('DI1'); st.uDI2 = r2.U('DI2'); reg.api.inputs(st.uDI1 >= eV.diOn, st.uDI2 >= eV.diOn);   // wejście aktywne ≥ 15 V (IEC 61131-2, typ 1)
     for (const d of [X0, Q1, K1, S0, S1, S2, H1, R1, S3]) d.api.tick(dt);

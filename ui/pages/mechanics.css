@@ -1,11 +1,14 @@
-/* Laboratorium mechaniki (js/labs/mechanics/, z Tornado.io): porty elementu, lista elementów napędu, lista przedmiotów,
-   ostrzeżenia, kursor nad sterowaniem */
+/* Laboratorium mechaniki (js/labs/mechanics/, z Tornado.io): porty elementu, lista elementów napędu, lista przedmiotów
+   (kategorie planu, „w planie”), ostrzeżenia, kursor nad sterowaniem */
 .ports { list-style: none; margin: 0; padding: 0; font-size: 12px; }
 .ports li { padding-block: 4px; border-block-end: 1px solid var(--line); color: var(--dim); }
 .ports li b { color: var(--text); font-weight: 500; }
 .ports a { color: var(--accent); text-decoration: none; }
 .stats.list span { cursor: pointer; }
 .stats.list span:hover { color: var(--accent); }
+#itemList h3.cat { margin-block: 14px 2px; font-size: 12px; font-weight: 600; color: var(--accent); letter-spacing: 0.02em; }
+#itemList h3.cat:first-child { margin-block-start: 2px; }
+#itemList p.plan { margin-block: 2px 4px; font-size: 11px; color: var(--dim); font-style: italic; }
 #itemList h4 { margin-block: 10px 4px; font-size: 11px; font-weight: 500; color: var(--dim); text-transform: none; }
 .warn { margin-block: 6px 0; font-size: 12px; color: var(--err); grid-column: 1 / -1; }
 #view canvas.grab { cursor: pointer; }

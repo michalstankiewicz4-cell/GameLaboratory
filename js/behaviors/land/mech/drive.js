@@ -7,12 +7,22 @@
 //   d.add(el)            el: { id, name, type, props: [[nazwa, wartość]], ports: [{ id, name, kind }], J, spin, frame }
 //     frame: { o: Vector3 (punkt na osi), axis: Vector3, ref: Vector3 (zero kąta, ⟂ osi) }
 //   d.connect(a, pa, b, pb, type, opts)  type: 'shaft' | 'coupling' | 'mesh' | 'chain' | 'belt' | 'ujoint' | 'planetary'
+//                                        | 'rack' (koło ↔ listwa) | 'screw' (śruba ↔ nakrętka) | 'crank' (korba → suwak)
+//   el.dof: 'rot' (kąt, rad; J — bezwładność, kg·m²) albo 'lin' (przesunięcie, m; J — masa, kg; frame.axis — kierunek ruchu).
+//   Współrzędne uogólnione: ten sam graf, te same wzory dynamiki (moment ↔ siła, ω ↔ v).
+//   Porty: jeśli model ma userData.ports (MechKit), połączenie sprawdza złącza (COMPAT) — niezgodne → ostrzeżenie w konsoli.
 //   d.solve(motorId, outId) → { ok, conflicts }    d.step(dt, { rpm, brake }) → stan
 import * as THREE from '../../../../vendor/three/three.module.js';
 
 export const ENV = ['land'];
-export const EFF = { shaft: 1, coupling: 0.995, mesh: 0.98, chain: 0.97, belt: 0.95, ujoint: 0.99, planetary: 0.97 };
-export const KIND_NAME = { shaft: 'wał', coupling: 'sprzęgło', mesh: 'zazębienie', chain: 'łańcuch', belt: 'pas', ujoint: 'przegub Cardana', planetary: 'przekładnia planetarna' };
+export const EFF = { shaft: 1, coupling: 0.995, mesh: 0.98, chain: 0.97, belt: 0.95, ujoint: 0.99, planetary: 0.97, rack: 0.98, screw: 0.9, crank: 0.97 };
+export const KIND_NAME = { shaft: 'wał', coupling: 'sprzęgło', mesh: 'zazębienie', chain: 'łańcuch', belt: 'pas', ujoint: 'przegub Cardana', planetary: 'przekładnia planetarna', rack: 'listwa zębata', screw: 'śruba pociągowa', crank: 'mechanizm korbowy' };
+// złącza dozwolone w danym połączeniu; połączenia zamieniające ruch (CONVERT) łączą różne dziedziny (obrót ↔ przesuw)
+export const COMPAT = { shaft: ['wał', 'wpust', 'mocowanie', 'łożysko'], coupling: ['wał', 'wpust'], mesh: ['zazębienie'], chain: ['łańcuch'], belt: ['pas'], ujoint: ['wał', 'przegub'], planetary: ['zazębienie', 'wał', 'wpust'], rack: ['zazębienie'], screw: ['gwint'], crank: ['wał', 'wpust', 'sworzeń'] };
+export const CONVERT = { rack: true, screw: true, crank: true };
+// sprawność przegubu Cardana zależna od kąta łamania β: straty tarcia w łożyskach igiełkowych krzyżaka (ruch wahadłowy
+// czopów o ±β): η = 1 − (2/π)·μ·(r_c / R)·(tg β + sin β); μ — tarcie efektywne, r_c — promień czopa, R — ramię krzyżaka
+export function ujointEta(beta, { mu = 0.05, rc = 0.0055, R = 0.026 } = {}) { return 1 - (2 / Math.PI) * mu * (rc / R) * (Math.tan(beta) + Math.sin(beta)) - 0.002; }
 const TAU = Math.PI * 2;
 const wrapPi = (a) => a - TAU * Math.round(a / TAU);
 
@@ -21,7 +31,7 @@ export function createDrive() {
   let order = [], motor = null, out = null, conflicts = [];
   const st = { theta: 0, omega: 0, Tm: 0, Jeff: 0, Tload: 0, P: 0 };
 
-  function add(el) { el.theta = 0; el.omega = 0; el.T = 0; el.r = 0; el.eta = 1; els.set(el.id, el); return el; }
+  function add(el) { el.theta = 0; el.omega = 0; el.T = 0; el.r = 0; el.eta = 1; el.dof = el.dof || 'rot'; els.set(el.id, el); return el; }
 
   // relacja kąta b od kąta a (θb = f(θa, θb poprzednie)) dla danego rodzaju połączenia
   function relation(type, A, B, o) {
@@ -47,6 +57,25 @@ export function createDrive() {
         return tb;
       };
     }
+    if (type === 'rack') {   // koło ↔ listwa: x = x0 + s·r_p·θ (x0 — gdzie wrąb listwy trafia pod ząb koła)
+      const gear = A.dof === 'lin' ? B : A, rk = A.dof === 'lin' ? A : B, g = rackGeom(gear, rk, o);
+      const f = A === gear ? (ta) => g.x0 + g.s * g.rp * ta + (o.phase || 0) : (ta) => (ta - g.x0 - (o.phase || 0)) / (g.s * g.rp);
+      f.geom = g; return f;
+    }
+    if (type === 'screw') {   // śruba ↔ nakrętka: x = −h·θ·skok/2π (gwint prawy: nakrętka cofa się, gdy śruba wkręca się w nią)
+      const sc = A.dof === 'lin' ? B : A, nt = A.dof === 'lin' ? A : B, k = -(o.hand === 'left' ? -1 : 1) * Math.sign(sc.frame.axis.dot(nt.frame.axis) || 1) * o.lead / TAU;
+      return A === sc ? (ta) => k * ta + (o.phase || 0) : (ta) => (ta - (o.phase || 0)) / k;
+    }
+    if (type === 'crank') {   // korba (a, obrót) → suwak (b, przesuw): sworzeń korby po okręgu r, korbowód l, sworzeń suwaka po prostej
+      const ax = A.frame.axis, ref = A.frame.ref, zz = new THREE.Vector3().crossVectors(ax, ref), u = B.frame.axis, S0 = B.frame.o;
+      const off = S0.clone().sub(A.frame.o).dot(ax), P = new THREE.Vector3(), D = new THREE.Vector3();
+      return (ta, prev) => {
+        const a = ta + (o.a0 || 0); P.copy(A.frame.o).addScaledVector(ax, off).addScaledVector(ref, o.r * Math.cos(a)).addScaledVector(zz, o.r * Math.sin(a));
+        D.subVectors(S0, P); const b = D.dot(u), disc = Math.max(0, b * b - D.lengthSq() + o.l * o.l), q = Math.sqrt(disc);
+        const x1 = -b + q, x2 = -b - q;
+        return Math.abs(x1 - (prev ?? x1)) <= Math.abs(x2 - (prev ?? x1)) ? x1 : x2;
+      };
+    }
     throw new Error('Nieznane połączenie ' + type);
   }
 
@@ -57,9 +86,27 @@ export function createDrive() {
     const pa = A && A.group && A.group.userData.phys, pb = B && B.group && B.group.userData.phys;
     return (pa && pa.eta) ?? (pb && pb.eta);
   }
+  // geometria koła z listwą: punkt styku na linii podziałowej listwy, kierunek ruchu zęba, wrąb listwy pod zębem koła
+  function rackGeom(G, R, o) {
+    const u = R.frame.axis, rp = o.m * o.z / 2, p = Math.PI * o.m, oA = G.frame.o, O = o.origin || R.frame.o;   // O: punkt linii podziałowej listwy, od którego liczy się y0
+    const yc = oA.clone().sub(O).dot(u), contact = O.clone().addScaledVector(u, yc), d = contact.clone().sub(oA);
+    const zA = new THREE.Vector3().crossVectors(G.frame.axis, G.frame.ref), psi = Math.atan2(d.dot(zA), d.dot(G.frame.ref));
+    const t = new THREE.Vector3().crossVectors(G.frame.axis, d).normalize(), s = Math.sign(t.dot(u)) || 1;
+    const j = Math.round(psi / (TAU / o.z)), sg = rp * (j * TAU / o.z - psi);
+    let x0 = yc + s * sg - (o.y0 || 0); x0 -= p * Math.round(x0 / p);
+    return { x0, s, rp, p, yc };
+  }
+  function checkPorts(A, B, pa, pb, type) {
+    const qa = A && A.group && A.group.userData.ports && A.group.userData.ports[pa], qb = B && B.group && B.group.userData.ports && B.group.userData.ports[pb], ok = COMPAT[type];
+    if (!ok) return;
+    for (const [el, q, n] of [[A, qa, pa], [B, qb, pb]]) if (q && !ok.includes(q.iface)) console.warn(`Napęd: port „${n}” elementu ${el.name || el.id} (${q.iface}) nie pasuje do połączenia ${KIND_NAME[type] || type}`);
+    if (qa && qb && !CONVERT[type] && qa.domain !== qb.domain) console.warn(`Napęd: ${A.name || A.id} (${qa.domain}) i ${B.name || B.id} (${qb.domain}) — różne dziedziny bez zamiany ruchu`);
+    if (qa && qb && CONVERT[type] && qa.domain === qb.domain) console.warn(`Napęd: ${KIND_NAME[type]} łączy ${qa.domain} z ${qb.domain} — oczekiwana zamiana obrót ↔ przesuw`);
+  }
   function connect(a, pa, b, pb, type, opts = {}) {
     const A = els.get(a), B = els.get(b);
-    const e = { a: A, b: B, pa, pb, type, opts, eta: opts.eta ?? physEta(type, A, B) ?? EFF[type] ?? 1 };
+    checkPorts(A, B, pa, pb, type);
+    const e = { a: A, b: B, pa, pb, type, opts, eta: opts.eta ?? (type === 'ujoint' && opts.phys ? ujointEta(Math.acos(Math.min(1, Math.abs(A.frame.axis.dot(B.frame.axis)))), opts.phys) : physEta(type, A, B)) ?? EFF[type] ?? 1 };
     e.rel = relation(type, A, B, opts);
     edges.push(e);
     return e;

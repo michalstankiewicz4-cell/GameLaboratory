@@ -40,6 +40,10 @@ export function testBench() {
   for (let i = 0; i < N; i++) nv.push(-1.5, 2.01, -7 + i * 0.1, 1.5, 2.01, -7 + i * 0.1 + 0.002, 1.5, 2.015, -7 + i * 0.1);
   const sl = new THREE.BufferGeometry(); sl.setAttribute('position', new THREE.Float32BufferAttribute(nv, 3)); sl.computeVertexNormals();
   put('needles', sl, new THREE.MeshStandardMaterial({ color: 0x808080, side: THREE.DoubleSide }), 0, 0, 0);
+  // clash: an assembly of two separate models on the deck — a sphere of model B enters the box of model A (found)
+  const clashA = new THREE.Group(), clashB = new THREE.Group(); clashA.name = 'clash model A'; clashB.name = 'clash model B'; root.add(clashA, clashB);
+  put('clash box', new THREE.BoxGeometry(0.6, 0.6, 0.6), grey, -1.4, 2.3, 0.5, clashA);
+  put('clash ball', new THREE.SphereGeometry(0.3, 16, 12), blue, -1.0, 2.32, 0.5, clashB);
   const mount = new THREE.Group(); mount.name = 'gun mount'; mount.userData.part = true; mount.position.set(0, 2, -9); root.add(mount);
   put('mount base', new THREE.CylinderGeometry(0.6, 0.6, 0.4, 16), grey, 0, 0.2, 0, mount);
   const gun = new THREE.Group(); gun.position.set(0, 0.6, 0); mount.add(gun);
@@ -47,7 +51,7 @@ export function testBench() {
   put('wall in the line of fire', new THREE.BoxGeometry(1.2, 1.4, 0.2), grey, 0, 2.7, -7.6);
   return {
     root, measured: { triangles: 999999, drawCalls: 999, materials: 4 },
-    opts: { mounts: [{ name: 'test gun', group: mount, train: mount, guns: [gun], arc: 90 }], waterline: true, below: (n) => n.startsWith('hull'),
+    opts: { components: [clashA, clashB], mounts: [{ name: 'test gun', group: mount, train: mount, guns: [gun], arc: 90 }], waterline: true, below: (n) => n.startsWith('hull'),
       hullSide: (z) => (Math.abs(z) < 10 ? 2 : -1), deck: () => 2, budget: { triangles: 1000, drawCalls: 10, measured: { triangles: 999999, drawCalls: 999 } },
       // colliders for "pierce": a sloped chute through the middle of a wall (found), two sheets overlapping at a corner
       // and a wall standing on a floor (not found)

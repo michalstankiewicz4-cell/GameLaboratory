@@ -15,7 +15,33 @@ Każdy element obrotowy jest budowany wzdłuż lokalnej osi +x: część stała 
 | `gears.js` | `gear`, `ringGear`, `sprocket` |
 | `loops.js` | `pulley`, `loopPath`, `chainDistance`, `chainLoop`, `beltLoop` |
 | `shafts.js` | `shaft`, `pillowBlock`, `jawCoupling`, `flangeCoupling`, `yoke`, `cross` |
-| `units.js` | `motor` (`MOTORS`), `housing`, `tubeHousing`, `planetary`, `discBrake` |
+| `units.js` | `motor` (`MOTORS`), `housing` (otwory na łożyska `bores`), `tubeHousing` (otwór w deklach `hole`), `planetary`, `discBrake` |
+| `motion.js` | zamiana ruchu: `rack` (listwa zębata), `slider` (suwak w prowadnicy, opcjonalnie z listwą), `conRod` (korbowód, `pose(A, B)`), `leadScrew` (śruba kulowa / trapezowa), `screwNut` (nakrętka z wózkiem); części przesuwne w `userData.slide`, oś w `slideAxis` |
+| `fasteners.js` | `bolt` — śruba ISO 4017 z podkładką, klasa 8.8 (napięcie wstępne `Fp`, tarcie złącza `mu`; trzpień `doctorOk = 'clash'`) |
+| `bearings.js` | `rollingBearing` — kulkowe, walcowe, stożkowe, wzdłużne, igiełkowe, tuleja ślizgowa (`BEARINGS`: nośności, prędkość graniczna, tarcie, trwałość L10, koszyk) |
+
+Porty w danych części (`userData.ports`: nazwa, dziedzina `DOMAIN` — obrót, przesuw, prąd, sygnał, płyn, światło — i złącze);
+`drive.connect` sprawdza złącza (`COMPAT`, zamiana ruchu `CONVERT`). Wały mają wpusty tylko pod piastami (`setKeys`),
+oprawy łożysk i silnik — miejsca śrub (`userData.mounts`).
+
+## Pozostałe kity (`js/models/mech/`, z Tornado.io, 2026-11-28)
+
+| Folder / plik | Co |
+|---|---|
+| `common.js` | wspólne materiały i pomocniki nowych kitów |
+| `clock/` | ClockKit: koła zegarowe, wychwyt Grahama z kotwicą, sprężyny (naciskowa, spiralna w bębnie, skrętna), zapadka, koło zamachowe, tarcza, zegar — regulator |
+| `mechanisms/` | dźwignia (rodzaje 1–3), zatrzask z wyzwalaczem |
+| `power/` | akumulator (AGM, NMC, LiFePO4) |
+| `relays/` | przekaźnik czasowy, przekaźnik sygnałowy w gnieździe |
+| `regulators/` | regulator PID, regulator odśrodkowy Watta |
+| `sensors/` | czujnik indukcyjny, enkoder, bariera optyczna |
+| `fluid/` | FluidKit: rury, węże (także przezroczysty), źródła, pompy (zębata, tłokowa, odśrodkowa), zawory, rozdzielacz, siłownik, zbiorniki, przyrządy, przenośnik |
+| `optics.js`, `optics/` | OptiKit: lustro; soczewki, pryzmaty, oprawy, źródła (laser, LED), odbiorniki (fotodioda, ekran) |
+
+Zachowania tych kitów: `js/behaviors/land/mech/` (`escapement.js`, `sensors.js`, `signal.js`, `timer-relay.js`, `pid.js`,
+`governor.js`, `relay.js`, `latch.js`, `battery.js`, `fluid.js`, `hydraulics.js`, `hydraulic-axis.js`, `conveyor.js`,
+`fountain.js`, `optics.js`, `raytrace.js`). Wygląd: LiquidKit `js/render/fluid/liquid.js` (ciecze, struga, krople),
+wiązki światła `js/render/optics/beams.js`.
 
 ## ControlKit (`controls.js`)
 
@@ -45,6 +71,8 @@ Każda część niesie swoje dane — laboratorium tylko je czyta i dokłada geo
   `js/models/mech/assemblies/engine-layout/` — `machine.js` (rozmieszczenie na łożu, połączenia portów w napędzie),
   `installation.js` (regulator, urządzenia, kable z długościami z ułożenia, lista połączeń zacisków), wejście
   `engine-layout.js` (`buildEngineLayout({ hall })`). Fizyka układu (luz ze stref brył zębów, sztywności, łańcuch, pas,
-  łożyska, krok klatki) — zachowanie `js/behaviors/land/mech/engine-layout.js` (`createEngineLayoutPhysics({ mc })`).
+  łożyska, krok klatki, śruby mocujące i luźne części, siły promieniowe w łożyskach) — zachowanie
+  `js/behaviors/land/mech/engine-layout.js` (`createEngineLayoutPhysics({ mc })`); mocowania (śruby `boltG`, lista
+  `FIXT` z rolami części: silnik, obudowa przekładni planetarnej, wspornik zacisku) są w modelu `machine.js`.
   Korzystają z nich laboratorium mechaniki i scena (`js/scene/mechanics.js`). W laboratorium zostały: okno Opis,
   kontrole brył zderzeń i hitboksy (`js/labs/mechanics/physics-mode.js`).

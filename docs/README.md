@@ -61,7 +61,7 @@ W kolejności kategorii z menu Narzędzia i strony startowej (`ui/data/catalog.j
 | | Rośliny | `labs/plants.html` | [labs/plants.md](labs/plants.md) |
 | | Skały | `labs/rocks.html` | [labs/rocks.md](labs/rocks.md) |
 | | Przedmioty (złomowisko) | `labs/items.html`, `js/models/junkyard/` | [labs/items.md](labs/items.md), [models/junkyard.md](models/junkyard.md) |
-| Maszyny i mechanika | Mechanika (MechKit, ControlKit: zębatki, łańcuchy, pasy, sprzęgła, silnik, sterowanie; napęd, fizyka, obwód) | `labs/mechanics.html`, `js/models/mech/` | [labs/mechanics.md](labs/mechanics.md), [models/mech.md](models/mech.md) |
+| Maszyny i mechanika | Mechanika (MechKit, ControlKit, ClockKit, FluidKit, OptiKit: zębatki, łańcuchy, pasy, sprzęgła, łożyska, zamiana ruchu, silnik, sterowanie, zegar, czujniki, płyny, optyka; napęd, fizyka, obwód) | `labs/mechanics.html`, `js/models/mech/` | [labs/mechanics.md](labs/mechanics.md), [models/mech.md](models/mech.md) |
 | Życie i postacie | Życie, edytor stworów | `labs/life.html`, `labs/creator.html` | [labs/life.md](labs/life.md) |
 | | Człowiek | `labs/human.html` | [labs/human.md](labs/human.md) |
 | | Przedmioty bohatera | `labs/gear.html` | [labs/gear.md](labs/gear.md) |

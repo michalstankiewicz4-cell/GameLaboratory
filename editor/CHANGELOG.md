@@ -3,6 +3,13 @@
 Wersja: `ui/data/versions.js` (`editor/index.html`). `x.y.z` — y: nowa funkcja, z: poprawka. Krótki wpis także w głównym
 `CHANGELOG.md`.
 
+## 0.60.1 — 2026-11-28
+
+### Zmienione
+- Układ silnika (`mech/machine`) z poprawkami i nowymi częściami z laboratorium mechaniki: łożyska w ściankach i deklach,
+  śruby mocujące, korba → suwak z listwą → zębnik na śrubie kulowej → nakrętka; w ▶ Graj fizyka luźnych części i sił
+  w łożyskach (jak w trybie Fizyka laboratorium).
+
 ## 0.60.0 — 2026-11-27
 
 ### Dodane

@@ -3,6 +3,56 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.117.0 — 2026-11-28 (mechanika z Tornado.io: poprawki i nowe elementy; doktor — złożenie)
+
+Uzupełnienie kopii z Tornado.io (mechanika 0.12.0–0.20.0, doktor): poprawki tego, co już było, i nowe rzeczy.
+
+### Zmienione (poprawki w skopiowanych częściach)
+- MechKit: faza wyciągnięć do środka — obrys i otwory mają wymiar nominalny (zęby współpracujących kół i wały w otworach
+  już w siebie nie wchodzą); faza drobnych zębów ograniczona. Oprawa UCP z prawdziwą wkładką łożyskową (otwór na wał)
+  i płaskimi łapami, widełki przegubu z oczkami na kubki łożysk (zasięg 70 mm), wały z wpustem tylko pod piastami,
+  mostek zacisku hamulca na obudowach klocków, porty w danych części (`userData.ports`: dziedzina i złącze).
+- Napęd (`drive.js`): sprawdzanie złączy portów, sprawność przegubu Cardana od kąta łamania; fizyka (`physics.js`):
+  rozłączanie połączeń (luźne części), sprężyna miękka tylko, gdy krok ją stabilnie liczy; `contact.js` — zderzenie
+  brył 3D (`meshClash`), listwa w strefie luzu.
+- Układ silnika: łożyska kulkowe w ściankach i deklach, igiełkowe w satelitach, wał 4 przed słupkiem podpory wału 5,
+  wał 9 od piasty widełek, cieńsze rowki łoża — maszyna bez kolizji modeli.
+
+### Dodane
+- MechKit: zamiana ruchu (listwa, suwak, korbowód, śruba kulowa / trapezowa z nakrętką — `motion.js`), śruby mocujące
+  (`fasteners.js`), łożyska toczne i ślizgowe (`bearings.js`); kity ClockKit, FluidKit, OptiKit, mechanizmy, czujniki,
+  przekaźniki, regulatory, akumulator (`js/models/mech/`) z zachowaniami w `js/behaviors/land/mech/`; LiquidKit
+  (`js/render/fluid/liquid.js`) i wiązki światła (`js/render/optics/beams.js`).
+- Układ silnika (model i zachowanie, także w scenie): korba → suwak z listwą → zębnik na śrubie kulowej → nakrętka;
+  każda część stała przykręcona śrubami, luźne części (przewracanie od momentu reakcji, obudowa przekładni jak wahadło)
+  i siły promieniowe w łożyskach (przesuw luźnych opraw: napięcie pasa, przeskok łańcucha, wyjście zębów z przyporu);
+  przekaźnik czasowy KT1 w obwodzie (bez automatyki — zmostkowany).
+- Doktor modeli 1.11.0: test `clash` — w złożeniu część jednego modelu wchodzi w zamkniętą bryłę innego (głębiej niż
+  0,3 mm); `python3 tools/doctor.py --scene <strona>` z `window.LabScene`; nowe przedmioty mechaniki w źródłach
+  (`MECH_VARIANTS`).
+
+## Laboratorium mechaniki 1.1.0 — 2026-11-28
+
+### Dodane
+- Przedmioty w kategoriach planu (1–6, „w planie” dla pustych): zamiana ruchu i łożyska, sprężyny, koło zamachowe,
+  akumulatory, dźwignie, zapadka, wychwyt z wahadłem, regulatory (PID, Watta), przekaźniki, czujniki, płyny (rury,
+  węże, źródła, pompy, zawory, rozdzielacz, siłownik, zbiorniki, dysze, przenośnik), optyka (lustro, soczewki,
+  pryzmaty, laser, LED, fotodioda) — 75 przedmiotów.
+- Maszyna i Fizyka: zegar — regulator obok łoża (kamery „Zegar”, „Wychwyt zegara”), czujniki B1–B3, przekaźnik KT1
+  i PID U1, stanowisko zatrzasku z wyzwalaczem, stanowisko hydrauliczne z podajnikiem, fontanna, stół optyczny;
+  kliknięcie śruby — odkręca ją, przycisk **Reset mocowań** w oknie Machine; w oknie Opis mocowania, luźne części,
+  przeguby Cardana (sprawność, luz, kolizje w obrocie), suwak, zębnik i nakrętka.
+- Dwa języki: dane przedmiotów i maszyny po angielsku słownikiem (`lang.js`, `lang-en.js`), teksty strony po polsku
+  z `data-pl`.
+- `MechanicsApi`: `clock`, `runClock`, `windClock`, `bolts`, `boltsScreen`, `device`, `simulate`, `pid`; `window.LabScene`
+  dla doktora.
+
+## Edytor sceny 0.60.1 — 2026-11-28
+
+### Zmienione
+- Układ silnika w scenie z poprawkami i nowymi częściami z laboratorium mechaniki (łożyska, śruby, korba z listwą
+  i śrubą kulową; fizyka luźnych części i sił w łożyskach).
+
 ## Program 0.116.3 — 2026-11-27 (boczne menu: Sceny przed Laboratoriami)
 
 ### Zmienione

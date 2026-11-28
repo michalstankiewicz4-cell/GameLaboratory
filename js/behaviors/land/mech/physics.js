@@ -1,5 +1,5 @@
 // Napęd fizyczny (środowisko ląd) — tryb „Fizyka” laboratorium mechaniki. Każdy element ma własny kąt i prędkość
-// (stopień swobody), połączenia z napędu (js/behaviors/mech/drive.js: te same porty i związki kątów) są wiązaniami
+// (stopień swobody), połączenia z napędu (js/behaviors/land/mech/drive.js: te same porty i związki kątów) są wiązaniami
 // rozwiązywanymi metodą XPBD na kątach: C = θb − f(θa), gradient z pochodnej f. Siły nie są „przełożeniem z wzoru”:
 // silnik daje moment swojemu wirnikowi, hamulec — tarczy, a reszta porusza się dlatego, że wiązania nie pozwalają
 // się rozjechać. Momenty przenoszone przez połączenia — z mnożników wiązań (λ / h²).
@@ -17,7 +17,7 @@
 //      (nierówny bieg — relacja kątów z modify()).
 //   4. bryły zderzeń zębów — backlash(edge) może zwrócić strefę z brył ({ zone(θa, out) → out.lo, out.hi }, contact.js):
 //      granice wiązania zazębienia zależą wtedy od kąta koła a (zmienność luzu wzdłuż przyporu), a nie są stałym ±luz/2.
-//   5. obwód elektryczny (js/behaviors/mech/circuit.js) — zasilanie silnika z falownika: on = false → moment 0 (wybieg).
+//   5. obwód elektryczny (js/behaviors/land/mech/circuit.js) — zasilanie silnika z falownika: on = false → moment 0 (wybieg).
 //   const ph = createPhysics(drive, { motorId, brakeId, backlash: (edge) => luz kątowy koła b (rad) | 0,
 //                                     stiffness: (edge) => ({ k, zeta, name }) | null (sztywno),
 //                                     modify: (edge) => nowa relacja kątów (ta, tb) => θb | null,
@@ -34,7 +34,7 @@ export function createPhysics(drive, { motorId, brakeId, backlash = () => 0, sti
   const idx = new Map(nodes.map((n, i) => [n, i]));
   const N = nodes.length, th = new Float64Array(N), om = new Float64Array(N), prev = new Float64Array(N), w = new Float64Array(N);
   nodes.forEach((n, i) => { th[i] = n.theta; om[i] = n.omega || 0; w[i] = 1 / Math.max(n.J || 0, 1e-6); });
-  const E = order.map((e) => { const r = modify(e); return { e: r ? { ...e, rel: r, base: e } : e, a: idx.get(e.a), b: idx.get(e.b), ...zoneOf(backlash(e)), lam: 0, T: 0, Tl: 0, C: 0, contact: 0, twist: 0, eta: e.eta ?? 1, belt: belt(e), slip: 0, slipping: false, creepRate: 0, ...elastic(e) }; });
+  const E = order.map((e) => { const r = modify(e); return { e: r ? { ...e, rel: r, base: e } : e, a: idx.get(e.a), b: idx.get(e.b), ...zoneOf(backlash(e)), off: 0, lam: 0, T: 0, Tl: 0, C: 0, contact: 0, twist: 0, eta: e.eta ?? 1, belt: belt(e), slip: 0, slipping: false, creepRate: 0, ...elastic(e) }; });
   // strefa swobody połączenia: liczba — symetryczna ±luz/2; obiekt z zone() — granice z brył zderzeń (zależne od θa)
   function zoneOf(b) {
     if (b && typeof b.zone === 'function') { const z = b.zone(0, {}); return { zone: b.zone, lo: z.lo, hi: z.hi, dead: (z.hi - z.lo) / 2 }; }
@@ -45,14 +45,18 @@ export function createPhysics(drive, { motorId, brakeId, backlash = () => 0, sti
     const sp = stiffness(e); if (!sp || !(sp.k > 0)) return { soft: false, k: Infinity, name: '' };
     const ia = idx.get(e.a), ib = idx.get(e.b), eps = 1e-5, ga = (e.rel(e.a.theta + eps, e.b.theta) - e.rel(e.a.theta - eps, e.b.theta)) / (2 * eps);
     const Jr = 1 / (w[ia] * ga * ga + w[ib]), c = 2 * (sp.zeta ?? 0.03) * Math.sqrt(sp.k * Jr);
-    return { soft: sp.k < SOFT, kc: c, k: sp.k, zeta: sp.zeta ?? 0.03, name: sp.name || '' };
+    // miękka (jawna sprężyna) tylko, gdy krok ją rozwiązuje stabilnie: ω·h < 0,5 (ω = √(k / J_zred)); sprężyna szybsza niż
+    // krok (np. lekki zębnik na listwie) — jak sztywna, ze strefą luzu. Próg dla współrzędnej liniowej (N/m) — SOFT·10.
+    const h = 1 / (60 * substeps), stable = Math.sqrt(sp.k / Jr) * h < 0.5, lim = e.b.dof === 'lin' ? SOFT * 10 : SOFT;
+    return { soft: sp.k < lim && stable, kc: c, k: sp.k, zeta: sp.zeta ?? 0.03, name: sp.name || '' };
   }
   const RIGID = E.filter((c) => !c.soft), SOFTS = E.filter((c) => c.soft);
   const st = { omega: 0, Tm: 0, Tb: 0, P: 0, t: 0 };
 
   // wiązanie sztywne: przesunięcie θa i θb tak, by C wróciło do strefy [−dead, +dead]
   function solve(c) {
-    const ta = th[c.a], tb = th[c.b], C = tb - c.e.rel(ta, tb);
+    if (c.broken) return;   // połączenie rozłączone (np. luźna część odjechała — sprzęgło, korona, zacisk)
+    const ta = th[c.a], tb = th[c.b], C = tb - c.e.rel(ta, tb) - c.off;
     c.C = C;
     if (c.zone) c.zone(ta, c);
     let ex = 0;
@@ -65,7 +69,8 @@ export function createPhysics(drive, { motorId, brakeId, backlash = () => 0, sti
   }
   // sprężyna skrętna (połączenie miękkie): moment uogólniony F = −(k·skręcenie + c·Ċ) → na b: F, na a: F·∂C/∂θa
   function spring(c, h) {
-    const ta = th[c.a], tb = th[c.b], C = tb - c.e.rel(ta, tb), eps = 1e-5, ga = -(c.e.rel(ta + eps, tb) - c.e.rel(ta - eps, tb)) / (2 * eps);
+    if (c.broken) return;
+    const ta = th[c.a], tb = th[c.b], C = tb - c.e.rel(ta, tb) - c.off, eps = 1e-5, ga = -(c.e.rel(ta + eps, tb) - c.e.rel(ta - eps, tb)) / (2 * eps);
     let ex = 0;
     const Ce = C - c.slip;   // pas: przesunięcie z poślizgu
     if (c.zone) c.zone(ta, c);
@@ -143,5 +148,13 @@ export function createPhysics(drive, { motorId, brakeId, backlash = () => 0, sti
   }
   // ustawienie stanu z kąta i prędkości z napędu kinematycznego (przy wejściu w tryb)
   function sync() { nodes.forEach((nd, i) => { th[i] = nd.theta; om[i] = nd.omega || 0; }); }
-  return { step, sync, state: st, edges: E, nodes };
+  // setBroken(pred, v) — rozłącza / łączy połączenia spełniające warunek (pred(edge drive'u) → true)
+  // ponowne połączenie (v = false) — w bieżącym położeniu: przesunięcie fazy off = C (sprzęgło / korona chwyta tam, gdzie stoją)
+  function setBroken(pred, v) {
+    for (const c of E) if (pred(c.e.base || c.e)) {
+      if (c.broken && !v) { c.off = 0; c.off = th[c.b] - c.e.rel(th[c.a], th[c.b]); }
+      c.broken = !!v;
+    }
+  }
+  return { setBroken, step, sync, state: st, edges: E, nodes };
 }

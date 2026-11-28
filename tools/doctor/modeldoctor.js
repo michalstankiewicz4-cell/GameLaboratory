@@ -23,6 +23,9 @@
 //   budget     the merged model is over the game's per-ship budget (triangles, draw calls)    warning
 //   pierce     one collider box passes right through a thin one (a chute through a wall: what slides down     warning
 //              stops at the wall) — it sticks out on both sides of the plate, inside the plate's face
+//   clash      in an assembly (opts.components): a piece of one model enters a closed piece of ANOTHER model    warning
+//              deeper than opts.clashDepth (bolt head in a stand, part through a housing) — models must not
+//              interpenetrate; touching and fits (shaft in its bore) are fine
 //   hidden     a piece entirely inside another one — drawn for nothing                        info
 //   speck      a piece too small to ever be seen — a draw call (or triangles) for nothing     info
 //   sliver     long, thin triangles that shade badly (needles)                                info
@@ -44,10 +47,12 @@
 //   opts.budget      { triangles, drawCalls, measured: { triangles, drawCalls } } for "budget"
 //   opts.colliders   [{ at: [x,y,z], half: [hx,hy,hz], rot?: [rx,ry,rz], name? }] — the model's collider boxes in its
 //                    own frame, for "pierce"; opts.pierceOk(a, b) → true for crossings that are meant
+//   opts.components  [Object3D] — the separate models of an assembly (scene) for "clash"; a piece belongs to the nearest
+//                    listed ancestor; opts.clashDepth (default 0.3 mm), opts.clashOk(compA, compB) → true when meant
 import * as THREE from '../../vendor/three/three.module.js';
 
-export const CHECKS = ['nan', 'inverted', 'facing', 'seethrough', 'arc', 'zfight', 'floating', 'dangling', 'waterline', 'poke', 'budget', 'pierce', 'hidden', 'speck', 'sliver'];
-export const SEVERITY = { nan: 'error', inverted: 'error', facing: 'error', seethrough: 'error', arc: 'warning', zfight: 'warning', floating: 'warning', dangling: 'warning', waterline: 'warning', poke: 'warning', budget: 'warning', pierce: 'warning', hidden: 'info', speck: 'info', sliver: 'info' };
+export const CHECKS = ['nan', 'inverted', 'facing', 'seethrough', 'arc', 'zfight', 'floating', 'dangling', 'waterline', 'poke', 'budget', 'pierce', 'clash', 'hidden', 'speck', 'sliver'];
+export const SEVERITY = { nan: 'error', inverted: 'error', facing: 'error', seethrough: 'error', arc: 'warning', zfight: 'warning', floating: 'warning', dangling: 'warning', waterline: 'warning', poke: 'warning', budget: 'warning', pierce: 'warning', clash: 'warning', hidden: 'info', speck: 'info', sliver: 'info' };
 export const ABOUT = {
   nan: 'positions that are not numbers (broken maths)',
   inverted: 'closed shape built inside-out: its outside is culled',
@@ -61,6 +66,7 @@ export const ABOUT = {
   poke: 'fitting sticks out through the hull side',
   budget: 'over the per-ship budget of the game',
   pierce: 'a collider passes right through a thin one (things moving along it stop there)',
+  clash: 'a piece of one model enters another model of the assembly',
   hidden: 'piece entirely inside another, drawn for nothing',
   speck: 'piece too small to ever be seen',
   sliver: 'needle triangles that shade badly',
@@ -676,6 +682,47 @@ export function examine(root, opts = {}) {
     }
   }
   lap('pierce', t);
+
+  // clash: assembly — sampled vertices of a piece deep inside a closed piece of another model (point inside, and still
+  // inside when moved by the depth along ±x, ±y, ±z: a point on a touching face or in a fit is not a clash)
+  t = performance.now();
+  if (run.has('clash') && opts.components && opts.components.length) {
+    const comps = new Set(opts.components), depth = opts.clashDepth || 3e-4;
+    const compOf = (o) => { for (let p = o; p; p = p.parent) if (comps.has(p)) return p; return null; };
+    const list = meshes.filter((m) => !m.nan).map((m) => ({ m, c: compOf(m.o) })).filter((q) => q.c);
+    const trees = new Map(), tree = (m) => { if (!trees.has(m)) trees.set(m, triTree(m.o)); return trees.get(m); };
+    const dir = new THREE.Vector3(0.3113, 0.8271, 0.4679).normalize(), r = new THREE.Ray(), q = new THREE.Vector3(), w = new THREE.Vector3();
+    const insideW = (pW, m) => {   // point in world space inside the closed mesh m: odd number of crossings
+      const tr = tree(m); if (!tr.box.containsPoint(pW)) return false;
+      r.origin.copy(pW); r.direction.copy(dir); let n = 0;
+      for (let k = 0; k < 64; k++) { const h = tr.hit(r, 1e9); if (!h) break; n++; r.origin.addScaledVector(dir, h.t + 1e-7); }
+      return n % 2 === 1;
+    };
+    const OFF = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]];
+    const deep = (pW, m, d) => insideW(pW, m) && OFF.every(([x, y, z]) => insideW(w.set(pW.x + x * d, pW.y + y * d, pW.z + z * d), m));
+    const wb = (m) => m.box.clone().applyMatrix4(root.matrixWorld);
+    const boxes = new Map(list.map((x) => [x.m, wb(x.m)]));
+    const nameOf = (c) => c.name || (c.userData && c.userData.part) || 'model';
+    const seen = new Set();
+    for (const A of list) for (const B of list) {
+      if (A.c === B.c || !closedShape(B.m.g)) continue;
+      if (!opts.ignoreAllow && (allowed(A.m.o, 'clash') || allowed(B.m.o, 'clash'))) continue;   // a fit declared on the piece (bolt shank in its hole)
+      const ba = boxes.get(A.m), bb = boxes.get(B.m);
+      if (!ba.clone().expandByScalar(-depth).intersectsBox(bb)) continue;
+      if (opts.clashOk && opts.clashOk(A.c, B.c)) continue;
+      const key = A.m.o.id + ':' + B.m.o.id; if (seen.has(key)) continue; seen.add(key);
+      const nv = A.m.W.length / 3, step = Math.max(1, Math.floor(nv / 48));
+      let worst = 0; const at = new THREE.Vector3();
+      for (let i = 0; i < nv; i += step) {
+        q.fromArray(A.m.W, i * 3).applyMatrix4(root.matrixWorld);
+        if (!bb.containsPoint(q) || !deep(q, B.m, depth)) continue;
+        let d = depth; while (d < 0.2 && deep(q, B.m, d * 2)) d *= 2;
+        if (d > worst) { worst = d; at.copy(q); }
+      }
+      if (worst) add('clash', [A.m, B.m], `${nameOf(A.c)} enters ${nameOf(B.c)} (≥ ${(worst * 1000).toFixed(worst < 0.001 ? 1 : 0)} mm near ${at.x.toFixed(3)}, ${at.y.toFixed(3)}, ${at.z.toFixed(3)})`);
+    }
+  }
+  lap('clash', t);
 
   // hidden: every sampled vertex inside another closed piece
   t = performance.now();

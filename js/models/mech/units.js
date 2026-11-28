@@ -1,6 +1,6 @@
 // MechKit — silnik (motor), obudowy z akrylu (housing, tubeHousing), przekładnia planetarna (planetary), hamulec tarczowy (discBrake).
 import * as THREE from '../../../vendor/three/three.module.js';
-import { MOTOR_ELEC, PHYS, STEEL_RHO, TAU, boreHole, box, circlePath, cyl, extrude, lathe, materials, mesh, newPart, planetPhase, uvScale } from './base.js';
+import { boreHole, box, circlePath, cyl, DOMAIN, extrude, lathe, materials, mesh, MOTOR_ELEC, newPart, PHYS, planetPhase, port, ringX, STEEL_RHO, TAU, uvScale } from './base.js';
 import { gear, ringGear } from './gears.js';
 
 /* ---------------- silnik ---------------- */
@@ -36,17 +36,20 @@ export function motor({ kW = 1.1, poles = 4, paint = 'paintBlue', name } = {}) {
   g.userData.spin.position.y = spec.H;
   if (paint !== 'paintBlue') body0.traverse((o) => { if (o.material === M.paintBlue) o.material = M[paint] || M.paintBlue; });
   const nSync = 6000 / poles, nRated = nSync * (1 - 0.034 - 0.02 / Math.sqrt(spec.kW));
-  Object.assign(g.userData, { elec: { ...MOTOR_ELEC, kW: spec.kW, In: spec.kW * 1000 / (Math.sqrt(3) * MOTOR_ELEC.U * MOTOR_ELEC.eta * MOTOR_ELEC.cosPhi) }, H: spec.H, mass: spec.mass, J: spec.J * (poles >= 6 ? 1.6 : poles <= 2 ? 0.55 : 1), spec, poles, nSync, nRated, Tn: spec.kW * 1000 / (nRated * TAU / 60), shaftD: sr * 2, shaftL: sl });
+  Object.assign(g.userData, { mounts: [-0.08, -0.25].flatMap((x) => [-0.07, 0.07].map((z) => ({ p: new THREE.Vector3(x, 0.012, z), d: 0.01 }))), base: { x0: -0.27, x1: -0.06, z: 0.09 }, ports: { out: port('Wał wyjściowy', DOMAIN.rot, 'wał'), power: port('Zaciski U V W', DOMAIN.el, 'zaciski') }, elec: { ...MOTOR_ELEC, kW: spec.kW, In: spec.kW * 1000 / (Math.sqrt(3) * MOTOR_ELEC.U * MOTOR_ELEC.eta * MOTOR_ELEC.cosPhi) }, H: spec.H, mass: spec.mass, J: spec.J * (poles >= 6 ? 1.6 : poles <= 2 ? 0.55 : 1), spec, poles, nSync, nRated, Tn: spec.kW * 1000 / (nRated * TAU / 60), shaftD: sr * 2, shaftL: sl });
   return g;
 }
 
 /* ---------------- obudowa z akrylu ---------------- */
 // prostopadłościan: szyby z akrylu i profile aluminiowe 20 × 20 na krawędziach; size [x, y, z], środek w (0, 0, 0)
-export function housing(size, { frame = 0.02, name = 'Obudowa (akryl, profile 20 × 20)' } = {}) {
+export function housing(size, { frame = 0.02, bores = [], name = 'Obudowa (akryl, profile 20 × 20)' } = {}) {
+  // bores: [[y, z, r]] — otwory w ściankach x (względem środka) na łożyska wałów; wokół otworu — oprawka z aluminium
   const M = materials(), g = new THREE.Group(); g.name = name;
   const [sx, sy, sz] = size, panes = new THREE.Group(); panes.name = 'szyby';
+  const wallX = () => { const sh = new THREE.Shape(); sh.moveTo(-sz / 2, -sy / 2); sh.lineTo(sz / 2, -sy / 2); sh.lineTo(sz / 2, sy / 2); sh.lineTo(-sz / 2, sy / 2); sh.closePath(); for (const [y, z, r] of bores) sh.holes.push(circlePath(r, 40, -z, y)); return new THREE.ShapeGeometry(sh, 24); };
+  for (const sx2 of [-1, 1]) for (const [y, z, r] of bores) { const seat = mesh(ringX(r, r + 0.012, 0.012), M.alu); seat.position.set(sx2 * sx / 2, y, z); g.add(seat); }
   for (const [w, h, p, r] of [[sx, sy, [0, 0, sz / 2], [0, 0, 0]], [sx, sy, [0, 0, -sz / 2], [0, 0, 0]], [sz, sy, [sx / 2, 0, 0], [0, Math.PI / 2, 0]], [sz, sy, [-sx / 2, 0, 0], [0, Math.PI / 2, 0]], [sx, sz, [0, sy / 2, 0], [Math.PI / 2, 0, 0]]]) {
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), M.acrylic); m.position.set(...p); m.rotation.set(...r); m.renderOrder = 5; panes.add(m);
+    const m = new THREE.Mesh(bores.length && r[1] ? wallX() : new THREE.PlaneGeometry(w, h), M.acrylic); m.position.set(...p); m.rotation.set(...r); m.renderOrder = 5; panes.add(m);
   }
   g.add(panes);
   const f = frame;
@@ -57,11 +60,11 @@ export function housing(size, { frame = 0.02, name = 'Obudowa (akryl, profile 20
   return g;
 }
 // cylindryczna obudowa z akrylu (rura) z aluminiowymi pierścieniami, oś wzdłuż x
-export function tubeHousing({ r = 0.1, len = 0.1, name = 'Obudowa (rura z akrylu)' } = {}) {
+export function tubeHousing({ r = 0.1, len = 0.1, hole = 0.02, name = 'Obudowa (rura z akrylu)' } = {}) {   // hole: otwór w deklach (gniazdo łożyska)
   const M = materials(), g = new THREE.Group(); g.name = name;
   const tube = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, 48, 1, true).rotateZ(-Math.PI / 2), M.acrylic); tube.renderOrder = 5;
   const panes = new THREE.Group(); panes.add(tube);
-  for (const s of [-1, 1]) { const cap = new THREE.Mesh(new THREE.RingGeometry(0.02, r, 48).rotateY(Math.PI / 2), M.acrylic); cap.position.x = s * len / 2; cap.renderOrder = 5; panes.add(cap); const rg = mesh(new THREE.TorusGeometry(r, 0.005, 8, 48).rotateY(Math.PI / 2), M.alu); rg.position.x = s * len / 2; g.add(rg); }
+  for (const s of [-1, 1]) { const cap = new THREE.Mesh(new THREE.RingGeometry(hole, r, 48).rotateY(Math.PI / 2), M.acrylic); cap.position.x = s * len / 2; cap.renderOrder = 5; panes.add(cap); const rg = mesh(new THREE.TorusGeometry(r, 0.005, 8, 48).rotateY(Math.PI / 2), M.alu); rg.position.x = s * len / 2; g.add(rg); }
   g.add(panes); g.userData.panes = panes;
   return g;
 }
@@ -92,7 +95,7 @@ export function planetary({ zs = 24, zp = 24, n = 3, m = 0.002, w = 0.02, mat = 
     return { tc };
   }
   const mass = sun.userData.mass + ring.userData.mass + planets.reduce((a, p) => a + p.userData.mass, 0) + 0.3;
-  Object.assign(g.userData, { phys: { ...PHYS.planetary }, zs, zp, zr, n, m, ratio: 1 + zr / zs, assemblyOk: Number.isInteger(assembly), assembly, clearanceOk: clearance > 0, RC, R: ring.userData.R, mass, update, carrier, ring, sun });
+  Object.assign(g.userData, { phys: { ...PHYS.planetary }, ports: { in: port('Wał słonecznego (wejście)', DOMAIN.rot, 'wał'), out: port('Jarzmo (wyjście)', DOMAIN.rot, 'wał') }, zs, zp, zr, n, m, ratio: 1 + zr / zs, assemblyOk: Number.isInteger(assembly), assembly, clearanceOk: clearance > 0, RC, R: ring.userData.R, mass, update, carrier, ring, sun });
   return g;
 }
 
@@ -107,8 +110,8 @@ export function discBrake({ d = 0.2, t = 0.008, vents = 12 } = {}) {
   // zacisk pływający okracza tarczę: dwie obudowy klocków po bokach (luz 1 mm do tarczy) i mostek nad krawędzią (2 mm)
   const gap = 0.001, ht = 0.018, cx = t / 2 + gap + ht / 2;
   for (const sx of [-1, 1]) { const c = mesh(box(ht, 0.05, 0.07), M.paintRed); c.position.set(sx * cx, R - 0.015, 0); g.add(c); }
-  const bridge = mesh(box(2 * (cx + ht / 2), 0.012, 0.07), M.paintRed); bridge.position.set(0, R + 0.002 + 0.006, 0); g.add(bridge);
+  const bridge = mesh(box(2 * (cx + ht / 2) - 0.002, 0.012, 0.068), M.paintRed); bridge.position.set(0, R - 0.015 + 0.025 + 0.006, 0); g.add(bridge);   // mostek na obudowach klocków (nie w nich), 10 mm nad krawędzią tarczy
   const mass = STEEL_RHO * Math.PI * R * R * t * 0.9 + STEEL_RHO * Math.PI * (R * 0.32) ** 2 * 0.03;
-  Object.assign(g.userData, { d, t, vents, mass, J: 0.5 * mass * R * R * 0.85 });
+  Object.assign(g.userData, { ports: { shaft: port('Piasta (wpust)', DOMAIN.rot, 'wpust') }, d, t, vents, mass, J: 0.5 * mass * R * R * 0.85 });
   return g;
 }

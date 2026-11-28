@@ -1,28 +1,38 @@
 // Laboratorium mechaniki — tryb Fizyka (z Tornado.io): instalacja i regulator z modelu układu silnika
 // (js/models/mech/assemblies/engine-layout/installation.js), fizyka układu z zachowania (js/behaviors/land/mech/engine-layout.js);
-// tutaj to, co należy do laboratorium: okno Opis (physStats), kontrole brył zderzeń (na żywo i zahaczenia), hitboksy.
-//   createPhysicsMode({ scene, root, M, S, save, $, el, mc, ui }) → { reg, ELEC, phys, physStats, hitG, elecG, setHit, syncHit, stepPhysics }
-//   mc — maszyna (machine.js modelu); ui — { fmt, rpmOf, dirOf, select, showSel, sel } z głównego skryptu.
+// tutaj to, co należy do laboratorium: okno Opis (physStats, boltRows — mocowania i luźne części), kontrole brył zderzeń
+// (na żywo, zahaczenia, kolizje przegubów Cardana w obrocie), hitboksy.
+//   createPhysicsMode({ scene, root, M, S, save, $, el, mc, ui }) → { reg, ELEC, phys, layout, physStats, boltRows, hitG, elecG, setHit, syncHit, stepPhysics }
+//   mc — maszyna (machine.js modelu); ui — { fmt, rpmOf, dirOf, speedTxt, T, select, showSel, sel, allParts(), extraRows(rows),
+//   perfRows(rows), auto() } z głównego skryptu.
 import * as THREE from '../../../vendor/three/three.module.js';
 import * as MK from '../../models/mech/mechkit.js';
 import * as CK from '../../models/mech/controls.js';
-import { planeMap, contactPair } from '../../behaviors/land/mech/contact.js';
+import { planeMap, contactPair, meshClash } from '../../behaviors/land/mech/contact.js';
+import { ujointEta } from '../../behaviors/land/mech/drive.js';
+import { cardanMax } from './items.js';
+import { tr } from './lang.js';
 import { buildInstallation } from '../../models/mech/assemblies/engine-layout/installation.js';
 import { createEngineLayoutPhysics } from '../../behaviors/land/mech/engine-layout.js';
 
 const TAU = Math.PI * 2, X = new THREE.Vector3(1, 0, 0), Y = new THREE.Vector3(0, 1, 0);
 
 export function createPhysicsMode({ scene, root, M, S, save, $, el, mc, ui }) {
-  const { BED_TOP, CH, P, Y0, YS5, ZPL, ZR, ZS, belt, chain, cross1, cross2, drive, eC1, eDisc, eSun, motorG, parts, planets, ring } = mc;
-  const { fmt, rpmOf, dirOf, select, showSel } = ui;
+  const { BED_TOP, CH, P, Y0, YS5, ZPL, ZR, ZS, belt, chain, chainPath, cross1, cross2, crossPose, drive, eC1, eDisc, eSun, motorG, parts, planets, ring, rod, boltG, FIXT, YK, eS7, eS8, eS9, eSl, eScr, eNut, BETA, DIR, Q8, applyAngles, ZB, RK, ZM, CR, scrG, slG, pinion } = mc;
+  const { fmt, rpmOf, dirOf, select, showSel, speedTxt, loadTxt, T } = ui;
 /* ---------------- instalacja (model) i fizyka układu (zachowanie) ---------------- */
-const { reg, elecG, ELEC } = buildInstallation({ scene, mc, M });
-const { phys, ZONES, isGear, BELT_F0, BELT_WRAP, step } = createEngineLayoutPhysics({ mc });
-const stepPhysics = (dt) => step(dt, { reg, ELEC, brake: S.brake });   // klatka trybu Fizyka (to samo co w scenie)
+const { reg, elecG, ELEC } = buildInstallation({ scene, mc, M, hooks: { auto: ui.auto } });   // automatyka laboratorium: przekaźnik KT1, PID
+const layout = createEngineLayoutPhysics({ mc }), { phys, ZONES, isGear, BELT_F0, BELT_WRAP, SUP, G, step } = layout;
+const stepPhysics = (dt) => step(dt, { reg, ELEC, brake: S.brake });   // klatka trybu Fizyka (to samo co w scenie): napęd, śruby, luźne części, łożyska
 function physStats() {
   const st = phys.state, f1 = (v) => fmt(v, 1), a = reg.api;
   const rows = [['Regulator', `${a.run ? 'RUN' : 'STOP'} · ${a.dir > 0 ? 'FWD' : 'REV'} · ${f1(Math.abs(a.f))} Hz (zadana ${f1(a.set)} Hz)`], ['Silnik', `${dirOf(st.omega)} ${fmt(Math.abs(rpmOf(st.omega)))} obr/min (synchr. ${fmt(Math.abs(30 * a.f))})`], ['Moment silnika', `${f1(st.Tm)} N·m`],
     ['Wyjście', `${dirOf(eDisc.omega)} ${f1(Math.abs(rpmOf(eDisc.omega)))} obr/min`], ['Moment hamulca', `${f1(Math.abs(st.Tb))} N·m`]];
+  boltRows(rows);
+  { const be = phys.edges.find((c) => c.belt), ch = phys.edges.find((c) => c.e.type === 'chain');
+    if (be && Math.abs(be.da || 0) > 1e-4) rows.push(['Pas — rozstaw osi', `${fmt((be.da || 0) * 1000, 1)} mm → napięcie wstępne ${fmt(SUP.F0)} N (było ${BELT_F0} N), moment graniczny ${fmt(be.belt.Tmax, 1)} N·m`]);
+    if (ch && (SUP.broken.chain || Math.abs(ch.da || 0) > 1e-4)) rows.push(['Łańcuch — rozstaw osi', SUP.broken.chain ? 'ŁAŃCUCH PRZESKOCZYŁ po zębach — napęd przerwany (Reset mocowań)' : `${fmt((ch.da || 0) * 1000, 1)} mm (przeskok przy −4 mm)`]);
+    for (const c of SUP.broken.mesh) rows.push([`Zazębienie ${c.e.a.group.userData.z} : ${c.e.b.group.userData.z}`, `ZĘBY WYSZŁY Z PRZYPORU — koła rozsunięte o ${fmt((c.da || 0) * 1000, 1)} mm (Reset mocowań)`]); }
   // punkt 5 — obwód elektryczny
   { const E = ELEC, es = E.st, onoff = (v) => (v ? 'zamknięty' : 'otwarty');
     rows.push(['Zasilanie X0', `${E.X0.api.on ? 'WŁ' : 'WYŁ'} · 3 × 400/230 V, 50 Hz (TN-S)${es.r && es.r.shorts.length ? ` · ZWARCIE: ${es.r.shorts.join(', ')}` : ''}`]);
@@ -37,7 +47,7 @@ function physStats() {
     rows.push(['Spadek napięcia W1–W3', `${fmt(es.dU * 1000, 1)} mV (${fmt(es.dU / 4, 4)} %) · ${fmt(E.Rline * 1000, 1)} mΩ na żyłę (2,5 mm² Cu, ${fmt(['W1', 'W2', 'W3'].reduce((a, k) => a + E.cables[k].userData.len, 0), 2)} m)`]);
   }
   // sprężyste połączenia: skręcenie (poza luzem) i moment — miękkie na liście (sztywność poniżej 10⁵ N·m/rad)
-  for (const c of phys.edges) if (c.k < 1e5) rows.push([`Sprężystość: ${c.name}`, `${fmt(c.twist * 180 / Math.PI, 3)}° · ${fmt(Math.abs(c.T), 2)} N·m · k = ${fmt(c.k)} N·m/rad`]);
+  for (const c of phys.edges) if (c.soft) rows.push([`Sprężystość: ${c.name}`, `${fmt(c.twist * 180 / Math.PI, 3)}° · ${fmt(Math.abs(c.T), 2)} N·m · k = ${fmt(c.k)} N·m/rad`]);
   // punkt 3: straty, pas, łańcuch
   const loss = phys.edges.reduce((a, c) => a + Math.abs(c.Tl * c.e.b.omega), 0);
   rows.push(['Straty tarcia w połączeniach', `${fmt(loss, 1)} W (sprawność ${fmt(st.P > 0.5 ? (st.Pout || 0) / st.P * 100 : 0, 1)} %)`]);
@@ -48,7 +58,22 @@ function physStats() {
     rows.push(['Pas — poślizg', `${full ? 'POŚLIZG ' : ''}${fmt(sl * 100, 2)} %${full ? ' — pas ślizga się w rowku (moment graniczny przekroczony)' : ' — pełzanie sprężyste'} · moment ${fmt(Math.abs(c.T), 1)} N·m, graniczny ${fmt(c.belt.Tmax, 1)} N·m (napięcie 2 × ${BELT_F0} N, opasanie ${Math.round(BELT_WRAP * 180 / Math.PI)}°)`]);
   }
   for (const c of phys.edges) if (c.e.type === 'chain') rows.push(['Łańcuch — efekt wielokąta', `prędkość koła biernego waha się o ±${fmt((1 - Math.cos(Math.PI / 18)) * 50, 2)} % (z = 18)${Math.abs(c.e.a.omega) > 0.5 ? ` · teraz ${fmt(c.e.b.omega / c.e.a.omega * 27 / 18 * 100 - 100, 2)} %` : ''}`]);
-  for (const c of phys.edges) if (c.dead) {
+  // przeguby Cardana: kąt, sprawność od kąta, luz łożysk krzyżaka, kolizje w obrocie i kąt graniczny
+  { const q = cross1.userData.phys, eta = ujointEta(BETA, q);
+    rows.push(['Przeguby Cardana', `β = ${fmt(BETA * 180 / Math.PI)}° · sprawność ${fmt(eta * 100, 2)} % na przegub · luz ${fmt(2 * q.clear / q.R * 180 / Math.PI, 3)}° · ${CARDAN.length ? `KOLIZJE: ${CARDAN.map((h) => `${h.name} przy ${h.at}°`).join('; ')}` : 'bez kolizji w obrocie'} · największy kąt łamania ${fmt(CARDAN_MAX.beta, 1)}°`]); }
+  // zamiana ruchu: suwak (korbowód), zębnik na śrubie (listwa), nakrętka (gwint) — położenie, prędkość, siła w połączeniu
+  { const ce = (t) => phys.edges.find((c) => c.e.type === t), cr = ce('crank'), rk = ce('rack'), sc = ce('screw');
+    rows.push(['Suwak (korbowód)', `x ${fmt(eSl.theta * 1000, 1)} mm · ${fmt(eSl.omega * 1000, 0)} mm/s · siła w korbowodzie ${fmt(Math.abs(cr ? cr.T : 0), 1)} N`]);
+    rows.push(['Zębnik na śrubie (listwa)', `${fmt(eScr.theta * 180 / Math.PI, 1)}° · ${speedTxt(eScr)} · moment ${fmt(Math.abs(rk ? rk.T : 0), 2)} N·m`]);
+    rows.push(['Nakrętka (gwint)', `x ${fmt(eNut.theta * 1000, 2)} mm · ${fmt(eNut.omega * 1000, 1)} mm/s · siła osiowa ${fmt(Math.abs(sc ? sc.T : 0), 1)} N`]); }
+  for (const c of phys.edges) if (c.dead && c.e.type === 'rack') {
+    const Z = ZONES.get('rack'), mm = (x) => fmt(Math.abs(x) * Z.rp * 1000, 3);
+    rows.push(['Luz listwa : zębnik', `z brył zębów ${mm(c.hi - c.lo)} mm (wzdłuż przyporu ${fmt(Z.z.width.min * 1000, 3)}–${fmt(Z.z.width.max * 1000, 3)}) · ${c.contact > 0 ? 'przylega flanką przednią' : c.contact < 0 ? 'przylega flanką tylną' : 'w luzie'}`]);
+  }
+  for (const c of phys.edges) if (c.dead && c.e.type === 'ujoint') {   // luz kątowy łożysk igiełkowych krzyżaka (bez zębów)
+    rows.push([`Luz przegubu: ${c.e.a.name} → ${c.e.b.name}`, `${fmt((c.hi - c.lo) * 180 / Math.PI, 3)}° (łożyska igiełkowe krzyżaka) · ${c.contact > 0 ? 'czopy dociśnięte w przód' : c.contact < 0 ? 'czopy dociśnięte w tył' : 'w luzie'}`]);
+  }
+  for (const c of phys.edges) if (c.dead && c.e.type === 'mesh') {
     const ga = c.e.a.group.userData, gb = c.e.b.group.userData, Z = ZONES.get(`${ga.z}:${gb.z}`), mm = (x) => fmt(x * gb.rp * 1000, 3);
     const zone = Z ? `z brył zębów ${mm(c.hi - c.lo)} mm (wzdłuż przyporu ${mm(Z.z.width.min)}–${mm(Z.z.width.max)})` : `${fmt((ga.phys.luz + gb.phys.luz) * 1000, 2)} mm`;
     rows.push([`Luz ${ga.z} : ${gb.z}`, `${zone} · ${c.contact > 0 ? 'przylega flanką przednią' : c.contact < 0 ? 'przylega flanką tylną' : 'w luzie — zęby się nie dotykają'}`]);
@@ -60,10 +85,11 @@ function physStats() {
   LIVE.planets.forEach((p, k) => rows.push([`Satelita ${k + 1} — zęby`, ['sun', 'ring'].map((key) => `${key === 'sun' ? 'ze słonecznym' : 'z koroną'} ${p[key].pen ? 'PRZENIKANIE' : `luz −${mmS(p[key].lo)} / +${mmS(p[key].hi)} mm`}`).join(' · ')]));
   for (const r of LIVE.rollers) rows.push([`Rolki łańcucha — ${r.name}`, `${r.near} rolek na kole · ${r.pen ? `PRZENIKANIE ${r.pen} rolek` : 'bez przenikania (zarys ISO 606: gniazdo, bok r_e, głowa)'}`]);
   rows.push(['Zahaczenia o obudowy i łożyska', CLASHES.length ? CLASHES.map((c) => `${c.part} × ${c.fixed} ${mmS(c.depth)} mm`).join('; ') : `brak (sprawdzone ${parts.filter((e) => e.spin).length} części obrotowych, dla każdego kąta)`]);
+  ui.extraRows(rows);   // zegar, automatyka, stanowiska (mechanics.js)
   $('bDrive').replaceChildren(...rows.flatMap(([x, y]) => [el('span', { textContent: x }), el('b', { textContent: y })]));
-  $('bList').replaceChildren(...parts.flatMap((e) => { const sp = el('span', { textContent: e.name }); sp.onclick = () => select(e); return [sp, el('b', { textContent: `${dirOf(e.omega)} ${fmt(Math.abs(rpmOf(e.omega)), 1)} obr/min · ${fmt(e.T, 1)} N·m` })]; }));
+  $('bList').replaceChildren(...ui.allParts().flatMap((e) => { const sp = el('span', { textContent: e.name }); sp.onclick = () => select(e); return [sp, el('b', { textContent: `${speedTxt(e)} · ${loadTxt(e.T, e)}` })]; }));
   if (ui.sel) showSel();
-  if (window.LabPerf) window.LabPerf.modelRows([['Stopnie swobody', String(phys.nodes.length)], ['Wiązania', String(phys.edges.length)], ['Zazębienia z luzem', String(phys.edges.filter((c) => c.dead).length)], ['Bryły zderzeń zębów', `${[...ZONES.values()].reduce((a, v) => a + v.ua.z + v.ub.z, 0)} wielokątów wypukłych (${ZONES.size} zazębienia)`]]);
+  ui.perfRows([['Stopnie swobody', String(phys.nodes.length)], ['Wiązania', String(phys.edges.length)], ['Zazębienia z luzem', String(phys.edges.filter((c) => c.dead).length)], ['Bryły zderzeń zębów', `${[...ZONES.values()].reduce((a, v) => a + (v.ua ? v.ua.z + v.ub.z : ZB.z + RK.n), 0)} wielokątów wypukłych (${ZONES.size} zazębienia)`]]);
 }
 // hitboksy z geometrii (ogólnie, bez ręcznych wymiarów): zębatka — bryły zderzeń zębów (wielokąty wypukłe z zarysu),
 // walec stóp i walce piast; inna część obrotowa — walec wzdłuż osi (obraca się z częścią); część nieruchoma —
@@ -149,9 +175,10 @@ function liveChecks() {
   }
   // rolki łańcucha: wielokąt rolki w płaszczyźnie koła łańcuchowego, z częściami wypukłymi zębów (SAT)
   chain.updateWorldMatrix(true, false);
-  const R = chain.userData.rollers(chainPhase()), v = new THREE.Vector3(), inv = new THREE.Matrix4();
+  const v = new THREE.Vector3(), inv = new THREE.Matrix4();
   for (const S of SPROCKETS) {
-    const sp = S.e.spin; sp.updateWorldMatrix(true, false); inv.copy(sp.matrixWorld).invert();
+    // faza łańcucha przy tym kole z jego kąta (łańcuch sprężysty: cięgno się wydłuża, rolki leżą w gniazdach każdego koła)
+    const R = chain.userData.rollers(S.e === eC1 ? chainPhase() : (S.e.theta - chainPath.seat.phase2) * S.u.z / TAU), sp = S.e.spin; sp.updateWorldMatrix(true, false); inv.copy(sp.matrixWorld).invert();
     let near = 0, pen = 0;
     for (const [x, y, z] of R) {
       v.set(x, y, z).applyMatrix4(chain.matrixWorld).applyMatrix4(inv);
@@ -174,8 +201,8 @@ let LIVE = null;
 function interference() {
   const isPart = (o) => { for (let p = o; p; p = p.parent) if (p.userData && p.userData.el) return true; return false; };
   const fixed = [];
-  for (const o of root.children) if (!isPart(o) && !o.isLight && o.visible && o !== chain && o !== belt && o !== ring && o !== cross1 && o !== cross2) fixed.push({ o, name: o.name || 'podpora' });
-  for (const e of parts) for (const c of e.group.children) if (c !== e.spin) fixed.push({ o: c, name: `${e.name} — część stała` });
+  for (const o of root.children) if (!isPart(o) && !o.isLight && o.visible && o !== chain && o !== belt && o !== ring && o !== cross1 && o !== cross2 && o !== rod) fixed.push({ o, name: o.name || 'podpora' });
+  for (const e of parts) for (const c of e.group.children) if (c !== e.spin && c !== e.slide) fixed.push({ o: c, name: `${e.name} — część stała` });
   for (const o of [reg.group, ...elecG.children]) fixed.push({ o, name: o.name || (ELEC.devices.find((d) => d.group === o) || {}).name || 'instalacja elektryczna' });
   elecG.updateWorldMatrix(true, true); reg.group.updateWorldMatrix(true, true);
   root.updateWorldMatrix(true, true);
@@ -223,13 +250,54 @@ function interference() {
   }
   return res;
 }
+// przeguby Cardana: kolizje widełek i krzyżaków w pełnym obrocie wału 7 (bryły modeli, contact.js meshClash) — raz przy starcie
+function cardanSweep(samples = 16) {
+  const e1 = drive.edges.find((d) => d.type === 'ujoint' && d.a === eS7), e2 = drive.edges.find((d) => d.type === 'ujoint' && d.a === eS8), keep = [eS7.theta, eS8.theta, eS9.theta], hits = [];
+  const P8 = new THREE.Vector3(0, 0, 1).applyQuaternion(Q8);
+  for (let k = 0; k < samples; k++) {
+    const t7 = k * TAU / samples, t8 = e1.rel(t7, eS8.theta), t9 = e2.rel(t8, eS9.theta);
+    eS7.spin.rotation.x = t7; eS8.spin.rotation.x = t8; eS9.spin.rotation.x = t9; eS8.theta = t8; eS9.theta = t9;
+    crossPose(cross1, Y, t7, X, P8, t8, DIR); crossPose(cross2, P8, t8, DIR, Y, t9, X); root.updateWorldMatrix(true, true);
+    for (const [A, B, name] of [[YK.a1, YK.b1, 'przegub 1: widełki z widełkami'], [cross1, YK.a1, 'przegub 1: krzyżak z widełkami wału 7'], [cross1, YK.b1, 'przegub 1: krzyżak z widełkami wału przegubowego'],
+      [YK.a2, YK.b2, 'przegub 2: widełki z widełkami'], [cross2, YK.a2, 'przegub 2: krzyżak z widełkami wału przegubowego'], [cross2, YK.b2, 'przegub 2: krzyżak z widełkami wału 9']]) {
+      if (!hits.some((h) => h.name === name) && meshClash(A, B)) hits.push({ name, at: Math.round(t7 * 180 / Math.PI) });
+    }
+  }
+  [eS7.theta, eS8.theta, eS9.theta] = keep; applyAngles();
+  return hits;
+}
+const CARDAN = cardanSweep(), CARDAN_MAX = cardanMax();
+// wiersz okna Opis: śruby i części luźne (z momentem reakcji — czy przewróci; bez — stoi)
+function boltRows(rows) {
+  const all = boltG.children.length, out = boltG.children.filter((b) => b.userData.target).length;
+  rows.push(['Mocowania', `${all - out} ${T('z', 'of')} ${all} śrub dokręconych${out ? ' — kliknij śrubę, żeby ją dokręcić, albo „Reset mocowań”' : ' — kliknij śrubę, żeby ją odkręcić'}`]);
+  for (const f of FIXT) {
+    if (!f.loose && !f.phi && !(f.phys && f.bolts.some((b) => b.userData.target))) continue;
+    if (!f.phys) {
+      if (!f.loose) continue;
+      let sp = null; for (const [, S0] of SUP.shafts) for (const q of S0.sup) if (q.fix === f) sp = q;
+      if (!sp) { rows.push([`Luźna: ${f.name}`, 'stoi — nic jej nie obciąża']); continue; }
+      const m = sp.obj.userData.mass || 1, N = m * G - sp.L.y, moved = sp.d.length();
+      rows.push([`Luźna: ${f.name}`, `${moved > 0.0005 ? `PRZESUNIĘTA ${fmt(moved * 1000, 1)} mm${sp.d.y > 0.0005 ? ' (uniesiona)' : ''}` : 'stoi'} · siła z łożyska: w bok ${fmt(Math.abs(sp.L.z), 0)} N, w górę ${fmt(Math.max(0, sp.L.y), 0)} N · trzyma: tarcie ${fmt(Math.max(0, 0.2 * N), 0)} N, ciężar ${fmt(m * G, 0)} N`]);
+      continue;
+    }
+    const P = f.phys, tl = f.tilt || 0, txt = P.axis && Math.abs(f.om) > 0.5 ? `OBRACA SIĘ na wałach (${fmt(Math.abs(f.om) * 60 / TAU)} obr/min) — ${P.what}` : tl > P.limit ? `${P.axis ? 'WYCHYLONA' : 'PRZEWRÓCONA'} ${fmt(tl * 180 / Math.PI, 1)}° — ${P.what}` : tl > 0 ? `przechyla się ${fmt(tl * 180 / Math.PI, 2)}°` : f.loose ? 'stoi' : `${f.bolts.filter((b) => !b.userData.target).length} śrub trzyma`;
+    rows.push([`${f.loose ? 'Luźna' : 'Mocowanie'}: ${f.name}`, `${txt} · moment reakcji ${fmt(Math.abs(f.tau || 0), 1)} N·m, ciężar trzyma do ${fmt(P.axis ? P.m * G * P.d : (f.resist || P.m * G * P.b), 1)} N·m${S.mode === 'physics' ? '' : ' (siły — w trybie Fizyka)'}`]);
+  }
+}
+
+if (CARDAN.length) console.warn(`Przeguby Cardana: kolizje — ${CARDAN.map((h) => `${h.name} przy ${h.at}°`).join('; ')}`);
 const t0Clash = performance.now(), CLASHES = interference();
-console.info(`Kontrola zahaczeń: ${CLASHES.length ? CLASHES.map((c) => `${c.part} × ${c.fixed} ${(c.depth * 1000).toFixed(2)} mm`).join('; ') : 'brak'} (${Math.round(performance.now() - t0Clash)} ms)`);
+console.info(tr(`Kontrola zahaczeń: ${CLASHES.length ? CLASHES.map((c) => `${c.part} × ${c.fixed} ${(c.depth * 1000).toFixed(2)} mm`).join('; ') : 'brak'}`) + ` (${Math.round(performance.now() - t0Clash)} ms)`);
 
 function buildHit() {
   hitItems = [];
   for (const e of parts) {   // walec: zasięg wzdłuż osi (x lokalne) i największy promień w płaszczyźnie (y, z) części wirującej
     if (isToothed(e.group.userData) && e.spin) { gearHit(e.group); continue; }
+    if (e.dof === 'lin') {   // część przesuwna: prostopadłościan w układzie wózka (przesuwa się z nim)
+      e.slide.updateWorldMatrix(true, true); const bb = new THREE.Box3(); eachVert(e.slide, (v) => bb.expandByPoint(v), false);
+      const bx = new THREE.Box3Helper(bb, 0x4ad8ff); bx.material = HM.spin; bx.renderOrder = 20; const holder = new THREE.Group(); holder.add(bx); hitG.add(holder); hitItems.push({ holder, src: e.slide }); continue;
+    }
     const sp = e.spin || e.group; sp.updateWorldMatrix(true, true);
     let x0 = Infinity, x1 = -Infinity, r = 0;
     const gears = eachVert(sp, (v) => { x0 = Math.min(x0, v.x); x1 = Math.max(x1, v.x); r = Math.max(r, Math.hypot(v.y, v.z)); }, true);
@@ -252,5 +320,5 @@ function syncHit() { if (rollHit) rollHit(); for (const h of hitItems) { h.src.u
 function setHit(on) { S.hit = on; save(); if (on && !hitItems) buildHit(); hitG.visible = on && S.mode !== 'items'; }
 $('hit').checked = S.hit; $('hit').onchange = () => setHit($('hit').checked);
 
-  return { reg, ELEC, phys, physStats, hitG, elecG, setHit, syncHit, stepPhysics };
+  return { reg, ELEC, phys, layout, physStats, boltRows, hitG, elecG, setHit, syncHit, stepPhysics };
 }

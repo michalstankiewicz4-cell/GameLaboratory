@@ -1,15 +1,17 @@
 // Laboratorium mechaniki — tryb Przedmioty (z Tornado.io): każdy przedmiot osobno na stole (z dala od maszyny), na
-// statywie albo na blacie, z ustawieniami z katalogu (items.js), danymi, portami i podglądem ruchu.
-//   createItemsMode({ scene, M, S, save, $, el, orbit }) → { item, itemDef, itemRoot, itemStats, frameItem, buildItem,
+// statywie albo na blacie, z ustawieniami z katalogu (items.js; lista w kategoriach planu CATS), danymi, portami
+// i podglądem ruchu.
+//   createItemsMode({ scene, M, S, save, $, el, orbit, fmt, perfRows }) → { item, itemDef, itemRoot, itemStats, frameItem, buildItem,
 //     itemList, itemSettings, frame(dt) }
 import * as THREE from '../../../vendor/three/three.module.js';
 import * as MK from '../../models/mech/mechkit.js';
-import { ITEMS } from './items.js';
+import { ITEMS, CATS } from './items.js';
+import { T, tr, EN } from './lang.js';
 import { valid } from '../shared/saved.js';
 
 const TAU = Math.PI * 2;
 
-export function createItemsMode({ scene, M, S, save, $, el, orbit }) {
+export function createItemsMode({ scene, M, S, save, $, el, orbit, fmt, perfRows }) {
 /* ---------------- tryb „Przedmioty”: stół, katalog, ustawienia ---------------- */
 const IO = new THREE.Vector3(0, 0, -6), TABLE = 0.9;   // stół z podglądem z dala od maszyny
 const itemRoot = new THREE.Group(); scene.add(itemRoot);
@@ -60,14 +62,19 @@ function frameItem(v) {
   if (v) { orbit.yaw = v.yaw; orbit.pitch = v.pitch; } else { orbit.yaw = d0.yaw; orbit.pitch = d0.pitch; }
 }
 function itemList() {
-  const groups = [...new Set(ITEMS.map((i) => i.group))];
-  $('itemList').replaceChildren(...groups.flatMap((gname) => [el('h4', { textContent: gname }), el('div', { className: 'btns' }, ...ITEMS.filter((i) => i.group === gname).map((i) => {
+  // kategorie planu (CATS) → grupy → przedmioty; kategoria bez przedmiotów — pokazana jako „w planie”
+  const groupEl = (gname) => [el('h4', { textContent: gname }), el('div', { className: 'btns' }, ...ITEMS.filter((i) => i.group === gname).map((i) => {
     const b = el('button', { type: 'button', textContent: i.name, className: i.id === S.item ? 'on' : '' }); b.onclick = () => { S.item = i.id; save(); itemList(); itemSettings(); buildItem(); frameItem(); }; return b;
-  }))]));
+  }))];
+  const used = new Set(CATS.flatMap(([, gs]) => gs)), rest = [...new Set(ITEMS.map((i) => i.group))].filter((g) => !used.has(g));
+  $('itemList').replaceChildren(...CATS.flatMap(([cat, gs], k) => {
+    const have = gs.filter((g) => ITEMS.some((i) => i.group === g)), extra = k === 0 ? rest : [];
+    return [el('h3', { className: 'cat', textContent: `${k + 1}. ${cat}` }), ...(have.length + extra.length ? [...have, ...extra].flatMap(groupEl) : [el('p', { className: 'plan', textContent: 'w planie' })])];
+  }));
 }
 function itemSettings() {
   const def = ITEMS.find((i) => i.id === S.item) || ITEMS[0], p = itemParams(def), box0 = $('itemSet');
-  const fmtV = (q, v) => (q.unit === 'mm' ? `${Math.round(v * 1000)} mm` : q.unit === 'mm×2' ? `${Math.round(v * 1000)} mm` : q.unit === '°' ? `${v}°` : q.unit ? `${String(v).replace('.', ',')} ${q.unit}` : String(v));
+  const fmtV = (q, v) => (q.unit === 'mm.1' ? `${fmt(v * 1000, 1)} mm` : q.unit === 'mm.2' ? `${fmt(v * 1000, 2)} mm` : q.unit === 'mm' ? `${Math.round(v * 1000)} mm` : q.unit === 'mm×2' ? `${Math.round(v * 1000)} mm` : q.unit === '°' ? `${v}°` : q.unit ? `${(EN ? String(v) : String(v).replace('.', ','))} ${q.unit}` : String(v));
   const rows = def.params.map((q) => {
     const set = (v) => { (S.items[def.id] ||= {})[q.key] = v; save(); buildItem(); };
     if (q.type === 'select') {
@@ -80,24 +87,24 @@ function itemSettings() {
       return el('label', { className: 'row' }, el('span', { textContent: q.label }), cb, el('output'));
     }
     const r = el('input', { type: 'range', min: q.min, max: q.max, step: q.step, value: p[q.key] }), out = el('output', { textContent: fmtV(q, p[q.key]) });
-    r.oninput = () => { out.textContent = fmtV(q, +r.value); }; r.onchange = () => set(+r.value);
+    r.oninput = () => { out.textContent = tr(fmtV(q, +r.value)); }; r.onchange = () => set(+r.value);
     return el('div', { className: 'row' }, el('span', { textContent: q.label }), r, out);
   });
-  const sp = el('input', { type: 'range', min: 0, max: 120, step: 1, value: S.spin }), spo = el('output', { textContent: `${S.spin} obr/min` });
-  sp.oninput = () => { S.spin = +sp.value; spo.textContent = `${S.spin} obr/min`; save(); };
+  const sp = el('input', { type: 'range', min: 0, max: 120, step: 1, value: S.spin }), spo = el('output', { textContent: `${S.spin} ${T('obr/min', 'rpm')}` });
+  sp.oninput = () => { S.spin = +sp.value; spo.textContent = `${S.spin} ${T('obr/min', 'rpm')}`; save(); };
   const reset = el('button', { type: 'button', textContent: 'Domyślne' }); reset.onclick = () => { delete S.items[def.id]; save(); itemSettings(); buildItem(); };
   // sterowanie i zasilanie — bez obrotu podglądu; sterowanie obsługuje się na modelu
-  const preview0 = def.group === 'Zasilanie i przewody' && def.id === 'wire' ? [] : ['Sterowanie', 'Zasilanie i przewody'].includes(def.group) ? [el('p', { className: 'note', textContent: 'Obsługa na modelu: klik — dźwignia, przycisk, wyłącznik, RUN / STOP; przytrzymanie — przycisk chwilowy, krańcówka; przeciąganie w górę / w dół — pokrętło.' })] : [el('h3', { textContent: 'Podgląd' }), el('div', { className: 'row' }, el('span', { textContent: 'Obrót wejścia' }), sp, spo)];
+  const preview0 = def.group === 'Zasilanie i przewody' && def.id === 'wire' ? [] : (['Sterowanie', 'Zasilanie i przewody', 'Optyka', 'Przekaźniki', 'Regulatory'].includes(def.group) || ['latch', 'battery', 'dirValve'].includes(def.id)) ? def.group === 'Optyka' || ['governor', 'battery'].includes(def.id) ? [] : [el('p', { className: 'note', textContent: 'Obsługa na modelu: klik — dźwignia, przycisk, wyłącznik, RUN / STOP; przytrzymanie — przycisk chwilowy, krańcówka; przeciąganie w górę / w dół — pokrętło.' })] : [el('h3', { textContent: 'Podgląd' }), el('div', { className: 'row' }, el('span', { textContent: 'Obrót wejścia' }), sp, spo)];
   box0.replaceChildren(el('h3', { textContent: def.name }), ...rows, ...preview0, el('div', { className: 'btns' }, reset));
 }
 function itemStats() {
   if (!item) return;
-  $('selName').textContent = itemDef.name;
+  $('selName').textContent = tr(itemDef.name);
   const rows = [...item.info, ...(item.live ? item.live() : [])];   // wartości na żywo zastępują te same pola z opisu
   const uniq = []; const seen = new Set(); for (const r of rows) { if (seen.has(r[0])) { uniq[uniq.findIndex((u) => u[0] === r[0])] = r; continue; } seen.add(r[0]); uniq.push(r); }
   $('selProps').replaceChildren(...uniq.flatMap(([a, b]) => [el('span', { textContent: a }), el('b', { textContent: String(b) })]), ...(item.warn || []).map((w) => el('p', { className: 'warn', textContent: '⚠ ' + w })));
   $('selPorts').replaceChildren(...item.ports.map((pt) => el('li', {}, el('b', { textContent: pt.name }), el('span', { textContent: ` · ${pt.kind}` }))));
-  if (window.LabPerf) window.LabPerf.modelRows([['Przedmiot', itemDef.name], ['Ustawienia', String(itemDef.params.length)], ['Porty', String(item.ports.length)]]);
+  perfRows([['Przedmiot', itemDef.name], ['Ustawienia', String(itemDef.params.length)], ['Porty', String(item.ports.length)]]);
 }
   return {
     get item() { return item; }, get itemDef() { return itemDef; }, itemRoot, itemStats, frameItem, buildItem, itemList, itemSettings,

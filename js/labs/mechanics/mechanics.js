@@ -1,9 +1,12 @@
 // Laboratorium mechaniki — kategoria 1: transmisja ruchu. Tryb „Przedmioty”: każdy przedmiot osobno na stole, z ustawieniami
 // (katalog js/labs/mechanics/items.js) — dane, porty i podgląd ruchu. Tryb „Maszyna”: jedna maszyna na żeliwnym łożu z elementów MechKit
-// (js/models/mech/mechkit.js) połączonych portami w napędzie (js/behaviors/mech/drive.js):
+// (js/models/mech/mechkit.js) połączonych portami w napędzie (js/behaviors/land/mech/drive.js):
 //   silnik → sprzęgło kłowe → wał → para zębatek 20 : 40 → przekładnia dwustopniowa (16 : 48, 24 : 40) w obudowie z akrylu
 //   → łańcuch 18 : 27 → pas klinowy Ø 160 : Ø 80 → sprzęgło kołnierzowe → wał przegubowy (dwa przeguby Cardana, 25°)
-//   → przekładnia planetarna (24 / 24 / 72, korona stała) → tarcza hamulca i tarcza z podziałką.
+//   → przekładnia planetarna (24 / 24 / 72, korona stała) → tarcza hamulca i tarcza z podziałką; korba → suwak z listwą
+//   → zębnik na śrubie kulowej → nakrętka. Każda część stała przykręcona śrubami (kliknięcie śruby — odkręca).
+// Obok łoża: zegar — regulator (clock.js), czujniki, przekaźnik czasowy i PID (automation.js), stanowiska: zatrzask
+// z wyzwalaczem (trigger.js), hydraulika z podajnikiem, fontanna, stół optyczny (*-station.js). Języki: lang.js (PL / EN).
 // Kliknięcie elementu — jego właściwości, porty i to, co przez nie płynie. Dla AI: MechanicsApi. Z Tornado.io; części:
 // maszyna i instalacja — model układu silnika (js/models/mech/assemblies/engine-layout/), fizyka układu — zachowanie
 // (js/behaviors/land/mech/engine-layout.js); physics-mode.js (tryb Fizyka: okno Opis, kontrole, hitboksy), items-mode.js
@@ -15,6 +18,14 @@ import { LookPipeline, LOOK_PRESETS } from '../../render/sea/look.js';
 import * as MK from '../../models/mech/mechkit.js';
 import { KIND_NAME } from '../../behaviors/land/mech/drive.js';
 import { ITEMS } from './items.js';
+import { createClock } from './clock.js';
+import { createAutomation } from './automation.js';
+import { createTrigger } from './trigger.js';
+import { tickLiquids } from '../../render/fluid/liquid.js';
+import { createHydraulicStation } from './hydraulic-station.js';
+import { createFountainStation } from './fountain-station.js';
+import { createOpticsStation } from './optics-station.js';
+import { T, tr, LOC, EN, translateDom } from './lang.js';
 import { loadState } from '../shared/saved.js';
 import { buildMachine } from '../../models/mech/assemblies/engine-layout/machine.js';
 import { createPhysicsMode } from './physics-mode.js';
@@ -23,7 +34,11 @@ import { createOrbit } from '../shared/orbit.js';
 import { viewSize as VS, fitTo } from '../shared/view.js';   // widok w wolnym środku (js/labs/shared/view.js)
 
 const $ = (id) => document.getElementById(id);
-const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
+translateDom();   // statyczne teksty strony w bieżącym języku (data-pl / data-en)
+const perfRows = (rows) => { if (window.LabPerf) window.LabPerf.modelRows(rows.map(([a, b]) => [tr(a), tr(String(b))])); };
+// teksty z danych (po polsku) — w języku angielskim tłumaczone słownikiem (lang-en.js)
+const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); if (EN) { if (typeof props.textContent === 'string') props.textContent = tr(props.textContent); if (props.title) props.title = tr(props.title); } Object.assign(e, props); kids.forEach((k) => e.append(k)); return e; };
+const WEATHER_PL = { clear: 'Bezchmurnie', fair: 'Cumulusy pięknej pogody', broken: 'Rozerwane chmury', overcast: 'Całkowite zachmurzenie', rain: 'Deszcz', fog: 'Mgła morska', storm: 'Burza' };
 const KEY = 'gameLab.mechanics.v1';
 const S = loadState(KEY, { mode: 'items', item: 'gear', items: {}, spin: 20, rpm: 600, brake: 20, alpha: 0.25, hit: false, weather: 'fair', sunEl: 40, sunAz: 205 },
   { mode: ['items', 'machine', 'physics'], item: ITEMS.map((i) => i.id), items: (v) => !Array.isArray(v), spin: (v) => v >= 0 && v <= 120, rpm: (v) => v >= 0 && v <= 1500, brake: (v) => v >= 0 && v <= 300, alpha: (v) => v >= 0 && v <= 1, weather: Object.keys(WEATHER) });
@@ -54,16 +69,28 @@ const root = new THREE.Group(); scene.add(root);
 
 /* ---------------- maszyna (machine.js) ---------------- */
 const mc = buildMachine({ scene, root, M });
-const { drive, parts, panes, applyAngles, solved, CH, eDisc, cross1, cross2 } = mc;
+const { drive, parts, panes, applyAngles, solved, CH, eDisc, cross1, cross2, boltG, FIXT, BED_TOP, Y0, motorG, eMotor, eG1, disc } = mc;
+// zegar, automatyka i stanowiska (tworzone na końcu, gdy jest już instalacja): części do wyboru, urządzenia do obsługi
+let CLOCK = { parts: [], devices: [], step: () => {}, rows: () => {} };
+let AUTO = null; const STATIONS = [];
+const extraParts = () => [...CLOCK.parts, ...(AUTO ? AUTO.parts : []), ...STATIONS.flatMap((st) => st.parts)];
+const allParts = () => [...parts, ...extraParts()];
+const extraRows = (rows) => { CLOCK.rows(rows); if (AUTO) AUTO.rows(rows); STATIONS.forEach((st) => st.rows(rows)); };
 
 /* ---------------- pętla ---------------- */
 let last = performance.now(), statT = 0, sel = null;
 const selBox = new THREE.BoxHelper(new THREE.Object3D(), 0xf2c14e); selBox.visible = false; scene.add(selBox);
+// jeden krok symulacji (pętla klatek i MechanicsApi.simulate)
+function simStep(dt) {
+  if (S.mode === 'machine') { drive.step(dt, { rpm: S.rpm, brake: S.brake }); applyAngles(); layout.fixtureStep(dt, false); }   // śruby: tylko animacja
+  else if (S.mode === 'physics') stepPhysics(dt);   // obwód, regulator, napęd fizyczny, luźne części, łożyska (js/behaviors/land/mech/engine-layout.js)
+  tickLiquids(dt);   // falowanie powierzchni cieczy (LiquidKit)
+  if (S.mode !== 'items') { CLOCK.step(dt); if (AUTO) AUTO.step(dt); STATIONS.forEach((st) => st.step(dt)); }
+  else items.frame(dt);
+}
 function loop(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  if (S.mode === 'machine') { drive.step(dt, { rpm: S.rpm, brake: S.brake }); applyAngles(); }
-  else if (S.mode === 'physics') stepPhysics(dt);   // obwód, regulator, napęd fizyczny (js/behaviors/land/mech/engine-layout.js)
-  else items.frame(dt);
+  simStep(dt);
   orbit.moveKeys(dt, 0.6);
   if ((statT += dt) > 0.2) { statT = 0; stats(); }
   if (sel) selBox.update();
@@ -75,26 +102,30 @@ function loop(now) {
   stage.render(dt);
   requestAnimationFrame(loop);
 }
-const rpmOf = (w) => w * 60 / TAU, fmt = (v, d = 0) => v.toLocaleString('pl', { minimumFractionDigits: d, maximumFractionDigits: d });
+const rpmOf = (w) => w * 60 / TAU, fmt = (v, d = 0) => v.toLocaleString(LOC, { minimumFractionDigits: d, maximumFractionDigits: d });
 const dirOf = (w) => (Math.abs(w) < 1e-3 ? '—' : w > 0 ? '↺' : '↻');   // patrząc od +x wzdłuż osi
+// prędkość i obciążenie elementu: obrót — obr/min i N·m, przesuw — mm/s, położenie i N
+const speedTxt = (e, d = 1) => (e.dof === 'lin' ? `${fmt(e.omega * 1000, d)} mm/s · x ${fmt(e.theta * 1000, 1)} mm` : `${dirOf(e.omega)} ${fmt(Math.abs(rpmOf(e.omega)), d)} obr/min`);
+const loadTxt = (Tq, e) => (e.dof === 'lin' ? `${fmt(Tq, 1)} N` : `${fmt(Tq, 1)} N·m`);
 function stats() {
   if (S.mode === 'items') { items.itemStats(); return; }
   if (S.mode === 'physics') { physStats(); return; }
   const st = drive.state;
   const rows = [['Silnik', `${fmt(rpmOf(st.omega))} obr/min`], ['Moment silnika', `${fmt(st.Tm, 1)} N·m`], ['Moc silnika', `${fmt(st.P)} W`], ['Moc na hamulcu', `${fmt(st.Pout || 0)} W`],
     ['Sprawność całkowita', `${fmt(eDisc.eta * 100, 1)} %`], ['Przełożenie całkowite', `${fmt(Math.abs(1 / (eDisc.r || 1e-9)), 2)} : 1`], ['Bezwładność zredukowana', `${fmt(st.Jeff * 1e4, 1)} kg·cm²`], ['Wyjście', `${fmt(rpmOf(eDisc.omega), 1)} obr/min, ${fmt(eDisc.T, 1)} N·m`]];
+  boltRows(rows); extraRows(rows);
   $('bDrive').replaceChildren(...rows.flatMap(([a, b]) => [el('span', { textContent: a }), el('b', { textContent: b })]));
-  $('bList').replaceChildren(...parts.flatMap((e) => { const s = el('span', { textContent: e.name }); s.onclick = () => select(e); return [s, el('b', { textContent: `${dirOf(e.omega)} ${fmt(Math.abs(rpmOf(e.omega)), 1)} obr/min · ${fmt(e.T, 1)} N·m` })]; }));
+  $('bList').replaceChildren(...allParts().flatMap((e) => { const s = el('span', { textContent: e.name }); s.onclick = () => select(e); return [s, el('b', { textContent: `${speedTxt(e)} · ${loadTxt(e.T, e)}` })]; }));
   if (sel) showSel();
-  if (window.LabPerf) window.LabPerf.modelRows([['Elementy', String(parts.length)], ['Połączenia', String(drive.edges.length)], ['Ogniwa łańcucha', String(CH.N)]]);
+  perfRows([['Elementy', String(parts.length)], ['Połączenia', String(drive.edges.length)], ['Ogniwa łańcucha', String(CH.N)]]);
 }
 
 /* ---------------- wybór elementu ---------------- */
 function select(e) { sel = e; selBox.setFromObject(e.group); selBox.visible = !!e; showSel(); }
 function showSel() {
   const e = sel; if (!e) return;
-  $('selName').textContent = e.name;
-  const rows = [...e.props, ['Prędkość', `${dirOf(e.omega)} ${fmt(Math.abs(rpmOf(e.omega)), 1)} obr/min`], ['Moment przenoszony', `${fmt(e.T, 2)} N·m`], ['Moc', `${fmt(Math.abs(e.T * e.omega))} W`], ['Sprawność od silnika', `${fmt(e.eta * 100, 1)} %`]];
+  $('selName').textContent = tr(e.name);
+  const rows = [...e.props, ['Prędkość', speedTxt(e)], [e.dof === 'lin' ? 'Siła przenoszona' : 'Moment przenoszony', loadTxt(e.T, e)], ['Moc', `${fmt(Math.abs(e.T * e.omega))} W`], ['Sprawność od silnika', `${fmt(e.eta * 100, 1)} %`]];
   $('selProps').replaceChildren(...rows.flatMap(([a, b]) => [el('span', { textContent: a }), el('b', { textContent: String(b) })]));
   // porty: z czym są połączone i co przez nie płynie
   $('selPorts').replaceChildren(...(e.ports || []).map((p) => {
@@ -107,14 +138,16 @@ function showSel() {
 }
 function pick(e) {
   const r = renderer.domElement.getBoundingClientRect(); ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ndc, camera);
-  const hits = ray.intersectObjects(parts.map((p) => p.group), true);
+  const bh = ray.intersectObject(boltG, true)[0];   // śruba mocująca — odkręć / dokręć
+  if (bh) { let o = bh.object; while (o && !o.userData.bolt) o = o.parent; if (o) { layout.toggleBolt(o); return; } }
+  const hits = ray.intersectObjects(allParts().map((p) => p.group), true);
   for (const h of hits) { let o = h.object; while (o && !o.userData.el) o = o.parent; if (o) { select(o.userData.el); return; } }
-  sel = null; selBox.visible = false; $('selName').textContent = 'Kliknij element maszyny'; $('selProps').replaceChildren(); $('selPorts').replaceChildren();
+  sel = null; selBox.visible = false; $('selName').textContent = tr('Kliknij element maszyny'); $('selProps').replaceChildren(); $('selPorts').replaceChildren();
 }
 
 /* ---------------- kamera ---------------- */
 const orbit = createOrbit({ target: new THREE.Vector3(-1.4, 0.9, 0.2), dist: 9, yaw: 0.25, pitch: 0.38 , pitchMin: 0.02, pitchMax: 1.52, distMin: 0.3, distMax: 30, rot: 0.005, tilt: 0.004, zoom: 0.0011 });
-const CAMS = { 'Cała maszyna': { t: [-1.4, 0.9, 0.2], dist: 9.5, yaw: 0.25, pitch: 0.4 }, 'Zębatki': { t: [-5.3, 0.9, 0.06], dist: 1.5, yaw: 0.7, pitch: 0.35 }, 'Przekładnia': { t: [-4.1, 0.95, 0.12], dist: 1.3, yaw: 0.35, pitch: 0.3 },
+const CAMS = { 'Zegar': { t: [4.6, 1.3, 0.25], dist: 1.5, yaw: 0.2, pitch: 0.12 }, 'Wychwyt zegara': { t: [4.6, 1.537, 0.225], dist: 0.22, yaw: 0.25, pitch: 0.15 }, 'Cała maszyna': { t: [-1.4, 0.9, 0.2], dist: 9.5, yaw: 0.25, pitch: 0.4 }, 'Zębatki': { t: [-5.3, 0.9, 0.06], dist: 1.5, yaw: 0.7, pitch: 0.35 }, 'Przekładnia': { t: [-4.1, 0.95, 0.12], dist: 1.3, yaw: 0.35, pitch: 0.3 },
   'Łańcuch': { t: [-2.6, 1.07, 0.12], dist: 1.2, yaw: -1.15, pitch: 0.15 }, 'Pas': { t: [-0.95, 1.07, 0.12], dist: 1.2, yaw: -1.15, pitch: 0.15 }, 'Sprzęgła i przeguby': { t: [0.9, 0.9, 0.25], dist: 1.9, yaw: 0.2, pitch: 0.45 }, 'Planetarna': { t: [2.36, 0.87, 0.37], dist: 0.55, yaw: -1.0, pitch: 0.25 }, 'Hamulec': { t: [3.1, 0.9, 0.37], dist: 1.1, yaw: 0.8, pitch: 0.3 } };
 const setCam = (v) => { Object.assign(orbit, { yaw: v.yaw, pitch: v.pitch, dist: v.dist }); orbit.target.set(...v.t); };
 function cams() {
@@ -126,7 +159,7 @@ const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
 // sterowanie na modelu (tryb Przedmioty): część z userData.control — klik / przytrzymanie / przeciąganie zamiast obrotu kamery
 let ctl = null;
 // obiekt z obsługą w bieżącym trybie: przedmiot ze sterowaniem (Przedmioty) albo regulator przy silniku (Fizyka)
-const ctlTarget = () => (S.mode === 'items' ? (items.item && items.item.controls ? [{ group: items.item.group, api: items.item.api }] : null) : S.mode === 'physics' ? ELEC.devices : null);
+const ctlTarget = () => (S.mode === 'items' ? (items.item && items.item.controls ? [{ group: items.item.group, api: items.item.api }] : null) : S.mode === 'physics' ? [...ELEC.devices, ...CLOCK.devices, ...(AUTO ? AUTO.devices : []), ...STATIONS.flatMap((st) => st.devices)] : null);
 function controlAt(e) {
   const tgs = ctlTarget(); if (!tgs) return null;
   const r = renderer.domElement.getBoundingClientRect(); ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ndc, camera);
@@ -152,8 +185,9 @@ cv.addEventListener('wheel', (e) => { e.preventDefault(); orbit.zoomBy(e.deltaY)
 orbit.watchKeys();   // W A S D (js/labs/shared/orbit.js)
 
 /* ---------------- tryb Fizyka (physics-mode.js) i tryb Przedmioty (items-mode.js) ---------------- */
-const { reg, ELEC, phys, physStats, hitG, elecG, setHit, syncHit, stepPhysics } = createPhysicsMode({ scene, root, M, S, save, $, el, mc, ui: { fmt, rpmOf, dirOf, select, showSel, get sel() { return sel; } } });
-const items = createItemsMode({ scene, M, S, save, $, el, orbit });
+const { reg, ELEC, phys, layout, physStats, boltRows, hitG, elecG, setHit, syncHit, stepPhysics } = createPhysicsMode({ scene, root, M, S, save, $, el, mc,
+  ui: { fmt, rpmOf, dirOf, speedTxt, loadTxt, T, select, showSel, get sel() { return sel; }, allParts, extraRows, perfRows, auto: () => AUTO } });
+const items = createItemsMode({ scene, M, S, save, $, el, orbit, fmt, perfRows });
 
 function setMode(m) {
   const was = S.mode;
@@ -165,19 +199,19 @@ function setMode(m) {
   if (phy && was !== 'physics') phys.sync();   // fizyka startuje z bieżącego położenia części
   $('mBar').hidden = !mach;
   $('info').textContent = phy ? $('info').dataset.physics : mach ? $('info').dataset.machine : $('info').dataset.items;
-  if (mach) { sel = null; $('selName').textContent = 'Kliknij element maszyny'; $('selProps').replaceChildren(); $('selPorts').replaceChildren(); if (was === 'items' || !was) setCam(CAMS['Cała maszyna']); }
+  if (mach) { sel = null; $('selName').textContent = tr('Kliknij element maszyny'); $('selProps').replaceChildren(); $('selPorts').replaceChildren(); if (was === 'items' || !was) setCam(CAMS['Cała maszyna']); }
   else { items.buildItem(); items.frameItem(); }
   cams(); stats();
 }
 for (const b of document.querySelectorAll('#modes button')) b.onclick = () => setMode(b.dataset.mode);
 
 /* ---------------- UI ---------------- */
-const bind = (id, key, fmtV, after) => { $(id).value = S[key]; $(id + 'V').textContent = fmtV(S[key]); $(id).oninput = () => { S[key] = +$(id).value; $(id + 'V').textContent = fmtV(S[key]); if (after) after(); save(); }; };
-bind('rpm', 'rpm', (v) => (v ? `${v} obr/min` : 'stop'));
+const bind = (id, key, fmtV, after) => { $(id).value = S[key]; $(id + 'V').textContent = tr(fmtV(S[key])); $(id).oninput = () => { S[key] = +$(id).value; $(id + 'V').textContent = tr(fmtV(S[key])); if (after) after(); save(); }; };
+bind('rpm', 'rpm', (v) => (v ? `${v} ${T('obr/min', 'rpm')}` : 'stop'));
 bind('brake', 'brake', (v) => `${v} N·m`);
 bind('alpha', 'alpha', (v) => `${Math.round(v * 100)} %`, applyAlpha);
 function applyAlpha() { M.acrylic.opacity = S.alpha; for (const p of panes) p.visible = S.alpha > 0.01; }
-$('weather').replaceChildren(...Object.entries(WEATHER).map(([k, w]) => el('option', { value: k, textContent: w.label || k })));
+$('weather').replaceChildren(...Object.entries(WEATHER).map(([k, w]) => el('option', { value: k, textContent: T(WEATHER_PL[k] || w.label || k, w.label || k) })));
 $('weather').value = S.weather; $('weather').onchange = () => { S.weather = $('weather').value; sky(); save(); };
 for (const k of ['sunEl', 'sunAz']) { $(k).value = S[k]; $(k + 'V').textContent = S[k] + '°'; $(k).oninput = () => { S[k] = +$(k).value; $(k + 'V').textContent = S[k] + '°'; sky(); save(); }; }
 function sky() { stage.setSky({ weather: S.weather, sunEl: S.sunEl, sunAz: S.sunAz }); }
@@ -186,9 +220,26 @@ addEventListener('keydown', (e) => {
   if (e.code === 'KeyH') document.querySelectorAll('[data-window]').forEach((p) => p.classList.toggle('hidden-panel'));
 });
 
+/* ---------------- zegar — regulator (js/labs/mechanics/clock.js) ---------------- */
+CLOCK = createClock({ root, S, fmt });
+/* ---------------- etap 3: czujniki, przekaźnik czasowy, regulator PID (js/labs/mechanics/automation.js) ---------------- */
+AUTO = createAutomation({ root, elecG, S, fmt, BED_TOP, Y0, motorG, eMotor, g1: eG1.group, eG1, disc, eDisc });
+/* ---------------- etap 4: zatrzask z wyzwalaczem, hydraulika z podajnikiem i fontanna; etap 5: stół optyczny ---------------- */
+STATIONS.push(createTrigger({ root, S, fmt, BED_TOP }), createHydraulicStation({ root, S, fmt, BED_TOP }), createFountainStation({ root, S, fmt, BED_TOP }), createOpticsStation({ root, S, fmt, BED_TOP }));
+
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), RUN_MAX = 120;
+// scena dla doktora modeli (python3 tools/doctor.py --scene labs/mechanics.html): każdy model maszyny osobno — śruby,
+// stopy, urządzenia, kable pominięte (wchodzą w dławiki z założenia); doktor sprawdza, czy modele nie wchodzą jeden w drugi
+window.LabScene = {
+  prepare: async () => { setMode('machine'); applyAngles(); elecG.visible = true; reg.group.visible = true; scene.updateMatrixWorld(true); },   // położenia z kinematyki (dokładne fazy zazębień)
+  root: () => scene,
+  components: () => [...root.children.filter((c) => c !== boltG), ...boltG.children, cross1, cross2, reg.group, ...elecG.children.filter((o) => !(o.userData && o.userData.cores))],
+};
 // MechanicsApi.mode('items' | 'machine'), item(id, ustawienia), items(), rpm(v), brake(Nm), alpha(0–1), state(), elements(), select(id), view(…), run(sekundy)
 window.MechanicsApi = {
+  clock() { const c = CLOCK.state, e = CLOCK.esc.state; return { time: CLOCK.hms(), amp: +(c.amp * 180 / Math.PI).toFixed(3), period: +(+c.period).toFixed(4), wind: +c.wind.toFixed(3), contact: e.contact, face: e.face, escRev: +(-c.te / TAU).toFixed(3) }; },
+  runClock(sec = 10) { const n = Math.round(clamp(sec, 0, 600) * 60); for (let i = 0; i < n; i++) CLOCK.step(1 / 60); return this.clock(); },
+  windClock(n = 1) { for (let i = 0; i < n * 4; i++) CLOCK.devices[0].api.press('wind'); return CLOCK.state.wind; },
   mode(m) { setMode(m); return S.mode; },
   // regulator(nazwa) — obsługa regulatora przy silniku w trybie Fizyka: 'run' | 'stop' | 'dir' | liczba (przeciągnięcie pokrętła, px)
   // circuit(nazwa) — obsługa instalacji w trybie Fizyka: circuit('dir', 'I' | '0' | 'II') — przełącznik S3, 'power' (X0), 'main' (Q1), 'start' / 'stop' (chwilowe), 'estop' (zatrzask / odblokowanie), 'test' (K1 ręcznie); circuit('pot', 0–1)
@@ -198,26 +249,40 @@ window.MechanicsApi = {
     if (c === 'pot') { E.R1.api.pos = Number(v) || 0; } else if (map[c]) { const [d, n] = map[c]; d.api.press(n); if (c === 'start' || c === 'stop') setTimeout(() => d.api.release(n), 150); }
     const es = E.st; return { power: E.X0.api.on, main: E.Q1.api.on, k1: E.K1.api.on, estop: E.S0.api.latched, vfd: reg.api.powered, Ucoil: es.uK, Uvfd: es.uV, shorts: es.r ? es.r.shorts : [] };
   },
+  // boltsScreen() — położenia łbów śrub na ekranie (px, względem okna) — do klikania (testy, AI)
+  boltsScreen() { const r = renderer.domElement.getBoundingClientRect(), v = new THREE.Vector3(); return boltG.children.map((b, i) => { b.children[1].getWorldPosition(v); v.project(camera); return { i, fix: b.userData.fix && b.userData.fix.name, x: r.left + (v.x + 1) / 2 * r.width, y: r.top + (1 - v.y) / 2 * r.height, vis: v.z < 1 && Math.abs(v.x) < 1 && Math.abs(v.y) < 1, out: b.userData.target }; }); },
+  // bolts('reset') — wszystkie śruby dokręcone; bolts('unscrew', nazwa) — odkręca śruby części o nazwie zawierającej tekst; bolts() — stan
+  bolts(c, name) {
+    if (c === 'reset') { layout.resetBolts(); stats(); }
+    if (c === 'unscrew' || c === 'screw') for (const f of FIXT) if (!name || f.name.toLowerCase().includes(String(name).toLowerCase())) for (const b of f.bolts) b.userData.target = c === 'unscrew' ? 1 : 0;
+    return FIXT.map((f) => ({ name: f.name, bolts: f.bolts.length, out: f.bolts.filter((b) => b.userData.target).length, loose: !!f.loose, tilt: +((f.tilt || 0) * 180 / Math.PI).toFixed(2), spin: f.phys && f.phys.axis ? +(f.om * 60 / TAU).toFixed(1) : undefined, tau: f.tau !== undefined ? +f.tau.toFixed(2) : undefined }));
+  },
   regulator(c) { if (typeof c === 'number') reg.api.drag('knob', c); else reg.api.press(c); return { run: reg.api.run, dir: reg.api.dir, f: reg.api.f, set: reg.api.set }; },
   // ratios() — przełożenia ω_element / ω_silnika w fizyce i w kinematyce (sprawdzenie zgodności)
   ratios() { return parts.filter((e) => phys.nodes.includes(e)).slice(-4).map((e) => [e.name, +(phys.state.omega ? e.omega / phys.state.omega : 0).toFixed(4)]); },
   item(id, params = {}) { S.item = id; S.items[id] = { ...(S.items[id] || {}), ...params }; items.itemList(); items.itemSettings(); items.buildItem(); items.frameItem(); const item = items.item; return { name: items.itemDef.name, info: item.info, warn: item.warn || [], ports: item.ports.map((p) => p.name) }; },
   items: () => ITEMS.map((i) => ({ id: i.id, name: i.name, group: i.group, params: i.params.map((q) => q.key) })),
   // control(nazwa, 'press' | 'release' | dy) — obsługa części sterującej przedmiotu (jak myszą); zwraca stan na żywo
+  // stanowiska na łożu (tryb Fizyka): device('HY-button') — klik przycisku, device('HY-valve', 'a') / device('HY-valve', 'a', 'release')
+  device(id, name = 'button', act = 'press') { const e = STATIONS.flatMap((st) => st.parts).find((p) => p.id === id), d = e && STATIONS.flatMap((st) => st.devices).find((v) => v.group === e.group); if (!d) return false; if (act === 'release') d.api.release(name); else { d.api.press(name); if (act === 'click') d.api.release(name); } return true; },
   control(name, act = 'press') { const item = items.item; if (!item || !item.api) return null; if (act === 'press') item.api.press(name); else if (act === 'release') item.api.release(name); else item.api.drag(name, act); return item.live ? Object.fromEntries(item.live()) : null; },
   // liczby spoza zakresu przycinane do zakresu suwaka; nie-liczby pomijane (zostaje obecna wartość)
   rpm(v) { if (Number.isFinite(v)) { S.rpm = clamp(v, 0, 1500); $('rpm').value = S.rpm; $('rpmV').textContent = S.rpm ? `${S.rpm} obr/min` : 'stop'; save(); } return S.rpm; },
   brake(v) { if (Number.isFinite(v)) { S.brake = clamp(v, 0, 300); $('brake').value = S.brake; $('brakeV').textContent = `${S.brake} N·m`; save(); } return S.brake; },
   alpha(a) { if (Number.isFinite(a)) { S.alpha = clamp(a, 0, 1); $('alpha').value = S.alpha; $('alphaV').textContent = `${Math.round(S.alpha * 100)} %`; applyAlpha(); save(); } return S.alpha; },
   state: () => ({ ...drive.state, ok: solved.ok }),
-  elements: () => parts.map((e) => ({ id: e.id, name: e.name, rpm: +rpmOf(e.omega).toFixed(2), T: +e.T.toFixed(3), eta: +e.eta.toFixed(4), theta: +e.theta.toFixed(4) })),
-  select(id) { const e = parts.find((p) => p.id === id); if (e) select(e); return !!e; },
+  elements: () => parts.map((e) => ({ id: e.id, name: e.name, dof: e.dof, rpm: e.dof === 'lin' ? undefined : +rpmOf(e.omega).toFixed(2), v: e.dof === 'lin' ? +e.omega.toFixed(5) : undefined, T: +e.T.toFixed(3), eta: +e.eta.toFixed(4), theta: +e.theta.toFixed(4) })),
+  select(id) { const e = allParts().find((p) => p.id === id); if (e) select(e); return !!e; },
   view(t = [-1.4, 0.9, 0.2], dist = 9, yaw = 0.25, pitch = 0.38) { orbit.target.set(...t); Object.assign(orbit, { dist, yaw, pitch }); },
+  // simulate(s) — bieżący tryb (Maszyna, Fizyka, Przedmioty) krokami 1/60 s, bez rysowania (testy, AI)
+  simulate(sec = 1) { const n = Math.round(clamp(Number.isFinite(sec) ? sec : 0, 0, RUN_MAX) * 60); for (let i = 0; i < n; i++) simStep(1 / 60); stats(); return { mode: S.mode, k1: ELEC.K1.api.on, kt1: AUTO.kt.state, run: reg.api.run, f: +reg.api.f.toFixed(2), rpm: +AUTO.B2.state.rpm.toFixed(1), pid: { auto: AUTO.pid.state.auto, sv: AUTO.pid.state.sv, out: +AUTO.pid.state.out.toFixed(3) }, b1: AUTO.B1.state.edges, b3: AUTO.B3.state.count }; },
+  pid(c, v) { const P = AUTO.pid.state; if (c === 'auto') P.auto = !!v; if (c === 'sv') P.sv = clamp(+v, 0, 1500); return { ...P }; },
   // run: najwyżej RUN_MAX sekund na wywołanie (Infinity / NaN nie zawieszą strony)
   run(sec = 1) { const n = Math.round(clamp(Number.isFinite(sec) ? sec : 0, 0, RUN_MAX) * 60); for (let i = 0; i < n; i++) drive.step(1 / 60, { rpm: S.rpm, brake: S.brake }); applyAngles(); stats(); return this.state(); },
   drive,
 };
 
+$('resetBolts').onclick = () => { layout.resetBolts(); stats(); };
 sky(); applyAlpha(); applyAngles(); items.itemList(); items.itemSettings(); setMode(S.mode); if (S.hit) setHit(true);
-if (window.LabLoad) window.LabLoad.step('The machine is assembled', 1);
+if (window.LabLoad) window.LabLoad.step(T('Maszyna złożona', 'The machine is assembled'), 1);
 requestAnimationFrame(loop);

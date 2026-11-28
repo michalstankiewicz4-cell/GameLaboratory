@@ -120,3 +120,11 @@ export function sprocketOutline(z, p, d1) {
   for (let k = 0; k < z; k++) { const c = Math.cos(k * pz), s_ = Math.sin(k * pz); for (const [x, y] of block) pts.push(new THREE.Vector2(x * c - y * s_, x * s_ + y * c)); }
   return { pts, R, rs, ra: rT, re, alpha };
 }
+/* ---------------- zamiana ruchu: listwa zębata, suwak w prowadnicy, korbowód, śruba pociągowa z nakrętką ---------------- */
+// listwa zębata (moduł m, n zębów): zarys w płaszczyźnie (y, z) — linia podziałowa z = 0 wzdłuż y (0 … n·p), zęby w +z,
+// szerokość wzdłuż x. Zęby wypukłe (trapezy zarysu odniesienia, kąt 20°), ząb cieńszy o backlash·m jak w kołach.
+export function rackHulls(m, n, { backlash = 0.04 } = {}) {
+  const p = Math.PI * m, s2 = p / 4 - backlash * m / 2, t = Math.tan(ALPHA), hr = s2 + 1.25 * m * t, ht = s2 - m * t, out = [];
+  for (let i = 0; i < n; i++) { const c = (i + 0.5) * p; out.push([[c - hr, -1.25 * m], [c + hr, -1.25 * m], [c + ht, m], [c - ht, m]]); }
+  return out;
+}

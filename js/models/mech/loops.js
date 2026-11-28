@@ -1,6 +1,6 @@
 // MechKit — koło pasowe (pulley), droga wokół dwóch kół (loopPath, chainDistance), łańcuch rolkowy (chainLoop), pas klinowy (beltLoop).
 import * as THREE from '../../../vendor/three/three.module.js';
-import { IRON_RHO, PHYS, RHO, TAU, box, circlePath, cyl, extrude, lathe, materials, mesh, newPart } from './base.js';
+import { box, circlePath, cyl, DOMAIN, extrude, IRON_RHO, lathe, materials, mesh, newPart, PHYS, port, RHO, TAU } from './base.js';
 
 /* ---------------- koło pasowe (rowki klinowe) ---------------- */
 // profile pasów wąskoklinowych (ISO 4184): szerokość u góry, wysokość, szerokość skuteczna; podziałka rowków e
@@ -25,7 +25,7 @@ export function pulley({ d = 0.16, profile = 'SPA', grooves = 1, bore = 0.0125, 
     }
   }
   const rho = RHO[mat] || IRON_RHO, mass = rho * (Math.PI * (ro * ro - rimIn * rimIn) * w + Math.PI * (rimIn * rimIn - hubR * hubR) * web * 0.6 + Math.PI * hubR * hubR * w * 1.5);
-  Object.assign(g.userData, { phys: { ...PHYS.belt }, d, rp, w, profile, grooves, mass, J: 0.5 * mass * (ro * ro + rimIn * rimIn) * 0.85, spokes });
+  Object.assign(g.userData, { phys: { ...PHYS.belt }, ports: { bore: port('Otwór z wpustem', DOMAIN.rot, 'wpust'), belt: port('Pas', DOMAIN.rot, 'pas') }, d, rp, w, profile, grooves, mass, J: 0.5 * mass * (ro * ro + rimIn * rimIn) * 0.85, spokes });
   return g;
 }
 

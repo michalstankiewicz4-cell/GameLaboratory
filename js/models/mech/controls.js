@@ -10,7 +10,7 @@ const mesh = (g, m, shadow = true) => { const o = new THREE.Mesh(g, m); o.castSh
 const plastic = (color, rough = 0.45) => new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: 0 });
 let P = null;
 // ---------------- właściwości elektryczne (userData.elec) ----------------
-// Każde urządzenie niesie swoje dane elektryczne — obwód (js/behaviors/mech/circuit.js) i laboratorium tylko je czytają.
+// Każde urządzenie niesie swoje dane elektryczne — obwód (js/behaviors/land/mech/circuit.js) i laboratorium tylko je czytają.
 // contacts: styki z numerami zacisków wg EN 60947 ('13-14': 'NO' — zwierny, '11-12': 'NC' — rozwierny,
 // przy przełączniku — położenie, w którym styk jest zamknięty)
 const parseVolts = (v) => { const m = /^(\d+(?:[.,]\d+)?)\s*(AC|DC)?/i.exec(String(v)); return { U: m ? parseFloat(m[1].replace(',', '.')) : 230, kind: m && m[2] ? m[2].toUpperCase() : 'AC' }; };
