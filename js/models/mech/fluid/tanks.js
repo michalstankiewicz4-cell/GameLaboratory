@@ -76,7 +76,7 @@ export function accumulator({ V0 = 0.7e-3, name } = {}) {
 export function floatGauge({ H = 0.194, R = 0.014, reach = 0.045, name } = {}) {
   const F = fluidMaterials(), g = new THREE.Group(); g.name = name || (EN ? 'Float level gauge' : 'Wskaźnik poziomu z pływakiem');
   const rod = mesh(new THREE.CylinderGeometry(0.0025, 0.0025, H + 0.012, 12), F.stainless); rod.position.y = 0.002 + (H + 0.012) / 2; g.add(rod);
-  const foot = mesh(new THREE.CylinderGeometry(0.006, 0.007, 0.004, 16), F.stainless); foot.position.y = 0.0022;   // 0,2 mm nad dnem (bez wspólnej płaszczyzny) g.add(foot);
+  const foot = mesh(new THREE.CylinderGeometry(0.006, 0.007, 0.004, 16), F.stainless); foot.position.y = 0.0022; g.add(foot);   // 0,2 mm nad dnem (bez wspólnej płaszczyzny)
   const arm = mesh(new THREE.BoxGeometry(reach + 0.006, 0.004, 0.012), F.stainless); arm.position.set(-reach / 2 + 0.003, H + 0.014 + 0.002, 0); g.add(arm);
   // listwa z podziałką co 10 mm (procenty wysokości), za prętem
   const sc = canvasTex(64, 512, (c, w, h) => { c.fillStyle = '#f4f2ea'; c.fillRect(0, 0, w, h); c.fillStyle = '#111'; c.font = 'bold 18px sans-serif'; for (let i = 0; i <= 20; i++) { const y = h - 8 - i * (h - 16) / 20; c.fillRect(0, y, i % 2 ? 14 : 26, 3); if (i % 4 === 0) c.fillText(String(i * 5), 30, y + 7); } });

@@ -9,7 +9,7 @@ export function opticalBarrier({ span = 0.3, name } = {}) {
   const M = materials(), g = new THREE.Group(); g.name = name || (EN ? 'Through-beam photoelectric sensor' : 'Bariera optyczna (nadajnik i odbiornik)');
   const leds = [];
   const unit = (x, dir, rx) => {
-    const u = new THREE.Group(); u.position.x = x; g.add(u);
+    const u = new THREE.Group(); u.position.x = x; g.add(u); if (rx) u.userData.doctorOk = 'floating';   // odbiornik — osobne urządzenie naprzeciw nadajnika
     const box = mesh(new THREE.BoxGeometry(0.018, 0.05, 0.05), plastic(rx ? 0x3a3d42 : 0xb02a2a, 0.45)); u.add(box);
     const lens = mesh(new THREE.CylinderGeometry(0.009, 0.009, 0.002, 32).rotateZ(Math.PI / 2), new THREE.MeshPhysicalMaterial({ color: rx ? 0x202428 : 0x5a0a0a, roughness: 0.05, clearcoat: 1, transmission: 0.3 })); lens.position.x = dir * 0.0095; u.add(lens);
     const bracket = mesh(new THREE.BoxGeometry(0.03, 0.003, 0.05), M.steel); bracket.position.set(-dir * 0.005, -0.0265, 0); u.add(bracket);

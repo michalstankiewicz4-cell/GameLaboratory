@@ -3,6 +3,36 @@
 Wersja programu i każdego laboratorium: `ui/data/versions.js`. `x.y.z` — y: nowa funkcja, z: poprawka.
 Historia laboratoriów Space sprzed przeniesienia: `docs/history/space-labs.md` (i reszta historii w `docs/history/`); Battle i aTrain — w historii git.
 
+## Program 0.117.1 — 2026-11-28 (przegląd ostrzeżeń doktora w mechanice z Tornado.io; sprawdzanie składni)
+
+### Poprawione
+- Modele mechaniki (z Tornado.io): pompa zębata miała wał, źródło LED wspornik, a zbiornik nóżki tylko w komentarzu
+  (polecenie doklejone za komentarzem — nie wykonywało się); uchwyt V lasera nad słupkiem; ramię uchwytu lustra sięga
+  słupka; podpora dźwigni regulatora Watta stoi na łapie podstawy (widełki szersze od dźwigni); wałek enkodera sięga
+  tarczy kodowej; sworzeń zatrzasku wystaje 1 mm z tyłu płyty. Odbiornik bariery optycznej i styk pod pokrywą
+  przekaźnika — oznaczone jako zamierzone (`doctorOk`).
+- Sprawdzanie składni przy wypchnięciu (`check.yml`): `node --check plik.js` w Node 22 przepuszczał moduł ES z błędem
+  składni (wykrywanie modułu) — moduły sprawdzane teraz jako moduły (`--input-type=module`). Wszystkie 569 plików czyste.
+
+## Doktor modeli 1.12.0 — 2026-11-28
+
+### Zmienione
+- `floating`: przezroczyste bryły też trzymają (pokrywa na obudowie w przekroju, styk pod przezroczystą pokrywą) —
+  tylko zamknięte bryły, które są rzeczami: nie pręty (wiązka światła, struga), nie poświaty, nie słabe objętości.
+- `zfight` przy `opts.ground`: pomija ściany leżące na gruncie spodem do niego (nigdy niewidoczne).
+- `floating`: główna bryła nie może być grupą oznaczoną jako osobna (`doctorOk = 'floating'` — drugie urządzenie obok
+  modelu); wtedy główna jest największa z pozostałych.
+- Stanowisko testowe: gałka na szklanej skrzynce (nie zgłoszona), lampa na wiązce światła (zgłoszona); nowe
+  `test/ground` — stropy w jednej płaszczyźnie zgłoszone, spody na gruncie nie; urządzenie osobne nie jest główną bryłą,
+  klocek wiszący obok zgłoszony.
+
+## Laboratorium mechaniki 1.1.1 — 2026-11-28
+
+### Poprawione
+- Przedmioty: puszki przycisków przy przekaźnikach (czasowym i sygnałowym) nie wchodzą w przekaźnik ani w siebie (osobne
+  urządzenia na stole — `doctorOk`);
+  płyta regulatora PID z wycięciem 45,5 × 45,5 mm (DIN 43700); blaszka chorągiewki bariery od piasty.
+
 ## Program 0.117.0 — 2026-11-28 (mechanika z Tornado.io: poprawki i nowe elementy; doktor — złożenie)
 
 Uzupełnienie kopii z Tornado.io (mechanika 0.12.0–0.20.0, doktor): poprawki tego, co już było, i nowe rzeczy.

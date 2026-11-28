@@ -44,6 +44,13 @@ export function testBench() {
   const clashA = new THREE.Group(), clashB = new THREE.Group(); clashA.name = 'clash model A'; clashB.name = 'clash model B'; root.add(clashA, clashB);
   put('clash box', new THREE.BoxGeometry(0.6, 0.6, 0.6), grey, -1.4, 2.3, 0.5, clashA);
   put('clash ball', new THREE.SphereGeometry(0.3, 16, 12), blue, -1.0, 2.32, 0.5, clashB);
+  // see-through holders for "floating": a knob on a closed glass case on the deck (not found); a lamp on a light beam —
+  // a see-through rod is not a thing that holds (found)
+  const glass = new THREE.MeshStandardMaterial({ color: 0xa0c8e0, transparent: true, opacity: 0.35, depthWrite: false });
+  put('glass case', new THREE.BoxGeometry(0.5, 0.5, 0.5), glass, -1.2, 2.25, 2);
+  put('knob on the glass', new THREE.SphereGeometry(0.1, 12, 8), red, -1.2, 2.55, 2);
+  put('light beam', new THREE.CylinderGeometry(0.01, 0.01, 1.5, 8), new THREE.MeshBasicMaterial({ color: 0xffe0a0, transparent: true, opacity: 0.5, depthWrite: false }), -1.2, 2.75, 3.2);
+  put('lamp on the beam', new THREE.BoxGeometry(0.2, 0.2, 0.2), grey, -1.2, 3.6, 3.2);
   const mount = new THREE.Group(); mount.name = 'gun mount'; mount.userData.part = true; mount.position.set(0, 2, -9); root.add(mount);
   put('mount base', new THREE.CylinderGeometry(0.6, 0.6, 0.4, 16), grey, 0, 0.2, 0, mount);
   const gun = new THREE.Group(); gun.position.set(0, 0.6, 0); mount.add(gun);
@@ -61,4 +68,20 @@ export function testBench() {
   };
 }
 
-export const models = [{ id: 'test/bench', label: 'Test bench', sub: 'one mistake per check', family: 'test', kind: 'test', build: testBench }];
+// the ground (opts.ground): two blocks with their tops in one plane (found) and two blocks of different heights whose
+// undersides lie on the ground in one plane (never seen — not found); a separate device and a hanging block (floating)
+export function testGround() {
+  const root = new THREE.Group(), M = (c) => new THREE.MeshStandardMaterial({ color: c });
+  const put = (name, geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.name = name; m.position.set(x, y, z); root.add(m); return m; };
+  put('block A', new THREE.BoxGeometry(1, 0.5, 1), M(0xb04030), 0, 0.25, 0); put('block B', new THREE.BoxGeometry(0.6, 0.5, 0.6), M(0x3060a0), 0.6, 0.25, 0);
+  put('block C', new THREE.BoxGeometry(1, 0.4, 1), M(0xb04030), 1.4, 0.2, 0); put('block D', new THREE.BoxGeometry(0.6, 0.7, 0.6), M(0x3060a0), 2.0, 0.35, 0);
+  // floating with a separate device beside: the big sphere is declared separate (doctorOk) — it is not the main body
+  // the rest is measured against; the block hanging above A is still found
+  const dev = put('separate device', new THREE.SphereGeometry(0.5, 32, 24), M(0x808080), -2, 0.5, 0); dev.userData.doctorOk = 'floating';
+  put('block hanging in the air', new THREE.BoxGeometry(0.2, 0.2, 0.2), M(0x808080), 0, 1.5, 0);
+  root.updateMatrixWorld(true);
+  return { root, measured: { triangles: 1500, drawCalls: 6, materials: 6 }, opts: { ground: 0 } };
+}
+
+export const models = [{ id: 'test/bench', label: 'Test bench', sub: 'one mistake per check', family: 'test', kind: 'test', build: testBench },
+  { id: 'test/ground', label: 'Test bench: the ground', sub: 'undersides on the ground are not z-fighting', family: 'test', kind: 'test', build: testGround }];

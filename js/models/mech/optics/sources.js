@@ -20,7 +20,7 @@ export function laser({ nm = 650, mW = 1, name } = {}) {
   const cable = mesh(cylZ(0.0018, 0.03, 12), M.rubber); cable.position.z = -L - 0.015; head.add(cable);
   // uchwyt V: blok z rowkiem i śrubą dociskową
   const v = new THREE.Shape(); v.moveTo(-0.012, -0.013); v.lineTo(0.012, -0.013); v.lineTo(0.012, -0.002); v.lineTo(0.0052, -0.002); v.lineTo(0, -0.0068); v.lineTo(-0.0052, -0.002); v.lineTo(-0.012, -0.002); v.closePath();
-  const vb = mesh(new THREE.ExtrudeGeometry(v, { depth: 0.025, bevelEnabled: false }).translate(0, 0, -0.035), M.anod); head.add(vb);
+  const vb = mesh(new THREE.ExtrudeGeometry(v, { depth: 0.025, bevelEnabled: false }).translate(0, 0, -0.02), M.anod); head.add(vb);   // nad słupkiem (oś słupka w z = 0)
   const lt = canvasTex(256, 48, (c, w, h) => { c.fillStyle = '#e6c84a'; c.fillRect(0, 0, w, h); c.fillStyle = '#111'; c.font = 'bold 22px sans-serif'; c.fillText(`⚠ ${nm} nm · ${mW} mW · ${mW <= 1 ? (EN ? 'Class 2' : 'Klasa 2') : 'Klasa 3R'}`, 6, 32); });
   const lab = mesh(new THREE.CylinderGeometry(0.0062, 0.0062, 0.016, 32, 1, false).rotateX(Math.PI / 2), new THREE.MeshStandardMaterial({ map: lt.t, roughness: 0.5 })); lab.position.z = -0.03; head.add(lab);
   const g = postMount(head, { headDrop: 0.013 });
@@ -43,7 +43,7 @@ export function ledSource({ color = 'white', nm = 590, W = 3, name } = {}) {
   const sp = mesh(new THREE.ExtrudeGeometry(sl, { depth: 0.002, bevelEnabled: false }), M.anod); sp.position.z = -0.006; head.add(sp);
   const glowM = new THREE.MeshStandardMaterial({ color: 0x111111, emissive: col, emissiveIntensity: 0, roughness: 0.3 });
   const glow = mesh(new THREE.PlaneGeometry(0.001, 0.006), glowM); glow.position.z = -0.0055; head.add(glow);
-  const arm = mesh(new THREE.BoxGeometry(0.012, 0.01, 0.034), M.anod); arm.position.set(0, -0.016, -0.017);   // wspornik od tubusu nad słupek head.add(arm);
+  const arm = mesh(new THREE.BoxGeometry(0.012, 0.01, 0.034), M.anod); arm.position.set(0, -0.016, -0.017); head.add(arm);   // wspornik od tubusu nad słupek
   const g = postMount(head, { headDrop: 0.021 });
   g.name = name || (white ? (EN ? `White LED source with slit, ${W} W` : `Źródło LED białe ze szczeliną, ${W} W`) : (EN ? `LED source ${nm} nm with slit` : `Źródło LED ${nm} nm ze szczeliną`));
   g.userData = { emitter: { kind: 'led', white, nm, P: W * 0.3 * 0.002, slit: [0.001, 0.006], head, origin: () => toWorld(head, new THREE.Vector3(0, 0, -0.004)), dir: () => dirWorld(head, new THREE.Vector3(0, 0, 1)), up: () => dirWorld(head, new THREE.Vector3(0, 1, 0)) },

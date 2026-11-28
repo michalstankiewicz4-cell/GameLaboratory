@@ -68,7 +68,8 @@ export const SIGNALS = [
       const b = SN.opticalBarrier({ span: p.span }), u = b.userData, logic = createBarrier({}), L = logic.state, g = new THREE.Group(); g.add(b);
       // obracająca się chorągiewka (blacha na wałku) przecina wiązkę
       const M = clockMats(), flag = new THREE.Group(); flag.position.set(p.span / 2, -0.06, 0); g.add(flag);
-      const plate = new THREE.Mesh(new THREE.BoxGeometry(0.004, 0.09, 0.03), M.steel); plate.position.y = 0.06; flag.add(plate);
+      flag.userData.doctorOk = 'floating';   // chorągiewka na wałku (wałek poza podglądem)
+      const plate = new THREE.Mesh(new THREE.BoxGeometry(0.004, 0.09, 0.03), M.steel); plate.position.y = 0.053; flag.add(plate);   // od piasty (r 8 mm)
       const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.02, 20).rotateX(Math.PI / 2), M.steelP); flag.add(hub);
       const ray = new THREE.Raycaster(); let hit = null;
       const live = () => [['Wiązka', L.blocked ? T('przerwana', 'blocked') : T('wolna', 'clear')], ['Wyjście (załącza przy przerwaniu)', onOff(L.out)], ['Przerwania', String(L.count)]];
@@ -90,7 +91,7 @@ export const SIGNALS = [
       const g = new THREE.Group(); g.add(r);
       const rail = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.035, 0.0075), clockMats().steel); rail.position.set(0.03, 0.045, -0.002); g.add(rail);
       const bS = CK.pushButton({ color: 'green', mode: 'latch', contact: 'NO', lit: false }), bB = CK.pushButton({ color: 'black', mode: 'momentary', contact: 'NO' });
-      for (const [btn, name, x] of [[bS, 'supply', 0.04], [bB, 'b1', 0.075]]) { btn.position.set(x, 0, 0.02); btn.traverse((o) => { if (o.userData.control) o.userData.control = name; }); g.add(btn); }
+      for (const [btn, name, x] of [[bS, 'supply', 0.06], [bB, 'b1', 0.155]]) { btn.position.set(x, 0, 0.02); btn.userData.doctorOk = 'floating'; btn.traverse((o) => { if (o.userData.control) o.userData.control = name; }); g.add(btn); }   // puszki 70 mm z łapami — osobne urządzenia na stole, obok przekaźnika i obok siebie
       const api = { press: (n) => (n === 'supply' ? bS.userData.api.press('button') : n === 'b1' ? bB.userData.api.press('button') : ra.press(n)), release: (n) => (n === 'supply' ? bS.userData.api.release('button') : n === 'b1' ? bB.userData.api.release('button') : ra.release(n)), drag: (n, dy) => ra.drag(n, dy), tick: (dt) => { bS.userData.api.tick(dt); bB.userData.api.tick(dt); } };
       const live = () => [['Funkcja (pokrętło)', `${L.fn} — ${FUNCTIONS[L.fn]}`], ['Czas (pokrętło)', `${num(L.T, 1)} s`], ['Zasilanie A1–A2', L.powered ? '230 V' : '0 V'], ['Wejście B1', L.b1 ? '230 V' : '0 V'], ['Stan', L.phase], ['Pozostało', `${num(logic.remaining(), 1)} s`], ['Styk 15–18', L.closed ? T('zamknięty', 'closed') : T('otwarty', 'open')]];
       return { group: g, controls: true, api, rest: true, view: { yaw: 0.2, pitch: 0.2 }, live, update() {},
@@ -105,7 +106,7 @@ export const SIGNALS = [
     build(p) {
       const r = RL.signalRelay(), logic = createRelay({ Un: 24 }), L = logic.state, g = new THREE.Group(); g.add(r);
       const rail = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.035, 0.0075), clockMats().steel); rail.position.set(0.02, 0.04, -0.004); g.add(rail);
-      const btn = CK.pushButton({ color: 'black', mode: 'momentary', contact: 'NO' }); btn.position.set(0.04, 0, 0.02); btn.traverse((o) => { if (o.userData.control) o.userData.control = 'coil'; }); g.add(btn);
+      const btn = CK.pushButton({ color: 'black', mode: 'momentary', contact: 'NO' }); btn.position.set(0.06, 0, 0.02); btn.userData.doctorOk = 'floating'; btn.traverse((o) => { if (o.userData.control) o.userData.control = 'coil'; }); g.add(btn);   // puszka z łapą obok gniazda — osobne urządzenie na stole
       const api = { press: (n) => (n === 'coil' || n === 'test') && btn.userData.api.press('button'), release: (n) => (n === 'coil' || n === 'test') && btn.userData.api.release('button'), drag() {}, tick: (dt) => btn.userData.api.tick(dt) };
       const warn = [];
       if (p.U < 0.7 * 24) warn.push(T(`Napięcie ${num(p.U, 1)} V poniżej napięcia zadziałania ${num(0.7 * 24, 1)} V — przekaźnik nie zadziała.`, `Voltage ${num(p.U, 1)} V below the pick-up voltage ${num(0.7 * 24, 1)} V — the relay will not operate.`));
@@ -127,7 +128,10 @@ export const SIGNALS = [
     ],
     build(p) {
       const c = RG.pidController(), pid = createPID({ Kp: p.Kp, Ti: p.Ti, Td: p.Td, sv: 1200 }), S = pid.state, g = new THREE.Group(); g.add(c);
-      const panel = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.003), clockMats().paintGrey); panel.position.z = -0.0015; g.add(panel);
+      // płyta z wycięciem 45,5 × 45,5 mm (DIN 43700) — korpus przechodzi przez otwór, ramka przylega z przodu
+      const ps = new THREE.Shape(); ps.moveTo(-0.05, -0.05); ps.lineTo(0.05, -0.05); ps.lineTo(0.05, 0.05); ps.lineTo(-0.05, 0.05); ps.closePath();
+      const ph = new THREE.Path(); ph.moveTo(-0.02275, -0.02275); ph.lineTo(-0.02275, 0.02275); ph.lineTo(0.02275, 0.02275); ph.lineTo(0.02275, -0.02275); ph.closePath(); ps.holes.push(ph);
+      const panel = new THREE.Mesh(new THREE.ExtrudeGeometry(ps, { depth: 0.003, bevelEnabled: false }).translate(0, 0, -0.003), clockMats().paintGrey); g.add(panel);
       // obiekt: falownik (rampa 10 Hz/s, 0–10 V → 0–50 Hz) i silnik 4-biegunowy 1,1 kW (poślizg proporcjonalny do momentu, stała czasowa 0,25 s)
       const plant = { f: 0, n: 0 };
       S.auto = true; S.manual = 4;

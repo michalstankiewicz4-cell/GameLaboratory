@@ -669,15 +669,13 @@
   }
  },
  "mech/barrier": {
-  "counts": {
-   "floating": 3
-  },
+  "counts": {},
   "fingerprint": {
    "drawCalls": 13,
    "materials": 11,
    "size": [
     0.28,
-    0.11,
+    0.1,
     0.05
    ],
    "triangles": 972
@@ -1183,18 +1181,16 @@
   }
  },
  "mech/encoder": {
-  "counts": {
-   "floating": 4
-  },
+  "counts": {},
   "fingerprint": {
-   "drawCalls": 12,
+   "drawCalls": 13,
    "materials": 6,
    "size": [
     0.14,
     0.08,
     0.06
    ],
-   "triangles": 3376
+   "triangles": 3456
   }
  },
  "mech/escapement": {
@@ -1267,29 +1263,33 @@
   }
  },
  "mech/floatGauge": {
-  "counts": {},
+  "counts": {
+   "hidden": 1
+  },
   "fingerprint": {
-   "drawCalls": 24,
+   "drawCalls": 25,
    "materials": 7,
    "size": [
     0.22,
     0.22,
     0.16
    ],
-   "triangles": 1816
+   "triangles": 1880
   }
  },
  "mech/floatGauge-1": {
-  "counts": {},
+  "counts": {
+   "hidden": 1
+  },
   "fingerprint": {
-   "drawCalls": 24,
+   "drawCalls": 25,
    "materials": 7,
    "size": [
     0.22,
     0.22,
     0.16
    ],
-   "triangles": 1816
+   "triangles": 1880
   }
  },
  "mech/fluidSource": {
@@ -1403,67 +1403,60 @@
   }
  },
  "mech/gearPump": {
-  "counts": {
-   "floating": 1
-  },
+  "counts": {},
   "fingerprint": {
-   "drawCalls": 19,
+   "drawCalls": 20,
    "materials": 8,
    "size": [
-    0.06,
+    0.07,
     0.06,
     0.08
    ],
-   "triangles": 10866
+   "triangles": 10962
   }
  },
  "mech/gearPump-1": {
-  "counts": {
-   "floating": 1
-  },
+  "counts": {},
   "fingerprint": {
-   "drawCalls": 19,
+   "drawCalls": 20,
    "materials": 7,
    "size": [
     0.08,
     0.12,
     0.13
    ],
-   "triangles": 12786
+   "triangles": 12882
   }
  },
  "mech/governor": {
   "counts": {
-   "floating": 1,
-   "sliver": 1,
-   "zfight": 1
+   "sliver": 1
   },
   "fingerprint": {
-   "drawCalls": 15,
+   "drawCalls": 16,
    "materials": 5,
    "size": [
     0.18,
     0.33,
     0.14
    ],
-   "triangles": 5708
+   "triangles": 5720
   }
  },
  "mech/governor-1": {
   "counts": {
    "hidden": 1,
-   "sliver": 1,
-   "zfight": 2
+   "sliver": 1
   },
   "fingerprint": {
-   "drawCalls": 15,
+   "drawCalls": 16,
    "materials": 5,
    "size": [
     0.17,
     0.33,
     0.14
    ],
-   "triangles": 5708
+   "triangles": 5720
   }
  },
  "mech/hose": {
@@ -1636,8 +1629,7 @@
  },
  "mech/latch": {
   "counts": {
-   "hidden": 1,
-   "zfight": 1
+   "hidden": 1
   },
   "fingerprint": {
    "drawCalls": 17,
@@ -1678,34 +1670,32 @@
  },
  "mech/ledSource": {
   "counts": {
-   "floating": 1,
    "sliver": 1
   },
   "fingerprint": {
-   "drawCalls": 25,
+   "drawCalls": 26,
    "materials": 8,
    "size": [
     0.09,
     0.15,
     0.33
    ],
-   "triangles": 1868
+   "triangles": 1880
   }
  },
  "mech/ledSource-1": {
   "counts": {
-   "floating": 1,
    "sliver": 1
   },
   "fingerprint": {
-   "drawCalls": 25,
+   "drawCalls": 26,
    "materials": 8,
    "size": [
     0.09,
     0.15,
     0.33
    ],
-   "triangles": 1868
+   "triangles": 1880
   }
  },
  "mech/lens": {
@@ -1861,7 +1851,6 @@
  },
  "mech/mirror": {
   "counts": {
-   "floating": 1,
    "sliver": 1
   },
   "fingerprint": {
@@ -2017,7 +2006,6 @@
  },
  "mech/photodiode": {
   "counts": {
-   "floating": 1,
    "sliver": 1
   },
   "fingerprint": {
@@ -2032,9 +2020,7 @@
   }
  },
  "mech/pid": {
-  "counts": {
-   "zfight": 1
-  },
+  "counts": {},
   "fingerprint": {
    "drawCalls": 14,
    "materials": 14,
@@ -2043,7 +2029,7 @@
     0.1,
     0.09
    ],
-   "triangles": 174
+   "triangles": 194
   }
  },
  "mech/pipe": {
@@ -2339,15 +2325,13 @@
  },
  "mech/relay": {
   "counts": {
-   "floating": 1,
-   "hidden": 2,
-   "zfight": 1
+   "hidden": 2
   },
   "fingerprint": {
    "drawCalls": 23,
    "materials": 11,
    "size": [
-    0.11,
+    0.13,
     0.08,
     0.1
    ],
@@ -2710,14 +2694,13 @@
  },
  "mech/timer": {
   "counts": {
-   "hidden": 3,
-   "zfight": 2
+   "hidden": 2
   },
   "fingerprint": {
    "drawCalls": 43,
    "materials": 18,
    "size": [
-    0.15,
+    0.23,
     0.1,
     0.1
    ],
@@ -4568,7 +4551,7 @@
    "clash": 1,
    "dangling": 1,
    "facing": 1,
-   "floating": 1,
+   "floating": 2,
    "hidden": 1,
    "inverted": 1,
    "nan": 1,
@@ -4589,6 +4572,22 @@
     20
    ],
    "triangles": 999999
+  }
+ },
+ "test/ground": {
+  "counts": {
+   "floating": 1,
+   "zfight": 1
+  },
+  "fingerprint": {
+   "drawCalls": 6,
+   "materials": 6,
+   "size": [
+    4.8,
+    1.6,
+    1
+   ],
+   "triangles": 1500
   }
  },
  "train/loco": {

@@ -72,6 +72,25 @@ trzymany tylko przy jednym końcu, którego dolny koniec wisi w powietrzu. Spraw
 („V” zamiast „A”) test nie łapie: kłody na gruncie z wolnymi wierzchołkami w górze wyglądają dla niego jak maszty —
 trzeba je sprawdzać na zrzucie.
 
+3. **Kod schowany na końcu komentarza** (mechanika z Tornado.io, przegląd 2026-11-28): polecenie dopisane w tej samej
+   linii za komentarzem nie wykonuje się, a plik przechodzi kontrolę składni. Trzy przypadki:
+   `shaft.position.x = …;   // koniec w tylnej pokrywie (łożysko) spin.add(shaft);` (pompa zębata bez wału — wpust
+   wisiał w powietrzu), `// wspornik od tubusu nad słupek head.add(arm);` (źródło LED — głowica 6 mm nad słupkiem),
+   `// 0,2 mm nad dnem (bez wspólnej płaszczyzny) g.add(foot);` (zbiornik bez nóżek). Przyczyna: komentarz dopisany
+   w środku linii, a reszta linii doklejona za nim przy edycji. Sprawdzenie: komentarz zawsze na końcu linii, po
+   ostatnim poleceniu; wyszukanie `//.*\b\w+\.\w+\([^()]*\);\s*\}?\s*$` w liniach, które nie zaczynają się od `//`
+   (`grep -rnP`). Doktor złapał dwa z trzech (część wisi w powietrzu); trzeci znalazło dopiero wyszukanie.
+   Ten sam błąd zrobiłem sam przy poprawkach (Claude, 2026-11-28): komentarz wstawiony przed `btn.traverse(…)` i przed
+   `g.add(btn)` — przyciski w przekaźnikach zniknęły; złapało to sprawdzenie importu w przeglądarce (`node --check`
+   tego nie zgłosił) i to samo wyszukanie.
+
+Przy tym samym przeglądzie (2026-11-28) prawdziwe błędy w modelach i przedmiotach z Tornado.io, poprawione:
+laser — uchwyt V obok słupka (głowica 7 mm nad słupkiem), lustro — ramię uchwytu 11 mm za słupkiem, regulator Watta —
+podpora dźwigni poza podstawą i 2 cm nad stołem, bariera — blaszka chorągiewki 7 mm od piasty, zatrzask — sworzeń równo
+z tyłem płyty, PID — płyta bez wycięcia 45 × 45 (korpus przez pełną płytę), przekaźniki — puszki przycisków wchodziły
+w przekaźnik i w siebie, enkoder — tarcza kodowa bez wałka w obudowie. Fałszywe zgłoszenia doktora (część na
+przezroczystej obudowie „wisiała”, spody na stole „migotały”) — poprawione w doktorze (`docs/tools/doctor.md`).
+
 ## Błędy z Tornado.io (kopia do analizy, 2026-11-27)
 
 Skopiowane bez zmian z `AI_COLLABORATION.md` repozytorium Tornado.io (przeglądy ChatGPT z 2026-11-25 i odpowiedzi

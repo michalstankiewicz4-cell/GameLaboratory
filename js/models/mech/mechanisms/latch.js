@@ -17,7 +17,8 @@ export function latchUnit({ L = 0.16, name } = {}) {
   const notch = mesh(new THREE.BoxGeometry(0.012, 0.01, 0.01), M.steelP); notch.position.set(-0.02, -0.013, 0); arm.add(notch);   // zaczep (za osią)
   const tail = mesh(new THREE.BoxGeometry(0.03, 0.014, 0.01), M.steel); tail.position.x = -0.012; arm.add(tail);
   const boss = mesh(cylZ(0.012, 0.012, 32), M.steel); arm.add(boss);
-  const pin = mesh(cylZ(0.005, 0.038, 16), M.steelP); pin.position.z = 0.011; pin.userData.doctorOk = 'clash'; g.add(pin);   // sworzeń przez płytę i oczko ramienia
+  const pin = mesh(cylZ(0.005, 0.039, 16), M.steelP); pin.position.z = 0.0105;   // wystaje 1 mm z tyłu płyty
+  pin.userData.doctorOk = 'clash'; g.add(pin);   // sworzeń przez płytę i oczko ramienia
   const spring = torsionSpring({ d: 0.0025, D: 0.03, n: 5, leg: 0.035 }); spring.position.set(0, 0, 0.019); g.add(spring);
   // zapadka na sworzniu pod zaczepem
   const searG = new THREE.Group(); searG.position.set(-0.05, -0.04, 0.012); g.add(searG);

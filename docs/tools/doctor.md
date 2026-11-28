@@ -29,7 +29,7 @@ wersji z Battle (historia obu — w git). Logika to wersja z Battle — ma wszys
 | `tools/doctor/sources/streets.js` | ulice StreetKit: przekroje, skrzyżowania, sygnalizatory, latarnie, znaki, słupki, barierki, ekrany, pikietaż, parkingi, wiadukty, tunele, rampa, kładki, przejście podziemne |
 | `tools/doctor/sources/mech.js` | przedmioty laboratorium mechaniki (MechKit, ControlKit, ClockKit, FluidKit, OptiKit i reszta `js/models/mech/`): ustawienia domyślne i warianty skrajne (`MECH_VARIANTS`); planeEps 0,2 mm |
 | `tools/doctor/sources/houses.js` | budynki z części HouseKit (każda część osobną siatką, jak przed zniszczeniem; `ground: 0`) |
-| `tools/doctor/sources/test-bench.js` | stanowisko testowe: model z jednym błędem na każdy test |
+| `tools/doctor/sources/test-bench.js` | stanowisko testowe: model z jednym błędem na każdy test (i przypadkami, których test nie może zgłosić); `test/ground` — grunt w `zfight` |
 | `tools/doctor/sources/common.js` | wspólne: koszt rysowania (trójkąty, wywołania, materiały) |
 | `tools/doctor.py` | doktor bez okna (Playwright): porównuje z `tools/doctor.golden.json` |
 
@@ -95,6 +95,19 @@ na części (trzpień śruby w otworze gwintowanym); para modeli zamierzona — 
 components() → [Object3D], clashOk?(a, b) }` (laboratorium mechaniki: wszystkie modele maszyny, śruby, krzyżaki,
 regulator i urządzenia instalacji). Przy okazji w MechKit: faza wyciągnięć do środka (`bevelOffset = −bevelSize` —
 obrys i otwory nominalne), faza ograniczona do 0,3 średniego odcinka obrysu (drobne zęby).
+
+`floating` — części łączą się, gdy ich prostopadłościany (powiększone o tolerancję) się stykają. Przezroczyste bryły
+(2026-11-28) też trzymają — pokrywa na obudowie w przekroju, styk pod przezroczystą pokrywą — ale tylko zamknięte bryły,
+które są rzeczami: nie pręty (wiązka, struga: środkowy wymiar poniżej 1/8 najdłuższego), nie poświaty (mieszanie
+addytywne), nie słabe objętości (krycie poniżej 0,2). Same nie są zgłaszane. Stanowisko testowe: gałka na szklanej
+skrzynce — nie zgłoszona; lampa na wiązce światła — zgłoszona. Główna bryła, do której się mierzy (największa grupa), nie
+może być grupą zgłoszoną jako osobna (`doctorOk = 'floating'` na wszystkich jej częściach — drugie urządzenie stojące
+obok, np. puszka z przyciskiem przy przekaźniku): wtedy główną jest największa z pozostałych (`test/ground`: kula
+oznaczona jako osobna, klocek wiszący nad blokiem — zgłoszony).
+
+`zfight` przy `opts.ground` (2026-11-28) pomija ściany leżące na gruncie spodem do niego (spód stojącej rzeczy) — nigdy
+ich nie widać. Stanowisko testowe `test/ground`: dwa klocki ze stropami w jednej płaszczyźnie — zgłoszone; dwa klocki
+różnej wysokości, których spody leżą na gruncie — nie zgłoszone (bez gruntu byłyby).
 
 Wyjątki dla zamierzonych przypadków: `userData.doctorOk = 'floating'` (albo tablica testów) na części lub jej przodku.
 

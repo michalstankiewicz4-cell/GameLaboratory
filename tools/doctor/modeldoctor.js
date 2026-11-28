@@ -15,7 +15,7 @@
 //              face (you look into the model — a missing cap, a gap between surfaces)
 //   arc        a gun's line of fire hits its own ship inside the mount's training arc         warning (AA: info)
 //   zfight     two pieces' faces in one plane, overlapping — they flicker                     warning
-//   floating   a piece that touches nothing of the rest of the model                          warning
+//   floating   a piece that touches nothing of the rest of the model (see-through solids hold too)      warning
 //   dangling   a slanted rod (a brace, a strut) held at one end only, the other, lower end hanging in the air      warning
 //              (a brace coming out of the joint instead of supporting it from below)
 //   waterline  a piece above the hull reaching below the waterline (y < 0)                    warning
@@ -36,7 +36,8 @@
 // API: examine(root, opts) → { findings, stats }
 //   opts.tolerance   fraction of the model's size for "touching" (default 0.004)
 //   opts.ground      y of the ground the model stands on (streets, lamps, buildings): nothing is seen from below it —
-//                    "seethrough" skips rays that meet the ground first, "facing" counts the ground as hit
+//                    "seethrough" skips rays that meet the ground first, "facing" counts the ground as hit, "zfight"
+//                    skips faces lying on it face-down
 //   opts.planeEps    distance that counts as "the same plane" for zfight (default 0.06 % of the model)
 //   opts.ignoreAllow true: report allow-listed pieces too
 //   opts.checks      subset of CHECKS to run (default all)
@@ -438,6 +439,8 @@ export function examine(root, opts = {}) {
         n.crossVectors(e1.subVectors(v1, v0), e2.subVectors(v2, v0));
         const area2 = n.length(); if (area2 < 1e-12 * L * L) continue;
         n.divideScalar(area2);
+        // a face lying on the ground and facing it (the underside of something standing there) is never seen
+        if (opts.ground != null && n.y < -0.999 && Math.abs(v0.y - opts.ground) <= eps) continue;
         const d = n.dot(v0), key = keyOf(n.x, n.y, n.z, d);
         let b = buckets.get(key); if (!b) buckets.set(key, b = []);
         if (b.length < 600) b.push({ mi, t: k, nx: n.x, ny: n.y, nz: n.z });
@@ -506,6 +509,17 @@ export function examine(root, opts = {}) {
       o.geometry.computeBoundingBox(); const m = new THREE.Matrix4();
       for (let k = 0; k < o.count; k++) { o.getMatrixAt(k, m); m.premultiply(o.matrixWorld); ibox.push(o.geometry.boundingBox.clone().applyMatrix4(m)); }
     });
+    // see-through solids hold what touches them (a cap on a cut-away housing, a contact under a clear cover) — like
+    // instances they join the sweep and are never reported. Only closed shapes that are things: not rod-like (a beam,
+    // a jet: middle size under 1/8 of the longest), not additive glows, not faint volumes (opacity under 0.2)
+    root.traverse((o) => {
+      if (!o.isMesh || o.isInstancedMesh || o.isSkinnedMesh || !visibleInTree(o) || isSolid(o) || !o.geometry || !o.geometry.attributes.position) return;
+      if (!closedShape(o.geometry) || matsOf(o).some((x) => !x || x.visible === false || x.blending === THREE.AdditiveBlending || (x.transparent && x.opacity < 0.2))) return;
+      o.geometry.computeBoundingBox();
+      const bb = o.geometry.boundingBox.clone().applyMatrix4(new THREE.Matrix4().multiplyMatrices(toRoot, o.matrixWorld)), s = bb.getSize(v0).toArray().sort((a, b) => a - b);
+      if (s[1] < s[2] / 8) return;
+      ibox.push(bb);
+    });
     const boxes = meshes.map((m) => m.box).concat(ibox), grown = boxes.map((b) => b.clone().expandByScalar(tol));
     const comp = boxes.map((_, i) => i), find = (i) => (comp[i] === i ? i : (comp[i] = find(comp[i])));
     const order = boxes.map((_, i) => i).sort((a, b) => boxes[a].min.x - boxes[b].min.x);   // sweep along x
@@ -523,10 +537,14 @@ export function examine(root, opts = {}) {
     const itris = new Map(); ibox.forEach((_, k) => { const r = find(meshes.length + k); itris.set(r, (itris.get(r) || 0) + 1); });
     for (const [r, g] of groups) g.itris = itris.get(r) || 0;
     const sorted = [...groups.values()].sort((x, y) => (y.reduce((s, m) => s + m.tris, 0) + y.itris * 12) - (x.reduce((s, m) => s + m.tris, 0) + x.itris * 12));
-    sorted.slice(1).forEach((g) => {
+    // the main body: the largest group that is not declared separate (doctorOk = 'floating' on all its pieces — a second
+    // device standing beside the model is not what the model is measured against)
+    const separate = (g) => !opts.ignoreAllow && g.every((m) => allowed(m.o, 'floating'));
+    const main = sorted.find((g) => !separate(g)) || sorted[0];
+    sorted.filter((g) => g !== main).forEach((g) => {
       let gap = Infinity;
       const gb = new THREE.Box3(); g.forEach((m) => gb.union(m.box));
-      sorted[0].forEach((m) => { gap = Math.min(gap, gb.distanceToPoint(m.box.clampPoint(gb.getCenter(v0), v1))); });
+      main.forEach((m) => { gap = Math.min(gap, gb.distanceToPoint(m.box.clampPoint(gb.getCenter(v0), v1))); });
       add('floating', g, 'touches nothing of the main body (gap ≈ ' + (gap < 1 ? (gap * 100).toFixed(0) + ' cm' : gap.toFixed(2) + ' m') + ', ' + (gap / L * 100).toFixed(2) + ' % of the model)');
     });
   }

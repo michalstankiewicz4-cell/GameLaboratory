@@ -25,7 +25,9 @@ export function governor({ L = 0.12, a = 0.06, l = 0.06, ball = 0.024, top = 0.3
     const link = mesh(new THREE.CylinderGeometry(0.0028, 0.0028, l, 10), M.steelP); spin.add(link); links.push({ m: link, s });
   }
   const lever = mesh(new THREE.BoxGeometry(0.12, 0.006, 0.01), M.steel); g.add(lever);
-  const fulcrum = mesh(new THREE.BoxGeometry(0.01, top * 0.5, 0.01), M.iron); fulcrum.position.set(0.09, 0.02 + top * 0.25, 0); g.add(fulcrum);
+  // podpora dźwigni: słupek na łapie podstawy (od stołu), widełki szersze od dźwigni
+  const lug = mesh(new THREE.BoxGeometry(0.045, 0.012, 0.016), M.iron); lug.position.set(0.0775, 0.006, 0); g.add(lug);
+  const fulcrum = mesh(new THREE.BoxGeometry(0.01, 0.02 + top * 0.5 - 0.012, 0.014), M.iron); fulcrum.position.set(0.09, 0.012 + (0.02 + top * 0.5 - 0.012) / 2, 0); g.add(fulcrum);
   function pose(phi, theta) {
     spin.rotation.y = theta;
     for (const A of arms) A.g.rotation.z = A.s * phi;

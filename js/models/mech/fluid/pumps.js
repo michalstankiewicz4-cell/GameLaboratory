@@ -35,7 +35,7 @@ export function gearPump({ m = 0.002, z = 10, b = 0.008, cut = false, name } = {
   const pilot = mesh(latheY([[0.0081, 0], [0.016, 0], [0.016, 0.004], [0.0081, 0.004], [0.0081, 0]], 40).rotateZ(Math.PI / 2), F.alu); pilot.position.x = 0; g.add(pilot);   // czop centrujący
   // wał: wystaje w −x z czopem centrującym, kręci się z kołem napędowym
   const spin = new THREE.Group(); g.add(spin);
-  const shL = 0.03 + 0.012 + Lb + 0.008, shaft = mesh(cylX(0.006, shL, 24), F.steel); shaft.position.x = -0.03 + shL / 2;   // koniec w tylnej pokrywie (łożysko) spin.add(shaft);
+  const shL = 0.03 + 0.012 + Lb + 0.008, shaft = mesh(cylX(0.006, shL, 24), F.steel); shaft.position.x = -0.03 + shL / 2; spin.add(shaft);   // koniec w tylnej pokrywie (łożysko)
   const key = mesh(new THREE.BoxGeometry(0.018, 0.003, 0.003), F.dark); key.position.set(-0.016, 0.0055, 0); spin.add(key);
   const seal = mesh(new THREE.TorusGeometry(0.0068, 0.0012, 8, 32).rotateY(Math.PI / 2), F.rubber); seal.position.x = -0.0005; seal.userData.doctorOk = 'clash'; g.add(seal);
   // koła zębate wewnątrz (widoczne przy cut): oś x, napędowe w y = 0, bierne w y = a

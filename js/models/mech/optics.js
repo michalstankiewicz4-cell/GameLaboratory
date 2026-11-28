@@ -70,7 +70,8 @@ export function mirror({ shape = 'flat', D = 0.0254, R = 0.2, coating = 'al', su
   }
   const ball = mesh(new THREE.SphereGeometry(0.002, 12, 8), steel); ball.position.set(-(P / 2 - 0.006), -(P / 2 - 0.006), back3.position.z + tb + 0.002);
   // ramię pod słupek (w dół z płyty tylnej) — punkt mocowania słupka pod środkiem lustra
-  const arm = mesh(new THREE.BoxGeometry(0.012, 0.012, tb + 0.004), M2); arm.position.set(0, -P / 2 - 0.006, back3.position.z + tb / 2);
+  const armZ0 = back3.position.z, armZ1 = 0.0065;   // od tyłu płyty tylnej do słupka (oś słupka w z = 0, Ø 12,7)
+  const arm = mesh(new THREE.BoxGeometry(0.012, 0.012, armZ1 - armZ0), M2); arm.position.set(0, -P / 2 - 0.006, (armZ0 + armZ1) / 2);
   const head = new THREE.Group(); head.add(optic, front3, back3, adj, ball, arm);   // to, co się obraca na słupku
   // słupek Ø 12,7 w tulei Ø 19, podstawa z wycięciem pod śrubę M6
   const yc = P / 2 + 0.012 + 0.05 + 0.04;   // oś lustra nad stołem

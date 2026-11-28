@@ -17,10 +17,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      # ES modules through stdin as a module: Node 22 "node --check file.js" lets a module with a syntax error pass
+      # silently (module detection) — found 2026-11-28; classic scripts as before
       - name: JavaScript syntax
         run: |
           fail=0
-          while IFS= read -r f; do node --check "$f" || fail=1; done < <(git ls-files '*.js' '*.mjs' ':!vendor/**')
+          while IFS= read -r f; do
+            if grep -qE '^\s*(import|export)\s' "$f"; then node --input-type=module --check < "$f" || { echo "syntax: $f"; fail=1; }
+            else node --check "$f" || fail=1; fi
+          done < <(git ls-files '*.js' '*.mjs' ':!vendor/**')
           exit $fail
       - name: Paths
         run: python3 tools/paths.py --strict

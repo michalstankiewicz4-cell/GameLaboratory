@@ -11,6 +11,7 @@ export function encoder({ ppr = 1024, cut = true, name } = {}) {
   const X = (geo) => geo.rotateZ(-Math.PI / 2);   // walec wzdłuż +x
   const shaft = new THREE.Group(); g.add(shaft);
   { const w = mesh(X(new THREE.CylinderGeometry(0.005, 0.005, 0.03, 24)), M.steelP); w.position.x = 0.015; shaft.add(w); }
+  { const wi = mesh(X(new THREE.CylinderGeometry(0.004, 0.004, 0.017, 20)), M.steelP); wi.position.x = 0.0385; shaft.add(wi); }   // wałek w obudowie (łożyska) aż do tarczy kodowej
   // sprzęgło mieszkowe (zwoje mieszka) między wałkiem enkodera a wałem maszyny
   const bel = []; for (let i = 0; i <= 24; i++) { const f = i / 24; bel.push(new THREE.Vector2(0.008 + (i % 2 ? 0.0028 : 0), -0.012 + f * 0.024)); }
   const bellows = mesh(X(new THREE.LatheGeometry(bel, 32)), new THREE.MeshPhysicalMaterial({ color: 0xd6d8da, metalness: 1, roughness: 0.18 }));
